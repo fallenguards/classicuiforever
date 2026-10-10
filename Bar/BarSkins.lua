@@ -518,8 +518,10 @@ local ROUND_RING, ROUND_RING_OFFSET = 2.5, 0.26
 local ROUND_HOVER = ROUND_RING * 32 / 52
 
 local FULL = { 0, 1, 0, 1 }
--- The quickslot ring isn't drawn: the band has a socket per bag, and the ring showed brown slivers between them that 1.x never had.
-local BAG_NORMAL = { coords = FULL, point = "CENTER", y = -1, alpha = 0 }
+-- Era's quickslot ring (64 over a 37 slot, 1 low), only its part inside the slot: its dark line hides the icon's silver
+-- bevel as in Era; the part past the slot showed brown slivers between the band's sockets.
+local BAG_NORMAL = { coords = { 13.5 / 64, 50.5 / 64, 12.5 / 64, 49.5 / 64 }, fill = true, alpha = 1 }
+local BAG_NORMAL_ROUND = { coords = FULL, fill = true, alpha = 0 }
 -- Square art; a round slot shows none, as the old minimap buttons.
 local BAG_PUSHED = { coords = FULL, fill = true, alpha = 1 }
 local BAG_PUSHED_ROUND = { coords = FULL, fill = true, alpha = 0 }
@@ -535,7 +537,7 @@ local function ApplyBagArt(button)
     if not state or not state.active then return end
     local size = state.size
     local round = state.round
-    Dress(StateTexture(button, "Normal"), "slotNormal", BAG_NORMAL, button, nil, nil, size * 50 / 30, size * 50 / 30)
+    Dress(StateTexture(button, "Normal"), "slotNormal", round and BAG_NORMAL_ROUND or BAG_NORMAL, button)
     Dress(StateTexture(button, "Pushed"), "slotPushed", round and BAG_PUSHED_ROUND or BAG_PUSHED, button)
     local highlight = StateTexture(button, "Highlight")
     if round then
@@ -554,7 +556,10 @@ local function ApplyBagArt(button)
             Dress(button.IconBorder, "trackingBorder", BAG_RING, button, -off, off, size * ROUND_RING, size * ROUND_RING)
             -- A gold sheet: grey like the bags beside it, bronze with the theme.
             ns.BronzeTint(button.IconBorder, nil, true)
+            ns.SetAlphaIf(button.IconBorder, 1)
         else
+            -- Era hides every quality border; Forever's gray one for a common bag read as a silver frame.
+            ns.SetAlphaIf(button.IconBorder, ns.ThemeLook() == "classic" and 0 or 1)
             ns.SetTex(button.IconBorder, "iconFrame")
             -- Thin frame round a bag's picture, bronze with the theme, and Forever's frame over the picture's grey bevel.
             ns.BronzeTint(button.IconBorder)
@@ -692,6 +697,7 @@ function ns.UnskinBagButton(button)
     if button.IconBorder then
         button.IconBorder:ClearAllPoints()
         button.IconBorder:SetAllPoints(button)
+        ns.SetAlphaIf(button.IconBorder, 1)
     end
     local pushed = StateTexture(button, "Pushed")
     if pushed then pushed:SetAlpha(1) end
