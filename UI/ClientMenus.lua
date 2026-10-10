@@ -213,9 +213,9 @@ end
 
 -------------------------------------------------- social window buttons
 
-local CLASSIC_ARROW = "Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-"
+-- Era's broadcast button, its 32 square (its frame takes the theme's copies, the bubble keeps its blue).
+local ERA_BROADCAST = "Interface\\FriendsFrame\\broadcast-"
 local CLIENT_SQUARE = "Interface\\Buttons\\UI-SquareButton-"
-local CLASSIC_STATES = { set = "file", highlightSet = "raw", coords = { 0, 1, 0, 1 }, center = { 24, 24 }, add = true }
 -- IconButtonTemplate.xml's art, filling the button.
 local CLIENT_STATES = { set = "file", highlightSet = "raw", coords = { 0, 1, 0, 1 }, fill = true, add = true }
 local DD_PIECES = { "ddLeft", "ddMiddle", "ddRight", "ddArrow", "ddArrowGlow" }
@@ -245,8 +245,8 @@ end
 
 local function PaintContacts(btn, classic)
     if classic then
-        ns.DressStates(btn, CLASSIC_ARROW .. "Up", CLASSIC_ARROW .. "Down", CLASSIC_ARROW .. "Disabled", ART.HILIGHT,
-            CLASSIC_STATES)
+        ns.DressStates(btn, ERA_BROADCAST .. "normal", ERA_BROADCAST .. "press", ERA_BROADCAST .. "normal", ART.HILIGHT,
+            CLIENT_STATES)
     else
         ns.DressStates(btn, CLIENT_SQUARE .. "Up", CLIENT_SQUARE .. "Down", CLIENT_SQUARE .. "Disabled", ART.HILIGHT,
             CLIENT_STATES)
