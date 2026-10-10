@@ -40,6 +40,7 @@ function ns.InnerBorder(box)
     for _, c in ipairs(INNER_CORNERS) do
         local tex = box:CreateTexture(nil, "BORDER", nil, -5)
         tex:SetAtlas(c[1])
+        ns.ThemeClientArt(tex)
         tex:SetSize(INNER_CORNER, INNER_CORNER)
         tex:SetPoint(c[2], box, c[2], 0, 0)
         corners[c[2]] = tex
@@ -47,6 +48,7 @@ function ns.InnerBorder(box)
     for _, e in ipairs(INNER_EDGES) do
         local tex = box:CreateTexture(nil, "BORDER", nil, -5)
         tex:SetAtlas(e[1])
+        ns.ThemeClientArt(tex)
         local across = e[4] == "TOP" or e[4] == "BOTTOM"
         local from, to = corners[e[2]], corners[e[3]]
         if across then
@@ -110,7 +112,7 @@ function ns.ColumnHeader(parent, column, previous, onClick)
     end
     button.key = column.key
 
-    ns.ThreeSlice(button, nil, COLUMN)
+    for _, slice in ipairs({ ns.ThreeSlice(button, nil, COLUMN) }) do ns.BronzeTint(slice) end
 
     local text = button:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
     text:SetPoint("LEFT", button, "LEFT", 8, 0)

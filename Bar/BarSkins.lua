@@ -577,7 +577,15 @@ local function ApplyBagArt(button)
     if state.bagSlot and button.icon and button.GetID then
         local empty = not GetInventoryItemTexture("player", button:GetID())
         if empty then button.icon:SetTexture("Interface\\PaperDoll\\UI-PaperDoll-Slot-Bag") end
-        button.icon:SetDesaturated(empty and not round)
+        -- The empty slot's picture takes the theme as the bar's empty slots do; grey with none, as before.
+        if empty and not round then
+            ns.BronzeTint(button.icon, nil, true)
+            state.tintedIcon = true
+        elseif state.tintedIcon then
+            ns.UntintBronze(button.icon)
+            state.tintedIcon = false
+        end
+        if not state.tintedIcon then button.icon:SetDesaturated(false) end
         -- Opaque as in 1.x: see-through let the band socket's relief show beside it as a second bag.
         button.icon:SetAlpha(1)
         button.icon:SetTexCoord(0, 1, 0, 1)

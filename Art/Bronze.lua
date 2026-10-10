@@ -70,8 +70,10 @@ local function Paint(texture, theme, share, silver)
         texture:SetVertexColor(r, g, b)
         ns.PaintFlat(texture, r, g, b)
     else
+        -- share.off: the shade it keeps with no theme (a grey icon).
+        local off = type(share) == "table" and share.off or 1
         texture:SetDesaturated(silver == true)
-        texture:SetVertexColor(1, 1, 1)
+        texture:SetVertexColor(off, off, off)
         ns.PaintFlat(texture)
     end
 end

@@ -1,8 +1,8 @@
 local _, ns = ...
 
--- Era's day/night picture (sun or moon in its ringed 50 x 50 of UI-TOD-Indicator) over the game's, which fades under it
--- and stays on top for its tooltip and click. Day and night are the game's own cycle, as its picture follows, not the
--- realm clock.
+-- Era's day/night picture (sun or moon in its ringed 50 x 50 of UI-TOD-Indicator; the ring in the theme's copies) over
+-- the game's, which fades under it and stays on top for its tooltip and click. Day and night are the game's own cycle,
+-- as its picture follows, not the realm clock.
 
 local MM = ns.MM
 
@@ -22,7 +22,7 @@ function MM.EraDiel(diel, home)
     local tod = MM.tod
     if not tod then
         tod = home:CreateTexture(nil, "ARTWORK")
-        tod:SetTexture(TOD_FILE)
+        ns.SetFile(tod, TOD_FILE)
         tod:SetSize(TOD_SIZE, TOD_SIZE)
         tod:SetPoint("CENTER", home, "CENTER", 0, 0)
         MM.tod = tod

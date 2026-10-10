@@ -375,6 +375,8 @@ end
 
 -- The who list's foot line under a list box (panel.listBox): the client's lens, its X once typed. onEnter(box) on Enter;
 -- the box is panel.query.
+-- The search glass: grey with no theme, the theme's metal under one.
+local LENS_SHADE = { shade = 0.6, off = 0.6 }
 function S.SearchLine(panel, onEnter)
     local query = ns.NewFrame("EditBox", nil, panel.listBox, "InputBoxTemplate")
     panel.query = query
@@ -387,7 +389,7 @@ function S.SearchLine(panel, onEnter)
     lens:SetTexture("Interface/Common/UI-Searchbox-Icon")
     lens:SetSize(14, 14)
     lens:SetPoint("LEFT", query, "LEFT", 1, -2)
-    lens:SetVertexColor(0.6, 0.6, 0.6)
+    ns.BronzeTint(lens, LENS_SHADE)
     query:SetTextInsets(16, 20, 0, 0)
     local clear = ns.SearchClear(query)
     query:HookScript("OnTextChanged", function(self)

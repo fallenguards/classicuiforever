@@ -8,7 +8,9 @@ local P = ns.panels
 
 -- Classic Era's numbers (Blizzard_WorldMap Vanilla): frame, art pieces, the map's hole, title, close button.
 local ERA_W, ERA_H = 610, 438
-local ART_LEFT_FILE, ART_RIGHT_FILE = 334393, 334394     -- UI-WorldMapSmall-Left / -Right
+-- The frame's two sheets, through the theme's copies.
+local ART_LEFT_FILE = "Interface\\WorldMap\\UI-WorldMapSmall-Left"
+local ART_RIGHT_FILE = "Interface\\WorldMap\\UI-WorldMapSmall-Right"
 local ART_X, ART_LEFT_W, ART_RIGHT_W, ART_H = 12, 512, 128, 512
 local CANVAS_LEFT, CANVAS_TOP, CANVAS_RIGHT, CANVAS_BOTTOM = 20, 22, 600, 410
 local TITLE_Y = -12
@@ -235,30 +237,30 @@ local function Art()
     local footRun = ART_X + ART_LEFT_W - CANVAS_LEFT
     for i, run in ipairs({ { CANVAS_LEFT, footRun }, { CANVAS_LEFT + footRun, CANVAS_RIGHT - CANVAS_LEFT - footRun } }) do
         local line = foot:CreateTexture(nil, "ARTWORK")
-        line:SetTexture(ART_LEFT_FILE)
+        ns.SetFile(line, ART_LEFT_FILE)
         line:SetSize(run[2], footRows)
         line:SetTexCoord((ART_LEFT_W - run[2]) / ART_LEFT_W, 1, FOOT_LINE_TOP / ART_H, FOOT_LINE_BOTTOM / ART_H)
         line:SetPoint("TOPLEFT", art, "TOPLEFT", run[1], -FOOT_LINE_TOP)
         foot[i] = line
     end
     local left = art:CreateTexture(nil, "ARTWORK")
-    left:SetTexture(ART_LEFT_FILE)
+    ns.SetFile(left, ART_LEFT_FILE)
     left:SetSize(ART_LEFT_W, ART_H)
     left:SetPoint("TOPLEFT", art, "TOPLEFT", ART_X, 0)
     local right = art:CreateTexture(nil, "ARTWORK")
-    right:SetTexture(ART_RIGHT_FILE)
+    ns.SetFile(right, ART_RIGHT_FILE)
     right:SetSize(ART_RIGHT_W, ART_H)
     art.right = right
     -- Pane open: the left piece's end repeated up to the right piece, the two hole edges as a divider, dark behind.
     art.fill = art:CreateTexture(nil, "ARTWORK")
-    art.fill:SetTexture(ART_LEFT_FILE)
+    ns.SetFile(art.fill, ART_LEFT_FILE)
     art.edgeRight = art:CreateTexture(nil, "ARTWORK", nil, 1)
-    art.edgeRight:SetTexture(ART_RIGHT_FILE)
+    ns.SetFile(art.edgeRight, ART_RIGHT_FILE)
     art.edgeRight:SetSize(EDGE_RIGHT_R - EDGE_RIGHT_L, EDGE_BOTTOM - EDGE_TOP)
     art.edgeRight:SetTexCoord(EDGE_RIGHT_L / ART_RIGHT_W, EDGE_RIGHT_R / ART_RIGHT_W, EDGE_TOP / ART_H, EDGE_BOTTOM / ART_H)
     art.edgeRight:SetPoint("TOPLEFT", art, "TOPLEFT", DIVIDER_X, -EDGE_TOP)
     art.edgeLeft = art:CreateTexture(nil, "ARTWORK", nil, 1)
-    art.edgeLeft:SetTexture(ART_LEFT_FILE)
+    ns.SetFile(art.edgeLeft, ART_LEFT_FILE)
     art.edgeLeft:SetSize(EDGE_LEFT_R - EDGE_LEFT_L, EDGE_BOTTOM - EDGE_TOP)
     art.edgeLeft:SetTexCoord(EDGE_LEFT_L / ART_LEFT_W, EDGE_LEFT_R / ART_LEFT_W, EDGE_TOP / ART_H, EDGE_BOTTOM / ART_H)
     art.edgeLeft:SetPoint("TOPLEFT", art.edgeRight, "TOPRIGHT", DIVIDER_GAP, 0)

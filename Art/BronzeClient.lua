@@ -45,6 +45,11 @@ local FILES = {
     [130824] = "UI-Panel-Button-Disabled.tga",
     -- Trade window's empty "will not be traded" slot.
     [137072] = "UI-TradeFrame-EnchantIcon.tga",
+    -- The bags' sheet: each item slot's background is cut from it.
+    [131003] = "UI-Bag-Components.tga",
+    -- The game's own checkboxes left unskinned (the group finder's role picks).
+    [130755] = "UI-CheckBox-Up.tga",
+    [130752] = "UI-CheckBox-Down.tga",
 }
 -- Atlases on a sheet too big to copy whole, packed into small copies: lower-case atlas -> copy, crop, tiled across.
 -- The game menu's red buttons: per state row, the right cap then the left; the middle alone, full width to tile.
@@ -102,6 +107,8 @@ end
 
 -- The theme on, read once a pass, not per texture.
 local themeOn = false
+-- Our own pieces on the game's atlases (the inset border): on the theme's copies as the game's are, across every turn.
+local ours = setmetatable({}, { __mode = "k" })
 
 local function BronzeClient(texture, off)
     if not texture or not texture.GetAtlas then return end
@@ -294,6 +301,7 @@ local function ClientPass(job)
     local list, n = ChatTextures()
     for i = 1, n do BronzeClient(list[i]) end
     for tex in pairs(clientWas) do pcall(BronzeClient, tex) end
+    for tex in pairs(ours) do BronzeClient(tex) end
     -- Each window watched so its opening asks for its walk at once.
     for _, name in ipairs(CLIENT_WINDOWS) do
         local window = _G[name]
@@ -313,6 +321,13 @@ local function ClientPass(job)
 end
 
 clientJob = ns.Sched.Job({ name = "bronze.client", every = 0.5, awake = true, fn = ClientPass })
+
+function ns.ThemeClientArt(texture)
+    ours[texture] = true
+    themeOn = ns.BronzeOn()
+    BronzeClient(texture)
+    if themeOn then clientJob:Wake() end
+end
 
 -- Every open window owes a walk: the theme turned, or the game filled a window.
 local function OweOpen()
