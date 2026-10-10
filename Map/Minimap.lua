@@ -487,6 +487,7 @@ local function Layout()
         map:SetPoint("CENTER", cluster, "TOP", 9, -92)
     end
     if map.SetMaskTexture then map:SetMaskTexture((ns.TexPath("portraitMask"))) end
+    ns.FadeSquareBorders(true)
     backdrop:SetSize(CLUSTER, CLUSTER)
     ns.SetPointOnce(backdrop, "CENTER", cluster, "CENTER", 0, -20)
     if backdrop.StaticOverlayTexture then ns.Fade(backdrop.StaticOverlayTexture) end
@@ -756,6 +757,7 @@ local function Restore()
     ThemeRingsOnGameMap()
     if not MM.taken then return end
     MM.taken = false
+    ns.FadeSquareBorders(false)
     MM.UnplaceEye()
     HideOwn(MinimapCluster)
     HideOwn(MinimapBackdrop)

@@ -121,6 +121,7 @@ Map\MinimapEye.lua
 Map\MinimapButton.lua
 Map\MinimapMicro.lua
 Map\MinimapCollector.lua
+Map\MinimapSquare.lua
 UI\ClassicFonts.lua
 Units\NamePlates.lua
 Units\NamePlateOptions.lua
