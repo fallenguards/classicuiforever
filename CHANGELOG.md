@@ -2,6 +2,47 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.23.0] - 2026-10-10
+
+### Added
+- The key ring can lie on its side: check Horizontal in its edit mode dialog. Dropped by the far end of a column of bags, it stays there, as the game's does. Resetting its position stands it upright again.
+- A Max camera distance slider in the options (/fcui), under Other, lets the camera pull back as far as 4.0. The game's own slider stops at 2.0.
+- Only show matches, by the options search, lists just the options that match your search instead of each match's whole section.
+- The tabs beside the professions window show on hover by default. Under Professions book in the options, pick on hover, always shown or hidden.
+
+### Changed
+- The trade skill window takes Era's size, art and layout: the rank bar across the top, a filter by the kind of item made, and recipe details that scroll when the reagents run long. On Forever it lines up with the professions book, so going from one to the other moves nothing.
+- The professions book's page is the spellbook's parchment, each profession's emblem kept, with smaller spells centered by their bars. Cataclysm-style book, under Professions book in the options, brings back the banded page.
+- Books, letters and plaques open in Era's reading window: its page, its text font, its scroll bar and the book icon.
+- Every minimap button wears Era's ring, with its stone rim and shadow.
+- The character window has Era's ammo slot, with its arrow pointing to the ranged slot.
+- The social window's contacts button has Era's broadcast button shape and size.
+- Text boxes in popups sit in the 1.x tooltip border, as in Era.
+- With a custom theme, more art takes the theme's color: the list and scroll borders in most windows, the small world map's frame, the minimap's day and night ring, the who list's column headers, the group finder's pages, empty bag slots and the latency meter.
+- The group finder icon on the minimap and the game's queue eye are one button. While you are queued, the game's eye sits on the icon's spot in Era's look, its eye turning as Era's does, instead of showing beside it in Forever's look.
+- The tracking icon on the minimap has Era's size: a larger ring than the other buttons, with a square icon. Tracking icon: same size as other buttons, under Minimap in the options, gives the old size back.
+- The Skills tab's bars take Era's size and spacing, and their gold border lights on the skill under the mouse and on the one you pick, as in Era.
+
+### Fixed
+- The bags on the bar follow edit mode's orientation and direction: Vertical stands them in a column, and the direction sets which way they grow (#141).
+- A name cut short in the who list shows in full in a tooltip when you point at it (#145).
+- Looting no longer closes the classic windows you have open.
+- Bags on the bar no longer show a silver border round their icons: Era's slot line covers the icon's edge, as in Era. Uncommon and better bags show no colored quality border either, as in Era.
+- The spellbook opened in a fight with its Professions tab picked no longer opens off to the side.
+- Turning to the professions book during a craft no longer makes its icons jump around.
+- Train in the trainer window grays out for a new profession when both profession slots are taken, as in Era.
+- The professions window's tab arrow is back at its old size and spot.
+- The Legacy window's art and close button no longer shift when you switch between its pages.
+- Addons that gather minimap buttons into a bag of their own no longer take the group finder eye and the other minimap icons off the ring. The options button shows its gryphon in their bag instead of a white dot, and opens the options from there (#146).
+- Another addon's square minimap border no longer shows around the round classic minimap (#108).
+- The Looking For Group window's portrait shows Era's eye while you are listed. Forever's green eye showed through.
+- After a reinstall that kept the classic layout at Era's interface size, the bars no longer come back at the game's larger size.
+- The bars in the professions book no longer show two greens: the fill matches the bar's rounded end.
+- The professions window no longer draws its art a moment late the first time it opens.
+- The friends button by the chat no longer opens the game's social window instead of the classic one.
+- A window's lock button no longer sits under the professions book's expand button.
+- Small alignment fixes in the quest log, the options window, the windows list in edit mode and the window lock buttons.
+
 ## [0.22.1] - 2026-10-10
 
 ### Fixed
