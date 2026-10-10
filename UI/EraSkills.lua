@@ -26,7 +26,10 @@ local DETAIL_W, DETAIL_BORDER_W = 211, 220
 -- The name's inset, the gap before the rank (Era's), and room kept at the bar's end.
 local NAME_X, RANK_GAP, END_PAD = 6, 13, 6
 
--- The window's sheets: the general top and the Skills tab's bottom, 2 right and 1 down as Era hangs them.
+-- The window's sheets: the general top and the Skills tab's bottom, on the window's corners as its other pages' art.
+-- Era hangs them 2 right and 1 down of its window: the page stands PAGE_X, PAGE_Y off instead, everything on it with it,
+-- so the window's border and X stand still between pages.
+local PAGE_X, PAGE_Y = -2, 1
 local SHEETS = {
     { "charGeneralTopLeft", "TOPLEFT", 256 }, { "charGeneralTopRight", "TOPRIGHT", 128 },
     { "skillFrameBotLeft", "BOTTOMLEFT", 256 }, { "skillFrameBotRight", "BOTTOMRIGHT", 128 },
@@ -220,7 +223,7 @@ local function Sheets(page, window)
     page.sheets = {}
     for i, sheet in ipairs(SHEETS) do
         local tex = Tex(window, "BORDER", sheet[1], sheet[3], 256)
-        tex:SetPoint(sheet[2], window, sheet[2], 2, -1)
+        tex:SetPoint(sheet[2], window, sheet[2], 0, 0)
         tex:Hide()
         page.sheets[i] = tex
     end
@@ -399,7 +402,8 @@ end
 -- onEnter(line, region) for a bar's tooltip if wanted; page.empty holds the words for an empty list.
 function ES.Build(window, owner)
     local page = ns.NewFrame("Frame", nil, window)
-    page:SetAllPoints(window)
+    page:SetPoint("TOPLEFT", window, "TOPLEFT", PAGE_X, PAGE_Y)
+    page:SetPoint("BOTTOMRIGHT", window, "BOTTOMRIGHT", PAGE_X, PAGE_Y)
     page:Hide()
     Sheets(page, window)
     page.all = AllTab(page, function() owner.onAll() end)
