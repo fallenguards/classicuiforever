@@ -22,14 +22,19 @@ local over, face   -- our look over the game's eye, and its Era eye
 local frame = 0
 local heldPoints   -- the eye's own place (moved in edit mode) while it rides the icon
 
+-- Era's LFG-Eye sheet frame n (0 to 28) on tex, cropped as c crops its first frame. The group finder's portrait too.
+function ns.EraEyeFrame(tex, n, c)
+    local u, v = (n % PER_ROW) * FRAME_U, math.floor(n / PER_ROW) * FRAME_V
+    tex:SetTexCoord(c[1] + u, c[2] + u, c[3] + v, c[4] + v)
+end
+ns.ERA_EYE_FRAMES, ns.ERA_EYE_TIME = FRAMES, FRAME_TIME
+
 -- Era's eye turning while queued; still on its first frame where the game holds its eye still, and in edit mode.
 local function Turn()
     local eye = QueueStatusButton
     local still = ns.EditMode.state or (eye and eye.Eye and eye.Eye.IsStaticMode and eye.Eye:IsStaticMode())
     frame = still and 0 or (frame + 1) % FRAMES
-    local c = ns.ERA_EYE.coords
-    local u, v = (frame % PER_ROW) * FRAME_U, math.floor(frame / PER_ROW) * FRAME_V
-    face:SetTexCoord(c[1] + u, c[2] + u, c[3] + v, c[4] + v)
+    ns.EraEyeFrame(face, frame, ns.ERA_EYE.coords)
 end
 
 local function EyeMoved(eye)

@@ -78,7 +78,17 @@ local ERA_EYE, ERA_EYE_BACK = 136317, 337500
 -- Where Era draws them in the window (its dump): eye 9, 5 and backing 12, 5, both 64 square.
 local ERA_EYE_X, ERA_EYE_Y, ERA_EYE_BACK_X, ERA_EYE_BACK_Y = 9, 5, 12, 5
 local eyeHost
+local C_LFGList = _G.C_LFGList
+local ERA_EYE_FIRST = { 0, 0.125, 0, 0.25 }
+local eyeTurn = 0
 local FRIENDLY_CX, ROLE_CY = ROLE_X + 24 + 3 * ROLE_STEP, ROLE_Y + 24
+
+-- While the window shows: Era's eye turns while you are listed (its LFGEyeTemplate), on its first frame otherwise.
+local function TurnEye(job)
+    local listed = C_LFGList and C_LFGList.HasActiveEntryInfo()
+    eyeTurn = listed and (eyeTurn + 1) % ns.ERA_EYE_FRAMES or 0
+    ns.EraEyeFrame(job.eye, eyeTurn, ERA_EYE_FIRST)
+end
 
 local function Size() return ERA_W, ERA_H end
 
@@ -295,10 +305,10 @@ local function DressParent(parent, first)
         At(close, 326, 8, 32, 32)
         ns.SetLevelIf(close, parent:GetFrameLevel() + 20)
     end
-    -- Era's eye (the first frame of its sheet) on its black backing, UNDER the pages: their ring overlaps it, as in Era.
-    -- This client's own eye button is faded, not moved; it animates that one.
+    -- Era's eye on its black backing, UNDER the pages: their ring overlaps it, as in Era. Turning while listed, as Era's.
+    -- This client's own eye button is faded whole (its animation draws on more than its texture), not moved.
     local portrait = _G["LFGParentFramePortrait"]
-    if portrait and first then Hide(portrait.texture) end
+    if portrait then ns.SetAlphaIf(portrait, 0) end
     local eyeFrame = eyeHost or ns.NewFrame("Frame", nil, parent)
     if not eyeHost then
         eyeHost = eyeFrame
@@ -312,6 +322,8 @@ local function DressParent(parent, first)
         eye:SetTexCoord(0, 0.125, 0, 0.25)
         eye:SetSize(64, 64)
         eye:SetPoint("TOPLEFT", eyeFrame, "TOPLEFT", ERA_EYE_X, -ERA_EYE_Y)
+        local turn = ns.Sched.Attach(eyeFrame, { name = "groupFinder.eye", every = ns.ERA_EYE_TIME, fn = TurnEye })
+        if turn then turn.eye = eye end
     end
     PointIf(eyeFrame, "TOPLEFT", Origin(), "TOPLEFT", 0, 0)
     ns.SetLevelIf(eyeFrame, parent:GetFrameLevel())
