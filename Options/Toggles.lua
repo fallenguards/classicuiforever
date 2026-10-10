@@ -146,6 +146,8 @@ ns.TOGGLES = {
 
     { "professionsBook", L["OPT_professionsBook"], L["OPT_professionsBook_TIP"], group = L["GROUP_PROFESSIONS"] },
     { "profBookBig", L["OPT_profBookBig"], L["OPT_profBookBig_TIP"], parent = "professionsBook", search = "big large popout" },
+    { "professionTabs", L["OPT_professionTabs"], L["OPT_professionTabs_TIP"], parent = "professionsBook",
+        search = "tabs hover side" },
     { "tradeSkill", L["OPT_tradeSkill"], L["OPT_tradeSkill_TIP"] },
     { "tradeSkillSearch", L["OPT_tradeSkillSearch"], L["OPT_tradeSkillSearch_TIP"], parent = "tradeSkill" },
     { "trainer", L["OPT_trainer"], L["OPT_trainer_TIP"] },

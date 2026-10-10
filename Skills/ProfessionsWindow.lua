@@ -20,10 +20,6 @@ T.BookW, T.BookH = BookW, BookH
 local SizeButton
 local sizeWas
 
-local RAW = { set = "raw" }
-local PREV_UP, PREV_DOWN = ns.ART.PAGE_PREV .. "Up", ns.ART.PAGE_PREV .. "Down"
-local NEXT_UP, NEXT_DOWN = ns.ART.PAGE_NEXT .. "Up", ns.ART.PAGE_NEXT .. "Down"
-local TOGGLE_TIP = { text = function() return TRADE_SKILLS or "Professions" end }
 -- Forever's side tabs drawn at the size of our Who and group finder tabs (its 50 px icon to their 32); the column keeps
 -- its chain, so it tightens with them.
 local PROF_TAB_SCALE = 0.64
@@ -106,19 +102,37 @@ local function FillTabIcons()
     EachTab(FillTabIcon)
 end
 
--- Side tabs tucked away like the sheet's equipment manager: an arrow under the
--- close button toggles them, saved. The client re-shows them on every open, so
--- they are made transparent and deaf, not hidden.
-local tabToggle
-local function TabsOpen() return ns.db and ns.db.professionTabs and true or false end
+-- Side tabs always up, or (the option off) seen only while the mouse is near one. The client re-shows them on every
+-- open, so they are made transparent, never hidden, and keep the mouse to be found.
+local function TabsAlways() return ns.db and ns.db.professionTabs == true end
 
-local function SetTabOpen(tab, open)
-    if not tab then return end
-    -- They cast in the client's name: sized out of combat only.
-    if not InCombatLockdown() then ns.SetScaleIf(tab, PROF_TAB_SCALE) end
-    ns.SetAlphaIf(tab, open and 1 or 0, 0.01)
-    if tab:IsMouseEnabled() ~= open then tab:EnableMouse(open) end
+-- Near: within PAD of a tab (the gaps between them too); up till HOLD after the mouse leaves; FADE in and out.
+local TAB_PAD, TAB_HOLD, TAB_FADE, FADE_STEP = 14, 0.4, 0.15, 0.02
+local overTab, leftAt = false, 0
+local tabAlpha, tabTarget = 0, 0
+local function NoteOver(tab)
+    if tab and tab:IsMouseOver(TAB_PAD, -TAB_PAD, -TAB_PAD, TAB_PAD) then overTab = true end
 end
+
+-- They cast in the client's name: sized and given the mouse out of combat only.
+local function PrepTab(tab)
+    if not tab or InCombatLockdown() then return end
+    ns.SetScaleIf(tab, PROF_TAB_SCALE)
+    if not tab:IsMouseEnabled() then tab:EnableMouse(true) end
+end
+
+local function SetTabAlpha(tab, alpha)
+    if tab then ns.SetAlphaIf(tab, alpha, 0.01) end
+end
+
+-- Awake only while a fade runs.
+local fadeJob = ns.Sched.Job({ name = "professions.tabFade", every = FADE_STEP, awake = false, fn = function(job)
+    local step = FADE_STEP / TAB_FADE
+    if tabAlpha < tabTarget then tabAlpha = math.min(tabTarget, tabAlpha + step)
+    else tabAlpha = math.max(tabTarget, tabAlpha - step) end
+    EachTab(SetTabAlpha, tabAlpha)
+    if tabAlpha == tabTarget then job:Sleep() end
+end })
 
 -- Forever's tab plate and hover rim are bronze: drained to silver off the theme; the gold selected mark stays.
 local TAB_METAL = { "Background", "HighlightTexture" }
@@ -132,43 +146,23 @@ local function DrainTabs()
     return EachTab(DrainTab)
 end
 
+-- Each pass of the watch (10 a second while the window is up) looks for the mouse; between fades the alpha is held
+-- against the client's re-show.
 local function SyncTabs()
-    local frame = ProfessionsFrame
-    if not frame then return end
-    local open = TabsOpen()
+    if not ProfessionsFrame then return end
     DrainTabs()
-    EachTab(SetTabOpen, open)
-    -- Level with the close button: border and pages sit hundreds of levels up and hid a button just above the window.
-    if tabToggle then
-        local close = frame.CloseButton
-        local level = math.min(10000, (close and close:GetFrameLevel() or (frame:GetFrameLevel() + 600)) + 1)
-        ns.SetLevelIf(tabToggle, level)
-        -- Smaller, up and right on the small book.
-        local big = T.Big()
-        local size = big and 24 or 17
-        if tabToggle:GetWidth() ~= size then tabToggle:SetSize(size, size) end
-        ns.SetPointOnce(tabToggle, "TOPRIGHT", frame, "TOPRIGHT", big and -15 or -7, big and -28 or -22)
+    EachTab(PrepTab)
+    local now = GetTime()
+    overTab = false
+    if not TabsAlways() then EachTab(NoteOver) end
+    if overTab then leftAt = now end
+    local target = (TabsAlways() or now - leftAt < TAB_HOLD) and 1 or 0
+    if target ~= tabTarget then
+        tabTarget = target
+        fadeJob:Wake()
+    elseif tabAlpha == tabTarget then
+        EachTab(SetTabAlpha, tabAlpha)
     end
-    if tabToggle and tabToggle.open ~= open then
-        tabToggle.open = open
-        ns.DressStates(tabToggle, open and PREV_UP or NEXT_UP, open and PREV_DOWN or NEXT_DOWN, nil, nil, RAW)
-    end
-end
-
-local function TabToggle()
-    local frame = ProfessionsFrame
-    if tabToggle or not frame then return end
-    tabToggle = ns.NewFrame("Button", "ClassicUIForeverProfessionTabsToggle", frame)
-    tabToggle:SetSize(24, 24)
-    -- Top of the book's right page, under and just inside the close button.
-    tabToggle:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -15, -28)
-    tabToggle:SetFrameLevel(frame:GetFrameLevel() + 40)
-    tabToggle:SetHighlightTexture(ns.ART.HILIGHT, "ADD")
-    tabToggle:SetScript("OnClick", function()
-        ns.db.professionTabs = not TabsOpen()
-        SyncTabs()
-    end)
-    ns.AttachTip(tabToggle, TOGGLE_TIP)
 end
 
 -- The popout beside the close button: the full book or the small one; the same switch as the option.
@@ -296,7 +290,6 @@ local function Home(frame)
     Rehome(frame.NineSlice, frame)
     Rehome(frame.TitleContainer, frame)
     Rehome(frame.ProfessionsOverviewTab, frame)
-    Rehome(tabToggle, frame)
     Rehome(T.FirstBookTab(), frame)
     T.PlaceBookPads()
     RefreshSize()
@@ -550,7 +543,6 @@ local function WatchTick(self, elapsed)
     end
     EnsureOpenHost(frame)
     if active then FillTabIcons() end
-    TabToggle()
     SizeButton(active and page:IsVisible())
     -- By face: book, trade skill, or the client's own when neither module is on.
     local bookUp = active and page:IsVisible() and true or false
@@ -687,6 +679,11 @@ local function Restore()
 end
 
 ns.RegisterModule("professionsBook", { apply = Apply, restore = Restore })
+
+-- Only their alpha changes: at once, in a fight too.
+ns.OnToggle(function(key)
+    if key == "professionTabs" then SyncTabs() end
+end)
 
 -- The page size switched (option or popout): rows now, cards and window on the watch's next pass (out of combat).
 ns.OnToggle(function(key)
