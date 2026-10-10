@@ -474,6 +474,11 @@ local function Build(canvas)
             Grouped(dark)
             Add(dark, "themeDark")
         end
+        if entry[1] == "addonMessages" then
+            local camera = O.CameraRow(child, LIST_W / COLUMNS - INDENT - 14)
+            Grouped(camera)
+            Add(camera)
+        end
         if entry[1] == "themeCustom" then
             local color = O.ColorRow(child, "themeColor", L["OPTWIN_COLOUR"],
                 L["OPTWIN_THE_CUSTOM_THEME_S_COLOUR"])

@@ -63,8 +63,9 @@ local function SetDarkness(value)
     ns.Sched.NextFrame("options.themeDarkness", function() ns.SetThemeDarkness(value) end)
 end
 
--- width: the row's room in its column; the slider takes all but the button.
-function O.DarknessRow(parent, width)
+-- A slider row's frame: its reset button at the right (returned with its icon), the slider's room beside it
+-- (width - 34). width: the row's room in its column.
+function O.SliderRow(parent, width)
     local row = ns.NewFrame("Frame", nil, parent)
     row:SetSize(width, 24)
     row:EnableMouse(true)
@@ -78,6 +79,11 @@ function O.DarknessRow(parent, width)
     -- Empty: the list's font and match bar hang on a row's text.
     row.text = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     row.text:SetPoint("RIGHT", reset, "LEFT", 0, 0)
+    return row, reset, icon
+end
+
+function O.DarknessRow(parent, width)
+    local row, reset, icon = O.SliderRow(parent, width)
     local slider = ns.band.StepperSlider(row, width - 34, row, 0)
     local Fill
     if slider then
