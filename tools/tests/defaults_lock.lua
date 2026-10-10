@@ -46,6 +46,7 @@ return {
     classicFonts = true,
     classicStatusFont = true,
     classicTracking = true,
+    trackingSameSize = false,
     collectionsMinimapButton = false,
     comboPoints = true,
     damageMeter = true,

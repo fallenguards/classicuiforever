@@ -34,6 +34,7 @@ local ns = setmetatable({
     Unfade = function(frame) frame.writes = frame.writes + 1 end,
 }, { __index = function() return Any end })
 assert(loadfile(ROOT .. "/Map/Minimap.lua"))("ClassicUIForever", ns)
+assert(loadfile(ROOT .. "/Map/MinimapTracking.lua"))("ClassicUIForever", ns)
 assert(loadfile(ROOT .. "/Map/MinimapDiel.lua"))("ClassicUIForever", ns)
 assert(module and module.apply and module.restore, "the minimap module registers apply and restore")
 

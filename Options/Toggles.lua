@@ -192,6 +192,8 @@ ns.TOGGLES = {
     { "hideMinimapZone", L["OPT_hideMinimapZone"], SHOW_TIP, parent = "minimap", radio = "minimapZoneShow", drop = true },
     { "hideMinimapHeader", L["OPT_hideMinimapHeader"], L["OPT_hideMinimapHeader_TIP"], parent = "minimap", search = "zone bar top" },
     { "classicTracking", L["OPT_classicTracking"], L["OPT_classicTracking_TIP"], parent = "minimap" },
+    { "trackingSameSize", L["OPT_trackingSameSize"], L["OPT_trackingSameSize_TIP"], parent = "minimap", needs = "classicTracking",
+        search = "tracking ring size big small uniform" },
     { "showMinimapTracking", L["OPT_showMinimapTracking"], SHOW_TIP, parent = "minimap", radio = "minimapTrackingShow", drop = true },
     { "hoverMinimapTracking", L["OPT_hoverMinimapTracking"], SHOW_TIP, parent = "minimap", radio = "minimapTrackingShow", drop = true },
     { "hideMinimapTracking", L["OPT_hideMinimapTracking"], SHOW_TIP, parent = "minimap", radio = "minimapTrackingShow", drop = true },

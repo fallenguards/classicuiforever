@@ -269,121 +269,6 @@ local function LayRingHome(key, parent, level, w, h)
     return home
 end
 
--------------------------------------------------------- classic tracking
-
--- 1.x MiniMapTracking: the active tracking spell on the rim; right-click cancels it.
--- Its buff leaves the buff bar meanwhile (TrackingBuff.lua).
-local C_Minimap = _G.C_Minimap
-local trackFrame
--- 52 like the mail and eye rings; ring centre is at (20, 19) on the 64px sheet.
-local TRACK_RING = 52
-local TRACK_CX, TRACK_CY = TRACK_RING * 20 / 64, TRACK_RING * 19 / 64
-local TRACK_BORDER = { layer = "ARTWORK", w = TRACK_RING, h = TRACK_RING, point = "TOPLEFT" }
-local TRACK_EVENTS = { "MINIMAP_UPDATE_TRACKING", "SPELLS_CHANGED", "PLAYER_ENTERING_WORLD" }
-
-local function TrackingOn() return MM.active and ns.db and ns.db.classicTracking ~= false end
-
-local function ActiveTrackingSpell()
-    if not (C_Minimap and C_Minimap.GetNumTrackingTypes and C_Minimap.GetTrackingInfo) then return nil end
-    local count = C_Minimap.GetNumTrackingTypes()
-    if ns.IsSecret(count) or type(count) ~= "number" then return nil end
-    for i = 1, count do
-        local info = C_Minimap.GetTrackingInfo(i)
-        if info and not ns.AnySecret(info.active, info.type) and info.active and info.type == "spell" then
-            return i, info
-        end
-    end
-    return nil
-end
-
-local function UpdateTracking()
-    local frame = trackFrame
-    local index, info
-    if frame and TrackingOn() then index, info = ActiveTrackingSpell() end
-    if MM.TrackingBuff then MM.TrackingBuff(info) end
-    if not frame then return end
-    frame.index = index
-    frame.spellID = info and not ns.IsSecret(info.spellID) and info.spellID or nil
-    frame.name = info and info.name
-    if info then
-        frame.icon:SetTexture(info.texture)
-        ns.RoundIcon(frame.icon)
-    end
-    frame:SetShown(index ~= nil)
-end
-
-local function QueueTracking() ns.Sched.Soon("minimap.tracking", UpdateTracking) end
-
-local function TrackingMouseUp(self, button)
-    if button == "RightButton" and self.index and C_Minimap.SetTracking then
-        C_Minimap.SetTracking(self.index, false)
-    end
-end
-
-local function TrackingEnter(self)
-    GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
-    if self.spellID and GameTooltip.SetSpellByID then
-        GameTooltip:SetSpellByID(self.spellID)
-    else
-        GameTooltip:SetText(self.name or "", 1, 1, 1)
-    end
-    GameTooltip:Show()
-end
-
--- Era's rim spot, in our backdrop's coordinates, until it is dragged round the ring (shift-drag, or edit mode): then at
--- its angle, as far from the map's middle as Era's spot is.
-local TRACK_KEY, TRACK_ANGLE, TRACK_R = "minimapTrackingIcon", "trackingIconAngle", 83.6
-local function PlaceTracking()
-    local frame = trackFrame
-    if not frame then return end
-    local degrees = ns.db and ns.db[TRACK_ANGLE]
-    if degrees then
-        ns.RingPoint(frame, degrees, TRACK_R, frame:GetEffectiveScale() / Minimap:GetEffectiveScale())
-    else
-        ns.SetPointOnce(frame, "TOPLEFT", frame:GetParent(), "TOPLEFT", 11, -26)
-    end
-end
-function ns.LayTrackingIcon(key)
-    if key == TRACK_KEY then PlaceTracking() end
-end
-
-local function TrackingFrame(backdrop, level)
-    local frame = trackFrame
-    if not frame then
-        frame = CreateFrame("Frame", "ForeverClassicUIMinimapTrackingIcon", backdrop)
-        trackFrame = frame
-        frame:Hide()
-        frame:SetSize(32, 32)
-        frame:EnableMouse(true)
-        -- Shift-drag round the ring, as our ring buttons move.
-        frame:RegisterForDrag("LeftButton")
-        local drag = ns.Sched.OnFrame(CreateFrame("Frame", nil, frame), { name = "minimap.trackingDrag", every = 0,
-            awake = false, fn = function()
-                ns.db[TRACK_ANGLE] = ns.MinimapCursorAngle()
-                PlaceTracking()
-            end })
-        frame:SetScript("OnDragStart", function() if IsShiftKeyDown() then drag:Wake() end end)
-        frame:SetScript("OnDragStop", function() drag:Sleep() end)
-        if ns.PlaceSavedWindows then ns.PlaceSavedWindows() end
-        local border = ns.DressNew(frame, "trackingBorder", TRACK_BORDER)
-        ns.MinimapButtonBorder(border)
-        -- Round, slightly wider than the hole so its edge hides under the ring.
-        local icon = frame:CreateTexture(nil, "BORDER")
-        icon:SetSize(22, 22)
-        icon:SetPoint("CENTER", border, "TOPLEFT", TRACK_CX, -TRACK_CY)
-        frame.icon = icon
-        ns.RoundIcon(icon)
-        frame:SetScript("OnMouseUp", TrackingMouseUp)
-        frame:SetScript("OnEnter", TrackingEnter)
-        frame:SetScript("OnLeave", GameTooltip_Hide)
-        frame:SetScript("OnEvent", QueueTracking)
-        ns.RegisterEvents(frame, TRACK_EVENTS)
-        UpdateTracking()
-    end
-    frame:SetFrameLevel(level)
-    PlaceTracking()
-end
-
 ----------------------------------------------------- the tracking glass
 
 -- The glass button's Normal and Pushed textures, re-read each Layout.
@@ -435,7 +320,7 @@ end
 -- Sole writer of MM.active.
 local function SetActive(on)
     MM.active = on
-    UpdateTracking()
+    MM.UpdateTracking()
 end
 
 ------------------------------------------------------------------- layout
@@ -535,12 +420,12 @@ local function Layout()
     end
 
     -- Tracking upper left: the spell at Era's spot, the glass (client menu) below, clear of the eye.
-    TrackingFrame(backdrop, above)
+    MM.TrackingFrame(backdrop, above)
     local tracking = cluster.Tracking
     if tracking then
         -- With the spell icon off the glass keeps its old spot.
         local glassHome = LayHome("minimapTracking", backdrop, above, 32, 32, backdrop, "TOPLEFT", 9 + 16,
-            (TrackingOn() and -64 or -45) - 16)
+            (MM.TrackingOn() and -64 or -45) - 16)
         tracking:SetParent(glassHome)
         tracking:SetFrameLevel(above + 1)
         tracking:SetSize(32, 32)

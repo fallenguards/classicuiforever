@@ -138,6 +138,7 @@ ns.DB_DEFAULTS = {
     barsNoteOff = false,
     minimap = true,
     classicTracking = true,
+    trackingSameSize = false,
     calendarRing = false,
     calendarBehind = false,
     calendarZone = true,

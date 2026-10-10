@@ -71,4 +71,5 @@ return {
     professionTabsHover = "kept as before: a dbVersion 16 migration (ns.OneProfTabsChoice) turns it off where Always was ticked",
     professionTabsHidden = "same for everyone: off by default; a third pick beside on hover and always",
     keyRingSnap = "same for everyone: off by default; set by dropping the flat key ring at a bag column's end",
+    trackingSameSize = "on for everyone, a restyle: the tracking icon at Era's size (a 64 ring); checked gives the others' size back",
 }
