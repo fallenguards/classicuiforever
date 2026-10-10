@@ -49,10 +49,11 @@ local function TellManager(frame, width, height)
         sizeWas.attrs = { PanelAttr(frame, "width"), PanelAttr(frame, "height"), PanelAttr(frame, "xoffset"),
             PanelAttr(frame, "yoffset") }
     end
-    local small, book = width == SMALL_W, width == SMALL_W or width == BIG_W
+    local small = width == SMALL_W
     local wantWidth, wantHeight = small and SMALL_TELL_W or width or sizeWas.attrs[1], height or sizeWas.attrs[2]
-    local wantX = book and BOOK_X or width and 0 or sizeWas.attrs[3]
-    local wantY = book and BOOK_Y or width and 0 or sizeWas.attrs[4]
+    -- Book and trade skill page on one spot, the spellbook's border's: a page turn never moves the window.
+    local wantX = width and BOOK_X or sizeWas.attrs[3]
+    local wantY = width and BOOK_Y or sizeWas.attrs[4]
     if PanelAttr(frame, "width") == wantWidth and PanelAttr(frame, "height") == wantHeight
         and PanelAttr(frame, "xoffset") == wantX and PanelAttr(frame, "yoffset") == wantY then return end
     SetPanelAttr(frame, "width", wantWidth)
@@ -203,8 +204,7 @@ local function BackToBook()
     if frame.CraftingPage then frame.CraftingPage:Hide() end
     local title = frame.TitleContainer and frame.TitleContainer.TitleText
     if title and TRADE_SKILLS then title:SetText(TRADE_SKILLS) end
-    local portrait = frame.PortraitContainer and frame.PortraitContainer.portrait
-    if portrait then portrait:SetTexture("Interface/ICONS/INV_SideTab_Professions_c60") end
+    ns.ProfessionPortrait(true)
     for _, tab in ipairs(frame.rightProfessionTabs or EMPTY) do
         if tab.SelectedTexture then tab.SelectedTexture:Hide() end
     end
@@ -351,6 +351,27 @@ local function SizeShut(watcher, tradeOn)
     end
 end
 
+-- The portrait as the page up: the professions icon on the book, the open profession's on its page. Held each pass
+-- of the watch: the client paints its own on its events, which left the last profession's or the book's up a while.
+local BOOK_ICON = "Interface/ICONS/INV_SideTab_Professions_c60"
+local portraitSet, portraitWanted   -- the icon we last put there, as a file id and as asked
+function ns.ProfessionPortrait(book)
+    local frame = ProfessionsFrame
+    local portrait = frame and frame.PortraitContainer and frame.PortraitContainer.portrait
+    if not portrait then return end
+    local icon = BOOK_ICON
+    if not book then
+        local api = C_TradeSkillUI
+        local info = api and api.GetBaseProfessionInfo and api.GetBaseProfessionInfo()
+        icon = info and info.professionID and api.GetTradeSkillTexture and api.GetTradeSkillTexture(info.professionID)
+        if not icon then return end
+    end
+    local now = portrait:GetTextureFileID()
+    if now ~= nil and now == portraitSet and portraitWanted == icon then return end
+    portrait:SetTexture(icon)
+    portraitSet, portraitWanted = portrait:GetTextureFileID(), icon
+end
+
 -- Turn to the crafting page piece by piece: the client turns only when the
 -- profession changes, so First Aid, shut, First Aid again left the book up.
 local function ToCraft()
@@ -364,11 +385,7 @@ local function ToCraft()
     local id = info and info.professionID
     local title = frame.TitleContainer and frame.TitleContainer.TitleText
     if title and info and info.professionName and info.professionName ~= "" then title:SetText(info.professionName) end
-    local portrait = frame.PortraitContainer and frame.PortraitContainer.portrait
-    if portrait and id and C_TradeSkillUI.GetTradeSkillTexture then
-        local icon = C_TradeSkillUI.GetTradeSkillTexture(id)
-        if icon then portrait:SetTexture(icon) end
-    end
+    ns.ProfessionPortrait()
     local overview = frame.ProfessionsOverviewTab
     if overview and overview.SelectedTexture then overview.SelectedTexture:Hide() end
     for _, tab in ipairs(frame.rightProfessionTabs or EMPTY) do
@@ -535,15 +552,16 @@ local function WatchTick(self, elapsed)
     if active then FillTabIcons() end
     TabToggle()
     SizeButton(active and page:IsVisible())
-    T.SmallFrame(active and page:IsVisible() and not T.Big())
-    T.SyncBookPads()
-    SyncTabs()
-    T.BookTabs()
-    -- Size by face: book, trade skill, or the client's own when neither module is on.
+    -- By face: book, trade skill, or the client's own when neither module is on.
     local bookUp = active and page:IsVisible() and true or false
     local crafting = frame.CraftingPage
     local tradeOn = ns.TradeSkillActive and ns.TradeSkillActive()
     local craftUp = not bookUp and tradeOn and crafting and crafting:IsVisible() and true or false
+    T.EraFrame((bookUp and not T.Big()) and "book" or craftUp and "trade" or nil)
+    if bookUp or craftUp then ns.ProfessionPortrait(bookUp) end
+    T.SyncBookPads()
+    SyncTabs()
+    T.BookTabs()
     if active then EnsureShape(frame) end
     Home(frame)
     if bookUp then

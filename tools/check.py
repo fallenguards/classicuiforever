@@ -83,7 +83,7 @@ ALLOWED = {
     "SECRETMOUSE": {folder: "only unit frame bars can answer secret" for folder in (
         "Art/", "Bar/", "Character/", "Core/", "Map/", "Options/", "Quest/", "Skills/", "Social/", "Spells/",
         "UI/", "Windows/")},
-    "SEARCHBOX": {"UI/Controls.lua": "ns.SearchBox", "Skills/TradeSkill.lua": "the craft count, no search",
+    "SEARCHBOX": {"UI/Controls.lua": "ns.SearchBox",
                   "Social/SocialWindow.lua": "the who line: the lens, ns.SearchClear",
                   "Spells/SpellBook.lua": "its search, X built in, Escape keeps the text"},
 }
@@ -1369,11 +1369,24 @@ def pattern_hits(path, lx, funcs):
     found |= held_cvar_hits(lx, funcs)
     if not allowed("THROTTLEFRAME", path):
         found |= throttle_frame_hits(lx)
+    if not allowed("SEARCHBOX", path):
+        found |= search_clear_hits(lx)
     for rule, per_file in ALLOWED_BODIES.items():
         if path in per_file:
             inside = body_lines(funcs, per_file[path])
             found = {h for h in found if h[0] != rule or h[1] not in inside}
     return [(rule, no, MESSAGES[rule]) for rule, no in sorted(found, key=lambda h: (h[1], h[0]))]
+
+
+SEARCH_HINT_RX = re.compile(r"SetText\(\s*SEARCH\b")
+SEARCH_CLEAR_RX = re.compile(r"\bns\s*\.\s*Search(Clear|Box)\s*\(")
+
+
+def search_clear_hits(lx):
+    """A hand-built search box: a Search hint in a file that never makes the X (ns.SearchClear or ns.SearchBox)."""
+    if any(SEARCH_CLEAR_RX.search(line) for line in lx.blank):
+        return set()
+    return {("SEARCHBOX", no) for no, line in enumerate(lx.keep, 1) if SEARCH_HINT_RX.search(line)}
 
 
 HELDCVAR_RX = re.compile(r"\bns\s*\.\s*SetCVar\s*\(")

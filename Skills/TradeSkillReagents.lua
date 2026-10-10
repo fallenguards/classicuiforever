@@ -136,3 +136,29 @@ function R.ToggleUnlearned()
     unlearned = not unlearned
     if R.Changed then R.Changed() end
 end
+
+------------------------------------------------------------------ Era's subclass filter: what a recipe makes
+
+-- The item type a recipe makes ("Consumable", "Trade Goods"), the names Era's subclass list shows; false: nothing.
+local typeOf = {}
+function R.TypeOf(recipeID)
+    local known = typeOf[recipeID]
+    if known ~= nil then return known or nil end
+    local api = C_TradeSkillUI
+    local schematic = api.GetRecipeSchematic and api.GetRecipeSchematic(recipeID, false)
+    local item = schematic and schematic.outputItemID
+    local itemType = item and select(2, C_Item.GetItemInfoInstant(item)) or nil
+    typeOf[recipeID] = itemType or false
+    return itemType
+end
+
+-- The types picked to show; none picked lists every recipe. Cleared as a profession opens, as Era's list is.
+local shownTypes = {}
+R.types = {}   -- the open profession's types, sorted (the window's Collect fills it)
+function R.TypeShown(itemType) return next(shownTypes) == nil or (itemType ~= nil and shownTypes[itemType] == true) end
+function R.TypePicked(itemType) return shownTypes[itemType] == true end
+function R.ToggleType(itemType)
+    shownTypes[itemType] = not shownTypes[itemType] or nil
+    if R.Changed then R.Changed() end
+end
+function R.ClearTypes() wipe(shownTypes) end

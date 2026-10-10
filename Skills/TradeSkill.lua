@@ -6,9 +6,16 @@ local _, ns = ...
 
 local active = false
 local panel
-local WINDOW_W, WINDOW_H = 362, 444
+local WINDOW_W, WINDOW_H = 338, 424
+-- Forever: the small book's size, the page 2 in, so its border lands on the book's and a page turn moves nothing.
+local FOREVER_W, FOREVER_H, PAGE_X = 339, 425, 2
 local LIST_ROWS = 8
 local REAGENTS_MAX = 8
+-- Era's detail spots, in its scroll's content.
+local ICON_TOP, LABEL_TOP = 3, 47
+local REAGENT_W, REAGENT_PITCH = 147, 43
+-- List rows as wide as Era's highlight: narrower while its scroll bar shows.
+local LIST_W, LIST_W_BAR = 316, 293
 
 local IsSecret = ns.IsSecret
 local SkillList = ns.SkillList
@@ -87,10 +94,18 @@ local function Collect()
     -- Retail lists every expansion's recipes: the picked one's only.
     local era = R.Line()
     local unlearned = R.Unlearned()
+    local types, seenType = R.types, {}
+    wipe(types)
     for _, id in ipairs(ids) do
         local info = api.GetRecipeInfo(id)
         local named = query == "" or (info and type(info.name) == "string" and info.name:lower():find(query, 1, true) ~= nil)
-        if info and (info.learned ~= false or unlearned) and named and (not era or api.IsRecipeInSkillLine(id, era.professionID)) then
+        local listed = info and (info.learned ~= false or unlearned) and named and (not era or api.IsRecipeInSkillLine(id, era.professionID))
+        local itemType = listed and R.TypeOf(id)
+        if itemType and not seenType[itemType] then
+            seenType[itemType] = true
+            types[#types + 1] = itemType
+        end
+        if listed and R.TypeShown(itemType) then
             local cat = info.categoryID or 0
             local group = groups[cat]
             if not group then
@@ -108,6 +123,7 @@ local function Collect()
             group.recipes[#group.recipes + 1] = info
         end
     end
+    table.sort(types)
     table.sort(order, GroupOrder)
     local first
     for _, group in ipairs(order) do
@@ -145,6 +161,7 @@ local function UpdateRows()
     if not panel then return end
     SkillList.Draw(panel, lines, collapsed, DrawItem)
     panel.bar:SetRange(math.max(0, #lines - LIST_ROWS))
+    panel.list:SetWidth(panel.bar:IsShown() and LIST_W_BAR or LIST_W)
     if panel.collapseAll then SkillList.FoldIcon(panel, lines, collapsed) end
 end
 
@@ -231,12 +248,28 @@ local function SelectedInfo()
     return C_TradeSkillUI.GetRecipeInfo(selected)
 end
 
+-- The content as tall as its reagents; the bar shows only when they run past the pane.
+local function FitDetail()
+    local detail, scroll = panel.detail, panel.detailScroll
+    local bottom = ICON_TOP + 37
+    local rows = math.ceil((detail.shownReagents or 0) / 2)
+    if rows > 0 then
+        bottom = LABEL_TOP + (detail.reagentLabel:GetStringHeight() or 10) + 3 + rows * REAGENT_PITCH - 2
+    end
+    local room = scroll:GetHeight() or 0
+    local height = math.max(room, bottom + 4)
+    detail:SetSize(scroll:GetWidth() or 1, height)
+    panel.detailBar:SetRange(height - room, REAGENT_PITCH)
+end
+
 UpdateDetail = function()
     if not panel then return end
     local detail = panel.detail
     local info = SelectedInfo()
     detail:SetShown(info ~= nil)
     if not info then
+        detail.shownReagents = 0
+        FitDetail()
         panel.create:Disable()
         panel.createAll:Disable()
         return
@@ -314,6 +347,13 @@ UpdateDetail = function()
     end
     for i = shown + 1, REAGENTS_MAX do detail.reagents[i]:Hide() end
     detail.reagentLabel:SetShown(shown > 0)
+    detail.shownReagents = shown
+    -- A new recipe opens at the top.
+    if detail.recipeShown ~= info.recipeID then
+        detail.recipeShown = info.recipeID
+        panel.detailBar:SetValue(0)
+    end
+    FitDetail()
 
     local gameOnly = R.GameOnly(info, schematic)
     local can = Craftable(info) > 0 and not info.disabled and not gameOnly and info.learned ~= false
@@ -349,9 +389,9 @@ end
 
 local function ReagentButton(parent, index)
     local button = ns.NewFrame("Button", nil, parent)
-    button:SetSize(148, 41)
+    button:SetSize(REAGENT_W, 41)
     local column, line = (index - 1) % 2, math.floor((index - 1) / 2)
-    button:SetPoint("TOPLEFT", parent.reagentLabel, "BOTTOMLEFT", column * 152 - 2, -3 - line * 43)
+    button:SetPoint("TOPLEFT", parent.reagentLabel, "BOTTOMLEFT", column * REAGENT_W - 5, -3 - line * REAGENT_PITCH)
     local plate = button:CreateTexture(nil, "BACKGROUND")
     ns.SetFile(plate, "Interface\\QuestFrame\\UI-QuestItemNameFrame")
     plate:SetSize(128, 64)
@@ -412,6 +452,7 @@ local function Refresh()
     local title = ProfessionsFrame and ProfessionsFrame.TitleContainer and ProfessionsFrame.TitleContainer.TitleText
     if title and prof and prof.professionName and (title:GetText() or "") == "" then title:SetText(prof.professionName) end
     ns.PlaceTradeSkillLink(panel.link, title)
+    if ns.OnForever() then ns.ProfessionPortrait() end
     if prof then
         local rank, maxRank = prof.skillLevel or 0, prof.maxSkillLevel or 0
         panel.rank:SetMinMaxValues(0, math.max(1, maxRank))
@@ -422,8 +463,8 @@ local function Refresh()
         else
             panel.rank.text:SetFormattedText("%d/%d", rank, maxRank)
         end
-        -- Retail: the picked expansion before the rank.
-        if era and era.expansionName then panel.rank.text:SetFormattedText("%s %s", era.expansionName, panel.rank.text:GetText()) end
+        -- Retail: the picked expansion in the profession's place.
+        panel.rank.name:SetText(era and era.expansionName or prof.professionName or "")
     end
     UpdateRows()
     UpdateDetail()
@@ -496,8 +537,6 @@ local function Result_OnEnter(self)
     GameTooltip:Show()
 end
 
-local PREV, NEXT = ns.ART.PAGE_PREV, ns.ART.PAGE_NEXT
-local PAGE_ARROW = { set = "file", highlightSet = "raw", add = true }
 local TRADE_EVENTS = { "TRADE_SKILL_SHOW", "TRADE_SKILL_LIST_UPDATE", "TRADE_SKILL_DATA_SOURCE_CHANGED",
     "TRADE_SKILL_DETAILS_UPDATE", "BAG_UPDATE_DELAYED", "GET_ITEM_INFO_RECEIVED", "SKILL_LINES_CHANGED",
     "UPDATE_TRADESKILL_CAST_STOPPED", "TRADE_SKILL_ITEM_CRAFTED_RESULT", "TRACKED_RECIPE_UPDATE" }
@@ -513,32 +552,69 @@ local function RunRefresh()
     detailOnly = true
 end
 
+-- Era's detail scrolls: its scroll frame's spot, the bar beside it in the list's column; the content becomes panel.detail.
+local function DetailScroll()
+    local scroll = ns.NewFrame("ScrollFrame", nil, panel.detail)
+    scroll:SetPoint("TOPLEFT", panel, "TOPLEFT", 8, -221)
+    scroll:SetPoint("BOTTOMRIGHT", panel, "TOPLEFT", 305, -397)
+    local content = ns.NewFrame("Frame", nil, scroll)
+    content:SetSize(1, 1)
+    scroll:SetScrollChild(content)
+    local bar = ns.ShellScrollBar(panel, scroll, function(value) scroll:SetVerticalScroll(value) end,
+        ns.TradeSkillColumns.detail)
+    bar.hideWhenIdle = true
+    bar:SetFrameLevel(panel.detailBox:GetFrameLevel() + 6)
+    scroll:EnableMouseWheel(true)
+    scroll:SetScript("OnMouseWheel", function(_, delta) bar:SetValue(bar:GetValue() - delta * REAGENT_PITCH) end)
+    panel.detailScroll, panel.detailBar, panel.detail = scroll, bar, content
+    scroll:SetScript("OnSizeChanged", FitDetail)
+    return content
+end
+
 local function Build()
     local host = ProfessionsFrame
     if panel or not host then return panel end
     panel = ns.ShellPage("ClassicUIForeverTradeSkill", host)
+    if ns.OnForever() then
+        ns.SetPointOnce(panel, "TOPLEFT", host, "TOPLEFT", PAGE_X, 0)
+        panel:SetSize(WINDOW_W, WINDOW_H)
+    end
     panel:Hide()
 
-    -- The rank bar, under the title and beside the portrait.
+    -- Era's rank bar in its strip under the title, all the way across: the profession, then the rank.
     local rank = ns.NewFrame("StatusBar", nil, panel)
-    rank:SetPoint("TOPLEFT", panel, "TOPLEFT", 72, -36)
-    rank:SetPoint("RIGHT", panel, "RIGHT", -42, 0)
-    rank:SetHeight(13)
+    rank:SetPoint("TOPLEFT", panel, "TOPLEFT", 61, -24)
+    rank:SetPoint("RIGHT", panel, "RIGHT", -9, 0)
+    rank:SetHeight(15)
     ns.SetBarFill(rank, "skillsBar")
-    rank:SetStatusBarColor(0.25, 0.25, 0.75)
+    -- Era's colors as it draws them: the fill blue at half; the backing its faint white, tinted half blue.
+    rank:SetStatusBarColor(0, 0, 1, 0.5)
     local rankBg = rank:CreateTexture(nil, "BACKGROUND")
     rankBg:SetAllPoints(rank)
-    rankBg:SetColorTexture(0, 0, 0, 0.6)
+    rankBg:SetColorTexture(1, 1, 1, 0.2)
+    rankBg:SetVertexColor(0, 0, 0.75, 0.5)
     local rankBorder = rank:CreateTexture(nil, "OVERLAY")
     ns.SetTex(rankBorder, "skillsBarBorder")
-    rankBorder:SetPoint("TOPLEFT", rank, "TOPLEFT", -5, 5)
-    rankBorder:SetPoint("BOTTOMRIGHT", rank, "BOTTOMRIGHT", 5, -5)
+    rankBorder:SetSize(281, 32)
+    rankBorder:SetPoint("LEFT", rank, "LEFT", -5, 0)
+    rank.name = rank:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    rank.name:SetPoint("LEFT", rank, "LEFT", 6, 1)
     rank.text = rank:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    rank.text:SetPoint("CENTER", rank, "CENTER", 0, 0)
+    rank.text:SetPoint("LEFT", rank.name, "RIGHT", 13, 0)
     panel.rank = rank
 
-    ns.OldSkillShell(panel, { rows = LIST_ROWS, createRow = CreateRow, onScroll = UpdateRows })
-    local all, filter, detail = panel.collapseAll, panel.filter, panel.detail
+    ns.OldSkillShell(panel, { rows = LIST_ROWS, createRow = CreateRow, onScroll = UpdateRows, era = true,
+        listColumn = ns.TradeSkillColumns.list })
+    ns.TradeSkillEraArt(panel)
+    -- Era's spots: rows from 83 down, its list bar beside them, the All button in its tab, the filter on its drop down.
+    ns.SetPointOnce(panel.list, "TOPLEFT", panel, "TOPLEFT", 10, -83)
+    panel.list:SetSize(LIST_W, LIST_ROWS * 16)
+    panel.bar:ClearAllPoints()
+    panel.bar:SetPoint("TOPLEFT", panel, "TOPLEFT", 311, -99)
+    panel.bar:SetPoint("BOTTOMLEFT", panel, "TOPLEFT", 311, -197)
+    panel.collapseAll:SetPoint("TOPLEFT", panel, "TOPLEFT", 14, -62)
+    panel.filter:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -11, -52)
+    local all, filter, detail = panel.collapseAll, panel.filter, DetailScroll()
     all:SetScript("OnClick", function()
         SkillList.FoldAll(lines, collapsed)
         Collect()
@@ -559,14 +635,14 @@ local function Build()
     -- Search box between the All tab and the filter (the old window had none), in
     -- the count's thin border.
     local search = ns.NewFrame("EditBox", nil, panel)
-    search:SetPoint("LEFT", panel.allTab, "RIGHT", 16, -6)
+    search:SetPoint("TOPLEFT", panel, "TOPLEFT", 75, -57)
     search:SetPoint("RIGHT", panel.filter, "LEFT", -14, 0)
     search:SetHeight(16)
     search:SetFrameLevel(panel:GetFrameLevel() + 13)
     search:SetAutoFocus(false)
     search:SetFontObject("GameFontHighlightSmall")
     search:SetMaxLetters(40)
-    search:SetTextInsets(2, 14, 0, 0)
+    search:SetTextInsets(2, 20, 0, 0)
     local searchBox = ns.SkillInsetBox(panel, 16, true, 0.5)
     searchBox:SetPoint("TOPLEFT", search, "TOPLEFT", -7, 5)
     searchBox:SetPoint("BOTTOMRIGHT", search, "BOTTOMRIGHT", 5, -5)
@@ -574,6 +650,7 @@ local function Build()
     local searchHint = search:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
     searchHint:SetPoint("LEFT", search, "LEFT", 3, 0)
     searchHint:SetText(SEARCH or "Search")
+    local clear = ns.SearchClear(search)
     search:SetScript("OnEscapePressed", function(self)
         self:SetText("")
         self:ClearFocus()
@@ -582,6 +659,7 @@ local function Build()
     search:SetScript("OnTextChanged", function(self)
         local text = (self:GetText() or ""):lower()
         searchHint:SetShown(text == "")
+        clear:SetShown(text ~= "")
         if text ~= query then
             query = text
             panel.bar:SetValue(0)
@@ -596,6 +674,8 @@ local function Build()
     panel.search, panel.searchBox = search, searchBox
 
     local iconButton = ns.ShellDetailHeader(detail, Result_OnEnter)
+    iconButton:SetPoint("TOPLEFT", detail, "TOPLEFT", 8, -ICON_TOP)
+    detail.name:SetPoint("TOPLEFT", detail, "TOPLEFT", 50, -5)
     detail.made = iconButton:CreateFontString(nil, "OVERLAY", "NumberFontNormal")
     detail.made:SetPoint("BOTTOMRIGHT", iconButton, "BOTTOMRIGHT", -2, 2)
     iconButton:SetScript("OnClick", function()
@@ -607,7 +687,7 @@ local function Build()
     -- Top right of the detail, its label ending at the inset's edge; the name stops short of it.
     if C_TradeSkillUI.SetRecipeTracked and C_TradeSkillUI.IsRecipeTracked then
         local track = ns.SmallCheck(detail, PROFESSIONS_TRACK_RECIPE or TRACK_RECIPE or "Track Recipe", 1, 0.82, 0)
-        track:SetPoint("TOPRIGHT", detail, "TOPRIGHT", -14 - math.ceil(track.label:GetStringWidth() or 60), -16)
+        track:SetPoint("TOPRIGHT", detail, "TOPRIGHT", -14 - math.ceil(track.label:GetStringWidth() or 60), 2 - ICON_TOP)
         track:SetScript("OnClick", function(self)
             ns.CheckSound(self)
             if selected then C_TradeSkillUI.SetRecipeTracked(selected, self:GetChecked() and true or false, false) end
@@ -619,62 +699,26 @@ local function Build()
     detail.cooldown:SetPoint("TOPLEFT", detail.requires, "BOTTOMLEFT", 0, -2)
     detail.reagentLabel = detail:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
     detail.reagentLabel:SetText(SPELL_REAGENTS or "Reagents:")
-    detail.reagentLabel:SetPoint("TOPLEFT", detail, "TOPLEFT", 19, -66)
+    detail.reagentLabel:SetPoint("TOPLEFT", detail, "TOPLEFT", 8, -LABEL_TOP)
     detail.reagents = {}
     for i = 1, REAGENTS_MAX do detail.reagents[i] = ReagentButton(detail, i) end
 
-    -- The foot: Create All, the count between its arrows, Create, Exit.
-    local createAll = ns.PanelButton(panel, CREATE_ALL or "Create All", 92)
-    createAll:SetPoint("BOTTOMLEFT", panel, "BOTTOMLEFT", 7, 11)
-    createAll:SetScript("OnClick", function() Craft(true) end)
-    panel.createAll = createAll
-
-    local dec = ns.NewFrame("Button", nil, panel)
-    dec:SetSize(20, 20)
-    dec:SetPoint("LEFT", createAll, "RIGHT", 5, 0)
-    ns.DressStates(dec, PREV .. "Up", PREV .. "Down", PREV .. "Disabled", ns.ART.HILIGHT, PAGE_ARROW)
-    local count = ns.NewFrame("EditBox", nil, panel, "InputBoxTemplate")
-    count:SetSize(24, 20)
-    count:SetPoint("LEFT", dec, "RIGHT", 5, 0)
-    count:SetAutoFocus(false)
-    count:SetNumeric(true)
-    ns.DrainInput(count)
-    count:SetMaxLetters(3)
-    count:SetNumber(1)
-    count:SetScript("OnEnterPressed", function(self) self:ClearFocus() end)
-    count:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
-    panel.count = count
-    local inc = ns.NewFrame("Button", nil, panel)
-    inc:SetSize(20, 20)
-    inc:SetPoint("LEFT", count, "RIGHT", 1, 0)
-    -- The count and its arrows in a thin border of their own.
-    local countBox = ns.SkillInsetBox(panel, 16, true)
-    countBox:SetPoint("TOPLEFT", dec, "TOPLEFT", -4, 4)
-    countBox:SetPoint("BOTTOMRIGHT", inc, "BOTTOMRIGHT", 4, -4)
-    countBox:SetFrameLevel(math.max(0, dec:GetFrameLevel() - 1))
-    ns.DressStates(inc, NEXT .. "Up", NEXT .. "Down", NEXT .. "Disabled", ns.ART.HILIGHT, PAGE_ARROW)
-    local function Step(by)
-        local info = SelectedInfo()
-        local most = math.max(1, Craftable(info))
-        count:SetNumber(math.max(1, math.min(most, (count:GetNumber() or 1) + by)))
-    end
-    dec:SetScript("OnClick", function() Step(-1) end)
-    inc:SetScript("OnClick", function() Step(1) end)
-
-    local exit = ns.ShellExitButton(panel, "ProfessionsFrame", 86)
-    local create = ns.PanelButton(panel, CREATE_PROFESSION or CREATE or "Create", 93)
-    create:SetPoint("RIGHT", exit, "LEFT", -2, 0)
-    create:SetScript("OnClick", function() Craft(false) end)
-    panel.create = create
+    ns.TradeSkillFoot(panel, Craft, function(by)
+        local most = math.max(1, Craftable(SelectedInfo()))
+        panel.count:SetNumber(math.max(1, math.min(most, (panel.count:GetNumber() or 1) + by)))
+    end)
 
     if ns.TradeSkillRetailParts then ns.TradeSkillRetailParts(panel, Refresh, SelectedInfo) end
     panel:SetScript("OnShow", Refresh)
+    R.Changed = Refresh
     RunWatch()
 
     local events = CreateFrame("Frame")
     ns.RegisterEvents(events, TRADE_EVENTS)
     -- Hidden, nothing is drawn: OnShow refreshes the page as it opens.
     events:SetScript("OnEvent", function(_, event, itemID)
+        -- A profession opening lists every type again, as Era's does.
+        if event == "TRADE_SKILL_SHOW" then R.ClearTypes() end
         if not active or not panel:IsShown() then return end
         if event == "GET_ITEM_INFO_RECEIVED" then
             if not OnPlates(itemID) then return end
@@ -709,7 +753,10 @@ function ns.ShowTradeSkill(up)
     ns.SetShownIf(panel, show)
 end
 
-function ns.TradeSkillWindowSize() return WINDOW_W, WINDOW_H end
+function ns.TradeSkillWindowSize()
+    if ns.OnForever() then return FOREVER_W, FOREVER_H end
+    return WINDOW_W, WINDOW_H
+end
 
 -- Retail's driver (Skills/TradeSkillRetail.lua) parks the game's page and shows ours itself.
 function ns.TradeSkillPage()

@@ -155,13 +155,13 @@ function ns.TradeSkillRetailParts(panel, refresh, selectedInfo)
     ns.AttachTip(drop, { text = function() return _G.EXPANSION_FILTER_TEXT or "" end })
 
     local best = ns.SmallCheck(detail, _G.PROFESSIONS_USE_BEST_QUALITY_REAGENTS or "", 1, 0.82, 0)
-    best:SetPoint("TOPRIGHT", detail, "TOPRIGHT", -14 - math.ceil(best.label:GetStringWidth() or 120), -36)
+    best:SetPoint("TOPRIGHT", detail, "TOPRIGHT", -14 - math.ceil(best.label:GetStringWidth() or 120), -22)
     best:SetScript("OnClick", function(self) ns.CheckSound(self) end)
     panel.best = best
 
     local more = ns.NewFrame("Button", nil, detail)
     more:SetHeight(14)
-    more:SetPoint("TOPRIGHT", detail, "TOPRIGHT", -14, -64)
+    more:SetPoint("TOPRIGHT", detail, "TOPRIGHT", -14, -50)
     local text = more:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
     text:SetPoint("RIGHT", more, "RIGHT", 0, 0)
     more:SetHighlightTexture(ns.ART.HILIGHT, "ADD")

@@ -270,7 +270,24 @@ local function AllTab(panel, listBox)
     panel.allTab = tab
 end
 
--- Rows, the scroll column over the pane's right edge, and the knob's run in the panes' marble.
+-- Our bar on the old scroll column, the knob's run in the panes' marble; column: art pieces of its own instead (Era's
+-- trainer column, DressPieces specs on the bar, shown with it).
+function ns.ShellScrollBar(panel, anchorTo, onValue, column)
+    local bar = ns.ClassicScrollBar(panel, anchorTo, onValue)
+    if column then
+        ns.DressPieces(bar, column)
+        return bar
+    end
+    ns.ScrollColumnOn(bar)
+    -- Over the column's grey, under the knob.
+    local run = bar:CreateTexture(nil, "BORDER")
+    ns.TileTex(run, "marbleBg", nil, MARBLE)
+    run:SetPoint("TOPLEFT", bar, "TOPLEFT", 0, 0)
+    run:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", 0, 0)
+    return bar
+end
+
+-- Rows and the scroll column over the pane's right edge.
 local function ListRows(panel, listBox, rowCount, opts)
     local list = ns.NewFrame("Frame", nil, listBox)
     list:SetPoint("TOPLEFT", listBox, "TOPLEFT", 17, -17)
@@ -279,20 +296,14 @@ local function ListRows(panel, listBox, rowCount, opts)
     panel.list = list
     panel.rows = {}
     for i = 1, rowCount do panel.rows[i] = opts.createRow(list, i) end
-    panel.bar = ns.ClassicScrollBar(panel, list, function() opts.onScroll() end)
-    -- The old window kept its scroll column whether the list ran past it or not.
-    panel.bar.hideWhenIdle = false
+    panel.bar = ns.ShellScrollBar(panel, list, function() opts.onScroll() end, opts.listColumn)
+    -- The old window kept its scroll column whether the list ran past it or not; Era's art hides it with nothing to scroll.
+    panel.bar.hideWhenIdle = opts.era == true
     panel.bar:ClearAllPoints()
     panel.bar:SetPoint("TOPLEFT", listBox, "TOPRIGHT", -9, -27)
     panel.bar:SetPoint("BOTTOMLEFT", listBox, "BOTTOMRIGHT", -9, 22)
     -- Above the pane, so the column's left edge covers the pane's right.
     panel.bar:SetFrameLevel(listBox:GetFrameLevel() + 6)
-    ns.ScrollColumnOn(panel.bar)
-    -- Over the column's grey, under the knob.
-    local run = panel.bar:CreateTexture(nil, "BORDER")
-    ns.TileTex(run, "marbleBg", nil, MARBLE)
-    run:SetPoint("TOPLEFT", panel.bar, "TOPLEFT", 0, 0)
-    run:SetPoint("BOTTOMRIGHT", panel.bar, "BOTTOMRIGHT", 0, 0)
     return list
 end
 
@@ -316,14 +327,20 @@ local function RimStones(panel, listBox)
     panel.tabStones = { overTab = overTab, besideTab = besideTab }
 end
 
+-- A pane in metal, or bare where Era's art is drawn under the page.
+local function Pane(panel, era, edge, bare)
+    if era then return ns.NewFrame("Frame", nil, panel) end
+    return ns.SkillInsetBox(panel, edge, bare)
+end
+
 -- Detail pane over the list's bottom edge so the borders read as one heavy line (metal 4 to 11 px in at this weight).
-local function DetailPanes(panel, listBox)
-    local detailBox = ns.SkillInsetBox(panel, 32)
+local function DetailPanes(panel, listBox, era)
+    local detailBox = Pane(panel, era, 32)
     detailBox:SetPoint("TOPLEFT", listBox, "BOTTOMLEFT", 0, 12)
     detailBox:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", 0, 33)
     detailBox:SetFrameLevel(listBox:GetFrameLevel() + 2)
     -- Foot: a lighter floorless border round its buttons, top edge under the detail pane's.
-    local footBox = ns.SkillInsetBox(panel, 20, true)
+    local footBox = Pane(panel, era, 20, true)
     footBox:SetPoint("TOPLEFT", detailBox, "BOTTOMLEFT", 0, 7)
     footBox:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", 1, 2)
     footBox:SetFrameLevel(listBox:GetFrameLevel() + 1)
@@ -334,22 +351,23 @@ local function DetailPanes(panel, listBox)
 end
 
 -- opts: rows (visible count), createRow(list, index), onScroll(). Row content, panel.detail and the foot are the caller's.
+-- era: bare panes, no All tab or stones, over Era's window art the caller draws; listColumn: the list bar's own art.
 function ns.OldSkillShell(panel, opts)
     local rowCount = opts.rows or LIST_ROWS
     FoldAllButton(panel)
     FilterButton(panel)
     -- Under the window border (drawn above this page), past the left edge and a little right, where the column covers it.
-    local listBox = ns.SkillInsetBox(panel, 32)
+    local listBox = Pane(panel, opts.era, 32)
     listBox:SetPoint("TOPLEFT", panel, "TOPLEFT", -2, -75)
     listBox:SetPoint("RIGHT", panel, "RIGHT", LIST_RIGHT, 0)
     listBox:SetHeight(rowCount * ROW_H + 25)
-    AllTab(panel, listBox)
+    if not opts.era then AllTab(panel, listBox) end
     panel.listBox = listBox
     panel.listRight = LIST_RIGHT
     local list = ListRows(panel, listBox, rowCount, opts)
-    RimStones(panel, listBox)
+    if not opts.era then RimStones(panel, listBox) end
     list:SetScript("OnMouseWheel", function(_, delta)
         panel.bar:SetValue((panel.bar:GetValue() or 0) - delta * 2)
     end)
-    DetailPanes(panel, listBox)
+    DetailPanes(panel, listBox, opts.era)
 end
