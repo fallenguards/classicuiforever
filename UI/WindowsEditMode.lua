@@ -17,6 +17,8 @@ local Plain = ns.Safe
 local MODE_W, MODE_PAD, ROW_W, ROW_H = 510, 20, 225, 32
 local MODE_TOP = 110
 local SECTION_GAP = 40
+-- The list (headings and rows) scrolls past nine rows' height, from just over its first heading.
+local LIST_TOP, LIST_MAX_H, BAR_ROOM = MODE_TOP - 32, 9 * ROW_H + 12, 40
 local FOOT_W, FOOT_H, FOOT_X, FOOT_Y, FOOT_GAP = 220, 28, 15, 16, 14
 -- The toggle's top right from the client's window's, beside its layout dropdown; Back from our window's top left.
 local TOGGLE_X, TOGGLE_Y, TOGGLE_H = -20, -50, 26
@@ -279,11 +281,12 @@ local function SyncToggle()
     end
 end
 
-local function ModeCheck(entry, index, top)
+-- top: in the window's units; the row hangs in the list's scrolling content.
+local function ModeCheck(list, entry, index, top)
     local col, row = (index - 1) % 2, math.floor((index - 1) / 2)
-    local check = ns.NewFrame("CheckButton", nil, mode, "UICheckButtonTemplate")
+    local check = ns.NewFrame("CheckButton", nil, list, "UICheckButtonTemplate")
     check:SetSize(ROW_H, ROW_H)
-    check:SetPoint("TOPLEFT", mode, "TOPLEFT", MODE_PAD + col * ROW_W, -(top + row * ROW_H))
+    check:SetPoint("TOPLEFT", list, "TOPLEFT", MODE_PAD + col * ROW_W, -(top - LIST_TOP + row * ROW_H))
     check:SetHitRectInsets(0, -(ROW_W - ROW_H), 0, 0)
     ns.EditModeCheck(check)
     local label = check:CreateFontString(nil, "ARTWORK", "GameFontHighlightMedium")
@@ -353,8 +356,11 @@ local function Mode()
         list.top = tall + SECTION_GAP
         tall = list.top + math.ceil(#list / 2) * ROW_H
     end
+    local listH = tall - LIST_TOP
+    local viewH = math.min(listH, LIST_MAX_H)
     -- Under a window's own dialog (200), children and all: lowered after they were made, its close stood over it.
-    mode = ns.band.EditDialog("ForeverClassicUIWindowsEditMode", MODE_W, tall + FOOT_GAP + FOOT_H + FOOT_Y, MODE_TITLE, 150)
+    mode = ns.band.EditDialog("ForeverClassicUIWindowsEditMode", MODE_W, LIST_TOP + viewH + FOOT_GAP + FOOT_H + FOOT_Y,
+        MODE_TITLE, 150)
     mode.close:SetScript("OnClick", TryClose)
     local back = ns.NewFrame("Button", nil, mode, "UIPanelButtonTemplate")
     back:SetSize(BACK_W, BACK_H)
@@ -372,16 +378,28 @@ local function Mode()
     help:SetWidth(MODE_W - 2 * MODE_PAD - 10)
     help:SetJustifyH("LEFT")
     help:SetText(MODE_HELP)
-    local head = mode:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-    head:SetPoint("BOTTOMLEFT", mode, "TOPLEFT", MODE_PAD + 5, -(MODE_TOP - 6))
-    head:SetText(L["UI_WINDOWS"])
+    local scroll = ns.NewFrame("ScrollFrame", nil, mode)
+    scroll:SetPoint("TOPLEFT", mode, "TOPLEFT", 0, -LIST_TOP)
+    scroll:SetSize(MODE_W - BAR_ROOM, viewH)
+    local list = ns.NewFrame("Frame", nil, scroll)
+    list:SetSize(MODE_W - BAR_ROOM, listH)
+    scroll:SetScrollChild(list)
+    local bar = ns.ClassicScrollBar(mode, scroll, function(value) scroll:SetVerticalScroll(value) end)
+    bar.hideWhenIdle = true
+    bar:SetRange(listH - viewH, ROW_H)
+    scroll:EnableMouseWheel(true)
+    scroll:SetScript("OnMouseWheel", function(_, delta) bar:SetValue(bar:GetValue() - delta * ROW_H) end)
+    local function Heading(text, top)
+        local head = list:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+        head:SetPoint("BOTTOMLEFT", list, "TOPLEFT", MODE_PAD + 5, -(top - 6 - LIST_TOP))
+        head:SetText(text)
+    end
+    Heading(L["UI_WINDOWS"], MODE_TOP)
     mode.checks = {}
-    for i, entry in ipairs(windows) do mode.checks[#mode.checks + 1] = ModeCheck(entry, i, MODE_TOP) end
-    for _, list in ipairs(sections) do
-        local sub = mode:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-        sub:SetPoint("BOTTOMLEFT", mode, "TOPLEFT", MODE_PAD + 5, -(list.top - 6))
-        sub:SetText(list.title)
-        for i, entry in ipairs(list) do mode.checks[#mode.checks + 1] = ModeCheck(entry, i, list.top) end
+    for i, entry in ipairs(windows) do mode.checks[#mode.checks + 1] = ModeCheck(list, entry, i, MODE_TOP) end
+    for _, section in ipairs(sections) do
+        Heading(section.title, section.top)
+        for i, entry in ipairs(section) do mode.checks[#mode.checks + 1] = ModeCheck(list, entry, i, section.top) end
     end
     mode.revert = FootButton(HUD_EDIT_MODE_REVERT_ALL_CHANGES or "Revert All Changes", "BOTTOMLEFT", FOOT_X, RevertAll)
     mode.save = FootButton(HUD_EDIT_MODE_SAVE_LAYOUT or "Save", "BOTTOMRIGHT", -FOOT_X, Save)
