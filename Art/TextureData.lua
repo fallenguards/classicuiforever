@@ -206,6 +206,15 @@ ns.TEX = {
     barKeyringClassic = "!UI-MainMenuBar-KeyRing-Classic.blp",
     -- The client's left page with Archaeology's fossil swapped for the old First Aid drop. Ours only.
     professionsBookLeft = "!Professions-Book-Left-FirstAid.tga",
+    -- That page's secondary emblems as a shading and a highlight layer, for the small book's parchment. Ours only.
+    professionsEmblemsMod = "!Professions-Emblems-Mod.tga",
+    professionsEmblemsAdd = "!Professions-Emblems-Add.tga",
+    -- The full book's two pages in the spellbook parchment's tones (dev/tools/prof_emblems.py). Ours only.
+    professionsBookLeftParchment = "!Professions-Book-Left-Parchment.tga",
+    professionsBookRightParchment = "!Professions-Book-Right-Parchment.tga",
+    -- Its primary bands and patterned strip the same way.
+    professionsBandsMod = "!Professions-Bands-Mod.tga",
+    professionsBandsAdd = "!Professions-Bands-Add.tga",
     -- window chrome
     frameMetal = "FrameGeneral\\UIFrameMetal",
     frameMetalH = "FrameGeneral\\UIFrameMetalHorizontal",

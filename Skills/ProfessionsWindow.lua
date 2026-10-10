@@ -685,9 +685,9 @@ ns.OnToggle(function(key)
     if key == "professionTabs" then SyncTabs() end
 end)
 
--- The page size switched (option or popout): rows now, cards and window on the watch's next pass (out of combat).
+-- The page size or its art switched (options or popout): rows now, cards and window on the watch's next pass (out of combat).
 ns.OnToggle(function(key)
-    if key ~= "profBookBig" then return end
+    if key ~= "profBookBig" and key ~= "profBookBands" then return end
     if T.Lay then T.Lay() end
     if watch then
         watch.dirty = true

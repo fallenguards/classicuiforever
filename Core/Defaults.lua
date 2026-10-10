@@ -99,6 +99,7 @@ ns.DB_DEFAULTS = {
     classColorNamesPlayer = true, classColorNamesTarget = true, classColorNamesFocus = true,
     nameBoxPlayer = false, nameBoxTarget = true, nameBoxFocus = true,
     profBookBig = false,
+    profBookBands = false,
     tradeSkillFull = false,
     reagentBagSlot = false,
     reagentBagRound = false,

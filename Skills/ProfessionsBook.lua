@@ -15,10 +15,23 @@ local PAGE_RIGHT = "Interface\\Spellbook\\Professions-Book-Right"
 -- primary raised 15 onto its band), or the 1.x window's size (option), each row on its own band of the page cut
 -- off on the right, stacked with no spare parchment.
 local BIG = { rowX = 80, rowW = 437, ring = 72, ringX = 7, ringY = -12, textX = 100, nameY = -8, rankW = 182,
-    spellX = 288, plates = true, rowY = { -62, -153, -282, -352, -422 } }
-local SMALL = { rowX = 17, rowW = 305, ring = 48, ringX = 4, ringY = -23, textX = 58, nameY = -11, rankW = 97,
-    spellX = 159, barW = 64, plates = false, iconsX = 159, descX = 129, descSize = 9, rowY = { -37, -131, -230, -294, -358 } }
--- The small page's art: { texture top, bottom, drawn top } on the left page from its spine margin, 322 wide.
+    spellX = 288, plates = true, rowY = { -62, -153, -284, -355, -431 } }
+-- Small, on the spellbook's parchment (it starts 63 down): no ring (the spell buttons carry the icon), the text at
+-- the secondaries' left, the unlearn button after the bar's end, each primary in the middle of its band; the spells at
+-- 4/5 size (two stacked fit a band) and the secondaries' in the primaries' column.
+local SMALL = { rowX = 17, rowW = 305, ring = 48, ringX = 4, ringY = -29, noRing = true, textX = 6, nameY = -31,
+    missingY = -40, cardDrop = 11, unlearnRight = true, centerSpells = true, rankW = 97, spellX = 154, barW = 64,
+    plates = false, iconsX = 154, spellScale = 0.8, descX = 129, descSize = 9, rowY = { -46, -124, -230, -294, -358 },
+    segMid = { 106.5, 186.5 } }
+-- The banded page (option): its ring and spots from before.
+local SMALL_BANDED = setmetatable({ ringY = -23, noRing = false, textX = 58, nameY = -11, missingY = -20, cardDrop = 5,
+    unlearnRight = false, centerSpells = false, spellX = 159, iconsX = 159, spellScale = 1, segMid = false,
+    rowY = { -37, -131, -230, -294, -358 } }, { __index = SMALL })
+-- segMid (small page): each primary's segment middle on the page, between its band's lines (BANDS): the text block and
+-- the spells stand on it, rowY unused for those two.
+-- A primary row's rank line, from the row's top; its bar 5 under it.
+local RANK_Y, BAR_GAP = 56, 5
+-- The banded page's art: { texture top, bottom, drawn top } on the left page from its spine margin, 322 wide.
 -- Every band drawn PULL further into the art, so the secondaries' emblems (at x 150-186) stand near their names; a cut
 -- inside a band showed a seam, so the whole band moves and its soft left rim goes under the window's metal.
 local PULL = 24
@@ -32,10 +45,30 @@ local SMALL_BANDS = {
     { 392, 456, 352 }, -- First Aid
     { 458, 466, 416 }, -- the page's foot
 }
+-- The small page on the spellbook's own parchment: only the secondaries' emblems, lifted off the page art as a shading
+-- (multiply) and a highlight (add) layer (dev/tools/prof_emblems.py), where their bands had them. { x, y, w, h, cell }
+-- on the page; each 128 x 64 cell from its top left.
+local EMBLEMS = {
+    { 68, 226, 80, 56, 0 },   -- Cooking
+    { 72, 290, 96, 52, 1 },   -- Fishing
+    { 70, 349, 84, 57, ns.OnForever() and 2 or 3 },   -- First Aid; retail's Archaeology
+}
+local EMBLEM_LAYERS = { { "professionsEmblemsMod", "MOD" }, { "professionsEmblemsAdd", "ADD" } }
+-- The old page's primary bands on the parchment, the same two layers (322 wide): { y on the page, height, top in the
+-- 512 x 128 sheet }. The first runs on its plain grain (sheet 96) to the second's top line; under them the same line
+-- and its shading, the band's top (sheet 3-38); no line has the light rim the old page has over it (sheet 0-2).
+local BANDS = { { 67, 54, 3 }, { 121, 21, 96 }, { 145, 54, 3 }, { 199, 13, 104 }, { 227, 36, 3 } }
+-- Cut to the parchment inside the frame's dark inset line, 4 in on the left and 2 on the right.
+local PARCH_BAND_X, PARCH_BAND_W, PARCH_CUT_L, PARCH_CUT_R = 8, 322, 4, 2
+local BAND_LAYERS = { { "professionsBandsMod", "MOD" }, { "professionsBandsAdd", "ADD" } }
 local PRIMARY_H, SECONDARY_H = 100, 52
 
 function T.Big() return ns.db == nil or ns.db.profBookBig == true end
-local function Spec() return T.Big() and BIG or SMALL end
+local function Banded() return ns.db ~= nil and ns.db.profBookBands == true end
+local function Spec()
+    if T.Big() then return BIG end
+    return Banded() and SMALL_BANDED or SMALL
+end
 -- Bands are 76 apart, rows 70: each band is redrawn centred on its row (First
 -- Aid by its emblem, high in the art). { art top, art bottom, drawn top, drawn
 -- bottom } in the 512 px page.
@@ -132,7 +165,7 @@ local function NewRow(content, primary, index)
 
         Font(row.name, "QuestTitleFontBlackShadow", "GameFontNormalLarge")
         row.name:SetJustifyH("LEFT")
-        row.bar:SetPoint("TOPLEFT", row.rank, "BOTTOMLEFT", 14, -5)
+        row.bar:SetPoint("TOPLEFT", row.rank, "BOTTOMLEFT", 14, -BAR_GAP)
 
         Font(row.missingHeader, "QuestTitleFontBlackShadow", "GameFontNormalLarge")
         row.missingHeader:SetTextColor(0.85, 0.7, 0.6)
@@ -157,12 +190,28 @@ local function NewRow(content, primary, index)
 end
 
 -- A row's size and inner spots for the page size.
+-- A primary row's text block: its name's top to its bar's foot, from the row's top. The rank line by its font's size,
+-- not its text's: rows, cards and spells are placed at different times and must agree.
+local function BarFoot(row)
+    return RANK_Y + (select(2, row.rank:GetFont()) or 10) + BAR_GAP + (row.bar:GetHeight() or 16)
+end
+local function TextMiddle(row, spec) return (-spec.nameY + BarFoot(row)) / 2 end
+
+-- Row i's top on the page: a primary's text block in the middle of its segment where the page has them.
+local function RowTop(i, spec)
+    local row = rows[i]
+    if i <= 2 and spec.segMid and row then return TextMiddle(row, spec) - spec.segMid[i] end
+    return spec.rowY[i]
+end
+
 local function LayRow(row, content, spec)
     row:SetSize(spec.rowW, row.primary and PRIMARY_H or SECONDARY_H)
     row.bar.fullW = row.bar.fullW or row.bar:GetWidth()
     row.bar:SetWidth(spec.barW or row.bar.fullW)
-    ns.SetPointOnce(row, "TOPLEFT", content, "TOPLEFT", spec.rowX, spec.rowY[row.index])
+    ns.SetPointOnce(row, "TOPLEFT", content, "TOPLEFT", spec.rowX, RowTop(row.index, spec))
     if row.primary then
+        SetShownIf(row.ring, not spec.noRing)
+        SetShownIf(row.icon, not spec.noRing)
         row.ring:SetSize(spec.ring, spec.ring)
         ns.SetPointOnce(row.ring, "TOPLEFT", row, "TOPLEFT", spec.ringX, spec.ringY)
         local inset = spec.ring / 9
@@ -170,9 +219,9 @@ local function LayRow(row, content, spec)
         row.icon:SetPoint("BOTTOMRIGHT", row.ring, "BOTTOMRIGHT", -inset, inset)
         ns.SetPointOnce(row.name, "TOPLEFT", row, "TOPLEFT", spec.textX, spec.nameY)
         row.name:SetWidth(spec.spellX - spec.textX - 4)
-        ns.SetPointOnce(row.rank, "TOPLEFT", row, "TOPLEFT", spec.textX, -56)
+        ns.SetPointOnce(row.rank, "TOPLEFT", row, "TOPLEFT", spec.textX, -RANK_Y)
         row.rank:SetWidth(spec.rankW)
-        ns.SetPointOnce(row.missingHeader, "TOPLEFT", row, "TOPLEFT", spec.textX + 20, -20)
+        ns.SetPointOnce(row.missingHeader, "TOPLEFT", row, "TOPLEFT", spec.textX + 20, spec.missingY or -20)
         row.missingText:SetWidth(spec.rowW - spec.textX - 32)
     else
         -- Untrained: the description after the emblem on the small page, at the row's right on the full one.
@@ -321,13 +370,38 @@ local function DressSpellButton(button)
     end
 end
 
+-- A spell button at the page's size (spec.spellScale of the client's): its icon, states and glow fill it, its name
+-- hangs off its side at full size. Returns how much shorter than the client's it stands.
+local fullSize = setmetatable({}, { __mode = "k" })
+local plateHeight = setmetatable({}, { __mode = "k" })
+local function SizeSpell(button, spec)
+    if not button then return 0 end
+    local full = fullSize[button]
+    if not full then
+        full = button:GetWidth()
+        fullSize[button] = full
+    end
+    local scale = spec.spellScale or 1
+    local size = full * scale
+    ns.SetSizeIf(button, size, size)
+    -- Its name plate as tall as it, in step.
+    local plate = plates[button]
+    if plate then
+        plateHeight[plate] = plateHeight[plate] or plate:GetHeight()
+        ns.SetSizeIf(plate, plate:GetWidth(), plateHeight[plate] * scale)
+    end
+    return full - size
+end
+
 local function DressUnlearn(card, content, y, spec)
     local button = card.UnlearnButton
     if not button then return end
-    -- Just left of the bar's end cap, level with the bar. Retail's button is scaled 0.7: its offsets and icon in its own units.
+    -- Level with the bar: just left of its end cap, or (spellbook parchment) a little past its far end. Retail's button
+    -- is scaled 0.7: its offsets and icon in its own units.
     local scale = button:GetScale()
     if not scale or scale <= 0 then scale = 1 end
-    ns.SetPointOnce(button, "CENTER", content, "TOPLEFT", (spec.rowX + spec.textX - 15) / scale, (y - 76) / scale)
+    local x = spec.unlearnRight and spec.rowX + spec.textX + 14 + spec.barW + 26 or spec.rowX + spec.textX - 15
+    ns.SetPointOnce(button, "CENTER", content, "TOPLEFT", x / scale, (y - 76) / scale)
     if button.Icon then
         button.Icon:SetTexture("Interface\\Buttons\\UI-GroupLoot-Pass-Up")
         button.Icon:SetSize(16 / scale, 16 / scale)
@@ -345,12 +419,14 @@ function T.PlaceCards()
     for i = 1, 2 do
         local card = Card(content, "PrimaryProfession" .. i)
         if card then
-            local y = spec.rowY[i]
+            local y = RowTop(i, spec)
             card:SetSize(170, PRIMARY_H)
-            ns.SetPointOnce(card, "TOPLEFT", content, "TOPLEFT", spec.rowX + spec.spellX - CLIENT_BUTTON_X, y - 5)
+            ns.SetPointOnce(card, "TOPLEFT", content, "TOPLEFT", spec.rowX + spec.spellX - CLIENT_BUTTON_X, y - (spec.cardDrop or 5))
             FadeCard(card)
             DressSpellButton(card.SpellButton1)
             DressSpellButton(card.SpellButton2)
+            SizeSpell(card.SpellButton1, spec)
+            SizeSpell(card.SpellButton2, spec)
             DressUnlearn(card, content, y, spec)
         end
     end
@@ -366,6 +442,8 @@ function T.PlaceCards()
                 local button = card["SpellButton" .. n]
                 if button then
                     DressSpellButton(button)
+                    -- Smaller, it keeps the row's middle.
+                    local short = SizeSpell(button, spec)
                     local named = spec.plates or n == 1
                     if plates[button] then plates[button]:SetShown(named) end
                     ns.SetAlphaIf(button.spellString, named and 1 or 0)
@@ -375,7 +453,7 @@ function T.PlaceCards()
                         if previous then
                             button:SetPoint("TOPRIGHT", previous, "TOPLEFT", -4, 0)
                         else
-                            button:SetPoint("TOPLEFT", card, "TOPLEFT", spec.iconsX, -6)
+                            button:SetPoint("TOPLEFT", card, "TOPLEFT", spec.iconsX, -6 - short / 2)
                         end
                     elseif previous then
                         button:SetPoint("TOPRIGHT", previous, "TOPLEFT", -109, 0)
@@ -394,6 +472,25 @@ end
 -- The book
 ---------------------------------------------------------------------------
 
+-- The full book's pages: the spellbook parchment's tones (Forever, our left page), or the Cataclysm page (option, and
+-- retail, whose left page carries Archaeology). Only on a change.
+local function PaintFull()
+    local full = rows.full
+    local parchment = FOREVER and not Banded()
+    if not full or full.parchment == parchment then return end
+    full.parchment = parchment
+    local function Left(tex)
+        if parchment then ns.SetTex(tex, "professionsBookLeftParchment")
+        elseif not (FOREVER and ns.SetTex(tex, "professionsBookLeft")) then tex:SetTexture(PAGE_LEFT) end
+    end
+    Left(full.left)
+    for _, band in ipairs(full.strips) do
+        Left(band)
+        band:SetTexCoord(unpack(band.coords))
+    end
+    if parchment then ns.SetTex(full.right, "professionsBookRightParchment") else full.right:SetTexture(PAGE_RIGHT) end
+end
+
 function T.Build()
     local page, content = Page(), Content()
     if T.built or not page or not content then return T.built end
@@ -404,21 +501,20 @@ function T.Build()
     end
     local artHost = FOREVER and page or content
     local left = artHost:CreateTexture(nil, "BACKGROUND", nil, 2)
-    PageArt(left)
     left:SetSize(512, 512)
     left:SetPoint("TOPLEFT", page, "TOPLEFT", 7, -25)
     local right = artHost:CreateTexture(nil, "BACKGROUND", nil, 2)
-    right:SetTexture(PAGE_RIGHT)
     right:SetPoint("TOPLEFT", left, "TOPRIGHT", 0, 0)
     rows.art = { left, right }
+    rows.full = { left = left, right = right, strips = {} }
     for _, strip in ipairs(BAND_STRIPS) do
         local band = artHost:CreateTexture(nil, "BACKGROUND", nil, 3)
-        PageArt(band)
-        band:SetTexCoord(BAND_X / 512, 1, strip[1] / 512, strip[2] / 512)
         -- Both corners on the page texture, so neighbouring strips share an edge exactly.
         band:SetPoint("TOPLEFT", left, "TOPLEFT", BAND_X, -strip[3])
         band:SetPoint("BOTTOMRIGHT", left, "TOPRIGHT", 0, -strip[4])
+        band.coords = { BAND_X / 512, 1, strip[1] / 512, strip[2] / 512 }
         rows.art[#rows.art + 1] = band
+        rows.full.strips[#rows.full.strips + 1] = band
     end
     rows.small = {}
     -- Clipped to the window's inside: the page stands lower than the window, and the art ran past its foot.
@@ -428,17 +524,37 @@ function T.Build()
     clip:SetClipsChildren(true)
     clip:SetFrameLevel(artHost:GetFrameLevel())
     rows.clip = clip
-    local function Piece(band, u0, u1, x)
-        local tex = clip:CreateTexture(nil, "BACKGROUND", nil, 2)
-        PageArt(tex)
-        tex:SetTexCoord(u0 / 512, u1 / 512, band[1] / 512, band[2] / 512)
-        tex:SetPoint("TOPLEFT", page, "TOPLEFT", x, -band[3])
-        tex:SetSize(u1 - u0, band[2] - band[1])
-        rows.small[#rows.small + 1] = tex
-    end
+    rows.bands = {}
     local artEnd = SMALL_ART_U + SMALL_ART_W
     for _, band in ipairs(SMALL_BANDS) do
-        Piece(band, SMALL_ART_U + PULL, artEnd + PULL, SMALL_ART_X)
+        local tex = clip:CreateTexture(nil, "BACKGROUND", nil, 2)
+        PageArt(tex)
+        tex:SetTexCoord((SMALL_ART_U + PULL) / 512, (artEnd + PULL) / 512, band[1] / 512, band[2] / 512)
+        tex:SetPoint("TOPLEFT", page, "TOPLEFT", SMALL_ART_X, -band[3])
+        tex:SetSize(SMALL_ART_W, band[2] - band[1])
+        rows.bands[#rows.bands + 1] = tex
+    end
+    for _, b in ipairs(BANDS) do
+        for _, layer in ipairs(BAND_LAYERS) do
+            local tex = clip:CreateTexture(nil, "BACKGROUND", nil, 2)
+            ns.SetTex(tex, layer[1])
+            tex:SetBlendMode(layer[2])
+            tex:SetTexCoord(PARCH_CUT_L / 512, (PARCH_BAND_W - PARCH_CUT_R) / 512, b[3] / 128, (b[3] + b[2]) / 128)
+            tex:SetPoint("TOPLEFT", page, "TOPLEFT", PARCH_BAND_X + PARCH_CUT_L, -b[1])
+            tex:SetSize(PARCH_BAND_W - PARCH_CUT_L - PARCH_CUT_R, b[2])
+            rows.small[#rows.small + 1] = tex
+        end
+    end
+    for _, e in ipairs(EMBLEMS) do
+        for _, layer in ipairs(EMBLEM_LAYERS) do
+            local tex = clip:CreateTexture(nil, "BACKGROUND", nil, 2)
+            ns.SetTex(tex, layer[1])
+            tex:SetBlendMode(layer[2])
+            tex:SetTexCoord(0, e[3] / 128, e[5] * 64 / 256, (e[5] * 64 + e[4]) / 256)
+            tex:SetPoint("TOPLEFT", page, "TOPLEFT", e[1], -e[2])
+            tex:SetSize(e[3], e[4])
+            rows.small[#rows.small + 1] = tex
+        end
     end
     for i = 1, 2 do rows[i] = NewRow(content, true, i) end
     for i = 1, 3 do rows[2 + i] = NewRow(content, false, 2 + i) end
@@ -457,26 +573,50 @@ function T.Lay()
 end
 
 -- Old book's mid-row spells: each fill resets them to 10 and 60 (whole offsets, no tie at 0.5); casting buttons, out of combat.
-local SPELL_LOW, SPELL_HIGH = 15, 56
+-- The full book's spots, set outright: the small page's centring may have moved them since the client's last fill.
+local SPELL_LOW, SPELL_HIGH, SPELL_ONE = 15, 56, 46
 local Near = ns.Near
-local function Tighten(button)
+local function Foot(button, want)
     local point, rel, relPoint, x, y = button:GetPoint(1)
-    if point == "BOTTOMLEFT" and y then
-        local want
-        if Near(y, 60, 0.5) then want = SPELL_HIGH elseif Near(y, 10, 0.5) then want = SPELL_LOW end
-        if want then button:SetPoint(point, rel, relPoint, x, want) end
+    if point == "BOTTOMLEFT" and not Near(y, want, 0.5) then button:SetPoint(point, rel, relPoint, x, want) end
+end
+
+-- A spell button's middle at center down from its card's top (the client hangs them by their foot).
+local function PutSpell(button, center)
+    local point, rel, relPoint, x, y = button:GetPoint(1)
+    if point ~= "BOTTOMLEFT" then return end
+    local want = PRIMARY_H - center - (button:GetHeight() or 0) / 2
+    if not y or math.abs(y - want) > 0.5 then button:SetPoint(point, rel, relPoint, x, want) end
+end
+
+-- Parchment page: the spells' middle level with the row's text, the name's top to the bar's foot; a pair as far
+-- apart as the old book's.
+local function CenterSpells(row, spec, first, second)
+    local middle = TextMiddle(row, spec) - spec.cardDrop
+    if first and second and first:IsShown() and second:IsShown() then
+        -- As close as the old book's pair at their size.
+        local half = (SPELL_HIGH - SPELL_LOW) * (spec.spellScale or 1) / 2
+        PutSpell(first, middle - half)
+        PutSpell(second, middle + half)
+    elseif first and first:IsShown() then
+        PutSpell(first, middle)
     end
 end
 
 function T.TightenSpells()
     local content = Content()
     if not content or InCombatLockdown() then return end
+    local spec = Spec()
     for i = 1, 2 do
         local card = Card(content, "PrimaryProfession" .. i)
         local first, second = card and card.SpellButton1, card and card.SpellButton2
-        if first and second and first:IsShown() and second:IsShown() then
-            Tighten(first)
-            Tighten(second)
+        if spec.centerSpells and rows[i] then
+            CenterSpells(rows[i], spec, first, second)
+        elseif first and second and first:IsShown() and second:IsShown() then
+            Foot(first, SPELL_HIGH)
+            Foot(second, SPELL_LOW)
+        elseif first and first:IsShown() then
+            Foot(first, SPELL_ONE)
         end
     end
 end
@@ -496,8 +636,11 @@ function T.ShowOurs(on)
         rows.clip:ClearAllPoints()
         rows.clip:SetAllPoints(backing)
     end
+    local banded = Banded()
+    if big then PaintFull() end
     for _, tex in ipairs(rows.art) do SetShownIf(tex, on and big) end
-    for _, tex in ipairs(rows.small) do SetShownIf(tex, on and not big) end
+    for _, tex in ipairs(rows.small) do SetShownIf(tex, on and not big and not banded) end
+    for _, tex in ipairs(rows.bands) do SetShownIf(tex, on and not big and banded) end
     for i = 1, 5 do
         if rows[i] then SetShownIf(rows[i], on) end
     end

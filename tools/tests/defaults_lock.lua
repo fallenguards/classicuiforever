@@ -187,6 +187,7 @@ return {
     platesOneSize = false,
     prdGap = 0,
     previousLayout = "",
+    profBookBands = false,
     profBookBig = false,
     professionTabs = false,
     professionsBook = true,

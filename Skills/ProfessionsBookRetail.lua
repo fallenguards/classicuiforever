@@ -70,5 +70,5 @@ function T.RetailBook(on, sizeButton)
 end
 
 ns.OnToggle(function(key)
-    if key == "profBookBig" then Changed() end
+    if key == "profBookBig" or key == "profBookBands" then Changed() end
 end)
