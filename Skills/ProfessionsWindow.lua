@@ -104,7 +104,18 @@ end
 
 -- Side tabs always up, or (the option off) seen only while the mouse is near one. The client re-shows them on every
 -- open, so they are made transparent, never hidden, and keep the mouse to be found.
-local function TabsAlways() return ns.db and ns.db.professionTabs == true end
+-- dbVersion 16: the tabs' checkbox became three picks; where Always was ticked, on hover is not on as well.
+function ns.OneProfTabsChoice()
+    if ns.db.professionTabs == true then ns.db.professionTabsHover = false end
+end
+
+-- The option's three picks: shown on hover, always (professionTabs), or never (no mouse either, out of combat).
+local function TabsMode()
+    local db = ns.db
+    if not db then return "hover" end
+    if db.professionTabsHidden == true then return "hidden" end
+    return db.professionTabs == true and "always" or "hover"
+end
 
 -- Near: within PAD of a tab (the gaps between them too); up till HOLD after the mouse leaves; FADE in and out.
 local TAB_PAD, TAB_HOLD, TAB_FADE, FADE_STEP = 14, 0.4, 0.15, 0.02
@@ -115,10 +126,10 @@ local function NoteOver(tab)
 end
 
 -- They cast in the client's name: sized and given the mouse out of combat only.
-local function PrepTab(tab)
+local function PrepTab(tab, hidden)
     if not tab or InCombatLockdown() then return end
     ns.SetScaleIf(tab, PROF_TAB_SCALE)
-    if not tab:IsMouseEnabled() then tab:EnableMouse(true) end
+    if tab:IsMouseEnabled() == hidden then tab:EnableMouse(not hidden) end
 end
 
 local function SetTabAlpha(tab, alpha)
@@ -151,12 +162,13 @@ end
 local function SyncTabs()
     if not ProfessionsFrame then return end
     DrainTabs()
-    EachTab(PrepTab)
+    local mode = TabsMode()
+    EachTab(PrepTab, mode == "hidden")
     local now = GetTime()
     overTab = false
-    if not TabsAlways() then EachTab(NoteOver) end
+    if mode == "hover" then EachTab(NoteOver) end
     if overTab then leftAt = now end
-    local target = (TabsAlways() or now - leftAt < TAB_HOLD) and 1 or 0
+    local target = (mode == "always" or (mode == "hover" and now - leftAt < TAB_HOLD)) and 1 or 0
     if target ~= tabTarget then
         tabTarget = target
         fadeJob:Wake()
@@ -693,7 +705,7 @@ ns.RegisterModule("professionsBook", { apply = Apply, restore = Restore })
 
 -- Only their alpha changes: at once, in a fight too.
 ns.OnToggle(function(key)
-    if key == "professionTabs" then SyncTabs() end
+    if key == "professionTabs" or key == "professionTabsHover" or key == "professionTabsHidden" then SyncTabs() end
 end)
 
 -- The page size or its art switched (options or popout): rows now, cards and window on the watch's next pass (out of combat).

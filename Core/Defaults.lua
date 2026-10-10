@@ -2,7 +2,7 @@ local _, ns = ...
 local L = ns.L
 
 ns.DB_DEFAULTS = {
-    dbVersion = 15,
+    dbVersion = 16,
     classicBar = true,
     oneBar = false,
     classicBarSize = false,
@@ -62,6 +62,8 @@ ns.DB_DEFAULTS = {
     talents = true,
     legacyWindow = true,
     professionTabs = false,
+    professionTabsHover = true,
+    professionTabsHidden = false,
     whoTabs = false,
     whoColumn = "zone",
     hideBuffArrow = true,

@@ -68,5 +68,7 @@ return {
     profBookBands = "on for everyone, a restyle: the professions book on the spellbook parchment as Era's; ticked brings the Cataclysm page back",
     searchOnlyMatches = "same for everyone: off by default; the options search's own checkbox",
     keyRingFlat = "same for everyone: off by default; the key ring's edit mode dialog lays it flat",
+    professionTabsHover = "kept as before: a dbVersion 16 migration (ns.OneProfTabsChoice) turns it off where Always was ticked",
+    professionTabsHidden = "same for everyone: off by default; a third pick beside on hover and always",
     keyRingSnap = "same for everyone: off by default; set by dropping the flat key ring at a bag column's end",
 }
