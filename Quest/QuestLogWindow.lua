@@ -56,7 +56,8 @@ local EMPTY_ART = {
     { key = "questLogEmptyBotLeft", layer = "BACKGROUND", w = 256, h = 128, point = "BOTTOMLEFT", y = 128 },
     { key = "questLogEmptyBotRight", layer = "BACKGROUND", w = 64, h = 128, point = "BOTTOMRIGHT", x = -64, y = 128 },
 }
-local BOOK = { layer = "ARTWORK", w = 64, h = 64, point = "TOPLEFT", x = 4, y = -4 }
+-- Under the window art, as Era's: its ring covers the picture's edge.
+local BOOK = { layer = "BACKGROUND", sublevel = -8, w = 64, h = 64, point = "TOPLEFT", x = 4, y = -4 }
 -- Built right to left; the middle is sized to the text in UpdateList.
 local COUNT_BOX = {
     { key = INPUT, set = "raw", layer = "ARTWORK", coords = { 0.9375, 1, 0, 0.625 }, w = 8, h = 20,
@@ -687,7 +688,8 @@ local function Build()
     listArea:EnableMouseWheel(true)
     listArea:SetScript("OnMouseWheel", function(_, delta) frame.listBar:SetValue(frame.listBar:GetValue() - delta) end)
     frame.listBar = ns.ClassicScrollBar(frame, listArea, function() UpdateList() end)
-    frame.listInset = ns.ListInset(listArea, frame.listBar, nil, frame, 6, 3)
+    -- Its left in line with the page under it, its right under the column's border, as Era's.
+    frame.listInset = ns.ListInset(listArea, frame.listBar, nil, frame, 2, 3, nil, 7)
 
     local detail = ns.NewFrame("ScrollFrame", nil, frame)
     detail:SetPoint("TOPLEFT", listArea, "BOTTOMLEFT", 0, -DETAIL_GAP)
