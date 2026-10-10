@@ -1,14 +1,15 @@
 local _, ns = ...
 local L = ns.L
 
--- Queue eye (its own edit mode system), placed from Minimap.lua's Layout: on the rim until
--- the player moves it. Stays UIParent's child: under the minimap a saved place restored wrong.
+-- Queue eye (its own edit mode system) in Era's look, placed from Minimap.lua's Layout: on our group finder icon while
+-- that is on (one button; the icon steps aside while queued), else on the rim until moved. UIParent's child: under the
+-- minimap a saved place restored wrong.
 
 local MM = ns.MM
 
--- The client eye is 43px with its own gold rim: scale it under our border, drawn from a frame above.
-local EYE_SCALE = 0.64
-local EYE_RING = { own = "border", layer = "OVERLAY", w = 52, h = 52, point = "TOPLEFT", x = 1, y = -1 }
+local SIZE = 32   -- a ring button's (Map/MinimapButton.lua)
+-- Era's LFG-Eye sheet: 29 frames of 64 on 512 x 256, 0.1 s each (its LFGEye.lua).
+local FRAMES, PER_ROW, FRAME_U, FRAME_V, FRAME_TIME = 29, 8, 64 / 512, 64 / 256, 0.1
 -- Outside edit mode only these move or resize the eye (probe P2); the spec change can switch the active layout.
 local EYE_EVENTS = { "EDIT_MODE_LAYOUTS_UPDATED", "UI_SCALE_CHANGED", "DISPLAY_SIZE_CHANGED", "PLAYER_ENTERING_WORLD",
     "PLAYER_SPECIALIZATION_CHANGED" }
@@ -17,6 +18,19 @@ local EYE_LOOK = 0.3   -- polling after each wake, for a client move that lands 
 local eyeWatch
 local sizeReset
 local lookUntil = 0
+local over, face   -- our look over the game's eye, and its Era eye
+local frame = 0
+local heldPoints   -- the eye's own place (moved in edit mode) while it rides the icon
+
+-- Era's eye turning while queued; still on its first frame where the game holds its eye still, and in edit mode.
+local function Turn()
+    local eye = QueueStatusButton
+    local still = ns.EditMode.state or (eye and eye.Eye and eye.Eye.IsStaticMode and eye.Eye:IsStaticMode())
+    frame = still and 0 or (frame + 1) % FRAMES
+    local c = ns.ERA_EYE.coords
+    local u, v = (frame % PER_ROW) * FRAME_U, math.floor(frame / PER_ROW) * FRAME_V
+    face:SetTexCoord(c[1] + u, c[2] + u, c[3] + v, c[4] + v)
+end
 
 local function EyeMoved(eye)
     return ns.InDefaultPosition(eye) == false
@@ -52,34 +66,65 @@ end
 local function PlaceEye()
     local eye, backdrop = QueueStatusButton, MinimapBackdrop
     if not eye or not backdrop then return end
-    eye:SetSize(33, 33)
-    -- Centred on the border's hole (measured): 0.5px right; the art sits 1px above its frame.
-    if eye.Eye and eye.Eye.SetScale then
-        eye.Eye:SetScale(EYE_SCALE)
-        ns.SetPointOnce(eye.Eye, "CENTER", eye, "CENTER", 0.5 / EYE_SCALE, (0.5 - EYE_SCALE) / EYE_SCALE)
-    end
-    -- Border and eye are the button's children, so edit mode's size scales both.
-    local over = eye.fcuiOver
+    local icon = ns.GroupFinderIcon()
+    -- A ring button's look over the game's eye, which fades; its glow stays (a group found). Border and eye are the
+    -- button's children, so edit mode's size scales both; on the icon, drawn at the icon's size.
     if not over then
         over = CreateFrame("Frame", nil, eye)
-        over:SetAllPoints(eye)
-        eye.fcuiOver = over
+        over:SetSize(SIZE, SIZE)
+        face = ns.RingLook(over, ns.EraEyeFace)
+        ns.DressStates(eye, nil, nil, nil, "zoomHighlight", ns.RING_HIGHLIGHT)
+        ns.Sched.Attach(over, { name = "minimap.eyeTurn", every = FRAME_TIME, fn = Turn })
     end
-    over:SetFrameLevel((eye.Eye and eye.Eye:GetFrameLevel() or eye:GetFrameLevel()) + 5)
-    ns.DressNew(over, "trackingBorder", EYE_RING, eye)
+    if eye.Eye then ns.SetAlphaIf(eye.Eye, 0) end
+    if not over:IsShown() then over:Show() end
+    over:SetFrameLevel(eye:GetFrameLevel() + 5)
+    local own = eye:GetEffectiveScale()
+    local k = (icon and own and own > 0) and icon:GetEffectiveScale() / own or 1
+    ns.SetScaleIf(over, k, 0.001)
+    ns.SetPointOnce(over, "CENTER", eye, "CENTER", 0, 0)
+    eye:SetSize(SIZE * k, SIZE * k)
     -- On the rim the minimap's edit mode box covers the eye's: lift it to HIGH.
     if eye.Selection and eye.Selection.SetFrameStrata and eye.Selection:GetFrameStrata() ~= "HIGH" then
         eye.Selection:SetFrameStrata("HIGH")
     end
     local dragging = eye.IsDragging and eye:IsDragging()
-    if EyeMoved(eye) or dragging or InCombatLockdown() then return end
+    if dragging or InCombatLockdown() then return end
     if eye:GetParent() ~= UIParent then eye:SetParent(UIParent) end
+    if icon then
+        if not heldPoints and EyeMoved(eye) then
+            heldPoints = {}
+            for i = 1, eye:GetNumPoints() do heldPoints[i] = { eye:GetPoint(i) } end
+        end
+        ns.SetPointOnce(eye, "CENTER", icon, "CENTER", 0, 0)
+        return
+    end
+    -- Off the icon: back to the place edit mode gave it.
+    if heldPoints then
+        eye:ClearAllPoints()
+        for _, p in ipairs(heldPoints) do eye:SetPoint(p[1], p[2], p[3], p[4], p[5]) end
+        heldPoints = nil
+        return
+    end
+    if EyeMoved(eye) then return end
     -- Scale is edit mode's; anchor the centre in its own units so it grows in place.
-    local own = eye:GetEffectiveScale()
-    local k = (own and own > 0) and (backdrop:GetEffectiveScale() / own) or 1
+    k = (own and own > 0) and (backdrop:GetEffectiveScale() / own) or 1
     ns.SetPointOnce(eye, "CENTER", backdrop, "TOPLEFT", 38.5 * k, -116.5 * k)
 end
 MM.PlaceEye = PlaceEye
+
+-- Our minimap off: the game's own eye back, at the place edit mode gave it.
+function MM.UnplaceEye()
+    local eye = QueueStatusButton
+    if not eye or not over then return end
+    over:Hide()
+    if eye.Eye then ns.SetAlphaIf(eye.Eye, 1) end
+    if heldPoints and not InCombatLockdown() then
+        eye:ClearAllPoints()
+        for _, p in ipairs(heldPoints) do eye:SetPoint(p[1], p[2], p[3], p[4], p[5]) end
+        heldPoints = nil
+    end
+end
 
 -- Sole writer of the eye watch's sleep (R8): awake through edit mode, else a short look after each wake.
 local function SetEyeWatch(awake)
@@ -99,8 +144,10 @@ local function EyeTick(job, now)
     if MM.active and QueueStatusButton then
         local moved = EyeMoved(QueueStatusButton)
         local scale = QueueStatusButton:GetEffectiveScale()
-        if moved ~= job.moved or scale ~= job.scale then
-            job.moved, job.scale = moved, scale
+        local icon = ns.GroupFinderIcon()
+        local iconScale = icon and icon:GetEffectiveScale()
+        if moved ~= job.moved or scale ~= job.scale or icon ~= job.icon or iconScale ~= job.iconScale then
+            job.moved, job.scale, job.icon, job.iconScale = moved, scale, icon, iconScale
             PlaceEye()
         end
     end
@@ -115,6 +162,11 @@ end
 
 local function EyeEvent()
     SetEyeWatch(true)
+end
+
+-- The group finder icon turned on or off, or its size changed: the eye takes a look.
+function ns.EyeFollows()
+    if eyeWatch and MM.active then SetEyeWatch(true) end
 end
 
 -- Created at the first Layout with an eye (after the bar's Init made the edit poll); runs with the module on or off.

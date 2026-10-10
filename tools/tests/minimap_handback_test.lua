@@ -42,6 +42,8 @@ function ns.MM.HideCalendar()
     GameTimeFrame:SetParent(Minimap)
     GameTimeFrame:SetAlpha(1)
 end
+-- The eye's half is Map/MinimapEye.lua's.
+function ns.MM.UnplaceEye() end
 
 -- Held elsewhere: the day/night, the coordinates and the calendar sit under a hidden frame that is not ours.
 local hidden = {}

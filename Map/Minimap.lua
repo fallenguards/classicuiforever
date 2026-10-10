@@ -756,6 +756,7 @@ local function Restore()
     ThemeRingsOnGameMap()
     if not MM.taken then return end
     MM.taken = false
+    MM.UnplaceEye()
     HideOwn(MinimapCluster)
     HideOwn(MinimapBackdrop)
     MM.HideCalendar()

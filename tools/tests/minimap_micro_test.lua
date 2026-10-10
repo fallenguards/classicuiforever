@@ -20,8 +20,12 @@ local ruleOn = {}
 C_GameRules = { IsGameRuleActive = function(rule) return ruleOn[rule] == true end }
 function InCombatLockdown() return false end
 function SetPortraitTexture() end
+-- The game's queue eye: shown while queued.
+local queued = false
+QueueStatusButton = { IsShown = function() return queued end }
 
 local shown, pads, apply, restore, soon = {}, {}, nil, nil, {}
+local eyeEdge, editEdge
 local questPad = { name = "quest log pad" }
 local noop = function() end
 local ns = {
@@ -37,7 +41,10 @@ local ns = {
     PadOf = function(button) return pads[button] end,
     MapPad = function(button, _, _, target) pads[button] = { clickbutton = target } end,
     SetAttributeIf = function(pad, key, value) pad[key] = value end,
-    Sched = { NextFrame = function(_, fn) soon[#soon + 1] = fn end },
+    Sched = { NextFrame = function(_, fn) soon[#soon + 1] = fn end,
+        OnVisible = function(_, _, fn) eyeEdge = fn end },
+    EditMode = { state = false },
+    OnEditMode = function(fn) editEdge = fn end,
     IsSecret = function() return false end,
     -- Retail: its own two icons are made.
     OnForever = function() return false end,
@@ -110,6 +117,21 @@ Check(not shown[SHOP], "no shop icon while the game has the shop off")
 ruleOn[Enum.GameRule.StoreDisabled] = nil
 Pass()
 Check(shown[SHOP], "the shop icon once the game allows it")
+
+-- Queued, the game's eye shows and ours gives way; in edit mode both show, to be placed.
+queued = true
+eyeEdge(true)
+Pass()
+Check(not shown[EYE], "queued: the game's eye shows, ours goes")
+ns.EditMode.state = true
+editEdge()
+Pass()
+Check(shown[EYE], "queued in edit mode: ours shows beside the game's")
+ns.EditMode.state = false
+queued = false
+eyeEdge(false)
+Pass()
+Check(shown[EYE], "out of the queue: ours is back")
 
 -- Unchecked, the block's switch, the module off.
 ns.db.legacyMinimapButton = false

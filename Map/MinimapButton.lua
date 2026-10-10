@@ -33,6 +33,17 @@ local HL_RING = { coords = FULL, fill = true, add = true, states = { "Highlight"
 
 local rings = {}
 
+-- The micro icons are the map's own pieces: off the map's own children, where button gatherers look for addon buttons.
+local pieceHost
+local function Home(ring)
+    if not ring.piece then return Minimap end
+    if not pieceHost then
+        pieceHost = CreateFrame("Frame", nil, Minimap)
+        pieceHost:SetAllPoints(Minimap)
+    end
+    return pieceHost
+end
+
 local function Radius()
     local map = Minimap
     return (map and map:GetWidth() or 140) / 2 + 5
@@ -55,7 +66,7 @@ end
 
 -- A button in the addon bag leaves its ring spot empty.
 local function OnMap(ring)
-    return not ring.button or ring.button:GetParent() == Minimap
+    return not ring.button or ring.button:GetParent() == Home(ring)
 end
 
 -- How far the nearest piece or button is from a spot; nil on a covered arc.
@@ -96,7 +107,7 @@ end
 -- Not while collected into the addon button bag (another parent). Offsets count in the button's own size (edit mode's).
 local function Position(ring)
     local button = ring.button
-    if not button or not Minimap or button:GetParent() ~= Minimap then return end
+    if not button or not Minimap or button:GetParent() ~= Home(ring) then return end
     local degrees = Angle(ring)
     local r = Radius()
     local k = button:GetEffectiveScale() / Minimap:GetEffectiveScale()
@@ -140,8 +151,20 @@ local function HookMap()
     ns.HookMethod(Minimap, "SetSize", PositionAll)
 end
 
+-- A ring button's look on a 32 square frame: the black disc, the face, the ring. Returns the face.
+function ns.RingLook(frame, face, name)
+    ns.DressNew(frame, "portraitMask", BACK)
+    -- Round mask first: RoundIcon sets its own crop, which the dress then replaces.
+    local icon = frame:CreateTexture(name)
+    ns.RoundIcon(icon)
+    face(icon)
+    ns.MinimapButtonBorder(ns.DressNew(frame, "trackingBorder", RING))
+    return icon
+end
+ns.RING_HIGHLIGHT = HL_RING
+
 local function Build(ring)
-    local b = CreateFrame("Button", ring.name, Minimap)
+    local b = CreateFrame("Button", ring.name, Home(ring))
     b:SetSize(SIZE, SIZE)
     b:SetFrameStrata("MEDIUM")
     b:SetFrameLevel((Minimap:GetFrameLevel() or 2) + 8)
@@ -152,12 +175,8 @@ local function Build(ring)
         { name = ring.name .. ".drag", every = 0, awake = false, fn = OnDragUpdate })
     dragJob.ring = ring
     b:SetMovable(true)
-    ns.DressNew(b, "portraitMask", BACK)
-    -- Round mask first: RoundIcon sets its own crop, which the dress then replaces.
-    b.icon = b:CreateTexture()
-    ns.RoundIcon(b.icon)
-    ring.face(b.icon)
-    ns.MinimapButtonBorder(ns.DressNew(b, "trackingBorder", RING))
+    -- Named: a gatherer that takes the button shows its <name>Icon.
+    b.icon = ns.RingLook(b, ring.face, ring.name .. "Icon")
     ns.DressStates(b, nil, nil, nil, "zoomHighlight", HL_RING)
     b:SetScript("OnClick", ring.onClick)
     -- Shift, as other addons' minimap buttons move; a pad over the button hands its drag here (UI/SecurePad.lua), and
@@ -176,7 +195,8 @@ local function Build(ring)
 end
 
 -- spec: { name, key (its edit mode entry), angleKey, angle (default degrees), free (takes the nearest clear spot), show
--- (its on hover id), face(texture), onClick(button, mouse), tip }; returns show and hide.
+-- (its on hover id), piece (the map's own, not an addon button), face(texture), onClick(button, mouse), tip }; returns
+-- show and hide.
 function ns.RingButton(spec)
     rings[#rings + 1] = spec
     local function Show()

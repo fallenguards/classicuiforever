@@ -89,9 +89,20 @@ local function Target(spec)
     return micro and ns.PressTarget(micro)
 end
 
-local function Wanted(spec)
+-- Queued, the game's own eye shows: ours gives way to it (both show in edit mode, to be placed).
+local function QueueEyeShown()
+    local eye = QueueStatusButton
+    return eye ~= nil and eye:IsShown() and not ns.EditMode.state
+end
+
+local function Chosen(spec)
     local db = ns.db
     return db and db.microMinimapButtons ~= false and db[spec.toggle] == true and Target(spec) ~= nil
+end
+
+local function Wanted(spec)
+    if spec.face == "eye" and QueueEyeShown() then return false end
+    return Chosen(spec)
 end
 
 for _, spec in ipairs(MICROS) do
@@ -102,6 +113,7 @@ for _, spec in ipairs(MICROS) do
         angleKey = spec.angleKey or ("minimap" .. spec.id .. "Angle"),
         angle = spec.angle,
         free = spec.free,
+        piece = true,
         show = "GroupFinderButton",
         face = function(icon) Face(spec, icon) end,
         tip = { anchor = "ANCHOR_LEFT", text = function() return TipText(spec) end, r = 1, g = 1, b = 1,
@@ -130,17 +142,49 @@ local function Aim()
     end
 end
 
-local function Sync()
+local on, watching = false, false
+local Sync
+
+-- The game's eye showing or hiding (inside its show pass: only asks for the next frame), and edit mode's edges.
+local function WatchQueueEye()
+    local function Again()
+        if on then ns.Sched.NextFrame("minimapMicro.sync", Sync) end
+    end
+    if QueueStatusButton then ns.Sched.OnVisible(QueueStatusButton, "minimapMicro.queue", Again) end
+    ns.OnEditMode(Again)
+end
+
+Sync = function()
+    on = true
+    if not watching then
+        watching = true
+        WatchQueueEye()
+    end
     for _, spec in ipairs(MICROS) do
         local want = Wanted(spec)
+        -- Made and placed even while queued: the game's eye rides it.
+        if not want and spec.face == "eye" and not _G[spec.frame] and Chosen(spec) then
+            spec.show()
+            spec.shown = true
+        end
         if want then spec.show() elseif spec.shown then spec.hide() end
         spec.shown = want
     end
     -- After the pass: a window's pad made later in it is the target.
     ns.Sched.NextFrame("minimapMicro.aim", Aim)
+    if ns.EyeFollows then ns.EyeFollows() end
+end
+
+-- Era's eye and the icon the game's eye rides while queued (Map/MinimapEye.lua): one button, one spot.
+function ns.EraEyeFace(icon) ns.Dress(icon, "lfgEye", EYE) end
+ns.ERA_EYE = EYE
+function ns.GroupFinderIcon()
+    local spec = byToggle.lfgMinimapButton
+    return on and Chosen(spec) and _G[spec.frame] or nil
 end
 
 local function Restore()
+    on = false
     for _, spec in ipairs(MICROS) do
         if spec.shown then spec.hide() end
         spec.shown = false
