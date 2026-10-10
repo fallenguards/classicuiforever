@@ -143,6 +143,17 @@ local function Row_OnDoubleClick(self)
     if self.entry then ns.Whisper(self.entry.name) end
 end
 
+-- Forever's surnames cut names short: over a cut one, the whole name (and the middle column, when that is cut too).
+local function Row_OnEnter(self)
+    local entry = self.entry
+    local nameCut, fieldCut = entry and self.Name:IsTruncated(), entry and self.Zone:IsTruncated()
+    if not (nameCut or fieldCut) then return end
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+    GameTooltip:SetText(entry.name, 1, 0.82, 0)
+    if fieldCut then GameTooltip:AddLine(self.Zone:GetText(), 1, 1, 1) end
+    GameTooltip:Show()
+end
+
 local function Header_OnClick(self)
     S.ToggleSort(sort, self.key)
     Refresh()
@@ -299,6 +310,10 @@ local function Build()
     -- Era's inset runs down round the search line to the buttons.
     panel.insetFoot = panel.refresh
     S.ScrollRows(panel, panel.found, 2, UpdateRows, COLUMNS, Row_OnClick, Row_OnDoubleClick, S.PlaceListBar)
+    for _, row in ipairs(panel.rows) do
+        row:HookScript("OnEnter", Row_OnEnter)
+        row:HookScript("OnLeave", ns.HideTip)
+    end
 
     panel:SetScript("OnShow", function()
         -- Results come to this window, not the chat frame.
