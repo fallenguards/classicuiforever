@@ -78,7 +78,8 @@ ns.TEX = {
     zoomOutDown = "Minimap\\UI-Minimap-ZoomOutButton-Down",
     zoomOutDisabled = "Minimap\\UI-Minimap-ZoomOutButton-Disabled",
     zoomHighlight = "Minimap\\UI-Minimap-ZoomButton-Highlight",
-    trackingBorder = "Minimap\\MiniMap-TrackingBorder",
+    -- Era's: Forever's copy of MiniMap-TrackingBorder is a plain gold ring, without the stone rim and shadow.
+    trackingBorder = "!EraMinimapTrackingBorder",
     -- The client's copy is a wider redraw; ours is the 128x32 original.
     nameplateBorder = "!Nameplate-Border",
     questTrackerButtons = "Buttons\\QuestTrackerButtons",

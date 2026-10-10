@@ -113,6 +113,7 @@ Units\StatusFont.lua
 Units\MirrorTimers.lua
 Units\ComboPoints.lua
 Map\Minimap.lua
+Map\MinimapDiel.lua
 Map\MinimapCalendar.lua
 Map\TrackingBuff.lua
 Map\MinimapEye.lua

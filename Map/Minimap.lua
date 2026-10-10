@@ -59,10 +59,16 @@ local DIEL_RING = "UI-HUD-Minimap-Frame-Cycle"
 -- Other addons' minimap buttons wear the old gold tracking ring (MiniMap-TrackingBorder): tinted as ours.
 local TRACKING_RING = 136430
 local RING_SHARE = { dark = 1.28 }
+local eraRings = setmetatable({}, { __mode = "k" })   -- another addon's ring -> its own file, given back at restore
 local function TintRing(region)
     if not (region.GetTexture and region.IsObjectType and region:IsObjectType("Texture")) then return end
     local file = ns.Safe(region:GetTexture())
     if file == TRACKING_RING or (type(file) == "string" and file:lower():find("minimap%-trackingborder")) then
+        -- Our minimap's: Era's ring, stone rim and shadow, in place of Forever's plain gold copy of the file.
+        if MM.active then
+            eraRings[region] = file
+            region:SetTexture(ns.TexPath("trackingBorder"))
+        end
         if ns.Once(region, "themeRing") then ns.BronzeTint(region, RING_SHARE) end
         -- Hide button borders is our minimap's: the game's map keeps its rings.
         if MM.active then ns.MinimapButtonBorder(region) end
@@ -586,8 +592,9 @@ local function Layout()
         local dielHome = LayHome("minimapDiel", cluster, above, w, h, map, "TOPRIGHT", 20 - w / 2, -2 - h / 2)
         if diel:GetParent() ~= dielHome then diel:SetParent(dielHome) end
         ns.SetPointOnce(diel, "CENTER", dielHome, "CENTER", 0, 0)
-        -- Its bronze ring follows the theme (silver off, darkened with Dark).
+        -- Its bronze ring follows the theme (silver off, darkened with Dark); Era's picture over it.
         if ns.Once(diel, "themeRing") then ns.EachRegion(diel, DrainDielRing) end
+        MM.EraDiel(diel, dielHome)
     end
     -- The game's coordinates under the map, in a home edit mode moves.
     local coords = PlayerCoords()
@@ -742,6 +749,10 @@ end
 -- place otherwise. OwnTexture never re-shows, so the ring needs a reload.
 local function Restore()
     SetActive(false)
+    for region, file in pairs(eraRings) do
+        region:SetTexture(file)
+        eraRings[region] = nil
+    end
     ThemeRingsOnGameMap()
     if not MM.taken then return end
     MM.taken = false
@@ -756,6 +767,7 @@ local function Restore()
     if diel then
         diel:SetParent(MinimapCluster)
         ns.SetPointOnce(diel, "CENTER", MinimapCluster, "CENTER", 63, 72)
+        MM.EraDielOff(diel)
     end
     local coords, box = PlayerCoords()
     if coords and Minimap then
