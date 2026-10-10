@@ -16,6 +16,8 @@ local TIPS = {
     "CustomizationNoHeaderTooltip", "FriendsTooltip", "PartyMemberBuffTooltip", "EncounterJournalTooltip",
     "LFGBrowseSearchEntryTooltip", "ConquestTooltip", "QueueStatusFrame", "BattlePetTooltip",
     "FloatingBattlePetTooltip", "FrameStackTooltip", "EventTraceTooltip", "PerksProgramTooltip",
+    -- The popups' text boxes wear the tooltip border (unlearning a profession, deleting an item).
+    "StaticPopup1EditBox", "StaticPopup2EditBox", "StaticPopup3EditBox", "StaticPopup4EditBox",
 }
 local PIECES = { "TopLeftCorner", "TopRightCorner", "BottomLeftCorner", "BottomRightCorner",
     "TopEdge", "BottomEdge", "LeftEdge", "RightEdge" }
