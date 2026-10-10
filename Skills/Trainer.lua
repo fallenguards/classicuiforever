@@ -311,10 +311,11 @@ UpdateDetail = function()
     detail.sub:SetText((line.sub and line.sub ~= "") and ("(" .. line.sub .. ")") or "")
     local needs = Requirements(line)
     detail.requires:SetText(needs ~= "" and ((REQUIRES_LABEL or "Requires:") .. " " .. needs) or "")
-    local cost = 0
+    local cost, profession = 0, false
     if GetTrainerServiceCost then
-        local ok, value = pcall(GetTrainerServiceCost, line.index)
+        local ok, value, isProfession = pcall(GetTrainerServiceCost, line.index)
         if ok and type(value) == "number" then cost = value end
+        profession = ok and isProfession and true or false
     end
     if cost > 0 then
         local coins = Coins(cost)
@@ -328,7 +329,9 @@ UpdateDetail = function()
         if ok and type(text) == "string" then words = text end
     end
     detail.text:SetText(words)
-    panel.train:SetEnabled(line.kind == "available" and cost <= money)
+    -- A new profession with both slots taken: Train grays out, as Era's and the game's own do.
+    local noSlot = profession and GetProfessions and select(2, GetProfessions()) ~= nil
+    panel.train:SetEnabled(line.kind == "available" and cost <= money and not noSlot)
 end
 
 local function Refresh()
