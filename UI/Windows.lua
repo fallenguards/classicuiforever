@@ -14,6 +14,8 @@ local LOOSE_PANELS = { "WorldMapFrame" }
 local LEAVE_OPEN = { PlayerSpellsFrame = true }
 -- Client windows that stand beside ours instead of replacing them (macros take spells from the book, as in Era).
 local BESIDE = { CharacterFrame = true, MacroFrame = true }
+-- Client windows that float over ours, closing none and taking no room (loot: at the cursor or its edit mode place, as Era).
+local FLOATS = { LootFrame = true }
 -- How much of the character window the old sheet's art fills.
 local BESIDE_WIDTH = 352
 -- Pieces a client window hangs past its right edge.
@@ -28,7 +30,8 @@ local function HideClientPanels(except)
         local panel = _G[name]
         -- The guild window kept open unseen under our roster (note bridge).
         local ghost = ns.guildGhost and name == "CommunitiesFrame"
-        if panel and panel ~= except and not LEAVE_OPEN[name] and not BESIDE[name] and not ghost and panel:IsShown() and HideUIPanel then
+        if panel and panel ~= except and not LEAVE_OPEN[name] and not BESIDE[name] and not FLOATS[name] and not ghost
+            and panel:IsShown() and HideUIPanel then
             pcall(HideUIPanel, panel)
         end
     end
@@ -45,7 +48,7 @@ end
 local NPC_WINDOWS = { "GossipFrame", "QuestFrame", "MerchantFrame", "MailFrame", "BankFrame", "ClassTrainerFrame",
     "AuctionHouseFrame", "AuctionFrame", "TradeFrame", "TaxiFrame", "FlightMapFrame", "PetStableFrame", "StableFrame",
     "ItemTextFrame", "TabardFrame", "GuildRegistrarFrame", "PetitionFrame", "CraftFrame", "TradeSkillFrame",
-    "ProfessionsFrame", "BarberShopFrame", "GuildBankFrame", "InspectFrame", "LootFrame" }
+    "ProfessionsFrame", "BarberShopFrame", "GuildBankFrame", "InspectFrame" }
 local npcWindow = {}
 for _, name in ipairs(NPC_WINDOWS) do npcWindow[name] = true end
 
@@ -145,7 +148,7 @@ end
 -- Ours stand around the sheet and talents, and in combat whatever stayed up (nothing can close);
 -- centre and full-screen windows float over everything and are left out.
 local function StandsBeside(name)
-    if ns.guildGhost and name == "CommunitiesFrame" then return false end
+    if FLOATS[name] or (ns.guildGhost and name == "CommunitiesFrame") then return false end
     if BESIDE[name] or LEAVE_OPEN[name] then return true end
     local info = UIPanelWindows and UIPanelWindows[name]
     local area = type(info) == "table" and info.area
@@ -234,6 +237,7 @@ local function RecordClientWindows()
 end
 
 local function ClientWindowOpened(name, panel)
+    if FLOATS[name] then return end
     -- Talents and the sheet share the screen with ours, in combat too; anything else replaces ours.
     if LEAVE_OPEN[name] or BESIDE[name] then
         PlaceClassicWindows()
@@ -388,6 +392,41 @@ local function PlaceAt(frame, x)
     if frame.OnClassicPlaced then frame:OnClassicPlaced(x, SLOT_Y) end
 end
 
+-- A floating client window on its own default spot (loot not at the cursor) stands past every open window on the slot
+-- row, as Era's panel row put its loot window; ours stay where they are.
+local standing = setmetatable({}, { __mode = "k" })
+local function StandPast(frame)
+    if InCombatLockdown() and Locked(frame) then return end
+    local k = Plain(frame:GetEffectiveScale())
+    local width = Plain(frame:GetWidth())
+    if not k or not width then return end
+    k = k / UIParent:GetEffectiveScale()
+    width = width * k
+    local blocks, mine = ClientBlocks(), {}
+    for other in pairs(classicWindows) do
+        if Seen(other) then
+            local left = Span(other)
+            if left then
+                local block = { left, left + SlotWidth(other) }
+                blocks[#blocks + 1] = block
+                mine[#mine + 1] = block
+            end
+        end
+    end
+    local x = OnScreen(FirstFree(0, width, blocks), width, width, mine)
+    ns.SetPointIf(frame, "TOPLEFT", UIParent, "TOPLEFT", x / k, SLOT_Y / k)
+end
+function ns.StandPastWindows(frame)
+    standing[frame] = true
+    StandPast(frame)
+end
+function ns.StopStandingPast(frame) standing[frame] = nil end
+local function StandingPass()
+    for frame in pairs(standing) do
+        if frame:IsShown() then StandPast(frame) end
+    end
+end
+
 PlaceClassicWindows = function()
     local shown = {}
     for frame in pairs(classicWindows) do
@@ -428,6 +467,7 @@ PlaceClassicWindows = function()
             cursor = math.max(cursor, x + width)
         end
     end
+    StandingPass()
 end
 
 -- A placed window's reset (WindowHandles.lua): ours back on the slots now; false for a client window.

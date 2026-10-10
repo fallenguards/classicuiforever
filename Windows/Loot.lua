@@ -139,10 +139,21 @@ end
 -- The client's spot at the mouse fits its own rows; ours put the skull ring under the cursor.
 local function AtCursor(frame)
     local gamepad = InputUtil and InputUtil.IsGamepadUIEnabled and InputUtil.IsGamepadUIEnabled()
-    if not (ns.GetCVarBool("lootUnderMouse") or gamepad) or GetNumLootItems() == 0 then return end
+    if not (ns.GetCVarBool("lootUnderMouse") or gamepad) then return false end
+    if GetNumLootItems() == 0 then return true end
     local scale = frame:GetEffectiveScale()
     local x, y = GetCursorPosition()
     ns.SetPointOnce(frame, "TOPLEFT", nil, "BOTTOMLEFT", x / scale - CURSOR_X, math.max(y / scale + CURSOR_Y, CURSOR_LOWEST_TOP))
+    return true
+end
+
+-- Not at the mouse and on its edit mode default: past the open windows, as Era's; a spot given in edit mode stays.
+local function Place(frame)
+    if AtCursor(frame) or ns.InDefaultPosition(frame) == false then
+        ns.StopStandingPast(frame)
+    else
+        ns.StandPastWindows(frame)
+    end
 end
 
 -- Overflow pages with two arrows at the foot, as in 1.x.
@@ -192,7 +203,7 @@ local function LootPager(frame)
     -- the client's loot open short.
     ns.Sched.AfterShow(frame, "loot.pages", function()
         UpdateLootPages(frame)
-        AtCursor(frame)
+        Place(frame)
     end)
     -- Slot change: look next frame, after the client redraws the row.
     local slots = ns.NewFrame("Frame", nil, pager)
