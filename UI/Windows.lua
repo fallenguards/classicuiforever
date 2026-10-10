@@ -173,7 +173,7 @@ local function ClientBlocks()
         if panel and panel:IsShown() then
             local left, right = BlockSpan(names[i], panel)
             if left then
-                blocks[#blocks + 1] = { left, right, true }
+                blocks[#blocks + 1] = { left, right, true, names[i] }
                 sig = Tally(sig, left, right)
             end
         end
@@ -182,15 +182,15 @@ local function ClientBlocks()
 end
 
 -- First clear x at or right of x. A client block too wide to stand past (over half of ours
--- would run off screen, e.g. the full-screen map) is ignored.
-local function FirstFree(x, width, blocks, drawn)
+-- would run off screen, e.g. the full-screen map) is ignored, as are client windows in shares (by name).
+local function FirstFree(x, width, blocks, drawn, shares)
     local screen = UIParent:GetWidth()
     local half = (drawn or width) / 2
     local moved = true
     while moved do
         moved = false
         for _, block in ipairs(blocks) do
-            local skip = block[3] and block[2] + half > screen
+            local skip = block[3] and (block[2] + half > screen or (shares and shares[block[4]]))
             if not skip and x < block[2] and block[1] < x + width then
                 x = block[2]
                 moved = true
@@ -324,6 +324,9 @@ local function SlotWidth(frame) return slotWidths[frame] or SLOT_STEP end
 
 -- Side tabs down a window's right edge stand past its art: the next window keeps clear of them.
 function ns.SetSlotWidth(frame, width) slotWidths[frame] = width end
+-- Client windows that are another tab of this one (the spellbook's professions): it takes their place, never stands past.
+local slotShares = setmetatable({}, { __mode = "k" })
+function ns.SetSlotShares(frame, names) slotShares[frame] = names end
 local showCount = 0
 
 -- Protected or anchor-restricted, asked under pcall.
@@ -419,7 +422,7 @@ PlaceClassicWindows = function()
             local right = keep and keep:IsShown() and keep:GetRight()
             if right then cursor = math.max(cursor, math.floor(right + 0.5)) end
             local drawn = Drawn(frame, width)
-            x = OnScreen(FirstFree(cursor, width, blocks, drawn), width, drawn, mine)
+            x = OnScreen(FirstFree(cursor, width, blocks, drawn, slotShares[frame]), width, drawn, mine)
             if frame.fcuiSlotX ~= x then PlaceAt(frame, x) end
             mine[#mine + 1] = { x, x + width }
             cursor = math.max(cursor, x + width)
@@ -445,7 +448,7 @@ local function HomeClosedWindows()
             blocks, none = blocks or ClientBlocks(), none or {}
             local width = SlotWidth(frame)
             local drawn = Drawn(frame, width)
-            local x = OnScreen(FirstFree(0, width, blocks, drawn), width, drawn, none)
+            local x = OnScreen(FirstFree(0, width, blocks, drawn, slotShares[frame]), width, drawn, none)
             if (frame.fcuiSlotX or 0) ~= x then PlaceAt(frame, x) end
         end
     end

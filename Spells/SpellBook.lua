@@ -752,6 +752,9 @@ local function CreateBook()
     -- book stuck open). Escape and placement are ours: the left window slot,
     -- like the classic quest log.
     ns.SetSlotWidth(f, ns.SIDE_TAB_SLOT)
+    -- Its professions tab is the game's window, closed by the book's key in a fight too: a fight begun with it open
+    -- homed the book beside it, where its casting layer then held it.
+    ns.SetSlotShares(f, { ProfessionsFrame = true })
     if not Hosted() then ns.RegisterClassicWindow(f, true, "spellBook") end
     ns.db.spellBookPos = nil
     -- Our Escape out of combat: the client's clears the target first, 1.x closed
