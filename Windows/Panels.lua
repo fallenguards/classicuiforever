@@ -104,7 +104,8 @@ local WINDOWS = {
     { "TaxiFrame" },
     { "DressUpFrame", after = A.DressUpFrame },
     { "PetStableFrame" },
-    { "ItemTextFrame", after = A.ItemTextFrame },
+    -- Era's own title line, 15 right of the window's middle; its foot line low enough for the scroll column's end.
+    { "ItemTextFrame", lift = 5, titleSpan = { 72, -42 }, after = A.ItemTextFrame },
     -- Half lift, as the vendor's: Accept, Purchase, Sign and Cancel sit 4 up from the bottom edge.
     { "TabardFrame", lift = 5 },
     { "GuildRegistrarFrame", lift = 5, after = A.GuildRegistrarFrame },

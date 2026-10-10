@@ -156,6 +156,8 @@ ns.TEX = {
     lootPanel = "!UI-LootPanel",
     -- Era scroll track beside the character sheet's lists.
     charScrollBar = "!UI-Character-ScrollBar",
+    -- Era's reading window page (a book, letter or plaque).
+    mailPage = "=MailFrame\\UI-MailFrameBG",
     -- Era's ammo slot socket and its arrow to the ranged slot.
     ammoSlot = "=PaperDollInfoFrame\\UI-Character-AmmoSlot",
     -- Era art (the client's are stand-ins): inset marble, rock to the border, frame sheet (title

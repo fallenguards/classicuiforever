@@ -222,23 +222,94 @@ end
 
 ---------------------------------------------------------------- item text
 
--- Book, plaque or letter: scroll column only while the page overflows (1.x), on
--- a dark floor of its own (the column art is hollow).
+-- Book, plaque or letter as Era draws it: the mail parchment, Morpheus text a line down, the 1.x scroll column always
+-- (arrows and knob only while the page overflows), the book over the portrait. The large book stays the game's.
+local ITEM_TAGS = { "P", "H1", "H2", "H3" }
+local ITEM_ICON = 136830   -- Interface\Spellbook\Spellbook-Icon
+local item = {}
+
+local function ItemTextIcon(region, frame)
+    if item.icon or not region:IsObjectType("Texture") or region:GetTextureFileID() ~= ITEM_ICON then return end
+    item.icon = region
+    region:SetSize(58, 58)
+    ns.SetPointOnce(region, "TOPLEFT", frame, "TOPLEFT", -5, 5)
+end
+
+-- Era's column of UI-Character-ScrollBar beside the scroll frame (head 28 x 256, foot 28 x 107, a dark run behind).
+local function ItemTextColumn(frame, scroll)
+    local top = ns.OwnTexture(scroll, "eraColumnTop", "ARTWORK")
+    ns.SetTex(top, "charScrollBar")
+    top:SetTexCoord(0, 0.484375, 0, 1)
+    top:SetSize(28, 256)
+    ns.SetPointOnce(top, "TOPLEFT", frame, "TOPRIGHT", -33, -58)
+    local foot = ns.OwnTexture(scroll, "eraColumnFoot", "ARTWORK")
+    ns.SetTex(foot, "charScrollBar")
+    foot:SetTexCoord(0.515625, 1, 0, 0.4140625)
+    foot:SetSize(28, 107)
+    ns.SetPointOnce(foot, "BOTTOMLEFT", frame, "BOTTOMRIGHT", -33, 3)
+    local run = ns.OwnTexture(scroll, "eraColumnRun", "BACKGROUND")
+    run:SetColorTexture(0, 0, 0, 0.8)
+    run:SetSize(25, 365)
+    ns.SetPointOnce(run, "TOPRIGHT", top, "TOPRIGHT", 0, 0)
+    item.column = { top, foot, run }
+end
+
+-- After the game's own page pass (registered later, so it runs second).
+local function ItemTextPage()
+    if not P.active then return end
+    local material = ItemTextGetMaterial() or "Parchment"
+    local large = material == "ParchmentLarge"
+    for _, tex in ipairs(item.column) do tex:SetShown(not large) end
+    local inset = item.frame.Inset
+    if inset then ns.ShowInsetBorder(inset.NineSlice, not large) end
+    local bg = ItemTextFramePageBg
+    -- A text contrast picked in the game's settings keeps its own page.
+    local ours = not large and (material ~= "Parchment" or not bg or bg:GetAtlas() == "QuestBG-Parchment")
+    item.page:SetShown(ours)
+    if bg then ns.SetAlphaIf(bg, ours and 0 or 1) end
+    if large then return end
+    local font = _G.ItemTextFontNormal or _G.QuestFont_Large
+    local file, size, flags = font:GetFont()
+    for _, tag in ipairs(ITEM_TAGS) do ItemTextPageText:SetFont(tag, file, size, flags) end
+    if ItemTextIsFullPage() then return end
+    ns.SetPointOnce(ItemTextPageText, "TOPLEFT", ItemTextPageScrollChild, "TOPLEFT", 19, -15)
+    -- Era's text opens with a blank line; a page in HTML keeps its own start.
+    local text = ItemTextGetText() or ""
+    if text:find("^%s*<[Hh][Tt][Mm][Ll]") then return end
+    local creator = ItemTextGetCreator()
+    if creator then
+        ItemTextPageText:SetText("\n" .. text .. "\n\n" .. ITEM_TEXT_FROM .. "\n" .. creator .. "\n")
+    else
+        ItemTextPageText:SetText("\n" .. text)
+    end
+    -- The game's padding again, for the longer page.
+    local scroll = ItemTextScrollFrame
+    local child = scroll:GetScrollChild()
+    child:SetHeight(1)
+    scroll:UpdateScrollChildRect()
+    local range = scroll:GetVerticalScrollRange()
+    if math.floor(range) > 0 then child:SetHeight(scroll:GetHeight() + range + 30) end
+end
+
 function A.ItemTextFrame(frame)
     local scroll = ItemTextScrollFrame
     local bar = scroll and scroll.ScrollBar
     if not bar or not bar.Track then return end
     ns.SkinMinimalScrollBar(bar)
-    ns.ScrollTrackArt(bar)
-    local art = bar.fcui
-    if art and art.trackTop and art.trackBottom and not art.trackFloor then
-        local floor = ns.OwnTexture(bar, "trackFloor", "BACKGROUND", -1)
-        floor:SetColorTexture(0.04, 0.04, 0.04, 1)
-        floor:ClearAllPoints()
-        floor:SetPoint("TOPLEFT", art.trackTop, "TOPLEFT", 5, -4)
-        floor:SetPoint("BOTTOMRIGHT", art.trackBottom, "BOTTOMRIGHT", -5, 4)
-        floor:Show()
+    -- Arrows at the column's ends, as Era's.
+    ns.SetTwoPointsIf(bar, "TOPLEFT", scroll, "TOPRIGHT", 7, 0, "BOTTOMLEFT", scroll, "BOTTOMRIGHT", 7, 0)
+    if not item.page then
+        item.frame = frame
+        item.page = ns.OwnTexture(frame, "eraPage", "BACKGROUND", 1)
+        ns.SetTex(item.page, "mailPage")
+        item.page:SetSize(512, 512)
+        ns.SetPointOnce(item.page, "TOPLEFT", frame, "TOPLEFT", 7, -62)
+        ItemTextColumn(frame, scroll)
+        ns.EventFrame("ITEM_TEXT_READY", ItemTextPage)
     end
+    ns.EachRegion(frame, ItemTextIcon, frame)
+    -- Era's inset border round the page and column.
+    if frame.Inset then ns.ShowInsetBorder(frame.Inset.NineSlice, true) end
     local function Sync()
         local can = true
         if bar.HasScrollableExtent then

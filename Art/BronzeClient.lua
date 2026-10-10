@@ -206,7 +206,7 @@ local CLIENT_WINDOWS = { "MailFrame", "OpenMailFrame", "TradeFrame", "MerchantFr
     "ContainerFrame3", "ContainerFrame4", "ContainerFrame5", "ContainerFrame6", "ProfessionsFrame", "ProfessionsBookFrame",
     "CalendarFrame", "CommunitiesFrame", "AchievementFrame", "MacroFrame", "AddonList", "InspectFrame", "AuctionHouseFrame",
     "GuildBankFrame", "ItemSocketingFrame", "DressUpFrame", "TaxiFrame", "PetStableFrame", "HelpFrame", "TimeManagerFrame",
-    "ChannelFrame", "StaticPopup1", "StaticPopup2", "StaticPopup3", "StaticPopup4" }
+    "ChannelFrame", "ItemTextFrame", "StaticPopup1", "StaticPopup2", "StaticPopup3", "StaticPopup4" }
 
 -- Forbidden pieces (trade window money boxes) may not be asked for regions.
 local Forbidden = ns.IsForbidden

@@ -213,12 +213,13 @@ local function SkinSystemTab(tab, lift)
 end
 
 -- Title between the ring (or plain corner) and the X, stone strip under it; left: just inside a plain corner's line.
-local function PlaceTitle(frame, plain, left)
+-- span: { left, right } of the title line, where Era's window has its own.
+local function PlaceTitle(frame, plain, left, span)
     local title = frame.TitleContainer
     if title then
         title:ClearAllPoints()
-        title:SetPoint("TOPLEFT", frame, "TOPLEFT", plain and left or 58, 0)
-        title:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -58, 0)
+        title:SetPoint("TOPLEFT", frame, "TOPLEFT", span and span[1] or plain and left or 58, 0)
+        title:SetPoint("TOPRIGHT", frame, "TOPRIGHT", span and span[2] or -58, 0)
     end
     local strip = frame.fcui and frame.fcui.titleStrip
     if strip then
@@ -251,8 +252,8 @@ function P.Reborder(frame, plain, lift)
     if not P.active or InCombatLockdown() then return false end
     local lines = NineSlice(frame, plain and "plain" or "portrait", lift, true)
     if not lines then return false end
-    PlaceTitle(frame, plain, lines.left + 1)
     local opts = P.windowOpts[frame]
+    PlaceTitle(frame, plain, lines.left + 1, opts and opts.titleSpan)
     if opts then PlaceBacking(frame, opts, lines) end
     return true
 end
@@ -329,7 +330,7 @@ function ns.SkinWindow(frame, opts)
     end
     local strip = ns.TileTex(ns.OwnTexture(frame, "titleStrip", "BACKGROUND"), "frameSheet", TITLE_STRIP)
     strip:SetHeight(17)
-    PlaceTitle(frame, opts.portrait == false, lines.left + 1)
+    PlaceTitle(frame, opts.portrait == false, lines.left + 1, opts.titleSpan)
     strip:Show()
     ns.SkinCloseButton(frame.CloseButton or (name and _G[name .. "CloseButton"]))
     if frame.MaximizeMinimizeButton then
