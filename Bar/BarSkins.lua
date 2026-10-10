@@ -708,9 +708,17 @@ local keyrings = {}
 local KEY_RING = { set = "tex", highlightSet = "tex", coords = { 0, 0.5625, 0, 0.609375 }, fill = true, alpha = 1, add = true,
     states = KEY_STATES }
 
+-- The game turns the key a quarter for a column of bags (KeyRingMixin:UpdateOrientation); ours stands upright.
+local function Upright(tex)
+    if tex and tex.GetRotation and tex:GetRotation() ~= 0 then tex:SetRotation(0) end
+end
+
 local function ApplyKeyRingArt(button)
     local state = keyrings[button]
     if not state or not state.active then return end
+    Upright(StateTexture(button, "Normal"))
+    Upright(StateTexture(button, "Pushed"))
+    Upright(StateTexture(button, "Highlight"))
     ns.DressStates(button, "keyRingUp", "keyRingDown", nil, "keyRingHighlight", KEY_RING)
     -- Only the three state textures stay seen.
     FadeTextures(button, 0, nil, StateTexture(button, "Normal"), StateTexture(button, "Pushed"), StateTexture(button, "Highlight"))

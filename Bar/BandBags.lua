@@ -34,18 +34,34 @@ function ns.OverlayOnBand(frame, point, bandPoint, x, y, w, h, relativeTo)
     frame:SetSize(w / fs, h / fs)
 end
 
--- Off the band the row carries a floor of band art from the bags' own post (the key ring stays in the band's section).
--- With the reagent slot: head, the extra socket, then the rest.
-local function FloorRun(floor, tex, x, width, u0, u1)
+-- Off the band the row carries a floor of band art from the bags' post (the key ring stays in the section); with the
+-- reagent slot: head, extra socket, rest. turn, as edit mode turns the row: "cw" a column up (backpack at its foot),
+-- "ccw" down, "mirror" a row growing right, nil as drawn. x runs along the strip from its far end.
+local function FloorRun(floor, tex, x, width, u0, u1, turn)
     local sheet = PIECES[B.Bag().sheet]
     Dress(tex, sheet.key, FLOOR_TEX)
-    ns.SetPointOnce(tex, "TOPLEFT", floor, "TOPLEFT", x, 0)
-    tex:SetSize(width, BAND_H)
-    tex:SetTexCoord(u0 / 256, u1 / 256, sheet.band[1], sheet.band[2])
+    local l, r, t, b = u0 / 256, u1 / 256, sheet.band[1], sheet.band[2]
+    if turn == "cw" then
+        ns.SetPointOnce(tex, "TOPLEFT", floor, "TOPLEFT", 0, -x)
+        tex:SetSize(BAND_H, width)
+        tex:SetTexCoord(l, b, r, b, l, t, r, t)
+    elseif turn == "ccw" then
+        ns.SetPointOnce(tex, "BOTTOMLEFT", floor, "BOTTOMLEFT", 0, x)
+        tex:SetSize(BAND_H, width)
+        tex:SetTexCoord(r, t, l, t, r, b, l, b)
+    elseif turn == "mirror" then
+        ns.SetPointOnce(tex, "TOPRIGHT", floor, "TOPRIGHT", -x, 0)
+        tex:SetSize(width, BAND_H)
+        tex:SetTexCoord(r, l, t, b)
+    else
+        ns.SetPointOnce(tex, "TOPLEFT", floor, "TOPLEFT", x, 0)
+        tex:SetSize(width, BAND_H)
+        tex:SetTexCoord(l, r, t, b)
+    end
     tex:Show()
 end
 
-local function LayFloor(art, square, floating, buttonScale, level, backpack)
+local function LayFloor(art, square, floating, buttonScale, level, backpack, turn)
     local floor = art.bagFloor
     if not floating then
         if floor then floor:Hide() end
@@ -59,21 +75,31 @@ local function LayFloor(art, square, floating, buttonScale, level, backpack)
         art.bagFloor = floor
     end
     local bag = B.Bag()
-    floor:SetSize(B.BagPart() - bag.trim, BAND_H)
+    local long = B.BagPart() - bag.trim
+    if turn == "cw" or turn == "ccw" then floor:SetSize(BAND_H, long) else floor:SetSize(long, BAND_H) end
     local u0, s0, s1 = 256 - bag.part + bag.trim, bag.socketU0, bag.socketU1
     if square then
         local head, unit = s0 - u0, s1 - s0
-        FloorRun(floor, floor.tex, 0, head, u0, s0)
-        FloorRun(floor, floor.socket, head, unit, s0, s1)
-        FloorRun(floor, floor.rest, head + unit, 256 - s0, s0, 256)
+        FloorRun(floor, floor.tex, 0, head, u0, s0, turn)
+        FloorRun(floor, floor.socket, head, unit, s0, s1, turn)
+        FloorRun(floor, floor.rest, head + unit, 256 - s0, s0, 256, turn)
     else
-        FloorRun(floor, floor.tex, 0, 256 - u0, u0, 256)
+        FloorRun(floor, floor.tex, 0, 256 - u0, u0, 256, turn)
         floor.socket:Hide()
         floor.rest:Hide()
     end
     floor:SetScale(buttonScale)
     floor:SetFrameLevel(math.max(0, level - 1))
-    ns.SetPointOnce(floor, "BOTTOMRIGHT", backpack, "BOTTOMRIGHT", -bag.x, -bag.y)
+    -- The backpack keeps its spot on the strip: its corner by the strip's backpack end, turned with it.
+    if turn == "cw" then
+        ns.SetPointOnce(floor, "BOTTOMLEFT", backpack, "BOTTOMLEFT", -bag.y, bag.x)
+    elseif turn == "ccw" then
+        ns.SetPointOnce(floor, "TOPRIGHT", backpack, "TOPRIGHT", bag.y, -bag.x)
+    elseif turn == "mirror" then
+        ns.SetPointOnce(floor, "BOTTOMLEFT", backpack, "BOTTOMLEFT", bag.x, -bag.y)
+    else
+        ns.SetPointOnce(floor, "BOTTOMRIGHT", backpack, "BOTTOMRIGHT", -bag.x, -bag.y)
+    end
     floor:Show()
 end
 
@@ -119,9 +145,33 @@ local function HookHover()
     end
 end
 
+-- Edit mode's Orientation and Direction for the bags, as the client's bags bar lays them (BagsBar.lua): the backpack at
+-- the end the row grows away from, each bag chained on the one before. { point, relativePoint, x, y } per step.
+local GROW = {
+    left = { "RIGHT", "LEFT", -1, 0 }, right = { "LEFT", "RIGHT", 1, 0, turn = "mirror" },
+    up = { "BOTTOM", "TOP", 0, 1, turn = "cw" }, down = { "TOP", "BOTTOM", 0, -1, turn = "ccw" },
+}
+local function Grow()
+    local bar, dirs = BagsBar, Enum and Enum.BagsDirection
+    if not (bar and dirs) then return GROW.left end
+    if bar.isHorizontal ~= false then return bar.direction == dirs.Right and GROW.right or GROW.left end
+    return bar.direction == dirs.Down and GROW.down or GROW.up
+end
+
+-- Turned (any way but the classic row growing left), the row cannot sit in the band's sockets: it stands as a moved row
+-- does, its floor turned with it (ClassicBar ReadShape).
+function B.BagsTurned() return Grow() ~= GROW.left end
+
+-- One more piece on the row, a step on from prev; step is the overlap between sockets (negative: a gap).
+local function Chain(button, prev, grow, step)
+    button:SetPoint(grow[1], prev, grow[2], -grow[3] * step, -grow[4] * step)
+end
+
 function B.LayoutBags()
     local backpack = MainMenuBarBackpackButton
     if not backpack then return end
+    local grow = Grow()
+    local vertical = grow[4] ~= 0
     local art, shape = B.art, B.shape
     local piece = BagsBar
     local out = piece and not shape.bags
@@ -137,6 +187,9 @@ function B.LayoutBags()
     -- The key slot's tenant: never the key ring (its own piece, BandSection.lua).
     local slim = B.SlimReagent() and CharacterReagentBag0Slot or nil
     if slim then rowW = rowW + KEYRING_W - KEYRING_GAP end
+    -- The piece's box: a column swaps its sides, as the client's does.
+    local boxW, boxH = rowW, KEYRING_H
+    if vertical then boxW, boxH = KEYRING_H, rowW end
     -- On the band: socket size. Off it (moved, or one-bar corner): edit mode's Size with the band scale divided out.
     local band = BandNow()
     if piece and (out or OneBar()) then
@@ -166,7 +219,7 @@ function B.LayoutBags()
             if not piece.isDragging then
                 -- Its own anchor kept: the hand-back puts it back without running edit mode's anchor pass.
                 B.Remember(piece, true)
-                ns.OverlayOnBand(piece, "BOTTOMRIGHT", homePoint, homeX, homeY - lift * buttonScale, rowW * buttonScale, KEYRING_H * buttonScale, relativeTo)
+                ns.OverlayOnBand(piece, "BOTTOMRIGHT", homePoint, homeX, homeY - lift * buttonScale, boxW * buttonScale, boxH * buttonScale, relativeTo)
             end
             home, homePoint, homeX, homeY = piece, "BOTTOMRIGHT", 0, lift
         elseif relativeTo then
@@ -175,15 +228,18 @@ function B.LayoutBags()
     end
     local level = ButtonLevel()
     local prev
-    -- Right to left: backpack in the corner, four bags a socket apart, then the key ring hole.
+    -- Backpack at the piece's end the row grows from (the classic row: its right end), four bags a socket apart, then
+    -- the key ring hole.
     for _, name in ipairs(BAG_BUTTONS) do
         local button = _G[name]
         if button then
             Seat(button, buttonScale, size, size, level)
-            if not prev then
-                button:SetPoint("BOTTOMRIGHT", home, homePoint, homeX / buttonScale, homeY / buttonScale)
+            if prev then
+                Chain(button, prev, grow, gap)
+            elseif home == piece then
+                button:SetPoint(grow[1], piece, grow[1], 0, 0)
             else
-                button:SetPoint("RIGHT", prev, "LEFT", gap, 0)
+                button:SetPoint("BOTTOMRIGHT", home, homePoint, homeX / buttonScale, homeY / buttonScale)
             end
             ns.SkinBagButton(button, size, name == "MainMenuBarBackpackButton")
             button:Show()
@@ -194,7 +250,7 @@ function B.LayoutBags()
     if square then
         local reagent = CharacterReagentBag0Slot
         Seat(reagent, buttonScale, size, size, level)
-        reagent:SetPoint("RIGHT", prev, "LEFT", gap, 0)
+        Chain(reagent, prev, grow, gap)
         ns.SkinBagButton(reagent, size, false, false)
         reagent:Show()
         ReagentSeen(reagent, true)
@@ -202,14 +258,14 @@ function B.LayoutBags()
     end
     if slim then
         Seat(slim, buttonScale, KEYRING_W, KEYRING_H, level)
-        slim:SetPoint("RIGHT", prev, "LEFT", KEYRING_GAP, 0)
+        Chain(slim, prev, grow, KEYRING_GAP)
         ns.SkinKeyRing(slim)
     end
     if not square and KeyRingButton and CharacterReagentBag0Slot then
         -- Both (Forever): the reagent bag is the small round one, centred level with the bags between key ring and last bag.
         local reagent = CharacterReagentBag0Slot
         Seat(reagent, buttonScale, REAGENT_SIZE, REAGENT_SIZE, level + 2)
-        reagent:SetPoint("CENTER", lastBag, "LEFT", -2, 0)
+        reagent:SetPoint("CENTER", lastBag, grow[2], 2 * grow[3], 2 * grow[4])
         ns.SkinBagButton(reagent, REAGENT_SIZE, false, true)
         if HoverWanted() then
             ReagentSeen(reagent, true)
@@ -220,8 +276,9 @@ function B.LayoutBags()
         end
     end
     -- Once moved, the piece is only sized to its row.
-    if piece and out then piece:SetSize(rowW, KEYRING_H) end
-    LayFloor(art, square, (out or OneBar()) and not ns.db.hideBagsArt, buttonScale, level, backpack)
+    if piece and out then piece:SetSize(boxW, boxH) end
+    -- The floor: a strip of the band from the backpack, turned with the row.
+    LayFloor(art, square, (out or OneBar()) and not ns.db.hideBagsArt, buttonScale, level, backpack, grow.turn)
     B.LaySection(level)
     if BagBarExpandToggle then BagBarExpandToggle:Hide() end
     if BagsBar then FadeTextures(BagsBar, 0, BAGS_BAR_ART) end

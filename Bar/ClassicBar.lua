@@ -70,7 +70,7 @@ local function ReadShape()
     -- On the band when the layout has them at default, or dropped on the band and held there by our record.
     local bagsMoved = BagsBar and SystemMoved(BagsBar)
     if not bagsMoved and ns.db.bagsHeld then ns.db.bagsHeld = false end
-    shape.bags = (not bagsMoved) or ns.db.bagsHeld == true
+    shape.bags = ((not bagsMoved) or ns.db.bagsHeld == true) and not B.BagsTurned()
     local count, sized = B.MicroCounts()
     local _, region = MicroPlan(count, MicroUserScale(), sized)
     local raw = math.max(MICRO_LEAD + MICRO_END_GAP, math.min(MICRO_REGION_MAX, region))
