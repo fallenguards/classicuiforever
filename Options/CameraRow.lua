@@ -6,27 +6,34 @@ local O = ns.options
 -- only as the player moves this (held in a fight); reset gives the client's default back.
 
 local CVAR = "cameraDistanceMaxZoomFactor"
-local LOW, HIGH, STEPS, LABEL_W = 1, 4, 30, 130
+local LOW, HIGH, STEPS = 1, 4, 30
 
 local function Current() return tonumber(ns.GetCVar(CVAR)) or LOW end
 local function Write(value)
     ns.Sched.NextFrame("options.camera", function() ns.SetCVarOrHold(CVAR, string.format("%.1f", value)) end)
 end
 local function Tenths(value) return string.format("%.1f", value) end
+local function Quiet() end
 
--- width: the row's room in its column.
+-- Its name on a line of its own, the slider under it indented as the theme's darkness slider. width: the slider row's.
 function O.CameraRow(parent, width)
+    local head = ns.NewFrame("Frame", nil, parent)
+    head:SetSize(width, 24)
+    head:EnableMouse(true)
+    head.text = head:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    head.text:SetPoint("LEFT", head, "LEFT", 4, 0)
+    head.text:SetJustifyH("LEFT")
+    head.text:SetWordWrap(false)
+    head.text:SetText(L["OPTWIN_CAMERA_DISTANCE"])
+    head.SetChecked, head.SetEnabled = Quiet, Quiet
+    O.Describe(head, "cameraDistance", L["OPTWIN_CAMERA_DISTANCE"], L["OPTWIN_CAMERA_DISTANCE_TIP"])
+    head.keyLow = head.keyLow .. " camera zoom distance far out view max slider"
+
     local row, reset = O.SliderRow(parent, width)
-    -- Alone in its section, so its name before it (the theme's slider sits under its toggle).
-    local name = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    name:SetPoint("LEFT", row, "LEFT", 4, 0)
-    name:SetWidth(LABEL_W)
-    name:SetJustifyH("LEFT")
-    name:SetWordWrap(false)
-    name:SetText(L["OPTWIN_CAMERA_DISTANCE"])
-    local slider, formatters = ns.band.StepperSlider(row, width - 34 - LABEL_W - 8, name, 4, Tenths)
+    local slider, formatters = ns.band.StepperSlider(row, width - 34, row, 4, Tenths)
     local Fill
     if slider then
+        ns.SetPointOnce(slider, "LEFT", row, "LEFT", 2, 0)
         Fill = ns.band.GuardedSlider(slider, function() return Current(), LOW, HIGH, STEPS end, function(value)
             row.shown = math.floor(value * 10 + 0.5) / 10
             Write(row.shown)
@@ -45,7 +52,7 @@ function O.CameraRow(parent, width)
         row.shown = nil
         ns.Sched.NextFrame("options.cameraReset", function() row:Sync() end)
     end)
-    O.Describe(row, "cameraDistance", L["OPTWIN_CAMERA_DISTANCE"], L["OPTWIN_CAMERA_DISTANCE_TIP"])
-    row.keyLow = row.keyLow .. " camera zoom distance far out view max slider"
-    return row
+    O.Describe(row, "cameraDistanceValue", L["OPTWIN_CAMERA_DISTANCE"], L["OPTWIN_CAMERA_DISTANCE_TIP"])
+    row.keyLow = head.keyLow
+    return head, row
 end

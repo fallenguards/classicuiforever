@@ -66,4 +66,5 @@ return {
     tradeSkillFull = "same for everyone: off by default; retail's size button on a profession's window sets it",
     barArtHidden = "kept as before: a dbVersion 9 migration (ns.KeepBarArt) takes bar art hidden in our layout as the player's own tick",
     profBookBands = "on for everyone, a restyle: the professions book on the spellbook parchment as Era's; ticked brings the Cataclysm page back",
+    searchOnlyMatches = "same for everyone: off by default; the options search's own checkbox",
 }

@@ -100,6 +100,7 @@ ns.DB_DEFAULTS = {
     nameBoxPlayer = false, nameBoxTarget = true, nameBoxFocus = true,
     profBookBig = false,
     profBookBands = false,
+    searchOnlyMatches = false,
     tradeSkillFull = false,
     reagentBagSlot = false,
     reagentBagRound = false,

@@ -475,9 +475,12 @@ local function Build(canvas)
             Add(dark, "themeDark")
         end
         if entry[1] == "addonMessages" then
-            local camera = O.CameraRow(child, LIST_W / COLUMNS - INDENT - 14)
+            local head, camera = O.CameraRow(child, LIST_W / COLUMNS - 2 * INDENT - 14)
+            head.text:SetWidth(LIST_W / COLUMNS - 30)
+            Grouped(head)
+            Add(head)
             Grouped(camera)
-            Add(camera)
+            Add(camera, head.key)
         end
         if entry[1] == "themeCustom" then
             local color = O.ColorRow(child, "themeColor", L["OPTWIN_COLOUR"],
@@ -526,7 +529,7 @@ local function Build(canvas)
     end
 
     -- Word starts in name, keywords or section title first, tooltip only when nothing matched those; whole sections show,
-    -- their matches lit and the rest dimmed; empty shows all.
+    -- their matches lit and the rest dimmed (Only show matches: a match, what is under it and the rows above it); empty: all.
     local search = ns.SearchBox(frame, width - 60, L["OPTWIN_SEARCH_TOGGLES"])
     search:SetPoint("TOP", frame, "TOP", 4, canvas and -16 or -50)
     frame.search = search
@@ -547,12 +550,17 @@ local function Build(canvas)
             hit[key] = true
             for _, other in ipairs(kids[key] or EMPTY) do MarkAll(other.key) end
         end
+        local only = text ~= "" and ns.db.searchOnlyMatches == true
         for _, box in ipairs(boxes) do
             matched[box] = best > 0 and level[box] == best
             if text == "" or matched[box] then
                 local head = box.key
-                while parentOf[head] do head = parentOf[head] end
-                MarkAll(head)
+                if only then MarkAll(head) end
+                while parentOf[head] do
+                    head = parentOf[head]
+                    if only then hit[head] = true end
+                end
+                if not only then MarkAll(head) end
             end
         end
         -- Sections in list order, head first, gathered under their group's header; a block is one header and its rows.
@@ -627,6 +635,18 @@ local function Build(canvas)
     end
     search:SetScript("OnTextChanged", function(self) frame:PlaceBoxes(self:GetText()) end)
     frame:PlaceBoxes("")
+    -- Its box's left under the search bar's, on the bulk buttons' line.
+    local onlyMatches = ns.SmallCheck(frame, L["OPTWIN_ONLY_MATCHES"], 1, 0.82, 0)
+    onlyMatches:SetPoint("TOPLEFT", search, "BOTTOMLEFT", -8, -5)
+    onlyMatches:SetChecked(ns.db.searchOnlyMatches == true)
+    onlyMatches:SetScript("OnClick", function(self)
+        ns.CheckSound(self)
+        ns.db.searchOnlyMatches = self:GetChecked() and true or false
+        frame:PlaceBoxes(search:GetText())
+    end)
+    onlyMatches.tooltip = L["OPTWIN_ONLY_MATCHES_TIP"]
+    onlyMatches.label = L["OPTWIN_ONLY_MATCHES"]
+    ns.AttachTip(onlyMatches, OPTION_TIP)
 
     local note = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     note:SetPoint("BOTTOM", frame, "BOTTOM", 0, 78)
@@ -668,7 +688,7 @@ local function Build(canvas)
     defaults.label = L["OPTWIN_RESET_TOGGLES"]
     ns.AttachTip(defaults, OPTION_TIP)
     -- The foot joins this list once built: the other tabs are reading, not settings.
-    local togglesOnly = { search, none, defaults, child }
+    local togglesOnly = { search, onlyMatches, none, defaults, child }
     AddTabs(frame, list, child, togglesOnly, listRows)
 
     -- Foot left: layout button over Reload UI; on the classic layout it offers a reset.
@@ -708,7 +728,7 @@ local function Build(canvas)
     preferredHover:EnableMouse(true)
     ns.AttachTip(preferredHover, PREFERRED_TIP)
     local status = ns.PanelButton(frame, L["OPTWIN_STATUS_REPORT"], 130)
-    status:SetPoint("RIGHT", github, "LEFT", -6, 0)
+    status:SetPoint("BOTTOM", frame, "BOTTOM", 0, 46)
     status:SetScript("OnClick", function() ns.ShowStatus() end)
     status.tooltip = L["OPTWIN_OPENS_A_WINDOW_WITH_YOUR"]
     status.label = L["OPTWIN_STATUS_REPORT"]
