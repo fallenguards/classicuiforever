@@ -160,6 +160,7 @@ Windows\Bags.lua
 Windows\DamageMeter.lua
 Character\CharacterModel.lua
 Character\CharacterCore.lua
+Character\CharacterSlots.lua
 Character\CharacterStats.lua
 Character\CharacterLists.lua
 Character\SkillDetail.lua

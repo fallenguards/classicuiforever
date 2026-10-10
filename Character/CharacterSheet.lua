@@ -5,10 +5,9 @@ local _, ns = ...
 -- Loads last of the sheet files: the module registers after the unlearn popup exists.
 
 local T = ns.sheet
-local Take, Own, Fade, TakeFaces = T.Take, T.Own, T.Fade, T.TakeFaces
+local Take, Fade, TakeFaces = T.Take, T.Fade, T.TakeFaces
 local EMPTY = ns.EMPTY
 
-local SLOT_GAP = 4
 -- The doll's 1.x sheet stands 2 right and 1 down of the shared one (1.x drew the shared one at 2, -1 to meet it): the
 -- doll page moves this far instead, with everything on it, so the window border stands still between tabs.
 local DOLL_X = -2
@@ -17,11 +16,6 @@ local DOLL_Y = 1
 local CLOSE_X = -47
 local CLOSE_Y = -25
 local CLOSE_SIZE = 34
-local LEFT_SLOTS = { "CharacterHeadSlot", "CharacterNeckSlot", "CharacterShoulderSlot", "CharacterBackSlot",
-    "CharacterChestSlot", "CharacterShirtSlot", "CharacterTabardSlot", "CharacterWristSlot" }
-local RIGHT_SLOTS = { "CharacterHandsSlot", "CharacterWaistSlot", "CharacterLegsSlot", "CharacterFeetSlot",
-    "CharacterFinger0Slot", "CharacterFinger1Slot", "CharacterTrinket0Slot", "CharacterTrinket1Slot" }
-local WEAPON_SLOTS = { "CharacterMainHandSlot", "CharacterSecondaryHandSlot", "CharacterRangedSlot" }
 local DOLL_BG = { "BackgroundTopLeft", "BackgroundTopRight", "BackgroundBotLeft", "BackgroundBotRight", "BackgroundOverlay" }
 local INNER_BORDER = { "TopLeft", "TopRight", "BottomLeft", "BottomRight", "Left", "Right", "Top", "Bottom", "Bottom2" }
 local SIDE_PIECES = { "CharacterStatsPane", "CharacterStatsPaneScrollBox", "PaperDollSidebarTabs", "PaperDollLevelInfo",
@@ -299,40 +293,6 @@ function ns.PlaceSheetChrome()
     if T.active and T.built then PlaceChrome() end
 end
 
--- Old bronze slot rim, owned so it hides with the sheet.
-local function Rim(slot)
-    ns.BronzeRim(slot, nil, 3)
-    local rim = Own(slot.fcuiBronzeRim)
-    if rim then rim:Show() end
-end
-
-local function DressSlot(slot, name)
-    Fade(_G[name .. "Frame"])
-    Fade(slot.BorderFrame)
-    Rim(slot)
-end
-
--- Each slot off the previous (nextPoint, dx, dy); the first at relPoint, x, y on the doll.
-local function ChainSlots(names, doll, relPoint, x, y, nextPoint, dx, dy)
-    local prev
-    for _, name in ipairs(names) do
-        local slot = _G[name]
-        if slot then
-            Take(slot, "points")
-            slot:ClearAllPoints()
-            if prev then
-                slot:SetPoint("TOPLEFT", prev, nextPoint, dx, dy)
-            else
-                slot:SetPoint("TOPLEFT", doll, relPoint, x, y)
-            end
-            DressSlot(slot, name)
-            prev = slot
-        end
-    end
-end
-
-local function FadeGearArt(frame) ns.FadeAtlas(frame, "gearslot", false, Fade) end
-
 local function HideControls(self)
     if T.active then self:Hide() end
 end
@@ -491,15 +451,7 @@ local function LayoutNow()
         PetTitle(title, pet)
     end
 
-    ChainSlots(LEFT_SLOTS, doll, "TOPLEFT", 21, -74, "BOTTOMLEFT", 0, -SLOT_GAP)
-    ChainSlots(RIGHT_SLOTS, doll, "TOPLEFT", 306, -74, "BOTTOMLEFT", 0, -SLOT_GAP)
-    ChainSlots(WEAPON_SLOTS, doll, "BOTTOMLEFT", T.WEAPON_SLOTS_X, 127, "TOPRIGHT", 5, 0)
-    local ammo = _G["CharacterAmmoSlot"]
-    if ammo then
-        DressSlot(ammo, "CharacterAmmoSlot")
-        FadeGearArt(ammo)
-        ns.EachChild(ammo, FadeGearArt)
-    end
+    T.LaySlots(doll)
 
     T.PlaceModel(doll, pet)
 

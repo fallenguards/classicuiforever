@@ -156,6 +156,8 @@ ns.TEX = {
     lootPanel = "!UI-LootPanel",
     -- Era scroll track beside the character sheet's lists.
     charScrollBar = "!UI-Character-ScrollBar",
+    -- Era's ammo slot socket and its arrow to the ranged slot.
+    ammoSlot = "=PaperDollInfoFrame\\UI-Character-AmmoSlot",
     -- Era art (the client's are stand-ins): inset marble, rock to the border, frame sheet (title
     -- strip, streaks), merchant bottom strip (repair slots) and item name slots.
     marbleBg = "!UI-Background-Marble",
@@ -408,7 +410,7 @@ local METAL = {
     zoomInUp = true, zoomInDown = true, zoomInDisabled = true, zoomOutUp = true, zoomOutDown = true, zoomOutDisabled = true,
     frameMetal = true, frameMetalH = true, frameMetalV = true,
     tabActive = true, tabInactive = true,
-    slotNormal = true,
+    slotNormal = true, ammoSlot = true,
     maxLevel = true, repBar = true, groupIndicator = true,
     plateElite = true, plateRare = true,
 }
