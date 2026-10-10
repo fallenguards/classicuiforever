@@ -346,12 +346,17 @@ end
 
 -- The portrait as the page up: the professions icon on the book, the open profession's on its page. Held each pass
 -- of the watch: the client paints its own on its events, which left the last profession's or the book's up a while.
+-- book nil: read from the page (a craft's list update while on the book swapped it every craft).
 local BOOK_ICON = "Interface/ICONS/INV_SideTab_Professions_c60"
 local portraitSet, portraitWanted   -- the icon we last put there, as a file id and as asked
 function ns.ProfessionPortrait(book)
     local frame = ProfessionsFrame
     local portrait = frame and frame.PortraitContainer and frame.PortraitContainer.portrait
     if not portrait then return end
+    if book == nil then
+        local page = Page()
+        book = active and page ~= nil and page:IsVisible()
+    end
     local icon = BOOK_ICON
     if not book then
         local api = C_TradeSkillUI
@@ -626,6 +631,12 @@ local function StartWatch()
             end
         end
         self.dirty = true
+        -- The client's book refills on these (a craft's skill-up too), its spells back at its spots: our pass this
+        -- frame, before it draws, not up to a tenth later.
+        if event ~= "TRADE_SKILL_SHOW" and event ~= "PLAYER_REGEN_ENABLED" and self.bookShown
+            and ProfessionsFrame and ProfessionsFrame:IsVisible() then
+            self.since = 1
+        end
     end)
     ns.Sched.OnFrame(watch, { name = "professions.watch", every = 0, fn = function(_, since) WatchTick(watch, since) end })
     local fightStart = CreateFrame("Frame")
