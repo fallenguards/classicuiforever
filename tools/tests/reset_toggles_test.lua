@@ -1,5 +1,6 @@
 -- Offline tests for Options/EraScale.lua under Lua 5.4: Reset toggles sets the boxes as the classic layout does, the 36 px
--- bar included at Classic Era's interface size (it put back the game-sized bar).
+-- bar included at Classic Era's interface size (it put back the game-sized bar); a reinstall on the classic layout at
+-- Era's size starts with the 36 px bar.
 -- Run from the addon root: lua tools/tests/reset_toggles_test.lua (CI runs every tools/tests/*_test.lua).
 -- luacheck: std lua54
 -- luacheck: ignore 111 112 113 121 212
@@ -17,7 +18,10 @@ UIParent = { GetScale = function() return uiScale end }
 ------------------------------------------------------------------ the addon
 
 local noop = function() end
+local classicLayout, changed = true, nil
 local ns = {
+    ClassicLayoutActive = function() return classicLayout end,
+    TogglesChanged = function(keys) changed = keys[1] end,
     L = setmetatable({}, { __index = function(_, key) return key end }),
     options = { TITLE = "ClassicUI Forever" },
     Popup = noop,
@@ -48,6 +52,25 @@ uiScale = 0.71
 ns.db = { classicBarSize = true }
 ns.ResetToggles()
 Check(ns.db.classicBarSize == false, "at another interface size the bar size is the default")
+
+-- Settings gone (a reinstall): the classic layout at Era's size gets the 36 px bar it was laid for, once.
+local function FreshLogin(scale, layout)
+    uiScale, classicLayout, changed = scale, layout, nil
+    ns.db = { classicBarSize = false }
+    ns.freshSettings = true
+    ns.EraSizeOnFreshInstall()
+end
+FreshLogin(0.9, true)
+Check(ns.db.classicBarSize == true and changed == "classicBarSize", "reinstall on the classic layout at Era's size: 36 px bar")
+Check(ns.freshSettings == nil, "asked once per load")
+FreshLogin(0.71, true)
+Check(ns.db.classicBarSize == false, "the classic layout at another size keeps the game-sized bar")
+FreshLogin(0.9, false)
+Check(ns.db.classicBarSize == false, "a new player (no classic layout yet) keeps the game-sized bar")
+uiScale, classicLayout = 0.9, true
+ns.db, ns.freshSettings = { classicBarSize = false }, nil
+ns.EraSizeOnFreshInstall()
+Check(ns.db.classicBarSize == false, "saved settings are never changed")
 
 if failures > 0 then
     print(string.format("reset toggles: %d failed", failures))

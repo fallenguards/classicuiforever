@@ -411,6 +411,7 @@ frame:SetScript("OnEvent", function(_, event, arg1)
         ns.db = ForeverClassicUIDB
         -- Saved before this version (dbVersion 1): read before the defaults fill the gaps.
         local saved = next(ns.db) ~= nil and (ns.db.dbVersion or 1)
+        ns.freshSettings = not saved
         local upgraded = saved and saved < 2
         local big = ns.db.defaultBarSize == true
         if saved and saved < 3 then ns.KeepOldLook() elseif saved == 3 then ns.NoteBarsLook() end
@@ -464,6 +465,7 @@ frame:SetScript("OnEvent", function(_, event, arg1)
             ns.layoutChecked = true
             C_Timer.After(3, function()
                 if ns.SelectClassicLayoutIfPending then ns.SelectClassicLayoutIfPending() end
+                if ns.EraSizeOnFreshInstall then ns.EraSizeOnFreshInstall() end
                 ns.FirstRun()
                 if ns.OfferBarSize then ns.OfferBarSize() end
                 if ns.OfferClassicLook then ns.OfferClassicLook() end

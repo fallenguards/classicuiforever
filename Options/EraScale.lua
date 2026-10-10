@@ -29,6 +29,16 @@ function ns.ResetToggles()
     if EraScale() ~= nil and not SizeOff() then ns.db.classicBarSize = true end
 end
 
+-- Settings gone with the classic layout kept at Era's size (a reinstall): the 36 px bar that layout was laid for. Both
+-- read from the game; the interface size is never written here.
+function ns.EraSizeOnFreshInstall()
+    if not ns.freshSettings then return end
+    ns.freshSettings = nil
+    if ns.db.classicBarSize or not ns.ClassicLayoutActive() or EraScale() == nil or SizeOff() then return end
+    ns.db.classicBarSize = true
+    ns.TogglesChanged({ "classicBarSize" })
+end
+
 local function QueueEraScale()
     ns.QueueLayoutJob("eraScale", true)
 end
