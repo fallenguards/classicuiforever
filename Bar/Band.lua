@@ -49,7 +49,8 @@ B.TAIL_WINDOW, B.TAIL_SLOT = 7, 30   -- window's left column, key slot's centre
 function B.TailParts()
     local db = ns.db
     local latency = not (db and (db.hideLatencyBar == true or ns.ValidPlace(db.latencyPos)))
-    local key = KeyRingButton ~= nil and not (db and (db.hideKeyRing == true or ns.ValidPlace(db.keyRingPos)))
+    local key = KeyRingButton ~= nil and not (db and (db.hideKeyRing == true or ns.ValidPlace(db.keyRingPos)
+        or (db.keyRingSnap == true and db.keyRingFlat == true and B.BagsColumn and B.BagsColumn() ~= nil)))
     return latency, key
 end
 -- A client with no key ring: the reagent bag without a socket of its own ends the bag row in the key slot.

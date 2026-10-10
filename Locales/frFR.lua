@@ -424,6 +424,7 @@ L["BAR_DRAG_TO_MOVE_LET_GO"] = "Faites glisser pour déplacer. Relâchez près d
 L["BAR_CLICK_FOR_ITS_SIZE_AND"] = "Cliquez pour sa taille et sa réinitialisation. La molette change aussi sa taille."
 L["BAR_LATENCY_BAR"] = "Barre de latence"
 L["BAR_KEY_RING"] = "Trousseau"
+L["BAR_KEY_RING_FLAT"] = "Horizontal"
 L["BAR_HIDE"] = "Masquer"
 L["BAR_FOLLOWS_THE_CLASSIC_BAR"] = "Suit la barre classique"
 L["CORE_CLASSICUI_FOREVER_N_NX"] = "ClassicUI Forever\n\n%s"

@@ -17,6 +17,7 @@ Locales\enUS.lua
 Locales\enUS_WhatsNew.lua
 Locales\enUS_Help.lua
 Locales\enUS_Legacy.lua
+Locales\enUS_Windows.lua
 Locales\deDE.lua
 Locales\deDE_WhatsNew.lua
 Locales\deDE_Legacy.lua

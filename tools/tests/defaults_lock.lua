@@ -149,6 +149,8 @@ return {
     hoverMinimapZoomOut = false,
     hoverOptionsButton = false,
     journalMinimapButton = true,
+    keyRingFlat = false,
+    keyRingSnap = false,
     keyTextSize = 12,
     layoutPrompted = false,
     layoutSelectPending = false,

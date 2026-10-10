@@ -719,28 +719,44 @@ end
 -- 1.x key ring: an 18x39 key from its own sheet. Without a key ring it goes on the reagent bag so the slot still opens
 -- something. The client refreshes bag textures often; the hook reapplies it.
 local keyrings = {}
-local KEY_RING = { set = "tex", highlightSet = "tex", coords = { 0, 0.5625, 0, 0.609375 }, fill = true, alpha = 1, add = true,
+local KEY_U, KEY_V, KEY_W, KEY_H = 0.5625, 0.609375, 18, 39
+local KEY_RING = { set = "tex", highlightSet = "tex", coords = { 0, KEY_U, 0, KEY_V }, alpha = 1, add = true,
     states = KEY_STATES }
+-- Laid flat (the band section's key ring by a column of bags): the same crop turned a quarter, as the column's floor.
+local function KeySpec(coords)
+    local spec = {}
+    for k, v in pairs(KEY_RING) do spec[k] = v end
+    spec.coords = coords
+    return spec
+end
+local KEY_FLAT = { cw = KeySpec({ 0, KEY_V, KEY_U, KEY_V, 0, 0, KEY_U, 0 }),
+    ccw = KeySpec({ KEY_U, 0, 0, 0, KEY_U, KEY_V, 0, KEY_V }) }
 
--- The game turns the key a quarter for a column of bags (KeyRingMixin:UpdateOrientation); ours stands upright.
-local function Upright(tex)
-    if tex and tex.GetRotation and tex:GetRotation() ~= 0 then tex:SetRotation(0) end
+-- The key at its own size on the button's middle, by crop: the game turns its art a quarter and swaps the button's size
+-- for a column of bags (KeyRingMixin:UpdateOrientation) on passes of its own.
+local function KeyArt(tex, button, turn)
+    if not tex then return end
+    if tex.GetRotation and tex:GetRotation() ~= 0 then tex:SetRotation(0) end
+    ns.SetPointOnce(tex, "CENTER", button, "CENTER", 0, 0)
+    if turn then tex:SetSize(KEY_H, KEY_W) else tex:SetSize(KEY_W, KEY_H) end
 end
 
 local function ApplyKeyRingArt(button)
     local state = keyrings[button]
     if not state or not state.active then return end
-    Upright(StateTexture(button, "Normal"))
-    Upright(StateTexture(button, "Pushed"))
-    Upright(StateTexture(button, "Highlight"))
-    ns.DressStates(button, "keyRingUp", "keyRingDown", nil, "keyRingHighlight", KEY_RING)
+    local turn = state.turn
+    ns.DressStates(button, "keyRingUp", "keyRingDown", nil, "keyRingHighlight", turn and KEY_FLAT[turn] or KEY_RING)
+    KeyArt(StateTexture(button, "Normal"), button, turn)
+    KeyArt(StateTexture(button, "Pushed"), button, turn)
+    KeyArt(StateTexture(button, "Highlight"), button, turn)
     -- Only the three state textures stay seen.
     FadeTextures(button, 0, nil, StateTexture(button, "Normal"), StateTexture(button, "Pushed"), StateTexture(button, "Highlight"))
     if button.CircleMask then button.CircleMask:Hide() end
     if button.Count then button.Count:SetAlpha(0) end
 end
 
-function ns.SkinKeyRing(button)
+-- turn: "cw" or "ccw", the band section's key ring laid flat as a column's floor; nil upright.
+function ns.SkinKeyRing(button, turn)
     local state = keyrings[button]
     if not state then
         state = {}
@@ -750,6 +766,7 @@ function ns.SkinKeyRing(button)
         end
     end
     state.active = true
+    state.turn = turn
     ApplyKeyRingArt(button)
 end
 

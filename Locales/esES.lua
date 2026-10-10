@@ -424,6 +424,7 @@ L["BAR_DRAG_TO_MOVE_LET_GO"] = "Arrastra para mover. Suéltalo cerca de la barra
 L["BAR_CLICK_FOR_ITS_SIZE_AND"] = "Haz clic para su tamaño y restablecerlo. La rueda del ratón también cambia su tamaño."
 L["BAR_LATENCY_BAR"] = "Barra de latencia"
 L["BAR_KEY_RING"] = "Llavero"
+L["BAR_KEY_RING_FLAT"] = "Horizontal"
 L["BAR_HIDE"] = "Ocultar"
 L["BAR_FOLLOWS_THE_CLASSIC_BAR"] = "Sigue a la barra clásica"
 L["CORE_CLASSICUI_FOREVER_N_NX"] = "ClassicUI Forever\n\n%s"

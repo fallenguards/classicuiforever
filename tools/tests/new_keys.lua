@@ -67,4 +67,6 @@ return {
     barArtHidden = "kept as before: a dbVersion 9 migration (ns.KeepBarArt) takes bar art hidden in our layout as the player's own tick",
     profBookBands = "on for everyone, a restyle: the professions book on the spellbook parchment as Era's; ticked brings the Cataclysm page back",
     searchOnlyMatches = "same for everyone: off by default; the options search's own checkbox",
+    keyRingFlat = "same for everyone: off by default; the key ring's edit mode dialog lays it flat",
+    keyRingSnap = "same for everyone: off by default; set by dropping the flat key ring at a bag column's end",
 }

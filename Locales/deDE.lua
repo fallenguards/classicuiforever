@@ -424,6 +424,7 @@ L["BAR_DRAG_TO_MOVE_LET_GO"] = "Ziehen zum Verschieben. Nahe der Leiste loslasse
 L["BAR_CLICK_FOR_ITS_SIZE_AND"] = "Klicken für Größe und Zurücksetzen. Das Mausrad ändert die Größe auch."
 L["BAR_LATENCY_BAR"] = "Latenzleiste"
 L["BAR_KEY_RING"] = "Schlüsselbund"
+L["BAR_KEY_RING_FLAT"] = "Horizontal"
 L["BAR_HIDE"] = "Ausblenden"
 L["BAR_FOLLOWS_THE_CLASSIC_BAR"] = "Folgt der klassischen Leiste"
 L["CORE_CLASSICUI_FOREVER_N_NX"] = "ClassicUI Forever\n\n%s"

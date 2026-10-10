@@ -162,6 +162,27 @@ end
 -- does, its floor turned with it (ClassicBar ReadShape).
 function B.BagsTurned() return Grow() ~= GROW.left end
 
+-- A column of bags (edit mode's Vertical): its floor's turn, else nil.
+function B.BagsColumn()
+    local turn = Grow().turn
+    return (turn == "cw" or turn == "ccw") and turn or nil
+end
+
+-- A column's far end, for the key ring lying flat to ride on (BandSection): the frame, the key ring home's point, the
+-- frame's point and the row's scale; nil when there is no column.
+function B.BagsFarEnd()
+    local turn, art = B.BagsColumn(), B.art
+    if not turn or not art then return nil end
+    local up = turn == "cw"
+    local floor, last = art.bagFloor, art.bagsLast
+    if floor and floor:IsShown() then
+        return floor, up and "BOTTOMLEFT" or "TOPLEFT", up and "TOPLEFT" or "BOTTOMLEFT", floor:GetScale()
+    end
+    if last and last:IsShown() then
+        return last, up and "BOTTOM" or "TOP", up and "TOP" or "BOTTOM", last:GetScale()
+    end
+end
+
 -- One more piece on the row, a step on from prev; step is the overlap between sockets (negative: a gap).
 local function Chain(button, prev, grow, step)
     button:SetPoint(grow[1], prev, grow[2], -grow[3] * step, -grow[4] * step)
@@ -275,6 +296,7 @@ function B.LayoutBags()
             ReagentSeen(reagent, true)
         end
     end
+    art.bagsLast = prev
     -- Once moved, the piece is only sized to its row.
     if piece and out then piece:SetSize(boxW, boxH) end
     -- The floor: a strip of the band from the backpack, turned with the row.
