@@ -621,6 +621,48 @@ function T.TightenSpells()
     end
 end
 
+-- A texture loads from disk when first drawn: the book's bands, bars and icons came up frames after the window. Each
+-- file the window holds (not its other pages) drawn once at alpha 0 on a speck of ours, some seconds after login.
+local PRELOAD_AFTER, PRELOAD_FOR = 5, 5
+local OTHER_PAGES = { "CraftingPage", "SpecPage", "OrdersPage" }
+local preload, preloaded
+
+local function PreloadTex(region)
+    if not region:IsObjectType("Texture") then return end
+    local atlas, file = region:GetAtlas(), region:GetTexture()
+    local key = atlas or file
+    if not key or ns.IsSecret(key) or preloaded[key] then return end
+    preloaded[key] = true
+    local tex = preload:CreateTexture(nil, "BACKGROUND")
+    if atlas then tex:SetAtlas(atlas) else tex:SetTexture(file) end
+    tex:SetAllPoints(preload)
+    tex:SetAlpha(0)
+end
+
+local function PreloadFrom(frame, skip)
+    if skip[frame] then return end
+    ns.EachRegion(frame, PreloadTex)
+    ns.EachChild(frame, PreloadFrom, skip)
+end
+
+function T.Preload()
+    if preload then return end
+    preload = ns.NewFrame("Frame", nil, UIParent)
+    preload:SetSize(1, 1)
+    preload:SetPoint("BOTTOMLEFT")
+    C_Timer.After(PRELOAD_AFTER, function()
+        local host = T.Host()
+        if not host then return end
+        preloaded = {}
+        local skip = {}
+        for _, key in ipairs(OTHER_PAGES) do
+            if host[key] then skip[host[key]] = true end
+        end
+        PreloadFrom(host, skip)
+        C_Timer.After(PRELOAD_FOR, function() preload:Hide() end)
+    end)
+end
+
 -- Our art only once the cards are placed (impossible in combat): a book first
 -- opened in combat showed our rows over the client's cards.
 function T.ShowOurs(on)

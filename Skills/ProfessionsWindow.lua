@@ -600,7 +600,10 @@ local function WatchTick(self, elapsed)
         end
         self.placedNow = placed
         ShowOurs(placed)
-        if placed then TightenSpells() end
+        if placed then
+            TightenSpells()
+            T.Preload()
+        end
     end
     SetPending(false)
 end
