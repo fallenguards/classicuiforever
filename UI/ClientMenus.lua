@@ -213,9 +213,10 @@ end
 
 -------------------------------------------------- social window buttons
 
--- Era's broadcast button, its 32 square (its frame takes the theme's copies, the bubble keeps its blue).
-local ERA_BROADCAST = "Interface\\FriendsFrame\\broadcast-"
 local CLIENT_SQUARE = "Interface\\Buttons\\UI-SquareButton-"
+-- The contacts button: the game's square and down arrow in every look, 2 right of the Battle.net bar as the game sets
+-- it, 3 further left while ours dresses the window.
+local CONTACTS_X, CLIENT_CONTACTS_X = -1, 2
 -- IconButtonTemplate.xml's art, filling the button.
 local CLIENT_STATES = { set = "file", highlightSet = "raw", coords = { 0, 1, 0, 1 }, fill = true, add = true }
 local DD_PIECES = { "ddLeft", "ddMiddle", "ddRight", "ddArrow", "ddArrowGlow" }
@@ -244,14 +245,10 @@ local function PaintStatus(dd, classic)
 end
 
 local function PaintContacts(btn, classic)
-    if classic then
-        ns.DressStates(btn, ERA_BROADCAST .. "normal", ERA_BROADCAST .. "press", ERA_BROADCAST .. "normal", ART.HILIGHT,
-            CLIENT_STATES)
-    else
-        ns.DressStates(btn, CLIENT_SQUARE .. "Up", CLIENT_SQUARE .. "Down", CLIENT_SQUARE .. "Disabled", ART.HILIGHT,
-            CLIENT_STATES)
-    end
-    if btn.Icon then btn.Icon:SetAlpha(classic and 0 or 1) end
+    ns.DressStates(btn, CLIENT_SQUARE .. "Up", CLIENT_SQUARE .. "Down", CLIENT_SQUARE .. "Disabled", ART.HILIGHT,
+        CLIENT_STATES)
+    if btn.Icon then btn.Icon:SetAlpha(1) end
+    ns.SetPointIf(btn, "LEFT", btn:GetParent(), "RIGHT", classic and CONTACTS_X or CLIENT_CONTACTS_X, 0)
 end
 
 -- Classic only while the social window wears the old chrome; client art otherwise.

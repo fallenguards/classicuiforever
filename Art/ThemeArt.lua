@@ -3,8 +3,6 @@ local _, ns = ...
 -- Made by dev/tools/bronze_variants.py: the art with a copy in every theme folder under media/,
 -- one file name per line, read case-blind in TextureData.lua. Do not edit by hand; run the tool again.
 ns.THEME_ART = [[
-broadcast-normal
-broadcast-press
 Button-Backpack-Up
 CharacterCreate-LabelFrame
 ChatFrame-Atlas
