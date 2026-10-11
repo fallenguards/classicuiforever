@@ -384,9 +384,15 @@ local function HandleRect(entry)
     local w, h = PreviewSize(entry, frame)
     w, h = w * k, h * k
     if left and not OnRing(entry) then return left, top, w, h end
-    if frame and not full and frame:IsShown() then
+    -- A piece shown only at times (the tracking spell's icon) still has its spot on the minimap while hidden.
+    if frame and not full and (frame:IsShown() or entry.piece) then
         local x, y = Plain(frame:GetLeft()), Plain(frame:GetTop())
         if x and y then return x * k, y * k, w, h end
+    end
+    -- A ring button turned off has no frame yet: its box where it would stand on the ring.
+    if entry.piece then
+        local cx, cy = ns.RingButtonSpot(entry.key)
+        if cx then return cx - w / 2, cy + h / 2, w, h end
     end
     if (entry.client or entry.quests) and not entry.cut then
         local x, down = GAME_LEFT, GAME_TOP

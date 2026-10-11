@@ -122,6 +122,22 @@ local function PositionAll()
     end
 end
 
+-- Where a ring button sits, or would while it is off (never built), by its edit mode entry key: its centre in
+-- UIParent units.
+function ns.RingButtonSpot(key)
+    if not Minimap then return nil end
+    for i = 1, #rings do
+        local ring = rings[i]
+        if ring.key == key then
+            local mx, my = Minimap:GetCenter()
+            if not mx or ns.AnySecret(mx, my) then return nil end
+            local a, r = math.rad(Angle(ring)), Radius()
+            local k = Minimap:GetEffectiveScale() / UIParent:GetEffectiveScale()
+            return (mx + math.cos(a) * r) * k, (my + math.sin(a) * r) * k
+        end
+    end
+end
+
 -- Edit mode's drag, reset and size steps, by its entry key (ns.LayPiece).
 function ns.PlaceRingButton(key)
     for i = 1, #rings do
