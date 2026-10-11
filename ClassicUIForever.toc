@@ -56,6 +56,7 @@ UI\Colors.lua
 UI\FriendsWindow.lua
 UI\Windows.lua
 UI\WindowList.lua
+UI\GameSpot.lua
 UI\WindowHandles.lua
 UI\WindowLayouts.lua
 UI\WindowsEditMode.lua
@@ -157,6 +158,8 @@ Social\FinderTabs.lua
 Social\GroupFinder.lua
 Units\LastNames.lua
 Map\MapFade.lua
+Map\WorldMapEraLarge.lua
+Map\WorldMapOptions.lua
 Map\WorldMapClassic.lua
 Windows\BagBand.lua
 Windows\Bags.lua

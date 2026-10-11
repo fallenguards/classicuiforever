@@ -1,7 +1,7 @@
 local _, ns = ...
 
--- Classic Era's small world map: its 610 x 438 art, the quest pane in a second hole the art widens across.
--- Nav bar row, filter, pin and coordinates show only with "Map navigation bar".
+-- Classic Era's world map in the header style picked: Classic (WorldMapEraLarge.lua), none (Era's small map) or the
+-- game's own. The quest pane in a second hole the art widens across; Map Options at the foot (WorldMapOptions.lua).
 -- Size and anchors change inside a snippet, out of combat: from our code the map's refit would run as ours.
 
 local P = ns.panels
@@ -19,21 +19,30 @@ local MAP_CLOSE_X = -44
 local MAP_CLOSE_Y = 5
 local MAP_CLOSE_SIZE = 32
 local MAXIMIZE_GAP = 10
+-- Map Options' box: its bottom right 10 in from the art's right end and 5 up, MoP's spot.
+-- Map Options in none style: its box's right edge from the window's right (+ right), its bottom from the bottom (+ up).
+local NONE_MAP_OPTIONS_X = -9
+local NONE_MAP_OPTIONS_Y = 5
 -- Under the picture as Era's (LowerFrameLevel); only the footer's top line, art rows 405 to 412, drawn over it.
 local ART_UNDER_MAP = 1
 local FOOT_LINE_OVER_MAP = 2
 local FOOT_LINE_TOP, FOOT_LINE_BOTTOM = 405, 412
 -- Quest pane: its own hole right of the map's; the art widens across it. Rect from the frame's top left.
-local QUEST_PANE_X = 611        -- pane's left (+ right)
+local QUEST_PANE_X = 607        -- pane's left (+ right)
 local QUEST_PANE_Y = 22         -- pane's top, down from the frame's top (+ lower)
 local QUEST_PANE_W = 330        -- pane's width (+ wider; the window widens with it)
-local QUEST_PANE_H = 383        -- pane's height (+ taller)
-local DIVIDER_X = 590           -- divider between map and pane: its left, under the map's right end (+ right)
-local DIVIDER_GAP = -2          -- divider: the pane's edge from the map's edge (- overlaps)
--- Era art columns and rows: the right piece's column a picture ends at (the map's at 600) and its art's end; a hole's
--- right edge (right piece), left edge (left piece) and their rows; the left piece's first clear column.
+local QUEST_PANE_H = 390        -- pane's height (+ taller): down to the footer, as the map's picture
+-- The quest pane's scroll column moved from the game's spot to meet each frame's border (+ right).
+local CLASSIC_SCROLL_COLUMN_X = 7
+local NONE_SCROLL_COLUMN_X = 0
+local PANE_BAR_SHIFT = { classic = CLASSIC_SCROLL_COLUMN_X, none = NONE_SCROLL_COLUMN_X }
+local DIVIDER_X = 598           -- divider between map and pane: its left, its rim on the map's right end (+ right)
+-- The large map's one divider (UI-WorldMap-Middle3, columns 190 to 199: a rim each side), straight, rows 20 to 412.
+local DIVIDER_FILE = "Interface\\WorldMap\\UI-WorldMap-Middle3"
+local DIVIDER_L, DIVIDER_R, DIVIDER_W = 190 / 256, 199 / 256, 9
+-- Era art columns and rows: the right piece's column a picture ends at (the map's at 600) and its art's end; the
+-- divider's rows; the left piece's first clear column.
 local PICTURE_RIGHT_COL, ART_RIGHT_COL = 76, 86
-local EDGE_RIGHT_L, EDGE_RIGHT_R, EDGE_LEFT_L, EDGE_LEFT_R = 66, 81, 0, 18
 local EDGE_TOP, EDGE_BOTTOM = 20, 412
 local FILL_MIN_COL = 17
 -- Forever's own small map and its picture's place (its XML: 2 in, under the 67 tall title row, 3 in from the right
@@ -49,7 +58,7 @@ local FOREVER_DETAILS_TEXT_X, FOREVER_DETAILS_TEXT_Y, FOREVER_DETAILS_TEXT_H = 5
 -- Era layout: the details text, its scroll bar, Back and the parchment up into the header band's room (+ up).
 local DETAILS_LIFT = 14
 
-local EXTRAS = { "NavBar", "WorldMapTrackingOptionsButton", "WorldMapTrackingPinButton" }
+local EXTRAS = { "NavBar", "WorldMapTrackingPinButton" }
 
 local layout, art, title
 local hidden = {}          -- client piece -> true while we hold it hidden
@@ -95,15 +104,27 @@ local REFIT = [[
 
 local function Map() return WorldMapFrame end
 
-local function WantEra()
+-- "classic", "none" or "forever" (Map navigation bar in the options).
+local function NavStyle()
+    local db = ns.db
+    if db.mapNavBar == true then return "forever" end
+    if db.mapNavNone == true then return "none" end
+    return "classic"
+end
+
+-- The header style the map wears now, nil for the game's own.
+local function EraStyle()
     local map = Map()
-    return map and P.active and ns.db.worldMap ~= false and ns.db.mapNavBar ~= true and not map:IsMaximized()
+    local style = map and P.active and ns.db.worldMap ~= false and NavStyle()
+    if style and style ~= "forever" and not map:IsMaximized() then return style end
 end
 
 local function PaneShown()
     local pane = Map().QuestLog
     return pane and pane:IsShown() and true or false
 end
+
+local function PaneW() return PaneShown() and QUEST_PANE_W or nil end
 
 local function Layout()
     if layout then return layout end
@@ -122,17 +143,31 @@ end
 local function PaneArtX() return QUEST_PANE_X + QUEST_PANE_W - PICTURE_RIGHT_COL end
 local function PaneWindowW() return PaneArtX() + ART_RIGHT_COL end
 
+-- The quest details fitted to a pane this tall (Era layout: lifted into the header band's room).
+local function Details(t, paneH)
+    t.dh = paneH - DETAILS_TOP
+    t.dtx, t.dty = FOREVER_DETAILS_TEXT_X, FOREVER_DETAILS_TEXT_Y + DETAILS_LIFT
+    t.dth = FOREVER_DETAILS_TEXT_H - (FOREVER_DETAILS_H - t.dh) + DETAILS_LIFT
+    return t
+end
+
 -- The map picture's two anchors (from the map frame's top left, then its given corner), the quest pane's (its first
--- corner from the same corner of the frame, its bottom right from qr) and the frame's size.
-local function Target(era)
+-- corner from the same corner of the frame, its bottom right from qr) and the frame's size. style nil: the game's.
+local function Target(style)
     local map = Map()
-    if era then
-        return { l = CANVAS_LEFT, t = -CANVAS_TOP, rp = "TOPLEFT", r = CANVAS_RIGHT, b = -CANVAS_BOTTOM,
+    if style == "classic" then
+        local LM = ns.MapLarge
+        local l, t, r, b = LM.Picture()
+        local x1, y1, x2, y2 = LM.Pane(QUEST_PANE_W)
+        local w, h = LM.Size(PaneW())
+        return Details({ l = l, t = -t, rp = "TOPLEFT", r = r, b = -b, qp = "TOPLEFT", qx1 = x1, qy1 = -y1,
+            qr = "TOPLEFT", qx2 = x2, qy2 = -y2, w = w, h = h }, y2 - y1)
+    end
+    if style then
+        return Details({ l = CANVAS_LEFT, t = -CANVAS_TOP, rp = "TOPLEFT", r = CANVAS_RIGHT, b = -CANVAS_BOTTOM,
             qp = "TOPLEFT", qx1 = QUEST_PANE_X, qy1 = -QUEST_PANE_Y,
             qr = "TOPLEFT", qx2 = QUEST_PANE_X + QUEST_PANE_W, qy2 = -(QUEST_PANE_Y + QUEST_PANE_H),
-            dh = QUEST_PANE_H - DETAILS_TOP, dtx = FOREVER_DETAILS_TEXT_X, dty = FOREVER_DETAILS_TEXT_Y + DETAILS_LIFT,
-            dth = FOREVER_DETAILS_TEXT_H - (FOREVER_DETAILS_H - (QUEST_PANE_H - DETAILS_TOP)) + DETAILS_LIFT,
-            w = PaneShown() and PaneWindowW() or ERA_W, h = ERA_H }
+            w = PaneShown() and PaneWindowW() or ERA_W, h = ERA_H }, QUEST_PANE_H)
     end
     local pane = PaneShown() and (map.questLogWidth or FOREVER_PANE_W) or 0
     local t = { l = FOREVER_LEFT, t = -FOREVER_TOP, rp = "BOTTOMRIGHT", r = -(FOREVER_RIGHT + pane), b = FOREVER_BOTTOM,
@@ -140,7 +175,11 @@ local function Target(era)
         qr = "BOTTOMRIGHT", qx2 = -FOREVER_PANE_RIGHT, qy2 = FOREVER_PANE_BOTTOM, dh = FOREVER_DETAILS_H,
         dtx = FOREVER_DETAILS_TEXT_X, dty = FOREVER_DETAILS_TEXT_Y, dth = FOREVER_DETAILS_TEXT_H }
     if not map:IsMaximized() then
-        t.w, t.h = (map.minimizedWidth or FOREVER_W) + pane, map.minimizedHeight or FOREVER_H
+        local w = map.minimizedWidth or FOREVER_W
+        t.w, t.h = w + pane, map.minimizedHeight or FOREVER_H
+        -- The picture's right from the window's left: the game widens the window for the pane before our next pass,
+        -- and fits the picture to its box at once; a box tied to the right edge took the pane's width for that fit.
+        t.rp, t.r = "BOTTOMLEFT", w - FOREVER_RIGHT
     end
     return t
 end
@@ -251,22 +290,17 @@ local function Art()
     ns.SetFile(right, ART_RIGHT_FILE)
     right:SetSize(ART_RIGHT_W, ART_H)
     art.right = right
-    -- Pane open: the left piece's end repeated up to the right piece, the two hole edges as a divider, dark behind.
+    -- Pane open: the left piece's end repeated up to the right piece, one divider, dark behind.
     art.fill = art:CreateTexture(nil, "ARTWORK")
     ns.SetFile(art.fill, ART_LEFT_FILE)
-    art.edgeRight = art:CreateTexture(nil, "ARTWORK", nil, 1)
-    ns.SetFile(art.edgeRight, ART_RIGHT_FILE)
-    art.edgeRight:SetSize(EDGE_RIGHT_R - EDGE_RIGHT_L, EDGE_BOTTOM - EDGE_TOP)
-    art.edgeRight:SetTexCoord(EDGE_RIGHT_L / ART_RIGHT_W, EDGE_RIGHT_R / ART_RIGHT_W, EDGE_TOP / ART_H, EDGE_BOTTOM / ART_H)
-    art.edgeRight:SetPoint("TOPLEFT", art, "TOPLEFT", DIVIDER_X, -EDGE_TOP)
-    art.edgeLeft = art:CreateTexture(nil, "ARTWORK", nil, 1)
-    ns.SetFile(art.edgeLeft, ART_LEFT_FILE)
-    art.edgeLeft:SetSize(EDGE_LEFT_R - EDGE_LEFT_L, EDGE_BOTTOM - EDGE_TOP)
-    art.edgeLeft:SetTexCoord(EDGE_LEFT_L / ART_LEFT_W, EDGE_LEFT_R / ART_LEFT_W, EDGE_TOP / ART_H, EDGE_BOTTOM / ART_H)
-    art.edgeLeft:SetPoint("TOPLEFT", art.edgeRight, "TOPRIGHT", DIVIDER_GAP, 0)
+    art.divider = art:CreateTexture(nil, "ARTWORK", nil, 1)
+    ns.SetFile(art.divider, DIVIDER_FILE)
+    art.divider:SetSize(DIVIDER_W, EDGE_BOTTOM - EDGE_TOP)
+    art.divider:SetTexCoord(DIVIDER_L, DIVIDER_R, 0, 1)
+    art.divider:SetPoint("TOPLEFT", art, "TOPLEFT", DIVIDER_X, -EDGE_TOP)
     art.paneBack = art:CreateTexture(nil, "BACKGROUND")
     art.paneBack:SetColorTexture(0, 0, 0, 1)
-    art.paneBack:SetPoint("TOPLEFT", art.edgeRight, "TOPLEFT", 0, 0)
+    art.paneBack:SetPoint("TOPLEFT", art.divider, "TOPLEFT", 0, 0)
     art.paneBack:SetPoint("BOTTOMRIGHT", right, "TOPLEFT", PICTURE_RIGHT_COL, -EDGE_BOTTOM)
     -- Over the map's border frame, which holds the client's own title; centred over the map.
     local titleHost = ns.NewFrame("Frame", nil, map.BorderFrame)
@@ -293,8 +327,7 @@ local function LayArt(a, pane)
         ns.SetPointOnce(a.fill, "TOPRIGHT", a.right, "TOPLEFT", 0, 0)
     end
     a.fill:SetShown(pane and fillW > 0)
-    a.edgeRight:SetShown(pane)
-    a.edgeLeft:SetShown(pane)
+    a.divider:SetShown(pane)
     a.paneBack:SetShown(pane)
 end
 
@@ -320,6 +353,39 @@ local function Coords(map)
     return coords
 end
 
+-- The pane's two scroll bars moved right by shift, or back on the game's own points (nil).
+local barPoints = setmetatable({}, { __mode = "k" })
+local function PaneBars()
+    local details = QuestMapFrame and QuestMapFrame.DetailsFrame and QuestMapFrame.DetailsFrame.ScrollFrame
+    return _G.QuestScrollFrame and _G.QuestScrollFrame.ScrollBar, details and details.ScrollBar
+end
+
+local function ShiftBar(bar, shift)
+    if not bar then return end
+    local was = barPoints[bar]
+    if shift then
+        if not was then
+            was = {}
+            for i = 1, bar:GetNumPoints() do was[i] = { bar:GetPoint(i) } end
+            barPoints[bar] = was
+        end
+        local first = was[1]
+        if not first or ns.IsAt(bar, first[1], first[2], first[3], first[4] + shift, first[5]) then return end
+        bar:ClearAllPoints()
+        for _, p in ipairs(was) do bar:SetPoint(p[1], p[2], p[3], p[4] + shift, p[5]) end
+    elseif was then
+        barPoints[bar] = nil
+        bar:ClearAllPoints()
+        for _, p in ipairs(was) do bar:SetPoint(unpack(p)) end
+    end
+end
+
+local function ShiftBars(shift)
+    local list, details = PaneBars()
+    ShiftBar(list, shift)
+    ShiftBar(details, shift)
+end
+
 local function HoldHidden(piece)
     if not piece then return end
     if piece:IsShown() then
@@ -328,13 +394,47 @@ local function HoldHidden(piece)
     end
 end
 
-local function DressEra()
-    local map = Map()
-    local border = map.BorderFrame
+-- Era's small map: its two sheets, the continent's name, the X in the right sheet's socket.
+local function DressSmall(map, close, sizer)
+    ns.MapLarge.Hide()
     local a = Art()
     LayArt(a, PaneShown())
     ns.SetShownIf(a, true)
     ns.SetShownIf(a.titleHost, true)
+    local id = map:GetMapID()
+    if id ~= titleFor then
+        titleFor = id
+        title:SetText(MapTitle())
+    end
+    if close then
+        ns.SetSizeIf(close, MAP_CLOSE_SIZE, MAP_CLOSE_SIZE)
+        ns.SetPointIf(close, "TOPRIGHT", a.right, "TOPRIGHT", MAP_CLOSE_X, MAP_CLOSE_Y)
+    end
+    if sizer and close then
+        ns.SetScaleIf(sizer, 1)
+        ns.SetPointIf(sizer, "RIGHT", close, "LEFT", MAXIMIZE_GAP, 0)
+    end
+    ns.MapOptions.Place(map, a, a:GetWidth() + NONE_MAP_OPTIONS_X, NONE_MAP_OPTIONS_Y - ERA_H, 1)
+end
+
+-- Era's large map: its sheets, header and buttons (WorldMapEraLarge.lua).
+local function DressLarge(map, close, sizer)
+    if art then
+        art:Hide()
+        art.titleHost:Hide()
+    end
+    local LM, level = ns.MapLarge, map.ScrollContainer:GetFrameLevel()
+    local paneW = PaneW()
+    LM.Art(map, math.max(0, level - ART_UNDER_MAP))
+    LM.Show(map, paneW, level + FOOT_LINE_OVER_MAP)
+    if close then LM.PlaceButtons(close, sizer, paneW) end
+    local rel, x, y = LM.FootSpot(paneW)
+    ns.MapOptions.Place(map, rel, x, y, LM.SCALE)
+end
+
+local function DressEra(style)
+    local map = Map()
+    local border = map.BorderFrame
     ns.SetAlphaIf(border.NineSlice, 0)
     ns.SetAlphaIf(border.TitleContainer, 0)
     ns.SetAlphaIf(border.InsetBorderTop, 0)
@@ -346,29 +446,26 @@ local function DressEra()
         ns.SetLevelIf(map.SidePanelToggle, map.ScrollContainer:GetFrameLevel() + FOOT_LINE_OVER_MAP + 1)
     end
     HoldHidden(Coords(map))
-    local id = map:GetMapID()
-    if id ~= titleFor then
-        titleFor = id
-        title:SetText(MapTitle())
-    end
+    ShiftBars(PANE_BAR_SHIFT[style])
+    ns.QuestPaneFloor(true)
     local close, sizer = border.CloseButton, border.MaximizeMinimizeFrame
-    if close then
-        ns.SetSizeIf(close, MAP_CLOSE_SIZE, MAP_CLOSE_SIZE)
-        ns.SetPointIf(close, "TOPRIGHT", a.right, "TOPRIGHT", MAP_CLOSE_X, MAP_CLOSE_Y)
-    end
-    if sizer and close then ns.SetPointIf(sizer, "RIGHT", close, "LEFT", MAXIMIZE_GAP, 0) end
-    eraDressed = true
+    if style == "classic" then DressLarge(map, close, sizer) else DressSmall(map, close, sizer) end
+    eraDressed = style
 end
 
 local function DressForever()
     if not eraDressed then return end
-    eraDressed = false
+    eraDressed = nil
     local map = Map()
     local border = map.BorderFrame
     if art then
         art:Hide()
         art.titleHost:Hide()
     end
+    ns.MapLarge.Hide()
+    ns.MapOptions.Release(map)
+    ShiftBars(nil)
+    ns.QuestPaneFloor(false)
     border.NineSlice:SetAlpha(1)
     if border.TitleContainer then border.TitleContainer:SetAlpha(1) end
     if border.InsetBorderTop then border.InsetBorderTop:SetAlpha(1) end
@@ -381,7 +478,10 @@ local function DressForever()
         ns.SetSizeIf(close, P.CLOSE_SIZE, P.CLOSE_SIZE)
         P.PlaceInSocket(close, border)
     end
-    if border.MaximizeMinimizeFrame and close then P.MaxMinBeside(border.MaximizeMinimizeFrame, close, 8) end
+    if border.MaximizeMinimizeFrame and close then
+        ns.SetScaleIf(border.MaximizeMinimizeFrame, 1)
+        P.MaxMinBeside(border.MaximizeMinimizeFrame, close, 8)
+    end
 end
 
 local touched   -- the map picture's anchors are ours from the first Era lay on
@@ -455,8 +555,8 @@ FadeTree = function(frame, depth)
     if depth < 4 then ns.EachChild(frame, FadeChild, depth + 1) end
 end
 
-local function FadeOutside(map)
-    local a = Art()
+local function FadeOutside(map, style)
+    local a = style == "classic" and ns.MapLarge.Frame() or Art()
     local key = string.format("%.0fx%.0f/%.0f", map:GetWidth(), map:GetHeight(), a:GetWidth())
     if fadedFor == key then return end
     fadedFor = key
@@ -467,6 +567,8 @@ local function FadeOutside(map)
         border.MaximizeMinimizeFrame }) do
         if piece then keep[piece] = true end
     end
+    ns.MapLarge.Keep(keep)
+    ns.MapOptions.Keep(keep, map)
     ClipMouse(map)
     FadeTree(map, 0)
 end
@@ -485,16 +587,19 @@ local function Pass()
     local map = Map()
     if not map then return end
     QuestButton(map)
-    if WantEra() then
+    local style = EraStyle()
+    if style then
         touched = true
-        local t = Target(true)
+        local t = Target(style)
         Lay(t)
+        -- Laid taller than the game's own size it was placed with: raised as the game would fit it.
+        if laidAt == GetTime() and Map():IsShown() then ns.FitGameWindow("map") end
         if Laid(t) then
-            DressEra()
+            DressEra(style)
             Unfade()
         elseif InCombatLockdown() and PictureLaid(t) then
-            DressEra()
-            FadeOutside(map)
+            DressEra(style)
+            FadeOutside(map, style)
         else
             Unfade()
             DressForever()
@@ -502,7 +607,7 @@ local function Pass()
     elseif touched then
         Unfade()
         DressForever()
-        Lay(Target(false))
+        Lay(Target(nil))
     end
     Refit()
 end
@@ -513,9 +618,15 @@ function ns.ClassicMapArt() return art end
 -- How far the Era layout lifts the quest details' text (its Back button follows, Quest/QuestMapPane.lua).
 function ns.MapDetailsLift() return eraDressed and DETAILS_LIFT or 0 end
 
--- The edit mode box: Era's size while its layout is on, the client's otherwise.
+-- The edit mode box: the size the header style draws, the client's for its own layout.
 function ns.ClassicMapSize()
-    if P.active and ns.db.worldMap ~= false and ns.db.mapNavBar ~= true then return ERA_W, ERA_H, PaneWindowW() - ERA_W end
+    local style = P.active and ns.db.worldMap ~= false and NavStyle()
+    if style == "classic" then
+        local w, h = ns.MapLarge.Size(nil)
+        return w, h, ns.MapLarge.Size(QUEST_PANE_W) - w
+    elseif style == "none" then
+        return ERA_W, ERA_H, PaneWindowW() - ERA_W
+    end
     return FOREVER_W, FOREVER_H, FOREVER_PANE_W
 end
 
@@ -547,8 +658,20 @@ if not Attach() then
     end)
 end
 
+local PASS_KEYS = { mapNavBar = true, mapNavClassic = true, mapNavNone = true, worldMap = true, hideMapQuestButton = true,
+    mapOptions = true, mapOptionsHover = true, mapOptionsHidden = true }
+local STYLE_KEYS = { mapNavBar = true, mapNavClassic = true, mapNavNone = true }
+
+-- A style picked: each draws the map at its own game's size, said once a session.
+ns.Popup("FCUI_MAP_STYLE_SIZE", { text = ns.L["MAP_STYLE_SIZE"], button1 = OKAY or "Okay", button2 = false })
+local sizeSaid
+
 ns.OnToggle(function(key)
-    if key == "mapNavBar" or key == "worldMap" or key == "hideMapQuestButton" then
+    if PASS_KEYS[key] then
         if Map() and Map():IsShown() then Pass() else LayShut() end
+    end
+    if STYLE_KEYS[key] and ns.db[key] == true and not sizeSaid then
+        sizeSaid = true
+        StaticPopup_Show("FCUI_MAP_STYLE_SIZE")
     end
 end)

@@ -72,4 +72,9 @@ return {
     professionTabsHidden = "same for everyone: off by default; a third pick beside on hover and always",
     keyRingSnap = "same for everyone: off by default; set by dropping the flat key ring at a bag column's end",
     trackingSameSize = "on for everyone, a restyle: the tracking icon at Era's size (a 64 ring); checked gives the others' size back",
+    mapNavClassic = "on for everyone, a restyle: Era's large map frame with its Continent and Zone header; a dbVersion 17 migration (ns.KeepMapNav) keeps Forever style where Map navigation bar was on",
+    mapNavNone = "same for everyone: off by default; the small Era map as before, a third pick of the header style",
+    mapOptions = "on for everyone: Map Options at the classic map's foot opens the game's own filter menu, hidden before",
+    mapOptionsHover = "same for everyone: off by default; a second pick beside shown",
+    mapOptionsHidden = "same for everyone: off by default; the filter hidden as before, a third pick",
 }

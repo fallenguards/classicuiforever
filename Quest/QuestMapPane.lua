@@ -352,6 +352,14 @@ local function DetailsShown()
     LayHeader()
 end
 
+-- The floor's right end: short of the scroll column on the game's frame (its border covers the rest), to the pane's
+-- edge on our classic frames, whose art under the pane showed behind the column and the gear.
+function ns.QuestPaneFloor(era)
+    if not floorTex then return end
+    ns.SetTwoPointsIf(floorTex, "TOPLEFT", QuestMapFrame, "TOPLEFT", QUEST_PANE_BG_LEFT, QUEST_PANE_BG_TOP, "BOTTOMRIGHT",
+        QuestMapFrame, "BOTTOMRIGHT", era and 0 or QUEST_PANE_BG_RIGHT, QUEST_PANE_BG_BOTTOM)
+end
+
 local function Build()
     if built or not QuestMapFrame then return end
     built = true
@@ -360,8 +368,7 @@ local function Build()
     -- Dark marble floor at the other lists' shade.
     floorTex = ns.OwnTexture(QuestMapFrame, "floor", "BACKGROUND", -3)
     ns.TileTex(floorTex, "marbleBg", nil, ns.PANE_SHADE or 0.9)
-    floorTex:SetPoint("TOPLEFT", QuestMapFrame, "TOPLEFT", QUEST_PANE_BG_LEFT, QUEST_PANE_BG_TOP)
-    floorTex:SetPoint("BOTTOMRIGHT", QuestMapFrame, "BOTTOMRIGHT", QUEST_PANE_BG_RIGHT, QUEST_PANE_BG_BOTTOM)
+    ns.QuestPaneFloor(false)
     if scroll then
         if scroll.Background then scroll.Background:SetAlpha(0) end
         if scroll.Edge then scroll.Edge:SetAlpha(0) end
@@ -390,10 +397,14 @@ local function Build()
     ns.HookGlobal("QuestLogQuests_Update", SkinRows)
 end
 
+-- The list's bottom shade (the game's gradient): the game sets its alpha on every scroll, so hidden, not faded.
+local function ListShadow() return _G.QuestScrollFrame and _G.QuestScrollFrame.BorderFrame and _G.QuestScrollFrame.BorderFrame.Shadow end
+
 local function Apply()
     active = true
     if not QuestMapFrame then ns.MissingPiece("QuestMapFrame") return end
     Build()
+    if ListShadow() then ListShadow():Hide() end
     if floorTex then floorTex:Show() end
     if parchmentTex then parchmentTex:Show() end
     if headerTex then headerTex:Show() end
@@ -406,6 +417,7 @@ end
 local function Restore()
     if not active then return end
     active = false
+    if ListShadow() then ListShadow():Show() end
     if floorTex then floorTex:Hide() end
     if parchmentTex then parchmentTex:Hide() end
     if headerTex then headerTex:Hide() end

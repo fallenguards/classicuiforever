@@ -143,6 +143,20 @@ function ns.KeepOldLook()
     db.dbVersion = 4
 end
 
+-- dbVersion 17: the map's header became three picks with Classic style the default, so the game's own layout stays
+-- where Map navigation bar was on.
+function ns.KeepMapNav()
+    local db = ns.db
+    local function Keep(t)
+        if t.mapNavBar == true then t.mapNavClassic = false end
+    end
+    Keep(db)
+    for _, shot in pairs(type(db.profiles) == "table" and db.profiles or {}) do
+        if type(shot) == "table" then Keep(shot) end
+    end
+    db.dbVersion = 17
+end
+
 -- Hide micro buttons reaches the game's own bar: an install with the classic bar off keeps every button there, in the
 -- account and every profile. Runs before the active profile is read.
 function ns.KeepGameMicroButtons(saved)
