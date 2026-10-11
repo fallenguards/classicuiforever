@@ -56,6 +56,7 @@ PlaySound = function() end
 wipe = function(t) for k in pairs(t) do t[k] = nil end return t end
 SOUNDKIT = {}
 local covered, raid = false, false
+local bands = {}
 
 local recent = {}
 local requested = 0
@@ -95,7 +96,12 @@ local S = {
     whoTab = New(),
     OverlayUp = function() return covered end,
     OnRaidPage = function() return raid end,
-    HeaderRow = function() return New() end,
+    HeaderRow = function()
+        local band = New()
+        function band:SetPoint(point, rel) if point == "TOP" then self.topTo = rel end end
+        bands[#bands + 1] = band
+        return New(), {}, band
+    end,
     ListBox = function() return New() end,
     RowCount = function() return 30 end,
     HideRow = function(row) row.entry = nil end,
@@ -132,6 +138,8 @@ Check(friends and allies and ignore, "three sub-tabs are made")
 Check(ignore.text == "Friend Requests (2)", "the third is Friend Requests, counted (" .. tostring(ignore.text) .. ")")
 Check(FriendsTabHeader.TabSystem.alpha == 0, "the client's header tabs step aside")
 Check(friends.picked and not allies.picked, "the window opens on Friends")
+Check(#bands == 2 and bands[1].topTo == FriendsFrameInset and bands[2].topTo == FriendsFrameInset,
+    "each page's header band starts at the inset's top, over the edge of the list floor's shade")
 Check(not ClassicUIForeverAlliesPage.shown and not ClassicUIForeverRequestsPage.shown, "on Friends no page of ours shows")
 Check(clientList.alpha == 1, "on Friends the client's list shows")
 

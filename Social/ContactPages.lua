@@ -251,7 +251,9 @@ local function BuildPage(key)
     divider:SetPoint("BOTTOM", first, "TOP", 0, 3)
     S.Span(divider, host)
     local columns = key == "allies" and ALLY_COLUMNS or REQUEST_COLUMNS
-    local headerRow = S.HeaderRow(page, host, columns)
+    local headerRow, _, band = S.HeaderRow(page, host, columns)
+    -- The band from the inset's top: one lower left the shade over the list's floor bare beside the sub-tabs, a dark line.
+    band:SetPoint("TOP", inset, "TOP", 0, 0)
     page.listBox = S.ListBox(page, host, headerRow, divider)
     -- The inset border down to the buttons on both pages, as on Friends.
     page.insetFoot = first

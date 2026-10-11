@@ -366,7 +366,7 @@ local function ListRow(parent, index, columns, onClick, onDoubleClick)
 end
 
 -- The column plates on a band of the window's stone; each(header, column)
--- runs as each plate is made. Returns the header row and the plates.
+-- runs as each plate is made. Returns the header row, the plates and the band.
 function S.HeaderRow(panel, host, columns, onClick, each)
     local headerBand = ns.NewFrame("Frame", nil, panel)
     headerBand:SetHeight(22)
@@ -385,7 +385,7 @@ function S.HeaderRow(panel, host, columns, onClick, each)
         headers[#headers + 1] = last
         if each then each(last, column) end
     end
-    return headerRow, headers
+    return headerRow, headers, headerBand
 end
 
 -- The box the list sits in, from under the plates down to bottom.
