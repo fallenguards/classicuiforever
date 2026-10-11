@@ -69,6 +69,18 @@ env.T.active = false
 Watch(nil, "UNIT_PET")
 Check(setPlayer == 1, "the sheet off: nothing")
 
+-- Training points: Forever's C_PetInfo pair (total, used) gives what is left to spend.
+local tpFrom = source:find("local function TrainingPoints()", 1, true)
+local tpTo = tpFrom and source:find("\nend\n", tpFrom, true)
+Check(tpFrom and tpTo, "TrainingPoints is in the file")
+local tpEnv = setmetatable({
+    C_PetInfo = { GetPetTrainingPoints = function() return 23, 8 end },
+    ns = { IsSecret = function() return false end },
+}, { __index = _G })
+tpEnv._G = tpEnv
+local TrainingPoints = assert(load(source:sub(tpFrom or 1, (tpTo or 0) + 4) .. "\nreturn TrainingPoints", "tp", "t", tpEnv))()
+Check(TrainingPoints() == 15, "Forever's training points: 23 earned, 8 used, 15 to spend")
+
 if failed > 0 then
     print(failed .. " check(s) failed")
     os.exit(1)

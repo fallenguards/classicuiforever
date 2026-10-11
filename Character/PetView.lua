@@ -40,16 +40,12 @@ local XP_EDGE = { 0.203125, 0.8046875, 0.2890625, 0.33984375 }
 local XP_PURPLE = { 0.58, 0, 0.55 }
 
 local function XPEdge(bar, key, width)
-    local tex = ns.OwnTexture(bar, key, "OVERLAY", 7)
-    tex:SetDrawLayer("OVERLAY", 7)
+    local tex = ns.OwnTexture(bar, key, "OVERLAY", 6)
+    tex:SetDrawLayer("OVERLAY", 6)
     ns.SetTex(tex, "barBody")
     tex:SetTexCoord(unpack(XP_EDGE))
     tex:SetSize(width, 13)
     return Own(tex)
-end
-
-local function XPText(bar, shown)
-    if bar.Text then bar.Text:SetAlpha(shown and 1 or 0) end
 end
 
 -- The client's pet XP bar in 1.x's dress; its OnUpdate sets the fill each frame from its width, so only the look is ours.
@@ -74,12 +70,11 @@ local function DressXP(bar, doll)
     ns.SetPointOnce(right, "LEFT", left, "RIGHT", 0, 0)
     left:Show()
     right:Show()
-    -- 1.x showed the numbers only under the mouse.
-    if bar.Text then Take(bar.Text, "alpha") end
-    XPText(bar, bar:IsMouseOver())
-    if ns.Once(bar, "petXPText") then
-        bar:HookScript("OnEnter", function(self) if T.active then XPText(self, true) end end)
-        bar:HookScript("OnLeave", function(self) if T.active then XPText(self, false) end end)
+    -- Era's text: the status bar font, centered, over the border, always shown.
+    if bar.Text then
+        Take(bar.Text, "font", "layer")
+        bar.Text:SetFontObject("TextStatusBarText")
+        bar.Text:SetDrawLayer("OVERLAY", 7)
     end
 end
 
@@ -113,8 +108,9 @@ end
 -- at the left, Close at the right. Shown in the pet view only.
 local footer
 local PET_ART_SUBLEVEL = 2
+-- Forever has them under C_PetInfo (total, used); 1.x's global is the same pair.
 local function TrainingPoints()
-    local get = _G["GetPetTrainingPoints"]
+    local get = C_PetInfo and C_PetInfo.GetPetTrainingPoints or _G["GetPetTrainingPoints"]
     if type(get) ~= "function" then return nil end
     local ok, total, spent = pcall(get)
     if not ok or type(total) ~= "number" or ns.IsSecret(total) then return nil end
