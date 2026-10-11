@@ -143,6 +143,15 @@ function ns.KeepOldLook()
     db.dbVersion = 4
 end
 
+-- dbVersion 17 too: double pane became the quest log's default; an install from before keeps one pane.
+function ns.KeepQuestLogSingle()
+    local db = ns.db
+    if db.questLogDual == nil then db.questLogDual = false end
+    for _, shot in pairs(type(db.profiles) == "table" and db.profiles or {}) do
+        if type(shot) == "table" and shot.questLogDual == nil then shot.questLogDual = false end
+    end
+end
+
 -- dbVersion 17: the map's header became three picks with Classic style the default, so the game's own layout stays
 -- where Map navigation bar was on.
 function ns.KeepMapNav()

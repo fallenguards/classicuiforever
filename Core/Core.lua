@@ -427,6 +427,7 @@ frame:SetScript("OnEvent", function(_, event, arg1)
         if saved and saved < 14 then ns.KeepAchievementsButton() end
         if saved and saved < 15 then ns.KeepPieceSpots() end
         if saved and saved < 16 then ns.OneProfTabsChoice() end
+        if saved and saved < 17 then ns.KeepQuestLogSingle() end
         if saved and saved < 17 then ns.KeepMapNav() end
         ns.CopyDefaults(ns.db, ns.DB_DEFAULTS)
         if upgraded then ns.KeepBarSize(big) end

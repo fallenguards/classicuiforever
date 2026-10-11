@@ -203,7 +203,7 @@ return {
     professionsMinimapButton = false,
     questLevels = false,
     questLog = true,
-    questLogDual = false,
+    questLogDual = true,
     questLogMinimapButton = false,
     questMapPane = true,
     questTracker = true,
