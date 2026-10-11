@@ -113,10 +113,11 @@ end
 
 local Ratio = ns.WindowRatio
 
--- Maximized, the map fills the screen as the client lays it: none of our place or size.
+-- Maximized, the map fills the screen: none of our place or size, the game's own or an Era style's scale.
 local function Full(entry, frame)
     return entry.quests and frame and frame.IsMaximized and frame:IsMaximized() and true or false
 end
+local function FullScale() return ns.FullMapScale and ns.FullMapScale() or nil end
 
 -- The part of the window its art fills, in its own units.
 local function DrawnSize(entry, frame)
@@ -151,7 +152,7 @@ local function Apply(entry)
     if not frame or moving[frame] then return end
     local left, top = PlaceOf(entry)
     local scale = Scales()[SizeKey(entry)]
-    if Full(entry, frame) then left, scale = nil, nil end
+    if Full(entry, frame) then left, scale = nil, FullScale() end
     if not (left or scale or scaled[frame]) then return end
     -- calm: its casting layer moves out of combat only.
     if InCombatLockdown() and (entry.calm or ns.WindowLocked(frame)) then
@@ -268,7 +269,8 @@ PlaceAll = function()
     for _, entry in ipairs(WINDOWS) do
         local frame = ns.WindowFrame(entry)
         if ns.MakeWindowLock then ns.MakeWindowLock(entry) end
-        if PlaceOf(entry) or Scales()[SizeKey(entry)] or IsFree(entry) or (frame and scaled[frame]) then
+        if PlaceOf(entry) or Scales()[SizeKey(entry)] or IsFree(entry) or (frame and scaled[frame])
+            or (entry.quests and FullScale()) then
             Watch(entry)
             Apply(entry)
         end

@@ -114,9 +114,28 @@ end
 
 -- The header style the map wears now, nil for the game's own.
 local function EraStyle()
+    local style = Map() and P.active and ns.db.worldMap ~= false and NavStyle()
+    if style and style ~= "forever" then return style end
+end
+
+-- Maximized, an Era style keeps its own layout scaled up to the screen as the game's fills it (its height, 30 short of
+-- its width); the game holds it by its top over its black backdrop. Our window manager wears the scale.
+local FULL_SIDE_MARGIN = 30
+local fullScale
+local function Fill(k)
+    if k == fullScale then return end
+    local was = fullScale
+    fullScale = k
+    ns.PlaceSavedWindows()
+    -- Restored: the game placed it while it still wore the big scale.
     local map = Map()
-    local style = map and P.active and ns.db.worldMap ~= false and NavStyle()
-    if style and style ~= "forever" and not map:IsMaximized() then return style end
+    if was and not k and not map:IsMaximized() and not ns.WindowPlaced("map") then ns.GameSpot(map) end
+end
+function ns.FullMapScale() return fullScale end
+
+local function FullScale(t)
+    local screenW, screenH = UIParent:GetSize()
+    return math.min(screenH / t.h, (screenW - FULL_SIDE_MARGIN) / t.w)
 end
 
 local function PaneShown()
@@ -603,7 +622,7 @@ local function FadeOutside(map, style)
     if not rect[1] then return end
     local border = map.BorderFrame
     for _, piece in ipairs({ a, a.titleHost, map.ScrollContainer, map.QuestLog, border.CloseButton,
-        border.MaximizeMinimizeFrame }) do
+        border.MaximizeMinimizeFrame, map.BlackoutFrame }) do
         if piece then keep[piece] = true end
     end
     ns.MapLarge.Keep(keep)
@@ -636,17 +655,20 @@ local function Pass()
         if Laid(t) then
             DressEra(style)
             Unfade()
+            Fill(map:IsMaximized() and FullScale(t) or nil)
         elseif InCombatLockdown() and PictureLaid(t) then
             DressEra(style)
             FadeOutside(map, style)
         else
             Unfade()
             DressForever()
+            Fill(nil)
         end
     elseif touched then
         Unfade()
         DressForever()
         Lay(Target(nil))
+        Fill(nil)
     end
     Refit()
 end
