@@ -529,7 +529,7 @@ local function Build(canvas)
     end
 
     -- Word starts in name, keywords or section title first, tooltip only when nothing matched those; whole sections show,
-    -- their matches lit and the rest dimmed (Only show matches: a match, what is under it and the rows above it); empty: all.
+    -- their matches lit and the rest dimmed (Only show matches: the matching rows alone); empty: all.
     local search = ns.SearchBox(frame, width - 60, L["OPTWIN_SEARCH_TOGGLES"])
     search:SetPoint("TOP", frame, "TOP", 4, canvas and -16 or -50)
     frame.search = search
@@ -544,25 +544,10 @@ local function Build(canvas)
             level[box] = #words > 0 and ns.OptionMatchLevel(box, words) or 0
             if level[box] > best then best = level[box] end
         end
-        -- A section shows whole or not at all: any match brings its top row and every line under it.
-        local hit, matched = {}, {}
-        local function MarkAll(key)
-            hit[key] = true
-            for _, other in ipairs(kids[key] or EMPTY) do MarkAll(other.key) end
-        end
+        local matched = {}
+        for _, box in ipairs(boxes) do matched[box] = best > 0 and level[box] == best end
         local only = text ~= "" and ns.db.searchOnlyMatches == true
-        for _, box in ipairs(boxes) do
-            matched[box] = best > 0 and level[box] == best
-            if text == "" or matched[box] then
-                local head = box.key
-                if only then MarkAll(head) end
-                while parentOf[head] do
-                    head = parentOf[head]
-                    if only then hit[head] = true end
-                end
-                if not only then MarkAll(head) end
-            end
-        end
+        local hit = ns.OptionSearchHits(boxes, matched, kids, parentOf, text ~= "", only)
         -- Sections in list order, head first, gathered under their group's header; a block is one header and its rows.
         local blocks, byTitle, count = {}, {}, 0
         -- Every row under key, depth first.
@@ -576,10 +561,11 @@ local function Build(canvas)
                 end
             end
         end
+        -- Only show matches: each match on its own line under its group header, its parent rows left out.
         for _, box in ipairs(boxes) do
             if not hit[box.key] then
                 box:Hide()
-            elseif not box.parent then
+            elseif only or not box.parent then
                 local title = box.group or ""
                 local block = byTitle[title]
                 if not block then
@@ -591,7 +577,7 @@ local function Build(canvas)
                 block[#block + 1] = box
                 block.rows = block.rows + 1
                 count = count + 1
-                AddKids(block, box.key)
+                if not only then AddKids(block, box.key) end
             end
         end
         for title, head in pairs(heads) do
@@ -623,7 +609,7 @@ local function Build(canvas)
                 row = row + 1
             end
             for _, box in ipairs(block) do
-                Put(row, box, (box.depth or 0) * INDENT)
+                Put(row, box, only and 0 or (box.depth or 0) * INDENT)
                 row = row + 1
             end
             if row > per then per = row end

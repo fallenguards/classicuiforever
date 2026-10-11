@@ -45,3 +45,26 @@ function ns.OptionMatchLevel(box, words)
     if WordsIn(box.keyLow .. " " .. box.tipLow, words) then return 1 end
     return 0
 end
+
+-- Keys a search shows: each match's whole section, or with only set the matching rows alone; no search: all.
+function ns.OptionSearchHits(boxes, matched, kids, parentOf, searching, only)
+    local hit = {}
+    local function MarkAll(key)
+        hit[key] = true
+        for _, other in ipairs(kids[key] or {}) do MarkAll(other.key) end
+    end
+    for _, box in ipairs(boxes) do
+        if not searching then
+            hit[box.key] = true
+        elseif matched[box] then
+            if only then
+                hit[box.key] = true
+            else
+                local head = box.key
+                while parentOf[head] do head = parentOf[head] end
+                MarkAll(head)
+            end
+        end
+    end
+    return hit
+end
