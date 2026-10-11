@@ -55,6 +55,8 @@ MM.PIECE_KEYS = PIECES
 local SHOW_IDS = { "MinimapZone", "MinimapTracking", "MinimapMail", "MinimapZoomIn", "MinimapZoomOut", "MinimapClock",
     "MinimapDiel", "MinimapCalendar", "MinimapCoords", "MinimapDifficulty" }
 local ZOOM_R = 79
+local ZOOM_DISC = 18
+local discMasks = setmetatable({}, { __mode = "k" })
 local DIEL_RING = "UI-HUD-Minimap-Frame-Cycle"
 -- Other addons' minimap buttons wear the old gold tracking ring (MiniMap-TrackingBorder): tinted as ours.
 local TRACKING_RING = 136430
@@ -105,8 +107,32 @@ function ns.MinimapButtonBorder(tex)
     buttonBorders[tex] = true
     ns.SetAlphaIf(tex, ns.db.hideButtonBorders and 0 or 1)
 end
+-- Rings drawn into a button's own art (day and night, zoom): cut to the disc inside them by a round mask instead.
+local DISC_MASK = "Interface\\CharacterFrame\\TempPortraitAlphaMask"
+local discs = setmetatable({}, { __mode = "k" })     -- texture -> its mask
+local cut = setmetatable({}, { __mode = "k" })       -- texture -> true while masked
+local function CutDisc(tex)
+    local on = MM.active and ns.db.hideButtonBorders == true
+    if (cut[tex] or false) == on then return end
+    cut[tex] = on or nil
+    if on then tex:AddMaskTexture(discs[tex]) else tex:RemoveMaskTexture(discs[tex]) end
+end
+-- A round mask d across, centred on owner, for its textures' discs.
+function ns.MinimapDiscMask(owner, d)
+    local mask = owner:CreateMaskTexture()
+    mask:SetTexture(DISC_MASK, "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+    mask:SetSize(d, d)
+    mask:SetPoint("CENTER", owner, "CENTER", 0, 0)
+    return mask
+end
+function ns.MinimapButtonDisc(tex, mask)
+    if not (tex and mask) then return end
+    discs[tex] = mask
+    CutDisc(tex)
+end
 local function ButtonBordersApply()
     for tex in pairs(buttonBorders) do ns.SetAlphaIf(tex, ns.db.hideButtonBorders and 0 or 1) end
+    for tex in pairs(discs) do CutDisc(tex) end
 end
 
 -- The game's coordinates line and the map container it hangs in (Blizzard_Minimap Minimap.xml).
@@ -142,11 +168,9 @@ local function CommaShift(coords)
     ns.SetTwoPointsIf(text, "TOPLEFT", coords, "TOPLEFT", shift, 0, "BOTTOMRIGHT", coords, "BOTTOMRIGHT", shift, 0)
 end
 
+-- The game's ring stays faded under Era's picture (MinimapDiel.lua): not one of Hide button borders' rings.
 local function DrainDielRing(region)
-    if region.GetAtlas and ns.Safe(region:GetAtlas()) == DIEL_RING then
-        ns.DrainBronze(region)
-        ns.MinimapButtonBorder(region)
-    end
+    if region.GetAtlas and ns.Safe(region:GetAtlas()) == DIEL_RING then ns.DrainBronze(region) end
 end
 local homes = {}
 
@@ -321,6 +345,7 @@ end
 local function SetActive(on)
     MM.active = on
     MM.UpdateTracking()
+    for tex in pairs(discs) do CutDisc(tex) end
 end
 
 ------------------------------------------------------------------- layout
@@ -413,6 +438,13 @@ local function Layout()
             local disabled = button:GetDisabledTexture()
             if disabled and disabled.SetDesaturated then disabled:SetDesaturated(false) end
             button:GetHighlightTexture():SetBlendMode("ADD")
+            -- Hide button borders: the plus or minus on its grey disc, 18 across, without the rims round it.
+            local disc = discMasks[button] or ns.MinimapDiscMask(button, ZOOM_DISC)
+            discMasks[button] = disc
+            for _, tex in ipairs({ button:GetNormalTexture(), button:GetPushedTexture(), disabled,
+                button:GetHighlightTexture() }) do
+                ns.MinimapButtonDisc(tex, disc)
+            end
             button:SetHitRectInsets(4, 4, 2, 6)
             ns.SetPointOnce(button, "CENTER", zoomHome, "CENTER", 0, 0)
             button:Show()

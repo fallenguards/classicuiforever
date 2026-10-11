@@ -8,6 +8,8 @@ local MM = ns.MM
 
 local TOD_FILE = "Interface\\Minimap\\UI-TOD-Indicator"
 local TOD_SIZE = 50
+-- Hide button borders: the sky inside the ring, 27 across.
+local TOD_DISC = 27
 local DIEL_EVENTS = { "DIEL_CYCLE_CHANGED", "PLAYER_ENTERING_WORLD" }
 
 local function TimeOfDay()
@@ -25,6 +27,7 @@ function MM.EraDiel(diel, home)
         ns.SetFile(tod, TOD_FILE)
         tod:SetSize(TOD_SIZE, TOD_SIZE)
         tod:SetPoint("CENTER", home, "CENTER", 0, 0)
+        ns.MinimapButtonDisc(tod, ns.MinimapDiscMask(home, TOD_DISC))
         MM.tod = tod
         MM.todWatch = ns.EventFrame(DIEL_EVENTS, TimeOfDay)
     elseif not MM.todWatching then
