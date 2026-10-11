@@ -164,10 +164,25 @@ local function PlaceFooter(doll, pet)
     if points then f.value:SetText(points) end
 end
 
+-- The client reads its happiness face being shown as the pet view being up, but a hunter pet's face shows itself
+-- anywhere: a summon put the pet in the player's model, pet XP raised its bar on the Character view. Ours is registered
+-- after the client's, so it runs after and undoes both by the client's own test.
+local petWatch
+local function PetOnCharacterView(_, event)
+    if not (T.active and PaperDollFrame and PaperDollFrame:IsShown()) or T.PetView() then return end
+    local happy = _G["PetPaperDollPetHappinessInfo"]
+    if not (HasPetUI() and happy and happy:IsShown()) then return end
+    local xp = _G["PetPaperDollFrameExpBar"]
+    if xp and xp:IsShown() then xp:Hide() end
+    local setPlayer = _G["PaperDollFrame_SetPlayer"]
+    if event == "UNIT_PET" and setPlayer then setPlayer() end
+end
+
 -- Every layout: the model, rotate buttons and stat boxes for the view up; the pet pieces in the pet view.
 function T.PlaceModel(doll, pet)
     local scene = CharacterModelScene
     if not scene then return end
+    petWatch = petWatch or ns.EventFrame({ "UNIT_PET", "UNIT_PET_EXPERIENCE" }, PetOnCharacterView, "player")
     Take(scene, "size", "points")
     if pet then
         ns.SetPointOnce(scene, "TOPLEFT", doll, "TOPLEFT", PET_MODEL_X, PET_MODEL_Y)
