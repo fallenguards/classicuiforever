@@ -12,7 +12,7 @@ if ROOT == (arg and arg[0]) or ROOT == "" then ROOT = "." end
 local Region = {}
 Region.__index = function(_, key) return Region[key] or function() end end
 local function New() return setmetatable({ scripts = {}, shown = false }, Region) end
--- What a page makes is kept in order: a line, then its picture.
+-- What a page makes is kept in order: a line, then its picture (the first texture after it).
 local madeText
 function Region:CreateFontString()
     local r = New()
@@ -26,7 +26,7 @@ end
 function Region:CreateTexture()
     local r = New()
     r.shown = true
-    if madeText then madeText.mate = r end
+    if madeText and not rawget(madeText, "mate") then madeText.mate = r end
     return r
 end
 function Region:SetText(text) self.text = text end
@@ -74,16 +74,38 @@ C_MajorFactions = {
 
 local chrome, laid, flip, arrow = 0, 0, nil, New()
 local page
+-- The 1.x pieces by key: the rule's stat box edge, the reward's slot ring; the heading's iron box.
+local art = {}
+local heading
 local ns = {
     sheet = { active = true },
     db = {},
     Sched = { NextFrame = function(_, fn) fn() end },
-    NewFrame = function() page = New() return page end,
+    NewFrame = function()
+        local frame = New()
+        page = page or frame
+        return frame
+    end,
+    SkillInsetBox = function(_, edge)
+        heading = New()
+        heading.edge = edge
+        function heading:CreateFontString()
+            local label = New()
+            heading.label = label
+            return label
+        end
+        return heading
+    end,
+    SetTex = function(tex, key)
+        art[key] = art[key] or {}
+        table.insert(art[key], tex)
+    end,
     SidePanel = function() return New(), 198, -77, -429 end,
     SidePanelArrow = function(_, _, _, _, Flip) flip = Flip return arrow end,
     SidePanelArrowFace = function(_, open) arrow.open = open end,
     SetShownIf = function(region, shown) region:SetShown(shown) end,
     SetPointOnce = function() end,
+    SetTwoPointsIf = function() end,
     RegisterEvents = function() end,
     PlaceSheetChrome = function() chrome = chrome + 1 end,
     SignalSheetLaid = function() laid = laid + 1 end,
@@ -128,10 +150,20 @@ Check(chrome > 0 and laid > 0, "opened: the title and close button move, docked 
 local lines, pictures = Lines()
 Check(lines[1] == "Civilian", "unranked: the title is the unranked name (" .. tostring(lines[1]) .. ")")
 Check(lines[2] == "cap up to 24750 for Rank 14", "the season's cap line (" .. tostring(lines[2]) .. ")")
-Check(lines[3] == "Next Rewards at Rank 3", "the first rank that pays out heads the rewards (" .. tostring(lines[3]) .. ")")
-Check(lines[4] == "Faction Tabard" and pictures[4] == 135026, "a reward with its picture")
-Check(lines[5] == "A cloak" and pictures[5] == nil, "a reward without a picture has none")
-Check(lines[6] == "sold in Stormwind" and #lines == 6, "the faction's vendor line ends the page")
+Check(heading and heading.shown and heading.label.text == "Next Rewards at Rank 3",
+    "the first rank that pays out heads the rewards, on the iron box")
+Check(lines[3] == "Faction Tabard" and pictures[3] == 135026, "a reward with its picture")
+Check(lines[4] == "A cloak" and pictures[4] == nil, "a reward without a picture has none")
+Check(lines[5] == "sold in Stormwind" and #lines == 5, "the faction's vendor line ends the page")
+local function Shown(key)
+    local n = 0
+    for _, tex in ipairs(art[key] or {}) do
+        if tex.shown then n = n + 1 end
+    end
+    return n
+end
+Check(Shown("charStatBox") == 1, "the rule: one piece of the stat box's straight top edge")
+Check(Shown("slotNormal") == 1, "one slot ring, around the one reward picture")
 
 -- Ranked, with points this week: rank number, progress and the week's cap rise; shorter pages hide the spare lines.
 info = { renownLevel = 3, maxLevel = 14, renownReputationEarned = 100, currentWeekProgressiveMaxLevel = 3,
@@ -143,6 +175,8 @@ lines = Lines()
 Check(lines[1] == "title of PVP_RANK_7_1" and lines[2] == "Rank 3", "ranked: the faction's title and the rank number")
 Check(lines[4] == "4100 of 4000" and lines[5] == "cap up by 2000", "points so far against the week's cap, and its rise")
 Check(#lines == 5, "no rank above pays out: no rewards block, spare lines hidden (" .. #lines .. ")")
+Check(Shown("slotNormal") == 0, "no rewards: no slot ring")
+Check(not heading.shown, "no rewards: no heading box")
 
 -- The sheet turned off: panel and arrow go, nothing widened.
 T.active = false
