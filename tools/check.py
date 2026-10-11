@@ -39,7 +39,7 @@ RULES = ["CVAR", "CVARREAD", "CVARLOGIN", "CVARREG", "REGISTRY", "HOOK", "ONUPDA
          "LOADADDON", "EDITMODE", "EDITQUERY", "SETTLE",
          "PANELMGR", "SECRET", "WALK", "REGEVENTS", "EVENTFRAME", "POINTONCE", "SETIF", "THEME", "ONCEFLAG",
          "FRAMEFIELD", "GAMEMENU", "SHAREDART", "PLATES", "FORBIDDEN", "SYSBASE", "LAYOUTFIELD",
-         "PADART", "SECRETMOUSE", "UNITEVENTS", "DRAGPOINT", "ERASPOT", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "TOC"]
+         "PADART", "SECRETMOUSE", "UNITEVENTS", "DRAGPOINT", "ERASPOT", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "TOC"]
 # A hit of these on a line the change adds fails even within the baseline, so swapping one call for another fails.
 # SINCE, DEADNS, FRAMEFIELD, CVARLOGIN and THROTTLEFRAME stay count-only, so a kept line can still be rewritten.
 LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", "EDITMODE", "PANELMGR", "SEARCHBOX", "ADDONCHAR",
@@ -49,11 +49,12 @@ LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", 
               "WALK", "GAMEMENU", "SHAREDART", "SYSBASE", "LAYOUTFIELD", "PADART", "SECRETMOUSE", "UNITEVENTS",
               "DRAGPOINT", "ERASPOT", "CVARREG", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST",
               "POINTEXACT",
-              "FADEDPIECE", "PCALLMANY", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE")
+              "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE")
 
 # The files allowed to hold each pattern, each with its reason; an entry ending in / is a folder.
 ALLOWED = {
     "SETTLE": {"Social/SocialWindow.lua": "S.SettleFrame lives there"},
+    "PLATESHIELD": {"Units/CastBars.lua": "the player's and unit frames' cast bars, whose shields measure"},
     "HOOK": {"Core/Hooks.lua": "the hook installers"},
     "ONUPDATE": {"Core/Scheduler.lua": "the one OnUpdate owner"},
     "SINCE": {"Core/Scheduler.lua": "the scheduler's own counters"},
@@ -164,6 +165,8 @@ FIX = {
     "SECRETATLAS": "test it with ns.IsSecret before a method call or table key on it, and skip that region when secret",
     "NAMEDTEMPLATE": "give the frame a name of ours: retail's copy of the template anchors its pieces by $parent names",
     "ADDONFORBID": "route it through a secure pad clicking the client's own button, or leave it to the client's code",
+    "PLATESHIELD": "set it blind (SetSize, ClearAllPoints, SetPoint) and give it back with the client's own values "
+                   "(EraShield in Units/NamePlates.lua)",
     "PCALLMANY": "pcall a function of ours that walks them and returns one value (ns.EachChildProtected, "
                  "ns.EachRegionProtected in Core/Util.lua), never the getter itself",
     "PADLIST": "change the list's size only in a secure snippet that measures it there too (LIST_TALL / LIST_BACK in "
@@ -325,6 +328,10 @@ LINE_PATTERNS = {
     "ADDONFORBID": re.compile(r"\b(?:TryRequestRecentAlliesData|BuyTrainerService|UseContainerItem|GuildSetMOTD|"
                               r"GuildRosterSetPublicNote|GuildRosterSetOfficerNote)\s*\("),
     "PCALLMANY": re.compile(r"\bpcall\s*\(\s*[\w.:\[\]\"]+\s*[.:]\s*(?:GetChildren|GetRegions|GetAnimations)\b"),
+    # A cast bar's shield measured: a plate's is a restricted region and the read errors.
+    "PLATESHIELD": re.compile(r"\b\w*[Ss]hield\s*:\s*(?:GetPoint|GetNumPoints|GetWidth|GetHeight|GetSize|GetRect|"
+                             r"GetScaledRect|GetCenter|GetLeft|GetRight|GetTop|GetBottom)\s*\("
+                             r"|\b(?:SetPointIf|SetTwoPointsIf|SetSizeIf|SetPointOnce|IsAt)\s*\(\s*[\w.]*[Ss]hield\b"),
 }
 # SYSBASE in Bar/: bar, frame and piece there are the band's edit mode systems.
 SYSBASE_BAND = re.compile(r"(?<![\w.])(?:bar|frame|piece)\s*:\s*(?:SetPoint|ClearAllPoints|SetScale|SetAllPoints)\s*\(")
@@ -417,6 +424,7 @@ MESSAGES = {
                "refused by Train's pad and fail a guild note save)",
     "FADEDPIECE": "a client end cap faded or laid on the band as a handle (bars snapped to it, saved at the screen top)",
     "PCALLMANY": "a pcall straight around GetChildren/GetRegions/GetAnimations: 22 or more results abort the beta client",
+    "PLATESHIELD": "a cast bar shield measured (a plate's is restricted: Can't measure restricted regions)",
     "ADDONFORBID": "a call the game forbids to addons (ADDON_ACTION_FORBIDDEN, out of combat too)",
     "NAMEDTEMPLATE": "a nameless frame from a client template that anchors by $parent names on retail (the profession "
                      "bars' backs ran from one bar to another: a black box over the book)",
