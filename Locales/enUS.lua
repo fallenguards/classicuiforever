@@ -759,6 +759,7 @@ L["WELCOME_CLASSIC_LOOK"] = "Classic look"
 L["WELCOME_CHANGELOG_LINK"] = "%s changelog on GitHub"
 L["WELCOME_UPDATED"] = "updated to %s. See what's new %s."
 L["WELCOME_HERE"] = "here"
+L["UPDATE_AVAILABLE"] = "version %s is out (you have %s). Get it on %s."
 
 -- Chat: /fcui help and messages (a command stays as typed)
 L["CHAT_1"] = "  /fcui - open the options window"

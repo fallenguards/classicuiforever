@@ -216,4 +216,5 @@ Options\GameMenu.lua
 Options\SettingsPanel.lua
 Options\Welcome.lua
 Options\Status.lua
+Options\VersionCheck.lua
 Core\API.lua
