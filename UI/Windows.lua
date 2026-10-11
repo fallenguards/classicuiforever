@@ -395,6 +395,16 @@ end
 -- A floating client window on its own default spot (loot not at the cursor) stands past every open window on the slot
 -- row, as Era's panel row put its loot window; ours stay where they are.
 local standing = setmetatable({}, { __mode = "k" })
+
+-- Era's row is packed from the left, so past every window is right of the rightmost: a gap left of one is not past it
+-- (the loot window stood left of a character sheet in the second slot). A window too wide to stand past is not counted.
+local function PastAll(blocks, width)
+    local screen, x = UIParent:GetWidth(), 0
+    for _, block in ipairs(blocks) do
+        if not (block[3] and block[2] + width / 2 > screen) and block[2] > x then x = block[2] end
+    end
+    return x
+end
 local function StandPast(frame)
     if InCombatLockdown() and Locked(frame) then return end
     local k = Plain(frame:GetEffectiveScale())
@@ -413,7 +423,7 @@ local function StandPast(frame)
             end
         end
     end
-    local x = OnScreen(FirstFree(0, width, blocks), width, width, mine)
+    local x = OnScreen(FirstFree(PastAll(blocks, width), width, blocks), width, width, mine)
     ns.SetPointIf(frame, "TOPLEFT", UIParent, "TOPLEFT", x / k, SLOT_Y / k)
 end
 function ns.StandPastWindows(frame)
