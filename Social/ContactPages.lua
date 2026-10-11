@@ -1,7 +1,8 @@
 local _, ns = ...
 
--- The friends page's sub-tabs, as 1.x had Friends and Ignore, with Recent Allies between: ours over the client's header
--- tabs. Recent Allies and Ignore are our own lists over the friends list; the game's switch shows neither in this window.
+-- The friends page's sub-tabs: Friends, Recent Allies and Friend Requests, ours over the client's header tabs. Recent
+-- Allies and Friend Requests are our own lists over the friends list (the game's switch shows neither in this window);
+-- the ignore list is the client's own window, from its drop down.
 
 local S = ns.social
 local IsSecret, Safe = ns.IsSecret, ns.Safe
@@ -9,7 +10,7 @@ local IsSecret, Safe = ns.IsSecret, ns.Safe
 local PAGES = {
     { key = "friends", label = FRIENDS or "Friends" },
     { key = "allies", label = CONTACTS_RECENT_ALLIES_TAB_NAME or "Recent Allies" },
-    { key = "ignore", label = IGNORE or "Ignore" },
+    { key = "requests" },
 }
 -- The who list's widths (Classic Era's) for the same four facts.
 local ALLY_COLUMNS = {
@@ -18,14 +19,19 @@ local ALLY_COLUMNS = {
     { key = "level", label = LEVEL_ABBR or "Lvl", x = 192, w = 32, justify = "LEFT" },
     { key = "class", label = CLASS or "Class", x = 224, w = 92, justify = "LEFT" },
 }
-local IGNORE_COLUMNS = { { key = "name", label = NAME or "Name", x = 4, w = 312, justify = "LEFT" } }
+local REQUEST_COLUMNS = { { key = "name", label = NAME or "Name", x = 4, w = 312, justify = "LEFT" } }
 local ALLY_EVENTS = { "RECENT_ALLIES_CACHE_UPDATE", "RECENT_ALLIES_DATA_READY", "RECENT_ALLY_DATA_UPDATED" }
+local REQUEST_EVENTS = { "BN_FRIEND_INVITE_ADDED", "BN_FRIEND_INVITE_REMOVED", "BN_FRIEND_INVITE_LIST_INITIALIZED" }
+-- Battle.net names in the friends list's blue.
+local BNET_BLUE = { 0.51, 0.773, 1 }
+-- Sub-tab row: room left at the window's right; each tab's label padding may shrink to this (its caps then overlap it).
+local ROW_RIGHT, MIN_PAD = 6, -15
 -- Client pieces our pages stand over: the list, its foot buttons.
 local CLIENT_FRIENDS = { "FriendsListFrame", "FriendsFrameAddFriendButton", "FriendsFrameSendMessageButton" }
 
 local current = "friends"
 local tabs, pages = {}, {}
-local allies, ignores = {}, {}
+local allies, requests = {}, {}
 local clientTabsOff = false
 
 -- Under the switch, while a window of ours dresses the friends window (the guild roster or the who list is on); with it
@@ -81,14 +87,32 @@ local function CollectAllies(find)
     end)
 end
 
-local function CollectIgnores()
-    wipe(ignores)
-    local api = C_FriendList
-    if not (api and api.GetNumIgnores and api.GetIgnoreName) then return end
-    for i = 1, Safe(api.GetNumIgnores(), 0) or 0 do
-        local name = api.GetIgnoreName(i)
-        if type(name) == "string" and not IsSecret(name) then ignores[#ignores + 1] = { name = name } end
+-- Pending Battle.net friend requests, in the client's order; ns.DevFriendRequests: the dev addon's stand-ins
+-- (/fcuidev fakerequests), never sent to the client.
+local function CollectRequests()
+    wipe(requests)
+    local stand = ns.DevFriendRequests
+    if type(stand) == "table" then
+        for _, invite in ipairs(stand) do requests[#requests + 1] = invite end
+        return
     end
+    local info = C_BattleNet and C_BattleNet.GetFriendInviteInfo
+    if not (info and BNGetNumFriendInvites) then return end
+    for i = 1, Safe(BNGetNumFriendInvites(), 0) or 0 do
+        local invite = info(i)
+        if invite and invite.inviteID and invite.accountName then
+            requests[#requests + 1] = { id = invite.inviteID, name = invite.accountName }
+        end
+    end
+end
+
+-- The dev addon's stand-in words (another client's), so a long language's tab row shows on this one.
+local function Label(text) return ns.DevLabel and ns.DevLabel(text) or text end
+
+local function RequestsLabel()
+    local count = BNGetNumFriendInvites and Safe(BNGetNumFriendInvites(), 0) or 0
+    if type(ns.DevFriendRequests) == "table" then count = #ns.DevFriendRequests end
+    return format(Label(FRIEND_REQUESTS or "Friend Requests (%d)"), count)
 end
 
 ---------------------------------------------------------------- the lists
@@ -108,7 +132,7 @@ local function UpdateRows(page)
         else
             row.entry = entry
             row.Name:SetText(entry.name)
-            row.Name:SetTextColor(1, 0.82, 0)
+            row.Name:SetTextColor(BNET_BLUE[1], BNET_BLUE[2], BNET_BLUE[3])
             row.Selected:SetShown(picked)
             row:Show()
         end
@@ -116,7 +140,8 @@ local function UpdateRows(page)
     page.bar:SetRange(math.max(0, #page.entries - shown))
     local entry = Selected(page)
     page.left:SetEnabled(entry ~= nil)
-    if page.key == "allies" then page.right:SetEnabled(entry ~= nil) end
+    page.right:SetEnabled(entry ~= nil)
+    if page.empty then page.empty:SetShown(#page.entries == 0) end
 end
 
 local function Refresh(page)
@@ -126,7 +151,7 @@ local function Refresh(page)
         CollectAllies(text ~= "" and text:lower() or nil)
         page.found:SetText(format(WHO_NUM_RESULTS or "%d", #allies))
     else
-        CollectIgnores()
+        CollectRequests()
     end
     if page.selected and page.selected > #page.entries then page.selected = nil end
     UpdateRows(page)
@@ -158,32 +183,6 @@ end
 
 ---------------------------------------------------------------- the pages
 
-ns.Popup("FCUI_ADD_IGNORE", {
-    text = ADD_IGNORE_LABEL or "",
-    button1 = ACCEPT,
-    button2 = CANCEL,
-    hasEditBox = 1,
-    maxLetters = 48,
-    OnShow = function(self)
-        local box = ns.PopupEditBox(self)
-        if box then
-            box:SetText("")
-            box:SetFocus()
-        end
-    end,
-    OnAccept = function(self)
-        local box = ns.PopupEditBox(self)
-        local name = box and box:GetText()
-        if name and name ~= "" then S.Ignore(name) end
-    end,
-    EditBoxOnEnterPressed = function(self)
-        local name = self:GetText()
-        if name and name ~= "" then S.Ignore(name) end
-        self:GetParent():Hide()
-    end,
-    EditBoxOnEscapePressed = function(self) self:GetParent():Hide() end,
-})
-
 -- A foot button over one of the client's (faded under ours), its size and place.
 local function FootButton(page, over, text, onClick)
     local button = ns.PanelButton(page, text, 120)
@@ -196,15 +195,38 @@ local function FootButton(page, over, text, onClick)
     return button
 end
 
+-- A request answered by the client's own call; the pick clears so a second click answers no one. A dev stand-in leaves
+-- its list as the server takes a real one away (whose removal event refreshes the list and the tab's count).
+local function Answer(page, entry, send)
+    if not entry then return end
+    page.selected = nil
+    local stand = ns.DevFriendRequests
+    if entry.dev and type(stand) == "table" then
+        for i, invite in ipairs(stand) do
+            if invite == entry then
+                table.remove(stand, i)
+                break
+            end
+        end
+        Refresh(page)
+        local tab = tabs.requests
+        local onEvent = tab and tab:GetScript("OnEvent")
+        if onEvent then onEvent(tab) end
+        return
+    end
+    UpdateRows(page)
+    if not entry.dev and send then send(entry.id) end
+end
+
 -- The who list's layout: plates, the list box down to an unseen bar over the buttons; Recent Allies adds its count and
 -- search line under the list, the inset running round them to the buttons.
 local function BuildPage(key)
     local host = FriendsFrame
     local inset = _G.FriendsFrameInset or host
-    local page = ns.NewFrame("Frame", key == "allies" and "ClassicUIForeverAlliesPage" or "ClassicUIForeverIgnorePage", host)
+    local page = ns.NewFrame("Frame", key == "allies" and "ClassicUIForeverAlliesPage" or "ClassicUIForeverRequestsPage", host)
     page.key = key
     -- Not page.list: the shared list builder keeps its scroll frame there.
-    page.entries = key == "allies" and allies or ignores
+    page.entries = key == "allies" and allies or requests
     page:SetPoint("TOPLEFT", inset, "TOPLEFT", 2, -2)
     page:SetPoint("BOTTOMRIGHT", host, "BOTTOMRIGHT", -8, 12)
     page:SetFrameLevel(host:GetFrameLevel() + 6)
@@ -218,17 +240,17 @@ local function BuildPage(key)
             function(entry) if entry then S.AddFriend(entry.name) end end)
         first = page.left
     else
-        page.right = FootButton(page, "FriendsFrameAddFriendButton", IGNORE_PLAYER or "Ignore Player",
-            function() StaticPopup_Show("FCUI_ADD_IGNORE") end)
-        page.left = FootButton(page, "FriendsFrameSendMessageButton", UNIGNORE_PLAYER_BUTTON_LABEL or "Remove",
-            function(entry) if entry and C_FriendList.DelIgnore then C_FriendList.DelIgnore(entry.name) end end)
-        first = page.right
+        page.left = FootButton(page, "FriendsFrameAddFriendButton", ACCEPT or "Accept",
+            function(entry) Answer(page, entry, BNAcceptFriendInvite) end)
+        page.right = FootButton(page, "FriendsFrameSendMessageButton", DECLINE or "Decline",
+            function(entry) Answer(page, entry, BNDeclineFriendInvite) end)
+        first = page.left
     end
     local divider = ns.StoneBar(page)
     divider:SetAlpha(0)
     divider:SetPoint("BOTTOM", first, "TOP", 0, 3)
     S.Span(divider, host)
-    local columns = key == "allies" and ALLY_COLUMNS or IGNORE_COLUMNS
+    local columns = key == "allies" and ALLY_COLUMNS or REQUEST_COLUMNS
     local headerRow = S.HeaderRow(page, host, columns)
     page.listBox = S.ListBox(page, host, headerRow, divider)
     -- The inset border down to the buttons on both pages, as on Friends.
@@ -248,8 +270,11 @@ local function BuildPage(key)
         end)
     else
         S.ScrollRows(page, divider, 2, function() UpdateRows(page) end, columns, RowClick, RowDoubleClick)
+        page.empty = page.listBox:CreateFontString(nil, "ARTWORK", "GameFontDisable")
+        page.empty:SetPoint("CENTER", page.listBox, "CENTER", 0, 0)
+        page.empty:SetText(NO_FRIEND_REQUESTS or "")
         page:SetScript("OnShow", function(self)
-            self:RegisterEvent("IGNORELIST_UPDATE")
+            ns.RegisterEvents(self, REQUEST_EVENTS)
             Refresh(self)
         end)
     end
@@ -285,12 +310,42 @@ local function TabClick(self)
     S.SyncContactPages()
 end
 
+-- The three labels at their padding; a row running past the window's right gives up padding alike, then the longest
+-- label is cut. Run as the sub-tabs show and as the count changes.
+local function FitTabs()
+    local first, last = tabs.friends, tabs.requests
+    for _, info in ipairs(PAGES) do
+        local tab = tabs[info.key]
+        tab:SetText(info.key == "requests" and RequestsLabel() or Label(info.label))
+        ns.SkinTopTab(tab, 0, nil, true)
+    end
+    local left, right = first:GetLeft(), FriendsFrame:GetRight()
+    if not left or not right or IsSecret(left) or IsSecret(right) then return end
+    local over = last:GetRight() - (right - ROW_RIGHT)
+    if over <= 0 then return end
+    local pad = math.max(MIN_PAD, -math.ceil(over / #PAGES))
+    for _, info in ipairs(PAGES) do ns.SkinTopTab(tabs[info.key], pad, nil, true) end
+    over = last:GetRight() - (right - ROW_RIGHT)
+    if over <= 0 then return end
+    local longest
+    for _, info in ipairs(PAGES) do
+        local tab = tabs[info.key]
+        if not longest or tab:GetWidth() > longest:GetWidth() then longest = tab end
+    end
+    ns.SkinTopTab(longest, pad, math.floor(longest.Text:GetStringWidth() - over), true)
+end
+
+-- The requests tab's count follows the requests while the tabs are up.
+local function CountRequests(self)
+    if self:IsShown() then FitTabs() end
+end
+
 local function BuildTabs()
     local system = FriendsTabHeader and FriendsTabHeader.TabSystem
     local previous
     for i, info in ipairs(PAGES) do
         local tab = ns.NewFrame("Button", "ClassicUIForeverContactTab" .. i, FriendsFrame, "PanelTopTabButtonTemplate")
-        tab:SetText(info.label)
+        tab:SetText(info.key == "requests" and RequestsLabel() or info.label)
         tab.page = info.key
         tab:SetScript("OnClick", TabClick)
         ns.SkinTopTab(tab, nil, nil, true)
@@ -302,8 +357,12 @@ local function BuildTabs()
         tabs[info.key] = tab
         previous = tab
     end
+    local requestsTab = tabs.requests
+    requestsTab:SetScript("OnShow", function(self) ns.RegisterEvents(self, REQUEST_EVENTS) end)
+    requestsTab:SetScript("OnHide", function(self) self:UnregisterAllEvents() end)
+    requestsTab:SetScript("OnEvent", CountRequests)
     BuildPage("allies")
-    BuildPage("ignore")
+    BuildPage("requests")
 end
 
 -- The client's list and foot buttons step aside (alpha) while one of our pages covers them.
@@ -338,7 +397,10 @@ function S.SyncContactPages()
         end
     end
     for key, page in pairs(pages) do ns.SetShownIf(page, onFriends and key == current) end
-    if onFriends then ClientFriends(current == "friends") end
+    if onFriends then
+        FitTabs()
+        ClientFriends(current == "friends")
+    end
     if ns.SocialInsetBorder then ns.SocialInsetBorder() end
 end
 

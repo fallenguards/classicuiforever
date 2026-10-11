@@ -1,6 +1,7 @@
--- Offline test under Lua 5.4 for the friends page's sub-tabs (Social/ContactPages.lua): Friends, Recent Allies and Ignore
--- over the client's header tabs, our own lists for the last two. A page shows only on the friends page with no list
--- of ours over it; the client's list and foot buttons step aside under it; recent allies list online first.
+-- Offline test under Lua 5.4 for the friends page's sub-tabs (Social/ContactPages.lua): Friends, Recent Allies and Friend
+-- Requests over the client's header tabs, our own lists for the last two. A page shows only on the friends page with no
+-- list of ours over it; the client's list and foot buttons step aside under it; recent allies list online first;
+-- requests are counted on their tab, accepted or declined by their invite id.
 -- Run from the addon root: lua tools/tests/contact_pages_test.lua (CI runs every tools/tests/*_test.lua).
 -- luacheck: std lua54
 -- luacheck: ignore 111 112 113 121 122 212
@@ -27,9 +28,11 @@ end
 function Frame:Show() self.shown = true end
 function Frame:Hide() self.shown = false end
 function Frame:IsShown() return self.shown end
+function Frame:SetShown(on) self.shown = on and true or false end
 function Frame:SetAlpha(a) self.alpha = a end
 function Frame:GetAlpha() return self.alpha end
 function Frame:SetScript(name, fn) self.scripts[name] = fn end
+function Frame:GetScript(name) return self.scripts[name] end
 function Frame:GetFrameLevel() return 1 end
 function Frame:SetEnabled(on) self.enabled = on end
 function Frame:SetText(text) self.text = text end
@@ -59,7 +62,13 @@ local requested = 0
 C_RecentAllies = { GetRecentAllies = function() return recent end,
     TryRequestRecentAlliesData = function() requested = requested + 1 end }
 C_CreatureInfo = { GetClassInfo = function(id) return { className = "Class" .. id, classFile = "CLASS" .. id } end }
-C_FriendList = { GetNumIgnores = function() return 2 end, GetIgnoreName = function(i) return ({ "Bob", "Ann" })[i] end }
+local invites, accepted, declined = { { inviteID = 71, accountName = "Ann#1234" }, { inviteID = 72, accountName = "Bob#77" } }, nil, nil
+BNGetNumFriendInvites = function() return #invites end
+C_BattleNet = { GetFriendInviteInfo = function(i) return invites[i] end }
+BNAcceptFriendInvite = function(id) accepted = id end
+BNDeclineFriendInvite = function(id) declined = id end
+FRIEND_REQUESTS = "Friend Requests (%d)"
+NO_FRIEND_REQUESTS = "You have no friend requests"
 
 local ns = setmetatable({}, { __index = function() return function() end end })
 ns.IsSecret = function() return false end
@@ -70,7 +79,11 @@ ns.WhenCalm = function(_, fn) fn() end
 ns.EachChild = function() end
 ns.ListOffset = function() return 0 end
 ns.NewFrame = function(_, name) return New(name) end
-ns.PanelButton = function() return New() end
+ns.PanelButton = function()
+    local button = New()
+    function button:GetScript(name) return self.scripts[name] end
+    return button
+end
 ns.RegisterEvents = function() end
 ns.StoneBar = function() return New() end
 format = string.format
@@ -116,9 +129,10 @@ assert(loadfile(ROOT .. "/Social/ContactPages.lua"))("ClassicUIForever", ns)
 S.SyncContactPages()
 local friends, allies, ignore = ClassicUIForeverContactTab1, ClassicUIForeverContactTab2, ClassicUIForeverContactTab3
 Check(friends and allies and ignore, "three sub-tabs are made")
+Check(ignore.text == "Friend Requests (2)", "the third is Friend Requests, counted (" .. tostring(ignore.text) .. ")")
 Check(FriendsTabHeader.TabSystem.alpha == 0, "the client's header tabs step aside")
 Check(friends.picked and not allies.picked, "the window opens on Friends")
-Check(not ClassicUIForeverAlliesPage.shown and not ClassicUIForeverIgnorePage.shown, "on Friends no page of ours shows")
+Check(not ClassicUIForeverAlliesPage.shown and not ClassicUIForeverRequestsPage.shown, "on Friends no page of ours shows")
 Check(clientList.alpha == 1, "on Friends the client's list shows")
 
 recent[1] = { characterData = { fullName = "Zed", level = 10, classID = 1 }, stateData = { isOnline = false } }
@@ -143,11 +157,41 @@ page.query.text = ""
 page.scripts.OnShow(page)
 
 ignore.scripts.OnClick(ignore)
-local ign = ClassicUIForeverIgnorePage
-Check(ign.shown and not page.shown, "Ignore shows its list alone")
+local ign = ClassicUIForeverRequestsPage
+Check(ign.shown and not page.shown, "Friend Requests shows its list alone")
 ign.scripts.OnShow(ign)
-Check(ign.rows[1].entry and ign.rows[1].entry.name == "Bob", "ignored names listed")
-Check(ign.insetFoot ~= nil and ign.insetFoot == ign.right and page.insetFoot == page.left,
+Check(ign.rows[1].entry and ign.rows[1].entry.name == "Ann#1234" and ign.rows[2].entry.name == "Bob#77",
+    "requests listed in the client's order")
+Check(ign.empty and not ign.empty.shown, "with requests, no empty line")
+Check(ign.left.enabled == false and ign.right.enabled == false, "nothing picked: Accept and Decline wait")
+ign.selected = 2
+ign.scripts.OnShow(ign)
+Check(ign.left.enabled and ign.right.enabled, "a picked request: Accept and Decline ready")
+ign.left.scripts.OnClick(ign.left)
+Check(accepted == 72, "Accept takes the picked request's invite id")
+Check(ign.selected == nil and ign.left.enabled == false, "answered: the pick clears, so a second click answers no one")
+ign.selected = 1
+ign.scripts.OnShow(ign)
+ign.right.scripts.OnClick(ign.right)
+Check(declined == 71, "Decline takes the picked request's invite id")
+
+-- The dev addon's stand-ins: never sent, and an answer takes one off its list with the count, as the server would.
+accepted, declined = nil, nil
+ns.DevFriendRequests = { { id = -1, name = "Thrall#1234", dev = true }, { id = -2, name = "Jaina#5678", dev = true } }
+ign.scripts.OnShow(ign)
+ign.selected = 1
+ign.scripts.OnShow(ign)
+ign.right.scripts.OnClick(ign.right)
+Check(declined == nil and accepted == nil, "stand-ins: nothing sent")
+Check(#ns.DevFriendRequests == 1 and ign.rows[1].entry and ign.rows[1].entry.name == "Jaina#5678", "stand-ins: the answered one leaves")
+Check(ignore.text == "Friend Requests (1)", "stand-ins: the count follows (" .. tostring(ignore.text) .. ")")
+ns.DevFriendRequests = nil
+invites = {}
+ign.scripts.OnShow(ign)
+Check(ign.empty.shown and ign.rows[1].entry == nil, "no requests: the client's empty line")
+ignore.scripts.OnEvent(ignore)
+Check(ignore.text == "Friend Requests (0)", "the tab's count follows the requests")
+Check(ign.insetFoot ~= nil and ign.insetFoot == ign.left and page.insetFoot == page.left,
     "both pages end their inset border at their buttons, as on Friends")
 
 covered = true
