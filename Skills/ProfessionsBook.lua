@@ -136,7 +136,6 @@ local function NewBar(parent, index)
         bar.rankText:SetPoint("CENTER", 0, 2)
     end
     if bar.capped then bar.capped:Hide() end
-    bar:SetStatusBarColor(0, 1, 0)
     return bar
 end
 
@@ -293,6 +292,7 @@ local function FillRow(row, index, slot)
     rank, maxRank = rank or 0, maxRank or 0
     row.bar:SetMinMaxValues(0, math.max(1, maxRank))
     row.bar:SetValue(rank)
+    if row.bar.capRight then row.bar.capRight:SetShown(maxRank > 0 and rank >= maxRank) end
     if row.bar.rankText then
         if rankModifier and rankModifier > 0 then
             row.bar.rankText:SetFormattedText(TRADESKILL_RANK_WITH_MODIFIER or "%d (+%d)/%d", rank, rankModifier, maxRank)
