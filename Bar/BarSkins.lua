@@ -598,15 +598,17 @@ local function ApplyBagArt(button)
     end
 end
 
--- The client's backpack Count also takes the ammo count (inventory slot 0 on every BAG_UPDATE): faded, ours shows free slots.
-local FREE_SLOTS = "(%s)"
+-- Free slots: Forever's FreeSlots, shown by the game's Show Free Bag Space as in Era, its Count left to the ammo (inventory
+-- slot 0 on every BAG_UPDATE) and faded; retail's Count, always shown. Both in Era's font; on our row at Era's spot.
 local FREE_EVENTS = { "BAG_UPDATE_DELAYED", "PLAYER_ENTERING_WORLD" }
+-- Era's: CENTER 1, -7 on its 37 backpack (Classic MainMenuBarBagButtons.xml). The client's: CENTER 0, -10.
+local ERA_BACKPACK, ERA_FREE_X, ERA_FREE_Y = 37, 1, -7
 local freeWatch, freeWatching
 
-local function ShowFreeSlots(button, state)
-    local calc = C_Container and C_Container.CalculateTotalNumberOfFreeBagSlots
-    state.count:SetText(FREE_SLOTS:format(calc and calc() or 0))
-    -- That same client update tints and greys the icon by the ammo's state.
+local function FreeCount(button) return button.FreeSlots or button.Count end
+
+-- That same client update tints and greys the icon by the ammo's state.
+local function ClearAmmoTint(button)
     local icon = button.icon
     if icon then
         ns.SetVertexColorIf(icon, 1, 1, 1)
@@ -616,17 +618,22 @@ end
 
 local function OnFreeSlotsEvent()
     for button, state in pairs(bags) do
-        if state.backpack and (state.active or state.game) and state.count then ShowFreeSlots(button, state) end
+        if state.free then ClearAmmoTint(button) end
     end
 end
 
+-- Era's spot at the row's bag size.
+local function PlaceFreeCount(button, state)
+    local free = FreeCount(button)
+    if not free or state.freeAt == state.size then return end
+    local k = state.size / ERA_BACKPACK
+    ns.SetPointOnce(free, "CENTER", ERA_FREE_X * k, ERA_FREE_Y * k)
+    state.freeAt = state.size
+end
+
 local function SkinFreeSlots(button, state)
-    if not state.count then
-        state.count = button:CreateFontString(nil, "ARTWORK", "NumberFontNormalSmall")
-        state.count:SetPoint("BOTTOM", button, "BOTTOM", 0, 3)
-    end
-    state.count:Show()
-    if button.Count then ns.SetAlphaIf(button.Count, 0) end
+    state.free = true
+    if button.FreeSlots and button.Count then ns.SetAlphaIf(button.Count, 0) end
     if not freeWatch then
         freeWatch = ns.EventFrame(FREE_EVENTS, OnFreeSlotsEvent)
         freeWatching = true
@@ -634,17 +641,20 @@ local function SkinFreeSlots(button, state)
         freeWatching = true
         ns.RegisterEvents(freeWatch, FREE_EVENTS)
     end
-    ShowFreeSlots(button, state)
+    ClearAmmoTint(button)
 end
 
 local function UnskinFreeSlots(button, state)
-    if state.count then state.count:Hide() end
+    state.free = false
+    local free = FreeCount(button)
+    if state.freeAt and free then ns.SetPointOnce(free, "CENTER", 0, -10) end
+    state.freeAt = nil
     if button.Count then ns.SetAlphaIf(button.Count, 1) end
     if freeWatch then freeWatch:UnregisterAllEvents() end
     freeWatching = false
 end
 
--- Our bar off: the game's own backpack takes the ammo count too, so it shows the free slots the same way, on its spot.
+-- Our bar off: the game's own backpack takes the ammo count too; its free slot count stays the client's.
 function ns.GameBackpackFreeSlots()
     local button = MainMenuBarBackpackButton
     if not (button and button.Count) then return end
@@ -654,11 +664,6 @@ function ns.GameBackpackFreeSlots()
         bags[button] = state
     end
     state.game = true
-    if not state.count then
-        state.count = button:CreateFontString(nil, "ARTWORK")
-        state.count:SetFontObject(button.Count:GetFontObject() or "NumberFontNormalSmall")
-        state.count:SetPoint("CENTER", button.Count, "CENTER", 0, 0)
-    end
     SkinFreeSlots(button, state)
 end
 
@@ -694,7 +699,10 @@ function ns.SkinBagButton(button, size, isBackpack, round)
     local fresh = not state.active
     state.active = true
     ApplyBagArt(button)
-    if fresh and state.backpack then SkinFreeSlots(button, state) end
+    if state.backpack then
+        if fresh then SkinFreeSlots(button, state) end
+        PlaceFreeCount(button, state)
+    end
 end
 
 function ns.UnskinBagButton(button)
