@@ -3,6 +3,16 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN32_1_TITLE"] = "Eras Weltkarte"
+L["WN32_1_TEXT"] = "Die Weltkarte zeigt standardmäßig Eras großen Kartenrahmen, mit Auswahllisten für Kontinent und Zone und Herauszoomen in der Kopfleiste. Jeder Stil zeigt die Karte in seiner eigenen Größe; die Größe änderst du jederzeit in ClassicUI Forever Fenster (Bearbeitungsmodus). Für die kleine Karte wie bisher wähle Navigationsleiste: keine in den Optionen (/fcui) unter Weltkarte."
+L["WN32_2_TITLE"] = "Kartenoptionen"
+L["WN32_2_TEXT"] = "Ein Feld Kartenoptionen unten rechts auf der klassischen Weltkarte wählt, was die Karte zeigt. Ob es immer, beim Darüberfahren oder nie erscheint, wählst du in den Optionen unter Weltkarte."
+L["WN32_3_TITLE"] = "Eras Zauberleiste auf Namensplaketten"
+L["WN32_3_TEXT"] = "Die Zauberleisten der Namensplaketten sehen aus wie in Era, mit dem Zaubersymbol im linken Feld der Leiste. Die Plakette deines Ziels und die unter der Maus leuchten heller, und ein nicht unterbrechbarer Zauber behält sein Symbol unter Eras Schild. Für die alte Zauberleiste aktiviere Zauberleiste: Symbol daneben in den Optionen unter Namensplaketten."
+L["WN32_4_TITLE"] = "Freie Taschenplätze"
+L["WN32_4_TEXT"] = "Die Zahl der freien Plätze im Rucksack folgt der Spieleinstellung für freien Taschenplatz unter Interface in den Spieloptionen, wie in Era: aus, bis du sie aktivierst, und nie doppelt angezeigt."
+L["WN32_5_TITLE"] = "Korrekturen"
+L["WN32_5_TEXT"] = "Tastenrahmen ausblenden erfasst auch die Tag-und-Nacht- und Zoomtasten der Minikarte und hinterlässt beim Ausschalten keinen zusätzlichen Ring. In ClassicUI Forever Fenster (Bearbeitungsmodus) erscheinen die Rahmen geschlossener Fenster dort, wo die Fenster sitzen, und Position zurücksetzen bringt die Weltkarte an die Stelle des Spiels zurück. Akzeptieren im Talentfenster passt auf seine Taste. Neue Installationen öffnen das Questlog in der doppelten Ansicht."
 L["WN31_1_TITLE"] = "Das Handwerksfenster aus Era"
 L["WN31_1_TEXT"] = "Das Handwerksfenster hat die Größe, Grafik und Anordnung aus Era, mit einem Filter nach der Art des hergestellten Gegenstands und Rezeptdetails, die rollen, wenn die Reagenzien nicht mehr hineinpassen."
 L["WN31_2_TITLE"] = "Berufebuch"

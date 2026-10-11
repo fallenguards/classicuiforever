@@ -3,6 +3,16 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN32_1_TITLE"] = "El mapa del mundo de Era"
+L["WN32_1_TEXT"] = "El mapa del mundo muestra por defecto el gran marco de mapa de Era, con listas desplegables de continente y zona y Alejar en su cabecera. Cada estilo muestra el mapa a su propio tamaño; cambia su tamaño cuando quieras en Ventanas de ClassicUI Forever (modo edición). Para el mapa pequeño de antes, elige Barra de navegación: ninguna en las opciones (/fcui), en Mapa del mundo."
+L["WN32_2_TITLE"] = "Opciones del mapa"
+L["WN32_2_TEXT"] = "Un recuadro Opciones del mapa abajo a la derecha del mapa del mundo clásico elige lo que muestra el mapa. Muéstralo siempre, al pasar el ratón o nunca en las opciones, en Mapa del mundo."
+L["WN32_3_TITLE"] = "La barra de lanzamiento de Era"
+L["WN32_3_TEXT"] = "Las barras de lanzamiento de las placas de nombre toman el aspecto de Era, con el icono del hechizo en la ranura izquierda de la barra. La placa de tu objetivo y la que está bajo el ratón brillan más, y un lanzamiento que no se puede interrumpir conserva su icono bajo el escudo de Era. Para la barra antigua, activa Barra de lanzamiento: icono al lado en las opciones, en Placas de nombre."
+L["WN32_4_TITLE"] = "Espacio libre en bolsas"
+L["WN32_4_TEXT"] = "El número de espacios libres de la mochila sigue el ajuste del juego para mostrar el espacio libre en bolsas, en Interfaz en las opciones del juego, como en Era: desactivado salvo que lo marques, y nunca se muestra dos veces."
+L["WN32_5_TITLE"] = "Correcciones"
+L["WN32_5_TEXT"] = "Ocultar bordes de botones también cubre los botones de día y noche y de zoom del minimapa, sin un anillo de más al desactivarlo. En Ventanas de ClassicUI Forever (modo edición), los recuadros de las ventanas cerradas aparecen donde están las ventanas, y Restablecer posición devuelve el mapa del mundo al lugar del juego. Aplicar en la ventana de talentos cabe en su botón. Las instalaciones nuevas abren el registro de misiones en doble panel."
 L["WN31_1_TITLE"] = "La ventana de oficio de Era"
 L["WN31_1_TEXT"] = "La ventana de oficio toma el tamaño, el arte y la disposición de Era, con un filtro por el tipo de objeto creado y detalles de receta que se desplazan cuando los componentes no caben."
 L["WN31_2_TITLE"] = "Libro de profesiones"

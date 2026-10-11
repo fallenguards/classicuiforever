@@ -2,6 +2,16 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN32_1_TITLE"] = "Era's world map"
+L["WN32_1_TEXT"] = "The world map shows Era's large map frame by default, with Continent and Zone drop downs and Zoom Out in its header. Each style draws the map at its own size; resize it any time in ClassicUI Forever Windows (edit mode). For the small map as before, turn on Navigation bar: none in the options (/fcui), under World map."
+L["WN32_2_TITLE"] = "Map Options"
+L["WN32_2_TEXT"] = "A Map Options box at the bottom right of the classic world map picks what the map shows. Show it always, on hover or never in the options, under World map."
+L["WN32_3_TITLE"] = "Era's nameplate cast bar"
+L["WN32_3_TEXT"] = "Nameplate cast bars take Era's look, the spell's icon in the bar's left slot. The plate you target or point at brightens, and a cast that cannot be interrupted keeps its icon under Era's shield. For the old cast bar, turn on Cast bar: icon beside it in the options, under Nameplates."
+L["WN32_4_TITLE"] = "Free bag slots"
+L["WN32_4_TEXT"] = "The backpack's free slot count follows the game's Show Free Bag Space, under Interface in the game's options, as in Era: off unless you check it, and never shown twice."
+L["WN32_5_TITLE"] = "Fixes"
+L["WN32_5_TEXT"] = "Hide button borders covers the minimap's day and night and zoom buttons too, with no extra ring when turned off. In ClassicUI Forever Windows (edit mode), the boxes of closed windows show where the windows sit, and Reset position puts the world map back on the game's own spot. The talents window's Apply button fits its text in every language. New installs open the quest log in its double pane."
 L["WN31_1_TITLE"] = "Era's trade skill window"
 L["WN31_1_TEXT"] = "The trade skill window takes Era's size, art and layout, with a filter by the kind of item made and recipe details that scroll when the reagents run long."
 L["WN31_2_TITLE"] = "Professions book"

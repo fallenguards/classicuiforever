@@ -3,6 +3,16 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN32_1_TITLE"] = "La carte du monde d'Era"
+L["WN32_1_TEXT"] = "La carte du monde affiche par défaut le grand cadre de carte d'Era, avec les listes déroulantes de continent et de zone et Zoom arrière dans son en-tête. Chaque style affiche la carte à sa propre taille ; redimensionnez-la quand vous voulez dans les fenêtres ClassicUI Forever (mode Édition). Pour la petite carte d'avant, choisissez Barre de navigation : aucune dans les options (/fcui), sous Carte du monde."
+L["WN32_2_TITLE"] = "Options de la carte"
+L["WN32_2_TEXT"] = "Un cadre Options de la carte en bas à droite de la carte du monde classique choisit ce que la carte affiche. Affichez-le toujours, au survol ou jamais dans les options, sous Carte du monde."
+L["WN32_3_TITLE"] = "La barre d'incantation d'Era"
+L["WN32_3_TEXT"] = "Les barres d'incantation des barres de nom prennent l'aspect d'Era, l'icône du sort dans l'emplacement gauche de la barre. La barre de nom de votre cible et celle sous la souris s'éclairent, et une incantation qui ne peut pas être interrompue garde son icône sous le bouclier d'Era. Pour l'ancienne barre, activez Barre d'incantation : icône à côté dans les options, sous Barres de nom."
+L["WN32_4_TITLE"] = "Places libres des sacs"
+L["WN32_4_TEXT"] = "Le nombre de places libres du sac à dos suit le réglage du jeu qui affiche l'espace libre des sacs, sous Interface dans les options du jeu, comme dans Era : désactivé tant que vous ne le cochez pas, et jamais affiché deux fois."
+L["WN32_5_TITLE"] = "Corrections"
+L["WN32_5_TEXT"] = "Masquer les bordures des boutons couvre aussi les boutons jour et nuit et de zoom de la minicarte, sans anneau en trop une fois désactivé. Dans les fenêtres ClassicUI Forever (mode Édition), les cadres des fenêtres fermées s'affichent là où se trouvent les fenêtres, et Réinitialiser la position remet la carte du monde à la place du jeu. Appliquer dans la fenêtre des talents tient dans son bouton. Les nouvelles installations ouvrent le journal de quêtes en double volet."
 L["WN31_1_TITLE"] = "La fenêtre d'artisanat d'Era"
 L["WN31_1_TEXT"] = "La fenêtre d'artisanat prend la taille, l'art et la disposition d'Era, avec un filtre par type d'objet fabriqué et des détails de recette qui défilent quand les composants dépassent."
 L["WN31_2_TITLE"] = "Livre des métiers"

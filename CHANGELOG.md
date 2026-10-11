@@ -2,6 +2,26 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.24.0] - 2026-10-11
+
+### Added
+- The world map's header can show Classic Era's large map frame, with Continent and Zone drop downs and Zoom Out, and it does by default. Under World map in the options (/fcui), pick Navigation bar: Classic style, Forever style (the game's own map layout) or none (Era's small map, as before). Each style draws the map at its own game's size; resize it any time in ClassicUI Forever Windows (edit mode) (#42).
+- A Map Options box at the bottom right of the classic world map picks what the map shows. Under World map in the options, pick Map options: shown, on hover or hidden (#133).
+
+### Changed
+- Nameplate cast bars take Era's classic look: the spell's icon in the slot at the bar's left, a dark backing, and Era's spark, border and spacing under the health bar. Cast bar: icon beside it, under Nameplates in the options, brings back the old look (#121).
+- The nameplate you target, and the one you point at, brighten as in Era. A cast that cannot be interrupted keeps its icon and shows Era's shield around the bar (#121).
+- Nameplate names take Era's size and look (#121).
+- On Forever, the backpack's free slot count follows the game's Show Free Bag Space, under Interface in the game's options, as in Era: off unless you check it. With it checked you no longer see two counts (#138).
+- New installs open the quest log in its double pane. Double pane, under Quest log in the options, gives the single pane.
+
+### Fixed
+- Hide button borders also hides the borders of the minimap's day and night button and its zoom buttons. Turning it off no longer leaves an extra ring around them.
+- In ClassicUI Forever Windows (edit mode), a window or button that is closed or hidden shows its box on its own spot. Those boxes gathered at the screen's left edge.
+- Reset position puts a window the game places, like the world map, back on the game's own spot. It sat a little low and moved up the next time it opened.
+- The talents window's Apply button fits its text in German, Spanish, French and Italian (#147).
+- Small alignment fixes in the world map's quest pane.
+
 ## [0.23.0] - 2026-10-10
 
 ### Added

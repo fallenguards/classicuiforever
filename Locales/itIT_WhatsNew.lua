@@ -3,6 +3,16 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN32_1_TITLE"] = "La mappa del mondo di Era"
+L["WN32_1_TEXT"] = "La mappa del mondo mostra di base la grande cornice della mappa di Era, con i menu a tendina di continente e zona e Riduci zoom nell'intestazione. Ogni stile mostra la mappa alla propria dimensione; ridimensionala quando vuoi in Finestre di ClassicUI Forever (modalità modifica). Per la piccola mappa di prima, scegli Barra di navigazione: nessuna nelle opzioni (/fcui), sotto Mappa del mondo."
+L["WN32_2_TITLE"] = "Opzioni mappa"
+L["WN32_2_TEXT"] = "Un riquadro Opzioni mappa in basso a destra della mappa del mondo classica sceglie cosa mostra la mappa. Mostralo sempre, al passaggio del mouse o mai nelle opzioni, sotto Mappa del mondo."
+L["WN32_3_TITLE"] = "La barra di lancio di Era"
+L["WN32_3_TEXT"] = "Le barre di lancio delle targhette prendono l'aspetto di Era, con l'icona dell'incantesimo nello spazio a sinistra della barra. La targhetta del tuo bersaglio e quella sotto il mouse si illuminano, e un lancio che non si può interrompere mantiene la sua icona sotto lo scudo di Era. Per la vecchia barra, attiva Barra di lancio: icona accanto nelle opzioni, sotto Targhette."
+L["WN32_4_TITLE"] = "Spazi liberi nelle borse"
+L["WN32_4_TEXT"] = "Il numero di spazi liberi dello zaino segue l'impostazione del gioco che mostra lo spazio libero nelle borse, sotto Interfaccia nelle opzioni del gioco, come in Era: disattivato finché non la selezioni, e mai mostrato due volte."
+L["WN32_5_TITLE"] = "Correzioni"
+L["WN32_5_TEXT"] = "Nascondi bordi dei pulsanti copre anche i pulsanti giorno e notte e di zoom della minimappa, senza un anello in più quando è disattivato. In Finestre di ClassicUI Forever (modalità modifica), i riquadri delle finestre chiuse compaiono dove si trovano le finestre, e Ripristina posizione riporta la mappa del mondo al posto del gioco. Applica nella finestra dei talenti entra nel suo pulsante. Le nuove installazioni aprono il registro delle missioni a doppio riquadro."
 L["WN31_1_TITLE"] = "La finestra dell'artigianato di Era"
 L["WN31_1_TEXT"] = "La finestra dell'artigianato prende dimensioni, grafica e disposizione di Era, con un filtro per tipo di oggetto creato e dettagli della ricetta che scorrono quando i reagenti non ci stanno."
 L["WN31_2_TITLE"] = "Libro delle professioni"
