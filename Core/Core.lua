@@ -1,7 +1,9 @@
 local ADDON, ns = ...
 local L = ns.L
 
-ns.PREFIX = "|cffe6c56cClassicUI Forever|r: "
+-- Chat lines lead with the 1.x bar's gryphon (the addon list icon), cut to its body: 128 x 76 of the file at 24 x 14.
+ns.PREFIX = "|TInterface\\AddOns\\" .. ADDON .. "\\media\\UI-MainMenuBar-EndCap-Dwarf:14:24:0:0:128:128:0:128:52:128|t "
+    .. "|cffe6c56cClassicUI Forever|r: "
 
 -- { key = db key, apply, restore, init, id }, walked in ns.MODULE_ORDER so bar art lays out
 -- after end caps. id defaults to key (pageArrows rides classicBar's toggle).
