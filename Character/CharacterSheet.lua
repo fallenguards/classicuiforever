@@ -27,6 +27,8 @@ local TAB_LABELS = {
     TokenFrame = CURRENCY or "Currency", PVPRankFrame = "PvP", SkillsFrame = SKILLS or "Skills",
     StatisticsFrame = "Stats",
 }
+-- The dev addon's stand-in words (another client's), so a long language's tab row shows on this one.
+local function Label(text) return ns.DevLabel and ns.DevLabel(text) or text end
 
 -- The client's pet view (its pet side tab swaps the gear for the pet); read only.
 local function PetView()
@@ -62,6 +64,11 @@ local TAB_MIN_WIDTH = 44
 -- The first tab's left edge in the strip, and how far each tab tucks under the one before.
 local TAB_FIRST_X = 14
 local TAB_OVERLAP, HIT_INSET = 15, 7   -- tabs overlap; each click area stops halfway into it
+-- A row past the art's right edge (a long language): the whole foot from the portrait corner, tabs tucked 2 further,
+-- short tabs down to the bare caps.
+local SQUEEZE_OVERLAP, SQUEEZE_MIN_WIDTH = 17, 40
+-- A tab's drawn edges inside its frame: the art is clear for 8 px at the left, 10 at the right.
+local TAB_ART_LEFT, TAB_ART_RIGHT = 8, 10
 local labelWidth = setmetatable({}, { __mode = "k" })
 -- Both sheets are 128 x 32; the faces take the shared spot and height (Windows/Tabs.lua).
 local TAB_COORDS = { { 0, 0.15625, 0, 1 }, { 0.15625, 0.84375, 0, 1 }, { 0.84375, 1, 0, 1 } }
@@ -157,51 +164,64 @@ local function PlaceTab(tab, prev, strip)
     return tab
 end
 
-local function TabFloor(tab)
-    return math.max(TAB_MIN_WIDTH, (labelWidth[tab] or 0) + TAB_TEXT_ROOM)
+local function TabFloor(tab, squeezed)
+    return math.max(squeezed and SQUEEZE_MIN_WIDTH or TAB_MIN_WIDTH, (labelWidth[tab] or 0) + TAB_TEXT_ROOM)
 end
 
--- 1.x's bounds check: tabs past the art's right edge all narrow alike; one at its floor stops and the rest share
--- what it could not give (an even cut alone crushed the short Pet tab).
+-- 1.x's bounds check: a row past the art's right edge is squeezed into the whole foot; tabs still too wide all narrow
+-- alike, one at its floor stops and the rest share what it could not give (an even cut alone crushed the short Pet
+-- tab). Whole pixels, the first tabs one more, so the row is cut by what it must and no more. True when squeezed.
 local function FitTabs(shown)
     local n = #shown
-    local right = TAB_FIRST_X - TAB_OVERLAP * (n - 1)
+    local total = 0
     local widths = {}
     for i, tab in ipairs(shown) do
         widths[i] = tab:GetWidth()
-        right = right + widths[i]
+        total = total + widths[i]
     end
-    local over = right - T.ART_RIGHT_EDGE
-    if n == 0 or over <= 0 then return end
-    for _ = 1, n do
+    if n == 0 or TAB_FIRST_X + total - TAB_OVERLAP * (n - 1) <= T.ART_RIGHT_EDGE then return false end
+    for i = 2, n do ns.SetPointOnce(shown[i], "LEFT", shown[i - 1], "RIGHT", -SQUEEZE_OVERLAP, 0) end
+    local over = math.ceil(total - SQUEEZE_OVERLAP * (n - 1) - (T.ART_RIGHT_EDGE - T.ART_LEFT_EDGE))
+    for _ = 1, 50 do
         local free = 0
         for i, tab in ipairs(shown) do
-            if widths[i] > TabFloor(tab) then free = free + 1 end
+            if widths[i] > TabFloor(tab, true) then free = free + 1 end
         end
         if free == 0 or over <= 0 then break end
-        local cut = math.ceil(over / free)
+        local share, extra = math.floor(over / free), over % free
         for i, tab in ipairs(shown) do
-            local take = math.min(cut, math.max(0, widths[i] - TabFloor(tab)))
-            widths[i] = widths[i] - take
-            over = over - take
+            local room = widths[i] - TabFloor(tab, true)
+            if room > 0 and over > 0 then
+                local take = share
+                if extra > 0 then
+                    take, extra = take + 1, extra - 1
+                end
+                take = math.min(take, room, over)
+                widths[i] = widths[i] - take
+                over = over - take
+            end
         end
     end
     for i, tab in ipairs(shown) do
         tab:SetWidth(widths[i])
         tab.text:SetWidth(widths[i] - 20)
     end
+    return true
 end
 
--- A row whose right margin to the art's edge is under its left one stands centred on the art.
-local function CenterTabs(shown, strip)
+-- A squeezed row, or one whose right gap is under its left, moves as one so its drawn ends stand the same distance
+-- inside the window's drawn edges at the foot (the body's border, the art's right edge).
+local function CenterTabs(shown, strip, squeezed)
     local n = #shown
     if n == 0 then return end
-    local total = -TAB_OVERLAP * (n - 1)
+    local total = -(squeezed and SQUEEZE_OVERLAP or TAB_OVERLAP) * (n - 1)
     for _, tab in ipairs(shown) do total = total + tab:GetWidth() end
-    local left = TAB_FIRST_X - T.ART_LEFT_EDGE
-    local right = T.ART_RIGHT_EDGE - (TAB_FIRST_X + total)
     local x = TAB_FIRST_X
-    if right < left then x = T.ART_LEFT_EDGE + (T.ART_RIGHT_EDGE - T.ART_LEFT_EDGE - total) / 2 end
+    local left = TAB_FIRST_X + TAB_ART_LEFT - T.BODY_LEFT_EDGE
+    local right = T.ART_RIGHT_EDGE - (TAB_FIRST_X + total - TAB_ART_RIGHT)
+    if squeezed or right < left then
+        x = (T.BODY_LEFT_EDGE + T.ART_RIGHT_EDGE - total + TAB_ART_RIGHT - TAB_ART_LEFT) / 2
+    end
     ns.SetPointOnce(shown[1], "BOTTOMLEFT", strip, "BOTTOMLEFT", x, 46)
 end
 
@@ -236,7 +256,7 @@ local function PlacePetTab(frame, prev, strip, pet)
     local tab = T.petTab
     tab:SetShown(PetWanted())
     if not tab:IsShown() then return nil end
-    tab:SetLabel(PET or "Pet")
+    tab:SetLabel(Label(PET or "Pet"))
     tab:SetSelected(pet)
     return PlaceTab(tab, prev, strip)
 end
@@ -344,7 +364,7 @@ local function LayTabs(frame, pet)
             end
             tab.mode = mode
             tab.frameName = mode.frameName
-            tab:SetLabel(TAB_LABELS[mode.frameName or ""] or mode.frameName or "")
+            tab:SetLabel(Label(TAB_LABELS[mode.frameName or ""] or mode.frameName or ""))
             tab:SetSelected(mode.frameName == frame.activeSubframe and not (i == 1 and pet))
             tab:SetShown(mode:IsShown())
             if mode:IsShown() then
@@ -357,8 +377,7 @@ local function LayTabs(frame, pet)
                 shown[#shown + 1] = petTab
             end
         end
-        FitTabs(shown)
-        CenterTabs(shown, strip)
+        CenterTabs(shown, strip, FitTabs(shown))
         CatchTabs()
     else
         for i = 1, 6 do

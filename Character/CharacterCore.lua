@@ -8,6 +8,8 @@ local EMPTY = ns.EMPTY
 T.WIDTH, T.HEIGHT = 384, 512
 -- Drawn border edges (transparent past the right one); docked copies sit against them.
 T.ART_RIGHT_EDGE, T.ART_LEFT_EDGE = 349, 3
+-- Under the portrait the border's left edge stands at 11 (the left sheets' first opaque column): what centers on the body.
+T.BODY_LEFT_EDGE = 11
 
 ---------------------------------------------------------------- give back
 

@@ -539,8 +539,8 @@ local function SkinPvP()
     local main = pvp and pvp.MainInfoFrame
     if not main or not T.active then return end
     Take(main, "points")
-    -- 3 in from each drawn edge, so its art is centered on the window drawn (the frame runs past the art's right edge).
-    ns.SetTwoPointsIf(main, "TOPLEFT", CharacterFrame, "TOPLEFT", T.ART_LEFT_EDGE + 3, -70,
+    -- 3 in from each of the body's drawn edges, so its art is centered on the window (the frame runs past the art's right).
+    ns.SetTwoPointsIf(main, "TOPLEFT", CharacterFrame, "TOPLEFT", T.BODY_LEFT_EDGE + 3, -70,
         "BOTTOMRIGHT", CharacterFrame, "TOPLEFT", T.ART_RIGHT_EDGE - 3, -205)
     if T.PvPPane then T.PvPPane() end
 end
