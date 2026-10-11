@@ -41,7 +41,32 @@ local QUICK_RING_64 = { set = "raw", tint = true, coords = { 0, 1, 0, 1 }, w = 6
 
 local active = false
 local KEYRING = Enum.BagIndex.Keyring
+local BACKPACK = Enum.BagIndex.Backpack
 local hooked = setmetatable({}, { __mode = "k" })
+local locked = setmetatable({}, { __mode = "k" })   -- item buttons faded as locked slots
+
+-- Without an authenticator the game adds locked slots past the backpack's own; with the option on, the usable count
+-- and how many are locked (nil when none are, as with an authenticator).
+local function LockedSlots()
+    local count = ns.db and ns.db.hideLockedSlots and ContainerFrame_GetContainerNumSlots
+    if not count then return nil end
+    local max, usable = count(BACKPACK)
+    if type(max) ~= "number" or type(usable) ~= "number" then return nil end
+    -- Dev stand-in: an account with an authenticator sees its last slots as locked.
+    usable = usable - (tonumber(ns.DevLockedSlots) or 0)
+    if usable >= max then return nil end
+    return usable, max - usable
+end
+
+-- Faded and deaf, never hidden: the game lays them out; the padlock's tooltip pad goes deaf too.
+local function Lock(button, on)
+    if not on and not locked[button] then return end
+    locked[button] = on or nil
+    ns.SetFrameAlphaIf(button, on and 0 or 1)
+    if button:IsMouseEnabled() == on then button:EnableMouse(not on) end
+    local pad = button.extendedFrame
+    if pad and pad:IsMouseEnabled() == on then pad:EnableMouse(not on) end
+end
 
 local function Pieces(frame)
     frame.fcui = frame.fcui or {}
@@ -318,9 +343,14 @@ local function LayoutItems(frame, backpackExtra, combined, plusTwo)
     local list = spare or {}
     spare = nil
     local count = 0
+    local usable = LockedSlots()
     for _, button in frame:EnumerateValidItems() do
-        count = count + 1
-        list[count] = button
+        local off = usable and button:GetBagID() == BACKPACK and button:GetID() > usable or false
+        Lock(button, off)
+        if not off then
+            count = count + 1
+            list[count] = button
+        end
     end
     -- Shadows the file's COLUMNS with this window's count (Skin's plusTwo uses four).
     local COLUMNS = ColumnsOf(frame)
@@ -397,9 +427,10 @@ local function Skin(frame, part)
         return
     end
     local combined = frame.IsCombinedBagContainer and frame:IsCombinedBagContainer() and true or false
-    local size = frame:GetBagSize() or 0
-    if size <= 1 then return end
     local main = combined or (frame.IsBackpack and frame:IsBackpack())
+    local _, lockedCount = LockedSlots()
+    local size = (frame:GetBagSize() or 0) - (main and lockedCount or 0)
+    if size <= 1 then return end
     local at = shape[frame]
     -- Nothing drawn yet to place by: the whole skin.
     if not at then part = nil end
@@ -431,6 +462,13 @@ local function Skin(frame, part)
     end
     local extra, wider = at.extra, at.wider
     if part == nil then LayoutItems(frame, extra, combined, at.plusTwo) end
+    -- The game's add-authenticator button rides the last locked slot: gone with them.
+    local add = main and frame.AddSlotsButton
+    if add then
+        local hide = lockedCount ~= nil
+        ns.SetAlphaIf(add, hide and 0 or 1)
+        if add:IsMouseEnabled() == hide then add:EnableMouse(not hide) end
+    end
     -- Old spots for portrait, name, close, money, search. Move the portrait's
     -- container so its round mask follows; the backpack gets the old bag icon.
     local pc = frame.PortraitContainer
@@ -585,12 +623,16 @@ local function RingClick()
     if frame then ContainerFrame_GenerateFrame(frame, math.max(GetKeyRingSize(), 4), KEYRING) end
 end
 
--- The options pass waits out a fight; a fade may change in one, so open bags turn at once.
+-- The options pass waits out a fight; these may change in one, so open bags turn at once.
 ns.OnToggle(function(key)
-    if key ~= "plainQuestItems" or not active then return end
+    if (key ~= "plainQuestItems" and key ~= "hideLockedSlots") or not active then return end
     for _, frame in ipairs(Frames()) do
         if frame:IsShown() and frame.EnumerateValidItems then
-            for _, button in frame:EnumerateValidItems() do ns.QuestItemLook(button) end
+            if key == "hideLockedSlots" then
+                ns.SafeCall(Skin, frame)
+            else
+                for _, button in frame:EnumerateValidItems() do ns.QuestItemLook(button) end
+            end
         end
     end
 end)

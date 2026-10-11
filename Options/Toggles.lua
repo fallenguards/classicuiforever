@@ -200,6 +200,7 @@ ns.TOGGLES = {
 
     { "bags", L["OPT_bags"], L["OPT_bags_TIP"], group = L["GROUP_BAGS"] },
     { "plainQuestItems", L["OPT_plainQuestItems"], L["OPT_plainQuestItems_TIP"], parent = "bags", search = "quest border glow" },
+    { "hideLockedSlots", L["OPT_hideLockedSlots"], L["OPT_hideLockedSlots_TIP"], parent = "bags", search = "authenticator 2fa padlock backpack" },
     { "oneBag", L["OPT_oneBag"], L["OPT_oneBag_TIP"] },
     { "bagsBesideBars", L["OPT_bagsBesideBars"], L["OPT_bagsBesideBars_TIP"] },
 

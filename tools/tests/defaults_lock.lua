@@ -96,6 +96,7 @@ return {
     hideKeyText = false,
     hideLastNames = false,
     hideLatencyBar = false,
+    hideLockedSlots = false,
     hideMapQuestButton = false,
     hideMicroAchievements = true,
     hideMicroArt = false,

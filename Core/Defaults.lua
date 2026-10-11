@@ -125,6 +125,7 @@ ns.DB_DEFAULTS = {
     englishMessages = false,
     englishWindows = false,
     plainQuestItems = false,
+    hideLockedSlots = false,
     plainNumbers = false,
     hideStatusMain = false,
     hideStatusSecond = false,
