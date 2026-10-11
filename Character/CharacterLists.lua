@@ -62,6 +62,8 @@ local ARROW = { own = "arrow", layer = "ARTWORK", coords = { 0.25, 0.75, 0.25, 0
 local function RepRowClick(row)
     if ns.ReputationRowClicked then ns.ReputationRowClicked(row) end
 end
+local function RepRowEnter(row) if ns.ReputationRowHover then ns.ReputationRowHover(row, true) end end
+local function RepRowLeave(row) if ns.ReputationRowHover then ns.ReputationRowHover(row, false) end end
 
 local function CurrencyRowClick(row)
     if ns.CurrencyRowClicked then ns.CurrencyRowClicked(row) end
@@ -109,8 +111,12 @@ local function SkinListEntry(row, barKey)
         Take(content, "scale")
         content:SetScale(1 / (skills and SKILL_LIST_SCALE or REP_LIST_SCALE))
     end
-    -- A faction's row opens the old detail box.
-    if not skills then ns.HookScriptOnce(row, "OnClick", RepRowClick) end
+    -- A faction's row opens the old detail box, and lights as the mouse is over it.
+    if not skills then
+        ns.HookScriptOnce(row, "OnClick", RepRowClick)
+        ns.HookScriptOnce(row, "OnEnter", RepRowEnter)
+        ns.HookScriptOnce(row, "OnLeave", RepRowLeave)
+    end
     ns.FadeAtlas(bar, "stat-bar-bg", false, Fade)
     -- Retail's bar has the old frame of its own, 99 wide, inside our 137: a second, narrower bar.
     if bar.LeftTexture then Fade(bar.LeftTexture) end

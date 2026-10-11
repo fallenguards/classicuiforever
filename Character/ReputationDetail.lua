@@ -81,19 +81,22 @@ local function BeatTick(job)
 end
 
 -- The chosen row gets the old yellow line, cut like the plate (strip and cap).
+-- Era's highlight on the picked faction and on the one under the mouse.
+local hovered = setmetatable({}, { __mode = "k" })
 local function MarkRow(row)
     local mark = row.fcuiRepMark
-    local chosen = row.elementData and row.elementData.factionID == repFactionID
+    local chosen = row.elementData and row.elementData.factionID == repFactionID and repDetail and repDetail:IsShown()
+    local lit = (chosen or hovered[row]) and true or false
     local bar = row.Content and row.Content.ReputationBar
     local plate = bar and bar.fcui and bar.fcui.plateLeft
-    if chosen and not mark and plate then
+    if lit and not mark and plate then
         mark = ns.NewFrame("Frame", nil, bar)
         mark:SetAllPoints(bar)
         mark:SetFrameLevel(bar:GetFrameLevel() + 3)
         ns.DressPieces(mark, REP_MARK, plate)
         row.fcuiRepMark = mark
     end
-    if mark then mark:SetShown((chosen and repDetail:IsShown()) and true or false) end
+    if mark then mark:SetShown(lit) end
 end
 
 local function HideMark(row)
@@ -224,6 +227,13 @@ function ns.ReputationRowClicked(row)
     MarkRepRows()
     ns.Sched.NextFrame("sheet.repMark", MarkRepRows)
     C_Timer.After(0.1, MarkRepRows)
+end
+
+-- The row's own enter and leave (the game lights its faded backing on both).
+function ns.ReputationRowHover(row, over)
+    if not T.active or not row then return end
+    hovered[row] = over or nil
+    MarkRow(row)
 end
 
 function T.HideRepDetail()
