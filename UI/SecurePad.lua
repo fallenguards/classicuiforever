@@ -146,6 +146,7 @@ MapPad = function(button, strata, after, target, when, editMode)
     return mapPad
 end
 ns.MapPad = MapPad
+ns.PlacePads = QueuePlace
 
 -- A named secure button a pad's macro runs with /click, pressing its clickbutton; sized and placed off screen: a button
 -- with neither is never clicked. Made out of combat.

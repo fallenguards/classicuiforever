@@ -412,8 +412,13 @@ local function Apply()
         WrapGuildToggle()
         BuildSecureOpener()
         -- The button presses the client's own opener, as the key does.
-        if BuildSocialOpener() and GuildMicroButton then
-            ns.MapPad(GuildMicroButton, nil, nil, socialOpen, function() return G.active end)
+        if BuildSocialOpener() then
+            if GuildMicroButton then ns.MapPad(GuildMicroButton, nil, nil, socialOpen, function() return G.active end) end
+            -- The friends button by chat too; a group toast on it keeps its own click (the quick join list).
+            local toast = _G["QuickJoinToastButton"]
+            ns.MapPad(toast, nil, nil, socialOpen, function() return G.active and not toast.displayedToast end)
+            ns.HookMethod(toast, "ShowToast", ns.PlacePads)
+            ns.HookMethod(toast, "ToastToFriendFinished", ns.PlacePads)
         end
         -- The social keys and the opener's arming wait for the opener.
         UpdateGuildBinding()
