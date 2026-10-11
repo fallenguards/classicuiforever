@@ -23,11 +23,11 @@ local LIFT = 25     -- the lock and reset over the window's own art and the drag
 local LOCK_EXTRA_WIDTH = 0
 local LOCK_EXTRA_HEIGHT = 0
 local LOCK_X = -22
-local LOCK_Y = 1
+local LOCK_Y = 0
 local RESET_EXTRA_WIDTH = 0
 local RESET_EXTRA_HEIGHT = 0
 local RESET_X = -44
-local RESET_Y = 1
+local RESET_Y = 0
 local RESET_ARROW_WIDTH = 12
 local RESET_ARROW_HEIGHT = 12
 local RESET_ARROW_X = 0
@@ -91,6 +91,9 @@ local function PlaceLock(entry)
         close = border.CloseButton
         beside = border.MaximizeMinimizeFrame or close
     end
+    -- Left of a size button beside the X while it shows (the professions book's).
+    local sizer = not entry.quests and ns.SizerBeside(close)
+    if sizer and sizer:IsShown() then beside = sizer end
     -- The X's box, so the three red squares on the title row match.
     local size = close and Plain(close:GetWidth()) or CLOSE_SIZE
     local resetWidth, resetHeight = size + RESET_EXTRA_WIDTH, size + RESET_EXTRA_HEIGHT

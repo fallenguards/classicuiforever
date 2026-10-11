@@ -178,11 +178,17 @@ local function SkinMaxMin(button)
 end
 
 -- Size button beside the X.
+-- Each close button's size button beside it: the window's lock stands left of it (UI/WindowLocks.lua).
+local sizerBy = setmetatable({}, { __mode = "k" })
 function P.MaxMinBeside(sizer, close, x)
     SkinMaxMin(sizer)
     sizer:SetSize(32, 32)
-    if close then ns.SetPointOnce(sizer, "RIGHT", close, "LEFT", x, 0) end
+    if close then
+        ns.SetPointOnce(sizer, "RIGHT", close, "LEFT", x, 0)
+        sizerBy[close] = sizer
+    end
 end
+function ns.SizerBeside(close) return close and sizerBy[close] end
 
 -- Escape won't close a window an addon wrote on mid-fight: windows met in
 -- combat keep the client's art until it ends.
