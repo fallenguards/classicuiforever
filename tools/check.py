@@ -1691,6 +1691,7 @@ def news_hits():
     with open(toggles, encoding="utf-8") as fh:
         toggle_keys = set(re.findall(r'^\s*\{ "(\w+)", L\[', fh.read(), re.M))
     off = {k for k in re.findall(r"^\s*(\w+) = false,", block, re.M) if k in toggle_keys}
+    on = {k for k in re.findall(r"^\s*(\w+) = true,", block, re.M) if k in toggle_keys}
     english = {}
     for name in sorted(os.listdir(LOCALE_DIR)):
         if name.startswith("enUS") and name.endswith(".lua"):
@@ -1698,13 +1699,15 @@ def news_hits():
                 english.update(LOCALE_ROW.findall(fh.read()))
     if not newest:
         return hits
-    # A check list row reads "Group: item": its group names it too.
+    # A check list row reads "Group: item": its group names it too. A label an on-by-default option shares (World map,
+    # a section and a micro button row) names that one.
+    on_labels = {english.get("OPT_" + key) for key in on}
     labels = {}
     for key in off:
         label = english.get("OPT_" + key)
         if label:
             for name in {label, label.split(":")[0]}:
-                if len(name) >= 6:
+                if len(name) >= 6 and name not in on_labels:
                     labels[name] = key
     prefix = "WN%s_" % newest.group(1)
     # An options section named as the place ("under Character and spells") names no option.
