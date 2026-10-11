@@ -279,3 +279,6 @@ local CLASSIC_MAP_OPTIONS_Y = 5
 function LM.FootSpot(paneW)
     return art, ART_W + (paneW and LM.Widen(paneW) or 0) + CLASSIC_MAP_OPTIONS_X, CLASSIC_MAP_OPTIONS_Y - ART_H
 end
+
+-- The footer's left: the picture's left edge, the sheets' bottom.
+function LM.FootLeft() return art, HOLE_L, -ART_H end

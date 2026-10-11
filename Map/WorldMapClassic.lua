@@ -353,6 +353,44 @@ local function Coords(map)
     return coords
 end
 
+-- One line in the footer under the picture, from its left edge, level with Map Options' middle (its box 24 tall, 5 up):
+-- the player's, the cursor's beside it. The game stacks its rows; only their labels move, its settings still show them.
+local FOOT_MID = 17
+local COORDS_GAP = 16
+local labelPoints = {}   -- label -> the game's points, taken back with its look
+
+local function PlaceLabel(label, rel, relPoint, x, y)
+    if not labelPoints[label] then
+        local points = {}
+        for i = 1, label:GetNumPoints() do points[i] = { label:GetPoint(i) } end
+        labelPoints[label] = points
+    end
+    ns.SetPointIf(label, "LEFT", rel, relPoint, x, y)
+end
+
+local function PlaceCoords(map, style)
+    local panel = Coords(map)
+    if not panel then return end
+    local rel, x, y
+    if style == "classic" then rel, x, y = ns.MapLarge.FootLeft() else rel, x, y = Art(), CANVAS_LEFT, -ERA_H end
+    y = y + FOOT_MID
+    local player = panel.PlayerCoords.Label
+    PlaceLabel(player, rel, "TOPLEFT", x, y)
+    local after = panel.PlayerCoords:IsShown()
+    -- The cursor's and the gamepad crosshair's take turns on the canvas: one spot for both.
+    for _, row in ipairs({ panel.CursorCoords, panel.CrosshairCoords }) do
+        if after then PlaceLabel(row.Label, player, "RIGHT", COORDS_GAP, 0) else PlaceLabel(row.Label, rel, "TOPLEFT", x, y) end
+    end
+end
+
+local function GameCoords()
+    for label, points in pairs(labelPoints) do
+        label:ClearAllPoints()
+        for _, p in ipairs(points) do label:SetPoint(p[1], p[2], p[3], p[4], p[5]) end
+    end
+    wipe(labelPoints)
+end
+
 -- The pane's two scroll bars moved right by shift, or back on the game's own points (nil).
 local barPoints = setmetatable({}, { __mode = "k" })
 local function PaneBars()
@@ -445,11 +483,11 @@ local function DressEra(style)
     if map.SidePanelToggle then
         ns.SetLevelIf(map.SidePanelToggle, map.ScrollContainer:GetFrameLevel() + FOOT_LINE_OVER_MAP + 1)
     end
-    HoldHidden(Coords(map))
     ShiftBars(PANE_BAR_SHIFT[style])
     ns.QuestPaneFloor(true)
     local close, sizer = border.CloseButton, border.MaximizeMinimizeFrame
     if style == "classic" then DressLarge(map, close, sizer) else DressSmall(map, close, sizer) end
+    PlaceCoords(map, style)
     eraDressed = style
 end
 
@@ -464,6 +502,7 @@ local function DressForever()
     end
     ns.MapLarge.Hide()
     ns.MapOptions.Release(map)
+    GameCoords()
     ShiftBars(nil)
     ns.QuestPaneFloor(false)
     border.NineSlice:SetAlpha(1)
