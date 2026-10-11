@@ -38,7 +38,6 @@ All notable changes to ClassicUI Forever are documented here.
 - The Looking For Group window's portrait shows Era's eye while you are listed. Forever's green eye showed through.
 - After a reinstall that kept the classic layout at Era's interface size, the bars no longer come back at the game's larger size.
 - The bars in the professions book no longer show two greens: the fill matches the bar's rounded end.
-- The professions window no longer draws its art a moment late the first time it opens.
 - The friends button by the chat no longer opens the game's social window instead of the classic one.
 - A window's lock button no longer sits under the professions book's expand button.
 - Small alignment fixes in the quest log, the options window, the windows list in edit mode and the window lock buttons.
