@@ -173,6 +173,23 @@
     "COMMENT": {
       "Social/GuildNoteBridge.lua": 3,
       "Spells/SpellBook.lua": 4
+    },
+    "PASSWRITE": {
+      "Bar/Band.lua": 2,
+      "Bar/BandArt.lua": 4,
+      "Bar/BandBags.lua": 12,
+      "Bar/BandBars.lua": 12,
+      "Bar/BandCast.lua": 1,
+      "Bar/BandHangers.lua": 2,
+      "Bar/BandLatency.lua": 1,
+      "Bar/BandMicro.lua": 4,
+      "Bar/BandPins.lua": 1,
+      "Bar/BandSection.lua": 5,
+      "Bar/BandStatus.lua": 6,
+      "Bar/BandStatusBack.lua": 1,
+      "Bar/BandStatusHide.lua": 1,
+      "Bar/BandWatch.lua": 4,
+      "Bar/ClassicBar.lua": 7
     }
   }
 }

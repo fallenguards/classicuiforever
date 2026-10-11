@@ -39,7 +39,7 @@ RULES = ["CVAR", "CVARREAD", "CVARLOGIN", "CVARREG", "REGISTRY", "HOOK", "ONUPDA
          "LOADADDON", "EDITMODE", "EDITQUERY", "SETTLE",
          "PANELMGR", "SECRET", "WALK", "REGEVENTS", "EVENTFRAME", "POINTONCE", "SETIF", "THEME", "ONCEFLAG",
          "FRAMEFIELD", "GAMEMENU", "SHAREDART", "PLATES", "FORBIDDEN", "SYSBASE", "LAYOUTFIELD",
-         "PADART", "SECRETMOUSE", "UNITEVENTS", "DRAGPOINT", "ERASPOT", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "TOC"]
+         "PADART", "SECRETMOUSE", "UNITEVENTS", "DRAGPOINT", "ERASPOT", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "TOC"]
 # A hit of these on a line the change adds fails even within the baseline, so swapping one call for another fails.
 # SINCE, DEADNS, FRAMEFIELD, CVARLOGIN and THROTTLEFRAME stay count-only, so a kept line can still be rewritten.
 LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", "EDITMODE", "PANELMGR", "SEARCHBOX", "ADDONCHAR",
@@ -49,7 +49,7 @@ LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", 
               "WALK", "GAMEMENU", "SHAREDART", "SYSBASE", "LAYOUTFIELD", "PADART", "SECRETMOUSE", "UNITEVENTS",
               "DRAGPOINT", "ERASPOT", "CVARREG", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST",
               "POINTEXACT",
-              "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE")
+              "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE")
 
 # The files allowed to hold each pattern, each with its reason; an entry ending in / is a folder.
 ALLOWED = {
@@ -167,6 +167,7 @@ FIX = {
     "ADDONFORBID": "route it through a secure pad clicking the client's own button, or leave it to the client's code",
     "PLATESHIELD": "set it blind (SetSize, ClearAllPoints, SetPoint) and give it back with the client's own values "
                    "(EraShield in Units/NamePlates.lua)",
+    "PASSWRITE": "write only on change: ns.SetScaleIf, ns.SetPointIf, ns.SetTwoPointsIf (Core/Setters.lua)",
     "PCALLMANY": "pcall a function of ours that walks them and returns one value (ns.EachChildProtected, "
                  "ns.EachRegionProtected in Core/Util.lua), never the getter itself",
     "PADLIST": "change the list's size only in a secure snippet that measures it there too (LIST_TALL / LIST_BACK in "
@@ -332,7 +333,12 @@ LINE_PATTERNS = {
     "PLATESHIELD": re.compile(r"\b\w*[Ss]hield\s*:\s*(?:GetPoint|GetNumPoints|GetWidth|GetHeight|GetSize|GetRect|"
                              r"GetScaledRect|GetCenter|GetLeft|GetRight|GetTop|GetBottom)\s*\("
                              r"|\b(?:SetPointIf|SetTwoPointsIf|SetSizeIf|SetPointOnce|IsAt)\s*\(\s*[\w.]*[Ss]hield\b"),
+    # The band pass runs on every stance and target change on a player's own layout: a blind write there re-lays
+    # every frame it touches (every slot re-anchored took 9 ms a pass, #149).
+    "PASSWRITE": re.compile(r":\s*(?:SetScale|ClearAllPoints)\s*\(|\bns\s*\.\s*SetPointOnce\s*\("),
 }
+# PASSWRITE's files: the band pass and what it calls.
+PASS_FILES = re.compile(r"^Bar/(?:Band\w*|ClassicBar)\.lua$")
 # SYSBASE in Bar/: bar, frame and piece there are the band's edit mode systems.
 SYSBASE_BAND = re.compile(r"(?<![\w.])(?:bar|frame|piece)\s*:\s*(?:SetPoint|ClearAllPoints|SetScale|SetAllPoints)\s*\(")
 # The windows edit mode: a setting written straight to ns.db skips its Save light and Revert (Set is the way).
@@ -425,6 +431,7 @@ MESSAGES = {
     "FADEDPIECE": "a client end cap faded or laid on the band as a handle (bars snapped to it, saved at the screen top)",
     "PCALLMANY": "a pcall straight around GetChildren/GetRegions/GetAnimations: 22 or more results abort the beta client",
     "PLATESHIELD": "a cast bar shield measured (a plate's is restricted: Can't measure restricted regions)",
+    "PASSWRITE": "a blind scale or anchor write in the band pass (it runs on every stance change: a missed frame)",
     "ADDONFORBID": "a call the game forbids to addons (ADDON_ACTION_FORBIDDEN, out of combat too)",
     "NAMEDTEMPLATE": "a nameless frame from a client template that anchors by $parent names on retail (the profession "
                      "bars' backs ran from one bar to another: a black box over the book)",
@@ -1342,7 +1349,7 @@ def pattern_hits(path, lx, funcs):
                     break
     for patterns, lines in ((LINE_PATTERNS, lx.blank), (KEEP_PATTERNS, lx.keep)):
         for rule, rx in patterns.items():
-            if allowed(rule, path):
+            if allowed(rule, path) or (rule == "PASSWRITE" and not PASS_FILES.match(path)):
                 continue
             for no, line in enumerate(lines, 1):
                 m = rx.search(line)
