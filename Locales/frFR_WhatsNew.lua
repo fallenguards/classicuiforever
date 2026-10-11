@@ -3,6 +3,20 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN33_1_TITLE"] = "Demandes d'amis"
+L["WN33_1_TEXT"] = "Les onglets de la page des contacts sont Contacts, Alliances récentes et Demandes d'amis. Les demandes d'amis Battle.net attendent sur leur propre onglet, leur nombre dans son nom : choisissez-en une, puis Accepter ou Refuser. La liste des joueurs ignorés est dans le menu déroulant à côté de votre nom Battle.net."
+L["WN33_2_TITLE"] = "Communautés en bouton"
+L["WN33_2_TEXT"] = "Désactivé par défaut : activez Communautés en bouton dans les options (/fcui), sous Liste de guilde. Les communautés quittent alors la rangée d'onglets pour un bouton rond sur la page de guilde, et les quatre onglets gardent leur largeur de la 1.x. Sans guilde, un onglet des communautés prend la place de l'onglet de guilde."
+L["WN33_3_TITLE"] = "Avis de mise à jour"
+L["WN33_3_TEXT"] = "Quand quelqu'un de votre guilde ou de votre groupe a un ClassicUI Forever plus récent, une ligne dans la discussion vous le dit, avec un lien vers CurseForge. Messages de l'addon, sous Autre dans les options, la coupe avec les autres lignes de l'addon dans la discussion."
+L["WN33_4_TITLE"] = "Changements de posture plus fluides"
+L["WN33_4_TEXT"] = "Le camouflage du voleur, les formes de druide et les autres changements de posture ne provoquent plus de petit à-coup, et le suivi des quêtes ne saute plus quand ils ont lieu."
+L["WN33_5_TITLE"] = "Détails JcJ"
+L["WN33_5_TEXT"] = "Le panneau de détails de l'onglet JcJ est disposé comme celui du jeu, en pièces de la 1.x : une ligne sous votre rang, le titre des prochaines récompenses dans un cadre de fer et l'icône de la récompense dans un emplacement d'objet."
+L["WN33_6_TITLE"] = "Onglet du familier"
+L["WN33_6_TEXT"] = "L'onglet du familier montre ses points de dressage, et sa barre d'expérience montre ses chiffres en permanence, comme dans Era. Invoquer votre familier avec la page du personnage ouverte ne l'affiche plus à votre place."
+L["WN33_7_TITLE"] = "Corrections"
+L["WN33_7_TEXT"] = "Les boutons de posture, de familier et de possession suivent le thème. Les rangées d'onglets des fenêtres sociale et du personnage tiennent dans les langues longues comme l'allemand, sans libellé coupé. Les lignes de réputation s'allument sous la souris comme dans Era, et la fenêtre de butin s'ouvre au-delà de vos fenêtres ouvertes. Les lignes de l'addon dans la discussion commencent par son griffon."
 L["WN32_1_TITLE"] = "La carte du monde d'Era"
 L["WN32_1_TEXT"] = "La carte du monde affiche par défaut le grand cadre de carte d'Era, avec les listes déroulantes de continent et de zone et Zoom arrière dans son en-tête. Chaque style affiche la carte à sa propre taille ; redimensionnez-la quand vous voulez dans les fenêtres ClassicUI Forever (mode Édition). Pour la petite carte d'avant, choisissez Barre de navigation : aucune dans les options (/fcui), sous Carte du monde."
 L["WN32_2_TITLE"] = "Options de la carte"

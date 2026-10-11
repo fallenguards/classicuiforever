@@ -2,6 +2,20 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN33_1_TITLE"] = "Friend Requests"
+L["WN33_1_TEXT"] = "The friends page's tabs are Friends, Recent Allies and Friend Requests. Battle.net friend requests wait on their own tab, counted in its name: pick one and Accept or Decline. The ignore list is in the drop down beside your Battle.net name."
+L["WN33_2_TITLE"] = "Communities as a button"
+L["WN33_2_TEXT"] = "Off by default: turn on Communities as a button in the options (/fcui), under Guild roster. Communities then leaves the tab row for a round button on the Guild page, and the four tabs keep their 1.x widths. Without a guild, a Communities tab stands in the Guild tab's place."
+L["WN33_3_TITLE"] = "Update notice"
+L["WN33_3_TEXT"] = "When someone in your guild or group has a newer ClassicUI Forever, one line in chat says so, with a link to CurseForge. Addon messages, under Other in the options, turns it off along with the addon's other chat lines."
+L["WN33_4_TITLE"] = "Smoother stance changes"
+L["WN33_4_TEXT"] = "Rogue stealth, druid forms and other stance changes no longer cause a micro stutter, and the quest tracker no longer jumps when they happen."
+L["WN33_5_TITLE"] = "PvP details"
+L["WN33_5_TEXT"] = "The PvP tab's details panel is laid out like the game's, in 1.x pieces: a line under your rank, the next rewards heading in an iron box and the reward's icon in an item slot."
+L["WN33_6_TITLE"] = "Pet tab"
+L["WN33_6_TEXT"] = "The pet tab shows your pet's training points, and its XP bar shows its numbers all the time, as in Era. Summoning your pet with the character window open no longer shows the pet in your place."
+L["WN33_7_TITLE"] = "Fixes"
+L["WN33_7_TEXT"] = "Stance, pet and possess buttons follow the theme. The social and character tab rows fit long languages like German, no label cut. Reputation rows light up under the mouse as in Era, and the loot window opens past your open windows. The addon's chat lines start with its gryphon."
 L["WN32_1_TITLE"] = "Era's world map"
 L["WN32_1_TEXT"] = "The world map shows Era's large map frame by default, with Continent and Zone drop downs and Zoom Out in its header. Each style draws the map at its own size; resize it any time in ClassicUI Forever Windows (edit mode). For the small map as before, turn on Navigation bar: none in the options (/fcui), under World map."
 L["WN32_2_TITLE"] = "Map Options"

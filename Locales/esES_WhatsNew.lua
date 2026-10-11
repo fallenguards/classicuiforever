@@ -3,6 +3,20 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN33_1_TITLE"] = "Solicitudes de amistad"
+L["WN33_1_TEXT"] = "Las pestañas de la página de amigos son Amigos, Aliados recientes y Solicitudes de amistad. Las solicitudes de amistad de Battle.net esperan en su propia pestaña, con su número en el nombre: elige una y pulsa Aceptar o Rechazar. La lista de ignorados está en el desplegable junto a tu nombre de Battle.net."
+L["WN33_2_TITLE"] = "Comunidades como botón"
+L["WN33_2_TEXT"] = "Desactivado por defecto: activa Comunidades como botón en las opciones (/fcui), en Lista de la hermandad. Comunidades deja entonces la fila de pestañas por un botón redondo en la página de la hermandad, y las cuatro pestañas mantienen su ancho de la 1.x. Sin hermandad, una pestaña de comunidades ocupa el lugar de la de hermandad."
+L["WN33_3_TITLE"] = "Aviso de actualización"
+L["WN33_3_TEXT"] = "Cuando alguien de tu hermandad o grupo tiene un ClassicUI Forever más nuevo, una línea en el chat te lo dice, con un enlace a CurseForge. Mensajes del accesorio, en Otros en las opciones, lo desactiva junto con las demás líneas del accesorio en el chat."
+L["WN33_4_TITLE"] = "Cambios de postura más fluidos"
+L["WN33_4_TEXT"] = "El sigilo del pícaro, las formas de druida y otros cambios de postura ya no causan un pequeño tirón, y el seguimiento de misiones ya no salta cuando ocurren."
+L["WN33_5_TITLE"] = "Detalles JcJ"
+L["WN33_5_TEXT"] = "El panel de detalles de la pestaña JcJ se dispone como el del juego, con piezas de la 1.x: una línea bajo tu rango, el encabezado de las próximas recompensas en un marco de hierro y el icono de la recompensa en una casilla de objeto."
+L["WN33_6_TITLE"] = "Pestaña de mascota"
+L["WN33_6_TEXT"] = "La pestaña de mascota muestra los puntos de adiestramiento de tu mascota, y su barra de experiencia muestra sus números siempre, como en Era. Invocar a tu mascota con la página de personaje abierta ya no la muestra en tu lugar."
+L["WN33_7_TITLE"] = "Correcciones"
+L["WN33_7_TEXT"] = "Los botones de postura, mascota y posesión siguen el tema. Las filas de pestañas de las ventanas social y de personaje caben en idiomas largos como el alemán, sin cortar ninguna etiqueta. Las filas de reputación se iluminan bajo el ratón como en Era, y la ventana de botín se abre más allá de tus ventanas abiertas. Las líneas del accesorio en el chat empiezan con su grifo."
 L["WN32_1_TITLE"] = "El mapa del mundo de Era"
 L["WN32_1_TEXT"] = "El mapa del mundo muestra por defecto el gran marco de mapa de Era, con listas desplegables de continente y zona y Alejar en su cabecera. Cada estilo muestra el mapa a su propio tamaño; cambia su tamaño cuando quieras en Ventanas de ClassicUI Forever (modo edición). Para el mapa pequeño de antes, elige Barra de navegación: ninguna en las opciones (/fcui), en Mapa del mundo."
 L["WN32_2_TITLE"] = "Opciones del mapa"

@@ -2,6 +2,29 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.25.0] - 2026-10-11
+
+### Added
+- The friends page's tabs are Friends, Recent Allies and Friend Requests. Battle.net friend requests are listed on their own tab, their count in its name: pick one and Accept or Decline. The ignore list stays in the game's drop down beside your Battle.net name.
+- Communities as a button, under Guild roster in the options (/fcui), off by default: Communities leaves the social window's tab row for a round button on the Guild page, with the game's Communities emblem, and the four tabs keep their 1.x widths. Without a guild, a Communities tab stands in the Guild tab's place; Communities tab without a guild, under it, turns that off.
+- When someone in your guild or group has a newer ClassicUI Forever, one line in chat says so, with a link to CurseForge. Addon messages, under Other in the options, turns it off with the addon's other chat lines.
+- On Forever, the pet tab shows your pet's training points at the bottom left, as in Era.
+
+### Changed
+- On Forever, the PvP tab's details panel is laid out as the game's, in 1.x pieces: centered, with a line under your rank, the next rewards heading in an iron box and the reward's icon in an item slot.
+- Stance, pet and possess buttons (stealth, druid forms and the like) wear the classic button skin and follow the theme.
+- On Forever, the pet's XP bar shows its numbers all the time, in Era's font, over its border.
+- Reputation rows light Era's highlight under the mouse as well as on the row you pick.
+- The addon's chat lines start with the gryphon from the 1.x action bar.
+- In long languages such as German, the social and character windows' tab rows fit the window: every tab gives up a little padding, the row stays centered and no label is cut.
+
+### Fixed
+- Rogue stealth, druid forms and other stance changes no longer cause a micro stutter, and the quest tracker no longer jumps when they happen (#149).
+- On Forever, summoning your pet with the character window open on the Character page no longer puts the pet in your character's place or shows the pet's XP bar there.
+- The loot window opens past every open window instead of in a gap to the left of one.
+- Less work in fights: the character stats update when their window opens, and a cast updates only the buttons that show it (#127).
+- Small alignment fixes: the PvP tab's art and the character tab row centered on the window, and no dark line beside the friends page's tabs.
+
 ## [0.24.0] - 2026-10-11
 
 ### Added

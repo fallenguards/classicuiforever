@@ -3,6 +3,20 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN33_1_TITLE"] = "Richieste di amicizia"
+L["WN33_1_TEXT"] = "Le schede della pagina degli amici sono Amici, Alleati recenti e Richieste di amicizia. Le richieste di amicizia di Battle.net attendono nella loro scheda, con il numero nel nome: scegline una e premi Accetta o Declina. L'elenco degli ignorati è nel menu a tendina accanto al tuo nome Battle.net."
+L["WN33_2_TITLE"] = "Comunità come pulsante"
+L["WN33_2_TEXT"] = "Disattivato di base: attiva Comunità come pulsante nelle opzioni (/fcui), sotto Elenco della gilda. Le comunità lasciano allora la fila delle schede per un pulsante rotondo nella pagina della gilda, e le quattro schede mantengono la larghezza della 1.x. Senza gilda, una scheda delle comunità prende il posto di quella della gilda."
+L["WN33_3_TITLE"] = "Avviso di aggiornamento"
+L["WN33_3_TEXT"] = "Quando qualcuno della tua gilda o del tuo gruppo ha un ClassicUI Forever più recente, una riga in chat te lo dice, con un collegamento a CurseForge. Messaggi dell'addon, sotto Altro nelle opzioni, la spegne insieme alle altre righe dell'addon in chat."
+L["WN33_4_TITLE"] = "Cambi di postura più fluidi"
+L["WN33_4_TEXT"] = "La furtività del ladro, le forme del druido e gli altri cambi di postura non causano più un piccolo scatto, e il tracciamento delle missioni non salta più quando avvengono."
+L["WN33_5_TITLE"] = "Dettagli PvP"
+L["WN33_5_TEXT"] = "Il pannello dei dettagli della scheda PvP è disposto come quello del gioco, con pezzi della 1.x: una linea sotto il tuo grado, il titolo delle prossime ricompense in una cornice di ferro e l'icona della ricompensa in uno spazio per oggetto."
+L["WN33_6_TITLE"] = "Scheda del famiglio"
+L["WN33_6_TEXT"] = "La scheda del famiglio mostra i suoi punti di addestramento, e la sua barra dell'esperienza mostra sempre i numeri, come in Era. Evocare il famiglio con la pagina del personaggio aperta non lo mostra più al tuo posto."
+L["WN33_7_TITLE"] = "Correzioni"
+L["WN33_7_TEXT"] = "I pulsanti di postura, del famiglio e di possessione seguono il tema. Le file di schede delle finestre sociale e del personaggio entrano anche nelle lingue lunghe come il tedesco, senza etichette tagliate. Le righe della reputazione si illuminano sotto il mouse come in Era, e la finestra del bottino si apre oltre le tue finestre aperte. Le righe dell'addon in chat iniziano con il suo grifone."
 L["WN32_1_TITLE"] = "La mappa del mondo di Era"
 L["WN32_1_TEXT"] = "La mappa del mondo mostra di base la grande cornice della mappa di Era, con i menu a tendina di continente e zona e Riduci zoom nell'intestazione. Ogni stile mostra la mappa alla propria dimensione; ridimensionala quando vuoi in Finestre di ClassicUI Forever (modalità modifica). Per la piccola mappa di prima, scegli Barra di navigazione: nessuna nelle opzioni (/fcui), sotto Mappa del mondo."
 L["WN32_2_TITLE"] = "Opzioni mappa"

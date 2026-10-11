@@ -3,6 +3,20 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN33_1_TITLE"] = "Freundschaftsanfragen"
+L["WN33_1_TEXT"] = "Die Reiter der Freundesseite sind Freunde, Kürzliche Verbündete und Freundschaftsanfragen. Battle.net-Freundschaftsanfragen warten auf ihrem eigenen Reiter, ihre Anzahl im Namen: eine auswählen und Annehmen oder Ablehnen. Die Ignorierliste steht im Dropdown neben deinem Battle.net-Namen."
+L["WN33_2_TITLE"] = "Communitys als Taste"
+L["WN33_2_TEXT"] = "Standardmäßig aus: Schalte Communitys als Taste in den Optionen (/fcui) unter Gildenliste ein. Communitys verlässt dann die Reiterleiste für eine runde Taste auf der Gildenseite, und die vier Reiter behalten ihre 1.x-Breite. Ohne Gilde steht ein Communitys-Reiter an der Stelle des Gildenreiters."
+L["WN33_3_TITLE"] = "Update-Hinweis"
+L["WN33_3_TEXT"] = "Hat jemand in deiner Gilde oder Gruppe eine neuere Version von ClassicUI Forever, sagt dir eine Zeile im Chat Bescheid, mit einem Link zu CurseForge. Addonnachrichten unter Sonstiges in den Optionen schaltet sie mit den übrigen Chatzeilen des Addons ab."
+L["WN33_4_TITLE"] = "Flüssigere Haltungswechsel"
+L["WN33_4_TEXT"] = "Verstohlenheit des Schurken, Druidengestalten und andere Haltungswechsel verursachen kein kurzes Ruckeln mehr, und die Questverfolgung springt dabei nicht mehr."
+L["WN33_5_TITLE"] = "PvP-Details"
+L["WN33_5_TEXT"] = "Die Detailleiste des PvP-Reiters ist wie die des Spiels aufgebaut, in 1.x-Teilen: eine Linie unter deinem Rang, die Überschrift der nächsten Belohnungen in einem eisernen Rahmen und das Symbol der Belohnung in einem Gegenstandsplatz."
+L["WN33_6_TITLE"] = "Begleiter-Reiter"
+L["WN33_6_TEXT"] = "Der Begleiter-Reiter zeigt die Trainingspunkte deines Begleiters, und seine EP-Leiste zeigt ihre Zahlen immer, wie in Era. Wird der Begleiter bei offener Charakterseite beschworen, erscheint er nicht mehr an deiner Stelle."
+L["WN33_7_TITLE"] = "Korrekturen"
+L["WN33_7_TEXT"] = "Haltungs-, Begleiter- und Besessenheitstasten folgen dem Thema. Die Reiterleisten von Kontakte- und Charakterfenster passen auch in langen Sprachen wie Deutsch, ohne abgeschnittene Beschriftung. Rufzeilen leuchten unter der Maus wie in Era, und das Beutefenster öffnet sich hinter deinen offenen Fenstern. Die Chatzeilen des Addons beginnen mit seinem Greifen."
 L["WN32_1_TITLE"] = "Eras Weltkarte"
 L["WN32_1_TEXT"] = "Die Weltkarte zeigt standardmäßig Eras großen Kartenrahmen, mit Auswahllisten für Kontinent und Zone und Herauszoomen in der Kopfleiste. Jeder Stil zeigt die Karte in seiner eigenen Größe; die Größe änderst du jederzeit in ClassicUI Forever Fenster (Bearbeitungsmodus). Für die kleine Karte wie bisher wähle Navigationsleiste: keine in den Optionen (/fcui) unter Weltkarte."
 L["WN32_2_TITLE"] = "Kartenoptionen"
