@@ -239,7 +239,7 @@ Check("a press on the world asks for none", kicks, 3)
 focus = nil
 onEvent(nil, "GLOBAL_MOUSE_UP")
 Check("a press on nothing asks for none", kicks, 3)
-onEvent(nil, "UPDATE_BONUS_ACTIONBAR")
+onEvent(nil, "PLAYER_TARGET_CHANGED")
 Check("a game event asks for one pass, no burst", kicks == 4 and bursts == 3, true)
 ns.FollowLayers()
 Check("the shared signal with no window asks for one pass", kicks == 5 and bursts == 3, true)
@@ -257,6 +257,34 @@ for _, region in ipairs(shut.regions) do
     if region.alpha == 0.25 and region ~= shutPieces[1] then followed = true end
 end
 Check("an opened window's layers follow at once", followed, true)
+
+-- A bar page or stance change restyles that bar's buttons alone: only what stands in its holder is followed.
+MainActionBar, StanceBar = {}, {}
+local holder, stanceHolder = NewFrame(true, UIParent), NewFrame(true, UIParent)
+local button, stanceButton = NewFrame(true, holder), NewFrame(true, stanceHolder)
+local buttonPiece, stancePiece = button:CreateTexture(), stanceButton:CreateTexture()
+ns.PaintCopy(buttonPiece, COPY)
+ns.PaintCopy(stancePiece, COPY)
+ns.band = { HolderOf = function(bar)
+    if bar == MainActionBar then return holder end
+    if bar == StanceBar then return stanceHolder end
+end }
+pass(5)
+pass(5)
+button.asked, stanceButton.asked, open.asked, other.asked, shut.asked = 0, 0, 0, 0, 0
+onEvent(nil, "UPDATE_BONUS_ACTIONBAR")
+pass(0.01)
+Check("a page change follows bar 1's buttons", button.asked, 1)
+Check("a page change asks no other bar's or window's frames", stanceButton.asked + open.asked + other.asked + shut.asked, 0)
+onEvent(nil, "UPDATE_SHAPESHIFT_FORMS")
+pass(0.01)
+Check("a stance change follows the stance bar's buttons alone", stanceButton.asked == 1 and button.asked == 1, true)
+onEvent(nil, "PLAYER_TARGET_CHANGED")
+pass(0.01)
+Check("another game event follows every frame", open.asked == 1 and other.asked == 1 and button.asked == 2, true)
+ns.PaintCopy(buttonPiece, nil)
+ns.PaintCopy(stancePiece, nil)
+ns.band, MainActionBar, StanceBar = nil, nil, nil
 
 -- A piece off UIParent (a nameplate) gets no watcher and still paints.
 local plate = NewFrame(true, WorldFrame)

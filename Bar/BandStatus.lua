@@ -671,6 +671,24 @@ function B.StatusMoved()
     return false
 end
 
+-- Only carried off, as the game's re-stacks on stance and target changes do: size, scale, shown state and bars as laid.
+local function OnlyCarried(list)
+    for i = 1, #list do
+        local frame = list[i]
+        local mark = statusMark[frame]
+        if not mark or (InCombatLockdown() and Protected(frame)) then return false end
+        local w, h = frame:GetSize()
+        if math.abs((w or 0) - mark.w) > 0.05 or math.abs((h or 0) - mark.h) > 0.05
+            or math.abs((frame:GetScale() or 1) - (mark.scale or 1)) > 0.001
+            or (frame:IsShown() and true or false) ~= mark.shown then
+            return false
+        end
+        local count, width, height = BarSums(frame)
+        if count ~= mark.count or math.abs(width - mark.width) > 0.05 or math.abs(height - mark.height) > 0.05 then return false end
+    end
+    return true
+end
+
 function B.StatusBack()
     B.WakeBars()
     if not B.active or B.applying then return end
@@ -680,7 +698,15 @@ function B.StatusBack()
         if list[i].isDragging then return end
     end
     ns.stripPasses = (ns.stripPasses or 0) + 1
-    B.WhileApplying(LayoutStatusBars)
+    if OnlyCarried(list) then
+        -- Back on the spot it stood, its bars as dressed: a full lay cost each stance change a millisecond.
+        for i = 1, #list do
+            local frame, mark = list[i], statusMark[list[i]]
+            if mark.point then ns.SetPointIf(frame, mark.point, mark.rel, mark.relPoint, mark.x, mark.y) end
+        end
+    else
+        B.WhileApplying(LayoutStatusBars)
+    end
     B.MarkStatus()
 end
 

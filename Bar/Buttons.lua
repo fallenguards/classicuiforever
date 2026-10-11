@@ -472,7 +472,7 @@ local function Repainted(button)
     return false
 end
 
--- Slot, page, bar and layout changes (a spec change re-applies the layout): the next frame checks every button.
+-- Slot, page, bar and layout changes (a spec change re-applies the layout): the next frame checks the buttons they touch.
 -- Art is repainted only in UpdateButtonArt (load, layout applies, edit mode below).
 local WATCH_EVENTS = { "ACTIONBAR_SLOT_CHANGED", "ACTIONBAR_PAGE_CHANGED", "UPDATE_BONUS_ACTIONBAR",
     "UPDATE_OVERRIDE_ACTIONBAR", "UPDATE_VEHICLE_ACTIONBAR", "SPELLS_CHANGED", "PLAYER_ENTERING_WORLD",
@@ -488,15 +488,40 @@ end
 -- Own frame, not a driver job, which would look a frame late and show the client's art that long.
 -- No period: walks only on a kick or when the pre asks; asleep while the module is off.
 local watch, watchJob
-local function OnWatchEvent()
+-- A page change touches bar 1's buttons, a slot change the buttons showing that slot (a stance change sends both);
+-- any other event every button.
+local PAGE_EVENTS = { ACTIONBAR_PAGE_CHANGED = true, UPDATE_BONUS_ACTIONBAR = true }
+local walk = { all = false, main = false, slots = {} }
+local function OnWatchEvent(_, event, slot)
+    if PAGE_EVENTS[event] then
+        walk.main = true
+    elseif event == "ACTIONBAR_SLOT_CHANGED" and type(slot) == "number" and not ns.IsSecret(slot) then
+        walk.slots[slot] = true
+    else
+        walk.all = true
+    end
     watchJob:Kick()
 end
 
+local function SlotVisit(button)
+    if button and walk.slots[button.action] then RepaintVisit(button) end
+end
 
-local function RepaintPass()
+-- all: every button (edit mode's walks); else what the events since the last walk touched.
+local function RepaintPass(all)
     if not active then return end
     ReadWalk()
-    ForEachButton(RepaintVisit)
+    if all == true or walk.all then
+        ForEachButton(RepaintVisit)
+    else
+        if walk.main then
+            local bar = ns.GetMainBar()
+            for _, button in ipairs(bar and bar.actionButtons or {}) do RepaintVisit(button) end
+        end
+        if next(walk.slots) then ForEachButton(SlotVisit) end
+    end
+    walk.all, walk.main = false, false
+    wipe(walk.slots)
 end
 
 -- Edit mode repaints slot art with no event (UpdateButtonArt, MarkBarArtDirty): walked every frame while it is open, by our
@@ -508,12 +533,12 @@ local function EditWatch()
         if ns.EditMode.Live() then return end
         job:Sleep()
         -- On the frame it shuts, as the old per-frame look did.
-        if active then RepaintPass() end
+        if active then RepaintPass(true) end
     end })
     ns.Sched.Attach(host, { name = "buttons.editWalk", every = 0, fn = function()
         if not active then return end
         shutJob:Wake()
-        RepaintPass()
+        RepaintPass(true)
     end })
 end
 
@@ -524,7 +549,12 @@ local function StartWatch()
     watchJob = ns.Sched.OnFrame(watch, { name = "buttons.repaint", every = math.huge, fn = RepaintPass })
     EditWatch()
     -- A classic bar or theme toggle in a fight holds its Apply; the walk follows it now.
-    ns.OnToggle(function() if active and SettingsMoved() then watchJob:Kick() end end)
+    ns.OnToggle(function()
+        if active and SettingsMoved() then
+            walk.all = true
+            watchJob:Kick()
+        end
+    end)
 end
 
 -- Anything else that dresses action buttons walks them from here.

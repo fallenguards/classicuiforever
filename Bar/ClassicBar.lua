@@ -141,8 +141,9 @@ local function Layout()
     if B.ReadNudge then B.ReadNudge(bar) end
     local moved = BarMoved(bar)
     ns.barMoved = moved
-    -- At its default place the bar goes where the band's centred spot needs it (offsets in screen px: it keeps scale 1).
-    if not moved then
+    -- At its default place the bar goes where the band's centred spot needs it (offsets in screen px: it keeps scale 1);
+    -- outside edit mode the game holds it there (B.GameHolds).
+    if not moved and not B.GameHolds(bar) then
         -- The client's own anchor, kept for the hand-back.
         Remember(bar)
         ns.SetPointOnce(bar, "BOTTOMLEFT", UIParent, "BOTTOM", HomeSpot(BandNow()))
@@ -230,6 +231,8 @@ local function Apply()
     if ok then ok, err = pcall(B.UnhookPieces) end
     B.applying = false
     Snapshot()
+    -- Frames the game holds may stand off our buttons: no box or click of theirs over the band outside edit mode.
+    pcall(B.HoldBandBoxes, not ns.EditMode.Live())
     if not ok then geterrorhandler()(err) end
 end
 B.Apply = Apply

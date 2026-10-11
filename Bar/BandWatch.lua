@@ -29,8 +29,8 @@ local shiftSeen = false
 
 local function WatchList()
     if #watchList > 0 then return watchList end
-    -- BagsBar comes in with the owned systems.
-    local names = { "BottomManagedFrameContainer", "RightManagedFrameContainer", "MicroMenu" }
+    -- BagsBar comes in with the owned systems. The right container is the game's alone: nothing of ours stands on it.
+    local names = { "BottomManagedFrameContainer", "MicroMenu" }
     for _, name in ipairs(OWNED_SYSTEMS) do names[#names + 1] = name end
     -- Bars 6-8 too: the client re-lays their buttons on a setting change, which shows as a size change.
     for _, name in ipairs(EXTRA_BARS) do names[#names + 1] = name end
@@ -172,11 +172,17 @@ function ns.MicroDroppedInFight()
     MarkStatus()
 end
 
+-- A bar the game holds moves as the game likes (B.GameHolds), and the XP holders have their own way back (StatusBack);
+-- movedBy names the last frame that called for a pass.
 local function Moved(list)
     local frames = list or WatchList()
+    local holders = StatusPair()
     for i = 1, #frames do
         local frame = frames[i]
-        if Differs(frame, baseline[frame]) then return true end
+        if Differs(frame, baseline[frame]) and frame ~= holders[1] and frame ~= holders[2] and not B.GameHolds(frame) then
+            B.movedBy = frame
+            return true
+        end
     end
     if not list then
         local micro, bags = Census()
@@ -327,6 +333,8 @@ local function PlaceNow(fromLane)
         if handHeld then return end
     end
     handIdle = 0
+    -- The game re-stacks the XP holders with its bars; they go back on their own path, before the frame draws.
+    if StatusMoved() then StatusBack() end
     local rows = RowsMoved()
     -- The bars are the client's to move in a fight; the bag and micro rows are not and go straight back.
     local fight = InCombatLockdown()
@@ -338,8 +346,8 @@ local function PlaceNow(fromLane)
         end
         if not shiftSeen and not ns.fightEdited then
             for _, frame in ipairs(UnpinnedBars()) do
-                -- Only a bar the band has a recorded place for.
-                if baseline[frame] and Differs(frame, baseline[frame]) then
+                -- Only a bar the band has a recorded place for and not the game's own.
+                if baseline[frame] and Differs(frame, baseline[frame]) and not B.GameHolds(frame) then
                     shiftSeen = true
                     -- Dev log: which bar, when, from where to where; built only with a dev sink attached (ns.Persist drops it otherwise).
                     if ns.debugSink then
@@ -395,13 +403,9 @@ local function LiveSideWidth()
     if not screenRight then return 0 end
     local leftmost
     for _, bar in ipairs(SideBarPair()) do
-        if bar and bar:IsVisible() and (bar:GetAlpha() or 1) > 0 then
-            local s = bar:GetEffectiveScale() / UIParent:GetEffectiveScale()
-            local l, r, w, h = bar:GetLeft(), bar:GetRight(), bar:GetWidth(), bar:GetHeight()
-            if l and r and w and h and h > w * 2 and (screenRight - r * s) < 100 then
-                if not leftmost or l * s < leftmost then leftmost = l * s end
-            end
-        end
+        -- What is drawn: the band's slots, not the frame the game may have carried off.
+        local l, r, t, b = B.ColumnBox(bar)
+        if l and t - b > (r - l) * 2 and screenRight - r < 100 and (not leftmost or l < leftmost) then leftmost = l end
     end
     return leftmost and math.max(0, screenRight - leftmost) or 0
 end
@@ -520,7 +524,10 @@ local function EditEdge(editing)
     if editing == edit.live then return end
     edit.live = editing
     if editing then B.RehookPieces() end
-    if not editing and B.active then
+    if editing and B.active and not InCombatLockdown() then
+        -- The bars the game held outside it go under our buttons, so its boxes are the bars.
+        ns.SafeCall(B.Apply)
+    elseif not editing and B.active then
         B.dragging, handHeld = false, false
         B.hot.Make()
         if InCombatLockdown() then pcall(CapsInFight) else ns.SafeCall(B.Apply) end
@@ -746,7 +753,7 @@ function B.StartWatch()
             pcall(B.HoldBandBoxes, true)
             return
         end
-        if event == "PLAYER_REGEN_ENABLED" then pcall(B.HoldBandBoxes, false) end
+        if event == "PLAYER_REGEN_ENABLED" then pcall(B.HoldBandBoxes, not EditModeLive()) end
         PlaceNow()
     end)
 end

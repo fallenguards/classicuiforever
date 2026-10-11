@@ -86,6 +86,9 @@ local function Holder(bar)
     return holder
 end
 
+-- Read by the theme layers: a bar change restyles only what stands in its bar's holder.
+function B.HolderOf(bar) return bar and holderOf[bar] end
+
 -- The button's slot, the button moved into it first; out of combat only, as the layout runs. Explicitly protected:
 -- a snippet's SetParent takes no other frame as the new parent.
 local function Slot(button, bar)
@@ -102,7 +105,10 @@ local function Slot(button, bar)
     -- The toggled border over the client's frame art: both on OVERLAY 0, the art could draw last and cut its top and
     -- left edges (bars 2 and 3's AddRow art hangs from the top left).
     local checked = button.GetCheckedTexture and button:GetCheckedTexture()
-    if checked then checked:SetDrawLayer("OVERLAY", 1) end
+    if checked then
+        local layer, sub = checked:GetDrawLayer()
+        if ns.AnySecret(layer, sub) or layer ~= "OVERLAY" or sub ~= 1 then checked:SetDrawLayer("OVERLAY", 1) end
+    end
     return slot
 end
 
@@ -148,8 +154,10 @@ local function LayoutButtons(bar, rowIndex, point, relTo, relPoint, x, y, vertic
     local step = (pitch or BUTTON_PITCH) / scale
     -- Icon Size rides on the slots, as the client puts it on its containers; the bar keeps scale 1
     -- (edit mode boxes the frame and would count the size twice), and its rectangle is what is drawn.
+    -- A bar the game holds keeps its own frame (B.GameHolds).
     local icon = IconScale(bar)
-    MatchScale(bar, 1)
+    local held = B.GameHolds(bar)
+    if not held then MatchScale(bar, 1) end
     local band = BandNow()
     -- A row on the band is placed in band pixels, a column off it at its own size; the step is read on the slots.
     origin = origin or band
@@ -174,17 +182,17 @@ local function LayoutButtons(bar, rowIndex, point, relTo, relPoint, x, y, vertic
     -- Over the gryphons and over this bar's own frame, which takes the mouse (edit mode lifts a bar's level and the
     -- stance and pet bars stand higher than bar 1): a slot under its bar hid its button from the mouse.
     local level = math.max(B.ButtonLevel(), bar:GetFrameLevel() + 2)
+    -- Only on change: the pass runs on every stance change, and blind writes to every slot missed a frame.
     for i, button in ipairs(bar.actionButtons) do
         count = i
         local slot = Slot(button, bar)
         ns.SetLevelIf(slot, level)
-        slot:SetScale(scale * icon)
-        slot:ClearAllPoints()
+        ns.SetScaleIf(slot, scale * icon)
         local along, across = (i - 1) % per, math.floor((i - 1) / per)
         if vertical then
-            slot:SetPoint("TOPLEFT", row, "TOPLEFT", across * step, -along * step)
+            ns.SetPointIf(slot, "TOPLEFT", row, "TOPLEFT", across * step, -along * step)
         else
-            slot:SetPoint("BOTTOMLEFT", row, "BOTTOMLEFT", along * step, across * step)
+            ns.SetPointIf(slot, "BOTTOMLEFT", row, "BOTTOMLEFT", along * step, across * step)
         end
     end
     -- Bar rectangle = its buttons, in whole pixels, set only on change: a size change makes the client
@@ -197,7 +205,7 @@ local function LayoutButtons(bar, rowIndex, point, relTo, relPoint, x, y, vertic
         local thick = math.floor((lines - 1) * (step * scale * icon) + slot + 0.5)
         local wide, tall = along, thick
         if vertical then wide, tall = thick, along end
-        if math.abs((bar:GetWidth() or 0) - wide) > 0.5 or math.abs((bar:GetHeight() or 0) - tall) > 0.5 then
+        if not held and (math.abs((bar:GetWidth() or 0) - wide) > 0.5 or math.abs((bar:GetHeight() or 0) - tall) > 0.5) then
             Remember(bar)
             bar:SetSize(wide, tall)
         end
@@ -232,13 +240,14 @@ local function LayoutOnOwnBar(bar, rowIndex, vertical, rows, pitch, target)
 end
 B.LayoutOnOwnBar = LayoutOnOwnBar
 
--- Bars whose own click we turned off for a fight (the client's stance bar takes clicks), to hand back after.
+-- Bars whose own click we turned off while held (the client's stance bar takes clicks), to hand back after.
 local clickHeld = setmetatable({}, { __mode = "k" })
+local motionHeld = setmetatable({}, { __mode = "k" })
 
--- A default bar's frame is carried off in a fight while its buttons stay: its box would drag an unseen frame and a
--- frame that takes clicks (the stance bar, level 70) lands over bar 2. Both take no clicks in a fight; player-placed
--- bars stay as they are. Runs at fight start (still allowed) and end.
-function B.HoldBandBoxes(fight)
+-- A default bar's frame is carried off while its buttons stay (fights; the game's own re-stacks outside edit mode): its
+-- box would drag an unseen frame and a frame that takes clicks (the stance bar, level 70) lands over bar 2. Both take no
+-- clicks while held; player-placed bars stay as they are. Set at fight start (still allowed), fight end and each pass.
+function B.HoldBandBoxes(held)
     local main = ns.GetMainBar()
     local locked = InCombatLockdown()
     for bar, hung in pairs(rowOf) do
@@ -246,16 +255,29 @@ function B.HoldBandBoxes(fight)
         if bar == main then onBand = not ns.barMoved else onBand = not hung.onBar end
         local selection = bar.Selection
         if selection and selection.EnableMouse and not (selection.IsProtected and selection:IsProtected() and locked) then
-            local want = not (fight and onBand)
+            local want = not (held and onBand)
             if selection:IsMouseEnabled() ~= want then selection:EnableMouse(want) end
         end
         if bar.SetMouseClickEnabled and not (bar:IsProtected() and locked) then
-            if fight and onBand and bar:IsMouseClickEnabled() then
-                bar:SetMouseClickEnabled(false)
-                clickHeld[bar] = true
-            elseif not fight and clickHeld[bar] then
-                bar:SetMouseClickEnabled(true)
-                clickHeld[bar] = nil
+            if held and onBand then
+                if bar:IsMouseClickEnabled() then
+                    bar:SetMouseClickEnabled(false)
+                    clickHeld[bar] = true
+                end
+                -- Motion too: held outside fights now, a frame taking it over the band would cover the buttons' tooltips.
+                if bar:IsMouseMotionEnabled() then
+                    bar:SetMouseMotionEnabled(false)
+                    motionHeld[bar] = true
+                end
+            elseif not held then
+                if clickHeld[bar] then
+                    bar:SetMouseClickEnabled(true)
+                    clickHeld[bar] = nil
+                end
+                if motionHeld[bar] then
+                    bar:SetMouseMotionEnabled(true)
+                    motionHeld[bar] = nil
+                end
             end
         end
     end
@@ -267,6 +289,12 @@ function B.RestoreSelections()
         if not (bar:IsProtected() and InCombatLockdown()) then
             bar:SetMouseClickEnabled(true)
             clickHeld[bar] = nil
+        end
+    end
+    for bar in pairs(motionHeld) do
+        if not (bar:IsProtected() and InCombatLockdown()) then
+            bar:SetMouseMotionEnabled(true)
+            motionHeld[bar] = nil
         end
     end
     for bar, hung in pairs(rowOf) do
@@ -338,7 +366,7 @@ local function BandRow(bar, rowIndex, x, y, pitch, target)
         return false
     end
     local band = BandNow()
-    Anchor(bar, "BOTTOMLEFT", "BOTTOMLEFT", x * band, y * band, 1)
+    if not B.GameHolds(bar) then Anchor(bar, "BOTTOMLEFT", "BOTTOMLEFT", x * band, y * band, 1) end
     LayoutButtons(bar, rowIndex, "BOTTOMLEFT", B.art, "BOTTOMLEFT", x, y, false, pitch, target)
     return true
 end
@@ -390,11 +418,13 @@ local function SideColumn(bar, rowIndex, x)
         LayoutOnOwnBar(bar, rowIndex, vertical, rows)
         return false
     end
-    Remember(bar)
-    ns.SetScaleIf(bar, 1)
     -- Frame starts at the first button and spans the buttons, so edit mode's box is the column itself.
     local icon = IconScale(bar)
-    ns.SetPointOnce(bar, "TOPRIGHT", UIParent, "BOTTOMRIGHT", x * icon, (SIDE_BAR_Y + SIDE_COL_H) * icon)
+    if not B.GameHolds(bar) then
+        Remember(bar)
+        ns.SetScaleIf(bar, 1)
+        ns.SetPointOnce(bar, "TOPRIGHT", UIParent, "BOTTOMRIGHT", x * icon, (SIDE_BAR_Y + SIDE_COL_H) * icon)
+    end
     LayoutButtons(bar, rowIndex, "TOPLEFT", UIParent, "BOTTOMRIGHT", x - BUTTON_SIZE, SIDE_BAR_Y + SIDE_COL_H, true, nil, nil, icon)
     return true
 end
@@ -422,6 +452,31 @@ local function TopOf(frame)
     local top = frame:GetTop()
     if not top then return 0 end
     return top * frame:GetEffectiveScale() / UIParent:GetEffectiveScale()
+end
+
+-- A bar's drawn box in UIParent units (left, right, top, bottom): its first and last slots while the band holds its
+-- buttons, else its frame; nil when not seen. The slots stay put while the game carries the frame off.
+function B.ColumnBox(bar)
+    local buttons = bar and bar.actionButtons
+    local first = buttons and buttons[1]
+    local slot = first and slotOf[first]
+    local from, to = bar, bar
+    if slot and first:GetParent() == slot then
+        from, to = slot, slot
+        for i = #buttons, 2, -1 do
+            local other = slotOf[buttons[i]]
+            if other and buttons[i]:IsShown() then
+                to = other
+                break
+            end
+        end
+    end
+    if not from or not from:IsVisible() or (from:GetEffectiveAlpha() or 1) <= 0 then return nil end
+    local l1, r1, t1, b1 = from:GetLeft(), from:GetRight(), from:GetTop(), from:GetBottom()
+    local l2, r2, t2, b2 = to:GetLeft(), to:GetRight(), to:GetTop(), to:GetBottom()
+    if not (l1 and r1 and t1 and b1 and l2 and r2 and t2 and b2) then return nil end
+    local k = from:GetEffectiveScale() / UIParent:GetEffectiveScale()
+    return math.min(l1, l2) * k, math.max(r1, r2) * k, math.max(t1, t2) * k, math.min(b1, b2) * k
 end
 
 -- A band bar by its buttons' slot: the client carries the bar frame off (a fight, the totem bar) while they stay.

@@ -44,6 +44,16 @@ local function StripAll()
     ns.ForEachActionButton(StripVisit)
 end
 
+-- A cast changes the swipe of the buttons playing its animation alone (PlaySpellCastAnim, the anim's OnHide): the rest
+-- keep the shade StripAll gave them. Writing every button on each cast cost Stealth a few ms of the game's frame.
+local function StripCasting(button)
+    local anim = button and button.SpellCastAnimFrame
+    if anim and anim:IsShown() then StripVisit(button) end
+end
+local function StripCastingAll()
+    ns.ForEachActionButton(StripCasting)
+end
+
 local function StripSlotVisit(button)
     local action = button and button.action
     if action ~= nil and not ns.IsSecret(action) and tonumber(action) == stripSlot then StripVisit(button) end
@@ -55,15 +65,17 @@ local SLOT_EVENTS = { "PLAYER_ENTERING_WORLD", "ACTIONBAR_SLOT_CHANGED" }
 
 local function OnCastEvent(_, event, slot)
     if not active then return end
-    -- A slot change repaints only its buttons, as ActionButton.lua does; slot 0 and the rest walk all.
+    -- A slot change repaints only its buttons, as ActionButton.lua does; slot 0 and entering the world walk all.
     if event == "ACTIONBAR_SLOT_CHANGED" and not ns.IsSecret(slot) and type(slot) == "number" and slot > 0 then
         stripSlot = slot
         ns.ForEachActionButton(StripSlotVisit)
-    else
+    elseif event == "ACTIONBAR_SLOT_CHANGED" or event == "PLAYER_ENTERING_WORLD" then
         StripAll()
+    else
+        StripCastingAll()
     end
     -- Client sets the swipe on the same event in no fixed order: one walk next frame covers them all.
-    ns.Sched.AfterPerFrame("castAnim.strip", 0, StripAll)
+    ns.Sched.AfterPerFrame("castAnim.strip", 0, StripCastingAll)
 end
 
 local function FollowPlaying()

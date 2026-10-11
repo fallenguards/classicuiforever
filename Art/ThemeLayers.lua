@@ -19,6 +19,7 @@ local job
 -- bars; one window's pieces are followed every frame for BURST after it showed, was pressed or had a layer move.
 local BURST = 0.25
 local wantWhole = false
+local wantHolders = setmetatable({}, weak)   -- a bar's holder (Bar/BandBars.lua) whose layers the next pass follows
 local dirty = setmetatable({}, weak)    -- layer -> piece, painted since the last pass
 local groups = setmetatable({}, weak)   -- root (a window under UIParent) -> { piece's frame -> its layers }
 local rootOf = setmetatable({}, weak)   -- a piece's frame -> its root
@@ -35,6 +36,15 @@ end
 local function Look()
     if not job:IsAwake() then return end
     wantWhole = true
+    job:Kick()
+end
+
+-- One bar's buttons alone on the next frame (a page or stance change restyles nothing else).
+local function LookBar(bar)
+    local band = ns.band
+    local holder = bar and band and band.HolderOf and band.HolderOf(bar)
+    if not (holder and job:IsAwake()) then return end
+    wantHolders[holder] = true
     job:Kick()
 end
 
@@ -68,7 +78,12 @@ ns.FollowLayers = Edge
 local EVENTS = { "GLOBAL_MOUSE_DOWN", "GLOBAL_MOUSE_UP", "PLAYER_ENTERING_WORLD", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED",
     "ACTIONBAR_PAGE_CHANGED", "UPDATE_BONUS_ACTIONBAR", "UPDATE_VEHICLE_ACTIONBAR", "UPDATE_OVERRIDE_ACTIONBAR",
     "UPDATE_SHAPESHIFT_FORMS", "PET_BAR_UPDATE", "PLAYER_TARGET_CHANGED", "PLAYER_FOCUS_CHANGED" }
+-- Each bar event's bar, by name: bar 1 pages, the stance and pet bars refill.
+local BAR_EVENTS = { ACTIONBAR_PAGE_CHANGED = "MainActionBar", UPDATE_BONUS_ACTIONBAR = "MainActionBar",
+    UPDATE_VEHICLE_ACTIONBAR = "MainActionBar", UPDATE_OVERRIDE_ACTIONBAR = "MainActionBar",
+    UPDATE_SHAPESHIFT_FORMS = "StanceBar", PET_BAR_UPDATE = "PetActionBar" }
 local listener = ns.EventFrame({}, function(_, event)
+    if BAR_EVENTS[event] then return LookBar(_G[BAR_EVENTS[event]]) end
     if event ~= "GLOBAL_MOUSE_DOWN" and event ~= "GLOBAL_MOUSE_UP" then return Look() end
     -- A press moves pieces of the window under the mouse only; on the world (the camera) none.
     local foci = GetMouseFoci and GetMouseFoci()
@@ -227,6 +242,17 @@ local function Pass(_, now)
         -- On a hidden frame the layer waits as it is: it shows with the frame.
         if layer.on and ns.Safe(frame:IsVisible(), true) and Follow(piece, layer, true) and rootOf[frame] then
             Heat(rootOf[frame], now)
+        end
+    end
+    -- A bar's holder alone; a whole pass covers them too.
+    for holder in pairs(wantHolders) do
+        wantHolders[holder] = nil
+        local group = not wantWhole and groups[holder]
+        if group then
+            for frame, set in pairs(group) do
+                local _, moved = FollowFrame(frame, set)
+                if moved then Heat(holder, now) end
+            end
         end
     end
     if wantWhole then

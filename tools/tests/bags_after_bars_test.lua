@@ -1,8 +1,8 @@
--- Offline test under Lua 5.4 for the bag windows beside the right bars (Bar/BandWatch.lua). An item on the cursor (a
--- right-click equip puts one there for an instant) makes the client send a right bar the layout holds as default to
--- the screen's edge. Out of a fight our lane puts it back: the bags are placed after that, never before (they jumped
--- 39 sideways for a frame). In a fight the bar cannot be put back: the width beside the bars is the one our last pass
--- left, so the bags stay where they were (they went right and stayed there till the fight ended).
+-- Offline test under Lua 5.4 for the bag windows beside the right bars (Bar/BandWatch.lua, B.ColumnBox in
+-- Bar/BandBars.lua). The game sends a right bar the layout holds as default to the screen's edge (an item on the cursor,
+-- a stance change, a fight) and outside edit mode leaves it there; its buttons stay on our slots. The width beside the
+-- bars is read from the slots, so the bags stay where they were (they jumped 39 sideways when it read the frame). With
+-- the band off the buttons are the bar's again and the frame is what is drawn.
 -- Run from the addon root: lua tools/tests/bags_after_bars_test.lua (CI runs every tools/tests/*_test.lua).
 -- luacheck: std lua54
 -- luacheck: ignore 111 112 113 121 122 212
@@ -39,57 +39,87 @@ for _ in source:gmatch("AnchorOpenBags%s*%(") do calls = calls + 1 end
 for _ in source:gmatch("SafeCall%(AnchorOpenBags") do calls = calls + 1 end
 Check(calls == 2, "the bag windows are placed from one spot only (" .. calls .. " mentions)")
 
------------------------------------------------------------------- the width beside the bars, cut out of the file and run
+------------------------------------------------------------------ the width beside the bars, cut out of the files and run
 
 local first = source:find("local function LiveSideWidth()", 1, true)
 local last = source:find("B.SideColumnsWidth = SideColumnsWidth", 1, true)
 Check(first and last and last > first, "the width's two functions are in the file")
 local chunk = first and last and source:sub(first, last + #"B.SideColumnsWidth = SideColumnsWidth") or ""
 
+handle = assert(io.open(ROOT .. "/Bar/BandBars.lua", "r"))
+local barsSource = handle:read("a")
+handle:close()
+local boxFrom = barsSource:find("function B.ColumnBox(bar)", 1, true)
+local boxTo = boxFrom and barsSource:find("\nend\n", boxFrom, true)
+Check(boxFrom and boxTo, "the drawn box's function is in Bar/BandBars.lua")
+local boxChunk = boxFrom and boxTo and barsSource:sub(boxFrom, boxTo + 4) or ""
+
 local fight = false
-local function Bar(left, right)
+local function Box(left, right, top, bottom)
     return {
-        left = left, right = right,
+        left = left, right = right, top = top, bottom = bottom, alpha = 1,
         IsVisible = function() return true end,
-        GetAlpha = function() return 1 end,
+        IsShown = function() return true end,
+        GetEffectiveAlpha = function(self) return self.alpha end,
         GetEffectiveScale = function() return 1 end,
         GetLeft = function(self) return self.left end,
         GetRight = function(self) return self.right end,
-        GetWidth = function(self) return self.right - self.left end,
-        GetHeight = function() return 498 end,
+        GetTop = function(self) return self.top end,
+        GetBottom = function(self) return self.bottom end,
     }
 end
+local slotOf = {}
+-- A right column of 12: the frame and, on our slots, the buttons drawn 42 apart down from 602.
+local function Column(left)
+    local bar = Box(left, left + 36, 602, 104)
+    bar.actionButtons = {}
+    for i = 1, 12 do
+        local slot = Box(left, left + 36, 602 - (i - 1) * 42, 566 - (i - 1) * 42)
+        local button = { IsShown = function() return true end }
+        button.GetParent = function() return button.home end
+        button.home = slot
+        slotOf[button] = slot
+        bar.actionButtons[i] = button
+    end
+    return bar
+end
 -- His screen: the outer bar 2 in from the edge, the inner one 44 in.
-local outer, inner = Bar(1479, 1515), Bar(1437, 1473)
+local outer, inner = Column(1479), Column(1437)
 local B = {}
 local env = setmetatable({
-    B = B, math = math, ipairs = ipairs,
+    B = B, math = math, ipairs = ipairs, slotOf = slotOf,
     SideBarPair = function() return { outer, inner } end,
     InCombatLockdown = function() return fight end,
     UIParent = { GetRight = function() return 1517 end, GetEffectiveScale = function() return 1 end },
 }, { __index = _G })
-local run, err = load(chunk, "side width", "t", env)
-Check(run ~= nil, "the width's functions load (" .. tostring(err) .. ")")
-if run then run() end
+for name, text in pairs({ ["drawn box"] = boxChunk, ["side width"] = chunk }) do
+    local run, err = load(text, name, "t", env)
+    Check(run ~= nil, "the " .. name .. " loads (" .. tostring(err) .. ")")
+    if run then run() end
+end
 local Width = B.SideColumnsWidth or function() return -1 end
 
 Check(Width() == 80, "both right bars standing: 80 wide (" .. Width() .. ")")
--- Our pass placed everything: the snapshot keeps the width (B.Snapshot's line, checked below).
-B.sideCalm = B.LiveSideWidth and B.LiveSideWidth()
 Check(source:find("B.sideCalm = B.LiveSideWidth()", 1, true) ~= nil, "the band's snapshot keeps the width our pass left")
+B.sideCalm = B.LiveSideWidth and B.LiveSideWidth()
 
--- The client sends the inner bar to the edge, on top of the outer one.
+-- The game sends the inner bar's frame to the edge, over the outer one; its buttons stay on our slots.
 inner.left, inner.right = 1476, 1512
-Check(Width() == 41, "out of a fight the width is read live: 41 until the lane puts the bar back (" .. Width() .. ")")
+Check(Width() == 80, "the game carries the frame off: the slots still stand 80 in, the bags stay (" .. Width() .. ")")
 fight = true
-Check(Width() == 80, "in a fight the width is the one our last pass left: 80, the bags stay (" .. Width() .. ")")
+Check(Width() == 80, "in a fight too: 80 (" .. Width() .. ")")
 fight = false
+
+-- A faded column is not beside anything.
+for _, button in ipairs(inner.actionButtons) do slotOf[button].alpha = 0 end
+Check(Width() == 38, "the inner column faded: the outer one alone, 38 (" .. Width() .. ")")
+for _, button in ipairs(inner.actionButtons) do slotOf[button].alpha = 1 end
+
+-- Band off: the buttons are the bar's again, and the frame is what is drawn.
+for _, button in ipairs(inner.actionButtons) do button.home = inner end
+Check(Width() == 41, "band off: the inner frame at the edge, 41 (" .. Width() .. ")")
 inner.left, inner.right = 1437, 1473
-Check(Width() == 80, "the fight over and the bar back: 80, read live again (" .. Width() .. ")")
--- No pass yet this session: nothing kept, the live width answers in a fight too.
-B.sideCalm = nil
-fight = true
-Check(Width() == 80, "in a fight with nothing kept: the live width (" .. Width() .. ")")
+Check(Width() == 80, "band off, the frame back: 80 (" .. Width() .. ")")
 
 if failed > 0 then
     print(failed .. " check(s) failed")

@@ -256,20 +256,44 @@ local UNIT_EVENTS = { "UNIT_STATS", "UNIT_ATTACK_POWER", "UNIT_RANGED_ATTACK_POW
     "UNIT_ATTACK_SPEED", "UNIT_RANGEDDAMAGE", "UNIT_ATTACK", "UNIT_RESISTANCES", "UNIT_INVENTORY_CHANGED",
     "UNIT_LEVEL", "UNIT_AURA", "UNIT_MAXHEALTH", "UNIT_MAXPOWER", "UNIT_DISPLAYPOWER", "UNIT_SPELL_HASTE" }
 local EVENTS = { "COMBAT_RATING_UPDATE", "SPELL_POWER_CHANGED", "PLAYER_EQUIPMENT_CHANGED",
-    "PLAYER_AVG_ITEM_LEVEL_UPDATE", "SKILL_LINES_CHANGED", "PLAYER_REGEN_ENABLED", "PET_STATS_UPDATE" }
+    "PLAYER_AVG_ITEM_LEVEL_UPDATE", "SKILL_LINES_CHANGED", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED",
+    "PET_STATS_UPDATE" }
+-- A change while the window is shut, laid as it opens or a fight begins: refreshing a shut sheet on every aura cost
+-- each stealth and every buff in a fight a millisecond.
+local stale = false
 local function QueueStats(_, event, unit)
-    -- UpdateStats' own test, asked first: the doll stays shown while the window is shut (pre-combat numbers).
+    -- UpdateStats' own test, asked first: the doll stays shown while the window is shut.
     if not (PaperDollFrame and PaperDollFrame:IsShown()) then return end
+    if event == "PLAYER_REGEN_DISABLED" then
+        -- Pre-combat numbers for a window opened in the fight.
+        if stale then
+            stale = false
+            UpdateStats()
+        end
+        return
+    end
     -- The pet's changes count only while its view is up.
     if (unit == "pet" or event == "PET_STATS_UPDATE") and not (T.PetView and T.PetView()) then return end
+    if not PaperDollFrame:IsVisible() then
+        stale = true
+        return
+    end
     ns.Sched.Soon("character.stats", UpdateStats)
 end
 local function DollShown() if T.active then UpdateStats(true) end end
+-- The doll stays shown while the window is shut: its window opening is the edge to refresh on, after the show pass.
+local function DollSeen()
+    if stale and T.active then
+        stale = false
+        UpdateStats()
+    end
+end
 
 function T.WatchStats(doll)
     local watcher = ns.EventFrame(UNIT_EVENTS, QueueStats, "player", "pet")
     ns.RegisterEvents(watcher, EVENTS)
     doll:HookScript("OnShow", DollShown)
+    ns.Sched.AfterShow(doll, "character.statsSeen", DollSeen)
 end
 
 -- The pet's right box rows start here in the stat boxes (1.x's pet sheet: 122 in; its first row level with Strength).

@@ -63,6 +63,12 @@ end
 B.SystemMoved = SystemMoved
 ns.SystemMoved = SystemMoved
 
+-- Outside edit mode a bar the layout holds at its default spot is the game's: it re-stacks it at will (stance, target,
+-- fights) and nothing drawn rides it, so its frame stays where the game puts it and the game's own layout runs as without us.
+function B.GameHolds(bar)
+    return bar ~= nil and bar.actionButtons ~= nil and not ns.EditMode.Live() and InDefaultPosition(bar, true) == true
+end
+
 -- Band bars the active layout still holds as the client's own, into list; withPins adds ours (re-pinned for the band's current length).
 local function CollectBandBars(list, withPins)
     if not B.active or not B.art then return list end
