@@ -30,6 +30,8 @@ function ns.FitBottomTab(tab)
     LiftTab(tab)
     local text = tab.Text or (tab.GetFontString and tab:GetFontString())
     if not text then return end
+    -- The game's resize fixes the label to the word it then held: a new one was cut with "...".
+    text:SetWidth(0)
     local pad = eraRows[tab] and ERA_TAB_PAD or tab.fcuiPad or 50
     local width = math.ceil(text:GetStringWidth() or 0) + pad
     tab:SetWidth(width)

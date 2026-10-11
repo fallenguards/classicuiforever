@@ -86,6 +86,9 @@ local SOCIAL_TAB_PAD = 38
 -- Foot tab row, placed from the window's foot; its faces are Era's (Windows/Tabs.lua).
 local SOCIAL_TAB_X = 5          -- first tab: its left from the window's left (+ right)
 local SOCIAL_TAB_Y = 2          -- tab row: its top above the window's foot (+ up; moves the picked tab too)
+-- A row too long for the window (German): the first tab starts further left, then every tab gives up the same padding.
+local TIGHT_TAB_X = 0           -- first tab's left at most this far in (+ right)
+local TIGHT_TAB_PAD = 24        -- least padding a tab keeps round its label
 -- Retail's client has a Who tab of its own (Forever's has none): unseen and off the row while ours stands in it.
 local clientWhoOff = false
 local function ClientWho() return FRIEND_TAB_WHO and _G["FriendsFrameTab" .. FRIEND_TAB_WHO] or nil end
@@ -193,6 +196,25 @@ local function RaidTab()
     if raidTab then ns.SetShownIf(raidTab, ours) end
 end
 
+-- The first tab's left and every tab's padding, so the shown tabs end inside the window.
+local function RowFit(order)
+    local labels, shown = 0, 0
+    for _, entry in ipairs(order) do
+        local text = entry:IsShown() and (entry.Text or entry:GetFontString())
+        if text then
+            labels = labels + math.ceil(text:GetStringWidth() or 0)
+            shown = shown + 1
+        end
+    end
+    local room = FriendsFrame:GetWidth()
+    if shown == 0 or not room or room <= 0 then return SOCIAL_TAB_X, SOCIAL_TAB_PAD end
+    local over = SOCIAL_TAB_X + labels + shown * SOCIAL_TAB_PAD + (shown - 1) * TAB_GAP - room
+    if over <= 0 then return SOCIAL_TAB_X, SOCIAL_TAB_PAD end
+    if over <= SOCIAL_TAB_X - TIGHT_TAB_X then return SOCIAL_TAB_X - over, SOCIAL_TAB_PAD end
+    over = over - (SOCIAL_TAB_X - TIGHT_TAB_X)
+    return TIGHT_TAB_X, math.max(TIGHT_TAB_PAD, SOCIAL_TAB_PAD - math.ceil(over / shown))
+end
+
 function S.PlaceTabs()
     local blizzard = S.FriendsFrameTabs()
     local clientWho = clientWhoOff and ClientWho() or nil
@@ -212,9 +234,10 @@ function S.PlaceTabs()
         if blizzard[i] ~= clientWho and blizzard[i] ~= clientQuick then order[#order + 1] = blizzard[i] end
     end
     -- Five tabs where 1.x had four: 19 either side of the label, not 25.
+    local x, pad = RowFit(order)
     for _, entry in ipairs(order) do
-        if entry.fcuiPad ~= SOCIAL_TAB_PAD then
-            entry.fcuiPad = SOCIAL_TAB_PAD
+        if entry.fcuiPad ~= pad then
+            entry.fcuiPad = pad
             ns.FitBottomTab(entry)
         end
     end
@@ -226,7 +249,7 @@ function S.PlaceTabs()
                 entry:SetPoint("LEFT", previous, "RIGHT", TAB_GAP, 0)
                 entry:SetPoint("BOTTOM", previous, "BOTTOM", 0, 0)
             else
-                entry:SetPoint("TOPLEFT", FriendsFrame, "BOTTOMLEFT", SOCIAL_TAB_X, SOCIAL_TAB_Y)
+                entry:SetPoint("TOPLEFT", FriendsFrame, "BOTTOMLEFT", x, SOCIAL_TAB_Y)
             end
             previous = entry
         end

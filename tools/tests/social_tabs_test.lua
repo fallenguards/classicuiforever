@@ -1,5 +1,6 @@
 -- Offline test under Lua 5.4 for the social window's foot tabs: retail's client has a Who tab of its own, which leaves
--- the row while ours stands in it and comes back when ours goes (Social/SocialWindow.lua).
+-- the row while ours stands in it and comes back when ours goes; a row too long for the window is pulled in to fit
+-- (Social/SocialWindow.lua).
 -- Run from the addon root: lua tools/tests/social_tabs_test.lua (CI runs every tools/tests/*_test.lua).
 -- luacheck: std lua54
 -- luacheck: ignore 111 112 113 121 212
@@ -40,15 +41,20 @@ local Tab = {}
 Tab.__index = Tab
 function Tab:IsShown() return self.shown end
 function Tab:ClearAllPoints() self.after, self.first = nil, nil end
-function Tab:SetPoint(point, rel)
+function Tab:SetPoint(point, rel, _, x)
     if point == "LEFT" then self.after = rel end
-    if point == "TOPLEFT" then self.first = true end
+    if point == "TOPLEFT" then self.first, self.x = true, x end
 end
 function Tab:Show() self.shown = true end
 function Tab:Hide() self.shown = false end
 function Tab:SetScript() end
 function Tab:SetID() end
 function Tab:SetText() end
+-- A label's drawn width, set by the test.
+function Tab:GetFontString()
+    local tab = self
+    return { GetStringWidth = function() return tab.labelWidth or 30 end }
+end
 function Tab:GetID() return self.id end
 function Tab:GetName() return self.name end
 function Tab:EnableMouse(on) self.mouse = on end
@@ -56,7 +62,7 @@ function Tab:EnableMouse(on) self.mouse = on end
 local function NewTab() return setmetatable({ shown = true, mouse = true, alpha = 1 }, Tab) end
 
 local function Social(clientWho)
-    FriendsFrame = {}
+    FriendsFrame = { GetWidth = function() return 338 end }
     for i = 1, 8 do _G["FriendsFrameTab" .. i] = nil end
     FriendsFrameTab1, FriendsFrameTab3, FriendsFrameTab4 = NewTab(), NewTab(), NewTab()
     FriendsFrameTab1.id, FriendsFrameTab1.name = 1, "FriendsFrameTab1"
@@ -130,6 +136,40 @@ do
     Check(_G.ClassicUIForeverRaidTab == nil or _G.ClassicUIForeverRaidTab.shown == false, "switch off: our Raid tab is gone")
     Check(S.whoTab.after == FriendsFrameTab1, "switch off: the client's Friends tab is first again")
     C_SocialUI, SocialUIFrame = nil, nil
+end
+
+------------------------------------------------------------------ a long language's row
+
+-- Shown tabs' right end with the pads the row was given (the tabs overlap 14).
+local function RowEnd(first, tabs)
+    local right = first.x
+    for i, tab in ipairs(tabs) do
+        right = right + tab.labelWidth + tab.fcuiPad + (i > 1 and -14 or 0)
+    end
+    return right
+end
+
+do
+    local S = Social(false)
+    FriendsFrameTab3.shown, FriendsFrameTab4.shown = false, false
+    local row = { FriendsFrameTab1, S.whoTab }
+    FriendsFrameTab1.labelWidth, S.whoTab.labelWidth = 40, 25
+    S.PlaceTabs()
+    Check(FriendsFrameTab1.x == 5 and FriendsFrameTab1.fcuiPad == 38, "a short row keeps Era's start and padding")
+
+    -- 5 + 290 + 2 * 38 - 14 = 357: 19 over the window's 338.
+    FriendsFrameTab1.labelWidth, S.whoTab.labelWidth = 180, 110
+    S.PlaceTabs()
+    Check(FriendsFrameTab1.x == 0, "a long row starts further left")
+    Check(FriendsFrameTab1.fcuiPad < 38 and S.whoTab.fcuiPad == FriendsFrameTab1.fcuiPad, "every tab gives up the same padding")
+    Check(RowEnd(FriendsFrameTab1, row) <= 338, "the long row ends inside the window")
+
+    -- 5 + 273 + 2 * 38 - 14 = 340: 2 over.
+    FriendsFrameTab1.labelWidth, S.whoTab.labelWidth = 163, 110
+    S.PlaceTabs()
+    Check(FriendsFrameTab1.x == 3 and FriendsFrameTab1.fcuiPad == 38,
+        "a row a little too long only starts further left")
+    Check(RowEnd(FriendsFrameTab1, row) <= 338, "that row ends inside the window")
 end
 
 if failed > 0 then

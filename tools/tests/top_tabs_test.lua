@@ -1,5 +1,6 @@
 -- Offline test for the macro window's tabs (Windows/Tabs.lua, Windows/PanelAfters.lua) under Lua 5.4: they follow
 -- Classic Era's TabButtonTemplate and its Blizzard_MacroUI.xml, not the character window's foot tabs turned over.
+-- A foot tab's label is never cut by a width the game fixed for an older word.
 -- Run from the addon root: lua tools/tests/top_tabs_test.lua (CI runs every tools/tests/*_test.lua).
 -- luacheck: std lua54
 -- luacheck: ignore 111 112 113 121 212
@@ -119,6 +120,14 @@ local glow = first.own.glow
 Check(art[glow] == "topTabHighlight" and glow.height == 32, "the hover glow is Era's tab highlight, 32 high")
 Check(#glow.points == 2 and glow.points[1].x == 2 and glow.points[1].y == -8 and glow.points[2].x == 2 and glow.points[2].y == -8,
     "the hover glow spans the tab, 2 right and 8 under its foot")
+
+-- A foot tab's label at its own width: the game's resize had fixed it for the word before, which cut the new one.
+local foot = Tab("FootTab", 60)
+foot.fcuiPad = 38
+foot.Text.width = 40
+ns.FitBottomTab(foot)
+Check(foot.Text.width == 0 and foot.width == 60 + 38,
+    "a foot tab's label is freed from the width the game fixed (" .. tostring(foot.Text.width) .. ", " .. tostring(foot.width) .. ")")
 
 if failed > 0 then
     print(failed .. " check(s) failed")
