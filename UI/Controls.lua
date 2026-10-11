@@ -204,6 +204,34 @@ function ns.DressDropArrow(dropdown)
     return arrow, glow
 end
 
+-- Era's classic dropdown on its sheet: the text holder round the button, the gold arrow at its right, the label
+-- right-aligned against the arrow. The client's own pieces hidden.
+local ERA_HOLDER = { 0.38672, 0.81641, 0.00391, 0.16406 }
+local ERA_ARROW = { 0.80078, 0.89063, 0.17188, 0.25781 }
+local eraDressed = setmetatable({}, { __mode = "k" })
+function ns.EraDropdownArt(dropdown, arrowX, arrowY, labelRight)
+    local holder = ns.OwnTexture(dropdown, "eraHolder", "BACKGROUND", 1)
+    local arrow = ns.OwnTexture(dropdown, "eraArrow", "OVERLAY", 1)
+    if not eraDressed[dropdown] then
+        eraDressed[dropdown] = true
+        if dropdown.Background then dropdown.Background:Hide() end
+        if dropdown.Arrow then dropdown.Arrow:Hide() end
+        ns.SetTex(holder, "dropdownClassic")
+        holder:SetTexCoord(unpack(ERA_HOLDER))
+        ns.SetTex(arrow, "dropdownClassic")
+        arrow:SetTexCoord(unpack(ERA_ARROW))
+        arrow:SetSize(23, 22)
+    end
+    ns.SetTwoPointsIf(holder, "TOPLEFT", dropdown, "TOPLEFT", -9, 8, "BOTTOMRIGHT", dropdown, "BOTTOMRIGHT", 8, -9)
+    ns.SetPointIf(arrow, "TOPRIGHT", dropdown, "TOPRIGHT", arrowX, arrowY)
+    local text = dropdown.Text
+    if text then
+        text:SetJustifyH("RIGHT")
+        ns.SetTwoPointsIf(text, "LEFT", dropdown, "LEFT", 9, 0, "RIGHT", dropdown, "RIGHT", labelRight, 0)
+    end
+    return arrow
+end
+
 function ns.SkinDropdown(dropdown)
     if not dropdown or not Once(dropdown, "dropdown") then return end
     if dropdown.Background then dropdown.Background:SetAlpha(0) end

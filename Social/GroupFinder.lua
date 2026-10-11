@@ -66,9 +66,6 @@ local BROWSE_SHEETS = {
     { key = "eraLfgFrame", tc = { 0, 1, 0.236, 0.5 }, x = 0, y = -121, w = 512, h = 135 },
     { key = "eraLfgFrame", tc = { 0, 1, 0.5, 1 }, x = 0, y = -256, w = 512, h = 256 },
 }
--- Era's classic dropdown on its sheet: the text holder round the button, the gold arrow at its right.
-local HOLDER_COORDS = { 0.38672, 0.81641, 0.00391, 0.16406 }
-local ARROW_COORDS = { 0.80078, 0.89063, 0.17188, 0.25781 }
 -- Role buttons: Era's 48 at a 73 step, 60 down; this client's are 64 (the new player box 84).
 local ROLE_SCALE, ROLE_STEP, ROLE_X, ROLE_Y = 48 / 64, 73, 67, 60
 -- The new player flag drawn as big as a role (its 84 art to the roles' 85 drawn), centred one role step on.
@@ -170,28 +167,10 @@ local function FootPair(left, right, first)
     At(right, FOOT_RIGHT[1], FOOT_Y, FOOT_RIGHT[2], FOOT_H)
 end
 
-local function EraDropdown(dropdown, x, y, width, first, arrowX, arrowY, labelRight)
+local function EraDropdown(dropdown, x, y, width, arrowX, arrowY, labelRight)
     if not dropdown then return end
     At(dropdown, x, y, width, 24)
-    local holder = ns.OwnTexture(dropdown, "eraHolder", "BACKGROUND", 1)
-    local arrow = ns.OwnTexture(dropdown, "eraArrow", "OVERLAY", 1)
-    if first then
-        Hide(dropdown.Background)
-        Hide(dropdown.Arrow)
-        ns.SetTex(holder, "dropdownClassic")
-        holder:SetTexCoord(unpack(HOLDER_COORDS))
-        ns.SetTex(arrow, "dropdownClassic")
-        arrow:SetTexCoord(unpack(ARROW_COORDS))
-        arrow:SetSize(23, 22)
-    end
-    ns.SetTwoPointsIf(holder, "TOPLEFT", dropdown, "TOPLEFT", -9, 8, "BOTTOMRIGHT", dropdown, "BOTTOMRIGHT", 8, -9)
-    PointIf(arrow, "TOPRIGHT", dropdown, "TOPRIGHT", arrowX, arrowY)
-    -- Era's label: right-aligned against the arrow, 9 in from the left.
-    local text = dropdown.Text
-    if text then
-        text:SetJustifyH("RIGHT")
-        ns.SetTwoPointsIf(text, "LEFT", dropdown, "LEFT", 9, 0, "RIGHT", dropdown, "RIGHT", labelRight, 0)
-    end
+    ns.EraDropdownArt(dropdown, arrowX, arrowY, labelRight)
 end
 
 local function PlaceList(page)
@@ -209,9 +188,9 @@ end
 
 local function DressBrowse(page, first)
     EraChrome(page, BROWSE_SHEETS, first)
-    EraDropdown(page.CategoryDropdown, 26, 94, 118, first, CATEGORY_DROPDOWN_ARROW_X, CATEGORY_DROPDOWN_ARROW_Y,
+    EraDropdown(page.CategoryDropdown, 26, 94, 118, CATEGORY_DROPDOWN_ARROW_X, CATEGORY_DROPDOWN_ARROW_Y,
         CATEGORY_DROPDOWN_LABEL_RIGHT)
-    EraDropdown(page.ActivityDropdown, 149, 94, 167, first, ACTIVITY_DROPDOWN_ARROW_X, ACTIVITY_DROPDOWN_ARROW_Y,
+    EraDropdown(page.ActivityDropdown, 149, 94, 167, ACTIVITY_DROPDOWN_ARROW_X, ACTIVITY_DROPDOWN_ARROW_Y,
         ACTIVITY_DROPDOWN_LABEL_RIGHT)
     At(page.RefreshButton, 315, 90, 32, 32)
     PlaceList(page)
