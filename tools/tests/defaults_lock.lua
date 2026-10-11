@@ -189,6 +189,7 @@ return {
     panels = true,
     plainNumbers = false,
     plainQuestItems = false,
+    plateCastBeside = false,
     plateDragons = false,
     plateNameSize = 0,
     platesOneSize = false,

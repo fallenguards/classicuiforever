@@ -17,6 +17,20 @@ local LEVEL_X = -11.5
 local ICON_SIZE = 14
 -- Cast border has no level slot: the left half twice, the second mirrored; the bar runs into the slot's width.
 local CAST_EXTRA = INSET_R - INSET_L
+-- Era's classic cast bar (Blizzard_NamePlateCastingBar, classic style): its own border under the health border, the
+-- icon's slot at its left (the icon 11.5 in), the bar 20.75 in from the left and 3.5 from the right, a half-black
+-- backing, the old spark; 4 between the health and cast boxes. Cast bar: icon beside it gives ours before back.
+local ERA_CAST_GAP, ERA_ICON_X = 4, 11.5
+-- The game's "cast at you" highlight, hugging Era's bar: 1.5 out at the sides, 1 above, 2.25 below (the modern look's 4).
+local AIM_X, AIM_TOP, AIM_BOTTOM, CLIENT_AIM = 1.5, 1, 2.25, 4
+local CAST_SPARK, CAST_SPARK_SIZE = "Interface\\CastingBar\\UI-CastingBar-Spark", 32
+-- Era's shield on a cast that cannot be interrupted: the old small shield around the bar, the icon kept.
+local SHIELD_L, SHIELD_T, SHIELD_R, SHIELD_B = 20, 11, 13, 13
+-- Era brightens the fill of the target's plate and the moused-over one: the fill's own file added at a quarter.
+local GLOW = { own = "glow", layer = "OVERLAY", sublevel = 0, blend = "ADD", alpha = 0.25, fill = true }
+-- Under the icon and text (OVERLAY 1) as Era's (OVERLAY -1): its icon slot is filled art.
+local CAST_BORDER = { own = "castBorder", layer = "OVERLAY", sublevel = -1, coords = { 0, 1, 0.5, 1 }, point = "TOPLEFT",
+    x = -INSET_R, y = INSET_T, point2 = "BOTTOMRIGHT", x2 = INSET_L, y2 = -INSET_B, show = true }
 
 local FULL = { 0, 1, 0, 1 }
 local BORDER = { own = "border", layer = "OVERLAY", sublevel = 2, coords = { 0, 1, 0.5, 1 }, point = "TOPLEFT", x = -INSET_L, y = INSET_T,
@@ -27,15 +41,18 @@ local BORDER_R = { own = "borderR", layer = "OVERLAY", sublevel = 2, w = BORDER_
     point = "TOPRIGHT", x = INSET_L, y = INSET_T, show = true }
 local BAR_FILL = { coords = FULL }
 local HEALTH_ART = { "bgTexture", "selectedBorder", "deselectedOverlay", "Text", "LeftText", "RightText" }
-local BADGES = { "LevelFrame", "PlayerLevelDiffFrame", "ClassificationFrame" }
+-- The client's classic-style glow too: ours shows in every style, theirs would add to it.
+local BADGES = { "LevelFrame", "PlayerLevelDiffFrame", "ClassificationFrame", "selectionHighlight" }
 local CAST_ART = { "Background", "Border" }
 local PLATE_EVENTS = { "NAME_PLATE_UNIT_ADDED", "NAME_PLATE_UNIT_REMOVED",
     "UNIT_LEVEL", "PLAYER_TARGET_CHANGED", "UNIT_FACTION", "UNIT_FLAGS",
     "PLAYER_FOCUS_CHANGED", "DISPLAY_SIZE_CHANGED", "UI_SCALE_CHANGED", "CVAR_UPDATE",
     "UNIT_SPELLCAST_START", "UNIT_SPELLCAST_STOP", "UNIT_SPELLCAST_CHANNEL_START",
-    "UNIT_SPELLCAST_CHANNEL_STOP", "UNIT_SPELLCAST_INTERRUPTED" }
+    "UNIT_SPELLCAST_CHANNEL_STOP", "UNIT_SPELLCAST_INTERRUPTED", "UNIT_SPELLCAST_NOT_INTERRUPTIBLE",
+    "UNIT_SPELLCAST_INTERRUPTIBLE", "UPDATE_MOUSEOVER_UNIT" }
 local CAST_EVENTS = { UNIT_SPELLCAST_START = true, UNIT_SPELLCAST_STOP = true, UNIT_SPELLCAST_CHANNEL_START = true,
-    UNIT_SPELLCAST_CHANNEL_STOP = true, UNIT_SPELLCAST_INTERRUPTED = true }
+    UNIT_SPELLCAST_CHANNEL_STOP = true, UNIT_SPELLCAST_INTERRUPTED = true, UNIT_SPELLCAST_NOT_INTERRUPTIBLE = true,
+    UNIT_SPELLCAST_INTERRUPTIBLE = true }
 
 -- The game's nameplate Size (Small..Huge) one classic-style step up: Forever's default (Small) draws Era's (Medium).
 local SIZE_CVAR = "nameplateSize"
@@ -58,16 +75,98 @@ local skinned = setmetatable({}, { __mode = "k" })
 
 local Forbidden = ns.IsForbidden
 
+-- The settings sample plate's "preview" token makes the lookup error: that is no plate.
+local function PlateFor(unitToken)
+    if not (C_NamePlate and C_NamePlate.GetNamePlateForUnit) then return nil end
+    local ok, plate = pcall(C_NamePlate.GetNamePlateForUnit, unitToken)
+    return ok and plate and plate.UnitFrame or nil
+end
+
 -- Border sheet around a bar, above its fill.
 local function Border(bar)
     return (DressNew(bar, "nameplateBorder", BORDER))
 end
 
 local function CastBorder(bar)
-    if bar.fcui and bar.fcui.border then bar.fcui.border:Hide() end
+    local own = bar.fcui
+    if own and own.border then own.border:Hide() end
+    if own and own.castBorder then own.castBorder:Hide() end
     local left = DressNew(bar, "nameplateBorder", BORDER_L)
     DressNew(bar, "nameplateBorder", BORDER_R)
     return left
+end
+
+local function EraCastBorder(bar)
+    local own = bar.fcui
+    for _, key in ipairs({ "border", "borderL", "borderR" }) do
+        if own and own[key] then own[key]:Hide() end
+    end
+    return DressNew(bar, "nameplateCastBorder", CAST_BORDER)
+end
+
+local function OldCast() return ns.db.plateCastBeside == true end
+
+-- The client's spark (its pip) to the old spark and back; what it had kept to give back.
+local sparkWas = setmetatable({}, { __mode = "k" })
+local function OldSpark(cast, on)
+    local spark = cast.Spark
+    if not spark then return end
+    if on then
+        if not sparkWas[spark] then sparkWas[spark] = { spark:GetAtlas(), spark:GetWidth(), spark:GetHeight() } end
+        spark:SetTexture(CAST_SPARK)
+        spark:SetSize(CAST_SPARK_SIZE, CAST_SPARK_SIZE)
+    elseif sparkWas[spark] then
+        local was = sparkWas[spark]
+        sparkWas[spark] = nil
+        if was[1] and not IsSecret(was[1]) then spark:SetAtlas(was[1]) end
+        spark:SetSize(was[2], was[3])
+    end
+end
+
+-- The client's shield (a badge in the icon's place) to Era's around the bar and back. A plate's shield cannot be
+-- measured (restricted region): set blind, given back as the client's own setup lays it.
+local CLIENT_SHIELD, CLIENT_SHIELD_W, CLIENT_SHIELD_H = "nameplates-InterruptShield", 10, 12
+local shieldTaken = setmetatable({}, { __mode = "k" })
+local function EraShield(cast, on)
+    local shield = cast.BorderShield
+    if not shield then return end
+    if on then
+        shieldTaken[shield] = true
+        Dress(shield, "castSmallShield", BAR_FILL)
+        shield:SetSize(0, 0)
+        shield:ClearAllPoints()
+        shield:SetPoint("TOPLEFT", cast, "TOPLEFT", -SHIELD_L, SHIELD_T)
+        shield:SetPoint("BOTTOMRIGHT", cast, "BOTTOMRIGHT", SHIELD_R, -SHIELD_B)
+    elseif shieldTaken[shield] then
+        shieldTaken[shield] = nil
+        ns.UntintBronze(shield)
+        ns.UnswapBronze(shield)
+        shield:SetAtlas(CLIENT_SHIELD)
+        local setup = _G.NamePlateSetupOptions
+        shield:SetSize(setup and setup.castBarShieldWidth or CLIENT_SHIELD_W,
+            setup and setup.castBarShieldHeight or CLIENT_SHIELD_H)
+        shield:ClearAllPoints()
+        if cast.Icon then shield:SetPoint("RIGHT", cast.Icon, "RIGHT", 0, 0) end
+    end
+end
+
+-- Era's glow on the target's plate and the moused-over one, looked up afresh for each pass.
+local glowTarget, glowOver
+local function GlowPlate(unitFrame)
+    local glow = ns.Path(unitFrame, "HealthBarsContainer", "healthBar", "fcui", "glow")
+    if glow then glow:SetShown(unitFrame == glowTarget or unitFrame == glowOver) end
+end
+
+local function LookGlows()
+    glowTarget, glowOver = PlateFor("target"), PlateFor("mouseover")
+end
+
+local function Glow(unitFrame, health)
+    local fill = health.barTexture or health:GetStatusBarTexture()
+    if not fill then return end
+    DressNew(health, "barFill", GLOW, fill):SetIgnoreParentAlpha(true)
+    LookGlows()
+    GlowPlate(unitFrame)
 end
 
 local function ShadedFill(bar)
@@ -141,7 +240,8 @@ local function LayChain(unitFrame, castContainer, container, health)
     ns.SetSizeIf(castContainer, BAR_W, BAR_H)
     ns.SetPointIf(castContainer, "BOTTOM", unitFrame, "BOTTOM", 0, INSET_B)
     ns.SetSizeIf(container, BAR_W, BAR_H)
-    ns.SetPointIf(container, "BOTTOM", castContainer, "TOP", 0, INSET_T + BORDER_GAP + INSET_B)
+    ns.SetPointIf(container, "BOTTOM", castContainer, "TOP", 0,
+        OldCast() and INSET_T + BORDER_GAP + INSET_B or ERA_CAST_GAP)
     ns.SetTwoPointsIf(health, "TOPLEFT", container, "TOPLEFT", 0, 0, "BOTTOMRIGHT", container, "BOTTOMRIGHT", 0, 0)
 end
 
@@ -152,7 +252,9 @@ local castCut = setmetatable({}, { __mode = "k" })
 local function LayCast(castContainer, unitFrame)
     local cast = castContainer.castBar
     if not cast then return end
-    ns.SetTwoPointsIf(cast, "TOPLEFT", castContainer, "TOPLEFT", 0, 0, "BOTTOMRIGHT", castContainer, "BOTTOMRIGHT", CAST_EXTRA, 0)
+    local old = OldCast()
+    ns.SetTwoPointsIf(cast, "TOPLEFT", castContainer, "TOPLEFT", old and 0 or CAST_EXTRA, 0, "BOTTOMRIGHT", castContainer,
+        "BOTTOMRIGHT", CAST_EXTRA, 0)
     ShadedFill(cast)
     -- 1.x yellow cast, green channel, red and full once interrupted (on our own 0 to 1: its range is secret).
     if castCut[unitFrame] then
@@ -165,11 +267,28 @@ local function LayCast(castContainer, unitFrame)
     else
         ns.SetBarColorIf(cast, 1, 0.7, 0)
     end
-    local castBorder = CastBorder(cast)
+    local castBorder = old and CastBorder(cast) or EraCastBorder(cast)
     FadeKeys(cast, CAST_ART)
+    local back = ns.OwnTexture(cast, "castBack", "BACKGROUND", -1)
+    back:SetColorTexture(0, 0, 0, 0.5)
+    back:SetAllPoints(cast)
+    back:SetShown(not old)
+    OldSpark(cast, not old)
+    EraShield(cast, not old)
+    local aim = cast.CastTargetIndicator
+    if aim then
+        local x, top, bottom = old and CLIENT_AIM or AIM_X, old and CLIENT_AIM or AIM_TOP, old and CLIENT_AIM or AIM_BOTTOM
+        ns.SetTwoPointsIf(aim, "TOPLEFT", cast, "TOPLEFT", -x, top, "BOTTOMRIGHT", cast, "BOTTOMRIGHT", x, -bottom)
+    end
     if cast.Icon then
         ns.SetSizeIf(cast.Icon, ICON_SIZE, ICON_SIZE)
-        ns.SetPointIf(cast.Icon, "RIGHT", castBorder, "LEFT", -1, 0)
+        if old then
+            ns.SetPointIf(cast.Icon, "RIGHT", castBorder, "LEFT", -1, 0)
+        else
+            ns.SetPointIf(cast.Icon, "CENTER", castBorder, "LEFT", ERA_ICON_X, 0)
+            -- Era keeps the icon on a cast that cannot be interrupted; the client's own style hides it.
+            if cast.showIcon ~= false and (cast.casting or cast.channeling) then cast.Icon:Show() end
+        end
     end
     if cast.Text then
         ns.SetPointIf(cast.Text, "CENTER", cast, "CENTER", 0, 0)
@@ -199,7 +318,8 @@ end
 ns.PLATE_NAME_MIN, ns.PLATE_NAME_MAX = -6, 6
 
 -- Era's plate name: Friz 10 at the plate's size, no outline, no shadow (Forever's is 17.5, outlined and shadowed).
-local ERA_NAME_SIZE = 10
+-- Era draws it from SystemFont_NamePlate's own 9, stretched to that height: about 2% wider and softer than a true 10.
+local ERA_NAME_SIZE, ERA_NAME_FONT = 10, 9
 
 -- The size the client shows (Classic fonts: Era's at the plate's size) plus the player's offset in points. The client's
 -- size is read off the name itself (it scales plate fonts on its own): any other than the one we last set is its new one.
@@ -212,7 +332,13 @@ local function NameSize(name, own)
     local want = math.max(6, base + (tonumber(ns.db.plateNameSize) or 0))
     local wantFlags = classic and (flags or ""):gsub("THICKOUTLINE", ""):gsub("OUTLINE", ""):gsub("^[,%s]+", "")
         :gsub("[,%s]+$", ""):gsub(",%s*,", ",") or flags
-    if math.abs(size - want) > 0.05 or flags ~= wantFlags then name:SetFont(file, want, wantFlags) end
+    -- The drawn base first, then the height: a later SetFont does not undo a stretch (the client reads back the height).
+    local drawn = classic and ERA_NAME_FONT or want
+    if math.abs(size - want) > 0.05 or flags ~= wantFlags or own.nameFont ~= drawn then
+        name:SetFont(file, drawn, wantFlags)
+        name:SetTextHeight(want)
+        own.nameFont = drawn
+    end
     own.nameSet = want
 end
 
@@ -233,6 +359,7 @@ local function Layout(unitFrame)
     LayChain(unitFrame, castContainer, container, health)
 
     ShadedFill(health)
+    Glow(unitFrame, health)
     NP.ClassColor(unitFrame)
     local border = Border(health)
     FadeKeys(health, HEALTH_ART)
@@ -278,13 +405,6 @@ local function SkinPlate(unitFrame)
     if not NP.active or Forbidden(unitFrame) then return end
     skinned[unitFrame] = true
     Layout(unitFrame)
-end
-
--- The settings sample plate's "preview" token makes the lookup error: that is no plate.
-local function PlateFor(unitToken)
-    if not (C_NamePlate and C_NamePlate.GetNamePlateForUnit) then return nil end
-    local ok, plate = pcall(C_NamePlate.GetNamePlateForUnit, unitToken)
-    return ok and plate and plate.UnitFrame or nil
 end
 
 local function LivePlate(unit)
@@ -438,6 +558,9 @@ local function OnEvent(_, event, unit, _, _, interruptedBy)
     elseif event == "UNIT_LEVEL" then
         local unitFrame = LivePlate(unit)
         if unitFrame then UpdateLevel(unitFrame) end
+    elseif event == "UPDATE_MOUSEOVER_UNIT" then
+        LookGlows()
+        EachPlate(GlowPlate)
     elseif CAST_EVENTS[event] then
         -- Cast start or stop re-lays only that plate's chain and cast bar; a channel's stop names who interrupted it.
         local unitFrame = unit and PlateFor(unit)
@@ -487,6 +610,10 @@ local function Restore()
         if unitFrame.CastBarsContainer then unitFrame.CastBarsContainer:SetScale(1) end
         local health = ns.Path(unitFrame, "HealthBarsContainer", "healthBar")
         local cast = ns.Path(unitFrame, "CastBarsContainer", "castBar")
+        if cast then
+            OldSpark(cast, false)
+            EraShield(cast, false)
+        end
         for _, bar in pairs({ health, cast }) do
             if bar.fcui then
                 for _, tex in pairs(bar.fcui) do tex:Hide() end
@@ -503,11 +630,15 @@ end
 
 ns.RegisterModule("namePlates", { apply = Apply, restore = Restore })
 
--- Elite dragons turn at once, in a fight too.
+-- Elite dragons and the cast bar's look turn at once, in a fight too.
 ns.OnToggle(function(key)
-    if key ~= "plateDragons" or not NP.active then return end
-    EachPlate(function(unitFrame)
-        local _, health = Pieces(unitFrame)
-        if health then UpdateDragon(unitFrame, health) end
-    end)
+    if not NP.active then return end
+    if key == "plateDragons" then
+        EachPlate(function(unitFrame)
+            local _, health = Pieces(unitFrame)
+            if health then UpdateDragon(unitFrame, health) end
+        end)
+    elseif key == "plateCastBeside" then
+        EachPlate(CastLayout)
+    end
 end)

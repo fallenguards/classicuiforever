@@ -77,4 +77,5 @@ return {
     mapOptions = "on for everyone: Map Options at the classic map's foot opens the game's own filter menu, hidden before",
     mapOptionsHover = "same for everyone: off by default; a second pick beside shown",
     mapOptionsHidden = "same for everyone: off by default; the filter hidden as before, a third pick",
+    plateCastBeside = "on for everyone, a restyle: Era's nameplate cast bar (#121); checked gives the old one back",
 }

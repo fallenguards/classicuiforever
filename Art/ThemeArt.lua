@@ -14,6 +14,7 @@ EraLFGFrame
 HelpFrameTab-Active
 HelpFrameTab-Inactive
 MailItemBorder
+Nameplate-Border-Castbar
 Nameplate-Border
 NumericThreatBorder
 PetHappinessFaces

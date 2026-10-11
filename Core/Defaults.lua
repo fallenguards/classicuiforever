@@ -131,6 +131,7 @@ ns.DB_DEFAULTS = {
     hoverBothNumbers = true,
     classColorPlates = false,
     plateDragons = false,
+    plateCastBeside = false,
     mapFade = false,
     welcomeNote = true,
     addonMessages = true,

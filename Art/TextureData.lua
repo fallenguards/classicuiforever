@@ -82,6 +82,7 @@ ns.TEX = {
     trackingBorder = "!EraMinimapTrackingBorder",
     -- The client's copy is a wider redraw; ours is the 128x32 original.
     nameplateBorder = "!Nameplate-Border",
+    nameplateCastBorder = "Tooltips\\Nameplate-Border-Castbar",
     questTrackerButtons = "Buttons\\QuestTrackerButtons",
     barFill = "TargetingFrame\\UI-TargetingFrame-BarFill",
     -- The client's copies are near-black stand-ins; ours are the Era originals.

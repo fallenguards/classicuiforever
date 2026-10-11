@@ -126,6 +126,8 @@ ns.TOGGLES = {
     { "namePlates", L["OPT_namePlates"], L["OPT_namePlates_TIP"], group = L["GROUP_NAMEPLATES"] },
     { "classColorPlates", L["OPT_classColorPlates"], L["OPT_classColorPlates_TIP"], parent = "namePlates" },
     { "plateDragons", L["OPT_plateDragons"], L["OPT_plateDragons_TIP"], parent = "namePlates", search = "elite rare dragon gold silver" },
+    { "plateCastBeside", L["OPT_plateCastBeside"], L["OPT_plateCastBeside_TIP"], parent = "namePlates",
+        search = "cast bar icon spell nameplate old gap" },
     { "fullPlates", L["OPT_fullPlates"], L["OPT_fullPlates_TIP"] },
     { "platesOneSize", L["OPT_platesOneSize"], L["OPT_platesOneSize_TIP"], search = "scale distance target bigger" },
     { "hideLastNames", L["OPT_hideLastNames"], L["OPT_hideLastNames_TIP"] },
