@@ -13,14 +13,19 @@ local BAR_W, BAR_H = 137, 13
 local SKILL_BLUE = { 0, 0, 0.5 }
 local SKILL_COORDS, REP_COORDS = { 0, 1, 0, 0.5 }, { 0, 1, 0, 1 }
 -- Row pitch is not ours to set (SkinListFrame): lists scale to the old pitch, contents by 1/scale.
--- Skills 30+3 to 19+1. Reputation: Forever's rows are 30 high and take 0.76; retail's are 22 (its own XML), so the
+-- Skills 30+3 to Era's 18. Reputation: Forever's rows are 30 high and take 0.76; retail's are 22 (its own XML), so the
 -- same scale packed them 6 tighter than their plates: retail's scale gives the same pitch.
 local RETAIL = not ns.OnForever()
-local SKILL_LIST_SCALE = 20 / 33
+local SKILL_LIST_SCALE = 18 / 33
+-- The list's left in the window, and the client's padding and a skill's indent in the list (a sub header's skill 46).
+local LIST_X, LIST_PAD, SKILL_INDENT, SUB_SKILL_INDENT = 12, 10, 2, 46
+-- Era's skill bar (SkillFrame.xml): 271 wide, 36 in from our art (Era's art stands 2 further in).
+local SKILL_BAR_X, SKILL_BAR_W = 36, 271
 local REP_LIST_SCALE = RETAIL and 0.76 * 30 / 22 or 0.76
 
 local FULL = { 0, 1, 0, 1 }
 local SKILL_BORDER = { own = "border", layer = "BORDER", coords = FULL, point = "LEFT", x = -5, point2 = "RIGHT", x2 = 5, h = 32, show = true }
+local SKILL_GLOW = { own = "glow", layer = "ARTWORK", coords = FULL, point = "LEFT", x = -5, point2 = "RIGHT", x2 = 5, h = 32, blend = "ADD" }
 -- Name plate and bar frame in one strip from 126 left of the bar; right cap cut above a stray mark.
 local REP_PLATE = {
     { own = "plateLeft", layer = "BORDER", sublevel = 0, key = "repPlate", coords = PLATE_L, w = 256, h = 21, point = "TOPLEFT", x = -126, y = 4, show = true },
@@ -60,6 +65,18 @@ end
 
 local function CurrencyRowClick(row)
     if ns.CurrencyRowClicked then ns.CurrencyRowClicked(row) end
+end
+
+-- Era's border glow on the skill under the mouse and the picked one: when the client lights the row's backing (faded).
+local function Lit(content)
+    local alpha = content.BackgroundHighlight:GetAlpha()
+    return not ns.IsSecret(alpha) and alpha > 0
+end
+
+local function SkillRowLit(row)
+    local content = T.active and row.Content
+    local bar = content and content.SkillsBar
+    if bar then ns.OwnTexture(bar, "glow"):SetShown(Lit(content)) end
 end
 
 -- The client sizes a bar's fill once, as a share of the width it had then; ours can be re-anchored wider after (the skill
@@ -113,9 +130,10 @@ local function SkinListEntry(row, barKey)
     Take(bar, "size", "points")
     bar:ClearAllPoints()
     if skills then
-        bar:SetPoint("LEFT", row, "LEFT", 20, 0)
-        bar:SetPoint("RIGHT", row, "RIGHT", -8, 0)
-        bar:SetHeight(15)
+        -- At Era's spot whatever the client's indent; a sub header's skill ends where the others do.
+        local extra = (row.elementData and row.elementData.isChild) and (SUB_SKILL_INDENT - SKILL_INDENT) * SKILL_LIST_SCALE or 0
+        bar:SetPoint("LEFT", row, "LEFT", SKILL_BAR_X - LIST_X - (LIST_PAD + SKILL_INDENT) * SKILL_LIST_SCALE, 0)
+        bar:SetSize(SKILL_BAR_W - extra, 15)
     else
         bar:SetSize(BAR_W - inset, BAR_H)
         -- One column of bars: an indented row's would run past the window.
@@ -193,6 +211,10 @@ local function SkinListEntry(row, barKey)
         name:SetPoint("LEFT", bar, "LEFT", 6, 1)
         name:SetWidth(0)
         Own(ns.DressNew(bar, "skillsBarBorder", SKILL_BORDER))
+        if content.BackgroundHighlight then
+            Own(ns.DressNew(bar, "skillsBarBorderHighlight", SKILL_GLOW)):SetShown(Lit(content))
+            ns.HookMethod(row, "RefreshBackgroundHighlightOpacity", SkillRowLit)
+        end
         if bar.Text then
             Take(bar.Text, "font", "width", "points", "justify")
             bar.Text:SetFontObject("GameFontHighlightSmall")
@@ -407,7 +429,7 @@ end
 local function AnchorList(box, k, bottom)
     local s = k or 1
     if k then box:SetScale(k) end
-    box:SetPoint("TOPLEFT", CharacterFrame, "TOPLEFT", 12 / s, -76 / s)
+    box:SetPoint("TOPLEFT", CharacterFrame, "TOPLEFT", LIST_X / s, -76 / s)
     box:SetPoint("BOTTOMRIGHT", CharacterFrame, "BOTTOMRIGHT", -66 / s, bottom / s)
 end
 
