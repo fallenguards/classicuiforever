@@ -39,6 +39,48 @@ local function TipTitle(row) return row.tip end
 local function TipDetail(row) return row.tip2 end
 local STAT_TIP = { text = TipTitle, r = 1, g = 1, b = 1, lines = { { TipDetail, nil, nil, nil, true } } }
 
+-- Era's Damage tooltip (CharacterDamageFrame_OnEnter): each hand's attack speed, damage and damage per second.
+local hands = { main = {}, off = {} }
+local LABEL_R, LABEL_G, LABEL_B = 1, 0.82, 0
+
+-- Era's numbers for one hand (PaperDollFrame_SetDamage): the range before bonuses, the bonuses after it, and DPS.
+local function FillHand(hand, low, high, speed, pos, neg, percent)
+    if percent == 0 then
+        low, high = 0, 0
+    else
+        low, high = low / percent - pos - neg, high / percent - pos - neg
+    end
+    local full = ((low + high) * 0.5 + pos + neg) * percent
+    local text = string.format("%d - %d", math.max(math.floor(low), 1), math.max(math.ceil(high), 1))
+    if pos > 0 then text = text .. GREEN .. " +" .. pos .. "|r" end
+    if neg < 0 then text = text .. RED .. " " .. neg .. "|r" end
+    if percent ~= 1 then
+        text = text .. (percent > 1 and GREEN or RED) .. " x" .. math.floor(percent * 100 + 0.5) .. "%|r"
+    end
+    hand.speed, hand.damage, hand.dps = speed, text, speed == 0 and 0 or math.max(full, 1) / speed
+end
+
+local function HandLines(hand)
+    GameTooltip:AddDoubleLine(ATTACK_SPEED_COLON or "Attack Speed (seconds):", string.format("%.2f", hand.speed),
+        LABEL_R, LABEL_G, LABEL_B, 1, 1, 1)
+    GameTooltip:AddDoubleLine(DAMAGE_COLON or "Damage:", hand.damage, LABEL_R, LABEL_G, LABEL_B, 1, 1, 1)
+    GameTooltip:AddDoubleLine(DAMAGE_PER_SECOND or "Damage per Second", string.format("%.1f", hand.dps),
+        LABEL_R, LABEL_G, LABEL_B, 1, 1, 1)
+end
+
+local function DamageTip(row)
+    if not hands.main.speed then return ns.ShowTip(row) end
+    GameTooltip:SetOwner(row, "ANCHOR_RIGHT")
+    GameTooltip:SetText(INVTYPE_WEAPONMAINHAND or "Main Hand", 1, 1, 1)
+    HandLines(hands.main)
+    if hands.off.speed then
+        GameTooltip:AddLine(" ")
+        GameTooltip:AddLine(INVTYPE_WEAPONOFFHAND or "Off Hand", 1, 1, 1)
+        HandLines(hands.off)
+    end
+    GameTooltip:Show()
+end
+
 local function StatRow(parent, label, anchor, relPoint, x, y)
     local row = ns.NewFrame("Frame", nil, parent)
     row:SetSize(104, 13)
@@ -90,9 +132,10 @@ local function Dashes()
         row.value:SetText("--")
         row.tip, row.tip2 = statLabels[i], nil
     end
-    for _, row in ipairs({ T.armor, T.attack, T.attackPower, T.damage, T.rangedAttack, T.rangedPower, T.rangedDamage, T.spellBonus }) do
+    for _, row in ipairs({ T.armor, T.attack, T.attackPower, T.damage, T.rangedAttack, T.rangedPower, T.rangedDamage, T.defense }) do
         row.value:SetText("--")
     end
+    hands.main.speed, hands.off.speed = nil, nil
     T.armor.tip, T.armor.tip2 = ARMOR_NAME, nil
     for _, res in ipairs(T.resistances) do res.value:SetText("--") end
 end
@@ -139,13 +182,25 @@ local function UpdateStats(opening)
         T.attackPower.value:SetText(Buffed(base, pos, neg))
     end
     do
-        local minDamage, maxDamage = UnitDamage(unit)
-        minDamage, maxDamage = Number(minDamage), Number(maxDamage)
-        T.damage.value:SetText(string.format("%d - %d", math.max(math.floor(minDamage), 1), math.max(math.ceil(maxDamage), 1)))
+        local low, high, offLow, offHigh, pos, neg, percent = UnitDamage(unit)
+        T.damage.value:SetText(string.format("%d - %d", math.max(math.floor(Number(low)), 1), math.max(math.ceil(Number(high)), 1)))
+        local speed, offSpeed = _G.UnitAttackSpeed(unit)
+        if type(speed) ~= "number" or type(low) ~= "number"
+            or ns.AnySecret(speed, offSpeed, low, high, offLow, offHigh, pos, neg, percent) then
+            hands.main.speed, hands.off.speed = nil, nil
+        else
+            pos, neg, percent = pos or 0, neg or 0, percent or 1
+            FillHand(hands.main, low, high, speed, pos, neg, percent)
+            hands.off.speed = nil
+            if offSpeed then FillHand(hands.off, offLow or 0, offHigh or 0, offSpeed, pos, neg, percent) end
+        end
     end
-    -- The pet's spell bonus (its sheet's third right row).
-    if unit == "pet" and GetPetSpellBonusDamage then
-        T.spellBonus.value:SetText(WHITE .. Number(GetPetSpellBonusDamage()) .. "|r")
+    -- Defense: the pet's sheet only (Forever's call is UnitDefenseSkill, Era's UnitDefense).
+    local defense = unit == "pet" and (UnitDefenseSkill or UnitDefense)
+    if defense then
+        local base, mod = defense(unit)
+        mod = Number(mod)
+        T.defense.value:SetText(Buffed(base, math.max(mod, 0), math.min(mod, 0)))
     end
     -- Ranged: only with a ranged weapon or wand in hand; the pet has none.
     local hasRanged = unit == "player" and CharacterRangedSlot and CharacterRangedSlot:IsShown()
@@ -219,12 +274,13 @@ function T.BuildStats(doll)
     T.rangedAttack = StatRow(attrs, RANGED_ATTACK or "Ranged Attack", T.damage, "BOTTOMLEFT", 0, -6)
     T.rangedPower = StatRow(attrs, ATTACK_POWER or "Power", T.rangedAttack, "BOTTOMLEFT", 0, 1)
     T.rangedDamage = StatRow(attrs, DAMAGE or "Damage", T.rangedPower, "BOTTOMLEFT", 0, 1)
-    T.spellBonus = StatRow(attrs, SPELL_BONUS or "Spell Bonus", T.damage, "BOTTOMLEFT", 0, 0)
-    T.spellBonus.tip = SPELL_BONUS or "Spell Bonus"
-    T.spellBonus:Hide()
+    T.defense = StatRow(attrs, DEFENSE or "Defense", T.damage, "BOTTOMLEFT", 0, -1)
+    T.defense.tip = DEFENSE or "Defense"
+    T.defense:Hide()
     T.attack.tip = MELEE_ATTACK or "Melee Attack"
     T.attackPower.tip = MELEE_ATTACK_POWER or "Attack Power"
     T.damage.tip = DAMAGE or "Damage"
+    T.damage:SetScript("OnEnter", DamageTip)
     T.rangedAttack.tip = RANGED_ATTACK or "Ranged Attack"
     T.rangedPower.tip = RANGED_ATTACK_POWER or "Ranged Attack Power"
     T.rangedDamage.tip = DAMAGE or "Damage"
@@ -296,24 +352,32 @@ function T.WatchStats(doll)
     ns.Sched.AfterShow(doll, "character.statsSeen", DollSeen)
 end
 
--- The pet's right box rows start here in the stat boxes (1.x's pet sheet: 122 in; its first row level with Strength).
-local PET_ROWS_X = 122
-local PET_ROWS_Y = -3
+-- Era's pet sheet: Attack, Attack Power, Damage, Defense and Armor in the right box from 122 in and 5 down, one under
+-- the next; the attributes start level with them. The character's first attribute row stands 3 down.
+local PET_ROWS_X, PET_ROWS_Y, PET_ROW_GAP = 122, -5, -1
+local CHAR_ROWS_Y = -3
 
--- Rows for the view up: the pet's right box holds power, damage, spell bonus and armor level with the attributes, no
--- heads or indent (its 1.x sheet); the character's has melee and ranged boxes, armor under the attributes.
+-- Rows for the view up: the pet's one right box, no heads; the character's melee and ranged boxes, armor under the
+-- attributes.
 function T.PetStatRows(pet)
     if not T.attrs then return end
     local attrs = T.attrs
     for _, pieces in ipairs(T.charBoxes) do BoxShown(pieces, not pet) end
     BoxShown(T.petBox, pet)
-    for _, row in ipairs({ T.attack, T.rangedAttack, T.rangedPower, T.rangedDamage }) do ns.SetShownIf(row, not pet) end
-    ns.SetShownIf(T.spellBonus, pet)
+    for _, row in ipairs({ T.rangedAttack, T.rangedPower, T.rangedDamage }) do ns.SetShownIf(row, not pet) end
+    local defense = pet and (UnitDefenseSkill or UnitDefense) ~= nil
+    ns.SetShownIf(T.defense, defense)
+    local attack = pet and (ATTACK or "Attack") or (MELEE_ATTACK or "Melee Attack")
+    T.attack.label:SetText(attack)
+    T.attack.tip = attack
+    ns.SetPointOnce(T.attributes[1], "TOPLEFT", attrs, "TOPLEFT", 6, pet and PET_ROWS_Y or CHAR_ROWS_Y)
     if pet then
-        ns.SetPointOnce(T.attackPower, "TOPLEFT", attrs, "TOPLEFT", PET_ROWS_X, PET_ROWS_Y)
-        ns.SetPointOnce(T.damage, "TOPLEFT", T.attackPower, "BOTTOMLEFT", 0, 0)
-        ns.SetPointOnce(T.armor, "TOPLEFT", T.spellBonus, "BOTTOMLEFT", 0, 0)
+        ns.SetPointOnce(T.attack, "TOPLEFT", attrs, "TOPLEFT", PET_ROWS_X, PET_ROWS_Y)
+        ns.SetPointOnce(T.attackPower, "TOPLEFT", T.attack, "BOTTOMLEFT", 0, PET_ROW_GAP)
+        ns.SetPointOnce(T.damage, "TOPLEFT", T.attackPower, "BOTTOMLEFT", 0, PET_ROW_GAP)
+        ns.SetPointOnce(T.armor, "TOPLEFT", defense and T.defense or T.damage, "BOTTOMLEFT", 0, PET_ROW_GAP)
     else
+        ns.SetPointOnce(T.attack, "TOPLEFT", attrs, "TOPLEFT", 122, -2)
         ns.SetPointOnce(T.attackPower, "TOPLEFT", T.attack, "BOTTOMLEFT", 0, 1)
         ns.SetPointOnce(T.damage, "TOPLEFT", T.attackPower, "BOTTOMLEFT", 0, 1)
         ns.SetPointOnce(T.armor, "TOPLEFT", T.attributes[#T.attributes], "BOTTOMLEFT", 0, 0)
