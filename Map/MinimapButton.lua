@@ -167,14 +167,16 @@ local function HookMap()
     ns.HookMethod(Minimap, "SetSize", PositionAll)
 end
 
--- A ring button's look on a 32 square frame: the black disc, the face, the ring. Returns the face.
-function ns.RingLook(frame, face, name)
+-- A ring button's look on a 32 square frame: the black disc, the face, the ring. offMap: a ring off the minimap keeps
+-- its border whatever Hide button borders says. Returns the face.
+function ns.RingLook(frame, face, name, offMap)
     ns.DressNew(frame, "portraitMask", BACK)
     -- Round mask first: RoundIcon sets its own crop, which the dress then replaces.
     local icon = frame:CreateTexture(name)
     ns.RoundIcon(icon)
     face(icon)
-    ns.MinimapButtonBorder(ns.DressNew(frame, "trackingBorder", RING))
+    local ring = ns.DressNew(frame, "trackingBorder", RING)
+    if not offMap then ns.MinimapButtonBorder(ring) end
     return icon
 end
 ns.RING_HIGHLIGHT = HL_RING

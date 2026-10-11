@@ -192,6 +192,10 @@ ns.TOGGLES = {
 
     { "whoList", L["OPT_whoList"], L["OPT_whoList_TIP"], group = L["GROUP_SOCIAL"] },
     { "guildRoster", L["OPT_guildRoster"], L["OPT_guildRoster_TIP"] },
+    { "communitiesButton", L["OPT_communitiesButton"], L["OPT_communitiesButton_TIP"], parent = "guildRoster",
+        search = "communities tab button tabs" },
+    { "communitiesNoGuildTab", L["OPT_communitiesNoGuildTab"], L["OPT_communitiesNoGuildTab_TIP"], parent = "communitiesButton",
+        search = "communities tab no guild" },
     { "groupFinder", L["OPT_groupFinder"], L["OPT_groupFinder_TIP"] },
 
     { "bags", L["OPT_bags"], L["OPT_bags_TIP"], group = L["GROUP_BAGS"] },

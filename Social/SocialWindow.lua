@@ -82,7 +82,8 @@ end
 -- 1.x tab order: Friends, Who, Guild, Communities, then the client's others.
 -- Era's gap: the client's tabs past the first have no anchors of their own, so a measured gap read its layout's state.
 local TAB_GAP = -14
-local SOCIAL_TAB_PAD = 38
+local SOCIAL_TAB_PAD = 38   -- five tabs where 1.x had four: 19 either side of the label
+local FOUR_TAB_PAD = 50     -- Communities as a button (S.fourTabs): 1.x's four, 25 either side
 -- Foot tab row, placed from the window's foot; its faces are Era's (Windows/Tabs.lua).
 local SOCIAL_TAB_X = 5          -- first tab: its left from the window's left (+ right)
 local SOCIAL_TAB_Y = 2          -- tab row: its top above the window's foot (+ up; moves the picked tab too)
@@ -207,12 +208,13 @@ local function RowFit(order)
         end
     end
     local room = FriendsFrame:GetWidth()
-    if shown == 0 or not room or room <= 0 then return SOCIAL_TAB_X, SOCIAL_TAB_PAD end
-    local over = SOCIAL_TAB_X + labels + shown * SOCIAL_TAB_PAD + (shown - 1) * TAB_GAP - room
-    if over <= 0 then return SOCIAL_TAB_X, SOCIAL_TAB_PAD end
-    if over <= SOCIAL_TAB_X - TIGHT_TAB_X then return SOCIAL_TAB_X - over, SOCIAL_TAB_PAD end
+    local pad = S.fourTabs and FOUR_TAB_PAD or SOCIAL_TAB_PAD
+    if shown == 0 or not room or room <= 0 then return SOCIAL_TAB_X, pad end
+    local over = SOCIAL_TAB_X + labels + shown * pad + (shown - 1) * TAB_GAP - room
+    if over <= 0 then return SOCIAL_TAB_X, pad end
+    if over <= SOCIAL_TAB_X - TIGHT_TAB_X then return SOCIAL_TAB_X - over, pad end
     over = over - (SOCIAL_TAB_X - TIGHT_TAB_X)
-    return TIGHT_TAB_X, math.max(TIGHT_TAB_PAD, SOCIAL_TAB_PAD - math.ceil(over / shown))
+    return TIGHT_TAB_X, math.max(TIGHT_TAB_PAD, pad - math.ceil(over / shown))
 end
 
 function S.PlaceTabs()
@@ -233,7 +235,6 @@ function S.PlaceTabs()
     for i = 2, #blizzard do
         if blizzard[i] ~= clientWho and blizzard[i] ~= clientQuick then order[#order + 1] = blizzard[i] end
     end
-    -- Five tabs where 1.x had four: 19 either side of the label, not 25.
     local x, pad = RowFit(order)
     for _, entry in ipairs(order) do
         if entry.fcuiPad ~= pad then

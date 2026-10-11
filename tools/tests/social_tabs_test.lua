@@ -172,6 +172,24 @@ do
     Check(RowEnd(FriendsFrameTab1, row) <= 338, "that row ends inside the window")
 end
 
+-- Communities as a button: 1.x's four tabs, 25 either side; German (Freunde, Wer, Gilde, Schlachtzug) still fits.
+do
+    local S = Social(false)
+    S.fourTabs = true
+    local guild = NewTab()
+    _G.ClassicUIForeverGuildTab = guild
+    local row = { FriendsFrameTab1, S.whoTab, guild, FriendsFrameTab3 }
+    FriendsFrameTab4.shown = false
+    FriendsFrameTab1.labelWidth, S.whoTab.labelWidth, guild.labelWidth, FriendsFrameTab3.labelWidth = 45, 22, 30, 70
+    S.PlaceTabs()
+    Check(FriendsFrameTab1.x == 5 and FriendsFrameTab1.fcuiPad == 50, "four tabs: Era's start and 1.x's padding")
+    Check(RowEnd(FriendsFrameTab1, row) <= 338, "four German tabs end inside the window")
+    S.fourTabs = false
+    S.PlaceTabs()
+    Check(FriendsFrameTab1.fcuiPad == 38, "the option off: five-tab padding again")
+    _G.ClassicUIForeverGuildTab = nil
+end
+
 if failed > 0 then
     print(failed .. " check(s) failed")
     os.exit(1)

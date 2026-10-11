@@ -14,6 +14,8 @@ return {
     classColorHealthTarget = "same for everyone: on by default under Class colored health, which colors every frame as before; unchecked leaves that frame green",
     classColorHealthFocus = "same for everyone: on by default under Class colored health, which colors every frame as before; unchecked leaves that frame green",
     plainQuestItems = "same for everyone: opt-in, off by default",
+    communitiesButton = "same for everyone: opt-in, off by default; the Communities tab stays as before",
+    communitiesNoGuildTab = "same for everyone: an option of Communities as a button, which is off by default",
     plainNumbers = "same for everyone: mirrors the game's own setting, which only the player changes",
     hideMicroShop = "same for everyone: opt-in, off by default; the classic bar never shows the shop",
     classicFonts = "on for everyone, as the damage meter was: a new restyle, text as Classic Era draws it",

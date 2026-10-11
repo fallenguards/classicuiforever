@@ -48,6 +48,8 @@ return {
     classicTracking = true,
     collectionsMinimapButton = false,
     comboPoints = true,
+    communitiesButton = false,
+    communitiesNoGuildTab = true,
     damageMeter = true,
     damageNumbersRepaired = false,
     dbVersion = 17,

@@ -113,6 +113,8 @@ ns.TEX = {
     questLogTabRight = "QuestFrame\\UI-QuestLogSortTab-Right",
     charGeneralTopLeft = "PaperDollInfoFrame\\UI-Character-General-TopLeft",
     charGeneralTopRight = "PaperDollInfoFrame\\UI-Character-General-TopRight",
+    -- The game's guild emblem with no tabard designed: the horned helm the Communities window shows.
+    guildNoLogo = "GuildFrame\\GuildLogo-NoLogo",
     charGeneralBotLeft = "PaperDollInfoFrame\\UI-Character-General-BottomLeft",
     charGeneralBotRight = "PaperDollInfoFrame\\UI-Character-General-BottomRight",
     charTabTopLeft = "PaperDollInfoFrame\\UI-Character-CharacterTab-L1",

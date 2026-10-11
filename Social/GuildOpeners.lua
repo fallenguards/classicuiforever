@@ -49,7 +49,8 @@ local function DressWindow(on)
     end
 end
 
-local function InGuild() return IsInGuild and IsInGuild() and true or false end
+-- ns.DevNoGuild: the dev addon's no-guild view (/fcuidev noguild).
+local function InGuild() return not ns.DevNoGuild and IsInGuild and IsInGuild() and true or false end
 
 local function ShowGuild()
     if not G.panel then return end
@@ -81,6 +82,72 @@ local function PlaceTab()
     S.PlaceTabs()
 end
 
+-- The roster took the communities' key and button, so they get a tab, or with Communities as a button (option) a round
+-- button on the guild page, that opens the client's window in this one's place.
+local communitiesTab
+local function OpenCommunities()
+    -- The client opens no window for an addon in a fight.
+    if InCombatLockdown() then
+        ns.SayNotInCombat()
+        return
+    end
+    PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB)
+    -- Drop the ghost first, or the toggle would only close it.
+    DropGhost()
+    if G.panel and G.panel:IsShown() then HideGuild() end
+    local frame = _G["CommunitiesFrame"]
+    if frame and frame:IsShown() then return end
+    if FriendsFrame and FriendsFrame:IsShown() then ns.HidePanel(FriendsFrame) end
+    local open = G.clientToggleGuild or ToggleGuildFrame
+    if type(open) == "function" then open() end
+end
+
+local function BuildCommunitiesTab(host)
+    if communitiesTab or not C_Club then return end
+    communitiesTab = S.NewTab(host, "ClassicUIForeverCommunitiesTab", 92, COMMUNITIES or "Communities")
+    if PanelTemplates_DeselectTab then PanelTemplates_DeselectTab(communitiesTab) end
+    communitiesTab:SetScript("OnClick", OpenCommunities)
+end
+
+-- The button's ring center from Show Offline Members' left middle, between it and the window's portrait (+ right, + up).
+local COMMUNITIES_X, COMMUNITIES_Y = -41, -1
+local COMMUNITIES_TIP = { text = function() return COMMUNITIES or "Communities" end, r = 1, g = 1, b = 1 }
+-- The helm on the game's color for a tabard with no design (SetGuildTabardTextures).
+local TABARD_BACK = { layer = "BORDER", fill = true, vertex = { 0.2245, 0.2088, 0.1794 } }
+local function Helm(icon)
+    ns.Dress(icon, "guildNoLogo", ns.RING_ICON_FACE)
+    ns.DressNew(icon:GetParent(), "portraitMask", TABARD_BACK, icon)
+end
+
+local function BuildCommunitiesButton()
+    local panel = G.panel
+    if not (panel and panel.offline) or panel.communities or not C_Club then return end
+    local button = ns.NewFrame("Button", nil, panel)
+    button:SetSize(32, 32)
+    button:SetPoint("CENTER", panel.offline, "LEFT", COMMUNITIES_X, COMMUNITIES_Y)
+    ns.RingLook(button, Helm, nil, true)
+    ns.DressStates(button, nil, nil, nil, "zoomHighlight", ns.RING_HIGHLIGHT)
+    button:SetScript("OnClick", OpenCommunities)
+    ns.AttachTip(button, COMMUNITIES_TIP)
+    panel.communities = button
+end
+
+-- With Communities as a button its tab stands only where the Guild tab would, for a player with no guild (unless that
+-- is turned off too, leaving the grayed Guild tab); the guild page carries the button.
+local function SyncCommunities()
+    if not G.active then return end
+    local asButton = ns.db.communitiesButton == true
+    local swapped = asButton and not InGuild() and ns.db.communitiesNoGuildTab ~= false
+    BuildCommunitiesButton()
+    if G.panel and G.panel.communities then ns.SetShownIf(G.panel.communities, asButton) end
+    -- The row is laid again only on a change: guild events come often.
+    local changed = S.fourTabs ~= asButton
+    S.fourTabs = asButton
+    if communitiesTab and ns.SetShownIf(communitiesTab, not asButton or swapped) then changed = true end
+    if tab and ns.SetShownIf(tab, not swapped) then changed = true end
+    if changed then S.PlaceTabs() end
+end
+
 -- Grayed out with no guild, as 1.x had it.
 local function KeepTabState()
     if not tab then return end
@@ -105,31 +172,7 @@ local function KeepTabState()
         tab:Disable()
         if text then text:SetTextColor(0.5, 0.5, 0.5) end
     end
-end
-
--- The roster took the communities' key and button, so they get a tab that
--- opens the client's window in this one's place.
-local communitiesTab
-local function BuildCommunitiesTab(host)
-    if communitiesTab or not C_Club then return end
-    communitiesTab = S.NewTab(host, "ClassicUIForeverCommunitiesTab", 92, COMMUNITIES or "Communities")
-    if PanelTemplates_DeselectTab then PanelTemplates_DeselectTab(communitiesTab) end
-    communitiesTab:SetScript("OnClick", function()
-        -- The client opens no window for an addon in a fight.
-        if InCombatLockdown() then
-            ns.SayNotInCombat()
-            return
-        end
-        PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB)
-        -- Drop the ghost first, or the toggle would only close it.
-        DropGhost()
-        if G.panel and G.panel:IsShown() then HideGuild() end
-        local frame = _G["CommunitiesFrame"]
-        if frame and frame:IsShown() then return end
-        if FriendsFrame and FriendsFrame:IsShown() then ns.HidePanel(FriendsFrame) end
-        local open = G.clientToggleGuild or ToggleGuildFrame
-        if type(open) == "function" then open() end
-    end)
+    SyncCommunities()
 end
 
 local function OnClientTab() if G.active then HideGuild() end end
@@ -424,6 +467,7 @@ local function Apply()
         UpdateGuildBinding()
         if communitiesTab then communitiesTab:Show() end
         if tab then tab:Show() PlaceTab() end
+        SyncCommunities()
     end)
 end
 
@@ -434,7 +478,14 @@ local function Restore()
     HideGuild()
     if tab then tab:Hide() end
     if communitiesTab then communitiesTab:Hide() end
+    if G.panel and G.panel.communities then G.panel.communities:Hide() end
+    S.fourTabs = false
     S.PlaceTabs()
 end
 
 ns.RegisterModule("guildRoster", { apply = Apply, restore = Restore })
+
+-- Plain frames of ours: the tabs and button answer the options at once, in a fight too.
+ns.OnToggle(function(key)
+    if key == "communitiesButton" or key == "communitiesNoGuildTab" then SyncCommunities() end
+end)
