@@ -739,20 +739,6 @@ L["SKILL_POINTS_IN_X"] = "Points in %s: "
 -- UI/Dialogs.lua
 L["UI_LATER"] = "Later"
 
--- UI/WindowHandles.lua
-L["UI_UNLOCKED_DRAG_THE_MAP_BY"] = "Unlocked: drag the map by its title bar, out of combat. Click to lock it."
-L["UI_LOCKED_CLICK_TO_DRAG_THE"] = "Locked. Click to drag the map anywhere by its title bar, out of combat."
-L["UI_UNLOCKED_DRAG_THE_WINDOW_BY"] = "Unlocked: drag the window by its title bar, out of combat. Click to lock it."
-L["UI_LOCKED_CLICK_TO_DRAG_THE_WINDOW"] = "Locked. Click to drag the window anywhere by its title bar, out of combat."
-L["UI_WITH_QUEST_LOG"] = "With quest log"
-L["UI_MAP_ONLY"] = "Map only"
-
--- UI/WindowsEditMode.lua
-L["UI_CLASSICUI_FOREVER_WINDOWS"] = "ClassicUI Forever Windows"
-L["UI_CHECK_THE_WINDOWS_TO_MOVE"] = "Check the windows to move. Drag a window's box to place it; click the box to size it, make it movable anytime or reset it."
-L["UI_IF_YOU_EXIT_NOW_YOU"] = "If you exit now you will lose any unsaved changes.\nHow would you like to proceed?"
-L["UI_SWITCH_TO_MOVING_THE_CLASSICUI"] = "Switch to moving the ClassicUI Forever windows (character, professions, talents, quest log, social, map): pick the ones to move and size."
-
 -- Sentences built with values
 L["OPTWIN_LAYOUTS_FULL"] = "%s\n\nEdit mode is at its layout limit, so there is no room for the %s layout.\n\nDelete one you no longer use: press Escape, choose Edit Mode, pick it in the layout list and delete it. Then set up the classic layout again from the options."
 L["OPTWIN_SWITCHING_TO_LAYOUT"] = "Switching to your %s layout."

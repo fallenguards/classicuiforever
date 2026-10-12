@@ -438,26 +438,29 @@ local function WrapOpenBags(shown)
     local prev = first
     for i = 2, #shown do
         local frame = shown[i]
-        k = frame:GetEffectiveScale() / ui
-        local w, h = frame:GetWidth() * k, frame:GetHeight() * k
-        local wrap = prev.IsCombinedBagContainer and prev:IsCombinedBagContainer()
-        if not wrap then wrap = reach + 8 * k + h > top end
-        local rel, relPoint, x, y
-        if wrap then
-            right = headLeft - 11 * k
-            headLeft, reach = right - w, bottom + h
-            rel, relPoint, x, y = head, "BOTTOMLEFT", -11, 0
-            head = frame
-        else
-            reach = reach + 8 * k + h
-            rel, relPoint, x, y = prev, "TOPRIGHT", 0, 8
+        -- The game's reagent window parked out of sight while our slots fill the combined bag (Windows/Bags.lua).
+        if not ns.BagIsParked(frame) then
+            k = frame:GetEffectiveScale() / ui
+            local w, h = frame:GetWidth() * k, frame:GetHeight() * k
+            local wrap = prev.IsCombinedBagContainer and prev:IsCombinedBagContainer()
+            if not wrap then wrap = reach + 8 * k + h > top end
+            local rel, relPoint, x, y
+            if wrap then
+                right = headLeft - 11 * k
+                headLeft, reach = right - w, bottom + h
+                rel, relPoint, x, y = head, "BOTTOMLEFT", -11, 0
+                head = frame
+            else
+                reach = reach + 8 * k + h
+                rel, relPoint, x, y = prev, "TOPRIGHT", 0, 8
+            end
+            -- Per frame while bags are open: a plain read, no secret values here.
+            local p, r, rp, px, py = frame:GetPoint(1)
+            if p ~= "BOTTOMRIGHT" or r ~= rel or rp ~= relPoint or math.abs((px or 0) - x) > 0.01 or math.abs((py or 0) - y) > 0.01 then
+                ns.SetPointOnce(frame, "BOTTOMRIGHT", rel, relPoint, x, y)
+            end
+            prev = frame
         end
-        -- Per frame while bags are open: a plain read, no secret values here.
-        local p, r, rp, px, py = frame:GetPoint(1)
-        if p ~= "BOTTOMRIGHT" or r ~= rel or rp ~= relPoint or math.abs((px or 0) - x) > 0.01 or math.abs((py or 0) - y) > 0.01 then
-            ns.SetPointOnce(frame, "BOTTOMRIGHT", rel, relPoint, x, y)
-        end
-        prev = frame
     end
 end
 local function AnchorOpenBags()

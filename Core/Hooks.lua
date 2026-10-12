@@ -61,9 +61,10 @@ function ns.HookGlobal(name, fn)
     return true
 end
 
-function ns.HookScriptOnce(frame, script, fn)
+-- tag: another module's hook on the same script.
+function ns.HookScriptOnce(frame, script, fn, tag)
     if not frame or not frame.HookScript then return end
-    local marks, key = Marks(frame), "script:" .. script
+    local marks, key = Marks(frame), "script:" .. script .. (tag or "")
     if marks[key] then return end
     marks[key] = true
     frame:HookScript(script, fn)

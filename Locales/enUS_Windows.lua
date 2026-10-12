@@ -1,7 +1,7 @@
 local _, ns = ...
 local L = ns.L
 
--- Our window mover and its edit mode window (UI/), beside Locales/enUS.lua.
+-- Our window mover and its edit mode window (UI/), the one bag's reagent slots, beside Locales/enUS.lua.
 -- UI/WindowHandles.lua
 L["UI_CHARACTER"] = "Character"
 L["UI_PROFESSIONS"] = "Professions"
@@ -43,3 +43,28 @@ L["UI_MOVABLE_ANYTIME_BY_ITS_TITLE"] = "Movable anytime, by its title bar"
 L["UI_BACK_TO_REGULAR_EDIT_MODE"] = "Back to regular edit mode"
 L["UI_THE_HUD_EDIT_MODE_SAVE"] = "The HUD Edit Mode. Save or revert window changes first."
 L["UI_WINDOWS"] = "Windows"
+
+-- UI/WindowHandles.lua
+L["UI_UNLOCKED_DRAG_THE_MAP_BY"] = "Unlocked: drag the map by its title bar, out of combat. Click to lock it."
+L["UI_LOCKED_CLICK_TO_DRAG_THE"] = "Locked. Click to drag the map anywhere by its title bar, out of combat."
+L["UI_UNLOCKED_DRAG_THE_WINDOW_BY"] = "Unlocked: drag the window by its title bar, out of combat. Click to lock it."
+L["UI_LOCKED_CLICK_TO_DRAG_THE_WINDOW"] = "Locked. Click to drag the window anywhere by its title bar, out of combat."
+L["UI_WITH_QUEST_LOG"] = "With quest log"
+L["UI_MAP_ONLY"] = "Map only"
+
+-- UI/WindowsEditMode.lua
+L["UI_CLASSICUI_FOREVER_WINDOWS"] = "ClassicUI Forever Windows"
+L["UI_CHECK_THE_WINDOWS_TO_MOVE"] = "Check the windows to move. Drag a window's box to place it; click the box to size it, make it movable anytime or reset it."
+L["UI_IF_YOU_EXIT_NOW_YOU"] = "If you exit now you will lose any unsaved changes.\nHow would you like to proceed?"
+L["UI_SWITCH_TO_MOVING_THE_CLASSICUI"] = "Switch to moving the ClassicUI Forever windows (character, professions, talents, quest log, social, map): pick the ones to move and size."
+
+-- Bag windows: the reagent bag in the one bag (Windows/BagReagent.lua)
+L["OPT_reagentBagCombined"] = "Reagent bag in the one bag"
+L["OPT_reagentBagCombined_TIP"] = "The reagent bag's slots join the one bag window instead of a window of their own."
+L["OPT_reagentBagTint"] = "Tint reagent slots"
+L["OPT_reagentBagTint_TIP"] = "The reagent bag's slots in the one bag are tinted green, to tell them apart."
+L["OPT_reagentSlotsFirst"] = "Reagent slots: first"
+L["OPT_reagentSlotsFirst_TIP"] = "The reagent bag's slots come first in the one bag, before the backpack's."
+L["OPT_reagentSlotsLast"] = "Reagent slots: last"
+L["OPT_reagentSlotsLast_TIP"] = "The reagent bag's slots come last in the one bag, after your last bag's."
+L["OPT_reagentSlotsPlace_TIP"] = "Where the reagent bag's slots stand in the one bag."

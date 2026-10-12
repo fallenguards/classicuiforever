@@ -170,6 +170,7 @@ Map\WorldMapOptions.lua
 Map\WorldMapClassic.lua
 Windows\BagBand.lua
 Windows\Bags.lua
+Windows\BagReagent.lua
 Windows\DamageMeter.lua
 Character\CharacterModel.lua
 Character\CharacterCore.lua

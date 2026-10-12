@@ -42,7 +42,12 @@ local QUICK_RING_64 = { set = "raw", tint = true, coords = { 0, 1, 0, 1 }, w = 6
 local active = false
 local KEYRING = Enum.BagIndex.Keyring
 local BACKPACK = Enum.BagIndex.Backpack
+local REAGENT = Enum.BagIndex.ReagentBag
+-- The reagent slots' tint in the combined bag (option): a soft green over the slot's socket.
+local REAGENT_TINT = { 0.25, 0.8, 0.35, 0.3 }
 local hooked = setmetatable({}, { __mode = "k" })
+local tints = setmetatable({}, { __mode = "k" })    -- reagent button -> our tint over its socket
+local tinted = setmetatable({}, { __mode = "k" })   -- those tints, which the fade skips
 local locked = setmetatable({}, { __mode = "k" })   -- item buttons faded as locked slots
 
 -- Without an authenticator the game adds locked slots past the backpack's own; with the option on, the usable count
@@ -66,6 +71,15 @@ local function Lock(button, on)
     if button:IsMouseEnabled() == on then button:EnableMouse(not on) end
     local pad = button.extendedFrame
     if pad and pad:IsMouseEnabled() == on then pad:EnableMouse(not on) end
+end
+
+-- The game's reagent window while our slots stand in the combined bag (option, Windows/BagReagent.lua).
+local function ParkedReagent()
+    local combined = ContainerFrameCombinedBags
+    if not (REAGENT and ns.db and ns.db.reagentBagCombined and combined and combined:IsShown()) then return nil end
+    for _, frame in ContainerFrameUtil_EnumerateContainerFrames() do
+        if frame:IsShown() and not frame:IsCombinedBagContainer() and frame:GetBagID() == REAGENT then return frame end
+    end
 end
 
 local function Pieces(frame)
@@ -108,12 +122,12 @@ end
 -- Our textures, which the fade skips.
 local function IsOurs(frame, region)
     local p = frame.fcui
-    if not p then return false end
+    if not p then return tinted[region] == true end
     if p.bagTop and (p.bagTop:Owns(region) or p.bagBottom:Owns(region)) then return true end
     if p.tokenStrip and (p.tokenStrip:Owns(region) or p.tokenFoot:Owns(region)) then return true end
     for _, piece in ipairs(p.bagMiddle or EMPTY) do if piece:Owns(region) then return true end end
     for _, piece in ipairs(p.blanks or EMPTY) do if region == piece then return true end end
-    return false
+    return tinted[region] == true
 end
 
 -- Fade every client texture but the portrait, slots and controls.
@@ -128,6 +142,7 @@ end
 local function Kept(frame, child)
     return child == frame.PortraitButton or child == frame.MoneyFrame or child == frame.CloseButton
         or child == frame.FilterIcon or child == BagItemSearchBox or child == BagItemAutoSortButton
+        or ns.IsReagentHolder(child)
 end
 
 local function FadeChild(child, frame, portrait)
@@ -338,12 +353,63 @@ end
 
 local spare = {}   -- the slot list, reused; a nested pass takes a new one
 
+-- On the slot's parent (our holder in the combined bag), under the slot and over the combined bag's sheet.
+local function Tint(button, on)
+    local tex = tints[button]
+    if not on then
+        if tex then tex:Hide() end
+        return
+    end
+    if not tex then
+        tex = button:GetParent():CreateTexture(nil, "BACKGROUND")
+        tex:SetColorTexture(REAGENT_TINT[1], REAGENT_TINT[2], REAGENT_TINT[3], REAGENT_TINT[4])
+        tex:SetAllPoints(button)
+        tints[button], tinted[tex] = tex, true
+    end
+    tex:Show()
+end
+
+-- The slots in page order (combined) or 1.x order; the reagent bag's tinted with tint on; one blank patch (none on a
+-- plusTwo bag, whose top has a cut for it). Returns how many patches it used.
+local function LaySlots(frame, list, count, columns, combined, backpackExtra, tint, noBlank)
+    local rows = math.ceil(count / columns)
+    for i = 1, count do
+        local button = list[i]
+        list[i] = nil
+        SlotArt(button)
+        Place(button, i - 1, 0, 0, frame, columns, rows, count, combined, backpackExtra)
+        Tint(button, tint and button:GetBagID() == REAGENT)
+    end
+    local missing = rows * columns - count
+    if noBlank or missing <= 0 then return 0 end
+    local tex = Blank(frame, 1)
+    tex:SetSize(missing * COL - 3, BLANK_H)
+    -- Right end at the grid's last place in page order (combined), else the first place past the slots.
+    Place(tex, combined and (count - rows * columns) or count, 1, -1, frame, columns, rows, count, combined, backpackExtra)
+    tex:Show()
+    return 1
+end
+
+-- Our reagent slots into the list, last slot first: the combined bag's list runs from its foot to its top.
+local function AddReagentSlots(list, count, own, n)
+    for i = n, 1, -1 do
+        count = count + 1
+        list[count] = own[i]
+    end
+    return count
+end
+
 local function LayoutItems(frame, backpackExtra, combined, plusTwo)
     if not frame.EnumerateValidItems then return end
     local list = spare or {}
     spare = nil
     local count = 0
     local usable = LockedSlots()
+    -- The reagent bag's slots before the backpack's, or after the last bag's (option), as another bag's.
+    local own, n = EMPTY, 0
+    if combined then own, n = ns.OwnReagentSlots() end
+    local last = ns.db and ns.db.reagentSlotsLast == true
+    if last then count = AddReagentSlots(list, count, own, n) end
     for _, button in frame:EnumerateValidItems() do
         local off = usable and button:GetBagID() == BACKPACK and button:GetID() > usable or false
         Lock(button, off)
@@ -352,28 +418,10 @@ local function LayoutItems(frame, backpackExtra, combined, plusTwo)
             list[count] = button
         end
     end
-    -- Shadows the file's COLUMNS with this window's count (Skin's plusTwo uses four).
-    local COLUMNS = ColumnsOf(frame)
-    local rows = math.ceil(count / COLUMNS)
-    for i = 1, count do
-        local button = list[i]
-        list[i] = nil
-        SlotArt(button)
-        Place(button, i - 1, 0, 0, frame, COLUMNS, rows, count, combined, backpackExtra)
-    end
+    if not last then count = AddReagentSlots(list, count, own, n) end
+    local blanks = LaySlots(frame, list, count, ColumnsOf(frame), combined, backpackExtra,
+        combined and ns.db and ns.db.reagentBagTint == true, plusTwo)
     spare = list
-    -- Blank the places past the last slot; plusTwo bags have a top cut for it.
-    local blanks = 0
-    local missing = rows * COLUMNS - count
-    if not plusTwo and missing > 0 then
-        blanks = 1
-        local tex = Blank(frame, 1)
-        tex:SetSize(missing * COL - 3, BLANK_H)
-        -- Right end at the grid's last place in page order (combined), else the
-        -- first place past the slots.
-        Place(tex, combined and (count - rows * COLUMNS) or count, 1, -1, frame, COLUMNS, rows, count, combined, backpackExtra)
-        tex:Show()
-    end
     local made = Pieces(frame).blanks
     if made then for j = blanks + 1, #made do made[j]:Hide() end end
 end
@@ -415,6 +463,38 @@ local function PlaceSearch(frame)
 end
 
 local shape = setmetatable({}, { __mode = "k" })   -- bag frame -> { extra, plusTwo, wider } as last drawn
+local parked = setmetatable({}, { __mode = "k" })  -- the game's reagent window while our slots fill the combined bag
+function ns.BagIsParked(frame) return parked[frame] == true end
+
+local HEADER = { "PortraitContainer", "TitleContainer", "CloseButton" }
+local function Header(frame, shown)
+    for _, key in ipairs(HEADER) do
+        local piece = frame[key]
+        if piece then
+            ns.SetAlphaIf(piece, shown and 1 or 0)
+            if piece.IsMouseEnabled and piece:IsMouseEnabled() ~= shown then piece:EnableMouse(shown) end
+        end
+    end
+    if frame:IsMouseEnabled() ~= shown then frame:EnableMouse(shown) end
+end
+
+-- Opened by B or a vendor beside the combined bag that holds our slots: kept open, so B's toggle still counts it, but
+-- its art, header and slots unseen and deaf, the window a dot on the combined bag's corner.
+local function Park(frame)
+    FadeArt(frame)
+    local p = Pieces(frame)
+    for _, piece in ipairs({ p.bagTop, p.bagBottom, p.tokenStrip, p.tokenFoot }) do piece:Hide() end
+    HideMiddles(p, 0)
+    for _, blank in ipairs(p.blanks or EMPTY) do blank:Hide() end
+    Header(frame, false)
+    for _, button in frame:EnumerateValidItems() do
+        Lock(button, true)
+        Tint(button, false)
+    end
+    frame:SetSize(1, 1)
+    ns.SetPointOnce(frame, "TOPLEFT", ContainerFrameCombinedBags, "TOPLEFT", 0, 0)
+    parked[frame] = true
+end
 
 -- Runs inside the client's layout pass: it stacks bags by height, so a deferred
 -- pass would misplace them or flash the client's layout.
@@ -426,6 +506,14 @@ local function Skin(frame, part)
         end
         return
     end
+    if frame == ParkedReagent() then return Park(frame) end
+    if parked[frame] then
+        parked[frame] = nil
+        Header(frame, true)
+        part = nil
+    end
+    local reagent = ParkedReagent()
+    if reagent and not parked[reagent] and frame == ContainerFrameCombinedBags then Park(reagent) end
     local combined = frame.IsCombinedBagContainer and frame:IsCombinedBagContainer() and true or false
     local main = combined or (frame.IsBackpack and frame:IsBackpack())
     local _, lockedCount = LockedSlots()
@@ -440,7 +528,8 @@ local function Skin(frame, part)
     local tokenRow = main and TokenRow(frame)
     if part ~= "trim" then
         local columns = ColumnsOf(frame)
-        local rows = math.ceil(size / columns)
+        local own = combined and select(2, ns.OwnReagentSlots()) or 0
+        local rows = math.ceil((size + own) / columns)
         SetBandColumns(frame, columns)
         if ns.debugSink then
             ns.Persist(string.format("bags: skin %s size %d rows %d backpack %s", tostring(frame:GetName()), size, rows, tostring(frame.IsBackpack and frame:IsBackpack())))
@@ -525,6 +614,16 @@ end
 local LAYOUT_PARTS = { UpdateFrameSize = "size", UpdateItemLayout = "items", UpdateSearchBox = "search",
     UpdateMiscellaneousFrames = "trim" }
 
+-- The parked reagent window shut: its header back for its next open; the combined bag shut: it stands alone.
+local function Hidden(self)
+    if parked[self] then
+        parked[self] = nil
+        Header(self, true)
+    elseif self.IsCombinedBagContainer and self:IsCombinedBagContainer() then
+        for reagent in pairs(parked) do Skin(reagent) end
+    end
+end
+
 local function Hook(frame)
     if hooked[frame] then return end
     hooked[frame] = true
@@ -534,6 +633,7 @@ local function Hook(frame)
         end
     end
     frame:HookScript("OnShow", function(self) Skin(self) end)
+    frame:HookScript("OnHide", Hidden)
 end
 
 -- Combined bag columns (settings, or the edit mode bags dialog); applies live.
@@ -541,9 +641,14 @@ function ns.SetOneBagColumns(columns)
     columns = ClampColumns(tonumber(columns) or COLUMNS)
     if not ns.db then return columns end
     ns.db.oneBagColumns = columns
+    ns.ReskinOneBag()
+    return columns
+end
+
+-- The combined bag laid again while open: its columns, or the reagent slots' count (Windows/BagReagent.lua).
+function ns.ReskinOneBag()
     local frame = ContainerFrameCombinedBags
     if active and frame and frame:IsShown() then ns.SafeCall(Skin, frame) end
-    return columns
 end
 
 -- Every container frame once, in the order the client lists them.
@@ -624,11 +729,13 @@ local function RingClick()
 end
 
 -- The options pass waits out a fight; these may change in one, so open bags turn at once.
+local RESKIN = { hideLockedSlots = true, reagentBagCombined = true, reagentBagTint = true, reagentSlotsFirst = true,
+    reagentSlotsLast = true }
 ns.OnToggle(function(key)
-    if (key ~= "plainQuestItems" and key ~= "hideLockedSlots") or not active then return end
+    if (key ~= "plainQuestItems" and not RESKIN[key]) or not active then return end
     for _, frame in ipairs(Frames()) do
         if frame:IsShown() and frame.EnumerateValidItems then
-            if key == "hideLockedSlots" then
+            if RESKIN[key] then
                 ns.SafeCall(Skin, frame)
             else
                 for _, button in frame:EnumerateValidItems() do ns.QuestItemLook(button) end
@@ -649,6 +756,8 @@ local function Apply()
         Hook(frame)
         if frame:IsShown() then Skin(frame) end
     end
+    -- The reagent slots made now, out of combat, before a first open in a fight.
+    if not InCombatLockdown() then ns.OwnReagentSlots() end
 end
 
 local function Restore()
