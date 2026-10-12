@@ -135,6 +135,12 @@ local WINDOWS = {
         patterns = { "<micro button name>" },
         part = function(_, part) return ns.MicroButtonNow(part) end,
     },
+    worldMap = {
+        -- No open: the game's own key and button. The frame: the Era border drawn now, its right edge the art's outer
+        -- edge (the quest pane counted); nil in the game's own look.
+        frame = function() return ns.ClassicMapBorder() end,
+        parts = {},
+    },
     whoList = {
         open = function() return ns.OpenWhoList() end,
         frame = function() return ns.WhoPanel() end,

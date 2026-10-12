@@ -680,6 +680,12 @@ function ns.ClassicMapArt() return art end
 -- How far the Era layout lifts the quest details' text (its Back button follows, Quest/QuestMapPane.lua).
 function ns.MapDetailsLift() return eraDressed and DETAILS_LIFT or 0 end
 
+-- The Era frame drawn now, its right edge the border's outer edge (Core/API.lua's worldMap); nil in the game's look.
+function ns.ClassicMapBorder()
+    if eraDressed == "classic" then return ns.MapLarge.Frame() end
+    return eraDressed and art or nil
+end
+
 -- The edit mode box: the size the header style draws, the client's for its own layout.
 function ns.ClassicMapSize()
     local style = P.active and ns.db.worldMap ~= false and NavStyle()
