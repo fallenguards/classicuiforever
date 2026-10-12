@@ -1899,9 +1899,18 @@ function ns.BookPadMacro()
         clickProxy:SetScript("PostClick", FollowLayer)
     end
     local layer = book and book.Clicks
-    if layer and layer.fcuiLinked then return "/click ForeverClassicUISpellBookClicks\n/click " .. CLICK_NAME end
-    return "/click " .. CLICK_NAME
+    local first = ns.GameSpellsCloseLine(book)
+    if layer and layer.fcuiLinked then return first .. "/click ForeverClassicUISpellBookClicks\n/click " .. CLICK_NAME end
+    return first .. "/click " .. CLICK_NAME
 end
+
+-- While the game's spell window leaves the book no room, the key's macro closes it first, in the player's name
+-- (UI/WindowCloser.lua); the micro pad presses the key.
+ns.OnGameSpellsRoom(function()
+    local layer = book and book.Clicks
+    if not (active and bindButton and layer and layer.fcuiLinked) or Hosted() then return end
+    ns.SetAttributeIf(bindButton, "macrotext", ns.GameSpellsCloseLine(book) .. BookMacro())
+end)
 -- The professions key and micro button: our layer down first (our code cannot in a fight), then the client's opener; the
 -- book then goes as a client window replaces ours.
 local PROF_BIND_NAME = "ForeverClassicUIProfessionsBind"

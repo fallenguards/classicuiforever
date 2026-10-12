@@ -38,6 +38,15 @@ local function MicroClick()
 end
 local TakeButton = ns.WindowMicro({ "QuestLogMicroButton" }, MicroClick)
 
+-- While the game's spell window leaves the log no room, the key's and the pad's macro close it first, in the player's
+-- name (UI/WindowCloser.lua).
+local function KeyMacro()
+    return (QL.active and ns.GameSpellsCloseLine(QL.Frame and QL.Frame()) or "") .. DROP_LAYER
+end
+ns.OnGameSpellsRoom(function()
+    if bindButton then ns.SetAttributeIf(bindButton, "macrotext", KeyMacro()) end
+end)
+
 -- Runs at login with the module on or off; handlers check QL.active.
 local hooked = false
 local function Init()
@@ -53,7 +62,7 @@ local function Init()
     -- a side frame: a frame with registrations can be refused by the secure environment.
     if ns.EscArmOnClick then ns.EscArmOnClick(bindButton, "questlog") end
     if QuestLogMicroButton and ns.MapPad then
-        local pad = ns.MapPad(QuestLogMicroButton, nil, MicroClick, DROP_LAYER, function() return QL.active end)
+        local pad = ns.MapPad(QuestLogMicroButton, nil, MicroClick, KeyMacro, function() return QL.active end)
         if pad and ns.EscArmOnClick then ns.EscArmOnClick(pad, "questlog") end
     end
     ns.EventFrame({ "UPDATE_BINDINGS", "PLAYER_REGEN_ENABLED", "PLAYER_ENTERING_WORLD" }, UpdateBinding)

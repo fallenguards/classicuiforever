@@ -58,6 +58,7 @@ UI\WindowRow.lua
 UI\Windows.lua
 UI\WindowList.lua
 UI\GameSpot.lua
+UI\WindowCloser.lua
 UI\WindowHandles.lua
 UI\WindowLayouts.lua
 UI\WindowsEditMode.lua

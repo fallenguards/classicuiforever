@@ -201,11 +201,19 @@ end)
 -- The game's Legacy key opens this window too.
 local key = ns.WindowKey("ClassicUIForeverLegacyBind", "TOGGLELEGACYSYSTEM", Toggle, "legacy")
 
+-- While the game's spell window leaves ours no room, the key and the micro button close it first in the player's name
+-- (UI/WindowCloser.lua): the key's own secure click, and a pad over the button that presses the key.
+local function CloserMacro()
+    if active and ns.GameSpellsCloser(frame) then return "/click " .. key.name end
+end
+ns.OnGameSpellsRoom(function() key:PressFirst(active and ns.GameSpellsCloser(frame) or nil) end)
+
 local function Apply()
     if not Supported() then return end
     active = true
     TakeButton(true)
     key:Set(true)
+    if ns.MapPad and _G.LegacyMicroButton then ns.MapPad(_G.LegacyMicroButton, nil, nil, CloserMacro, function() return active end) end
 end
 
 local function Restore()

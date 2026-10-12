@@ -198,6 +198,13 @@ local TakeButton = ns.WindowMicro({ "TalentMicroButton", "PlayerSpellsMicroButto
 end)
 local key = ns.WindowKey("ClassicUIForeverTalentsBind", "TOGGLETALENTS", Toggle, "talents")
 
+-- While the game's spell window leaves ours no room, the key and the micro button close it first in the player's name
+-- (UI/WindowCloser.lua): the key's own secure click, and a pad over the button that presses the key.
+local function CloserMacro()
+    if active and not Hosted() and ns.GameSpellsCloser(frame) then return "/click " .. key.name end
+end
+ns.OnGameSpellsRoom(function() key:PressFirst(active and not Hosted() and ns.GameSpellsCloser(frame) or nil) end)
+
 local function Apply()
     active = true
     if Hosted() then
@@ -208,6 +215,7 @@ local function Apply()
     TakeButton(true)
     TakeInspectButton(true)
     key:Set(true)
+    if ns.MapPad and _G.TalentMicroButton then ns.MapPad(_G.TalentMicroButton, nil, nil, CloserMacro, function() return active end) end
 end
 
 local function Restore()

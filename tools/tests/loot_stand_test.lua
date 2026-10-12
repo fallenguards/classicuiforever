@@ -22,7 +22,7 @@ assert(loadfile(ROOT .. "/UI/WindowRow.lua"))("ClassicUIForever", ns)
 -- The loot window, 250 wide, past a solved row on a 1536 screen.
 local function Past(game, ours)
     local s = { start = 0, screen = 1536, game = game, ours = ours or {} }
-    return ns.WindowRowEnd(s, ns.SolveWindowRow(s, {}), 250)
+    return ns.WindowRowEnd(s, ns.SolveWindowRow(s, {}))
 end
 
 Check(Past({}) == 0, "nothing open: the first slot")

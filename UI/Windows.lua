@@ -350,8 +350,8 @@ local counted = {}
 local function AddGame(n, panel)
     if counted[panel] or not panel:IsShown() then return n end
     counted[panel] = true
-    -- Placed by the player: out of the row.
-    if ns.FramePlaced and ns.FramePlaced(panel) then return n end
+    -- Placed by the player (our edit mode, or a window mover off the row's line): out of the row.
+    if (ns.FramePlaced and ns.FramePlaced(panel)) or ns.GameWindowOffRow(panel) then return n end
     local name = panel:GetName()
     local left, right = BlockSpan(name, panel)
     if not left then return n end
@@ -423,7 +423,7 @@ local function StandPast(frame)
     if not (k and width and solved) then return end
     local _, y = RowStart()
     width = width * k
-    local x = math.max(0, math.min(ns.WindowRowEnd(row, laid, width), math.floor(UIParent:GetWidth() - width)))
+    local x = math.max(0, math.min(ns.WindowRowEnd(row, laid), math.floor(UIParent:GetWidth() - width)))
     ns.SetPointIf(frame, "TOPLEFT", UIParent, "TOPLEFT", x / k, y / k)
 end
 local function StandingPass()
@@ -504,6 +504,19 @@ ns.EventFrame(HOME_EVENTS, function(_, event)
         HomeClosedWindows()
     end
 end)
+
+-- Room left past the game's windows for one of ours opened now (UIParent units), and whether the game's spell window
+-- stands in that row (UI/WindowCloser.lua).
+function ns.RowRoomFor(frame)
+    GameRow()
+    local finish, spells = RowStart(), false
+    for _, block in ipairs(row.game) do
+        finish = math.max(finish, block[2])
+        spells = spells or block[3] == "PlayerSpellsFrame"
+    end
+    local k = ns.WindowRatio(frame) or 1
+    return UIParent:GetWidth() - finish - Drawn(frame, SlotWidth(frame)) * k, spells
+end
 
 -- For the dev addon's row probe: the last pass's state, answer and our windows in it.
 function ns.WindowRowState() return row, laid, order end
@@ -699,10 +712,12 @@ function ns.RegisterClassicWindow(frame, shares)
         -- fcuiKeep names the client window it belongs beside (the inspect window's talents).
         HideClientPanels(self.fcuiKeep and self:fcuiKeep() or nil)
         PlaceClassicWindows()
+        if ns.GameSpellsRoomChanged then ns.GameSpellsRoomChanged() end
     end)
     frame:HookScript("OnHide", function()
         PlaceClassicWindows()
         HomeClosedWindows()
+        if ns.GameSpellsRoomChanged then ns.GameSpellsRoomChanged() end
     end)
     WatchClientWindows()
 end

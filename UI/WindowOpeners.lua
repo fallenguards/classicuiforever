@@ -34,6 +34,14 @@ function ns.WindowKey(name, binding, press, escName)
         end
         Bind()
     end
+    -- A secure click made before press(), in the player's name (the game's spell window's close, UI/WindowCloser.lua), or
+    -- none; out of a fight.
+    function key.PressFirst(_, target)
+        if not button or InCombatLockdown() then return end
+        ns.SetAttributeIf(button, "type", target and "click" or nil)
+        ns.SetAttributeIf(button, "clickbutton", target)
+    end
+    key.name = name
     return key
 end
 

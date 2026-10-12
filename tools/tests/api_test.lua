@@ -115,6 +115,15 @@ Check(API.GetFrame("microMenu", "HelpMicroButton") == nil, "a micro button shown
 Check(API.GetFrame("talents", "talent:nope") == nil and API.GetFrame("talents", "bogus") == nil, "unknown parts: nil")
 Check(API.GetFrame("nope") == nil and API.GetFrame("nope", "part") == nil, "unknown windows: nil")
 
+-- SecureOpener: the key's secure button for a window in force, nothing otherwise.
+env.ClassicUIForeverTalentsBind = Frame()
+Check(API.SecureOpener("talents") == "ClassicUIForeverTalentsBind", "talents' secure opener by name")
+Check(API.SecureOpener("spellBook") == nil, "no opener before its button exists")
+inForce.talents = false
+Check(API.SecureOpener("talents") == nil, "no opener while not in force")
+inForce.talents = true
+Check(API.SecureOpener("trainer") == nil and API.SecureOpener("nope") == nil, "no opener for windows without one")
+
 -- Windows lists every window with its parts and patterns.
 local list = API.Windows()
 local function Has(name, part)

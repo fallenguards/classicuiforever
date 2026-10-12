@@ -166,6 +166,19 @@ function API.GetFrame(name, part)
     return window.part and window.part(frame, part) or nil
 end
 
+-- The secure buttons that open these windows as their keys do; see API.SecureOpener.
+local OPENERS = { spellBook = "ForeverClassicUISpellBookBind", talents = "ClassicUIForeverTalentsBind",
+    legacyWindow = "ClassicUIForeverLegacyBind", questLog = "ForeverClassicUIQuestLogBind" }
+
+-- The global name of the secure button that opens this window as its own key does, or nil. Pressed from another
+-- addon's secure button (a click in the player's name: type "click" with it as clickbutton, or "/click <name>"), it
+-- also closes the game's spell window first where that leaves ours no room, which a plain Open cannot. Toggles.
+function API.SecureOpener(name)
+    local opener = OPENERS[name]
+    if not opener or not API.IsOn(name) or not _G[opener] then return nil end
+    return opener
+end
+
 -- The spell a spellbook page button shows right now (nil once its page turned away, or for any other frame): the stable way
 -- to tell a button from GetFrame("spellBook", "spell:<id>") still shows that spell.
 function API.SpellOnButton(button)

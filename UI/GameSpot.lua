@@ -35,13 +35,57 @@ function ns.WindowRatio(frame)
     return scale / screen
 end
 
+-- A window's spot from a row start (left, top): its panel offsets (none with no frame), then raised to fit when h (its
+-- drawn height) is given, as the game's ClampUIPanelY. Left, and down from the top.
+local function Spot(frame, h, left, top)
+    local down = -top - (Offset(frame, "yoffset") or 0)
+    if h then
+        local bottom = UIParent:GetHeight() - down - h
+        local floor = Offset(frame, "bottomClampOverride") or GAME_BOTTOM
+        if bottom < floor then down = down - (floor - bottom) end
+        down = math.max(down, -(Offset(frame, "minYOffset") or GAME_MIN_Y))
+    end
+    return left + (Offset(frame, "xoffset") or 0), down
+end
+
+-- The classic sheet stands 12 above the game's line (Era's spot, UI/Windows.lua); within LINE_SLACK is on the line.
+local ERA_RAISE, LINE_SLACK = 12, 1.5
+
+-- A window's top in UIParent units, or nil while unreadable.
+local function Top(panel)
+    local top, k = Plain(panel:GetTop()), ns.WindowRatio(panel)
+    return top and k and top * k
+end
+
+-- A game window whose top is not where the game's manager puts it at its height now (nor Era's spot above that): exact,
+-- for learning a centering addon's sideways shift only.
+function ns.GameWindowOffLine(panel)
+    local top, h, k = Top(panel), Plain(panel:GetHeight()), ns.WindowRatio(panel)
+    if not (top and h and k) then return false end
+    -- The line needs no left: the layout's top alone (the row's left would ask Learn, which asks this).
+    local _, down = Spot(panel, h * k, 0, LayoutValue("TOP_OFFSET", GAME_TOP))
+    local line = UIParent:GetHeight() - down
+    return math.abs(top - line) > LINE_SLACK and math.abs(top - (line + ERA_RAISE)) > LINE_SLACK
+end
+
+-- A game window off the band its manager places in: below its line, or above the highest the fit raises it to (Era's
+-- spot counted). The player or a window mover put it there, so it leaves the row as our own placed ones do. A band, not
+-- the line: the game's spell window is laid at its two-page size on its first open, then shrinks to its talents.
+function ns.GameWindowOffRow(panel)
+    local top = Top(panel)
+    if not top then return false end
+    local line = UIParent:GetHeight() + LayoutValue("TOP_OFFSET", GAME_TOP) + (Offset(panel, "yoffset") or 0)
+    local highest = UIParent:GetHeight() + (Offset(panel, "minYOffset") or GAME_MIN_Y) + ERA_RAISE
+    return top < line - LINE_SLACK or top > highest + LINE_SLACK
+end
+
 -- How far the game's left window stands from where its manager put it: an addon that re-anchors the game's windows
--- (a centering one) moves ours by as much. Read while that window stands on an anchor not the manager's.
+-- (a centering one) moves ours by as much. Read while that window stands on an anchor not the manager's, on its line.
 local shift = 0
 local function Learn(left)
     local panel = _G.GetUIPanel and _G.GetUIPanel("left")
     if not (panel and panel:IsVisible()) or (ns.FramePlaced and ns.FramePlaced(panel)) then return end
-    if ns.WindowMoving and ns.WindowMoving(panel) then return end
+    if (ns.WindowMoving and ns.WindowMoving(panel)) or ns.GameWindowOffLine(panel) then return end
     if Plain(panel:GetNumPoints()) == 1 then
         local point, rel, relPoint = panel:GetPoint(1)
         if Plain(point) == "TOPLEFT" and Plain(relPoint) == "TOPLEFT" and (rel == nil or Plain(rel) == UIParent) then
@@ -61,18 +105,10 @@ function ns.GameRow()
     return left + shift, LayoutValue("TOP_OFFSET", GAME_TOP)
 end
 
--- The game's left spot for a window in UIParent units: the row's start and its panel offsets (none with no frame),
--- then raised to fit when h (its drawn height) is given. Left, and down from the top.
+-- The game's left spot for a window in UIParent units, from the row's start. Left, and down from the top.
 function ns.GameHome(frame, h)
     local left, top = ns.GameRow()
-    local down = -top - (Offset(frame, "yoffset") or 0)
-    if h then
-        local bottom = UIParent:GetHeight() - down - h
-        local floor = Offset(frame, "bottomClampOverride") or GAME_BOTTOM
-        if bottom < floor then down = down - (floor - bottom) end
-        down = math.max(down, -(Offset(frame, "minYOffset") or GAME_MIN_Y))
-    end
-    return left + (Offset(frame, "xoffset") or 0), down
+    return Spot(frame, h, left, top)
 end
 
 -- A game window open alone goes to the game's own left spot now (the sheet's Era pass takes it on); beside another it

@@ -49,7 +49,7 @@ out = Row(START, SCREEN, { sheet }, { Ours() })
 Check(out.x[1] == 876, "#154 sheet then spellbook: the book past the sheet, not at the screen's edge: " .. Xs(out, 1))
 out = Row(START, SCREEN, { sheet }, { Ours(), Ours() })
 Check(out.x[1] == 876 and out.x[2] == 1228, "#154 sheet, talents, spellbook: one row: " .. Xs(out, 2))
-local finish = ns.WindowRowEnd({ start = START, screen = SCREEN, game = { sheet }, ours = { Ours(), Ours() } }, out, 250)
+local finish = ns.WindowRowEnd({ start = START, screen = SCREEN, game = { sheet }, ours = { Ours(), Ours() } }, out)
 Check(finish == 1580, "the row's end past the last of ours: " .. tostring(finish))
 out = Row(START, SCREEN, {}, { Ours(), Ours() })
 Check(out.x[1] == 524 and out.x[2] == 876, "#154 talents then spellbook alone: from the game's row start: " .. Xs(out, 2))
@@ -64,7 +64,7 @@ out = Row(0, 1920, { { 0, 600, "ProfessionsFrame" } }, { Ours({ shares = { Profe
 Check(out.x[1] == 0, "a window that shares a place with a game one takes that place")
 
 out = Row(0, 1920, { { 0, 1900, "WorldMapFrame" } }, { Ours() })
-Check(out.x[1] == 0, "a game window too wide to share the screen with is left out")
+Check(out.x[1] == 0, "a screen-wide game window (the maximized map) is left out")
 
 out = Row(0, 1920, {}, { Ours({ keep = 700 }) })
 Check(out.x[1] == 700, "a window kept beside a game one stands past it")
@@ -101,6 +101,13 @@ out = GameLast(talentsAfterSheet, { Ours(), Ours() }, 1366)
 Check(#out.close == 2, "no room for any of ours: all shut, oldest first")
 out = Row(0, 1366, talentsAfterSheet, { Ours() })
 Check(#out.close == 0 and out.x[1] == 982, "ours opened last keeps the newest: back on the screen, not shut: " .. Xs(out, 1))
+
+-- Forever's talent window (1218 of 1517, centered) open, ours opened after it: no room past it, so ours stands on top at
+-- the screen's right edge, as behind the one-page spellbook; nothing of ours closes.
+out = Row(0, 1517, { { 149.5, 1367.5, "PlayerSpellsFrame" } }, { Ours() })
+Check(#out.close == 0 and out.x[1] == 1133, "past the big talent window: on top at the right edge: " .. Xs(out, 1))
+out = Row(0, 1517, { { 16, 354, "MacroFrame" }, { 386, 1188.7, "PlayerSpellsFrame" } }, { Ours() })
+Check(out.x[1] == 1133, "past the one-page spellbook: the same edge: " .. Xs(out, 1))
 
 -- A closed window's trial (its spot before a fight): past the open ones, nothing closed.
 out = Row(0, 1100, narrow, { Ours(), Ours(), Ours() }, true)

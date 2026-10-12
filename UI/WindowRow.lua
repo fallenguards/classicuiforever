@@ -6,13 +6,16 @@ local _, ns = ...
 local lefts, rights = {}, {}   -- blocks laid so far this pass: held ones first, then each placed
 local closed = {}              -- index -> true while left out to make room
 
--- Past the game's last window, but one it shares a place with or one too wide to share the screen with this one
--- (the maximized map).
-local function GameEnd(s, shares, drawn)
+-- A game window across nearly the whole screen (the maximized map): nothing stands past it, so it is left out.
+local SCREEN_WIDE = 0.9
+
+-- Past the game's last window, but one it shares a place with or a screen-wide one. A window too big to share the
+-- screen with (Forever's spell window) still counts: the one past it is pulled back to the edge, over it.
+local function GameEnd(s, shares)
     local x = s.start
     for _, block in ipairs(s.game) do
         local right = block[2]
-        if right > x and right - block[1] + drawn <= s.screen and not (shares and shares[block[3]]) then x = right end
+        if right > x and right - block[1] < s.screen * SCREEN_WIDE and not (shares and shares[block[3]]) then x = right end
     end
     return x
 end
@@ -46,7 +49,7 @@ local function Lay(s, out)
         if w.held and not closed[i] then
             x = w.held
         elseif not closed[i] then
-            x = math.max(cursor, GameEnd(s, w.shares, w.drawn), w.keep or cursor)
+            x = math.max(cursor, GameEnd(s, w.shares), w.keep or cursor)
             x = math.floor(FirstFree(x, w.width, n) + 0.5)
             n = n + 1
             lefts[n], rights[n] = x, x + w.width
@@ -92,9 +95,9 @@ function ns.SolveWindowRow(s, out)
     return out
 end
 
--- Past everything in a solved row, for a window drawn this wide (the loot window on its own spot).
-function ns.WindowRowEnd(s, out, drawn)
-    local finish = GameEnd(s, nil, drawn)
+-- Past everything in a solved row (the loot window on its own spot).
+function ns.WindowRowEnd(s, out)
+    local finish = GameEnd(s, nil)
     for i, w in ipairs(s.ours) do
         local x = out.x[i]
         if x and x + w.width > finish then finish = x + w.width end
