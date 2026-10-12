@@ -56,6 +56,7 @@ local COVERED = { { 60, 120 }, { 246, 294 } }
 local APART = 25
 
 local function Angle(ring)
+    if ring.ride then return ring.angle end
     return ns.db and ns.db[ring.angleKey] or ring.freeAngle or ring.angle
 end
 
@@ -85,7 +86,7 @@ end
 -- A button with no place of its own (spec.free): the nearest clear spot to its own, kept while it stays clear; on a full
 -- ring the roomiest spot.
 local function FreeSpot(ring)
-    if not ring.free or (ns.db and ns.db[ring.angleKey]) then return end
+    if ring.ride or not ring.free or (ns.db and ns.db[ring.angleKey]) then return end
     if ring.freeAngle and (Room(ring.freeAngle, ring) or 0) >= APART then return end
     local best, bestRoom = ring.angle, -1
     for step = 0, 180 do
@@ -108,6 +109,14 @@ end
 local function Position(ring)
     local button = ring.button
     if not button or not Minimap or button:GetParent() ~= Home(ring) then return end
+    -- Riding another frame (the group finder icon on the game's queue eye, which edit mode places and sizes).
+    local host = ring.ride and ring.ride()
+    if host then
+        local own, theirs = ns.Safe(button:GetParent():GetEffectiveScale()), ns.Safe(host:GetEffectiveScale())
+        if own and theirs and own > 0 then ns.SetScaleIf(button, theirs / own, 0.001) end
+        ns.SetPointOnce(button, "CENTER", host, "CENTER", 0, 0)
+        return
+    end
     local degrees = Angle(ring)
     local r = Radius()
     local k = button:GetEffectiveScale() / Minimap:GetEffectiveScale()
@@ -187,7 +196,8 @@ local function Build(ring)
     b:SetFrameStrata("MEDIUM")
     b:SetFrameLevel((Minimap:GetFrameLevel() or 2) + 8)
     b:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-    b:RegisterForDrag("LeftButton")
+    -- A riding button moves with what it rides, never by its own drag.
+    if not ring.ride then b:RegisterForDrag("LeftButton") end
     -- Pure child watcher, asleep until a drag starts.
     local dragJob = ns.Sched.OnFrame(CreateFrame("Frame", nil, b),
         { name = ring.name .. ".drag", every = 0, awake = false, fn = OnDragUpdate })
@@ -213,8 +223,8 @@ local function Build(ring)
 end
 
 -- spec: { name, key (its edit mode entry), angleKey, angle (default degrees), free (takes the nearest clear spot), show
--- (its on hover id), piece (the map's own, not an addon button), face(texture), onClick(button, mouse), tip }; returns
--- show and hide.
+-- (its on hover id), piece (the map's own, not an addon button), face(texture), onClick(button, mouse), tip, ride() (a
+-- frame it sits on at that frame's size instead of the ring) }; returns show and hide.
 function ns.RingButton(spec)
     rings[#rings + 1] = spec
     local function Show()

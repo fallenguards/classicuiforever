@@ -431,6 +431,7 @@ frame:SetScript("OnEvent", function(_, event, arg1)
         if saved and saved < 16 then ns.OneProfTabsChoice() end
         if saved and saved < 17 then ns.KeepQuestLogSingle() end
         if saved and saved < 17 then ns.KeepMapNav() end
+        if saved and saved < 18 then ns.EyeSnapToDecide() end
         ns.CopyDefaults(ns.db, ns.DB_DEFAULTS)
         if upgraded then ns.KeepBarSize(big) end
         ns.BarSizeKey()

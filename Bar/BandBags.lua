@@ -361,7 +361,23 @@ ns.EventFrame({ "ACTIONBAR_SHOWGRID", "ACTIONBAR_HIDEGRID" }, function(_, event)
     end
 end)
 
-local function BagsCheck(extra, rel, relPoint, x, y, label, onClick)
+-- An extra panel's foot: addon settings save on click, outside Save/Revert, and it says so (a dark Save reads as
+-- "nothing happened"); and its red size reset, placed beside Revert Changes by its owner. Returns the button.
+function B.DialogFoot(extra, note, label, onClick)
+    local saved = extra:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
+    saved:SetPoint("BOTTOMLEFT", extra, "BOTTOMLEFT", 26, 14)
+    saved:SetText(note)
+    local resize = CreateFrame("Button", nil, extra, "UIPanelButtonTemplate")
+    resize:SetHeight(28)
+    resize:SetText(label)
+    resize:SetFrameLevel(210)
+    resize:SetScript("OnClick", onClick)
+    ns.EditModeRed(resize)
+    return resize
+end
+
+-- A check row in an extra panel under edit mode's dialog (the bags', the queue eye's).
+function B.DialogCheck(extra, rel, relPoint, x, y, label, onClick)
     local check = CreateFrame("CheckButton", nil, extra, "UICheckButtonTemplate")
     check:SetSize(30, 30)
     check:SetPoint("TOPLEFT", rel, relPoint, x, y)
@@ -413,18 +429,18 @@ local function BagsExtra()
     extra:Hide()
     art.bagsExtra = extra
     B.PanelBorder(extra)
-    local check = BagsCheck(extra, extra, "TOPLEFT", 22, -14, L["BAR_OPENED_BAGS_TAKE_THIS_SIZE"], FollowClick)
+    local check = B.DialogCheck(extra, extra, "TOPLEFT", 22, -14, L["BAR_OPENED_BAGS_TAKE_THIS_SIZE"], FollowClick)
     extra.check = check
-    local above = BagsCheck(extra, check, "BOTTOMLEFT", 0, -2, L["BAR_OPENED_BAGS_ABOVE_THE_BAG"], AboveClick)
+    local above = B.DialogCheck(extra, check, "BOTTOMLEFT", 0, -2, L["BAR_OPENED_BAGS_ABOVE_THE_BAG"], AboveClick)
     extra.above = above
-    local hideArt = BagsCheck(extra, above, "BOTTOMLEFT", 0, -2, HUD_EDIT_MODE_SETTING_ACTION_BAR_HIDE_BAR_ART or "Hide Bar Art",
+    local hideArt = B.DialogCheck(extra, above, "BOTTOMLEFT", 0, -2, HUD_EDIT_MODE_SETTING_ACTION_BAR_HIDE_BAR_ART or "Hide Bar Art",
         function(self)
             ns.MicroTouched()
             ns.db.hideBagsArt = self:GetChecked() and true or false
             ns.ToggleChanged("hideBagsArt")
         end)
     extra.art = hideArt
-    local one = BagsCheck(extra, hideArt, "BOTTOMLEFT", 0, -2, L["BAR_ONE_BAG_ALL_BAGS_OPEN"], function(self)
+    local one = B.DialogCheck(extra, hideArt, "BOTTOMLEFT", 0, -2, L["BAR_ONE_BAG_ALL_BAGS_OPEN"], function(self)
         ns.db.oneBag = self:GetChecked() and true or false
         ns.ToggleChanged("oneBag")
         if extra.InitColumns then extra.InitColumns() end
@@ -441,17 +457,7 @@ local function BagsExtra()
         extra.InitColumns = B.GuardedSlider(slider, ColumnValues, OnColumns,
             { formatters = formatters, owner = extra, enabled = OneBagOn, label = colsLabel })
     end
-    -- Addon settings save on click, outside Save/Revert, and say so (a dark Save reads as "nothing happened").
-    local saved = extra:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
-    saved:SetPoint("BOTTOMLEFT", extra, "BOTTOMLEFT", 26, 14)
-    saved:SetText(L["BAR_BAG_WINDOW_OPTIONS_APPLY_AND"])
-    local resize = CreateFrame("Button", nil, extra, "UIPanelButtonTemplate")
-    resize:SetHeight(28)
-    resize:SetText(L["BAR_RESET_TO_DEFAULT_SIZE"])
-    resize:SetFrameLevel(210)
-    resize:SetScript("OnClick", ResetBagsSize)
-    ns.EditModeRed(resize)
-    extra.resize = resize
+    extra.resize = B.DialogFoot(extra, L["BAR_BAG_WINDOW_OPTIONS_APPLY_AND"], L["BAR_RESET_TO_DEFAULT_SIZE"], ResetBagsSize)
     return extra
 end
 

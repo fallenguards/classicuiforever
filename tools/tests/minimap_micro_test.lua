@@ -118,7 +118,7 @@ ruleOn[Enum.GameRule.StoreDisabled] = nil
 Pass()
 Check(shown[SHOP], "the shop icon once the game allows it")
 
--- Queued, the game's eye shows and ours gives way; in edit mode both show, to be placed.
+-- Queued, the game's eye shows and ours gives way; in edit mode the game's eye is the box placed, ours stays hidden.
 queued = true
 eyeEdge(true)
 Pass()
@@ -126,7 +126,7 @@ Check(not shown[EYE], "queued: the game's eye shows, ours goes")
 ns.EditMode.state = true
 editEdge()
 Pass()
-Check(shown[EYE], "queued in edit mode: ours shows beside the game's")
+Check(not shown[EYE], "in edit mode: the game's eye is the box, ours stays hidden")
 ns.EditMode.state = false
 queued = false
 eyeEdge(false)

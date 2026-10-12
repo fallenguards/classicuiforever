@@ -2,7 +2,7 @@ local _, ns = ...
 local L = ns.L
 
 ns.DB_DEFAULTS = {
-    dbVersion = 17,
+    dbVersion = 18,
     classicBar = true,
     oneBar = false,
     classicBarSize = false,
@@ -213,6 +213,7 @@ ns.DB_DEFAULTS = {
     showAddonBag = true, hoverAddonBag = false,
     microMinimapButtons = true, lfgMinimapButton = true, legacyMinimapButton = true,
     showGroupFinderButton = true, hoverGroupFinderButton = false,
+    eyeSnapMinimap = true,
     characterMinimapButton = false, spellbookMinimapButton = false, talentsMinimapButton = false,
     professionsMinimapButton = false, questLogMinimapButton = false, worldMapMinimapButton = false,
     guildMinimapButton = false, collectionsMinimapButton = false, helpMinimapButton = false,

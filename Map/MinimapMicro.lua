@@ -31,9 +31,11 @@ local MICROS = {
     { toggle = "worldMapMinimapButton", face = "World", id = "WorldMap", angle = 232, free = true, label = L["OPT_hideMicroWorldMap"] },
     { toggle = "guildMinimapButton", micro = "GuildMicroButton", face = "Socials", id = "Guild", angle = 232, free = true,
         label = L["OPT_hideMicroGuild"], rule = "CommunitiesPanelDisabled" },
-    -- Era's LFG eye spot (backdrop top left +25, -28); its frame and entry keep their first names.
+    -- Era's eye while not queued: it rides the game's queue eye, which the game's edit mode places (Map/MinimapEye.lua).
+    -- Its frame and entry keep their first names.
     { toggle = "lfgMinimapButton", micro = "LFDMicroButton", face = "eye", id = "GroupFinder", angle = 137,
         name = "ForeverClassicUIGroupFinderButton", entry = "minimapGroupFinder", angleKey = "lfgButtonAngle",
+        ride = function() return QueueStatusButton end,
         label = L["OPT_hideMicroGroupFinder"], rule = "FinderPanelDisabled" },
     { toggle = "collectionsMinimapButton", micro = "CollectionsMicroButton", face = "Mounts", id = "Collections", angle = 232, free = true,
         label = L["OPT_hideMicroCollections"], rule = "CollectionsPanelDisabled" },
@@ -100,8 +102,9 @@ local function Chosen(spec)
     return db and db.microMinimapButtons ~= false and db[spec.toggle] == true and Target(spec) ~= nil
 end
 
+-- Queued, the game's eye shows instead; in edit mode too, as its box.
 local function Wanted(spec)
-    if spec.face == "eye" and QueueEyeShown() then return false end
+    if spec.face == "eye" and (QueueEyeShown() or ns.EditMode.state) then return false end
     return Chosen(spec)
 end
 
@@ -113,11 +116,12 @@ for _, spec in ipairs(MICROS) do
         angleKey = spec.angleKey or ("minimap" .. spec.id .. "Angle"),
         angle = spec.angle,
         free = spec.free,
+        ride = spec.ride,
         piece = true,
         show = "GroupFinderButton",
         face = function(icon) Face(spec, icon) end,
         tip = { anchor = "ANCHOR_LEFT", text = function() return TipText(spec) end, r = 1, g = 1, b = 1,
-            lines = { { L["MAP_DRAG_TO_MOVE_AROUND_THE"], 0.8, 0.8, 0.8 } } },
+            lines = not spec.ride and { { L["MAP_DRAG_TO_MOVE_AROUND_THE"], 0.8, 0.8, 0.8 } } or nil },
     })
     spec.frame = spec.name or ("ForeverClassicUIMinimap" .. spec.id .. "Button")
 end
@@ -162,11 +166,6 @@ Sync = function()
     end
     for _, spec in ipairs(MICROS) do
         local want = Wanted(spec)
-        -- Made and placed even while queued: the game's eye rides it.
-        if not want and spec.face == "eye" and not _G[spec.frame] and Chosen(spec) then
-            spec.show()
-            spec.shown = true
-        end
         if want then spec.show() elseif spec.shown then spec.hide() end
         spec.shown = want
     end
