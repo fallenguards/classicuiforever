@@ -302,6 +302,14 @@ end
 -- Forever's Legacy system, after Talents; retail has none.
 local FOREVER_ROWS = {
     talents = {
+        { "talentsThreePane", L["OPT_talentsThreePane"], L["OPT_talentsThreePane_TIP"], parent = "talents",
+            search = "three trees side by side triple pane all trees" },
+        { "talentsScroll", L["OPT_talentsScroll"], L["OPT_talentsScroll_TIP"], parent = "talentsThreePane",
+            radio = "talentsHeight", drop = true, dropTip = L["OPT_talentsHeight_TIP"], search = "scroll bar height" },
+        { "talentsTall", L["OPT_talentsTall"], L["OPT_talentsTall_TIP"], parent = "talentsThreePane",
+            radio = "talentsHeight", drop = true, search = "tall taller no scroll every row height" },
+        { "talentsSqueeze", L["OPT_talentsSqueeze"], L["OPT_talentsSqueeze_TIP"], parent = "talentsThreePane",
+            radio = "talentsHeight", drop = true, search = "squeeze fit no scroll every row height" },
         { "legacyWindow", L["OPT_legacyWindow"], L["OPT_legacyWindow_TIP"], search = "legacy points perks tree challenges rewards track" },
     },
 }

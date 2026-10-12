@@ -71,6 +71,7 @@ local function Build()
     if frame then return frame end
     frame = ns.TalentWindow("ClassicUIForeverTalents", { hosted = Hosted(), refresh = Refresh, learn = Learn })
     frame.title:SetText(TALENTS or "Talents")
+    ns.TalentTrees(frame)
 
     frame:SetScript("OnShow", function()
         -- Hidden and shown in one go (inspect to own) with a talent tooltip up: keep listening.

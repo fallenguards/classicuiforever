@@ -21,15 +21,19 @@ Locales\enUS_Windows.lua
 Locales\deDE.lua
 Locales\deDE_WhatsNew.lua
 Locales\deDE_Legacy.lua
+Locales\deDE_Windows.lua
 Locales\frFR.lua
 Locales\frFR_WhatsNew.lua
 Locales\frFR_Legacy.lua
+Locales\frFR_Windows.lua
 Locales\esES.lua
 Locales\esES_WhatsNew.lua
 Locales\esES_Legacy.lua
+Locales\esES_Windows.lua
 Locales\itIT.lua
 Locales\itIT_WhatsNew.lua
 Locales\itIT_Legacy.lua
+Locales\itIT_Windows.lua
 Core\Core.lua
 Core\Defaults.lua
 Core\Settings.lua
@@ -198,6 +202,7 @@ UI\SkillLineTab.lua
 UI\RewardSlot.lua
 UI\TraitTree.lua
 UI\TalentWindow.lua
+UI\TalentTrees.lua
 Skills\Talents.lua
 Skills\TalentsTree.lua
 Legacy\LegacyWindow.lua

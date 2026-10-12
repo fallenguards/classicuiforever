@@ -10,6 +10,9 @@ local IsSecret = ns.IsSecret
 local WINDOW_W, WINDOW_H = 384, 512
 local VIEW_X, VIEW_Y, VIEW_W, VIEW_H = 22, -77, 296, 332
 local BUTTON, START_X, START_Y, PITCH = 37, 35, 20, 63
+-- The foot's undo spot, points box and its text.
+local RESET_X, RESET_Y = 17, 101
+local POINTS_BOX_W, POINTS_BOX_H, POINTS_TEXT_X = 196, 24, -10
 local ART = "Interface\\TalentFrame\\"
 local BRANCHES, ARROWS = ART .. "UI-TalentBranches", ART .. "UI-TalentArrows"
 -- The X: its centre from the window's top right.
@@ -70,8 +73,11 @@ local function ReleaseAll(pool)
     pool.n = 0
 end
 
-local function CellX(column) return START_X + column * PITCH end
-local function CellY(tier) return -(START_Y + tier * PITCH) end
+-- A view's cells (the window's one tree, or a pane of the three: UI/TalentTrees.lua): view.geo is the first's top left
+-- in it, then the pitch across and down.
+local GEO = { START_X, START_Y, PITCH, PITCH }
+local function CellX(view, column) return view.geo[1] + column * view.geo[3] end
+local function CellY(view, tier) return -(view.geo[2] + tier * view.geo[4]) end
 
 local function BranchPiece(frame, lit, kind, x, y, w, h)
     local child = frame.child
@@ -92,7 +98,7 @@ end
 
 -- A run of branch between two places, and the arrow into the second.
 local function DrawEdge(frame, from, to, lit)
-    local fx, fy, tx, ty = CellX(from.column), CellY(from.tier), CellX(to.column), CellY(to.tier)
+    local fx, fy, tx, ty = CellX(frame, from.column), CellY(frame, from.tier), CellX(frame, to.column), CellY(frame, to.tier)
     local half = BUTTON / 2
     if from.tier == to.tier then
         -- Along the row.
@@ -353,7 +359,8 @@ local function BuildShell(name, spec)
     frame.portrait = portrait
 
     local title = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    title:SetPoint("CENTER", frame, "CENTER", 6, 232)
+    -- In its bar 24 down, from the top: a taller window (the three trees) keeps it there.
+    title:SetPoint("CENTER", frame, "TOP", 6, -24)
     frame.title = title
 
     local close = ns.NewFrame("Button", nil, frame)
@@ -384,25 +391,22 @@ local function RimBar(parent)
     return bar
 end
 
--- Points spent on the rimmed bar, and the tree in a window that scrolls.
-local function BuildView(frame)
-    local spentBar = RimBar(frame)
-    spentBar:SetWidth(258)
-    spentBar:SetPoint("TOP", frame, "TOP", 12, -48)
-    frame.spentBar, frame.spent = spentBar, spentBar.text
-
-    local scroll = ns.NewFrame("ScrollFrame", nil, frame)
-    scroll:SetPoint("TOPLEFT", frame, "TOPLEFT", VIEW_X, VIEW_Y)
+-- A tree in a view that scrolls, on Era's background with its scroll bar beside it, filled into view (the window, or
+-- a pane of the three: UI/TalentTrees.lua); placed by the caller through view.scroll.
+local function TreeView(view)
+    view.geo = GEO
+    view.buttons, view.branchPool, view.arrowPool = view.buttons or {}, view.branchPool or {}, view.arrowPool or {}
+    local scroll = ns.NewFrame("ScrollFrame", nil, view)
     scroll:SetSize(VIEW_W, VIEW_H)
     scroll:EnableMouseWheel(true)
     local child = ns.NewFrame("Frame", nil, scroll)
     child:SetSize(VIEW_W, VIEW_H)
     scroll:SetScrollChild(child)
-    frame.scroll, frame.child = scroll, child
+    view.scroll, view.child = scroll, child
     -- The arrows stand over the talents they point into.
-    frame.arrows = ns.NewFrame("Frame", nil, child)
-    frame.arrows:SetAllPoints(child)
-    frame.arrows:SetFrameLevel(child:GetFrameLevel() + 5)
+    view.arrows = ns.NewFrame("Frame", nil, child)
+    view.arrows:SetAllPoints(child)
+    view.arrows:SetFrameLevel(child:GetFrameLevel() + 5)
 
     local background = {}
     for _, key in ipairs({ "TopLeft", "TopRight", "BottomLeft", "BottomRight" }) do
@@ -412,13 +416,24 @@ local function BuildView(frame)
     background.TopRight:SetPoint("TOPLEFT", background.TopLeft, "TOPRIGHT", 0, 0)
     background.BottomLeft:SetPoint("TOPLEFT", background.TopLeft, "BOTTOMLEFT", 0, 0)
     background.BottomRight:SetPoint("TOPLEFT", background.TopLeft, "BOTTOMRIGHT", 0, 0)
-    frame.background = background
+    view.background = background
 
-    frame.bar = ns.ClassicScrollBar(frame, scroll, function(value) scroll:SetVerticalScroll(value or 0) end)
-    ns.ScrollColumnOn(frame.bar)
+    view.bar = ns.ClassicScrollBar(view, scroll, function(value) scroll:SetVerticalScroll(value or 0) end)
+    ns.ScrollColumnOn(view.bar)
     scroll:SetScript("OnMouseWheel", function(_, delta)
-        frame.bar:SetValue((frame.bar:GetValue() or 0) - delta * 30)
+        view.bar:SetValue((view.bar:GetValue() or 0) - delta * 30)
     end)
+    return view
+end
+
+-- Points spent on the rimmed bar, and the tree in a window that scrolls.
+local function BuildView(frame)
+    local spentBar = RimBar(frame)
+    spentBar:SetWidth(258)
+    spentBar:SetPoint("TOP", frame, "TOP", 12, -48)
+    frame.spentBar, frame.spent = spentBar, spentBar.text
+    TreeView(frame)
+    frame.scroll:SetPoint("TOPLEFT", frame, "TOPLEFT", VIEW_X, VIEW_Y)
 end
 
 -- Foot: undo, points-left box, Apply Changes, fixed sizes so nothing moves when
@@ -427,16 +442,17 @@ end
 local function BuildFoot(frame, spec)
     local foot = ns.NewFrame("Frame", nil, frame)
     frame.foot = foot
-    foot:SetPoint("TOPLEFT", frame, "TOPLEFT", 14, -409)
-    -- To the border's inner edge (340 in the old art); 352 ran past the window's side.
-    foot:SetPoint("BOTTOMRIGHT", frame, "TOPLEFT", 340, -435)
+    -- From the window's foot (Era's 409 and 435 down of 512), to the border's inner edge, 44 in from the right in the old
+    -- art; 352 ran past the window's side.
+    foot:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 14, 103)
+    foot:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -44, 77)
     local footStone = foot:CreateTexture(nil, "BACKGROUND")
     footStone:SetAllPoints(foot)
     ns.TileTex(footStone, "rockBg")
 
     -- Undo and Apply at opposite ends: side by side, a slip undid points meant to be applied.
     frame.reset = ns.PanelButton(foot, "", 28)
-    frame.reset:SetPoint("TOPLEFT", frame, "TOPLEFT", 17, -411)
+    frame.reset:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", RESET_X, RESET_Y)
     -- The arrow, small enough to sit inside the button with room round it.
     local undo = frame.reset:CreateTexture(nil, "OVERLAY")
     undo:SetSize(13, 13)
@@ -456,12 +472,13 @@ local function BuildFoot(frame, spec)
 
     local pointsBox = ns.SkillInsetBox(foot, 16, true, 0.55)
     pointsBox:SetPoint("LEFT", frame.reset, "RIGHT", 2, 0)
-    pointsBox:SetSize(196, 24)
+    pointsBox:SetSize(POINTS_BOX_W, POINTS_BOX_H)
+    frame.pointsBox = pointsBox
     frame.points = pointsBox:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
-    frame.points:SetPoint("RIGHT", pointsBox, "RIGHT", -10, 0)
+    frame.points:SetPoint("RIGHT", pointsBox, "RIGHT", POINTS_TEXT_X, 0)
 
     frame.learn = ns.PanelButton(foot, L["SKILL_APPLY_CHANGES"], 104)
-    frame.learn:SetPoint("LEFT", pointsBox, "RIGHT", 1, 0)
+    frame.learn:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT", -36, 101)
     frame.learn:SetScript("OnClick", function()
         local tree = frame.tree
         if not tree or InCombatLockdown() then return end
@@ -548,8 +565,10 @@ end
 -- Public API (Core/API.lua): a talent window's shown button for a talent's spell (talents, the Legacy tree).
 function ns.TalentWindowButtonFor(frame, spellID)
     if not (frame and frame:IsShown() and frame.buttons) or type(spellID) ~= "number" then return nil end
-    for _, button in ipairs(frame.buttons) do
-        if button:IsVisible() and button.talent and button.talent.spellID == spellID then return button end
+    for _, view in ipairs(frame.panes or { frame }) do
+        for _, button in ipairs(view.buttons) do
+            if button:IsVisible() and button.talent and button.talent.spellID == spellID then return button end
+        end
     end
 end
 
@@ -558,7 +577,7 @@ local function DrawButtons(frame, tab)
     for i, talent in ipairs(tab.nodes) do
         local button = TalentButton(frame, i)
         button.talent = talent
-        ns.SetPointOnce(button, "TOPLEFT", child, "TOPLEFT", CellX(talent.column), CellY(talent.tier))
+        ns.SetPointOnce(button, "TOPLEFT", child, "TOPLEFT", CellX(frame, talent.column), CellY(frame, talent.tier))
         button.icon:SetTexture(talent.icon or "Interface\\Icons\\INV_Misc_QuestionMark")
         local ranked, maxed = talent.rank > 0, talent.rank >= talent.maxRank
         if maxed or (ranked and not talent.canBuy) then
@@ -600,10 +619,41 @@ local function DrawFootTabs(frame, tree, names)
     end
 end
 
+-- A tab's tree in a view's cells (its down pitch may be squeezed).
+local function TreeHeight(view, tab) return 2 * view.geo[2] + (tab.tiers - 1) * view.geo[4] + BUTTON end
+
+-- A view's tab drawn (view.tree set): background and buttons as tall as the tree, scrolled in its view's height.
+local function DrawView(view, tab, look)
+    local room = view.scroll:GetHeight() or VIEW_H
+    local height = math.max(room, TreeHeight(view, tab))
+    view.child:SetSize(VIEW_W, height)
+    DrawBackground(view, look.background and look.background(tab), height)
+    DrawButtons(view, tab)
+    local over = math.max(0, height - room)
+    view.bar:SetRange(over, 20)
+    view.scroll:SetVerticalScroll(math.min(view.bar:GetValue() or 0, over))
+end
+
+-- The foot's points and buttons for the tree as staged.
+local function DrawFoot(frame, tree, look)
+    frame.points:SetText(look.points or "")
+    frame.learn:SetEnabled(tree.staged)
+    frame.reset:SetEnabled(tree.staged)
+    frame.undoIcon:SetDesaturated(not tree.staged)
+    frame.undoIcon:SetAlpha(tree.staged and 1 or 0.5)
+end
+
+-- For the three trees side by side (UI/TalentTrees.lua).
+ns.talentView = { TreeView = TreeView, DrawView = DrawView, DrawBackground = DrawBackground, DrawFoot = DrawFoot,
+    TreeHeight = TreeHeight, RimBar = RimBar, ReleaseAll = ReleaseAll, ART = ART, VIEW_X = VIEW_X, VIEW_Y = VIEW_Y,
+    VIEW_W = VIEW_W, VIEW_H = VIEW_H, GEO = GEO, BUTTON = BUTTON, RESET_X = RESET_X, RESET_Y = RESET_Y,
+    POINTS_BOX_W = POINTS_BOX_W, POINTS_BOX_H = POINTS_BOX_H, POINTS_TEXT_X = POINTS_TEXT_X }
+
 -- DrawTalentTab(frame, tree, look): the picked tab drawn. look: background(tab) -> an Era tree's art or nil; title;
 -- points (the foot's points-left text); tabNames (each foot tab a tree of its own: tree is the picked one, drawn
--- whole). A missing or empty tree draws nothing.
+-- whole). A missing or empty tree draws nothing. With its three trees up, all three (UI/TalentTrees.lua).
 function ns.DrawTalentTab(frame, tree, look)
+    if frame.trees and frame.trees.on then return frame.trees.Draw(tree, look) end
     frame.tree, frame.tab = tree, nil
     ReleaseAll(frame.branchPool)
     ReleaseAll(frame.arrowPool)
@@ -628,19 +678,7 @@ function ns.DrawTalentTab(frame, tree, look)
     frame.tab = tab
     if not names then DrawFootTabs(frame, tree) end
 
-    local height = math.max(VIEW_H, START_Y + (tab.tiers - 1) * PITCH + BUTTON + START_Y)
-    frame.child:SetSize(VIEW_W, height)
-    DrawBackground(frame, look.background and look.background(tab), height)
-
     frame.spent:SetText(string.format(L["SKILL_POINTS_SPENT_IN_X_TALENTS"], tab.name) .. "|cffffffff" .. tab.spent .. "|r")
-    frame.points:SetText(look.points or "")
-    frame.learn:SetEnabled(tree.staged)
-    frame.reset:SetEnabled(tree.staged)
-    frame.undoIcon:SetDesaturated(not tree.staged)
-    frame.undoIcon:SetAlpha(tree.staged and 1 or 0.5)
-    DrawButtons(frame, tab)
-
-    local over = math.max(0, height - VIEW_H)
-    frame.bar:SetRange(over, 20)
-    frame.scroll:SetVerticalScroll(math.min(frame.bar:GetValue() or 0, over))
+    DrawFoot(frame, tree, look)
+    DrawView(frame, tab, look)
 end
