@@ -57,15 +57,25 @@ local function Top(panel)
     return top and k and top * k
 end
 
--- A game window whose top is not where the game's manager puts it at its height now (nor Era's spot above that): exact,
--- for learning a centering addon's sideways shift only.
-function ns.GameWindowOffLine(panel)
+-- Its top and the manager's line for it, or nil while unreadable; the layout's top alone (the row's left asks Learn).
+local function TopAndLine(panel)
     local top, h, k = Top(panel), Plain(panel:GetHeight()), ns.WindowRatio(panel)
-    if not (top and h and k) then return false end
-    -- The line needs no left: the layout's top alone (the row's left would ask Learn, which asks this).
+    if not (top and h and k) then return nil end
     local _, down = Spot(panel, h * k, 0, LayoutValue("TOP_OFFSET", GAME_TOP))
-    local line = UIParent:GetHeight() - down
+    return top, UIParent:GetHeight() - down
+end
+
+-- Not where the manager puts it at its height now (nor Era's spot above that): exact, for learning a shift only.
+function ns.GameWindowOffLine(panel)
+    local top, line = TopAndLine(panel)
+    if not top then return false end
     return math.abs(top - line) > LINE_SLACK and math.abs(top - (line + ERA_RAISE)) > LINE_SLACK
+end
+
+-- On Era's spot (the sheet, UI/Windows.lua): raised 12 above the line and stood 16 left of the manager's x.
+function ns.GameWindowAtEra(panel)
+    local top, line = TopAndLine(panel)
+    return top ~= nil and math.abs(top - (line + ERA_RAISE)) <= LINE_SLACK
 end
 
 -- A game window off the band its manager places in: below its line, or above the highest the fit raises it to (Era's
@@ -79,22 +89,19 @@ function ns.GameWindowOffRow(panel)
     return top < line - LINE_SLACK or top > highest + LINE_SLACK
 end
 
--- How far the game's left window stands from where its manager put it: an addon that re-anchors the game's windows
--- (a centering one) moves ours by as much. Read while that window stands on an anchor not the manager's, on its line.
+-- How far the game's left window stands from where its manager put it: an addon that moves the game's windows (a
+-- centering one, by its own anchor or by the offset on UIParent's) moves ours by as much. Read from where it is drawn,
+-- on its line, less Era's step left where the sheet stands at Era's spot; kept while no game window is up.
+local ERA_LEFT = 16
 local shift = 0
 local function Learn(left)
     local panel = _G.GetUIPanel and _G.GetUIPanel("left")
     if not (panel and panel:IsVisible()) or (ns.FramePlaced and ns.FramePlaced(panel)) then return end
     if (ns.WindowMoving and ns.WindowMoving(panel)) or ns.GameWindowOffLine(panel) then return end
-    if Plain(panel:GetNumPoints()) == 1 then
-        local point, rel, relPoint = panel:GetPoint(1)
-        if Plain(point) == "TOPLEFT" and Plain(relPoint) == "TOPLEFT" and (rel == nil or Plain(rel) == UIParent) then
-            shift = 0
-            return
-        end
-    end
     local x, k = Plain(panel:GetLeft()), ns.WindowRatio(panel)
-    if x and k then shift = math.floor(x * k - left - (Offset(panel, "xoffset") or 0) + 0.5) end
+    if not (x and k) then return end
+    local era = ns.GameWindowAtEra(panel) and ERA_LEFT or 0
+    shift = math.floor(x * k + era - left - (Offset(panel, "xoffset") or 0) + 0.5)
 end
 
 -- Where the game's row of windows starts, in UIParent units: left, and top (down from the screen's top, negative).

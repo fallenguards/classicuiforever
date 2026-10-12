@@ -546,6 +546,12 @@ local function SecureTopLeft(panel, x, y)
     return true
 end
 
+-- Era's spot stands on our own anchor at UIParent's corner: an addon that shifts the game's UIParent-anchored windows
+-- (a centering one) took our moved x for a fresh one and shifted it a second time (#154).
+local eraHost = ns.NewFrame("Frame", nil, UIParent)
+eraHost:SetSize(1, 1)
+eraHost:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0, 0)
+
 local function StandAt(panel, x)
     if InCombatLockdown() and Locked(panel) then return end
     local left, right, k = Span(panel)
@@ -556,11 +562,12 @@ local function StandAt(panel, x)
     local point, rel, relPoint, ox, oy = panel:GetPoint(1)
     ox, oy = Plain(ox), Plain(oy)
     if not ox or not oy or Plain(point) ~= "TOPLEFT" or Plain(relPoint) ~= "TOPLEFT" then return end
-    if rel ~= nil and Plain(rel) ~= UIParent then return end
+    -- UIParent, or the sheet's Era anchor (the same corner), kept as it is.
+    if rel ~= nil and Plain(rel) ~= UIParent and rel ~= eraHost then return end
     local newX = ox + (x - left) / k
     if Locked(panel) then
         if not SecureTopLeft(panel, newX, oy) then return end
-    elseif not pcall(panel.SetPoint, panel, "TOPLEFT", UIParent, "TOPLEFT", newX, oy) then
+    elseif not pcall(panel.SetPoint, panel, "TOPLEFT", rel or UIParent, "TOPLEFT", newX, oy) then
         return
     end
     return x
@@ -640,7 +647,8 @@ local function SheetPastHeld()
         if frame:IsShown() and frame.fcuiHoldX and frame:fcuiHoldX() then
             local left, right = Span(frame)
             local top, bottom = Rows(frame)
-            if left and top and sheetLeft < right and sheetRight > left and sheetTop > bottom and sheetBottom < top then
+            -- Touching by under a unit (a fractional row start) is not covering.
+            if left and top and sheetLeft < right - 1 and sheetRight > left + 1 and sheetTop > bottom and sheetBottom < top then
                 StandAt(CharacterFrame, math.floor(right + 0.5))
                 return
             end
@@ -660,12 +668,12 @@ local function AtEraSpot(frame)
     if Plain(frame:GetNumPoints()) ~= 1 then return end
     local point, rel, relPoint, x, y = frame:GetPoint(1)
     x, y = Plain(x), Plain(y)
-    if Plain(point) ~= "TOPLEFT" or Plain(relPoint) ~= "TOPLEFT" or not x or not y then return end
+    if Plain(point) ~= "TOPLEFT" or Plain(relPoint) ~= "TOPLEFT" or not x or not y or rel == eraHost then return end
     if rel ~= nil and Plain(rel) ~= UIParent then return end
     if eraY[frame] and math.abs(y - eraY[frame]) < 0.5 then return end
     if InCombatLockdown() and Locked(frame) then return end
     eraY[frame] = y + ERA_Y
-    pcall(frame.SetPoint, frame, "TOPLEFT", UIParent, "TOPLEFT", x + ERA_X, eraY[frame])
+    pcall(frame.SetPoint, frame, "TOPLEFT", eraHost, "TOPLEFT", x + ERA_X, eraY[frame])
 end
 
 local function SheetPass()

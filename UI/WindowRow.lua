@@ -50,7 +50,8 @@ local function Lay(s, out)
             x = w.held
         elseif not closed[i] then
             x = math.max(cursor, GameEnd(s, w.shares), w.keep or cursor)
-            x = math.floor(FirstFree(x, w.width, n) + 0.5)
+            -- Whole units, rounded up: a game window's fractional edge (a centering addon's) is never overlapped.
+            x = math.ceil(FirstFree(x, w.width, n) - 0.01)
             n = n + 1
             lefts[n], rights[n] = x, x + w.width
             cursor = x + w.width

@@ -56,6 +56,11 @@ Check(out.x[1] == 524 and out.x[2] == 876, "#154 talents then spellbook alone: f
 out = Row(START, SCREEN, { sheet }, { Ours(), Ours() })
 Check(out.x[1] == 876 and out.x[2] == 1228, "#154 talents, spellbook, then the sheet: ours step past it: " .. Xs(out, 2))
 
+-- #154: a centering addon's start is fractional (267.7 on 2560 x 1080); ours never stand inside the sheet's edge, or in
+-- a fight the sheet steps past a held spellbook.
+out = Row(267.7, SCREEN, { { 267.7, 619.7, "CharacterFrame" } }, { Ours() })
+Check(out.x[1] == 620, "past a fractional edge: rounded up, not into the sheet: " .. Xs(out, 1))
+
 -- The game's windows in the row, wherever the game stood them: ours past the last, never in a gap between.
 out = Row(0, 1920, { { 0, 352, "CharacterFrame" }, { 700, 1050, "MacroFrame" } }, { Ours() })
 Check(out.x[1] == 1050, "past the game's last window, not in the gap before it: " .. Xs(out, 1))
