@@ -115,6 +115,13 @@ local function Card(content, name)
     return content[name] or (not FOREVER and _G[name]) or nil
 end
 
+-- Public API (Core/API.lua): the book's page, and a profession's card on it (kind "primary" 1-2, "secondary" 1-3).
+function T.BookCard(kind, n)
+    local content = Content()
+    if not content then return nil end
+    return Card(content, (kind == "primary" and "PrimaryProfession" or "SecondaryProfession") .. n)
+end
+
 local function Font(fontString, name, fallback)
     local object = _G[name] or _G[fallback]
     if object then fontString:SetFontObject(object) end

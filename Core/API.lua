@@ -34,9 +34,10 @@ local WINDOWS = {
         parts = { abandon = "abandon", share = "share", close = "close" },
     },
     spellBook = {
-        -- arg: "pet" for the pet's book.
+        -- arg: "pet" for the pet's book, or "spell:<spellID>" for the tab and page that show that spell (out of a fight).
         open = function(which)
-            ns.ShowSpellBookBank(which == "pet")
+            local id = Numbered(which, "spell")
+            if not (id and ns.SpellBookShowSpell(id)) then ns.ShowSpellBookBank(which == "pet") end
             return Shown(_G.ForeverClassicUISpellBook)
         end,
         frame = function() return _G.ForeverClassicUISpellBook end,
@@ -53,15 +54,86 @@ local WINDOWS = {
         end,
     },
     talents = {
-        -- arg: a tree tab number.
-        open = function(tab) return ns.ShowTalents(tab) end,
+        -- arg: a tree tab number, or "talent:<spellID>" for the tab that holds that talent.
+        open = function(tab)
+            local id = Numbered(tab, "talent")
+            if id then return ns.ShowTalentSpell(id) end
+            return ns.ShowTalents(tab)
+        end,
         frame = function() return _G.ClassicUIForeverTalents end,
         parts = { learn = "learn", reset = "reset" },
-        patterns = { "tab:<n>" },
+        -- tab:<n> the tree tabs, talent:<spellID> its button on the tab shown.
+        patterns = { "tab:<n>", "talent:<spellID>" },
         part = function(frame, part)
             local n = Numbered(part, "tab")
             if n then return frame.tabs[n] end
+            n = Numbered(part, "talent")
+            if n then return ns.TalentWindowButtonFor(frame, n) end
         end,
+    },
+    legacyWindow = {
+        -- arg: a page (rewards, challenges, tree) or its tab number.
+        open = function(page) return ns.ShowLegacy(page) end,
+        frame = function() return _G.ClassicUIForeverLegacy end,
+        parts = { learn = "learn", reset = "reset" },
+        -- tab:<n> the page tabs down the right edge, talent:<spellID> a button on the tree page.
+        patterns = { "tab:<n>", "talent:<spellID>" },
+        part = function(frame, part)
+            local n = Numbered(part, "tab")
+            if n then return ns.LegacyPageTab(n) end
+            n = Numbered(part, "talent")
+            if n then return ns.TalentWindowButtonFor(frame, n) end
+        end,
+    },
+    tradeSkill = {
+        -- arg: "recipe:<recipeID>": picked in the window open now (unfolded, scrolled to). Opening a profession is the
+        -- game's protected call, refused to addons: the player's own click (its spell or button) opens it first.
+        open = function(arg)
+            local id, panel = Numbered(arg, "recipe"), ns.TradeSkillPanel()
+            if not (id and panel and panel:IsShown()) then return false end
+            ns.TradeSkillWant(id)
+            return true
+        end,
+        frame = function() return ns.TradeSkillPanel() end,
+        parts = { create = "create", createAll = "createAll", count = "count", search = "searchBox" },
+        -- recipe:<recipeID> its row, scrolled into view and its header unfolded.
+        patterns = { "recipe:<recipeID>" },
+        part = function(_, part)
+            local id = Numbered(part, "recipe")
+            if id then return ns.TradeSkillRowFor(id) end
+        end,
+    },
+    trainer = {
+        -- No open: a trainer's window opens at the trainer.
+        frame = function() return ns.TrainerPanel() end,
+        parts = { train = "train" },
+        -- service:<index> the row of the game's service index, scrolled into view and its header unfolded.
+        patterns = { "service:<index>" },
+        part = function(_, part)
+            local n = Numbered(part, "service")
+            if n then return ns.TrainerRowFor(n) end
+        end,
+    },
+    professionsBook = {
+        open = function() return ns.OpenProfessionsBook() end,
+        frame = function() return ns.prof and ns.prof.Page and ns.prof.Page() end,
+        parts = {},
+        -- primary:<n> (1-2) and secondary:<n> (1-3) a profession's card; its spell buttons are the game's own.
+        patterns = { "primary:<n>", "secondary:<n>" },
+        part = function(_, part)
+            local n = Numbered(part, "primary")
+            if n then return ns.prof.BookCard("primary", n) end
+            n = Numbered(part, "secondary")
+            if n then return ns.prof.BookCard("secondary", n) end
+        end,
+    },
+    microMenu = {
+        -- No window: a micro button by the game's name (CharacterMicroButton, ...) where it stands now, on the bar or as
+        -- its minimap icon; nil while neither shows.
+        frame = function() return _G.MicroMenu or UIParent end,
+        parts = {},
+        patterns = { "<micro button name>" },
+        part = function(_, part) return ns.MicroButtonNow(part) end,
     },
     whoList = {
         open = function() return ns.OpenWhoList() end,
@@ -79,7 +151,7 @@ end
 -- (a window the client keeps shut in combat opens after it).
 function API.Open(name, arg)
     local window = WINDOWS[name]
-    if not window or not API.IsOn(name) then return false end
+    if not (window and window.open) or not API.IsOn(name) then return false end
     local ok, shown = pcall(window.open, arg)
     return ok and shown == true
 end

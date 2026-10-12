@@ -545,6 +545,14 @@ local function DrawBackground(frame, name, height)
     art.BottomRight:SetTexCoord(0, 1, 0, 75 / 128)
 end
 
+-- Public API (Core/API.lua): a talent window's shown button for a talent's spell (talents, the Legacy tree).
+function ns.TalentWindowButtonFor(frame, spellID)
+    if not (frame and frame:IsShown() and frame.buttons) or type(spellID) ~= "number" then return nil end
+    for _, button in ipairs(frame.buttons) do
+        if button:IsVisible() and button.talent and button.talent.spellID == spellID then return button end
+    end
+end
+
 local function DrawButtons(frame, tab)
     local child = frame.child
     for i, talent in ipairs(tab.nodes) do

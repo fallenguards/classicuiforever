@@ -146,6 +146,17 @@ function ns.ShowTalents(tab)
     return frame:IsShown()
 end
 
+-- Public API: the player's talents shown on the tree tab holding a talent's spell; false when no tab holds it.
+function ns.ShowTalentSpell(spellID)
+    local tree = TL.ReadTree and TL.ReadTree()
+    for i, tab in ipairs(tree and tree.tabs or ns.EMPTY) do
+        for _, talent in ipairs(tab.nodes) do
+            if talent.spellID == spellID then return ns.ShowTalents(i) end
+        end
+    end
+    return false
+end
+
 -- The inspect window's Talents button, which opened the client's window.
 local function ShowInspect(unit)
     if not unit then return end

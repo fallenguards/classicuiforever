@@ -226,3 +226,33 @@ ns.OnToggle(function(key)
     if key == "microMinimapButtons" or byToggle[key] then Sync() else ns.Sched.NextFrame("minimapMicro.aim", Aim) end
 end)
 ns.EventFrame({ "PLAYER_ENTERING_WORLD" }, function() ns.Sched.NextFrame("minimapMicro.aim", Aim) end)
+
+-- Public API (Core/API.lua): where a micro button stands now: the button (or ours standing in for it on the band) while
+-- seen, else its icon on the minimap ring while seen; nil while neither is.
+local STAND_INS = { SpellbookMicroButton = "ForeverClassicUISpellbookMicroButton",
+    HelpMicroButton = "ForeverClassicUIHelpMicroButton", WorldMapMicroButton = "ForeverClassicUIWorldMapMicroButton" }
+-- Forever's talents button has the ring icon talents' button has.
+local RING_ALIASES = { PlayerSpellsMicroButton = "TalentMicroButton" }
+
+-- Shown, not faded, and placed: a micro button hidden from the bar keeps its shown state with no point.
+local function Seen(frame)
+    if type(frame) ~= "table" or not frame.IsVisible or not frame:IsVisible() or not ns.Safe(frame:GetLeft()) then
+        return false
+    end
+    local alpha = ns.Safe(frame:GetEffectiveAlpha())
+    return alpha == nil or alpha > 0
+end
+
+function ns.MicroButtonNow(name)
+    if type(name) ~= "string" then return nil end
+    if Seen(_G[name]) then return _G[name] end
+    local standIn = STAND_INS[name] and _G[STAND_INS[name]]
+    if Seen(standIn) then return standIn end
+    local micro = RING_ALIASES[name] or name
+    for _, spec in ipairs(MICROS) do
+        if spec.micro == micro or (spec.id == "WorldMap" and name == "WorldMapMicroButton") then
+            local icon = _G[spec.name or ("ForeverClassicUIMinimap" .. spec.id .. "Button")]
+            if Seen(icon) then return icon end
+        end
+    end
+end

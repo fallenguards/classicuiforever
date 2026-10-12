@@ -211,6 +211,19 @@ function ns.TrainerState()
     return selected, ClientSelection(), ClientRow() ~= nil, panel and panel.train, tall, held
 end
 
+-- Public API (Core/API.lua): the window while built, and its row for a service (the game's index) brought into view.
+function ns.TrainerPanel() return panel end
+function ns.TrainerRowFor(index)
+    if not (active and panel and panel:IsShown()) or type(index) ~= "number" or not GetTrainerServiceInfo then return nil end
+    local category = select(6, GetTrainerServiceInfo(index))
+    if not category or category == "" then category = OTHER or "Other" end
+    if collapsed[category] then
+        collapsed[category] = nil
+        panel.refresh()
+    end
+    return SkillList.RowFor(panel, lines, function(line) return line.index == index end, UpdateRows)
+end
+
 local function TrainRefused()
     if InCombatLockdown() then ns.SayNotInCombat() end
 end

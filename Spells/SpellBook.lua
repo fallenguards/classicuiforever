@@ -2089,6 +2089,41 @@ function ns.SpellBookButtonFor(spellID)
     return PageButtonFor(spellID)
 end
 
+-- Public API: the book opened on the tab and page that show a spell (the player's, else the pet's), out of a fight; false
+-- when no tab lists it.
+function ns.SpellBookShowSpell(spellID)
+    if not active or InCombatLockdown() or type(spellID) ~= "number" then return false end
+    local function PageIn(bank, line)
+        for i, slot in ipairs(SlotsFor(bank, line, "")) do
+            local info = ItemInfo(slot, bank)
+            if info and (info.spellID == spellID or info.actionID == spellID) then return math.ceil(i / SPELLS_PER_PAGE) end
+        end
+    end
+    local bank, line, page = BANK_PLAYER, nil, nil
+    for l = 1, C_SpellBook.GetNumSpellBookSkillLines() or 0 do
+        page = PageIn(BANK_PLAYER, l)
+        if page then
+            line = l
+            break
+        end
+    end
+    if not page then
+        page = PageIn(BANK_PET, state.line)
+        if not page then return false end
+        bank = BANK_PET
+    end
+    if book and book.Search then book.Search:SetText("") end
+    state.bank, state.search = bank, ""
+    if line then
+        state.line = line
+        heldLine = nil
+    end
+    state.pages[line or "pet"] = page
+    Show()
+    if book and book:IsShown() then book:Refresh() end
+    return book ~= nil and book:IsShown()
+end
+
 function ns.ToggleSpellBook()
     if not active then return false end
     Toggle()

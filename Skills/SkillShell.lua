@@ -123,6 +123,27 @@ function SkillList.Draw(panel, lines, collapsed, drawItem)
     end
 end
 
+-- The row drawing the first item match(line) accepts, scrolled into view first (redraw: the list's own); nil when none.
+function SkillList.RowFor(panel, lines, match, redraw)
+    local at
+    for i, line in ipairs(lines) do
+        if not line.header and match(line) then
+            at = i
+            break
+        end
+    end
+    if not at then return nil end
+    local offset, count = math.floor((panel.bar:GetValue() or 0) + 0.5), #panel.rows
+    if at <= offset or at > offset + count then
+        local _, most = panel.bar:GetMinMaxValues()
+        panel.bar:SetValue(math.max(0, math.min(at - 1, most or 0)))
+        redraw()
+    end
+    for _, row in ipairs(panel.rows) do
+        if row.line == lines[at] and row:IsVisible() then return row end
+    end
+end
+
 -- An item row in its colour: white text on a bar of that colour when picked.
 function SkillList.Paint(row, picked, color)
     if picked then

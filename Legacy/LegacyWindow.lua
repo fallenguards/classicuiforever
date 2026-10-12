@@ -218,6 +218,21 @@ end
 -- The gamepad cannot navigate our windows (Core/Gamepad.lua): with it on at login the game's window stays.
 ns.RegisterModule("legacyWindow", { apply = Apply, restore = Restore, padLogin = true })
 
+-- Public API (Core/API.lua): the window shown, on a page if given (its key: rewards, challenges, tree; or its tab
+-- number); false when it cannot show.
+function ns.ShowLegacy(page)
+    if not (active and Supported()) or ns.padSession then return false end
+    Build()
+    if not frame:IsShown() then frame:Show() end
+    local want = type(page) == "number" and LG.pages[page] or nil
+    for _, each in pairs(LG.pages) do
+        if each.key == page then want = each end
+    end
+    if want then ShowPage(want) end
+    return frame:IsShown()
+end
+function ns.LegacyPageTab(n) return tabs[n] end
+
 -- Opens or closes the window (/fcui legacy); false when this client or session cannot show it (said in chat).
 function ns.ToggleLegacy()
     if not Supported() then

@@ -84,6 +84,7 @@ end
 
 -- Search text: lists matching recipes even under folded headers.
 local query = ""
+local wanted   -- a recipe asked for (public API): unfolded and picked once listed
 
 local function Collect()
     wipe(lines)
@@ -107,6 +108,7 @@ local function Collect()
         end
         if listed and R.TypeShown(itemType) then
             local cat = info.categoryID or 0
+            if id == wanted then collapsed[cat] = nil end
             local group = groups[cat]
             if not group then
                 local catInfo = CategoryOf(cat, cache)
@@ -136,10 +138,12 @@ local function Collect()
             end
         end
     end
-    -- The chosen recipe stays chosen while it is still listed.
+    -- The chosen recipe stays chosen while it is still listed; one asked for is chosen once listed.
     local still = false
     for _, line in ipairs(lines) do
-        if line.info and line.info.recipeID == selected then still = true break end
+        local id = line.info and line.info.recipeID
+        if id and id == wanted then selected, wanted = id, nil end
+        if id and id == selected then still = true end
     end
     if not still then selected = first end
 end
@@ -756,6 +760,17 @@ end
 function ns.TradeSkillWindowSize()
     if ns.OnForever() then return FOREVER_W, FOREVER_H end
     return WINDOW_W, WINDOW_H
+end
+
+-- Public API (Core/API.lua): the window while built; a recipe unfolded and picked as the list fills; its row in view.
+function ns.TradeSkillPanel() return panel end
+function ns.TradeSkillWant(recipeID)
+    wanted = recipeID
+    if panel and panel:IsShown() then ns.Sched.NextFrame("tradeskill.refresh", RunRefresh) end
+end
+function ns.TradeSkillRowFor(recipeID)
+    if not (active and panel and panel:IsShown()) or type(recipeID) ~= "number" then return nil end
+    return SkillList.RowFor(panel, lines, function(line) return line.info and line.info.recipeID == recipeID end, UpdateRows)
 end
 
 -- Retail's driver (Skills/TradeSkillRetail.lua) parks the game's page and shows ours itself.
