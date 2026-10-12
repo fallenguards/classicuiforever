@@ -273,11 +273,12 @@ function LM.PlaceButtons(close, sizer, paneW)
 end
 
 -- Map Options in Classic style: its box's right edge from the window's right (+ right), its bottom from the bottom
--- (+ up), in the sheets' units.
+-- (+ up), in the sheets' units; clear of the unlocked map's corner grip.
 local CLASSIC_MAP_OPTIONS_X = -3
 local CLASSIC_MAP_OPTIONS_Y = 5
 function LM.FootSpot(paneW)
-    return art, ART_W + (paneW and LM.Widen(paneW) or 0) + CLASSIC_MAP_OPTIONS_X, CLASSIC_MAP_OPTIONS_Y - ART_H
+    local x = math.min(CLASSIC_MAP_OPTIONS_X, -ns.WindowGripRoom("map"))
+    return art, ART_W + (paneW and LM.Widen(paneW) or 0) + x, CLASSIC_MAP_OPTIONS_Y - ART_H
 end
 
 -- The footer's left: the picture's left edge, the sheets' bottom.

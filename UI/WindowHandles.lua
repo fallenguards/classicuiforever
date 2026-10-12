@@ -269,6 +269,7 @@ PlaceAll = function()
     for _, entry in ipairs(WINDOWS) do
         local frame = ns.WindowFrame(entry)
         if ns.MakeWindowLock then ns.MakeWindowLock(entry) end
+        if ns.MakeWindowGrip then ns.MakeWindowGrip(entry) end
         if PlaceOf(entry) or Scales()[SizeKey(entry)] or IsFree(entry) or (frame and scaled[frame])
             or (entry.quests and FullScale()) then
             Watch(entry)
@@ -764,7 +765,7 @@ ns.windowEdit = {
     Ratio = Ratio, PlaceAll = PlaceAll, LayHandle = LayHandle, Refresh = Refresh, IsFree = IsFree, Full = Full, Reset = Reset,
     STRIP_LEFT = STRIP_LEFT, STRIP_LIFT = STRIP_LIFT, StripOf = function(frame) return strips[frame] end,
     ShowHandle = ShowHandle, Set = Set, DialogKeys = DialogKeys, PlaceOf = PlaceOf, SetFree = SetFree, SetPlace = SetPlace,
-    Leader = Leader,
+    Leader = Leader, SizeKey = SizeKey, DrawnSize = DrawnSize, SaveFrom = SaveFrom,
     HideDialog = function() if dialog then dialog:Hide() end end,
 }
 

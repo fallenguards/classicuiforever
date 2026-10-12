@@ -61,6 +61,7 @@ UI\WindowHandles.lua
 UI\WindowLayouts.lua
 UI\WindowsEditMode.lua
 UI\WindowLocks.lua
+UI\WindowGrips.lua
 UI\Portraits.lua
 UI\ScrollBars.lua
 UI\Controls.lua

@@ -471,7 +471,8 @@ local function DressSmall(map, close, sizer)
         ns.SetScaleIf(sizer, 1)
         ns.SetPointIf(sizer, "RIGHT", close, "LEFT", MAXIMIZE_GAP, 0)
     end
-    ns.MapOptions.Place(map, a, a:GetWidth() + NONE_MAP_OPTIONS_X, NONE_MAP_OPTIONS_Y - ERA_H, 1)
+    local x = math.min(NONE_MAP_OPTIONS_X, -ns.WindowGripRoom("map"))
+    ns.MapOptions.Place(map, a, a:GetWidth() + x, NONE_MAP_OPTIONS_Y - ERA_H, 1)
 end
 
 -- Era's large map: its sheets, header and buttons (WorldMapEraLarge.lua).
