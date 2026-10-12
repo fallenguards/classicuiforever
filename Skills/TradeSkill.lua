@@ -9,13 +9,10 @@ local panel
 local WINDOW_W, WINDOW_H = 338, 424
 -- Forever: the small book's size, the page 2 in, so its border lands on the book's and a page turn moves nothing.
 local FOREVER_W, FOREVER_H, PAGE_X = 339, 425, 2
-local LIST_ROWS = 8
 local REAGENTS_MAX = 8
 -- Era's detail spots, in its scroll's content.
 local ICON_TOP, LABEL_TOP = 3, 47
 local REAGENT_W, REAGENT_PITCH = 147, 43
--- List rows as wide as Era's highlight: narrower while its scroll bar shows.
-local LIST_W, LIST_W_BAR = 316, 293
 
 local IsSecret = ns.IsSecret
 local SkillList = ns.SkillList
@@ -164,8 +161,8 @@ end
 local function UpdateRows()
     if not panel then return end
     SkillList.Draw(panel, lines, collapsed, DrawItem)
-    panel.bar:SetRange(math.max(0, #lines - LIST_ROWS))
-    panel.list:SetWidth(panel.bar:IsShown() and LIST_W_BAR or LIST_W)
+    panel.bar:SetRange(math.max(0, #lines - #panel.rows))
+    panel.list:SetWidth(panel.bar:IsShown() and panel.listWBar or panel.listW)
     if panel.collapseAll then SkillList.FoldIcon(panel, lines, collapsed) end
 end
 
@@ -559,8 +556,6 @@ end
 -- Era's detail scrolls: its scroll frame's spot, the bar beside it in the list's column; the content becomes panel.detail.
 local function DetailScroll()
     local scroll = ns.NewFrame("ScrollFrame", nil, panel.detail)
-    scroll:SetPoint("TOPLEFT", panel, "TOPLEFT", 8, -221)
-    scroll:SetPoint("BOTTOMRIGHT", panel, "TOPLEFT", 305, -397)
     local content = ns.NewFrame("Frame", nil, scroll)
     content:SetSize(1, 1)
     scroll:SetScrollChild(content)
@@ -587,8 +582,6 @@ local function Build()
 
     -- Era's rank bar in its strip under the title, all the way across: the profession, then the rank.
     local rank = ns.NewFrame("StatusBar", nil, panel)
-    rank:SetPoint("TOPLEFT", panel, "TOPLEFT", 61, -24)
-    rank:SetPoint("RIGHT", panel, "RIGHT", -9, 0)
     rank:SetHeight(15)
     ns.SetBarFill(rank, "skillsBar")
     -- Era's colors as it draws them: the fill blue at half; the backing its faint white, tinted half blue.
@@ -607,17 +600,10 @@ local function Build()
     rank.text:SetPoint("LEFT", rank.name, "RIGHT", 13, 0)
     panel.rank = rank
 
-    ns.OldSkillShell(panel, { rows = LIST_ROWS, createRow = CreateRow, onScroll = UpdateRows, era = true,
+    -- Rows for the double pane; the single shows its first 8 (Skills/TradeSkillDual.lua places every piece).
+    ns.OldSkillShell(panel, { rows = ns.tradeDual.ROWS, createRow = CreateRow, onScroll = UpdateRows, era = true,
         listColumn = ns.TradeSkillColumns.list })
     ns.TradeSkillEraArt(panel)
-    -- Era's spots: rows from 83 down, its list bar beside them, the All button in its tab, the filter on its drop down.
-    ns.SetPointOnce(panel.list, "TOPLEFT", panel, "TOPLEFT", 10, -83)
-    panel.list:SetSize(LIST_W, LIST_ROWS * 16)
-    panel.bar:ClearAllPoints()
-    panel.bar:SetPoint("TOPLEFT", panel, "TOPLEFT", 311, -99)
-    panel.bar:SetPoint("BOTTOMLEFT", panel, "TOPLEFT", 311, -197)
-    panel.collapseAll:SetPoint("TOPLEFT", panel, "TOPLEFT", 14, -62)
-    panel.filter:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -11, -52)
     local all, filter, detail = panel.collapseAll, panel.filter, DetailScroll()
     all:SetScript("OnClick", function()
         SkillList.FoldAll(lines, collapsed)
@@ -639,8 +625,6 @@ local function Build()
     -- Search box between the All tab and the filter (the old window had none), in
     -- the count's thin border.
     local search = ns.NewFrame("EditBox", nil, panel)
-    search:SetPoint("TOPLEFT", panel, "TOPLEFT", 75, -57)
-    search:SetPoint("RIGHT", panel.filter, "LEFT", -14, 0)
     search:SetHeight(16)
     search:SetFrameLevel(panel:GetFrameLevel() + 13)
     search:SetAutoFocus(false)
@@ -713,6 +697,8 @@ local function Build()
     end)
 
     if ns.TradeSkillRetailParts then ns.TradeSkillRetailParts(panel, Refresh, SelectedInfo) end
+    if ns.OnForever() then panel.singleSize = { WINDOW_W, WINDOW_H } end
+    ns.tradeDual.Built(panel, Refresh)
     panel:SetScript("OnShow", Refresh)
     R.Changed = Refresh
     RunWatch()
@@ -758,6 +744,11 @@ function ns.ShowTradeSkill(up)
 end
 
 function ns.TradeSkillWindowSize()
+    local dual = ns.tradeDual
+    if dual.On() then
+        local w, h = dual.Size()
+        return ns.OnForever() and w + PAGE_X or w, h
+    end
     if ns.OnForever() then return FOREVER_W, FOREVER_H end
     return WINDOW_W, WINDOW_H
 end

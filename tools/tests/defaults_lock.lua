@@ -273,6 +273,7 @@ return {
     threatNumberGrouped = false,
     trackingSameSize = false,
     tradeSkill = true,
+    tradeSkillDual = false,
     tradeSkillFull = false,
     tradeSkillSearch = true,
     trainer = true,

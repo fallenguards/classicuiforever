@@ -177,15 +177,17 @@ local function SyncTabs()
     end
 end
 
--- The popout beside the close button: the full book or the small one; the same switch as the option.
+-- The popout beside the close button: the full book or the small one, on a trade skill its double pane or single; the
+-- same switches as the options.
 local sizeButton
 local function PickSize(big)
-    if not ns.db or (ns.db.profBookBig == true) == big then return end
-    ns.db.profBookBig = big
-    ns.ToggleChanged("profBookBig")
+    local key = sizeButton.trade and "tradeSkillDual" or "profBookBig"
+    if not ns.db or (ns.db[key] == true) == big then return end
+    ns.db[key] = big
+    ns.ToggleChanged(key)
 end
 
-SizeButton = function(shown)
+SizeButton = function(book, trade)
     local frame = T.Host()
     if not frame then return end
     if not sizeButton then
@@ -198,8 +200,13 @@ SizeButton = function(shown)
     end
     local close = frame.CloseButton
     if close then ns.SetLevelIf(sizeButton, close:GetFrameLevel() + 1) end
-    if T.Big() then sizeButton:SetMinimizedLook() else sizeButton:SetMaximizedLook() end
-    ns.SetShownIf(sizeButton, shown and true or false)
+    sizeButton.trade = trade
+    if (trade and ns.tradeDual.On()) or (not trade and T.Big()) then
+        sizeButton:SetMinimizedLook()
+    else
+        sizeButton:SetMaximizedLook()
+    end
+    ns.SetShownIf(sizeButton, (book or trade) and true or false)
 end
 
 -- Turn back to the book piece by piece: calling the window's own code would taint it.
@@ -348,7 +355,7 @@ local function SizeShut(watcher, tradeOn)
         -- The manager keeps the book's size: in a fight others stand past a grown book,
         -- and a book's extra width off a trade skill till it ends (a gap, never a cover).
         local width, height = ns.TradeSkillWindowSize()
-        FitWindow(width, height, BookW(), BookH())
+        FitWindow(width, height, math.max(width, BookW()), math.max(height, BookH()))
     elseif watcher.bookWhenShut then
         if active then FitWindow(BookW(), BookH()) end
     elseif tradeOn then
@@ -560,13 +567,14 @@ local function WatchTick(self, elapsed)
     end
     EnsureOpenHost(frame)
     if active then FillTabIcons() end
-    SizeButton(active and page:IsVisible())
     -- By face: book, trade skill, or the client's own when neither module is on.
     local bookUp = active and page:IsVisible() and true or false
     local crafting = frame.CraftingPage
     local tradeOn = ns.TradeSkillActive and ns.TradeSkillActive()
     local craftUp = not bookUp and tradeOn and crafting and crafting:IsVisible() and true or false
-    T.EraFrame((bookUp and not T.Big()) and "book" or craftUp and "trade" or nil)
+    SizeButton(bookUp, craftUp)
+    local trade = ns.tradeDual.On() and "tradeDual" or "trade"
+    T.EraFrame((bookUp and not T.Big()) and "book" or craftUp and trade or nil)
     if bookUp or craftUp then ns.ProfessionPortrait(bookUp) end
     T.SyncBookPads()
     SyncTabs()

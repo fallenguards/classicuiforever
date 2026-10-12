@@ -137,7 +137,7 @@ function ns.TradeSkillRetailParts(panel, refresh, selectedInfo)
     local rank, detail = panel.rank, panel.detail
     R.Changed = refresh
     panel:SetPoint("BOTTOMRIGHT", ProfessionsFrame, "BOTTOMRIGHT", 0, -FOOT_DROP)
-    rank:SetPoint("RIGHT", panel, "RIGHT", -64, 0)
+    panel.rankRight = -64
     local drop = ns.NewFrame("Button", nil, panel)
     drop:SetSize(24, 24)
     drop:SetPoint("LEFT", rank, "RIGHT", 5, -1)

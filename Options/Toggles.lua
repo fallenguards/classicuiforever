@@ -158,6 +158,8 @@ ns.TOGGLES = {
         radio = "professionTabsShow", drop = true, search = "tabs hidden never side" },
     { "tradeSkill", L["OPT_tradeSkill"], L["OPT_tradeSkill_TIP"] },
     { "tradeSkillSearch", L["OPT_tradeSkillSearch"], L["OPT_tradeSkillSearch_TIP"], parent = "tradeSkill" },
+    { "tradeSkillDual", L["OPT_tradeSkillDual"], L["OPT_tradeSkillDual_TIP"], parent = "tradeSkill",
+        search = "double pane wide wider two side by side professions crafting" },
     { "trainer", L["OPT_trainer"], L["OPT_trainer_TIP"] },
 
     { "questLog", L["OPT_questLog"], L["OPT_questLog_TIP"], group = L["GROUP_QUESTS"] },

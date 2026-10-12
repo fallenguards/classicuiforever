@@ -296,7 +296,7 @@ end
 function ns.ShellScrollBar(panel, anchorTo, onValue, column)
     local bar = ns.ClassicScrollBar(panel, anchorTo, onValue)
     if column then
-        ns.DressPieces(bar, column)
+        bar.column = ns.DressPieces(bar, column, nil, true)
         return bar
     end
     ns.ScrollColumnOn(bar)

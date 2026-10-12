@@ -14,6 +14,7 @@ return {
     classColorHealthTarget = "same for everyone: on by default under Class colored health, which colors every frame as before; unchecked leaves that frame green",
     classColorHealthFocus = "same for everyone: on by default under Class colored health, which colors every frame as before; unchecked leaves that frame green",
     plainQuestItems = "same for everyone: opt-in, off by default",
+    tradeSkillDual = "same for everyone: opt-in, off by default; the single pane stays",
     hideLockedSlots = "same for everyone: opt-in, off by default; an account with an authenticator has no locked slots",
     eyeSnapMinimap = "kept as before: EyeSnapToDecide (dbVersion 18) marks it auto, decided at the first look: on the rim as it stood (on our icon, or Era's spot), off where the eye was moved with our icon off (it stood free)",
     communitiesButton = "same for everyone: opt-in, off by default; the Communities tab stays as before",

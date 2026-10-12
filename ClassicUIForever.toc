@@ -191,6 +191,7 @@ Skills\ProfessionsBookRetail.lua
 Skills\TradeSkillExtras.lua
 Skills\TradeSkillReagents.lua
 Skills\TradeSkill.lua
+Skills\TradeSkillDual.lua
 Skills\TradeSkillRetail.lua
 Skills\Trainer.lua
 UI\SkillLineTab.lua

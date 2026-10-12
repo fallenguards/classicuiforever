@@ -20,6 +20,11 @@ local KINDS = {
         ring = { key = "Interface\\ClassTrainerFrame\\UI-ClassTrainer-TopLeft", set = "raw", layer = "OVERLAY",
             coords = { 0, 72 / 256, 0, 72 / 256 }, w = 72, h = 72, point = "TOPLEFT" },
         portrait = { x = -3, y = 7, size = 60 }, title = { x = 186, y = -12 }, close = { x = -11, y = -11 } },
+    -- The double pane (Skills/TradeSkillDual.lua): the 3.x quest log's double frame on the same spot.
+    tradeDual = { x = -10, y = 13, pieces = function() return ns.tradeDual and ns.tradeDual.FRAME_ART end,
+        ring = { key = "questLogDualLeft", layer = "OVERLAY", coords = { 0, 72 / 512, 0, 72 / 512 }, w = 72, h = 72,
+            point = "TOPLEFT" },
+        portrait = { x = -3, y = 10, size = 60 }, title = { x = 353, y = -11 }, close = { x = -12, y = -11 } },
 }
 
 local holders, rings = {}, {}

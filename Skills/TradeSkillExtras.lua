@@ -119,12 +119,15 @@ ns.TradeSkillColumns = {
 }
 
 -- The window's inside as Era draws it, under the page's rows and buttons.
+-- Kept on the page for the double pane to hide (Skills/TradeSkillDual.lua).
 function ns.TradeSkillEraArt(panel)
     if not ns.OnForever() then
-        for _, tex in ipairs(ns.DressPieces(panel, WINDOW_ART, nil, true)) do ns.BronzeTint(tex) end
+        panel.eraWindow = ns.DressPieces(panel, WINDOW_ART, nil, true)
+        for _, tex in ipairs(panel.eraWindow) do ns.BronzeTint(tex) end
     end
-    for _, tex in ipairs(ns.DressPieces(panel, OVERLAYS, nil, true)) do ns.BronzeTint(tex) end
-    ns.DressPieces(panel, DIVIDER_ART)
+    panel.eraOverlays = ns.DressPieces(panel, OVERLAYS, nil, true)
+    for _, tex in ipairs(panel.eraOverlays) do ns.BronzeTint(tex) end
+    for _, tex in ipairs(ns.DressPieces(panel, DIVIDER_ART, nil, true)) do panel.eraOverlays[#panel.eraOverlays + 1] = tex end
 end
 
 local INPUT = "Interface\\Common\\Common-Input-Border"
@@ -179,6 +182,7 @@ function ns.TradeSkillFoot(panel, craft, step)
     dec:SetScript("OnClick", function() step(-1) end)
     inc:SetScript("OnClick", function() step(1) end)
     panel.createAll, panel.create, panel.count = createAll, create, count
+    panel.dec, panel.inc, panel.exit = dec, inc, exit
 end
 
 -- The profession's link in chat, the chat opened if shut.
