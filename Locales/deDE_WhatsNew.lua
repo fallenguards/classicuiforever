@@ -3,6 +3,20 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN34_1_TITLE"] = "Fensterplatzierung"
+L["WN34_1_TEXT"] = "Die Fenster des Addons öffnen sich in einer Reihe nach den Fenstern des Spiels, in der Reihenfolge, in der du sie öffnest, und richten sich nach Addons, die die Fenster des Spiels verschieben. Ein Fenster, das du verschoben hast, bleibt, wo du es hingestellt hast. Ist kein Platz mehr, schließt sich das älteste, nie im Kampf."
+L["WN34_2_TITLE"] = "Zauberbuch und Talente"
+L["WN34_2_TEXT"] = "Das große Zauberbuch- und Talentfenster des Spiels schließt sich, wenn du ein Fenster des Addons öffnest, das daneben keinen Platz hat, so wie das Spiel es mit seinen eigenen Fenstern macht."
+L["WN34_3_TITLE"] = "Größengriff"
+L["WN34_3_TEXT"] = "Solange ein Fenster entsperrt ist, ziehst du am Griff in seiner unteren rechten Ecke, um seine Größe zu ändern; ein Rechtsklick auf den Griff gibt ihm seine Standardgröße."
+L["WN34_4_TITLE"] = "Auge der Gruppensuche"
+L["WN34_4_TEXT"] = "Das Auge wird wieder im Bearbeitungsmodus des Spiels platziert und skaliert, mit An Minikarte ausrichten und Auch ohne Warteschlange zeigen in seinem Dialog."
+L["WN34_5_TITLE"] = "Gesperrte Plätze ausblenden"
+L["WN34_5_TEXT"] = "Ohne Authenticator auf deinem Account schaltest du in den Optionen (/fcui) unter Taschenfenster Gesperrte Plätze ausblenden ein, und der Rucksack schrumpft auf die Plätze, die du nutzen kannst."
+L["WN34_6_TITLE"] = "Karte und Werte"
+L["WN34_6_TEXT"] = "Maximiert behält die Weltkarte ihr Era-Aussehen, auf den Bildschirm skaliert. Der Tooltip für Schaden zeigt für jede Hand Angriffstempo und Schaden pro Sekunde, wie in Era."
+L["WN34_7_TITLE"] = "Auch auf Forever"
+L["WN34_7_TEXT"] = "Die klassische Weltkarte zeigt deine Koordinaten und die des Mauszeigers in einer Zeile in ihrer Fußleiste. Der Begleiter-Reiter zeigt Eras Zeilen Angriff, Angriffskraft, Schaden, Verteidigung und Rüstung."
 L["WN33_1_TITLE"] = "Freundschaftsanfragen"
 L["WN33_1_TEXT"] = "Die Reiter der Freundesseite sind Freunde, Kürzliche Verbündete und Freundschaftsanfragen. Battle.net-Freundschaftsanfragen warten auf ihrem eigenen Reiter, ihre Anzahl im Namen: eine auswählen und Annehmen oder Ablehnen. Die Ignorierliste steht im Dropdown neben deinem Battle.net-Namen."
 L["WN33_2_TITLE"] = "Communitys als Taste"

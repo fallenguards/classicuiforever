@@ -2,6 +2,20 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN34_1_TITLE"] = "Window placement"
+L["WN34_1_TEXT"] = "The addon's windows open in one row after the game's windows, in the order you open them, and line up with addons that move the game's windows. A window you moved stays where you put it. With no room left, the oldest one closes, never in a fight."
+L["WN34_2_TITLE"] = "Spellbook and talents"
+L["WN34_2_TEXT"] = "The game's large spellbook and talent window closes when you open one of the addon's windows with no room beside it, as the game does with its own windows."
+L["WN34_3_TITLE"] = "Resize grip"
+L["WN34_3_TEXT"] = "While a window is unlocked, drag the grip in its bottom right corner to size it, or right-click the grip for its default size."
+L["WN34_4_TITLE"] = "Group finder eye"
+L["WN34_4_TEXT"] = "The eye is placed and sized in the game's Edit Mode again, with Snap to minimap and Show when not queued in its dialog."
+L["WN34_5_TITLE"] = "Hide locked slots"
+L["WN34_5_TEXT"] = "Without an authenticator on your account, turn on Hide locked slots in the options (/fcui), under Bag windows, and the backpack shrinks to the slots you can use."
+L["WN34_6_TITLE"] = "Map and stats"
+L["WN34_6_TEXT"] = "Maximized, the world map keeps its Era look, scaled to the screen. The Damage tooltip shows each hand's attack speed and damage per second, as in Era."
+L["WN34_7_TITLE"] = "Also on Forever"
+L["WN34_7_TEXT"] = "The classic world map shows your coordinates and the cursor's on one line in its footer. The pet tab shows Era's Attack, Attack Power, Damage, Defense and Armor rows."
 L["WN33_1_TITLE"] = "Friend Requests"
 L["WN33_1_TEXT"] = "The friends page's tabs are Friends, Recent Allies and Friend Requests. Battle.net friend requests wait on their own tab, counted in its name: pick one and Accept or Decline. The ignore list is in the drop down beside your Battle.net name."
 L["WN33_2_TITLE"] = "Communities as a button"

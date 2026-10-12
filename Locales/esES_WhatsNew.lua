@@ -3,6 +3,20 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN34_1_TITLE"] = "Colocación de ventanas"
+L["WN34_1_TEXT"] = "Las ventanas del accesorio se abren en una fila tras las ventanas del juego, en el orden en que las abres, y se alinean con los accesorios que mueven las ventanas del juego. Una ventana que hayas movido se queda donde la pusiste. Sin espacio, se cierra la más antigua, nunca en combate."
+L["WN34_2_TITLE"] = "Libro de hechizos y talentos"
+L["WN34_2_TEXT"] = "La gran ventana de libro de hechizos y talentos del juego se cierra cuando abres una ventana del accesorio que no tiene espacio a su lado, como hace el juego con sus propias ventanas."
+L["WN34_3_TITLE"] = "Asa de tamaño"
+L["WN34_3_TEXT"] = "Con una ventana desbloqueada, arrastra el asa de su esquina inferior derecha para cambiar su tamaño, o haz clic derecho en el asa para volver a su tamaño por defecto."
+L["WN34_4_TITLE"] = "Ojo del buscador de grupo"
+L["WN34_4_TEXT"] = "El ojo se coloca y se dimensiona de nuevo en el modo edición del juego, con Ajustar al minimapa y Mostrar sin estar en cola en su cuadro."
+L["WN34_5_TITLE"] = "Ocultar casillas bloqueadas"
+L["WN34_5_TEXT"] = "Sin autenticador en tu cuenta, activa Ocultar casillas bloqueadas en las opciones (/fcui), en Ventanas de bolsa, y la mochila se reduce a las casillas que puedes usar."
+L["WN34_6_TITLE"] = "Mapa y estadísticas"
+L["WN34_6_TEXT"] = "Maximizado, el mapa del mundo conserva su aspecto de Era, a escala de la pantalla. La descripción del daño muestra la velocidad de ataque y el daño por segundo de cada mano, como en Era."
+L["WN34_7_TITLE"] = "También en Forever"
+L["WN34_7_TEXT"] = "El mapa del mundo clásico muestra tus coordenadas y las del cursor en una línea en su pie. La pestaña de mascota muestra las filas de Era: Ataque, Poder de ataque, Daño, Defensa y Armadura."
 L["WN33_1_TITLE"] = "Solicitudes de amistad"
 L["WN33_1_TEXT"] = "Las pestañas de la página de amigos son Amigos, Aliados recientes y Solicitudes de amistad. Las solicitudes de amistad de Battle.net esperan en su propia pestaña, con su número en el nombre: elige una y pulsa Aceptar o Rechazar. La lista de ignorados está en el desplegable junto a tu nombre de Battle.net."
 L["WN33_2_TITLE"] = "Comunidades como botón"

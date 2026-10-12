@@ -3,6 +3,20 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN34_1_TITLE"] = "Placement des fenêtres"
+L["WN34_1_TEXT"] = "Les fenêtres de l'addon s'ouvrent en une rangée après les fenêtres du jeu, dans l'ordre où vous les ouvrez, et s'alignent avec les addons qui déplacent les fenêtres du jeu. Une fenêtre que vous avez déplacée reste où vous l'avez mise. Faute de place, la plus ancienne se ferme, jamais en combat."
+L["WN34_2_TITLE"] = "Grimoire et talents"
+L["WN34_2_TEXT"] = "La grande fenêtre de grimoire et de talents du jeu se ferme quand vous ouvrez une fenêtre de l'addon qui n'a pas de place à côté, comme le jeu le fait avec ses propres fenêtres."
+L["WN34_3_TITLE"] = "Poignée de taille"
+L["WN34_3_TEXT"] = "Quand une fenêtre est déverrouillée, faites glisser la poignée de son coin inférieur droit pour la redimensionner, ou cliquez droit sur la poignée pour sa taille par défaut."
+L["WN34_4_TITLE"] = "Œil de la recherche de groupe"
+L["WN34_4_TEXT"] = "L'œil se place et se dimensionne de nouveau dans le mode Édition du jeu, avec Aimanter à la minicarte et Afficher hors file d'attente dans sa fenêtre."
+L["WN34_5_TITLE"] = "Masquer les emplacements verrouillés"
+L["WN34_5_TEXT"] = "Sans authentificateur sur votre compte, activez Masquer les emplacements verrouillés dans les options (/fcui), sous Fenêtres de sac, et le sac à dos se réduit aux emplacements utilisables."
+L["WN34_6_TITLE"] = "Carte et caractéristiques"
+L["WN34_6_TEXT"] = "Agrandie, la carte du monde garde son aspect d'Era, mise à l'échelle de l'écran. L'infobulle des dégâts donne la vitesse d'attaque et les dégâts par seconde de chaque main, comme dans Era."
+L["WN34_7_TITLE"] = "Aussi sur Forever"
+L["WN34_7_TEXT"] = "La carte du monde classique affiche vos coordonnées et celles du curseur sur une ligne dans son pied. L'onglet du familier affiche les lignes d'Era : Attaque, Puissance d'attaque, Dégâts, Défense et Armure."
 L["WN33_1_TITLE"] = "Demandes d'amis"
 L["WN33_1_TEXT"] = "Les onglets de la page des contacts sont Contacts, Alliances récentes et Demandes d'amis. Les demandes d'amis Battle.net attendent sur leur propre onglet, leur nombre dans son nom : choisissez-en une, puis Accepter ou Refuser. La liste des joueurs ignorés est dans le menu déroulant à côté de votre nom Battle.net."
 L["WN33_2_TITLE"] = "Communautés en bouton"

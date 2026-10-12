@@ -2,6 +2,24 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.26.0] - 2026-10-12
+
+### Added
+- While a window is unlocked, a grip in its bottom right corner sizes it: drag it, or right-click it for the window's default size. It shows with the mouse on the window, or all the time with Always show window locks (#153).
+- Hide locked slots, under Bag windows in the options (/fcui), off by default: without an authenticator on your account, the backpack's locked slots are hidden and the bag shrinks to the slots you can use (#96).
+- The Damage row's tooltip shows each hand's attack speed, damage and damage per second, as in Era. On Forever, the pet tab shows Era's rows: Attack, Attack Power, Damage, Defense and Armor.
+- For addon authors: the addon's API can open more places, such as a spell in the spellbook, a talent, the Legacy window, a recipe in an open profession window, a trainer's service and a micro menu button.
+
+### Changed
+- Window placement is rebuilt (#154). The addon's windows stand in one row after the game's windows, in the order you opened them, from where the game's own row starts, so they line up with addons that move the game's windows. A window you moved stays where you put it and leaves the row; the others no longer shift around it. With no room left, the oldest window closes, never in a fight.
+- On Forever, the game's large spellbook and talent window closes when you open one of the addon's windows with no room beside it, as the game closes its own older windows; opened last, it closes the addon's windows that no longer fit.
+- The group finder eye is placed and sized in the game's Edit Mode again. Its Edit Mode dialog adds Snap to minimap, Show when not queued and Default Size.
+- On Forever, the classic world map shows the game's player and cursor coordinates on one line in its footer, as the game's map settings pick them.
+- Maximized, the Classic and none map styles keep their layout, scaled up to the screen.
+
+### Fixed
+- With the character window and the quest log open, opening the game's talent window no longer pushes the quest log to the screen's right edge.
+
 ## [0.25.0] - 2026-10-11
 
 ### Added

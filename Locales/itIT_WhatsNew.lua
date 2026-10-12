@@ -3,6 +3,20 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN34_1_TITLE"] = "Posizione delle finestre"
+L["WN34_1_TEXT"] = "Le finestre dell'addon si aprono in una fila dopo le finestre del gioco, nell'ordine in cui le apri, e si allineano con gli addon che spostano le finestre del gioco. Una finestra che hai spostato resta dove l'hai messa. Senza spazio si chiude la più vecchia, mai in combattimento."
+L["WN34_2_TITLE"] = "Libro degli incantesimi e talenti"
+L["WN34_2_TEXT"] = "La grande finestra del libro degli incantesimi e dei talenti del gioco si chiude quando apri una finestra dell'addon che non ha spazio accanto, come fa il gioco con le proprie finestre."
+L["WN34_3_TITLE"] = "Maniglia di ridimensionamento"
+L["WN34_3_TEXT"] = "Con una finestra sbloccata, trascina la maniglia nel suo angolo in basso a destra per ridimensionarla, o fai clic destro sulla maniglia per la sua dimensione predefinita."
+L["WN34_4_TITLE"] = "Occhio della ricerca gruppo"
+L["WN34_4_TEXT"] = "L'occhio si posiziona e si ridimensiona di nuovo nella modalità modifica del gioco, con Aggancia alla minimappa e Mostra anche senza coda nella sua finestra."
+L["WN34_5_TITLE"] = "Nascondi caselle bloccate"
+L["WN34_5_TEXT"] = "Senza autenticatore sul tuo account, attiva Nascondi caselle bloccate nelle opzioni (/fcui), sotto Finestre delle borse, e lo zaino si riduce alle caselle che puoi usare."
+L["WN34_6_TITLE"] = "Mappa e statistiche"
+L["WN34_6_TEXT"] = "Ingrandita, la mappa del mondo mantiene il suo aspetto di Era, in scala con lo schermo. Il tooltip dei danni mostra la velocità d'attacco e i danni al secondo di ogni mano, come in Era."
+L["WN34_7_TITLE"] = "Anche su Forever"
+L["WN34_7_TEXT"] = "La mappa del mondo classica mostra le tue coordinate e quelle del cursore su una riga nel suo piè di pagina. La scheda del famiglio mostra le righe di Era: Attacco, Potere d'attacco, Danni, Difesa e Armatura."
 L["WN33_1_TITLE"] = "Richieste di amicizia"
 L["WN33_1_TEXT"] = "Le schede della pagina degli amici sono Amici, Alleati recenti e Richieste di amicizia. Le richieste di amicizia di Battle.net attendono nella loro scheda, con il numero nel nome: scegline una e premi Accetta o Declina. L'elenco degli ignorati è nel menu a tendina accanto al tuo nome Battle.net."
 L["WN33_2_TITLE"] = "Comunità come pulsante"
