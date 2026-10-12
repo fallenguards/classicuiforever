@@ -644,7 +644,7 @@ end
 local function Build()
     frame = CreateFrame("Frame", FRAME_NAME, UIParent)
     frame:SetSize(WIDTH, HEIGHT)
-    frame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0, -104)
+    frame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", ns.ClassicSlot())
     frame:SetToplevel(true)
     frame:EnableMouse(true)
     frame:SetFrameStrata("HIGH")

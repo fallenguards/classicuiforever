@@ -746,7 +746,7 @@ local function CreateBook()
     -- Only the painted book takes the mouse: under its foot tabs and past its border the world does.
     f:SetHitRectInsets(0, 34, 0, 79)
     f:EnableMouseWheel(true)
-    f:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0, -104)
+    f:SetPoint("TOPLEFT", UIParent, "TOPLEFT", ns.ClassicSlot())
     f:Hide()
     -- Not a UIPanel: the panel manager refuses addon show/hide in combat (the
     -- book stuck open). Escape and placement are ours: the left window slot,
@@ -755,7 +755,7 @@ local function CreateBook()
     -- Its professions tab is the game's window, closed by the book's key in a fight too: a fight begun with it open
     -- homed the book beside it, where its casting layer then held it.
     ns.SetSlotShares(f, { ProfessionsFrame = true })
-    if not Hosted() then ns.RegisterClassicWindow(f, true, "spellBook") end
+    if not Hosted() then ns.RegisterClassicWindow(f, true) end
     ns.db.spellBookPos = nil
     -- Our Escape out of combat: the client's clears the target first, 1.x closed
     -- windows first. Closes like the X: a bare hide in combat leaves the layer up
@@ -859,7 +859,7 @@ local function CreateBook()
     clicks:EnableMouse(false)
     -- Anchored to UIParent: anchoring to the book would protect the book.
     clicks:SetSize(BOOK_W, BOOK_H)
-    clicks:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0, -104)
+    clicks:SetPoint("TOPLEFT", UIParent, "TOPLEFT", ns.ClassicSlot())
     clicks:SetFrameStrata("HIGH")
     clicks:Hide()
     f.Clicks = clicks
@@ -872,7 +872,8 @@ local function CreateBook()
         if left and top then
             clicks:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left, top)
         else
-            clicks:SetPoint("TOPLEFT", UIParent, "TOPLEFT", f.fcuiSlotX or 0, -104)
+            local x, y = ns.ClassicSlot()
+            clicks:SetPoint("TOPLEFT", UIParent, "TOPLEFT", f.fcuiSlotX or x, y)
         end
     end
     f.OnClassicPlaced = function() FollowBook() end

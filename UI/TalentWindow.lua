@@ -340,7 +340,7 @@ local function BuildShell(name, spec)
     frame:EnableMouse(true)
     -- Era's margins: past the art the world takes the mouse.
     frame:SetHitRectInsets(0, 30, 0, 45)
-    frame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0, -104)
+    frame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", ns.ClassicSlot())
     frame:Hide()
     -- Hosted, the game's window places and closes it; otherwise our window handles move it.
     if not spec.hosted then ns.CloseWithGameMenu(frame) end

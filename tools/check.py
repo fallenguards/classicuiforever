@@ -39,7 +39,7 @@ RULES = ["CVAR", "CVARREAD", "CVARLOGIN", "CVARREG", "REGISTRY", "HOOK", "ONUPDA
          "LOADADDON", "EDITMODE", "EDITQUERY", "SETTLE",
          "PANELMGR", "SECRET", "WALK", "REGEVENTS", "EVENTFRAME", "POINTONCE", "SETIF", "THEME", "ONCEFLAG",
          "FRAMEFIELD", "GAMEMENU", "SHAREDART", "PLATES", "FORBIDDEN", "SYSBASE", "LAYOUTFIELD",
-         "PADART", "SECRETMOUSE", "UNITEVENTS", "DRAGPOINT", "ERASPOT", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "TOC"]
+         "PADART", "SECRETMOUSE", "UNITEVENTS", "DRAGPOINT", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "TOC"]
 # A hit of these on a line the change adds fails even within the baseline, so swapping one call for another fails.
 # SINCE, DEADNS, FRAMEFIELD, CVARLOGIN and THROTTLEFRAME stay count-only, so a kept line can still be rewritten.
 LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", "EDITMODE", "PANELMGR", "SEARCHBOX", "ADDONCHAR",
@@ -47,7 +47,7 @@ LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", 
               "CVARREAD", "THEME", "POINTONCE", "SECRET", "SETIF", "REGEVENTS", "ONCEFLAG", "TIMER", "EDITQUERY",
               "PLATES", "FORBIDDEN", "EVENTFRAME",
               "WALK", "GAMEMENU", "SHAREDART", "SYSBASE", "LAYOUTFIELD", "PADART", "SECRETMOUSE", "UNITEVENTS",
-              "DRAGPOINT", "ERASPOT", "CVARREG", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST",
+              "DRAGPOINT", "ERASPOT", "WINDOWORIGIN", "CVARREG", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST",
               "POINTEXACT",
               "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE")
 
@@ -134,7 +134,7 @@ ALLOWED_BODIES = {
 # Names ClassicUIForeverDev reads; never reported by DEADNS.
 DEV_NAMES = frozenset((
     "walkFns", "stopped", "savedFirst", "MicroButtonList", "barMoved", "bandPasses", "stripPasses", "OnBarLaid", "OnMinimapLaid", "OnSpellBarPlaced",
-    "DevLabel", "DevNoGuild", "DevFriendRequests", "DevLockedSlots",
+    "DevLabel", "DevNoGuild", "DevFriendRequests", "DevLockedSlots", "WindowRowState",
     "CharacterCameraInfo", "db", "Persist", "Print", "BeginOutput", "FlushNotice", "debugSink", "debugFlushNotice",
     "missing", "mirrorLoaded", "SkinBank", "ClassicLayoutActive", "GetMainBar", "BandBarsToUnpinned", "SystemMoved",
     "DressLootRoll", "ToggleSpellBook", "CombatNumbersInfo", "ClassicBarActive", "hookFns", "MODULE_ORDER", "modules",
@@ -209,6 +209,8 @@ FIX = {
     "ONCEFLAG": "use ns.Once(frame, key), ns.Sched.Attach, or a file-local weak table; never our state as a field "
                 "on a client frame",
     "GAMEMENU": "use ns.CloseWithGameMenu(frame|getter, closer) (UI/Escape.lua): one hook per call, same moment",
+    "WINDOWORIGIN": "place from the game's layout: ns.ClassicSlot() for ours, ns.GameRow() or ns.GameHome(frame) for "
+                    "the game's (UI/GameSpot.lua)",
     "HELDCVAR": "use ns.SetCVarOrHold(name, value) (Core/Settings.lua): a pick made in a fight is written as it ends; "
                 "ns.SetCVar refuses in combat and the after-fight pass read the old value back (2026-10-01)",
     "OWNRELOAD": "show a game popup whose OnAccept calls ns.ReloadForLayout (ns.ReloadPopup, UI/Dialogs.lua): a press "
@@ -349,6 +351,8 @@ EDITSAVE_RX = re.compile(r"\bns\s*\.\s*db\s*(?:\.\s*\w+|\[[^\]]*\])\s*=(?!=)")
 # Client templates whose retail XML anchors children with relativeTo="$parent...": a frame made from one needs a name.
 NAMED_TEMPLATES = ("ProfessionStatusBarTemplate",)
 KEEP_PATTERNS = {
+    # A window on the game's row start as fixed numbers, not from the game's layout (ns.ClassicSlot, ns.GameRow).
+    "WINDOWORIGIN": re.compile(r'"TOPLEFT"\s*,\s*"?UIParent"?\s*,\s*"TOPLEFT"\s*,\s*[^,()]+,\s*-1(?:04|16)\b'),
     "NAMEDTEMPLATE": re.compile(r"\b(?:CreateFrame|NewFrame)\b\W+\"\w+\"\s*,\s*nil\s*,[^\n]*\"(?:%s)\""
                                 % "|".join(NAMED_TEMPLATES)),
     # The game's reload from our own button's click, or called outside ns.ReloadForLayout's file.
@@ -468,6 +472,8 @@ MESSAGES = {
     "THEME": "theme branch or input grey by hand outside Art/",
     "ONCEFLAG": "our state as a field on a frame",
     "GAMEMENU": "GameMenuFrame hooked outside ns.CloseWithGameMenu",
+    "WINDOWORIGIN": "a window on the game's row start as fixed numbers (0, -104 or 16, -116): a layout addon that "
+                    "moves the game's row leaves it behind",
     "OWNRELOAD": "the game's reload from our own button's click (or called directly outside ns.ReloadForLayout)",
     "HELDCVAR": "ns.SetCVar in code a toggle runs at once, in a fight too (KeyEffects, an ns.OnToggle handler)",
     "CVARREG": "an addon-registered cvar (a settings copy outside saved variables)",

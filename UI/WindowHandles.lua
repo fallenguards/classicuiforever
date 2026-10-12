@@ -6,7 +6,6 @@ local L = ns.L
 -- anyone moves the window, never inside the client's pass.
 
 local WINDOWS = ns.WINDOW_LIST
-local SLOT_LEFT, SLOT_TOP = 0, 104
 -- The whole painted title bar, clear of the portrait on the left and the lock and close on the right.
 local STRIP_H, STRIP_LEFT, STRIP_RIGHT = 40, 60, 90
 local STRIP_LIFT = 20
@@ -105,6 +104,13 @@ function ns.WindowPlaced(key)
 end
 -- A place carried over from an older record (the gryphons' old handle).
 function ns.SetWindowPlace(key, x, y) SetPlace(byKey[key], x, y) end
+-- A window the player placed (ours or the game's): out of the windows' row.
+function ns.FramePlaced(frame)
+    for _, entry in ipairs(WINDOWS) do
+        if not entry.piece and ns.WindowFrame(entry) == frame then return PlaceOf(entry) ~= nil end
+    end
+    return false
+end
 
 local function IsFree(entry)
     if entry.toggle then return ns.db[entry.toggle] == true end
@@ -373,7 +379,8 @@ local function HandleRect(entry)
         if frame then x, down = ns.GameHome(frame, h) end
         return x, UIParent:GetHeight() - down, w, h
     end
-    return SLOT_LEFT, UIParent:GetHeight() - SLOT_TOP, w, h
+    local x, y = ns.ClassicSlot()
+    return x, UIParent:GetHeight() + y, w, h
 end
 
 local function LayHandle(entry)
