@@ -198,7 +198,6 @@ ns.TOGGLES = {
         search = "communities tab button tabs" },
     { "communitiesNoGuildTab", L["OPT_communitiesNoGuildTab"], L["OPT_communitiesNoGuildTab_TIP"], parent = "communitiesButton",
         search = "communities tab no guild" },
-    { "groupFinder", L["OPT_groupFinder"], L["OPT_groupFinder_TIP"] },
 
     { "bags", L["OPT_bags"], L["OPT_bags_TIP"], group = L["GROUP_BAGS"] },
     { "plainQuestItems", L["OPT_plainQuestItems"], L["OPT_plainQuestItems_TIP"], parent = "bags", search = "quest border glow" },
@@ -319,6 +318,9 @@ local FOREVER_ROWS = {
         { "talentsSqueeze", L["OPT_talentsSqueeze"], L["OPT_talentsSqueeze_TIP"], parent = "talentsThreePane",
             radio = "talentsHeight", drop = true, search = "squeeze fit no scroll every row height" },
         { "legacyWindow", L["OPT_legacyWindow"], L["OPT_legacyWindow_TIP"], search = "legacy points perks tree challenges rewards track" },
+    },
+    communitiesNoGuildTab = {
+        { "groupFinder", L["OPT_groupFinder"], L["OPT_groupFinder_TIP"] },
     },
 }
 

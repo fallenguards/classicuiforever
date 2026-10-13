@@ -355,8 +355,11 @@ end
 
 local function ShowWho()
     if not panel then return end
-    S.BuildWhoFinderTabs(FriendsFrame, panel)
-    S.SyncWhoFinderTabs()
+    -- The finder those tabs open is Forever's alone.
+    if ns.OnForever() then
+        S.BuildWhoFinderTabs(FriendsFrame, panel)
+        S.SyncWhoFinderTabs()
+    end
     ns.HideGuildRoster()
     HideBlizzardPanels()
     panel:Show()
