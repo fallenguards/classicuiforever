@@ -76,6 +76,7 @@ local state = {
     pages = {},         -- current page per skill line, plus pages.pet
     slots = {},         -- spell book slot indices for the selected tab, future spells dropped
     search = "",        -- text in the search box; while set, the slots come from every tab
+    lines = {},         -- scratch: the skill lines in tab order (Spells/BookLines.lua)
 }
 
 local function CurrentPageKey()
@@ -218,16 +219,13 @@ local function CollectAllSlots()
             end
             return
         end
-        local n = C_SpellBook.GetNumSpellBookSkillLines() or 0
-        for line = 1, n do
+        for _, line in ipairs(ns.BookLines(state.lines)) do
             local info = C_SpellBook.GetSpellBookSkillLineInfo(line)
-            if info and not info.shouldHide and (info.offSpecID or 0) == 0 then
-                local first = (info.itemIndexOffset or 0) + 1
-                local last = (info.itemIndexOffset or 0) + (info.numSpellBookItems or 0)
-                for i = first, last do
-                    if Listed(i) and SpellMatches(i, BANK_PLAYER, query) then
-                        slots[#slots + 1] = i
-                    end
+            local first = (info.itemIndexOffset or 0) + 1
+            local last = (info.itemIndexOffset or 0) + (info.numSpellBookItems or 0)
+            for i = first, last do
+                if Listed(i) and SpellMatches(i, BANK_PLAYER, query) then
+                    slots[#slots + 1] = i
                 end
             end
         end
@@ -1357,12 +1355,7 @@ local function CreateBook()
         end
         pages.dirty = false
         f.tradeSig = TradeSignature()
-        local lines = {}
-        local n = C_SpellBook.GetNumSpellBookSkillLines() or 0
-        for i = 1, n do
-            local info = C_SpellBook.GetSpellBookSkillLineInfo(i)
-            if info and not info.shouldHide and (info.offSpecID or 0) == 0 and #lines < MAX_SKILL_TABS then lines[#lines + 1] = i end
-        end
+        local lines = ns.BookLines({}, MAX_SKILL_TABS)
         local hasPet = PetSpellCount() > 0
         local room = DYNAMIC - 1 - (hasPet and 1 or 0)
         wipe(lineContainer)
@@ -1530,22 +1523,18 @@ local function CreateBook()
         local selectedVisible, heldBack = false, false
         local firstLine
         if state.bank == BANK_PLAYER then
-            local n = C_SpellBook.GetNumSpellBookSkillLines() or 0
-            for i = 1, n do
+            for _, i in ipairs(ns.BookLines(state.lines, MAX_SKILL_TABS)) do
                 local info = C_SpellBook.GetSpellBookSkillLineInfo(i)
-                local offSpec = info and (info.offSpecID or 0) ~= 0
-                if info and not info.shouldHide and not offSpec and shown < MAX_SKILL_TABS then
-                    shown = shown + 1
-                    local tab = self.SkillTabs[shown]
-                    tab.line = i
-                    tab.tooltip = info.name
-                    tab:SetNormalTexture(info.iconID or "")
-                    tab:SetChecked(state.line == i)
-                    tab:Show()
-                    firstLine = firstLine or i
-                    if state.line == i then selectedVisible = true end
-                    if heldLine == i then heldBack = true end
-                end
+                shown = shown + 1
+                local tab = self.SkillTabs[shown]
+                tab.line = i
+                tab.tooltip = info.name
+                tab:SetNormalTexture(info.iconID or "")
+                tab:SetChecked(state.line == i)
+                tab:Show()
+                firstLine = firstLine or i
+                if state.line == i then selectedVisible = true end
+                if heldLine == i then heldBack = true end
             end
         end
         for i = shown + 1, MAX_SKILL_TABS do self.SkillTabs[i]:Hide() end

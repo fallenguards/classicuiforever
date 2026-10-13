@@ -186,6 +186,7 @@ Character\PetView.lua
 Character\StatPanes.lua
 Character\EquipmentPane.lua
 Character\PvPDetail.lua
+Spells\BookLines.lua
 Spells\SpellBook.lua
 Spells\SpellsHost.lua
 Skills\SkillShell.lua
