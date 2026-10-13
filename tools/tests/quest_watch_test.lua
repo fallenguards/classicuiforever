@@ -108,6 +108,26 @@ Check(shown[2].height == 13, "a short line is one line of 13")
 Check(shown[5].rgb == DIM and shown[6].text == " - Amulet: 1/1" and shown[7].text == " - Other Amulet: 0/1",
     "one objective left keeps the title dim")
 
+-- Room for a block above the quests: the first title moves under it, the watch grows by it and the gap, and is as wide
+-- as the widest of the two.
+local points = {}
+ns.SetPointOnce = function(frame, _, _, _, _, y) points[frame] = y end
+local home = ns.QuestWatchFrame()
+local plainH = home.h
+Check(ns.QuestWatchRoom("top", 40, 400) == true, "room is kept while the watch is the pick")
+Check(points[shown[1]] == -44, "the first title under the room and a gap (" .. tostring(points[shown[1]]) .. ")")
+Check(home.h == plainH + 44 and home.w == 410, "taller by the room and gap, as wide as the block (" .. home.w .. ")")
+ns.QuestWatchRoom("top", nil)
+ns.QuestWatchRoom("bottom", 30, 100)
+Check(points[shown[1]] == 0 and home.h == plainH + 34, "room under the quests: the titles stay, the watch grows")
+local saved = quests
+quests = {}
+ns.QuestWatchRoom("bottom", 30, 100)
+Check(home.shown == true and home.h == 30, "no quests: the watch shows for the block alone, its height")
+quests = saved
+ns.QuestWatchRoom("bottom", nil)
+Check(home.h == plainH, "given back, the watch is as before")
+
 -- The tracker's three boxes as one choice: an install from before keeps what it showed.
 ns.db = {
     questTracker = false, dbVersion = 10,

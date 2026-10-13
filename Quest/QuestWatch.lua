@@ -18,6 +18,8 @@ local EVENTS = { "QUEST_WATCH_LIST_CHANGED", "QUEST_LOG_UPDATE", "PLAYER_ENTERIN
 
 local home, lines, hits, events, unitEvents, menu
 local active = false
+-- Room another addon's block keeps above the quests (top) or under them (bottom): { height, width } in the watch's scale.
+local rooms = {}
 
 local function Line(i)
     local line = lines[i]
@@ -108,7 +110,10 @@ end
 -- Era's QuestWatch_Update over the game's watch list; a quest with no objectives is left out, as Era did.
 local function Update()
     if not active then return end
-    local used, quests, widest, tall = 0, 0, 0, 0
+    local top, bottom = rooms.top, rooms.bottom
+    local used, quests = 0, 0
+    local widest = math.max(top and top.width or 0, bottom and bottom.width or 0)
+    local tall = top and top.height or 0
     for i = 1, C_QuestLog.GetNumQuestWatches() do
         local questID = C_QuestLog.GetQuestIDForQuestWatchIndex(i)
         local goals = questID and C_QuestLog.GetQuestObjectives(questID)
@@ -117,7 +122,8 @@ local function Update()
             local title = Line(used)
             local width, height = Fill(title, C_QuestLog.GetTitleForQuestID(questID) or "")
             if used == 1 then
-                ns.SetPointOnce(title, "TOPLEFT", home, "TOPLEFT", 0, 0)
+                ns.SetPointOnce(title, "TOPLEFT", home, "TOPLEFT", 0, top and -(top.height + TITLE_GAP) or 0)
+                if top then tall = tall + TITLE_GAP end
             else
                 ns.SetPointOnce(title, "TOPLEFT", lines[used - 1], "BOTTOMLEFT", 0, -TITLE_GAP)
                 tall = tall + TITLE_GAP
@@ -142,9 +148,10 @@ local function Update()
             Color(title, hit:IsMouseOver() and WHITE or hit.rgb)
         end
     end
+    if bottom then tall = tall + (used > 0 and TITLE_GAP or 0) + bottom.height end
     for i = used + 1, #lines do lines[i]:Hide() end
     for i = quests + 1, #hits do hits[i]:Hide() end
-    home:SetShown(used > 0)
+    home:SetShown(used > 0 or top ~= nil or bottom ~= nil)
     home:SetSize(math.max(1, widest + PAD_W), math.max(1, tall))
     Lay()
 end
@@ -152,6 +159,21 @@ end
 -- Edit mode's reset and size steps.
 function ns.LayQuestWatch(key)
     if key == KEY then Lay() end
+end
+
+-- The watch while it is the pick, else nil.
+function ns.QuestWatchFrame()
+    return active and home or nil
+end
+
+-- Keeps room for a block at side "top" or "bottom" (one block a side), height nil gives it back; false while the watch
+-- is not the pick. The block draws itself: at the watch's top left, or its bottom left.
+function ns.QuestWatchRoom(side, height, width)
+    if side ~= "top" and side ~= "bottom" then return false end
+    rooms[side] = height and { height = height, width = width or 0 } or nil
+    if not active then return false end
+    Update()
+    return true
 end
 
 local function Apply()

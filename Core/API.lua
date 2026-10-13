@@ -141,6 +141,11 @@ local WINDOWS = {
         frame = function() return ns.ClassicMapBorder() end,
         parts = {},
     },
+    questWatch = {
+        -- No open: the Era quest watch shows while picked and anything is in it. Room for a block: API.WatchRoom.
+        frame = function() return ns.QuestWatchFrame() end,
+        parts = {},
+    },
     whoList = {
         open = function() return ns.OpenWhoList() end,
         frame = function() return ns.WhoPanel() end,
@@ -189,6 +194,13 @@ end
 -- to tell a button from GetFrame("spellBook", "spell:<id>") still shows that spell.
 function API.SpellOnButton(button)
     return ns.SpellBookButtonSpell(button)
+end
+
+-- Room in the Era quest watch for another addon's block, above the quests (side "top") or under them ("bottom"), one
+-- block a side: height and width in the watch's scale, height nil gives it back. The block draws itself at
+-- GetFrame("questWatch")'s top left or bottom left; false while the watch is not the pick.
+function API.WatchRoom(side, height, width)
+    return ns.QuestWatchRoom(side, height, width)
 end
 
 -- The windows Open and GetFrame support, each with its part names.

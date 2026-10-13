@@ -59,6 +59,8 @@ local ns = {
     OpenProfessionsBook = function() Log("profBook") return true end,
     prof = { Page = function() return bookPage end, BookCard = function(kind, n) return kind .. n end },
     MicroButtonNow = function(name) return name == "CharacterMicroButton" and "ringPortrait" or nil end,
+    QuestWatchFrame = function() return "watch" end,
+    QuestWatchRoom = function(side, height, width) Log("room", side, tostring(height), tostring(width)) return true end,
 }
 
 local env = setmetatable({
@@ -114,6 +116,8 @@ Check(API.GetFrame("microMenu", "CharacterMicroButton") == "ringPortrait", "a mi
 Check(API.GetFrame("microMenu", "HelpMicroButton") == nil, "a micro button shown nowhere: nil")
 Check(API.GetFrame("talents", "talent:nope") == nil and API.GetFrame("talents", "bogus") == nil, "unknown parts: nil")
 Check(API.GetFrame("nope") == nil and API.GetFrame("nope", "part") == nil, "unknown windows: nil")
+Check(API.GetFrame("questWatch") == "watch", "the Era quest watch")
+Check(API.WatchRoom("bottom", 30, 120) and Called("room bottom 30 120"), "room in the watch asked of it")
 
 -- SecureOpener: the key's secure button for a window in force, nothing otherwise.
 env.ClassicUIForeverTalentsBind = Frame()
