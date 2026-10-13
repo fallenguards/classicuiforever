@@ -438,12 +438,14 @@ local function Apply()
             S.ClientWhoTab(true)
         end
         S.PlaceTabs()
+        S.UseOpener("whoList", true)
     end)
 end
 
 local function Restore()
     SetActive(false)
     HideWho()
+    S.UseOpener("whoList", false)
     if tab then tab:Hide() end
     if S.ClientWhoTab(false) then S.PlaceTabs() end
 end

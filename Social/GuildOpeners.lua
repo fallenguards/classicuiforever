@@ -1,6 +1,6 @@
 local _, ns = ...
 
--- Roster openers (Guild and Communities tabs, guild key, micro button, social opener) and the module switch.
+-- Roster openers (Guild and Communities tabs, guild key, micro button) and the module switch.
 
 local G, S = ns.guild, ns.social
 local Build, Refresh, GuildTitle, DropGhost = G.Build, G.Refresh, G.GuildTitle, G.DropGhost
@@ -237,18 +237,7 @@ afterFight:SetScript("OnEvent", function()
 end)
 
 -- 1.x's micro menu had Social, not Guild: the guild button does that job.
-local function SocialShown() return FriendsFrame and FriendsFrame:IsShown() and true or false end
-
-local function ToggleSocial()
-    if not FriendsFrame then return end
-    if SocialShown() then
-        if G.panel and G.panel:IsShown() then G.panel:Hide() end
-        ns.HidePanel(FriendsFrame)
-    else
-        ns.ShowPanel(FriendsFrame)
-    end
-    ns.RefreshMicroButtons()
-end
+local SocialShown, ToggleSocial = S.SocialShown, S.ToggleSocial
 
 local function CloseClientGuildWindows()
     DropGhost()
@@ -282,53 +271,24 @@ local function WrapGuildToggle()
     end
 end
 
--- The guild key clicks our secure button; with the game's new social window on, the social keys click our opener too.
+-- The guild key clicks our secure button (the social keys click the social window's opener, Social/SocialOpener.lua).
 local GUILD_BIND = "ForeverClassicUIGuildBind"
-local SOCIAL_OPEN = "ForeverClassicUISocialOpen"
-local SOCIAL_BINDINGS = { "TOGGLESOCIAL", "TOGGLEFRIENDSTAB" }
-local guildBind, socialOpen
-
--- The toast's click runs the client's friends toggle: a counted panel that opens in combat. With the new window on that
--- toggle opens the new one, so ours opens from Lua (raw in a fight, Escape armed by the opener's click).
-local TOAST_OPEN = "/click QuickJoinToastButton"
-local function OpenerMacro() return ns.SocialUIOn() and "" or TOAST_OPEN end
-
-local escArmed = setmetatable({}, { __mode = "k" })
-local function ArmEscape(button, on)
-    if not button or (escArmed[button] or false) == on or not ns.EscArmOnClick then return end
-    escArmed[button] = on
-    if on then
-        ns.EscArmOnClick(button, "social")
-    elseif SecureHandlerUnwrapScript then
-        SecureHandlerUnwrapScript(button, "OnClick")
-    end
-end
-
-local function BindKeys(bindings, target)
-    for _, binding in ipairs(bindings) do
-        local key, second = GetBindingKey(binding)
-        for _, k in ipairs({ key, second }) do
-            if k then SetOverrideBindingClick(guildBind, true, k, ns.KeyProxy(target), "LeftButton") end
-        end
-    end
-end
+local guildBind
 
 local function UpdateGuildBinding()
     if not guildBind or InCombatLockdown() then return end
     ClearOverrideBindings(guildBind)
-    local newUI = ns.SocialUIOn()
-    for _, button in pairs({ guildBind, socialOpen }) do
-        ns.SetAttributeIf(button, "macrotext", OpenerMacro())
-        ArmEscape(button, newUI)
-    end
+    ns.SetAttributeIf(guildBind, "macrotext", S.OpenerMacro())
+    S.ArmEscape(guildBind, ns.SocialUIOn())
     if not G.active then return end
-    BindKeys(GUILD_BINDINGS, GUILD_BIND)
-    if newUI and socialOpen then BindKeys(SOCIAL_BINDINGS, SOCIAL_OPEN) end
+    for _, binding in ipairs(GUILD_BINDINGS) do
+        local key, second = GetBindingKey(binding)
+        for _, k in ipairs({ key, second }) do
+            if k then SetOverrideBindingClick(guildBind, true, k, ns.KeyProxy(GUILD_BIND), "LeftButton") end
+        end
+    end
 end
 ns.UpdateGuildBinding = UpdateGuildBinding
-
--- No friends micro button, and /friends is not secure (it adds the target as a friend): QuickJoinToastButton, clicked
--- with no toast waiting, runs the client's ToggleFriendsFrame.
 
 -- After a press: the key also opens the roster, the button only the window.
 -- Never selects the client's tab (it lit beside ours).
@@ -352,31 +312,6 @@ local function SettleSocialPress(was)
     if was == now then ToggleSocial() end
 end
 
-local function BuildSocialOpener()
-    if socialOpen or InCombatLockdown() then return end
-    if not _G["QuickJoinToastButton"] then return end
-    socialOpen = CreateFrame("Button", SOCIAL_OPEN, UIParent, "SecureActionButtonTemplate")
-    -- Sized and placed off screen: a button with neither is never clicked.
-    socialOpen:SetSize(1, 1)
-    socialOpen:SetPoint("TOPLEFT", UIParent, "TOPLEFT", -500, 500)
-    socialOpen:EnableMouse(false)
-    socialOpen:RegisterForClicks("AnyUp", "AnyDown")
-    socialOpen:SetAttribute("useOnKeyDown", false)
-    socialOpen:SetAttribute("type", "macro")
-    socialOpen:SetAttribute("macrotext", OpenerMacro())
-    socialOpen:SetScript("PreClick", function(self, _, down)
-        if down then return end
-        self.was = SocialShown()
-    end)
-    socialOpen:HookScript("OnClick", function(self, _, down)
-        if down or not G.active then return end
-        SettleSocialPress(self.was)
-        self.was = nil
-        AfterSocialPress(false)
-    end)
-    return socialOpen
-end
-
 local function BuildSecureOpener()
     if guildBind or InCombatLockdown() then return end
     if not G.panel then Build() end
@@ -386,7 +321,7 @@ local function BuildSecureOpener()
     -- Once per press, on release (both key halves reach this button).
     guildBind:SetAttribute("useOnKeyDown", false)
     guildBind:SetAttribute("type", "macro")
-    guildBind:SetAttribute("macrotext", OpenerMacro())
+    guildBind:SetAttribute("macrotext", S.OpenerMacro())
     guildBind:SetScript("PreClick", function(self, _, down)
         if down then return end
         self.was = SocialShown()
@@ -454,16 +389,12 @@ local function Apply()
         HookGuildOpeners()
         WrapGuildToggle()
         BuildSecureOpener()
-        -- The button presses the client's own opener, as the key does.
-        if BuildSocialOpener() then
-            if GuildMicroButton then ns.MapPad(GuildMicroButton, nil, nil, socialOpen, function() return G.active end) end
-            -- The friends button by chat too; a group toast on it keeps its own click (the quick join list).
-            local toast = _G["QuickJoinToastButton"]
-            ns.MapPad(toast, nil, nil, socialOpen, function() return G.active and not toast.displayedToast end)
-            ns.HookMethod(toast, "ShowToast", ns.PlacePads)
-            ns.HookMethod(toast, "ToastToFriendFinished", ns.PlacePads)
+        -- The button presses the social window's opener, as the key does.
+        local opener = S.UseOpener("guildRoster", true)
+        if opener and ns.Once(opener, "guildPress") then
+            if GuildMicroButton then ns.MapPad(GuildMicroButton, nil, nil, opener, function() return G.active end) end
+            opener:HookScript("OnClick", function(_, _, down) if not down then AfterSocialPress(false) end end)
         end
-        -- The social keys and the opener's arming wait for the opener.
         UpdateGuildBinding()
         if communitiesTab then communitiesTab:Show() end
         if tab then tab:Show() PlaceTab() end
@@ -475,6 +406,7 @@ local function Restore()
     if not G.active then return end
     G.active = false
     ns.UpdateGuildBinding()
+    S.UseOpener("guildRoster", false)
     HideGuild()
     if tab then tab:Hide() end
     if communitiesTab then communitiesTab:Hide() end

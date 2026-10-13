@@ -23,7 +23,7 @@ local GROUPS = {
     { "Skills/SkillShell.lua", "Skills/ProfessionsBook.lua", "Skills/ProfessionsBookFrame.lua",
         "Skills/ProfessionsFootTabs.lua", "Skills/ProfessionsWindow.lua", "Skills/TradeSkillExtras.lua",
         "Skills/TradeSkill.lua", "Skills/Talents.lua", "Skills/TalentsTree.lua" },
-    { "Social/SocialWindow.lua", "Social/GuildData.lua", "Social/GuildRoster.lua", "Social/GuildNoteBridge.lua",
+    { "Social/SocialWindow.lua", "Social/SocialOpener.lua", "Social/GuildData.lua", "Social/GuildRoster.lua", "Social/GuildNoteBridge.lua",
         "Social/GuildOpeners.lua", "Social/WhoFilters.lua", "Social/WhoList.lua", "Social/FinderTabs.lua",
         "Social/GroupFinder.lua" },
     { "Spells/SpellBook.lua" }, { "UI/ClassicFonts.lua" }, { "UI/ClientDialogs.lua" }, { "UI/ClientMenus.lua" },
