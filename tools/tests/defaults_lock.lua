@@ -160,6 +160,7 @@ return {
     layoutSelectPending = false,
     layoutSelectTries = 0,
     legacyMinimapButton = true,
+    legacyThreePane = false,
     legacyWindow = true,
     lfgMinimapButton = true,
     lootRoll = false,

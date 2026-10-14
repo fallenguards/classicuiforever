@@ -318,6 +318,8 @@ local FOREVER_ROWS = {
         { "talentsSqueeze", L["OPT_talentsSqueeze"], L["OPT_talentsSqueeze_TIP"], parent = "talentsThreePane",
             radio = "talentsHeight", drop = true, search = "squeeze fit no scroll every row height" },
         { "legacyWindow", L["OPT_legacyWindow"], L["OPT_legacyWindow_TIP"], search = "legacy points perks tree challenges rewards track" },
+        { "legacyThreePane", L["OPT_legacyThreePane"], L["OPT_legacyThreePane_TIP"], parent = "legacyWindow",
+            search = "legacy three trees side by side triple pane tripane all trees" },
     },
     communitiesNoGuildTab = {
         { "groupFinder", L["OPT_groupFinder"], L["OPT_groupFinder_TIP"] },

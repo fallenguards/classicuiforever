@@ -52,15 +52,35 @@ InCombatLockdown = function() return false end
 C_Traits = { GetConfigIDByTreeID = function() return nil end, GetTreeNodes = NOOP }
 
 local window, apply
+-- Each change of shape and of the tree's pieces, in order.
+local steps = {}
+local function Step(what) steps[#steps + 1] = what end
+-- UI/TalentTrees.lua's side by side: on when the page's wanted() says, as Reshape asks.
+local function TalentTrees(frame, opts)
+    frame.panes = { Window(), Window(), Window() }
+    frame.trees = { on = false }
+    function frame.trees.Reshape()
+        local on = opts.wanted(frame) == true
+        if on ~= frame.trees.on then Step(on and "three" or "one") end
+        frame.trees.on = on
+    end
+    frame.trees.Reshape()
+end
+wipe = function(t) for k in pairs(t) do t[k] = nil end end
 local ns = {
     L = setmetatable({}, { __index = function(_, key) return key end }), EMPTY = {}, SIDE_TAB_SLOT = 0,
+    db = { legacyThreePane = true },
     OnForever = function() return true end,
     WindowMicro = function() return NOOP end,
     WindowKey = function() return { Set = NOOP, PressFirst = NOOP, name = "key" } end,
     OnGameSpellsRoom = NOOP,
     RegisterModule = function(_, spec) apply = spec.apply end,
     TalentWindow = function() window = Window() return window end,
-    TalentTreeShown = function(w, on) w.treeShown = on end,
+    TalentTrees = TalentTrees, SetPointOnce = NOOP,
+    TalentTreeShown = function(w, on)
+        w.treeShown = on
+        Step(on and "pieces" or "no pieces")
+    end,
     EventFrame = function() return Stub() end,
     SkillLineTab = Tab,
     Sched = { NextFrame = NOOP },
@@ -89,6 +109,20 @@ Pick(2)
 Check(window.treeShown == false, "back on challenges: no tree pieces")
 Pick(1)
 Check(window.treeShown == false, "the reward track: no tree pieces")
+
+-- Three trees side by side: only on the tree page, its window widened after the pieces show and narrowed before they go.
+Check(window.trees.on == false, "the reward track: one window, not three trees")
+steps = {}
+Pick(3)
+Check(window.trees.on == true, "the tree page with the option on: three trees")
+Check(steps[1] == "pieces" and steps[2] == "three", "the tree's pieces show, then the three trees")
+steps = {}
+Pick(2)
+Check(window.trees.on == false, "challenges: not three trees")
+Check(steps[1] == "one" and steps[2] == "no pieces", "back to one tree before the tree's pieces go")
+ns.db.legacyThreePane = false
+Pick(3)
+Check(window.trees.on == false, "the option off: one tree per tab")
 
 if failed > 0 then
     print(failed .. " check(s) failed")

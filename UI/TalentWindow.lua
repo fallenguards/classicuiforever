@@ -463,7 +463,10 @@ local function BuildFoot(frame, spec)
     frame.undoIcon = undo
     frame.reset:SetScript("OnClick", function()
         local tree = frame.tree
-        if tree and C_Traits.RollbackConfig then pcall(C_Traits.RollbackConfig, tree.configID) end
+        -- Side by side, the Legacy trees are three configs (tree.parts).
+        if tree and C_Traits.RollbackConfig then
+            for _, part in ipairs(tree.parts or { tree }) do pcall(C_Traits.RollbackConfig, part.configID) end
+        end
         PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
         spec.refresh()
     end)

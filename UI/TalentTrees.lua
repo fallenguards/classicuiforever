@@ -1,9 +1,9 @@
 local _, ns = ...
 local L = ns.L
 
--- The talents window's three trees side by side (option), each in Era's view and spacing, in Era's frame widened by its
--- own art, inset lines over the seams and the foot. Height (option): each scrolls, the window grows, or rows squeeze
--- into Era's height; without scroll bars the trees touch. Drawn through UI/TalentWindow.lua's pieces.
+-- Three trees side by side (option) in the talents window or the Legacy tree, each in Era's view, in Era's frame widened
+-- by its own art, inset lines on the seams and foot. Height: each scrolls, the window grows, or rows squeeze into Era's;
+-- without scroll bars the trees touch. Drawn through UI/TalentWindow.lua's pieces.
 
 local V = ns.talentView
 
@@ -31,10 +31,11 @@ local TALENTS_BOX_WIDTH = 196
 local TALENTS_BOX_HEIGHT = 24
 local TALENTS_TEXT_RIGHT = -10
 
-local art = {}   -- the added pieces, reused in order
 local keyOf = setmetatable({}, { __mode = "k" })   -- a piece's art, set when it changes
 
+-- A window's added pieces (frame.trees.art), reused in order.
 local function Piece(frame, n, key, file, x0, y0, w, h, fileW, point, x, y, drawH)
+    local art = frame.trees.art
     local tex = art[n]
     if not tex then
         tex = frame:CreateTexture(nil, "BORDER")
@@ -71,6 +72,7 @@ local function Grow(frame, wide, tall)
             Add(key, false, x0, REPEAT_Y, w, math.min(STRIP, tall - row * STRIP), fileW, point, x, -256 - row * STRIP)
         end
     end
+    local art = frame.trees.art
     for i = n + 1, #art do art[i]:Hide() end
 end
 
@@ -82,8 +84,8 @@ local function Edge(frame, atlas)
     return tex
 end
 
--- The height pick: scroll, tall or squeeze.
-local function Mode()
+-- The talents' height pick: scroll, tall or squeeze.
+local function TalentsMode()
     local db = ns.db
     if db.talentsTall == true then return "tall" end
     if db.talentsSqueeze == true then return "squeeze" end
@@ -142,15 +144,25 @@ local function Size(frame, mode, room)
     Lay(frame, mode, room)
     Grow(frame, wide, tall)
     -- The row stands the next window past its full width.
-    ns.SetSlotWidth(frame, 352 + wide)
+    ns.SetSlotWidth(frame, (trees.opts.slot or 352) + wide)
 end
 
+-- A pane's tree and tab: one of the trees given (look.trees, a tab each), or one of the tree's three tabs.
+local function PaneTree(tree, look, i)
+    if look.trees then
+        local own = look.trees[i]
+        return own, own and own.tabs[1]
+    end
+    return tree, tree and tree.tabs[i]
+end
+
+-- tree: the window's (its foot; for look.trees, their parts), look as ns.DrawTalentTab's.
 local function Draw(frame, tree, look)
     frame.tree, frame.tab = tree, nil
     frame.title:SetText(look.title or "")
-    local mode, room = Mode(), V.VIEW_H
+    local mode, room = frame.trees.opts.mode(), V.VIEW_H
     for _, pane in ipairs(frame.panes) do
-        local tab = tree and tree.tabs[pane.index]
+        local _, tab = PaneTree(tree, look, pane.index)
         -- Squeezed: the rows' pitch down till the tree fits Era's height.
         local pitch = V.GEO[4]
         if mode == "squeeze" and tab and tab.tiers > 1 then
@@ -164,8 +176,8 @@ local function Draw(frame, tree, look)
         V.ReleaseAll(pane.branchPool)
         V.ReleaseAll(pane.arrowPool)
         for _, button in ipairs(pane.buttons) do button:Hide() end
-        local tab = tree and tree.tabs[i]
-        pane.tree, pane.tab = tree, tab
+        local own, tab = PaneTree(tree, look, i)
+        pane.tree, pane.tab = own, tab
         pane.header:SetShown(tab ~= nil)
         if tab then
             pane.header.text:SetText(string.format(L["SKILL_POINTS_IN_X"], tab.name) .. "|cffffffff"
@@ -219,23 +231,34 @@ local function Shape(frame, on)
     if on then
         frame.bar:Hide()
         for _, tab in ipairs(frame.tabs) do tab:Hide() end
-        Size(frame, Mode(), V.VIEW_H)
+        Size(frame, trees.opts.mode(), V.VIEW_H)
     else
         trees.mode, trees.room = nil, nil
         frame:SetSize(WINDOW_W, WINDOW_H)
-        for _, tex in ipairs(art) do tex:Hide() end
-        ns.SetSlotWidth(frame, nil)
+        for _, tex in ipairs(trees.art) do tex:Hide() end
+        ns.SetSlotWidth(frame, trees.opts.slot)
     end
 end
 
-local function Wanted(frame)
-    return ns.db and ns.db.talentsThreePane == true and not frame.spec.hosted and ns.TalentsActive()
+local function Reshape(frame)
+    Shape(frame, frame.trees.opts.wanted(frame) == true)
 end
 
-local window
--- The talents window as built (Skills/Talents.lua): its panes, and its shape for the option now.
-function ns.TalentTrees(frame)
-    window = frame
+-- The talents window's: its option and height pick, the game's own window in place while hosted or ours is off.
+local TALENTS = {
+    wanted = function(frame)
+        return ns.db and ns.db.talentsThreePane == true and not frame.spec.hosted and ns.TalentsActive()
+    end,
+    mode = TalentsMode,
+    keys = { talentsThreePane = true, talentsScroll = true, talentsTall = true, talentsSqueeze = true, talents = true },
+}
+
+local windows = {}
+-- A talent window as built (Skills/Talents.lua, or the Legacy tree's page): its panes, and its shape for the option
+-- now. opts (the talents' when none): wanted(frame), mode() for the height pick, keys (toggles that reshape it), slot
+-- (its row width at one tree; the talents' default). frame.trees.Reshape() after anything wanted() reads changes.
+function ns.TalentTrees(frame, opts)
+    windows[#windows + 1] = frame
     -- Over the trees' art and arrows; the seams and foot pass clear of the buttons.
     local lines = ns.NewFrame("Frame", nil, frame)
     lines:SetAllPoints(frame)
@@ -246,15 +269,17 @@ function ns.TalentTrees(frame)
         frame.panes[i].index = i
     end
     lines:SetFrameLevel(frame.panes[3].arrows:GetFrameLevel() + 2)
-    frame.trees = { on = false, lines = lines, foot = Edge(lines, INSET_FOOT),
-        Draw = function(tree, look) Draw(frame, tree, look) end }
-    Shape(frame, Wanted(frame))
+    frame.trees = { on = false, lines = lines, foot = Edge(lines, INSET_FOOT), art = {}, opts = opts or TALENTS,
+        Draw = function(tree, look) Draw(frame, tree, look) end, Reshape = function() Reshape(frame) end }
+    Reshape(frame)
 end
 
-local KEYS = { talentsThreePane = true, talentsScroll = true, talentsTall = true, talentsSqueeze = true, talents = true }
--- Our own window, nothing protected in it: the options answer at once, in a fight too.
+-- Our own windows, nothing protected in them: the options answer at once, in a fight too.
 ns.OnToggle(function(key)
-    if not KEYS[key] or not window then return end
-    Shape(window, Wanted(window))
-    if window:IsShown() then window.spec.refresh() end
+    for _, frame in ipairs(windows) do
+        if frame.trees.opts.keys[key] then
+            Reshape(frame)
+            if frame:IsShown() then frame.spec.refresh() end
+        end
+    end
 end)

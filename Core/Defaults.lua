@@ -66,6 +66,7 @@ ns.DB_DEFAULTS = {
     talentsTall = false,
     talentsSqueeze = false,
     legacyWindow = true,
+    legacyThreePane = false,
     professionTabs = false,
     professionTabsHover = true,
     professionTabsHidden = false,
