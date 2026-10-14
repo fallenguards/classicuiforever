@@ -94,7 +94,9 @@ local function Build()
     frame = CreateFrame("Frame", nil, TargetFrame)
     frame:SetSize(64, 64)
     frame:SetPoint("CENTER", Ring(), "CENTER", 0, 0)
-    frame:SetFrameLevel(TargetFrame:GetFrameLevel() + 5)
+    -- A strata over the target frame and its PvP flag, as Era's ComboFrame (MEDIUM, toplevel).
+    frame:SetFrameStrata("MEDIUM")
+    frame:SetToplevel(true)
     frame.orbs = {}
     for i = 1, POINTS do
         frame.orbs[i] = Orb(frame)

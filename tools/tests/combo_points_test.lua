@@ -29,6 +29,8 @@ local function Frame()
     function f:SetSize() end
     function f:SetPoint() end
     function f:SetFrameLevel() end
+    function f:SetFrameStrata(strata) self.strata = strata end
+    function f:SetToplevel() end
     function f:GetFrameLevel() return 5 end
     function f:SetScript(name, fn) self.scripts[name] = fn end
     return f
@@ -89,6 +91,7 @@ CreateFrame = realCreate
 for i = 1, 5 do Check(clientOrbs[i]:GetAlpha() == 0, "the client's orb " .. i .. " is faded") end
 Check(registered.COMBO_TARGET_CHANGED, "points moving to a new target are heard")
 Check(built and built.orbs and #built.orbs == 5, "our frame has five orbs (" .. tostring(built and built.orbs and #built.orbs) .. ")")
+Check(built and built.strata == "MEDIUM", "a strata over the target frame and its PvP flag, as Era's (#156)")
 if built and built.orbs then
     Count(built)
     Check(built.shown, "with points on an enemy target our orbs show")
