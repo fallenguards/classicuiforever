@@ -5,6 +5,7 @@ local _, ns = ...
 -- Hangs from UIParent, placed by measure out of combat: a frame a secure frame anchors to is locked in combat.
 local mapPads = {}
 local padWhen = {}   -- button -> its pad's when()
+local padMacro = {}  -- button -> its pad's macro text function
 local MapPad
 local Report = ns.Report
 
@@ -48,6 +49,7 @@ MapPad = function(button, strata, after, target, when, editMode)
     local mapPad = CreateFrame("Button", nil, UIParent, "SecureActionButtonTemplate")
     mapPads[button] = mapPad
     padWhen[button] = when
+    padMacro[button] = macroFn
     if macroFn or type(target) == "string" then
         mapPad:SetAttribute("type", "macro")
         mapPad:SetAttribute("macrotext", macroFn and "" or target)
@@ -165,9 +167,9 @@ end
 function ns.PadOf(button) return mapPads[button] end
 
 -- What another pad presses to do the button's work (a minimap icon for a micro button): its pad while that is
--- wanted, shown or not, else the button itself.
+-- wanted, shown or not, else the button itself. A closer's pad runs nothing while nothing is in the way.
 function ns.PressTarget(button)
-    local pad, when = mapPads[button], padWhen[button]
-    if pad and (not when or when()) then return pad end
+    local pad, when, macro = mapPads[button], padWhen[button], padMacro[button]
+    if pad and (not when or when()) and (not macro or macro()) then return pad end
     return button
 end

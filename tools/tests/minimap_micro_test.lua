@@ -48,7 +48,7 @@ local ns = {
     IsSecret = function() return false end,
     -- Retail: its own two icons are made.
     OnForever = function() return false end,
-    Dress = noop, OnToggle = noop, EventFrame = noop, WhenCalm = noop,
+    Dress = noop, OnToggle = noop, EventFrame = noop, WhenCalm = noop, OnGameSpellsRoom = noop,
 }
 assert(loadfile(ROOT .. "/Map/MinimapMicro.lua"))("ClassicUIForever", ns)
 

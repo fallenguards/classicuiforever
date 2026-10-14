@@ -225,6 +225,8 @@ ns.OnToggle(function(key)
     if key == "microMinimapButtons" or byToggle[key] then Sync() else ns.Sched.NextFrame("minimapMicro.aim", Aim) end
 end)
 ns.EventFrame({ "PLAYER_ENTERING_WORLD" }, function() ns.Sched.NextFrame("minimapMicro.aim", Aim) end)
+-- The game's spell window in the way or not: a closer's pad or the micro button itself (ns.PressTarget).
+ns.OnGameSpellsRoom(Aim)
 
 -- Public API (Core/API.lua): where a micro button stands now: the button (or ours standing in for it on the band) while
 -- seen, else its icon on the minimap ring while seen; nil while neither is.
