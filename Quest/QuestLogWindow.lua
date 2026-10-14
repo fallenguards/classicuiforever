@@ -145,7 +145,7 @@ local function RowEnter(self)
     GameTooltip:Show()
 end
 
--- The picked quest stays white, as in 1.x; the rest go back to their level colour.
+-- The picked quest stays white, as in 1.x; the rest go back to their level color.
 local function RowLeave(self)
     local info = self.info
     if info and not (not info.isHeader and info.questID == selectedID) then
@@ -232,7 +232,7 @@ function FillRow(row, info)
     row.check:SetShown(IsWatched(info.questID))
     ns.SetTex(row.highlight, "questLogHighlight")
     row.highlight:SetAllPoints(row)
-    -- 1.x: only the picked quest has a bar, in its level colour, and white text; a hover only whitens the text.
+    -- 1.x: only the picked quest has a bar, in its level color, and white text; a hover only whitens the text.
     if info.questID == selectedID then
         row.highlight:SetVertexColor(r, g, b)
         row.highlight:SetAlpha(1)
@@ -270,7 +270,8 @@ local function UpdateList(fresh)
     ns.SetCollapseIcon(frame.allIcon, frame.allCollapsed)
     local _, numQuests = C_QuestLog.GetNumQuestLogEntries()
     local max = (C_QuestLog.GetMaxNumQuestsCanAccept and C_QuestLog.GetMaxNumQuestsCanAccept()) or MAX_QUESTS or 20
-    frame.count:SetText(string.format("%s: %d/%d", QUESTS or "Quests", numQuests or 0, max))
+    -- Era's: the label in the font's gold, the numbers white.
+    frame.count:SetText(string.format("%s: |cffffffff%d/%d|r", QUESTS or "Quests", numQuests or 0, max))
     frame.countMiddle:SetWidth(math.max(20, frame.count:GetStringWidth()))
 end
 
@@ -337,7 +338,6 @@ local function CountBox(parent)
     local pieces = ns.DressPieces(parent, COUNT_BOX, nil, true)
     local right, middle = pieces[1], pieces[2]
     local text = parent:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    text:SetTextColor(ns.QuestYellow())
     text:SetPoint("RIGHT", right, "RIGHT", -6, 0)
     return text, middle, right
 end

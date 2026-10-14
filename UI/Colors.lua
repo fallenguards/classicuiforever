@@ -17,7 +17,7 @@ function ns.EraLevelColor(color)
     if color and fair and color.r == fair.r and color.g == fair.g and color.b == fair.b then return ERA_FAIR end
     return color
 end
--- Quest log labels (All, the count) use the same yellow.
+-- Quest log labels (All, Show Map) use the same yellow.
 function ns.QuestYellow()
     local c = QUEST_COLOURS.difficult
     return c[1], c[2], c[3]
