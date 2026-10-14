@@ -24,3 +24,8 @@ L["OPT_reagentSlotsFirst_TIP"] = "Las casillas de la bolsa de componentes van pr
 L["OPT_reagentSlotsLast"] = "Casillas de componentes: al final"
 L["OPT_reagentSlotsLast_TIP"] = "Las casillas de la bolsa de componentes van al final de la bolsa única, después de las de tu última bolsa."
 L["OPT_reagentSlotsPlace_TIP"] = "Dónde van las casillas de la bolsa de componentes en la bolsa única."
+
+-- Options foot: every window back to its own size and spot (UI/WindowLocks.lua)
+L["OPTWIN_RESET_WINDOWS"] = "Restablecer ventanas"
+L["OPTWIN_PUTS_EVERY_WINDOW_BACK"] = "Devuelve cada ventana a su tamaño y lugar propios, como si nunca se hubiera movido ni cambiado de tamaño. Los bloqueos se quedan como están."
+L["OPTWIN_RESET_WINDOWS_CONFIRM"] = "¿Devolver cada ventana a su tamaño y lugar propios?"

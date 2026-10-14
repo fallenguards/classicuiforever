@@ -719,10 +719,16 @@ local function Build(canvas)
     status.tooltip = L["OPTWIN_OPENS_A_WINDOW_WITH_YOUR"]
     status.label = L["OPTWIN_STATUS_REPORT"]
     ns.AttachTip(status, OPTION_TIP)
+    local windows = ns.PanelButton(frame, L["OPTWIN_RESET_WINDOWS"], 130)
+    windows:SetPoint("TOP", status, "BOTTOM", 0, -4)
+    windows:SetScript("OnClick", function() StaticPopup_Show("FCUI_WINDOWS_RESET") end)
+    windows.tooltip = L["OPTWIN_PUTS_EVERY_WINDOW_BACK"]
+    windows.label = L["OPTWIN_RESET_WINDOWS"]
+    ns.AttachTip(windows, OPTION_TIP)
     local feedback = frame:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
     feedback:SetPoint("BOTTOM", github, "TOP", 0, 18)
     feedback:SetText(L["OPTWIN_BUG_REPORTS_FEEDBACK"])
-    for _, piece in ipairs({ note, layout, reload, curse, github, preferred, preferredHover, status, feedback }) do
+    for _, piece in ipairs({ note, layout, reload, curse, github, preferred, preferredHover, status, windows, feedback }) do
         togglesOnly[#togglesOnly + 1] = piece
     end
 

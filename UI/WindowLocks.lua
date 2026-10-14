@@ -185,6 +185,28 @@ end
 
 ns.MakeWindowLock = MakeLock
 ns.SyncWindowLocks = SyncLocks
+
+-- Every window back to its own size and spot (the options' Reset windows); locks stay. Sizes first, so each returns
+-- to the row at its own scale.
+function ns.ResetAllWindows()
+    local scales = W.Scales()
+    for _, entry in ipairs(W.WINDOWS) do
+        if not entry.piece then scales[W.SizeKey(entry)] = nil end
+    end
+    W.PlaceAll()
+    for _, entry in ipairs(W.WINDOWS) do
+        if not entry.piece then W.Reset(entry) end
+    end
+    W.PlaceAll()
+    W.Refresh()
+end
+
+ns.Popup("FCUI_WINDOWS_RESET", {
+    text = L["OPTWIN_RESET_WINDOWS_CONFIRM"],
+    button1 = RESET or L["OPTWIN_RESET_WINDOWS"],
+    button2 = CANCEL or "Cancel",
+    OnAccept = function() ns.ResetAllWindows() end,
+})
 -- For the dev addon's window test.
 function ns.WindowLockButtons(key) return locks[key], resets[key] end
 ns.OnToggle(function(key) if key == "windowLocksAlways" then SyncLocks() end end)

@@ -68,3 +68,8 @@ L["OPT_reagentSlotsFirst_TIP"] = "The reagent bag's slots come first in the one 
 L["OPT_reagentSlotsLast"] = "Reagent slots: last"
 L["OPT_reagentSlotsLast_TIP"] = "The reagent bag's slots come last in the one bag, after your last bag's."
 L["OPT_reagentSlotsPlace_TIP"] = "Where the reagent bag's slots stand in the one bag."
+
+-- Options foot: every window back to its own size and spot (UI/WindowLocks.lua)
+L["OPTWIN_RESET_WINDOWS"] = "Reset windows"
+L["OPTWIN_PUTS_EVERY_WINDOW_BACK"] = "Puts every window back to its own size and spot, as if never moved or sized. Locks stay as they are."
+L["OPTWIN_RESET_WINDOWS_CONFIRM"] = "Put every window back to its own size and spot?"

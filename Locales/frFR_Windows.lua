@@ -24,3 +24,8 @@ L["OPT_reagentSlotsFirst_TIP"] = "Les emplacements du sac de composants viennent
 L["OPT_reagentSlotsLast"] = "Emplacements de composants : en dernier"
 L["OPT_reagentSlotsLast_TIP"] = "Les emplacements du sac de composants viennent en dernier dans le sac unique, après ceux de votre dernier sac."
 L["OPT_reagentSlotsPlace_TIP"] = "Où se placent les emplacements du sac de composants dans le sac unique."
+
+-- Options foot: every window back to its own size and spot (UI/WindowLocks.lua)
+L["OPTWIN_RESET_WINDOWS"] = "Rétablir fenêtres"
+L["OPTWIN_PUTS_EVERY_WINDOW_BACK"] = "Remet chaque fenêtre à sa taille et à sa place d'origine, comme si elle n'avait jamais été déplacée ni redimensionnée. Les verrous restent tels quels."
+L["OPTWIN_RESET_WINDOWS_CONFIRM"] = "Remettre chaque fenêtre à sa taille et à sa place d'origine ?"

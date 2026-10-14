@@ -137,3 +137,5 @@ local function MakeGrip(entry)
 end
 
 ns.MakeWindowGrip = MakeGrip
+-- For the dev addon's window test.
+function ns.WindowGripButton(key) return grips[key] end

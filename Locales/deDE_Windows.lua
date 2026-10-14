@@ -24,3 +24,8 @@ L["OPT_reagentSlotsFirst_TIP"] = "Die Plätze der Reagenzientasche kommen in der
 L["OPT_reagentSlotsLast"] = "Reagenzienplätze: zuletzt"
 L["OPT_reagentSlotsLast_TIP"] = "Die Plätze der Reagenzientasche kommen in der einen Tasche zuletzt, nach denen der letzten Tasche."
 L["OPT_reagentSlotsPlace_TIP"] = "Wo die Plätze der Reagenzientasche in der einen Tasche stehen."
+
+-- Options foot: every window back to its own size and spot (UI/WindowLocks.lua)
+L["OPTWIN_RESET_WINDOWS"] = "Fenster zurücksetzen"
+L["OPTWIN_PUTS_EVERY_WINDOW_BACK"] = "Setzt jedes Fenster auf seine eigene Größe und Stelle zurück, als wäre es nie verschoben oder vergrößert worden. Sperren bleiben, wie sie sind."
+L["OPTWIN_RESET_WINDOWS_CONFIRM"] = "Jedes Fenster auf seine eigene Größe und Stelle zurücksetzen?"

@@ -24,3 +24,8 @@ L["OPT_reagentSlotsFirst_TIP"] = "Le caselle della borsa dei reagenti vengono pe
 L["OPT_reagentSlotsLast"] = "Caselle dei reagenti: in fondo"
 L["OPT_reagentSlotsLast_TIP"] = "Le caselle della borsa dei reagenti vengono per ultime nella borsa unica, dopo quelle della tua ultima borsa."
 L["OPT_reagentSlotsPlace_TIP"] = "Dove stanno le caselle della borsa dei reagenti nella borsa unica."
+
+-- Options foot: every window back to its own size and spot (UI/WindowLocks.lua)
+L["OPTWIN_RESET_WINDOWS"] = "Ripristina finestre"
+L["OPTWIN_PUTS_EVERY_WINDOW_BACK"] = "Riporta ogni finestra alla sua dimensione e al suo posto, come se non fosse mai stata spostata o ridimensionata. I blocchi restano come sono."
+L["OPTWIN_RESET_WINDOWS_CONFIRM"] = "Riportare ogni finestra alla sua dimensione e al suo posto?"
