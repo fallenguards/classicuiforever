@@ -2,6 +2,18 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN35_1_TITLE"] = "Three talent trees"
+L["WN35_1_TEXT"] = "Turn on Three trees side by side in the options (/fcui), under Talent window, to see all three trees at once. Its Height drop down picks whether each tree scrolls, the window grows or the rows sit closer."
+L["WN35_2_TITLE"] = "Double pane professions"
+L["WN35_2_TEXT"] = "Turn on Double pane in the options (/fcui), under Profession windows, for a wider window: the recipes on the left, the chosen recipe and its reagents beside them."
+L["WN35_3_TITLE"] = "Reagent bag in the one bag"
+L["WN35_3_TEXT"] = "Turn on Reagent bag in the one bag in the options (/fcui), under Bag windows, and its slots open with the one bag like any other bag's, first or last, tinted green if you like. Hover the reagent bag button to light them."
+L["WN35_4_TITLE"] = "Spellbook tabs"
+L["WN35_4_TEXT"] = "The spellbook's tabs stand in Era's order for every class: a mage's read Arcane, Fire, Frost."
+L["WN35_5_TITLE"] = "Fixes"
+L["WN35_5_TEXT"] = "Combo points draw over the target's PvP flag, as in Era. Nameplates no longer cause Lua errors in dungeons. The social key opens the addon's social window again with the guild roster off, and the addon's windows line up with addons that center the game's windows."
+L["WN35_6_TITLE"] = "Also on retail"
+L["WN35_6_TEXT"] = "The Who page no longer shows the group finder's side tabs, which open WoW Forever's group finder."
 L["WN34_1_TITLE"] = "Window placement"
 L["WN34_1_TEXT"] = "The addon's windows open in one row after the game's windows, in the order you open them, and line up with addons that move the game's windows. A window you moved stays where you put it. With no room left, the oldest one closes, never in a fight."
 L["WN34_2_TITLE"] = "Spellbook and talents"

@@ -3,6 +3,18 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN35_1_TITLE"] = "Tres árboles de talentos"
+L["WN35_1_TEXT"] = "Activa Tres árboles en paralelo en las opciones (/fcui), en Ventana de talentos, para ver los tres árboles a la vez. Su desplegable Altura elige si cada árbol se desplaza, la ventana crece o las filas se juntan."
+L["WN35_2_TITLE"] = "Profesiones en doble panel"
+L["WN35_2_TEXT"] = "Activa Doble panel en las opciones (/fcui), en Ventanas de profesión, para una ventana más ancha: las recetas a la izquierda y la receta elegida con sus componentes al lado."
+L["WN35_3_TITLE"] = "Bolsa de componentes en la bolsa única"
+L["WN35_3_TEXT"] = "Activa Bolsa de componentes en la bolsa única en las opciones (/fcui), en Ventanas de bolsa, y sus casillas se abren con la bolsa única como las de cualquier otra bolsa, primero o al final, teñidas de verde si quieres. Pasa el ratón por el botón de la bolsa de componentes para resaltarlas."
+L["WN35_4_TITLE"] = "Pestañas del libro de hechizos"
+L["WN35_4_TEXT"] = "Las pestañas del libro de hechizos siguen el orden de Era en todas las clases: las de un mago, Arcano, Fuego, Escarcha."
+L["WN35_5_TITLE"] = "Correcciones"
+L["WN35_5_TEXT"] = "Los puntos de combo se dibujan sobre el emblema JcJ del objetivo, como en Era. Las placas de nombre ya no provocan errores de Lua en las mazmorras. La tecla social vuelve a abrir la ventana social del addon con la lista de la hermandad desactivada, y las ventanas del addon se alinean con addons que centran las ventanas del juego."
+L["WN35_6_TITLE"] = "También en retail"
+L["WN35_6_TEXT"] = "La página Quién ya no muestra las pestañas laterales del buscador de grupo, que abren el buscador de WoW Forever."
 L["WN34_1_TITLE"] = "Colocación de ventanas"
 L["WN34_1_TEXT"] = "Las ventanas del accesorio se abren en una fila tras las ventanas del juego, en el orden en que las abres, y se alinean con los accesorios que mueven las ventanas del juego. Una ventana que hayas movido se queda donde la pusiste. Sin espacio, se cierra la más antigua, nunca en combate."
 L["WN34_2_TITLE"] = "Libro de hechizos y talentos"

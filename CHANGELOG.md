@@ -2,6 +2,24 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.27.0] - 2026-10-14
+
+### Added
+- Three trees side by side, under Talent window in the options (/fcui), off by default: on Forever the talent window shows all three trees at once, each as the 1.x window shows one. Its Height drop down picks how they fit: each tree scrolls, the window grows taller, or the rows sit closer together.
+- Double pane, under Profession windows in the options, off by default: the profession window widens to two panes, the recipes on the left and the chosen recipe with its reagents beside them, both on dark panes.
+- Reagent bag in the one bag, under Bag windows in the options, off by default: the reagent bag's slots join the one bag window instead of a window of their own, and open with it from any bag button. Items drag in and out, sell with a right-click and match the bag search as in any other bag. Reagent slots picks whether they come first or last, Tint reagent slots shades them green, and hovering the reagent bag button lights its slots as the other bag buttons do.
+- For addon authors: the addon's API offers the classic world map's border, for side tabs on it, and the Era quest watch, with room in it for another addon's block.
+
+### Changed
+- The spellbook's tabs stand in Era's order for every class: a mage's read Arcane, Fire, Frost.
+- On retail, the Who page no longer shows the group finder's side tabs or the Group finder option: the finder they open is Forever's alone.
+
+### Fixed
+- Combo points draw over the target's PvP flag, as in Era. The flag covered them before (#156).
+- In dungeons, nameplates no longer set off a stream of Lua errors with Hide last names on (#157).
+- With the Who list on and the guild roster off, the social key (O) opens the addon's social window again instead of the game's newer one.
+- With an addon that centers the game's windows, the addon's windows no longer shift twice or cover a sliver of a game window's edge (#154).
+
 ## [0.26.0] - 2026-10-12
 
 ### Added

@@ -3,6 +3,18 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN35_1_TITLE"] = "Tre alberi dei talenti"
+L["WN35_1_TEXT"] = "Attiva Tre alberi affiancati nelle opzioni (/fcui), sotto Finestra dei talenti, per vedere tutti e tre gli alberi insieme. Il suo menu Altezza sceglie se ogni albero scorre, se la finestra cresce o se le righe si stringono."
+L["WN35_2_TITLE"] = "Professioni in doppio riquadro"
+L["WN35_2_TEXT"] = "Attiva Doppio riquadro nelle opzioni (/fcui), sotto Finestre delle professioni, per una finestra più larga: le ricette a sinistra, la ricetta scelta e i suoi reagenti accanto."
+L["WN35_3_TITLE"] = "Borsa dei reagenti nella borsa unica"
+L["WN35_3_TEXT"] = "Attiva Borsa dei reagenti nella borsa unica nelle opzioni (/fcui), sotto Finestre delle borse, e le sue caselle si aprono con la borsa unica come quelle di qualsiasi altra borsa, prima o in fondo, colorate di verde se vuoi. Passa il mouse sul pulsante della borsa dei reagenti per evidenziarle."
+L["WN35_4_TITLE"] = "Schede del libro degli incantesimi"
+L["WN35_4_TEXT"] = "Le schede del libro degli incantesimi seguono l'ordine di Era per ogni classe: per un mago Arcano, Fuoco, Gelo."
+L["WN35_5_TITLE"] = "Correzioni"
+L["WN35_5_TEXT"] = "I punti combo si disegnano sopra l'emblema PvP del bersaglio, come in Era. Le barre dei nomi non causano più errori Lua nelle spedizioni. Il tasto social riapre la finestra social dell'addon con l'elenco della gilda disattivato, e le finestre dell'addon si allineano con gli addon che centrano le finestre del gioco."
+L["WN35_6_TITLE"] = "Anche su retail"
+L["WN35_6_TEXT"] = "La pagina Chi non mostra più le schede laterali della ricerca di gruppi, che aprono quella di WoW Forever."
 L["WN34_1_TITLE"] = "Posizione delle finestre"
 L["WN34_1_TEXT"] = "Le finestre dell'addon si aprono in una fila dopo le finestre del gioco, nell'ordine in cui le apri, e si allineano con gli addon che spostano le finestre del gioco. Una finestra che hai spostato resta dove l'hai messa. Senza spazio si chiude la più vecchia, mai in combattimento."
 L["WN34_2_TITLE"] = "Libro degli incantesimi e talenti"

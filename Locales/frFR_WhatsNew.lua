@@ -3,6 +3,18 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN35_1_TITLE"] = "Trois arbres de talents"
+L["WN35_1_TEXT"] = "Activez Trois arbres côte à côte dans les options (/fcui), sous Fenêtre des talents, pour voir les trois arbres à la fois. Sa liste Hauteur choisit si chaque arbre défile, si la fenêtre grandit ou si les rangées se resserrent."
+L["WN35_2_TITLE"] = "Métiers en double volet"
+L["WN35_2_TEXT"] = "Activez Double volet dans les options (/fcui), sous Fenêtres de métier, pour une fenêtre plus large : les recettes à gauche, la recette choisie et ses composants à côté."
+L["WN35_3_TITLE"] = "Sac de composants dans le sac unique"
+L["WN35_3_TEXT"] = "Activez Sac de composants dans le sac unique dans les options (/fcui), sous Fenêtres de sac, et ses emplacements s'ouvrent avec le sac unique comme ceux de n'importe quel sac, en premier ou en dernier, teintés de vert si vous le souhaitez. Survolez le bouton du sac de composants pour les mettre en évidence."
+L["WN35_4_TITLE"] = "Onglets du grimoire"
+L["WN35_4_TEXT"] = "Les onglets du grimoire suivent l'ordre d'Era pour chaque classe : pour un mage, Arcanes, Feu, Givre."
+L["WN35_5_TITLE"] = "Corrections"
+L["WN35_5_TEXT"] = "Les points de combo s'affichent par-dessus l'emblème JcJ de la cible, comme dans Era. Les barres de nom ne provoquent plus d'erreurs Lua en donjon. La touche sociale ouvre de nouveau la fenêtre sociale de l'addon avec la liste de guilde désactivée, et les fenêtres de l'addon s'alignent avec les addons qui centrent les fenêtres du jeu."
+L["WN35_6_TITLE"] = "Aussi sur retail"
+L["WN35_6_TEXT"] = "La page Qui n'affiche plus les onglets latéraux de la recherche de groupe, qui ouvrent celle de WoW Forever."
 L["WN34_1_TITLE"] = "Placement des fenêtres"
 L["WN34_1_TEXT"] = "Les fenêtres de l'addon s'ouvrent en une rangée après les fenêtres du jeu, dans l'ordre où vous les ouvrez, et s'alignent avec les addons qui déplacent les fenêtres du jeu. Une fenêtre que vous avez déplacée reste où vous l'avez mise. Faute de place, la plus ancienne se ferme, jamais en combat."
 L["WN34_2_TITLE"] = "Grimoire et talents"

@@ -3,6 +3,18 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN35_1_TITLE"] = "Drei Talentbäume"
+L["WN35_1_TEXT"] = "Schalte in den Optionen (/fcui) unter Talentfenster Drei Bäume nebeneinander ein, um alle drei Bäume auf einmal zu sehen. Das Auswahlfeld Höhe legt fest, ob jeder Baum scrollt, das Fenster wächst oder die Reihen enger stehen."
+L["WN35_2_TITLE"] = "Berufe in doppelter Ansicht"
+L["WN35_2_TEXT"] = "Schalte in den Optionen (/fcui) unter Berufsfenster Doppelte Ansicht ein, für ein breiteres Fenster: die Rezepte links, das gewählte Rezept und seine Reagenzien daneben."
+L["WN35_3_TITLE"] = "Reagenzientasche in der einen Tasche"
+L["WN35_3_TEXT"] = "Schalte in den Optionen (/fcui) unter Taschenfenster Reagenzientasche in der einen Tasche ein, und ihre Plätze öffnen sich mit der einen Tasche wie die jeder anderen Tasche, zuerst oder zuletzt, auf Wunsch grün getönt. Fahr mit der Maus über die Reagenzientasche, um sie hervorzuheben."
+L["WN35_4_TITLE"] = "Reiter des Zauberbuchs"
+L["WN35_4_TEXT"] = "Die Reiter des Zauberbuchs stehen für jede Klasse in Eras Reihenfolge: bei einem Magier Arkan, Feuer, Frost."
+L["WN35_5_TITLE"] = "Fehlerbehebungen"
+L["WN35_5_TEXT"] = "Kombopunkte liegen wie in Era über dem PvP-Symbol des Ziels. Namensplaketten lösen in Dungeons keine Lua-Fehler mehr aus. Die Sozial-Taste öffnet bei ausgeschalteter Gildenliste wieder das Sozialfenster des Addons, und die Fenster des Addons reihen sich neben Addons ein, die die Fenster des Spiels zentrieren."
+L["WN35_6_TITLE"] = "Auch auf Retail"
+L["WN35_6_TEXT"] = "Die Wer-Seite zeigt die seitlichen Reiter der Gruppensuche nicht mehr, die die Gruppensuche von WoW Forever öffnen."
 L["WN34_1_TITLE"] = "Fensterplatzierung"
 L["WN34_1_TEXT"] = "Die Fenster des Addons öffnen sich in einer Reihe nach den Fenstern des Spiels, in der Reihenfolge, in der du sie öffnest, und richten sich nach Addons, die die Fenster des Spiels verschieben. Ein Fenster, das du verschoben hast, bleibt, wo du es hingestellt hast. Ist kein Platz mehr, schließt sich das älteste, nie im Kampf."
 L["WN34_2_TITLE"] = "Zauberbuch und Talente"
