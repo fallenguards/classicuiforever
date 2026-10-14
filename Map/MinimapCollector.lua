@@ -36,6 +36,9 @@ local function Pocket(button)
     -- Their drag pulls a button back round the map.
     button:RegisterForDrag()
     if button:GetParent() ~= popout then button:SetParent(popout) end
+    -- LibDBIcon pins its buttons at MEDIUM 8: under the backing they drew dim (#168).
+    if button:HasFixedFrameStrata() then button:SetFixedFrameStrata(false) end
+    if button:HasFixedFrameLevel() then button:SetFixedFrameLevel(false) end
     ns.SetStrataIf(button, popout:GetFrameStrata())
     ns.SetLevelIf(button, popout:GetFrameLevel() + ABOVE_BACKING)
     ns.SetScaleIf(button, FitScale(button))
@@ -53,7 +56,8 @@ local function Take(button, libName)
         return
     end
     local record = { parent = button:GetParent(), lib = libName, points = {}, strata = button:GetFrameStrata(),
-        level = button:GetFrameLevel(), scale = button:GetScale(), mouseover = button.showOnMouseover }
+        level = button:GetFrameLevel(), scale = button:GetScale(), mouseover = button.showOnMouseover,
+        fixedStrata = button:HasFixedFrameStrata(), fixedLevel = button:HasFixedFrameLevel() }
     for i = 1, button:GetNumPoints() do record.points[i] = { button:GetPoint(i) } end
     collected[button] = record
     order[#order + 1] = button
@@ -165,6 +169,8 @@ local function Release()
         button:SetParent(record.parent)
         button:SetFrameStrata(record.strata)
         button:SetFrameLevel(record.level)
+        button:SetFixedFrameStrata(record.fixedStrata)
+        button:SetFixedFrameLevel(record.fixedLevel)
         button:SetScale(record.scale or 1)
         button:ClearAllPoints()
         for _, point in ipairs(record.points) do button:SetPoint(unpack(point)) end
