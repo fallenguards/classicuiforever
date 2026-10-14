@@ -105,6 +105,10 @@ local function Build()
         ns.RegisterClassicWindow(frame, true)
         -- Escape shuts the window before the client drops the target.
         ns.CloseOnEscape(frame)
+        -- The game's button locks itself down on a press and only its own click lifts it.
+        for _, name in ipairs({ "TalentMicroButton", "PlayerSpellsMicroButton" }) do
+            ns.MicroButtonFollows(_G[name], function() return frame:IsShown() end, frame)
+        end
     end
 
     -- A change to the tree is a burst of events: one refresh, next frame.

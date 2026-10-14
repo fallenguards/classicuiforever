@@ -173,6 +173,8 @@ local function Build()
     ns.SetSlotWidth(frame, ns.SIDE_TAB_SLOT)
     ns.RegisterClassicWindow(frame, true)
     ns.CloseOnEscape(frame)
+    -- The game's button locks itself down on a press and only its own click lifts it.
+    ns.MicroButtonFollows(_G.LegacyMicroButton, function() return frame:IsShown() end, frame)
     -- The talent art, scroll bar, Apply foot and foot tabs are the tree page's: hidden until it shows.
     ns.TalentTreeShown(frame, false)
     ShowPage(LG.pages[1])

@@ -65,7 +65,7 @@ local ns = {
     SkillLineTab = Tab,
     Sched = { NextFrame = NOOP },
     SetSlotWidth = NOOP, RegisterClassicWindow = NOOP, CloseOnEscape = NOOP, TalentWindowShown = NOOP,
-    RegisterEvents = NOOP, DrawTalentTab = NOOP, Print = NOOP,
+    MicroButtonFollows = NOOP, RegisterEvents = NOOP, DrawTalentTab = NOOP, Print = NOOP,
 }
 assert(loadfile(ROOT .. "/Legacy/LegacyWindow.lua"))("ClassicUIForever", ns)
 local LG = ns.legacy

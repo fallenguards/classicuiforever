@@ -294,6 +294,7 @@ local MICRO_WINDOWS = {
     CollectionsMicroButton = { "CollectionsJournal" },
     EJMicroButton = { "EncounterJournal" },
     HelpMicroButton = { "HelpFrame" },
+    LegacyMicroButton = { "ClassicUIForeverLegacy", "LegacySystemFrame" },
     -- Matches the client's rule, or the two fight over it while settings are up.
     MainMenuMicroButton = { "GameMenuFrame", "SettingsPanel", "KeyBindingFrame", "MacroFrame" },
     ForeverClassicUIWorldMapMicroButton = { "WorldMapFrame" },
