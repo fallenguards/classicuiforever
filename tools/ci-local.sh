@@ -52,7 +52,8 @@ step_luacheck() {
         return 1
     fi
     local files=()
-    mapfile -t files < <(git ls-files '*.lua')
+    # New files too: one not yet added is checked before it is committed.
+    mapfile -t files < <(git ls-files --cached --others --exclude-standard '*.lua')
     "$bin" --no-color -q "${files[@]}"
 }
 
