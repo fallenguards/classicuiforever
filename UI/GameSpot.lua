@@ -28,6 +28,13 @@ local function LayoutValue(name, default)
     return type(value) == "number" and value or default
 end
 
+-- A window mover holds this game window (it makes a <window>Move frame for each one it takes): it places it, so ours
+-- stand aside, with no place, lock, row pass or learned shift of ours on it.
+function ns.MoverHolds(frame)
+    local name = frame and frame.GetName and frame:GetName()
+    return type(name) == "string" and type(_G[name .. "Move"]) == "table"
+end
+
 -- A window's scale against UIParent's (its units to UIParent units), nil while secret.
 function ns.WindowRatio(frame)
     local scale, screen = Plain(frame:GetEffectiveScale()), UIParent:GetEffectiveScale()
@@ -96,7 +103,7 @@ local ERA_LEFT = 16
 local shift = 0
 local function Learn(left)
     local panel = _G.GetUIPanel and _G.GetUIPanel("left")
-    if not (panel and panel:IsVisible()) or (ns.FramePlaced and ns.FramePlaced(panel)) then return end
+    if not (panel and panel:IsVisible()) or (ns.FramePlaced and ns.FramePlaced(panel)) or ns.MoverHolds(panel) then return end
     if (ns.WindowMoving and ns.WindowMoving(panel)) or ns.GameWindowOffLine(panel) then return end
     local x, k = Plain(panel:GetLeft()), ns.WindowRatio(panel)
     if not (x and k) then return end
@@ -133,7 +140,7 @@ end
 -- give way on their next pass. Never learned from this one, still where it was dragged. One in no slot goes to the
 -- left spot when that is clear, else waits for its next opening, when the game lays it.
 function ns.GameSpot(frame)
-    if not frame:IsShown() or (InCombatLockdown() and ns.WindowLocked(frame)) then return end
+    if not frame:IsShown() or (InCombatLockdown() and ns.WindowLocked(frame)) or ns.MoverHolds(frame) then return end
     local w, h = Plain(frame:GetWidth()), Plain(frame:GetHeight())
     local k = ns.WindowRatio(frame)
     if not (w and h and k) then return end

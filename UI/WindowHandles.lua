@@ -155,7 +155,7 @@ local function Fixed(entry) return entry.fixedIf ~= nil and ns.db[entry.fixedIf]
 
 local function Apply(entry)
     local frame = ns.WindowFrame(entry)
-    if not frame or moving[frame] then return end
+    if not frame or moving[frame] or ns.MoverHolds(frame) then return end
     local left, top = PlaceOf(entry)
     local scale = Scales()[SizeKey(entry)]
     if Full(entry, frame) then left, scale = nil, FullScale() end
@@ -240,7 +240,7 @@ local function Strip(entry)
     local frame = ns.WindowFrame(entry)
     if not frame then return end
     local strip = strips[frame]
-    if not IsFree(entry) then
+    if not IsFree(entry) or ns.MoverHolds(frame) then
         if strip then strip:Hide() end
         return
     end
@@ -305,7 +305,7 @@ local mapOnly = false
 function ns.FitGameWindow(key)
     local entry = byKey[key]
     local frame = entry and ns.WindowFrame(entry)
-    if not frame or PlaceOf(entry) or Full(entry, frame) or not frame:IsShown() then return end
+    if not frame or PlaceOf(entry) or Full(entry, frame) or not frame:IsShown() or ns.MoverHolds(frame) then return end
     if InCombatLockdown() and ns.WindowLocked(frame) then return end
     local left, top, h, k = Plain(frame:GetLeft()), Plain(frame:GetTop()), Plain(frame:GetHeight()), Ratio(frame)
     if not (left and top and h and k) then return end
@@ -755,6 +755,8 @@ end
 
 -- One window's placeholder up or down; its dialog goes with it.
 local function ShowHandle(entry, on)
+    -- A window a mover holds has no box here: it places that window.
+    if on and ns.MoverHolds(ns.WindowFrame(entry)) then on = false end
     if on then
         Handle(entry)
         LayHandle(entry)

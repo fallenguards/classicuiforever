@@ -351,7 +351,7 @@ local function AddGame(n, panel)
     if counted[panel] or not panel:IsShown() then return n end
     counted[panel] = true
     -- Placed by the player (our edit mode, or a window mover off the row's line): out of the row.
-    if (ns.FramePlaced and ns.FramePlaced(panel)) or ns.GameWindowOffRow(panel) then return n end
+    if (ns.FramePlaced and ns.FramePlaced(panel)) or ns.GameWindowOffRow(panel) or ns.MoverHolds(panel) then return n end
     local name = panel:GetName()
     local left, right = BlockSpan(name, panel)
     if not left then return n end
@@ -591,6 +591,7 @@ local function CloseSheetGap()
         local panel = getPanel(key)
         -- A native center window is centred, not in the row.
         if not (panel and panel:IsShown()) or panel:GetAttribute("UIPanelLayout-area") == "center" then return end
+        if ns.MoverHolds(panel) then return end
         -- A faded one (the spellbook's stand-in) takes no room and stays put.
         if Seen(panel) then
             local at = StandAt(panel, x + (Plain(panel:GetAttribute("UIPanelLayout-xoffset")) or 0) + sheetGap)
@@ -677,7 +678,7 @@ local function AtEraSpot(frame)
 end
 
 local function SheetPass()
-    if ns.WindowMoving and ns.WindowMoving(CharacterFrame) then return end
+    if (ns.WindowMoving and ns.WindowMoving(CharacterFrame)) or ns.MoverHolds(CharacterFrame) then return end
     AtEraSpot(CharacterFrame)
     SheetPastHeld()
     CloseSheetGap()

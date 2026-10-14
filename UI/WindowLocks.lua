@@ -54,7 +54,7 @@ local function LockShown(entry)
     local strip = W.StripOf(frame)
     if strip then ns.SetLevelIf(strip, level + W.STRIP_LIFT) end
     local over = ns.db.windowLocksAlways or zones[entry.key]:IsMouseOver() or lock:IsMouseOver() or reset:IsMouseOver()
-    local shown = over and not W.Full(entry, frame)
+    local shown = over and not W.Full(entry, frame) and not ns.MoverHolds(frame)
     ns.SetShownIf(lock, shown)
     -- Only a window with a place of its own has one to reset.
     ns.SetShownIf(reset, shown and W.PlaceOf(entry) ~= nil)

@@ -61,7 +61,8 @@ local grip = { SetButtonState = function(_, s) state = s end }
 local env = setmetatable({
     W = W, drag = {}, grips = { character = grip }, job = job, MIN_SCALE = 0.5, MAX_SCALE = 1.5,
     Plain = function(v) return v end,
-    ns = { WindowFrame = function() return frame end, WindowLocked = function() return false end },
+    ns = { WindowFrame = function() return frame end, WindowLocked = function() return false end,
+        MoverHolds = function() return false end },
     UIParent = { GetEffectiveScale = function() return 1 end, GetWidth = function() return 1000 end },
     GetCursorPosition = function() return cursorX, cursorY end,
     IsMouseButtonDown = function() return down end,

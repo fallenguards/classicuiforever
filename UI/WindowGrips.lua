@@ -20,7 +20,7 @@ local TIP = { text = L["UI_RESIZE"], r = 1, g = 1, b = 1, lines = { { L["UI_RESI
 
 -- Unlocked, not maximized, and not a window a fight holds still.
 local function Usable(entry, frame)
-    if not W.IsFree(entry) or W.Full(entry, frame) then return false end
+    if not W.IsFree(entry) or W.Full(entry, frame) or ns.MoverHolds(frame) then return false end
     return not (InCombatLockdown() and (entry.calm or ns.WindowLocked(frame)))
 end
 
