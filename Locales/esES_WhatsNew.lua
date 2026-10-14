@@ -3,6 +3,14 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN36_1_TITLE"] = "Árboles de Legado en paralelo"
+L["WN36_1_TEXT"] = "Activa Tres árboles en paralelo en las opciones (/fcui), en Ventana de Legado, para ver a la vez los tres árboles de la ventana de Legado, con un solo Aplicar para todos."
+L["WN36_2_TITLE"] = "Los botones del minimapa se pulsan"
+L["WN36_2_TEXT"] = "Los botones del accesorio en el minimapa, la bolsa de botones de accesorios y el ojo del buscador de grupo se hunden mientras mantienes el ratón pulsado sobre ellos, como en Era."
+L["WN36_3_TITLE"] = "Correcciones"
+L["WN36_3_TEXT"] = "Los hechizos canalizados muestran una barra de lanzamiento verde y la barra de respiración vuelve a ser transparente, como en Era. Las pestañas de la ventana del personaje se hunden al pulsarlas, el contador del registro de misiones tiene números blancos y los encabezados de misiones del mapa del mundo siguen dorados. La bolsa de botones de accesorios ya no oscurece los iconos, y los botones entran en ella al momento tras conectarte."
+L["WN36_4_TITLE"] = "Botón de Legado"
+L["WN36_4_TEXT"] = "El botón de Legado ya no se queda pulsado al cerrar su ventana, y el icono de Legado del minimapa vuelve a abrir su ventana."
 L["WN35_1_TITLE"] = "Tres árboles de talentos"
 L["WN35_1_TEXT"] = "Activa Tres árboles en paralelo en las opciones (/fcui), en Ventana de talentos, para ver los tres árboles a la vez. Su desplegable Altura elige si cada árbol se desplaza, la ventana crece o las filas se juntan."
 L["WN35_2_TITLE"] = "Profesiones en doble panel"

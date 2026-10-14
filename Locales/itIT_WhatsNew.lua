@@ -3,6 +3,14 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN36_1_TITLE"] = "Alberi dell'Eredità affiancati"
+L["WN36_1_TEXT"] = "Attiva Tre alberi affiancati nelle opzioni (/fcui), sotto Finestra dell'Eredità, per vedere insieme i tre alberi della finestra dell'Eredità, con un solo Applica per tutti."
+L["WN36_2_TITLE"] = "I pulsanti della minimappa si premono"
+L["WN36_2_TEXT"] = "I pulsanti dell'addon sulla minimappa, la borsa dei pulsanti degli addon e l'occhio della ricerca di gruppi si abbassano mentre tieni premuto il mouse su di essi, come in Era."
+L["WN36_3_TITLE"] = "Correzioni"
+L["WN36_3_TEXT"] = "Gli incantesimi canalizzati mostrano una barra di lancio verde e la barra del respiro è di nuovo trasparente, come in Era. Le schede della finestra del personaggio si abbassano quando le premi, il contatore del registro delle missioni ha numeri bianchi e le intestazioni delle missioni della mappa del mondo restano dorate. La borsa dei pulsanti degli addon non scurisce più le icone, e i pulsanti vi entrano subito dopo l'accesso."
+L["WN36_4_TITLE"] = "Pulsante dell'Eredità"
+L["WN36_4_TEXT"] = "Il pulsante dell'Eredità non resta più premuto dopo la chiusura della sua finestra, e l'icona dell'Eredità sulla minimappa apre di nuovo la sua finestra."
 L["WN35_1_TITLE"] = "Tre alberi dei talenti"
 L["WN35_1_TEXT"] = "Attiva Tre alberi affiancati nelle opzioni (/fcui), sotto Finestra dei talenti, per vedere tutti e tre gli alberi insieme. Il suo menu Altezza sceglie se ogni albero scorre, se la finestra cresce o se le righe si stringono."
 L["WN35_2_TITLE"] = "Professioni in doppio riquadro"

@@ -3,6 +3,14 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN36_1_TITLE"] = "Arbres de l'Héritage côte à côte"
+L["WN36_1_TEXT"] = "Activez Trois arbres côte à côte dans les options (/fcui), sous Fenêtre de l'Héritage, pour voir à la fois les trois arbres de la fenêtre de l'Héritage, avec un seul Appliquer pour tous."
+L["WN36_2_TITLE"] = "Les boutons de la minicarte s'enfoncent"
+L["WN36_2_TEXT"] = "Les boutons de l'addon sur la minicarte, le sac des boutons d'addons et l'œil de la recherche de groupe s'enfoncent tant que vous maintenez la souris dessus, comme dans Era."
+L["WN36_3_TITLE"] = "Corrections"
+L["WN36_3_TEXT"] = "Les sorts canalisés affichent une barre d'incantation verte et la barre de respiration est de nouveau transparente, comme dans Era. Les onglets de la fenêtre du personnage s'enfoncent quand on clique, le compteur du journal de quêtes a des chiffres blancs et les en-têtes de quêtes de la carte du monde restent dorés. Le sac des boutons d'addons n'assombrit plus les icônes, et les boutons y entrent aussitôt après la connexion."
+L["WN36_4_TITLE"] = "Bouton de l'Héritage"
+L["WN36_4_TEXT"] = "Le bouton de l'Héritage ne reste plus enfoncé après la fermeture de sa fenêtre, et l'icône de l'Héritage sur la minicarte ouvre de nouveau sa fenêtre."
 L["WN35_1_TITLE"] = "Trois arbres de talents"
 L["WN35_1_TEXT"] = "Activez Trois arbres côte à côte dans les options (/fcui), sous Fenêtre des talents, pour voir les trois arbres à la fois. Sa liste Hauteur choisit si chaque arbre défile, si la fenêtre grandit ou si les rangées se resserrent."
 L["WN35_2_TITLE"] = "Métiers en double volet"

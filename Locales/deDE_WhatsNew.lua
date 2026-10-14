@@ -3,6 +3,14 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN36_1_TITLE"] = "Vermächtnisbäume nebeneinander"
+L["WN36_1_TEXT"] = "Schalte in den Optionen (/fcui) unter Vermächtnisfenster Drei Bäume nebeneinander ein, um die drei Bäume des Vermächtnisfensters auf einmal zu sehen, mit einem Übernehmen für alle."
+L["WN36_2_TITLE"] = "Minikartentasten drücken sich"
+L["WN36_2_TEXT"] = "Die Minikartentasten des Addons, die Tasche der Addontasten und das Auge der Gruppensuche sinken ein, solange du die Maus darauf gedrückt hältst, wie in Era."
+L["WN36_3_TITLE"] = "Fehlerbehebungen"
+L["WN36_3_TEXT"] = "Kanalisierte Zauber zeigen einen grünen Zauberbalken, und der Atembalken ist wieder durchsichtig, wie in Era. Die Reiter des Charakterfensters sinken beim Klicken ein, die Questzahl im Questlog hat weiße Ziffern, und die Questüberschriften der Weltkarte bleiben golden. Die Tasche der Addontasten zeigt keine dunklen Symbole mehr, und Tasten kommen nach dem Einloggen sofort hinein."
+L["WN36_4_TITLE"] = "Vermächtnistaste"
+L["WN36_4_TEXT"] = "Die Vermächtnistaste bleibt nach dem Schließen ihres Fensters nicht mehr gedrückt, und das Vermächtnissymbol an der Minikarte öffnet sein Fenster wieder."
 L["WN35_1_TITLE"] = "Drei Talentbäume"
 L["WN35_1_TEXT"] = "Schalte in den Optionen (/fcui) unter Talentfenster Drei Bäume nebeneinander ein, um alle drei Bäume auf einmal zu sehen. Das Auswahlfeld Höhe legt fest, ob jeder Baum scrollt, das Fenster wächst oder die Reihen enger stehen."
 L["WN35_2_TITLE"] = "Berufe in doppelter Ansicht"

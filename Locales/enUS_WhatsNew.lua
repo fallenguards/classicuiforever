@@ -2,6 +2,14 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN36_1_TITLE"] = "Legacy trees side by side"
+L["WN36_1_TEXT"] = "Turn on Three trees side by side in the options (/fcui), under Legacy window, to see the Legacy window's three trees at once, with one Apply for all of them."
+L["WN36_2_TITLE"] = "Minimap buttons press"
+L["WN36_2_TEXT"] = "The addon's minimap buttons, the addon buttons bag and the group finder eye sink while you hold the mouse on them, as in Era."
+L["WN36_3_TITLE"] = "Fixes"
+L["WN36_3_TEXT"] = "Channeled spells show a green cast bar and the breath bar is see-through again, as in Era. The character window's tabs sink when pressed, the quest log's count has white numbers, and the world map's quest headers stay gold. The addon buttons bag no longer draws icons dark, and buttons join it at once after login."
+L["WN36_4_TITLE"] = "Legacy button"
+L["WN36_4_TEXT"] = "The Legacy button no longer stays pressed after its window closes, and the Legacy icon on the minimap opens its window again."
 L["WN35_1_TITLE"] = "Three talent trees"
 L["WN35_1_TEXT"] = "Turn on Three trees side by side in the options (/fcui), under Talent window, to see all three trees at once. Its Height drop down picks whether each tree scrolls, the window grows or the rows sit closer."
 L["WN35_2_TITLE"] = "Double pane professions"

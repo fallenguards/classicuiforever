@@ -2,6 +2,24 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.28.0] - 2026-10-14
+
+### Added
+- Three trees side by side, under Legacy window in the options (/fcui), off by default: on Forever the Legacy window's tree page shows Professions, Adventure and Resourcefulness at once, each as the 1.x talent window shows one, with one Apply and one Undo for all three (#171).
+
+### Changed
+- The addon's minimap buttons press as Era's do: the icon sinks while the mouse is held on it. That covers the options button, the addon buttons bag, the micro menu icons on the minimap and the group finder eye.
+- The character window's tabs sink their label when pressed, as the other tabs do (#166).
+- The quest log's count shows its numbers in white beside a gold label, as in Era (#164).
+
+### Fixed
+- The breath bar is see-through behind its empty part again, as in Era; the game drew a solid gray plate there (#163).
+- Channeled spells such as First Aid and Cannibalize show a green cast bar, as in Era, instead of gold (#167).
+- In the world map's quest list, zone headers go back to gold after the mouse leaves them instead of staying gray (#170).
+- On Forever, the Legacy micro button no longer stays pressed after its window closes, and shows pressed while the window is open from its key. With the classic bar off, the talents button lifts the same way (#169).
+- On Forever, the Legacy and Talents icons on the minimap open their windows again. Since 0.26.0 a click on them did nothing.
+- In the addon buttons bag, buttons made with the common minimap button library are no longer drawn dark, and a button an addon makes a moment after login goes into the bag at once instead of showing on the minimap first (#168).
+
 ## [0.27.0] - 2026-10-14
 
 ### Added
