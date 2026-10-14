@@ -328,7 +328,11 @@ local function Return(entry)
         end
         ns.ReturnClassicWindow(frame)
         -- The map is a game window too: the game's left panel spot.
-        if (entry.client or entry.quests) and not Full(entry, frame) then ns.GameSpot(frame) end
+        if (entry.client or entry.quests) and not Full(entry, frame) then
+            ns.GameSpot(frame)
+            -- Ours held for its leaving lay out again round it.
+            ns.ReleaseWindowRow()
+        end
     end
 end
 

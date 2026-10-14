@@ -60,6 +60,7 @@ UI\Colors.lua
 UI\FriendsWindow.lua
 UI\WindowRow.lua
 UI\Windows.lua
+UI\WindowPanels.lua
 UI\WindowList.lua
 UI\GameSpot.lua
 UI\WindowCloser.lua

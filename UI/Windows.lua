@@ -4,13 +4,22 @@ local _, ns = ...
 -- they close the client's and vice versa, and stand side by side clear of the client's.
 
 local classicWindows = {}
+-- Ours held where they stand while one has left the row open (dragged or sized out of it), till the next opening, close
+-- or reset: they slid into its gap before.
+local stay = setmetatable({}, { __mode = "k" })
+local inRow = setmetatable({}, { __mode = "k" })   -- the row's members last pass, ours and the game's
+-- An opening, close or reset lays the row afresh: no hold, and members counted anew (a pass asleep missed a leaving).
+local function Release()
+    wipe(stay)
+    wipe(inRow)
+end
+ns.ReleaseWindowRow = Release
 local WatchClientWindows   -- forward declared: must stay local
 
 -- Client windows outside its panel list; the map opens on its own terms.
 local LOOSE_PANELS = { "WorldMapFrame" }
 
--- Never closed by us: the talents close clears the bars' show-empty-slots note, and the
--- client never acts on a note we cleared.
+-- Never closed by us: closing talents clears the bars' empty-slot note, which the client never sets again.
 local LEAVE_OPEN = { PlayerSpellsFrame = true }
 -- Client windows that stand beside ours instead of replacing them (macros take spells from the book, as in Era).
 local BESIDE = { CharacterFrame = true, MacroFrame = true }
@@ -56,8 +65,7 @@ local function HideClientPanels(opener, except)
     end
 end
 
--- Windows that replace ours. Not all go through the panel call, so they are watched, never
--- hooked: a hook on the panel call ran inside the client's pass for every window it opened.
+-- Windows that replace ours, watched (a hook on the panel call ran inside the client's pass for every window).
 local NPC_WINDOWS = { "GossipFrame", "QuestFrame", "MerchantFrame", "MailFrame", "BankFrame", "ClassTrainerFrame",
     "AuctionHouseFrame", "AuctionFrame", "TradeFrame", "TaxiFrame", "FlightMapFrame", "PetStableFrame", "StableFrame",
     "ItemTextFrame", "TabardFrame", "GuildRegistrarFrame", "PetitionFrame", "CraftFrame", "TradeSkillFrame",
@@ -158,8 +166,7 @@ local function ClientSpan(name, panel)
     return left, right
 end
 
--- Ours stand around the sheet and talents, and in combat whatever stayed up (nothing can close);
--- centre and full-screen windows float over everything and are left out.
+-- Ours stand round the sheet and talents (in a fight, round whatever stayed up); centre and full-screen ones float.
 local function StandsBeside(name)
     if FLOATS[name] or (ns.guildGhost and name == "CommunitiesFrame") then return false end
     if BESIDE[name] or LEAVE_OPEN[name] then return true end
@@ -202,6 +209,7 @@ local function ClientWindowOpened(name, panel)
     if FLOATS[name] then return end
     openings.count = openings.count + 1
     openings.game = openings.count
+    Release()
     -- Talents and the sheet share the screen with ours, in combat too; anything else by Era's rule.
     if not (LEAVE_OPEN[name] or BESIDE[name]) then ns.HideReplacedWindows(panel) end
     PlaceClassicWindows()
@@ -232,6 +240,7 @@ local function WindowPass()
             -- ClientUp inline: one read per window.
             local shown = panel:IsShown() and not (name == "CommunitiesFrame" and ns.guildGhost)
             if shown and not clientShown[name] then ClientWindowOpened(name, panel) end
+            if clientShown[name] and not shown then Release() end
             clientShown[name] = shown
         end
     end
@@ -244,8 +253,7 @@ local function NamesStale()
     namesAt = nil
 end
 
--- Every frame while ours or the social window is up, else asleep: an opening of ours (its OnShow) or of the social
--- window (our child under it, run only while it shows) snapshots the client's windows and wakes it.
+-- Every frame while ours or the social window is up, else asleep till an opening of either wakes it.
 local windowJob
 local function WatchPre(job)
     if AnyOursUp() then return true end
@@ -324,11 +332,12 @@ local function Moved(frame)
         or math.abs(ox - x) > 0.5 or math.abs(oy - (placedY[frame] or oy)) > 0.5
 end
 
--- Where a window must stay, or nil: its own fcuiHoldX (the spellbook under live casting buttons), or in a fight a
--- protected window's actual place.
+-- Where a window must stay, or nil: its own fcuiHoldX (the spellbook under live casting buttons), held by one that left
+-- the row, or in a fight a protected window's actual place.
 local function HeldAt(frame)
     local at = frame.fcuiHoldX and frame:fcuiHoldX()
     if at then return at end
+    if stay[frame] then return stay[frame] end
     if not (InCombatLockdown() and Locked(frame)) then return nil end
     local left = Span(frame)
     return left and math.floor(left + 0.5) or frame.fcuiSlotX or 0
@@ -354,6 +363,7 @@ local solved = false   -- a pass has filled row and laid
 -- The game's row: the windows its manager stands in a row, those we showed raw in a fight (off its list), and the map.
 local ROW_SLOTS = { "left", "center", "right", "doublewide" }
 local rawShown = setmetatable({}, { __mode = "k" })
+ns.windowRawShown = rawShown   -- UI/WindowPanels.lua adds to it
 local counted = {}
 
 local function AddGame(n, panel)
@@ -423,8 +433,7 @@ local function OurRow()
     row.gameLast = n > 0 and openings.game > (order[n].fcuiShownAt or 0)
 end
 
--- A floating client window on its own default spot (loot not at the cursor) stands past every window in the row, as
--- Era's panel row put its loot window; ours stay where they are.
+-- A floating client window on its own spot (loot off the cursor) stands past the row, as Era's loot; ours stay.
 local standing = setmetatable({}, { __mode = "k" })
 local function StandPast(frame)
     if InCombatLockdown() and Locked(frame) then return end
@@ -441,11 +450,30 @@ local function StandingPass()
     end
 end
 
-local function Solve(stay)
+-- One of the row's members last pass still open but out of it now holds the rest (stay above).
+local function NoteLeavers()
+    local now = {}
+    for _, block in ipairs(row.game) do
+        if _G[block[3]] then now[_G[block[3]]] = true end
+    end
+    for frame in pairs(classicWindows) do
+        if frame:IsShown() and not Moved(frame) then now[frame] = true end
+    end
+    local left = false
+    for frame in pairs(inRow) do left = left or (frame:IsShown() and not now[frame]) end
+    wipe(inRow)
+    for frame in pairs(now) do
+        inRow[frame] = true
+        if left and classicWindows[frame] and frame.fcuiSlotX then stay[frame] = frame.fcuiSlotX end
+    end
+end
+
+local function Solve(keep)
     GameRow()
+    NoteLeavers()
     OurRow()
     local x, y = RowStart()
-    row.start, row.screen, row.stay = x, UIParent:GetWidth(), stay
+    row.start, row.screen, row.stay = x, UIParent:GetWidth(), keep
     ns.SolveWindowRow(row, laid)
     return y
 end
@@ -481,6 +509,7 @@ function ns.StopStandingPast(frame) standing[frame] = nil end
 -- A placed window's reset (WindowHandles.lua): ours back on the row now; false for a client window.
 function ns.ReturnClassicWindow(frame)
     if not classicWindows[frame] then return false end
+    Release()
     placedX[frame] = nil
     local _, y = RowStart()
     PlaceAt(frame, frame.fcuiSlotX or 0, y)
@@ -488,8 +517,7 @@ function ns.ReturnClassicWindow(frame)
     return true
 end
 
--- Out of combat, closed windows not moved wait where they would open now: past the row, as if opened next. A book
--- opened in a fight cannot move under its casting buttons, so it must already be there.
+-- Out of a fight, closed windows wait where they would open next: a book opened in a fight cannot move then.
 local function HomeClosedWindows()
     if InCombatLockdown() then return end
     local y = Solve(true)
@@ -514,8 +542,7 @@ ns.EventFrame(HOME_EVENTS, function(_, event)
     end
 end)
 
--- Room left past the game's windows for one of ours opened now (UIParent units), and whether the game's spell window
--- stands in that row (UI/WindowCloser.lua).
+-- Room past the game's windows for one of ours opened now, and whether the game's spell window is in that row.
 function ns.RowRoomFor(frame)
     GameRow()
     local finish, spells = RowStart(), false
@@ -530,8 +557,7 @@ end
 -- For the dev addon's row probe: the last pass's state, answer and our windows in it.
 function ns.WindowRowState() return row, laid, order end
 
--- The manager counts the sheet as frame + 82 (mode tabs) but we draw BESIDE_WIDTH,
--- so windows after it are stood at the drawn edge.
+-- The manager counts the sheet as frame + 82 (mode tabs); we draw BESIDE_WIDTH, so the next stands at that edge.
 local SHEET_NEXT = { left = { "center", "right" }, center = { "right" } }
 local sheetGap
 
@@ -718,6 +744,7 @@ function ns.RegisterClassicWindow(frame, pushable)
         if windowJob then windowJob:Wake() end
         openings.count = openings.count + 1
         self.fcuiShownAt = openings.count
+        Release()
         -- A window held in a fight (the spellbook over its live casting layer) comes straight back when hidden, and
         -- then hid this one: the two flashed in turn. A held one neither closes nor is closed; the rest lay out round it.
         local selfHeld = self.fcuiHoldX and self:fcuiHoldX()
@@ -734,69 +761,10 @@ function ns.RegisterClassicWindow(frame, pushable)
         if ns.GameSpellsRoomChanged then ns.GameSpellsRoomChanged() end
     end)
     frame:HookScript("OnHide", function()
+        Release()
         PlaceClassicWindows()
         HomeClosedWindows()
         if ns.GameSpellsRoomChanged then ns.GameSpellsRoomChanged() end
     end)
     WatchClientWindows()
-end
-
--- A window shown raw in a fight is off the client's panel list, so its Escape skips it. A child of ours signed up with
--- our Escape stands in, counted open while the window shows off that list (read each frame, not on show edges).
--- Never under a client layout frame (its layout pass would be ours).
-local PANEL_SLOTS = { "left", "center", "right", "doublewide", "fullscreen" }
-local escProxies = {}
-
-local function OnPanelList(frame)
-    local panelIn = _G.GetUIPanel
-    if not panelIn then return true end
-    for i = 1, #PANEL_SLOTS do
-        if panelIn(PANEL_SLOTS[i]) == frame then return true end
-    end
-    return false
-end
-
-local function EscProxy(frame)
-    if escProxies[frame] or frame.Layout then return end
-    local proxy = ns.NewFrame("Frame", nil, frame)
-    escProxies[frame] = proxy
-    ns.CloseOnEscape(proxy, function() ns.HidePanel(frame) end, function() return not OnPanelList(frame) end, frame)
-    if ns.debugSink then ns.Persist("esc: stand-in made for " .. tostring(frame:GetName())) end
-end
-
--- In combat the client refuses addon opens: an unprotected window is shown raw (outside the
--- panel list; our Escape closes it), a protected one is left alone. With the gamepad on too: its focus would be ours.
-function ns.ShowPanel(frame)
-    if not frame or frame:IsShown() then return true end
-    if not InCombatLockdown() and not ns.GamepadUI() then
-        if ShowUIPanel then ShowUIPanel(frame) else frame:Show() end
-        return true
-    end
-    if frame.IsProtected and frame:IsProtected() then return false end
-    -- No anchor until its panel call has opened it once: give it the start of the game's row.
-    if frame.GetNumPoints and frame:GetNumPoints() == 0 then
-        frame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", ns.GameRow())
-    end
-    frame:Show()
-    -- Off the game's list, it still stands in the row ours keep clear of.
-    rawShown[frame] = true
-    EscProxy(frame)
-    return true
-end
-
--- A window the gamepad holds is left for its own close: shut from our code, every later close is refused.
-function ns.HidePanel(frame)
-    if not frame or not frame:IsShown() then return true end
-    if ns.GamepadUI() then
-        if ns.GamepadHolds(frame) or (frame.IsProtected and frame:IsProtected()) then return false end
-        frame:Hide()
-        return true
-    end
-    if not InCombatLockdown() then
-        if HideUIPanel then HideUIPanel(frame) else frame:Hide() end
-        return true
-    end
-    if frame.IsProtected and frame:IsProtected() then return false end
-    frame:Hide()
-    return true
 end
