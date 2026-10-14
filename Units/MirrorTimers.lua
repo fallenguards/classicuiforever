@@ -1,6 +1,6 @@
 local _, ns = ...
 
--- 1.x breath/fatigue/feign death bars: old cast border round a plain status bar, label on it, old colours.
+-- 1.x breath/fatigue/feign death bars: old cast border round a plain status bar, label on it, old colors.
 -- Dressed a frame after the start event: the client's setup is done and we stay out of its pass.
 
 local BAR_W, BAR_H = 195, 13
@@ -23,6 +23,14 @@ local function Kind(bar)
     return bar.timer or bar.type or (bar.GetAttribute and bar:GetAttribute("timer")) or "BREATH"
 end
 
+-- The client's solid gray plate (unnamed) sits over our see-through one.
+local function GrayPlate(region, alpha)
+    if not region:IsObjectType("Texture") then return end
+    local atlas = region:GetAtlas()
+    if type(atlas) ~= "string" or ns.IsSecret(atlas) then return end
+    if atlas:lower() == "ui-castingbar-background" then region:SetAlpha(alpha) end
+end
+
 local function Dress(bar)
     if not bar or not bar.StatusBar then return end
     bar:SetSize(FRAME_W, FRAME_H)
@@ -34,6 +42,7 @@ local function Dress(bar)
     fill:SetPoint("TOPLEFT", bar, "TOPLEFT", 5, -2)
     fill:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", -5, 11)
     fill:Show()
+    ns.EachRegion(bar, GrayPlate, 0)
 
     local status = bar.StatusBar
     status:SetSize(BAR_W, BAR_H)
@@ -64,6 +73,7 @@ end
 local function RestoreChild(child)
     if child.fcui and child.fcui.ground then child.fcui.ground:Hide() end
     if child.TextBorder then child.TextBorder:SetAlpha(1) end
+    ns.EachRegion(child, GrayPlate, 1)
 end
 
 local function Apply()
