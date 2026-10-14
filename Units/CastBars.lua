@@ -1,6 +1,6 @@
 local _, ns = ...
 
--- 1.x cast bars: 195x13 in the old border, UI-StatusBar fill in the old colours, static spark, no modern FX.
+-- 1.x cast bars: 195x13 in the old border, UI-StatusBar fill in the old colors, static spark, no modern FX.
 -- Never write a field on a cast bar or call SetLook: an addon-set field taints later reads and the
 -- bar's update trips on other units' secret cast values. Secure hooks re-dress after each change.
 
@@ -30,6 +30,7 @@ local COLORS = {
 local active = false
 local skinned = {}
 local fillState = setmetatable({}, { __mode = "k" })   -- bar -> "full" (finished) or "interrupted", till the next start
+local artColor = setmetatable({}, { __mode = "k" })    -- bar -> the color its client atlas asked for (none when secret)
 
 -- 12.x never calls SetLook on target/focus/boss spell bars: those (with AdjustPosition) are small, the rest full size.
 local function LookOf(bar)
@@ -90,14 +91,21 @@ local function DressFlash(bar)
     Dress(bar.Flash, small and "castFlashSmall" or "castFlash", small and FLASH_SMALL or FLASH_BIG, bar)
 end
 
--- Colour from the client's chosen atlas name: the bar type itself is secret for other units.
+-- Color from the client's chosen atlas name: the bar type itself is secret for other units.
 local function FillColor(atlas)
-    atlas = (type(atlas) == "string" and not IsSecret(atlas)) and atlas:lower() or ""
+    atlas = atlas:lower()
     if atlas:find("interrupted", 1, true) then return COLORS.red end
     if atlas:find("full", 1, true) then return COLORS.green end
     if atlas:find("channel", 1, true) then return COLORS.green end
     if atlas:find("uninterrupt", 1, true) then return COLORS.gray end
     return COLORS.yellow
+end
+
+-- Another unit's cast hides its art: finished or channeling is green, else gold (its own flag, set by the client).
+local function FlagColor(bar, state)
+    local channeling = bar.channeling
+    if IsSecret(channeling) then channeling = nil end
+    return (state == "full" or channeling) and COLORS.green or COLORS.yellow
 end
 
 local function Fill(bar)
@@ -108,13 +116,12 @@ local function Fill(bar)
         local tex = bar:GetStatusBarTexture()
         local atlas = tex and tex.GetAtlas and tex:GetAtlas()
         if IsSecret(atlas) then
-            -- Another unit's cast hides its art: finished or channeling is green, else gold (its own flag, set by the client).
-            local channeling = bar.channeling
-            if IsSecret(channeling) then channeling = nil end
-            color = (state == "full" or channeling) and COLORS.green or COLORS.yellow
-        else
-            color = FillColor(atlas)
+            artColor[bar] = nil
+        elseif type(atlas) == "string" and atlas ~= "" then
+            artColor[bar] = FillColor(atlas)
         end
+        -- A re-dress finds our own fill art (no atlas): the color the client's art last asked for.
+        color = artColor[bar] or FlagColor(bar, state)
     end
     bar:SetStatusBarTexture(FILL_TEXTURE)
     bar:SetStatusBarColor(color:GetRGB())
