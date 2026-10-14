@@ -86,6 +86,13 @@ local function Collapsed(button)
     return false
 end
 
+-- The client grays the name on every update and mouse leave; Era's is gold, white under the mouse.
+local function GoldHeader(button)
+    if not active then return end
+    local text = HeaderText(button)
+    if text then text:SetTextColor(1, 0.82, 0) end
+end
+
 -- Header: 1.x plus/minus and yellow name; the client's bar and arrow faded.
 local function SkinHeader(button)
     if ns.Once(button, "questHeader") then
@@ -115,6 +122,7 @@ local function SkinHeader(button)
         end
         button:SetNormalFontObject("GameFontNormal")
         button:SetHighlightFontObject("GameFontHighlight")
+        button:HookScript("OnLeave", GoldHeader)
     end
     local icon = button.fcui and button.fcui.collapseIcon
     if icon then
@@ -126,12 +134,10 @@ local function SkinHeader(button)
         end
         icon:SetVertexColor(1, 1, 1)
     end
-    -- The client recolours the name on every update.
-    local text = HeaderText(button)
-    if text then text:SetTextColor(1, 0.82, 0) end
+    GoldHeader(button)
 end
 
--- 1.x difficulty colour; gold when the level is unknown.
+-- 1.x difficulty color; gold when the level is unknown.
 local function TitleColor(button)
     local level = button.info and button.info.difficultyLevel
     if not level and button.questID and C_QuestLog and C_QuestLog.GetQuestDifficultyLevel then
@@ -181,7 +187,7 @@ local function SkinTitle(button)
         end
         local box = button.Checkbox
         if box then ns.EachTexture(box, DressCheckRegion, box) end
-        -- The client restores its own colour on leave.
+        -- The client restores its own color on leave.
         button:HookScript("OnLeave", ColorTitle)
     end
     ns.StripQuestLevel(button.Text)
@@ -200,7 +206,7 @@ end
 
 ------------------------------------------------------------------ details
 
--- Ink all quest text; buttons are skipped so reward item names keep their colour.
+-- Ink all quest text; buttons are skipped so reward item names keep their color.
 local InkFrame
 
 local function InkRegion(region)
