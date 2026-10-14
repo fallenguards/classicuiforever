@@ -70,6 +70,7 @@ local SQUEEZE_OVERLAP, SQUEEZE_MIN_WIDTH = 17, 40
 -- A tab's drawn edges inside its frame: the art is clear for 8 px at the left, 10 at the right.
 local TAB_ART_LEFT, TAB_ART_RIGHT = 8, 10
 local labelWidth = setmetatable({}, { __mode = "k" })
+local picked = setmetatable({}, { __mode = "k" })
 -- Both sheets are 128 x 32; the faces take the shared spot and height (Windows/Tabs.lua).
 local TAB_COORDS = { { 0, 0.15625, 0, 1 }, { 0.15625, 0.84375, 0, 1 }, { 0.84375, 1, 0, 1 } }
 local CHAR_TAB_RISE = 4   -- picked tab: its whole art this much higher, its opening on the strip's line (+ up)
@@ -97,6 +98,8 @@ local function SetLabel(tab, text)
 end
 
 local function SetSelected(tab, selected)
+    picked[tab] = selected
+    if selected then tab:SetButtonState("NORMAL") end
     TabPieces(tab, selected)
     tab:SetNormalFontObject(selected and "GameFontHighlightSmall" or "GameFontNormalSmall")
     -- The picked tab never glows (1.x disabled it).
@@ -234,12 +237,18 @@ local function HookCatcher(tab, catcher)
         if GameTooltip and GameTooltip:GetOwner() == self then GameTooltip:Hide() end
     end)
     catcher:HookScript("OnLeave", function() tab:UnlockHighlight() end)
+    -- Its press sinks our label, as the game's tabs do; the picked one stays put (1.x disabled it).
+    catcher:HookScript("OnMouseDown", function()
+        if T.active and not picked[tab] then tab:SetButtonState("PUSHED") end
+    end)
+    catcher:HookScript("OnMouseUp", function() tab:SetButtonState("NORMAL") end)
 end
 
 -- Picture only, the client's own tab unseen over it: our click opened the tab tainted, refused its numbers in combat.
 local function NewTab(frame, i, mode)
     local tab = ClassicTab(frame, i)
     tab:EnableMouse(false)
+    if mode and mode.GetPushedTextOffset then tab:SetPushedTextOffset(mode:GetPushedTextOffset()) end
     HookCatcher(tab, mode)
     return tab
 end
