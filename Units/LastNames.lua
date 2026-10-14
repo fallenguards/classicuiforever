@@ -148,8 +148,9 @@ end
 local function WatchPlate(frame)
     if type(frame) ~= "table" or not frame.name then return end
     local name = frame.name
-    -- A plate name is never ours to hide.
-    if name:GetAlpha() < 1 then name:SetAlpha(1) end
+    -- A plate name is never ours to hide; in an instance its alpha can answer secret.
+    local alpha = name:GetAlpha()
+    if not IsSecret(alpha) and alpha < 1 then name:SetAlpha(1) end
     if not watched[name] then
         Watch(name, function() return frame.unit or frame.displayedUnit end)
     end

@@ -39,7 +39,7 @@ RULES = ["CVAR", "CVARREAD", "CVARLOGIN", "CVARREG", "REGISTRY", "HOOK", "ONUPDA
          "LOADADDON", "EDITMODE", "EDITQUERY", "SETTLE",
          "PANELMGR", "SECRET", "WALK", "REGEVENTS", "EVENTFRAME", "POINTONCE", "SETIF", "THEME", "ONCEFLAG",
          "FRAMEFIELD", "GAMEMENU", "SHAREDART", "PLATES", "FORBIDDEN", "SYSBASE", "LAYOUTFIELD",
-         "PADART", "SECRETMOUSE", "UNITEVENTS", "DRAGPOINT", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "TOC"]
+         "PADART", "SECRETMOUSE", "UNITEVENTS", "DRAGPOINT", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "TOC"]
 # A hit of these on a line the change adds fails even within the baseline, so swapping one call for another fails.
 # SINCE, DEADNS, FRAMEFIELD, CVARLOGIN and THROTTLEFRAME stay count-only, so a kept line can still be rewritten.
 LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", "EDITMODE", "PANELMGR", "SEARCHBOX", "ADDONCHAR",
@@ -49,7 +49,7 @@ LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", 
               "WALK", "GAMEMENU", "SHAREDART", "SYSBASE", "LAYOUTFIELD", "PADART", "SECRETMOUSE", "UNITEVENTS",
               "DRAGPOINT", "ERASPOT", "WINDOWORIGIN", "CVARREG", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST",
               "POINTEXACT",
-              "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE")
+              "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE")
 
 # The files allowed to hold each pattern, each with its reason; an entry ending in / is a folder.
 ALLOWED = {
@@ -163,6 +163,7 @@ FIX = {
                   "pieces only to what is visible, and a snap to an unnamed cap is saved at the screen's top",
     "SECRETLAYER": "test it with ns.AnySecret(layer, sub) before any compare or math, and skip that region when secret",
     "SECRETBAR": "test it with ns.IsSecret / ns.AnySecret before any compare or math, and skip the work when secret",
+    "SECRETALPHA": "read it into a local and test it with ns.IsSecret before the compare, and skip the work when secret",
     "SECRETATLAS": "test it with ns.IsSecret before a method call or table key on it, and skip that region when secret",
     "NAMEDTEMPLATE": "give the frame a name of ours: retail's copy of the template anchors its pieces by $parent names",
     "ADDONFORBID": "route it through a secure pad clicking the client's own button, or leave it to the client's code",
@@ -442,6 +443,8 @@ MESSAGES = {
                      "bars' backs ran from one bar to another: a black box over the book)",
     "SECRETLAYER": "a draw layer read with no secret test beside it (a nameplate's pieces answer secret: 0.16.1, 1381 errors)",
     "SECRETBAR": "a client bar's value read in Units/ with no secret test beside it (the swing bar answered secret: 351 errors)",
+    "SECRETALPHA": "an alpha compared in Units/ with no secret test beside it (a dungeon plate name answered secret: #157, "
+                   "2965 errors)",
     "SECRETATLAS": "an atlas read used as a table key or with a method on it, no secret test beside it (the nameplate "
                    "preview's spark answered secret: #139, 779 errors)",
     "ERASPOT": "Era's old-frame shift on a window Era leaves on 16, -116 (the social window flush on the screen edge)",
@@ -1188,6 +1191,8 @@ def secret_atlas_hits(lx):
 
 
 SECRET_BAR_READ = re.compile(r":\s*(?:GetValue|GetMinMaxValues)\s*\(")
+# An alpha compared where it is read: a plate's or unit frame's piece can answer secret in an instance.
+SECRET_ALPHA_COMPARE = re.compile(r":\s*GetAlpha\s*\(\s*\)\s*(?:[<>]|[=~]=)|(?:[<>]|[=~]=)=?\s*[\w.:\[\]\"]+:\s*GetAlpha\s*\(")
 
 
 def secret_bar_hits(path, lx):
@@ -1199,6 +1204,8 @@ def secret_bar_hits(path, lx):
     for i, line in enumerate(lines):
         if SECRET_BAR_READ.search(line) and not SECRET_TEST.search(" ".join(lines[i:i + 3])):
             found.add(("SECRETBAR", i + 1))
+        if SECRET_ALPHA_COMPARE.search(line) and not SECRET_TEST.search(" ".join(lines[i:i + 3])):
+            found.add(("SECRETALPHA", i + 1))
     return found
 
 
