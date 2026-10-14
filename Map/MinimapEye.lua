@@ -109,6 +109,8 @@ local function PlaceEye()
         over = CreateFrame("Frame", nil, eye)
         over:SetSize(SIZE, SIZE)
         face = ns.RingLook(over, ns.EraEyeFace)
+        -- Era's eye press; its hide watched on our face's frame, not the game's eye.
+        ns.RingPressable(eye, face, over)
         ns.DressStates(eye, nil, nil, nil, "zoomHighlight", ns.RING_HIGHLIGHT)
         ns.Sched.Attach(over, { name = "minimap.eyeTurn", every = FRAME_TIME, fn = Turn })
     end

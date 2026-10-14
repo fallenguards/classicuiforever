@@ -190,6 +190,34 @@ function ns.RingLook(frame, face, name, offMap)
 end
 ns.RING_HIGHLIGHT = HL_RING
 
+-- Era's minimap button press (MiniMapButtonTemplate): the face 1 right and 1 down while held, back on release.
+local faceOf = setmetatable({}, { __mode = "k" })   -- a pressable button -> its face
+local heldAt = setmetatable({}, { __mode = "k" })   -- a held face -> its point before the press
+function ns.RingPress(button, down)
+    local face = faceOf[button]
+    local held = face and heldAt[face]
+    if down and face and not held then
+        local point, rel, relPoint, x, y = face:GetPoint(1)
+        if not point then return end
+        heldAt[face] = { point, rel, relPoint, x, y }
+        ns.SetPointOnce(face, point, rel, relPoint, x + 1, y - 1)
+    elseif not down and held then
+        heldAt[face] = nil
+        ns.SetPointOnce(face, held[1], held[2], held[3], held[4], held[5])
+    end
+end
+local function PressDown(self) ns.RingPress(self, true) end
+local function PressUp(self) ns.RingPress(self, false) end
+-- button's press moves face; a pad over it passes its press on (UI/SecurePad.lua). hideHost: ours, hidden with it.
+function ns.RingPressable(button, face, hideHost)
+    local hooked = faceOf[button] ~= nil
+    faceOf[button] = face
+    if hooked then return end
+    button:HookScript("OnMouseDown", PressDown)
+    button:HookScript("OnMouseUp", PressUp)
+    ns.HookScriptOnce(hideHost or button, "OnHide", function() ns.RingPress(button, false) end, "ringPress")
+end
+
 local function Build(ring)
     local b = CreateFrame("Button", ring.name, Home(ring))
     b:SetSize(SIZE, SIZE)
@@ -205,6 +233,7 @@ local function Build(ring)
     b:SetMovable(true)
     -- Named: a gatherer that takes the button shows its <name>Icon.
     b.icon = ns.RingLook(b, ring.face, ring.name .. "Icon")
+    ns.RingPressable(b, b.icon)
     ns.DressStates(b, nil, nil, nil, "zoomHighlight", HL_RING)
     b:SetScript("OnClick", ring.onClick)
     -- Shift, as other addons' minimap buttons move; a pad over the button hands its drag here (UI/SecurePad.lua), and

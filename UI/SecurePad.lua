@@ -63,8 +63,13 @@ MapPad = function(button, strata, after, target, when, editMode)
     mapPad:SetFrameStrata(strata or "MEDIUM")
     mapPad:Hide()
     -- No art: the button under it shows the press and glow.
-    mapPad:SetScript("OnMouseDown", function() button:SetButtonState("PUSHED") end)
+    -- A ring button's face presses too (Map/MinimapButton.lua).
+    mapPad:SetScript("OnMouseDown", function()
+        button:SetButtonState("PUSHED")
+        if ns.RingPress then ns.RingPress(button, true) end
+    end)
     mapPad:SetScript("OnMouseUp", function()
+        if ns.RingPress then ns.RingPress(button, false) end
         if after or target or not (WorldMapFrame and WorldMapFrame:IsShown()) then button:SetButtonState("NORMAL") end
     end)
     local Place

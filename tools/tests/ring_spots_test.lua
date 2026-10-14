@@ -44,7 +44,7 @@ local ns = {
         Job = function() return { Wake = noop, Sleep = noop } end },
     RingPoint = function(frame, degrees) frame.angle = degrees end,
     DressNew = noop, RoundIcon = noop, MinimapButtonBorder = noop, DressStates = noop, AttachTip = noop, MinimapShow = noop,
-    HookMethod = noop, OnToggle = noop, Dress = noop, PlaceSavedWindows = noop,
+    HookMethod = noop, HookScriptOnce = noop, OnToggle = noop, Dress = noop, PlaceSavedWindows = noop,
     RegisterModule = function(key, spec)
         if key == "minimapButton" then showOptions = spec.apply end
         if key == "minimapCollector" then bagApply = spec.apply end
