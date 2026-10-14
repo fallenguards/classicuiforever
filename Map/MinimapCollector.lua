@@ -69,11 +69,25 @@ function ns.MinimapCollected(button)
     return active and button ~= nil and collected[button] ~= nil
 end
 
+-- Minimap children no addon's button by name or type, never looked at again (the sweep runs every frame).
+local notAddon = setmetatable({}, { __mode = "k" })
+
 local function TakeNamed(child)
+    if notAddon[child] then return end
     local name = child.GetName and child:GetName()
-    if not name or NOT_ADDONS[name] or name:find(OUR_PREFIX) or name:find("^[Mm]ini[Mm]ap") then return end
-    if not name:lower():find("minimap", 1, true) then return end
-    if child:IsObjectType("Button") and child:IsShown() then Take(child) end
+    if not name or NOT_ADDONS[name] or name:find(OUR_PREFIX) or name:find("^[Mm]ini[Mm]ap")
+        or not name:lower():find("minimap", 1, true) or not child:IsObjectType("Button") then
+        notAddon[child] = true
+        return
+    end
+    if child:IsShown() then Take(child) end
+end
+
+-- Named map buttons, which LibDBIcon says nothing of, and our options button.
+local function ScanNamed()
+    if Minimap then ns.EachChild(Minimap, TakeNamed) end
+    local ours = _G[OURS]
+    if ours and ours:IsShown() then Take(ours) end
 end
 
 local function Scan()
@@ -84,9 +98,7 @@ local function Scan()
             if button and not (button.db and button.db.hide) then Take(button, name) end
         end
     end
-    if Minimap then ns.EachChild(Minimap, TakeNamed) end
-    local ours = _G[OURS]
-    if ours and ours:IsShown() then Take(ours) end
+    ScanNamed()
 end
 
 -- Shown buttons only: an addon may hide its own. Offsets are in the button's own scale.
@@ -204,17 +216,18 @@ function ns.OnMinimapLaid()
     Scan()
 end
 
--- Addons make their map buttons for a while after login, most outside LibDBIcon's word: swept every 2 s for the first
--- 30 s the bag is on, then on the minimap's own passes and each opening.
-local SWEEP_EVERY, SWEEP_FOR = 2, 30
+-- Addons make their map buttons for a while after login, most outside LibDBIcon's word (one 0.6 s in): swept every frame
+-- for the first 30 s the bag is on, so none stands on the map first (every 2 s showed them); then on the map's passes.
+local SWEEP_FOR = 30
 local sweepJob, sweepUntil
 local function Sweep(job)
     if not active or GetTime() > sweepUntil then
         job:Sleep()
         return
     end
-    Scan()
-    if popout:IsShown() then Layout() end
+    local before = #order
+    ScanNamed()
+    if #order > before and popout:IsShown() then Layout() end
 end
 
 -- Every pass calls this: the sweep as it turns on, then for a while (and on each opening).
@@ -225,7 +238,7 @@ local function Apply()
         Scan()
         Listen()
         sweepUntil = GetTime() + SWEEP_FOR
-        if sweepJob then sweepJob:Wake() else sweepJob = ns.Sched.Job({ name = "minimapBag.sweep", every = SWEEP_EVERY, fn = Sweep }) end
+        if sweepJob then sweepJob:Wake() else sweepJob = ns.Sched.Job({ name = "minimapBag.sweep", every = 0, fn = Sweep }) end
     end
     ShowRing()
 end

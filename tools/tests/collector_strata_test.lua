@@ -1,6 +1,7 @@
 -- Offline test under Lua 5.4 for the addon-button bag (Map/MinimapCollector.lua): a LibDBIcon button pins its strata
 -- and level (MEDIUM 8, fixed), which ignored ours and left it under the bag's dark backing, drawn dim (#168). In the
--- bag it stands on the bag's strata over the backing; handed back, it has its own strata, level and pins again.
+-- bag it stands on the bag's strata over the backing; handed back, it has its own strata, level and pins again. A named
+-- button made late is taken on the next frame's sweep.
 -- Run from the addon root: lua tools/tests/collector_strata_test.lua (CI runs every tools/tests/*_test.lua).
 -- luacheck: std lua54
 -- luacheck: ignore 111 112 113 121 122 212
@@ -33,6 +34,7 @@ function Frame:SetFixedFrameStrata(on) self.fixedStrata = on end
 function Frame:HasFixedFrameLevel() return self.fixedLevel == true end
 function Frame:SetFixedFrameLevel(on) self.fixedLevel = on end
 function Frame:GetParent() return self.parent end
+function Frame:GetName() return self.name end
 function Frame:SetParent(parent) self.parent = parent end
 function Frame:IsShown() return true end
 function Frame:GetScale() return 1 end
@@ -52,7 +54,8 @@ local lib = {
 }
 function LibStub() return lib end
 
-local apply, restore
+local apply, restore, sweep
+local children = {}
 local ns = {
     L = setmetatable({}, { __index = function(_, key) return key end }),
     db = {},
@@ -61,10 +64,11 @@ local ns = {
         if key == "minimapCollector" then apply, restore = spec.apply, spec.restore end
     end,
     DialogBacking = noop, CloseOnEscape = noop, RegisterEvents = noop, ThemeAddonRing = noop, SetPointOnce = noop,
-    SetAlphaIf = noop, SetScaleIf = noop, EachChild = noop,
+    SetAlphaIf = noop, SetScaleIf = noop,
+    EachChild = function(_, fn) for _, child in ipairs(children) do fn(child) end end,
     SetStrataIf = function(frame, strata) if frame:GetFrameStrata() ~= strata then frame:SetFrameStrata(strata) end end,
     SetLevelIf = function(frame, level) if frame:GetFrameLevel() ~= level then frame:SetFrameLevel(level) end end,
-    Sched = { Attach = noop, Job = function() return { Wake = noop, Sleep = noop } end },
+    Sched = { Attach = noop, Job = function(spec) sweep = spec return { Wake = noop, Sleep = noop } end },
 }
 function GetTime() return 0 end
 assert(loadfile(ROOT .. "/Map/MinimapCollector.lua"))("ClassicUIForever", ns)
@@ -72,9 +76,17 @@ assert(loadfile(ROOT .. "/Map/MinimapCollector.lua"))("ClassicUIForever", ns)
 apply()
 Check(sack:GetFrameStrata() == "HIGH", "in the bag: on the bag's strata, over its backing (was " .. sack:GetFrameStrata() .. ")")
 Check(sack:GetFrameLevel() > 1, "in the bag: above the backing's level")
+-- A button its addon makes on a timer after login (0.6 s in): taken on the sweep's next pass, which is every frame.
+local late = New({ name = "BoundToLearnMinimapButton", parent = Minimap })
+function late:IsObjectType(kind) return kind == "Button" end
+children[#children + 1] = late
+Check(sweep and sweep.every == 0, "the sweep runs every frame (every 2 s left a late button on the map)")
+sweep.fn({ Sleep = noop })
+Check(late:GetParent() ~= Minimap, "a late named button is in the bag after one sweep pass")
 restore()
 Check(sack:GetFrameStrata() == "MEDIUM" and sack:GetFrameLevel() == 8, "handed back: its own strata and level")
 Check(sack.fixedStrata == true and sack.fixedLevel == true, "handed back: pinned again, as its library left it")
+Check(late:GetParent() == Minimap, "the late button handed back to the map")
 
 if failed > 0 then
     print(failed .. " check(s) failed")
