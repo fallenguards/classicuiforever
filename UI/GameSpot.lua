@@ -148,6 +148,7 @@ function ns.GameSpot(frame)
     local left, down = Spot(frame, h * k, start or (LayoutValue("LEFT_OFFSET", GAME_LEFT) + shift),
         LayoutValue("TOP_OFFSET", GAME_TOP))
     if not start and ns.WindowCovers(frame, left, UIParent:GetHeight() - down, w * k, h * k) then return end
-    -- Offsets in the window's own units, as the game sets them.
-    pcall(frame.SetPoint, frame, "TOPLEFT", UIParent, "TOPLEFT", left / k, -down / k)
+    -- Offsets in the window's own units, its anchors cleared first as the game's manager does: a drag's end leaves it
+    -- on the screen's centre, and a second anchor beside that one is refused (anchor family connection).
+    ns.SetPointOnce(frame, "TOPLEFT", UIParent, "TOPLEFT", left / k, -down / k)
 end

@@ -1,6 +1,7 @@
 -- Offline test under Lua 5.4 for game windows a window mover holds (UI/GameSpot.lua ns.MoverHolds): a mover that makes a
 -- <window>Move frame for each window it takes puts that window back on its own spot on every show, so our reset and our
 -- row's learned shift must leave it alone (the character window reset to the mover's spot, and ours opened past it).
+-- With no mover the reset clears a drag's leftover anchor first, or the game refuses the new one.
 -- Run from the addon root: lua tools/tests/mover_holds_test.lua (CI runs every tools/tests/*_test.lua).
 -- luacheck: std lua54
 -- luacheck: ignore 111 112 113 121 122 212
@@ -33,7 +34,13 @@ function sheet:GetLeft() return self.left end
 function sheet:GetTop() return self.top end
 function sheet:GetEffectiveScale() return 1 end
 function sheet:GetAttribute() return nil end
-function sheet:SetPoint() self.moves = self.moves + 1 end
+-- As the game does: a drag's end leaves it on the screen's centre, and a second anchor beside that one is refused.
+sheet.dragAnchor = true
+function sheet:ClearAllPoints() self.dragAnchor = false end
+function sheet:SetPoint()
+    if self.dragAnchor then error("SetPoint would result in anchor family connection") end
+    self.moves = self.moves + 1
+end
 function GetUIPanel(slot) if slot == "left" then return sheet end end
 
 local ns = {
@@ -42,6 +49,10 @@ local ns = {
     WindowMoving = function() return false end,
     WindowLocked = function() return false end,
     WindowCovers = function() return false end,
+    SetPointOnce = function(region, ...)
+        region:ClearAllPoints()
+        region:SetPoint(...)
+    end,
 }
 assert(loadfile(ROOT .. "/UI/GameSpot.lua"))("ClassicUIForever", ns)
 
@@ -56,8 +67,9 @@ Check(left == 16, "the row learns no shift from a window a mover holds (start " 
 -- No mover: the reset puts it on its slot as before.
 _G.CharacterFrameMove = nil
 Check(not ns.MoverHolds(sheet), "no mover frame, ours")
-ns.GameSpot(sheet)
-Check(sheet.moves == 1, "with no mover, the reset puts it on the game's spot")
+local ok, err = pcall(ns.GameSpot, sheet)
+Check(ok and sheet.moves == 1, "with no mover, the reset puts it on the game's spot, its drag's anchor cleared first ("
+    .. tostring(err) .. ")")
 
 if failed > 0 then
     print(failed .. " check(s) failed")

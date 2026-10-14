@@ -312,7 +312,8 @@ function ns.FitGameWindow(key)
     local _, down = ns.GameHome(frame, h * k)
     local want = UIParent:GetHeight() - down
     if top * k >= want - 0.5 then return end
-    pcall(frame.SetPoint, frame, "TOPLEFT", UIParent, "TOPLEFT", left, -down / k)
+    -- Anchors cleared first: one a drag's end left is refused a second beside it (UI/GameSpot.lua).
+    ns.SetPointOnce(frame, "TOPLEFT", UIParent, "TOPLEFT", left, -down / k)
 end
 
 -- Back where the client or our slots put it: ours on the slots, the game's at its own spot or on their next opening.
