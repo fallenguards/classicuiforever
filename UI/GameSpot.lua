@@ -118,15 +118,29 @@ function ns.GameHome(frame, h)
     return Spot(frame, h, left, top)
 end
 
--- A game window open alone goes to the game's own left spot now (the sheet's Era pass takes it on); beside another it
--- waits for its next opening, when the game lays it.
+-- The manager's start for the slot it holds a window in (its UpdateUIPanelPositions; read, never driven), with the
+-- shift last learned; nil for a window in none.
+local SLOT_START = { left = "LEFT_OFFSET", doublewide = "LEFT_OFFSET", center = "CENTER_OFFSET", right = "RIGHT_OFFSET" }
+local function SlotStart(frame)
+    local getPanel = _G.GetUIPanel
+    if not getPanel then return nil end
+    for slot, key in pairs(SLOT_START) do
+        if getPanel(slot) == frame then return LayoutValue(key, GAME_LEFT) + shift end
+    end
+end
+
+-- A game window back where its manager puts it for its slot (the sheet's Era pass takes it on); ours standing there
+-- give way on their next pass. Never learned from this one, still where it was dragged. One in no slot goes to the
+-- left spot when that is clear, else waits for its next opening, when the game lays it.
 function ns.GameSpot(frame)
     if not frame:IsShown() or (InCombatLockdown() and ns.WindowLocked(frame)) then return end
     local w, h = Plain(frame:GetWidth()), Plain(frame:GetHeight())
     local k = ns.WindowRatio(frame)
     if not (w and h and k) then return end
-    local left, down = ns.GameHome(frame, h * k)
-    if ns.WindowCovers(frame, left, UIParent:GetHeight() - down, w * k, h * k) then return end
+    local start = SlotStart(frame)
+    local left, down = Spot(frame, h * k, start or (LayoutValue("LEFT_OFFSET", GAME_LEFT) + shift),
+        LayoutValue("TOP_OFFSET", GAME_TOP))
+    if not start and ns.WindowCovers(frame, left, UIParent:GetHeight() - down, w * k, h * k) then return end
     -- Offsets in the window's own units, as the game sets them.
     pcall(frame.SetPoint, frame, "TOPLEFT", UIParent, "TOPLEFT", left / k, -down / k)
 end
