@@ -16,6 +16,19 @@ local LEAVE_OPEN = { PlayerSpellsFrame = true }
 local BESIDE = { CharacterFrame = true, MacroFrame = true }
 -- Client windows that float over ours, closing none and taking no room (loot: at the cursor or its edit mode place, as Era).
 local FLOATS = { LootFrame = true }
+-- Era's panel rule: a window opened where another stands closes it only when neither can be pushed aside (both
+-- pushable 0); otherwise they stand side by side. Ours carry Era's numbers (ns.RegisterClassicWindow), the game's its own.
+local function Pushable(frame)
+    if frame.fcuiPushable then return frame.fcuiPushable end
+    local value = ns.Safe(frame:GetAttribute("UIPanelLayout-pushable"))
+    local name = value == nil and UIPanelWindows and frame:GetName()
+    if name then value = UIPanelWindows[name] and UIPanelWindows[name].pushable end
+    return type(value) == "number" and value or 0
+end
+-- Era's map (allowOtherPanels 0, this client's 1) replaces what it opens on; ours close it as they open (LOOSE_PANELS).
+local function Replaces(opener, other)
+    return opener == _G.WorldMapFrame or (Pushable(opener) == 0 and Pushable(other) == 0)
+end
 -- How much of the character window the old sheet's art fills.
 local BESIDE_WIDTH = 352
 -- Pieces a client window hangs past its right edge.
@@ -23,14 +36,15 @@ local SIDE_PIECES = { CharacterFrame = { "ModeTabs" } }
 local PlaceClassicWindows   -- forward declared: must stay local
 
 -- The gamepad's windows close only by their own hand (Core/Gamepad.lua): ours then stand beside them.
-local function HideClientPanels(except)
+-- opener: ours, which closes a game window only as Era's rule says.
+local function HideClientPanels(opener, except)
     if InCombatLockdown() or ns.GamepadUI() then return end
     for name in pairs(UIPanelWindows or {}) do
         local panel = _G[name]
         -- The guild window kept open unseen under our roster (note bridge).
         local ghost = ns.guildGhost and name == "CommunitiesFrame"
         if panel and panel ~= except and not LEAVE_OPEN[name] and not BESIDE[name] and not FLOATS[name] and not ghost
-            and panel:IsShown() and HideUIPanel then
+            and panel:IsShown() and HideUIPanel and Replaces(opener, panel) then
             pcall(HideUIPanel, panel)
         end
     end
@@ -186,14 +200,11 @@ local openings = { count = 0, game = 0 }
 
 local function ClientWindowOpened(name, panel)
     if FLOATS[name] then return end
-    -- Talents and the sheet share the screen with ours, in combat too; anything else replaces ours.
-    if LEAVE_OPEN[name] or BESIDE[name] then
-        openings.count = openings.count + 1
-        openings.game = openings.count
-        PlaceClassicWindows()
-        return
-    end
-    ns.HideClassicWindows(panel)
+    openings.count = openings.count + 1
+    openings.game = openings.count
+    -- Talents and the sheet share the screen with ours, in combat too; anything else by Era's rule.
+    if not (LEAVE_OPEN[name] or BESIDE[name]) then ns.HideReplacedWindows(panel) end
+    PlaceClassicWindows()
     -- The social window gives way to an NPC's window too.
     if npcWindow[name] and FriendsFrame and FriendsFrame ~= panel and FriendsFrame:IsShown() then
         ns.HidePanel(FriendsFrame)
@@ -256,16 +267,14 @@ function WatchClientWindows()
     if FriendsFrame then ns.Sched.Attach(FriendsFrame, { name = "windows.social", every = 0, fn = WakeWindowWatch }) end
 end
 
-function ns.HideClassicWindows(except)
+-- Ours that a window opened now replaces by Era's rule.
+function ns.HideReplacedWindows(opener)
     for frame in pairs(classicWindows) do
-        if frame ~= except and frame:IsShown() then
-            frame:Hide()
-        end
+        if frame ~= opener and frame:IsShown() and Replaces(opener, frame) then frame:Hide() end
     end
 end
 
--- Sharing windows stand side by side in open order, shifting left as one shuts;
--- a non-sharing one (the quest log) has the place to itself.
+-- Ours stand side by side in open order, shifting left as one shuts.
 local SLOT_STEP = 352
 -- Era's old 384 x 512 windows stood 16 left of and 12 above the game's own spot (0, -104 against 16, -116).
 local ERA_X, ERA_Y = -16, 12
@@ -689,7 +698,8 @@ if CharacterFrame then
     ns.Sched.OnFrame(ns.NewFrame("Frame", nil, CharacterFrame), { name = "windows.sheetGap", every = 0, fn = SheetPass })
 end
 
-function ns.RegisterClassicWindow(frame, shares)
+-- pushable: Era's number for the window it stands for (its panel rule, Pushable above); 0 when none.
+function ns.RegisterClassicWindow(frame, pushable)
     if not frame or classicWindows[frame] then return end
     classicWindows[frame] = true
     -- Built on the row's first slot (ns.ClassicSlot): that anchor is ours until something else moves it. Read before a
@@ -701,7 +711,7 @@ function ns.RegisterClassicWindow(frame, shares)
     -- A micro button's window made on first open; a place given in edit mode applies from now.
     if ns.MicroWindowsChanged then ns.MicroWindowsChanged() end
     if ns.PlaceSavedWindows then ns.PlaceSavedWindows() end
-    frame.fcuiShares = shares and true or false
+    frame.fcuiPushable = pushable or 0
     frame:HookScript("OnShow", function(self)
         -- The watch may be asleep or on its slow beat and not have seen them yet.
         RecordClientWindows()
@@ -713,13 +723,13 @@ function ns.RegisterClassicWindow(frame, shares)
         local selfHeld = self.fcuiHoldX and self:fcuiHoldX()
         for other in pairs(classicWindows) do
             local otherHeld = other.fcuiHoldX and other:fcuiHoldX()
-            if other ~= self and other:IsShown() and not (self.fcuiShares and other.fcuiShares) and not selfHeld
+            if other ~= self and other:IsShown() and Replaces(self, other) and not selfHeld
                 and not otherHeld then
                 other:Hide()
             end
         end
         -- fcuiKeep names the client window it belongs beside (the inspect window's talents).
-        HideClientPanels(self.fcuiKeep and self:fcuiKeep() or nil)
+        HideClientPanels(self, self.fcuiKeep and self:fcuiKeep() or nil)
         PlaceClassicWindows()
         if ns.GameSpellsRoomChanged then ns.GameSpellsRoomChanged() end
     end)

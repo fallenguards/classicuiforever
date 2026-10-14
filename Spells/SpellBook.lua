@@ -753,7 +753,8 @@ local function CreateBook()
     -- Its professions tab is the game's window, closed by the book's key in a fight too: a fight begun with it open
     -- homed the book beside it, where its casting layer then held it.
     ns.SetSlotShares(f, { ProfessionsFrame = true })
-    if not Hosted() then ns.RegisterClassicWindow(f, true) end
+    -- Era's spellbook's pushable (0): the quest log and social window replace it, as there.
+    if not Hosted() then ns.RegisterClassicWindow(f, 0) end
     ns.db.spellBookPos = nil
     -- Our Escape out of combat: the client's clears the target first, 1.x closed
     -- windows first. Closes like the X: a bare hide in combat leaves the layer up

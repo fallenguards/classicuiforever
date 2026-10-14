@@ -650,7 +650,8 @@ local function Build()
     frame:SetFrameStrata("HIGH")
     TakeOldPlace()
     -- OnShow order matters: RegisterClassicWindow, CloseOnEscape, then ours.
-    ns.RegisterClassicWindow(frame)
+    -- Era's quest log's pushable (0): the spellbook and social window replace it, as there.
+    ns.RegisterClassicWindow(frame, 0)
     -- Escape closes the log before clearing the target.
     ns.CloseOnEscape(frame, CloseLog)
     frame:Hide()

@@ -171,7 +171,8 @@ local function Build()
     end)
     -- After the window's own SetScripts, which wipe earlier hooks; the next window keeps clear of the page tabs.
     ns.SetSlotWidth(frame, ns.SIDE_TAB_SLOT)
-    ns.RegisterClassicWindow(frame, true)
+    -- Era's talent window's pushable: it stands beside the spellbook and quest log.
+    ns.RegisterClassicWindow(frame, 6)
     ns.CloseOnEscape(frame)
     -- The game's button locks itself down on a press and only its own click lifts it.
     ns.MicroButtonFollows(_G.LegacyMicroButton, function() return frame:IsShown() end, frame)
