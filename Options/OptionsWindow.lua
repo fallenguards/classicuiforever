@@ -71,6 +71,19 @@ ns.Popup("FCUI_ALL_NONE", {
     button2 = CANCEL,
     OnAccept = function() TurnOff(nil) end,
 })
+-- A page's own: data holds its keys (and number rows for the reset); the text names the page.
+ns.Popup("FCUI_PAGE_NONE", {
+    text = L["OPTWIN_PAGE_NONE_CONFIRM"],
+    button1 = OKAY,
+    button2 = CANCEL,
+    OnAccept = function(_, data) TurnOff(data.keys) end,
+})
+ns.Popup("FCUI_PAGE_RESET", {
+    text = L["OPTWIN_PAGE_RESET_CONFIRM"],
+    button1 = OKAY,
+    button2 = CANCEL,
+    OnAccept = function(_, data) Reset(data.keys, data.numbers) end,
+})
 ns.Popup("FCUI_ALL_RESET", {
     text = L["OPTWIN_ALL_RESET_CONFIRM"],
     button1 = OKAY,
@@ -203,11 +216,14 @@ local function PageArea(frame, bottom)
     frame.pageTitle = title
     local reset = ns.PanelButton(box, L["OPTWIN_RESET_TOGGLES"], 110)
     reset:SetPoint("TOPRIGHT", box, "TOPRIGHT", -12, -7)
-    reset:SetScript("OnClick", function() Reset(frame:PageKeys(), NumberRows(frame.built.rows, frame.page)) end)
+    reset:SetScript("OnClick", function()
+        local data = { keys = frame:PageKeys(), numbers = NumberRows(frame.built.rows, frame.page) }
+        StaticPopup_Show("FCUI_PAGE_RESET", frame.page, nil, data)
+    end)
     Tip(reset, L["OPTWIN_RESET_TOGGLES"], L["OPTWIN_PAGE_RESET_TIP"])
     local none = ns.PanelButton(box, L["OPTWIN_TOGGLE_NONE"], 110)
     none:SetPoint("RIGHT", reset, "LEFT", -6, 0)
-    none:SetScript("OnClick", function() TurnOff(frame:PageKeys()) end)
+    none:SetScript("OnClick", function() StaticPopup_Show("FCUI_PAGE_NONE", frame.page, nil, { keys = frame:PageKeys() }) end)
     Tip(none, L["OPTWIN_TOGGLE_NONE"], L["OPTWIN_PAGE_NONE_TIP"])
     frame.pageButtons = { none, reset }
 
