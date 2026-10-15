@@ -456,7 +456,7 @@ end)
 -- in this frame's pass and the next: a plate registers its events after ours. Only player plates change colour with no
 -- event (a duel, a flag, a death): a 0.2 s sweep recolours while one shows.
 local SWEEP = 0.2
-local driver, sweepJob
+local driver, sweepJob, overJob
 -- Plates owed a re-lay in this frame's pass and in the next frame's; all = every plate.
 local relaySoon = { plates = setmetatable({}, { __mode = "k" }) }
 local relayNext = { plates = setmetatable({}, { __mode = "k" }) }
@@ -467,10 +467,22 @@ local function SetSweeping(on)
     if on then sweepJob:Wake() else sweepJob:Sleep() end
 end
 
+-- The client says when the mouse finds a unit, never when it leaves one: while a plate glows for it, look again.
+local function OverGlow()
+    LookGlows()
+    EachPlate(GlowPlate)
+    if not overJob then return end
+    if glowOver then overJob:Wake() else overJob:Sleep() end
+end
+local function OverLeft()
+    if PlateFor("mouseover") ~= glowOver then OverGlow() end
+end
+
 -- Sole writer of NP.active.
 local function SetActive(on)
     NP.active = on
     SetSweeping(on)
+    if overJob and not on then overJob:Sleep() end
 end
 
 local function Relay(owed)
@@ -559,8 +571,7 @@ local function OnEvent(_, event, unit, _, _, interruptedBy)
         local unitFrame = LivePlate(unit)
         if unitFrame then UpdateLevel(unitFrame) end
     elseif event == "UPDATE_MOUSEOVER_UNIT" then
-        LookGlows()
-        EachPlate(GlowPlate)
+        OverGlow()
     elseif CAST_EVENTS[event] then
         -- Cast start or stop re-lays only that plate's chain and cast bar; a channel's stop names who interrupted it.
         local unitFrame = unit and PlateFor(unit)
@@ -592,6 +603,7 @@ local function Apply()
         ns.RegisterEvents(driver, PLATE_EVENTS)
         driver:SetScript("OnEvent", OnEvent)
         sweepJob = ns.Sched.Job({ name = "namePlates.sweep", every = SWEEP, fn = Sweep })
+        overJob = ns.Sched.Job({ name = "namePlates.over", every = 0.1, awake = false, fn = OverLeft })
     end
     EachPlate(SkinPlate)
 end
