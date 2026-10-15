@@ -574,6 +574,7 @@ local function WatchTick(self, elapsed)
     local craftUp = not bookUp and tradeOn and crafting and crafting:IsVisible() and true or false
     SizeButton(bookUp, craftUp)
     local trade = ns.tradeDual.On() and "tradeDual" or "trade"
+    if active then T.PrepareEraFrames() end
     T.EraFrame((bookUp and not T.Big()) and "book" or craftUp and trade or nil)
     if bookUp or craftUp then ns.ProfessionPortrait(bookUp) end
     T.SyncBookPads()

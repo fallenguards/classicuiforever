@@ -30,6 +30,7 @@ local KINDS = {
 local holders, rings = {}, {}
 local current  -- the kind up now
 local saved    -- the chrome's own points, put back when an Era frame comes off
+local closeOwed  -- the close button's spot waits for the fight's end (a protected child of the window)
 
 local function Points(region)
     local list = {}
@@ -43,6 +44,7 @@ local function Restore(region, list)
     for _, p in ipairs(list) do region:SetPoint(unpack(p)) end
 end
 
+-- Children of the window, which a fight protects: made out of combat, kept shown, faded in and out (alpha is free).
 local function Holder(frame, kind)
     if holders[kind] then return holders[kind] end
     local spec = KINDS[kind]
@@ -52,61 +54,94 @@ local function Holder(frame, kind)
     for _, tex in ipairs(ns.DressPieces(holder, spec.pieces(), nil, true)) do
         if spec.tint then ns.BronzeTint(tex) end
     end
-    holder:Hide()
+    holder:SetAlpha(0)
     holders[kind] = holder
     local ring = ns.NewFrame("Frame", nil, frame)
     ring:SetAllPoints(holder)
     for _, tex in ipairs(ns.DressPieces(ring, { spec.ring }, nil, true)) do
         if spec.tint then ns.BronzeTint(tex) end
     end
-    ring:Hide()
+    ring:SetAlpha(0)
     rings[kind] = ring
     return holder
 end
 
--- kind: "book" (the small book page up), "trade" (the trade skill page up) or nil (the chrome back). Out of combat
--- only (the close button's window is protected).
-function T.EraFrame(kind)
+-- Every kind's art made ahead, out of combat: a page opened in a fight finds it, and its files are loaded before the
+-- first open (made as it opened, the art drew a frame late).
+function T.PrepareEraFrames()
     local frame = T.Host()
     if not frame or InCombatLockdown() then return end
+    for kind, spec in pairs(KINDS) do
+        if spec.pieces() then Holder(frame, kind) end
+    end
+end
+
+-- The close button, a protected child, moves out of combat only; its spot is owed till then.
+local function PlaceClose(close, spec)
+    if not close then return end
+    if InCombatLockdown() then
+        closeOwed = true
+        return
+    end
+    closeOwed = nil
+    if spec then
+        ns.SetPointOnce(close, "CENTER", T.Host(), "TOPRIGHT", spec.close.x, spec.close.y)
+    elseif saved then
+        Restore(close, saved.close)
+    end
+end
+
+-- kind: "book" (the small book page up), "trade" (the trade skill page up) or nil (the chrome back). In a fight too:
+-- the art fades in and out, portrait and title (regions) move; levels and the close button wait for calm.
+function T.EraFrame(kind)
+    local frame = T.Host()
+    if not frame then return end
     if kind and not KINDS[kind].pieces() then kind = nil end
+    local fight = InCombatLockdown()
+    if kind and fight and not holders[kind] then return end
     local portrait = frame.PortraitContainer and frame.PortraitContainer.portrait
     local title = frame.TitleContainer and frame.TitleContainer.TitleText
     local close = frame.CloseButton
-    if current and current ~= kind then
-        holders[current]:Hide()
-        rings[current]:Hide()
+    if kind == current then
+        if closeOwed and not fight then PlaceClose(close, kind and KINDS[kind] or nil) end
+        return
+    end
+    if current then
+        holders[current]:SetAlpha(0)
+        rings[current]:SetAlpha(0)
     end
     if kind then
         local spec = KINDS[kind]
         local art = Holder(frame, kind)
-        -- Under every piece of the window, the chrome's textures included.
-        ns.SetLevelIf(art, frame:GetFrameLevel())
         if not saved then
             saved = { portrait = portrait and Points(portrait), portraitSize = portrait and { portrait:GetSize() },
                 title = title and Points(title), close = close and Points(close) }
         end
-        ns.SetShownIf(art, true)
-        local page = spec.above and T.Page and T.Page()
-        local portraitHost = frame.PortraitContainer
-        ns.SetLevelIf(rings[kind], math.max(page and page:GetFrameLevel() or 0, portraitHost and portraitHost:GetFrameLevel() or 0)
-            + (spec.above and 5 or 1))
-        ns.SetShownIf(rings[kind], true)
+        if not fight then
+            -- Under every piece of the window, the chrome's textures included.
+            ns.SetLevelIf(art, frame:GetFrameLevel())
+            local page = spec.above and T.Page and T.Page()
+            local portraitHost = frame.PortraitContainer
+            ns.SetLevelIf(rings[kind], math.max(page and page:GetFrameLevel() or 0,
+                portraitHost and portraitHost:GetFrameLevel() or 0) + (spec.above and 5 or 1))
+        end
+        art:SetAlpha(1)
+        rings[kind]:SetAlpha(1)
         if frame.NineSlice then ns.SetAlphaIf(frame.NineSlice, 0) end
         if portrait then
             portrait:SetSize(spec.portrait.size, spec.portrait.size)
             ns.SetPointOnce(portrait, "TOPLEFT", frame, "TOPLEFT", spec.portrait.x, spec.portrait.y)
         end
         if title then ns.SetPointOnce(title, "CENTER", frame, "TOPLEFT", spec.title.x, spec.title.y) end
-        if close then ns.SetPointOnce(close, "CENTER", frame, "TOPRIGHT", spec.close.x, spec.close.y) end
+        PlaceClose(close, spec)
     elseif current then
         if frame.NineSlice then ns.SetAlphaIf(frame.NineSlice, 1) end
         if saved then
             Restore(portrait, saved.portrait)
             if portrait and saved.portraitSize then portrait:SetSize(unpack(saved.portraitSize)) end
             Restore(title, saved.title)
-            Restore(close, saved.close)
-            saved = nil
+            PlaceClose(close, nil)
+            if not closeOwed then saved = nil end
         end
     end
     current = kind
