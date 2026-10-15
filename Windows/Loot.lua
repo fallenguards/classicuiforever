@@ -113,6 +113,8 @@ local page = 0
 -- Whole pages as in 1.x: the list can't scroll past its end, so the last page shrinks to what is left and scrolls
 -- to the end, its rows at the top (a full last page repeated rows from the page before).
 local function UpdateLootPages(frame, visit)
+    -- The client sizes the window as it opens and in edit mode; the old size goes back after its pass.
+    ns.SetSizeIf(frame, LOOT_W, LOOT_H)
     local box = frame.ScrollBox
     if not box then return end
     local pitch = Walk(box, visit or PageRow)
@@ -243,9 +245,6 @@ local function SkinLoot(frame)
     if title then keep[title] = true end
     FadeBlizzardArt(frame, keep)
     if frame.fcui and frame.fcui.titleStrip then frame.fcui.titleStrip:Hide() end
-    -- Old size whatever the list wants; overrides go in before SetSize.
-    frame.GetPanelMaxHeight = function() return LOOT_H end
-    frame.Resize = function(self) self:SetSize(LOOT_W, LOOT_H) end
     frame:SetSize(LOOT_W, LOOT_H)
     ns.DressNew(frame, "lootPanel", SHEET)
     ns.DressNew(frame, "lootIcon", ICON)
