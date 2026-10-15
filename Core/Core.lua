@@ -433,6 +433,8 @@ frame:SetScript("OnEvent", function(_, event, arg1)
         if saved and saved < 17 then ns.KeepMapNav() end
         if saved and saved < 18 then ns.EyeSnapToDecide() end
         ns.CopyDefaults(ns.db, ns.DB_DEFAULTS)
+        -- Nothing of ours was ever zeroed on a fresh install: the game settings it holds are the player's own.
+        if not saved then ns.db.surnamesRepaired, ns.db.damageNumbersRepaired = true, true end
         if upgraded then ns.KeepBarSize(big) end
         ns.BarSizeKey()
         ns.db.lastOutput = nil   -- stale keys from old saves
