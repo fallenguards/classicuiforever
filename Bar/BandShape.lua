@@ -83,10 +83,23 @@ end
 -- Past bar 1 in snap order, the latency and key ring section between the groups: micro region (its head holds the page
 -- arrows) | section | bags, or page arrow room | bags | section | micro region; else on the bar 1 side of what stands.
 -- Bar 1 with fewer than 12 icons trims the band from the left by whole slots, like the client's bar.
-local function BandPlan(microOn, bagsOn, bagsFirst, region)
+local function BandPlan(microOn, bagsOn, bagsFirst, region, bar2W, bar2Left)
     local plan = { bagsFirst = (bagsFirst and microOn and bagsOn) and true or false }
     plan.cut = shape.cut or 0
     local x = ART_W / 2 - plan.cut
+    -- Bar 1's run and first button, and bar 2's (option): a run of sockets right after bar 1's, or before it with bar 1's
+    -- run then starting past the shared wall; the rest of the band after both.
+    plan.bar1Start, plan.bar1X, plan.bar2X = 0, ROW_X, nil
+    if bar2W and bar2W > 0 then
+        plan.bar2W = bar2W
+        if bar2Left then
+            plan.bar2Start, plan.bar2X = 0, ROW_X
+            plan.bar1Start, plan.bar1X, plan.bar1Skip = bar2W + ROW_X, bar2W + ROW_X, ROW_X
+        else
+            plan.bar2Start, plan.bar2X = x, x
+        end
+        x = x + bar2W
+    end
     plan.base = x
     plan.microFirst = (microOn and not plan.bagsFirst) and true or false
     -- Hide Bar Scrolling: the arrows' room goes and the rest closes up; a first micro region is then drawn as a second one.
@@ -153,7 +166,9 @@ end
 B.BandPlan = BandPlan
 
 local function CurrentPlan()
-    if not shape.plan then shape.plan = BandPlan(OnBandMicro(), OnBandBags(), ns.db and ns.db.bagsFirst, shape.region) end
+    if not shape.plan then
+        shape.plan = BandPlan(OnBandMicro(), OnBandBags(), ns.db and ns.db.bagsFirst, shape.region, shape.bar2W, shape.bar2Left)
+    end
     return shape.plan
 end
 B.CurrentPlan = CurrentPlan
@@ -174,11 +189,28 @@ function B.Segments()
     local plan = CurrentPlan()
     local cut = plan.cut
     local list = {}
-    if cut < 256 then
-        list[1] = { 0, 256 - cut, 1, cut / 256, 1, "bar" }
-        list[2] = { 256 - cut, 256, 2, 0, 1, "bar" }
+    -- A twelve-socket run at x from the sheets' u (bar 1's trim, or past the wall the run before it ends with).
+    local function Sockets(x, u)
+        if u < 256 then
+            list[#list + 1] = { x, 256 - u, 1, u / 256, 1, "bar" }
+            list[#list + 1] = { x + 256 - u, 256, 2, 0, 1, "bar" }
+        else
+            list[#list + 1] = { x, 512 - u, 2, (u - 256) / 256, 1, "bar" }
+        end
+    end
+    if plan.bar2Start and plan.bar2Start < plan.bar1Start then
+        -- Bar 2 left of bar 1: its own run trimmed at the left for fewer icons, bar 1's past the shared wall.
+        Sockets(0, 512 - ROW_X - plan.bar2W)
+        Sockets(plan.bar1Start, cut + plan.bar1Skip)
     else
-        list[1] = { 0, 512 - cut, 2, (cut - 256) / 256, 1, "bar" }
+        Sockets(0, cut)
+        if plan.bar2Start then
+            -- Bar 2 right of bar 1: the sheets again from past their left wall (bar 1's right wall serves), the second
+            -- cut short from its end for fewer icons.
+            local second = plan.bar2W - (256 - ROW_X)
+            list[#list + 1] = { plan.bar2Start, 256 - ROW_X, 1, ROW_X / 256, 1, "bar" }
+            if second > 0 then list[#list + 1] = { plan.bar2Start + 256 - ROW_X, second, 2, 0, second / 256, "bar" } end
+        end
     end
     local half = plan.base
     local headless = plan.microFirst and plan.noPages
@@ -240,7 +272,7 @@ end
 
 -- Bar 1's centred home: its bottom-left from the screen's bottom-centre.
 function B.HomeSpot(band)
-    return ((ns.db.barOffsetX or 0) - ArtWidth() / 2 + ROW_X) * band, ((ns.db.barOffsetY or 0) + ROW_Y) * band
+    return ((ns.db.barOffsetX or 0) - ArtWidth() / 2 + CurrentPlan().bar1X) * band, ((ns.db.barOffsetY or 0) + ROW_Y) * band
 end
 
 -- Whether a frame was dropped near a band spot (band px from its bottom-left), measured on screen where scales agree; plus the distance.
@@ -282,7 +314,7 @@ local function DropPlace(which, frame, current)
     local otherOn
     if which == "micro" then otherOn = shape.bagsReal ~= false else otherOn = shape.microReal ~= false end
     if not otherOn then return false end
-    local both = BandPlan(true, true, false, shape.region)
+    local both = BandPlan(true, true, false, shape.region, shape.bar2W, shape.bar2Left)
     local left = aL
     if not ns.barMoved then left = (aL + aR) / 2 - both.width / 2 end
     local line = (left + (both.base + both.width) / 2) * artScale

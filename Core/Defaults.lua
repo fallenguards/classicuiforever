@@ -13,6 +13,7 @@ ns.DB_DEFAULTS = {
     hideMicroKeepSize = false,
     hideMicroKeepWidth = false,
     bandHoldsBars = false,
+    bar2Over = true, bar2Right = false, bar2Left = false,
     hideMicroSpread = false,
     hideMicroAchievements = true, hideMicroLegacy = true,
     hideMicroHelp = false,

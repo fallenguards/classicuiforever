@@ -56,6 +56,22 @@ for _, keyRing in ipairs({ true, false }) do
     B.shape.noPages = noPages
     local plan = B.BandPlan(micro, bags, bagsFirst, B.MICRO_REGION_MAX)
     cases = cases + 1
+    -- Bar 2 right of bar 1: its run between bar 1's and the rest, which all stands 504 further along; left of it: its
+    -- run first, bar 1's run and first button 504 further along, the rest the same.
+    local rightPlan = B.BandPlan(micro, bags, bagsFirst, B.MICRO_REGION_MAX, 504)
+    if not (rightPlan.bar2Start == plan.base and rightPlan.bar2X == plan.base and rightPlan.bar1X == B.ROW_X
+        and rightPlan.base == plan.base + 504 and rightPlan.width == plan.width + 504) then
+        failures = failures + 1
+        print(string.format("FAIL bar 2 right: micro=%s bags=%s base %s->%s width %s->%s", tostring(micro), tostring(bags),
+            tostring(plan.base), tostring(rightPlan.base), tostring(plan.width), tostring(rightPlan.width)))
+    end
+    local leftPlan = B.BandPlan(micro, bags, bagsFirst, B.MICRO_REGION_MAX, 504, true)
+    if not (leftPlan.bar2Start == 0 and leftPlan.bar2X == B.ROW_X and leftPlan.bar1X == B.ROW_X + 504
+        and leftPlan.bar1Start == B.ROW_X + 504 and leftPlan.base == plan.base + 504 and leftPlan.width == plan.width + 504) then
+        failures = failures + 1
+        print(string.format("FAIL bar 2 left: micro=%s bags=%s bar1X %s base %s->%s", tostring(micro), tostring(bags),
+            tostring(leftPlan.bar1X), tostring(plan.base), tostring(leftPlan.base)))
+    end
     -- A piece after the page number slot starts at its post, under the box's edge: no dark stone between.
     local after = not plan.microFirst and not noPages and (plan.tailStart or plan.bagsStart)
     local edge = plan.base + B.PAGE_POST

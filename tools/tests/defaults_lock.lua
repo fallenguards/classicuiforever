@@ -11,6 +11,7 @@ return {
     bagsSnapScale = 0,
     bandHandedBack = false,
     bandHoldsBars = false,
+    bar2Over = true, bar2Right = false, bar2Left = false,
     barArtHidden = false,
     barDragged = false,
     barOffsetX = 0,

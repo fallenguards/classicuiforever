@@ -4,7 +4,7 @@ local B = ns.band
 -- Watch, never hook: our code inside the client's layout pass taints that pass for the session.
 -- What the band owns is sampled after our pass; a changed sample means the client moved it.
 
-local ROW_X, ROW_Y = B.ROW_X, B.ROW_Y
+local ROW_Y = B.ROW_Y
 local OWNED_SYSTEMS, EXTRA_BARS, BAG_BUTTONS, CAP_KEYS = B.OWNED_SYSTEMS, B.EXTRA_BARS, B.BAG_BUTTONS, B.CAP_KEYS
 local Record, Differs, Drifted, Due, BarSetting, StatusPair = B.Record, B.Differs, B.Drifted, B.Due, B.BarSetting, B.StatusPair
 local BandNow, OneBar, ArtWidth, HomeSpot = B.BandNow, B.OneBar, B.ArtWidth, B.HomeSpot
@@ -306,7 +306,7 @@ local function PlaceNow(fromLane)
         local bar = ns.GetMainBar()
         local art = B.art
         if bar and bar.isDragging and art and not handHeld then
-            ns.SetPointOnce(art, "BOTTOMLEFT", bar, "BOTTOMLEFT", -ROW_X, -ROW_Y)
+            ns.SetPointIf(art, "BOTTOMLEFT", bar, "BOTTOMLEFT", -B.CurrentPlan().bar1X, -ROW_Y)
         end
         -- Any other bar picked up off the band: its buttons hang on a band row (so the client can't carry them off in a fight)
         -- and stayed behind while its box followed the mouse. Our row hangs on the bar for the drag; the drop's pass lays it.

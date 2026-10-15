@@ -44,7 +44,7 @@ end
 -- Bars 2 and 3 side by side on the band: bar 2's width and the pair's, in band px; nil unless both stand on it.
 local function PairWidths()
     local lower, upper, bar = MultiBarBottomLeft, MultiBarBottomRight, ns.GetMainBar()
-    if OneBar() or not bar or not (OnBandRow(lower) and OnBandRow(upper)) then return nil end
+    if OneBar() or not bar or (B.shape.bar2W or 0) > 0 or not (OnBandRow(lower) and OnBandRow(upper)) then return nil end
     local band = BandScale(bar)
     local lowerW = RowSlots(lower) * BUTTON_PITCH * IconScale(lower) / band
     return lowerW, lowerW + (RowSlots(upper) * BUTTON_PITCH - SLOT_SPACE) * IconScale(upper) / band
@@ -82,6 +82,11 @@ local function ReadShape()
     local icons = BarSetting(ns.GetMainBar(), "NumIcons")
     if not icons or icons < 1 or icons > 12 then icons = 12 end
     shape.cut = (12 - math.floor(icons + 0.5)) * BUTTON_PITCH
+    -- Bar 2 on the line (option): its default-placed row joins the band beside bar 1, at its own icon count.
+    local lower = MultiBarBottomLeft
+    local side = ns.db.bar2Right == true or ns.db.bar2Left == true
+    shape.bar2W = (side and not OneBar() and OnBandRow(lower)) and RowSlots(lower) * BUTTON_PITCH or 0
+    shape.bar2Left = ns.db.bar2Left == true
     -- Bags dropped near a band spot go into it, judged before any preview. No layout write (it marks every piece as
     -- ours): our record holds them, and the size they wore reads as socket size.
     if B.bagsDropped then
@@ -116,14 +121,15 @@ local function ReadShape()
     if dragPreview.micro ~= nil then shape.micro = dragPreview.micro end
     if dragPreview.bags ~= nil then shape.bags = dragPreview.bags end
     if dragPreview.bagsFirst ~= nil then bagsFirst = dragPreview.bagsFirst end
-    shape.plan = BandPlan(OnBandMicro(), OnBandBags(), bagsFirst, shape.region)
+    shape.plan = BandPlan(OnBandMicro(), OnBandBags(), bagsFirst, shape.region, shape.bar2W, shape.bar2Left)
     -- Band holds bars 2 and 3 (option): the micro region widens to hold them, as Era's full micro sheet does.
     shape.microGrow = 0
     local _, pairW = PairWidths()
     local short = ns.db and ns.db.bandHoldsBars == true and pairW and (pairW + 2 * ROW_X - shape.plan.width) or 0
     if short > 0 and shape.plan.microStart then
         shape.microGrow = math.ceil(short)
-        shape.plan = BandPlan(OnBandMicro(), OnBandBags(), bagsFirst, shape.region + shape.microGrow)
+        shape.plan = BandPlan(OnBandMicro(), OnBandBags(), bagsFirst, shape.region + shape.microGrow, shape.bar2W,
+            shape.bar2Left)
     end
 end
 B.ReadShape = ReadShape
@@ -151,7 +157,7 @@ local function Layout()
     -- Default place: the band stands on the screen (the client carries bar 1 off mid-fight; its buttons hang on the band);
     -- it follows bar 1 only while dragged or once placed.
     if moved or bar.isDragging then
-        art:SetPoint("BOTTOMLEFT", bar, "BOTTOMLEFT", -ROW_X, -ROW_Y)
+        art:SetPoint("BOTTOMLEFT", bar, "BOTTOMLEFT", -CurrentPlan().bar1X, -ROW_Y)
     else
         art:SetPoint("BOTTOMLEFT", UIParent, "BOTTOM", (ns.db.barOffsetX or 0) - ArtWidth() / 2, ns.db.barOffsetY or 0)
     end
@@ -162,7 +168,7 @@ local function Layout()
     if bar.BorderArt then bar.BorderArt:SetAlpha(0) end
     if bar.HorizontalDividersPool then bar.HorizontalDividersPool:ReleaseAll() end
     if bar.VerticalDividersPool then bar.VerticalDividersPool:ReleaseAll() end
-    LayoutButtons(bar, 1, "BOTTOMLEFT", art, "BOTTOMLEFT", ROW_X, ROW_Y)
+    LayoutButtons(bar, 1, "BOTTOMLEFT", art, "BOTTOMLEFT", CurrentPlan().bar1X, ROW_Y)
     LayoutPageArrows(bar)
 
     local lower, upper = MultiBarBottomLeft, MultiBarBottomRight
@@ -178,18 +184,28 @@ local function Layout()
     -- Bars 2 and 3 side by side as one run of slots at the slots' own spacing, centred on the band (at the 1.x spots
     -- the right of a band widened by the latency bar, key ring and reagent bag stood bare); either alone keeps its
     -- 1.x spot. On the half band bar 3 goes over bar 2, the pet row moving up.
-    local lowerX, upperX = ROW_X, CurrentPlan().base + HALF_ROW_X
+    local linePlan = CurrentPlan()
+    local onLine = linePlan.bar2X ~= nil
+    local lowerX, upperX = linePlan.bar1X, linePlan.base + HALF_ROW_X
     local lowerW, pairW = PairWidths()
     if pairW then
         lowerX = math.max(ROW_X, (ArtWidth() - pairW) / 2)
         upperX = lowerX + lowerW
     end
-    local lowerOn = BandRow(lower, 2, lowerX, lowerY) and lower:IsShown()
+    -- Bar 2 beside bar 1 (option): its row on bar 1's line, at bar 1's icon size.
+    local lowerOn
+    if onLine then
+        local k = IconScale(bar) / IconScale(lower)
+        lowerOn = BandRow(lower, 2, linePlan.bar2X, ROW_Y, BUTTON_PITCH * k, (BUTTON_PITCH - SLOT_SPACE) * k)
+            and lower:IsShown()
+    else
+        lowerOn = BandRow(lower, 2, lowerX, lowerY) and lower:IsShown()
+    end
     local upperY, upperOn
     if OneBar() then
         upperY = UPPER_ROW_Y + BUTTON_PITCH + barLift
         if lowerOn then upperY = math.max(upperY, lowerY + BUTTON_PITCH * lowerRatio) end
-        upperOn = BandRow(upper, 3, ROW_X, upperY)
+        upperOn = BandRow(upper, 3, linePlan.bar1X, upperY)
     else
         upperY = lowerY
         upperOn = BandRow(upper, 3, upperX, upperY)
@@ -197,7 +213,7 @@ local function Layout()
     -- The stance and pet row keeps its 1.x distance over the taller row under it.
     local petLift = (OneBar() and BUTTON_PITCH or 0) + barLift
     local rise = PET_ROW_Y - UPPER_ROW_Y
-    if lowerOn then petLift = math.max(petLift, lowerY + rise * lowerRatio - PET_ROW_Y) end
+    if lowerOn and not onLine then petLift = math.max(petLift, lowerY + rise * lowerRatio - PET_ROW_Y) end
     if upperOn and upper:IsShown() then
         petLift = math.max(petLift, upperY + rise * IconScale(upper) / band - PET_ROW_Y)
     end
