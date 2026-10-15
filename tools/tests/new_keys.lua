@@ -93,4 +93,10 @@ return {
     plateCastBeside = "on for everyone, a restyle: Era's nameplate cast bar (#121); checked gives the old one back",
     spellBookHidePassives = "same for everyone: off by default; the book's options menu or the options window turns it on",
     spellBookFlyouts = "same for everyone: off by default, every spell on its own as before; grouping is opt-in",
+    showBags = "same for everyone: the default pick, the bag bar shown as before",
+    hideBagsAlways = "same for everyone: opt-in, off by default",
+    hideBagsOpen = "same for everyone: opt-in, off by default",
+    hideBagsHover = "same for everyone: opt-in, off by default",
+    bagsBackpackOnly = "same for everyone: opt-in, off by default",
+    bagsUnfolded = "same for everyone: off by default; the fold arrow's own state, nothing on screen without Bag bar: backpack only",
 }

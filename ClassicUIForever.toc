@@ -94,6 +94,7 @@ Bar\BandBare.lua
 Bar\BandArt.lua
 Bar\BandBars.lua
 Bar\BandBags.lua
+Bar\BandBagsShow.lua
 Bar\BandLatency.lua
 Bar\BandSection.lua
 Bar\BandMicro.lua

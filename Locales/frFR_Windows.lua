@@ -2,7 +2,7 @@ local _, ns = ...
 if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
--- Our window mover and its edit mode window (UI/), the one bag's reagent slots, beside Locales/frFR.lua.
+-- Our window mover and its edit mode window (UI/), the one bag's reagent slots and the bag bar pick, beside Locales/frFR.lua.
 L["UI_UNLOCKED_DRAG_THE_MAP_BY"] = "Déverrouillée : faites glisser la carte par sa barre de titre, hors combat. Cliquez pour la verrouiller."
 L["UI_LOCKED_CLICK_TO_DRAG_THE"] = "Verrouillée. Cliquez pour faire glisser la carte n'importe où par sa barre de titre, hors combat."
 L["UI_UNLOCKED_DRAG_THE_WINDOW_BY"] = "Déverrouillée : faites glisser la fenêtre par sa barre de titre, hors combat. Cliquez pour la verrouiller."
@@ -29,3 +29,13 @@ L["OPT_reagentSlotsPlace_TIP"] = "Où se placent les emplacements du sac de comp
 L["OPTWIN_RESET_WINDOWS"] = "Rétablir fenêtres"
 L["OPTWIN_PUTS_EVERY_WINDOW_BACK"] = "Remet chaque fenêtre à sa taille et à sa place d'origine, comme si elle n'avait jamais été déplacée ni redimensionnée. Les verrous restent tels quels."
 L["OPTWIN_RESET_WINDOWS_CONFIRM"] = "Remettre chaque fenêtre à sa taille et à sa place d'origine ?"
+
+-- The bag bar pick (Bar/BandBagsShow.lua) and its fold arrow.
+L["OPT_showBags"] = "Barre des sacs : affichée"
+L["OPT_hideBagsAlways"] = "Barre des sacs : masquée"
+L["OPT_hideBagsOpen"] = "Barre des sacs : jusqu'à l'ouverture des sacs"
+L["OPT_hideBagsHover"] = "Barre des sacs : au survol"
+L["OPT_bagsBackpackOnly"] = "Barre des sacs : sac à dos seul"
+L["BAGS_SHOW_BAGS"] = "Afficher les sacs"
+L["BAGS_HIDE_BAGS"] = "Masquer les sacs"
+L["OPT_bagsShow_TIP"] = "Les boutons de sac affichés, masqués, affichés seulement quand une fenêtre de sac est ouverte, seulement quand la souris survole leur emplacement, ou repliés sur le sac à dos derrière une flèche. Sur la barre classique, la barre se resserre sur les sacs masqués ou repliés et sinon leurs logements s'estompent avec eux."

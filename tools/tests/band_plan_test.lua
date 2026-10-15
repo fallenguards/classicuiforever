@@ -31,6 +31,9 @@ for _, file in ipairs({ "Bar/Band.lua", "Bar/BandShape.lua" }) do
     chunk("ClassicUIForever", ns)
 end
 local B = ns.band
+-- Later files' answers the band reads (Bar/BandBagsShow.lua): no pick, nothing folded.
+B.BagsFolded = function() return false end
+B.BagExtraCells = function() return B.ReagentSlot() and 1 or 0 end
 
 -- Section starts that leave out its own left post (B.TailSpan: latency after a post 7, key ring alone after one 23).
 local POSTLESS = { [7] = true, [23] = true }

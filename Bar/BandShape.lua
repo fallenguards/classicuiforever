@@ -61,7 +61,7 @@ B.shape = shape
 B.dragPreview = {}
 
 local function OnBandMicro() return shape.micro and not OneBar() end
-local function OnBandBags() return shape.bags and not OneBar() end
+local function OnBandBags() return shape.bags and not OneBar() and B.BagsMode() ~= "hidden" end
 B.OnBandMicro, B.OnBandBags = OnBandMicro, OnBandBags
 
 -- The latency and key ring section at x (spans: B.TailSpan).
@@ -198,13 +198,21 @@ function B.Segments()
     if plan.bagsStart then
         local bag = B.Bag()
         local x, u0, sheet = plan.bagsStart, 256 - bag.part + plan.bagTrim, bag.sheet
-        if B.ReagentSlot() then
-            -- Up to the first socket's far wall, the wall-and-socket unit once more, then the rest from that wall.
-            local s0, s1 = bag.socketU0, bag.socketU1
-            local head, unit = s0 - u0, s1 - s0
+        local s0, s1 = bag.socketU0, bag.socketU1
+        local head, unit = s0 - u0, s1 - s0
+        local extra = B.BagExtraCells()
+        if B.BagsFolded() then
+            -- Backpack only: the head, then from four cells on (the backpack's cell and the end), one cell in all.
+            local tail = s0 + 4 * bag.socket
             list[#list + 1] = { x, head, sheet, u0 / 256, s0 / 256, "bags" }
-            list[#list + 1] = { x + head, unit, sheet, s0 / 256, s1 / 256, "bags" }
-            list[#list + 1] = { x + head + unit, 256 - s0, sheet, s0 / 256, 1, "bags" }
+            list[#list + 1] = { x + head, 256 - tail, sheet, tail / 256, 1, "bags" }
+        elseif extra > 0 then
+            -- Up to the first socket's far wall, the wall-and-socket unit once per extra cell, then the rest from that wall.
+            list[#list + 1] = { x, head, sheet, u0 / 256, s0 / 256, "bags" }
+            for i = 1, extra do
+                list[#list + 1] = { x + head + (i - 1) * unit, unit, sheet, s0 / 256, s1 / 256, "bags" }
+            end
+            list[#list + 1] = { x + head + extra * unit, 256 - s0, sheet, s0 / 256, 1, "bags" }
         else
             list[#list + 1] = { x, 256 - u0, sheet, u0 / 256, 1, "bags" }
         end

@@ -92,6 +92,11 @@ function B.PaintArt()
     local main = ns.GetMainBar()
     local bare = B.BarBare(main)
     ARTLESS.bar, ARTLESS.micro, ARTLESS.bags = bare, ns.db.hideMicroArt == true, ns.db.hideBagsArt == true
+    -- The bag sockets' runs, faded with a hidden row (BandBagsShow); a piece drawn as another run next pass is lit again.
+    local bagRun = art.bagRun or {}
+    art.bagRun = bagRun
+    wipe(bagRun)
+    local bagAlpha = B.BagRunAlpha()
     for i, tex in ipairs(art.pieces) do
         local seg = segments[i]
         -- A hidden run keeps its top rim, the bottom border of the XP strip (or thin bar) over it; bar 1's takes all.
@@ -104,6 +109,9 @@ function B.PaintArt()
             if rim then v1 = v0 + (v1 - v0) * RIM_H / BAND_H end
             RUN[1], RUN[2], RUN[3], RUN[4] = seg[4], seg[5], v0, v1
             Dress(tex, piece.key, BAND_RUN, art, seg[1], rim and BAND_H - RIM_H or 0, seg[2], rim and RIM_H or BAND_H, RUN)
+            local bags = seg[6] == "bags"
+            if bags then bagRun[#bagRun + 1] = tex end
+            tex:SetAlpha(bags and bagAlpha or 1)
         else
             tex:Hide()
         end

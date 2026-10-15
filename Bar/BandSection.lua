@@ -349,6 +349,10 @@ local function Place(el, plan, level)
     return true
 end
 
+-- The key ring riding a moved bag row, and its home there: faded with the row (BandBagsShow).
+function B.KeyRingRides() return Snapped(KEYRING) and true or false end
+function B.KeyRingHome() return KEYRING.home end
+
 -- Every bag layout, after the row (which takes the key ring only when it has no place here).
 local watched = false
 function B.LaySection(level)

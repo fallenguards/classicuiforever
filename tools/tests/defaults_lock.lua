@@ -241,6 +241,8 @@ return {
     showOptionsButton = true,
     spellBook = true,
     spellBookFlyouts = false,
+    showBags = true, hideBagsAlways = false, hideBagsOpen = false, hideBagsHover = false, bagsBackpackOnly = false,
+    bagsUnfolded = false,
     spellBookHidePassives = false,
     spellBookSearch = true,
     spellBookTopRank = false,

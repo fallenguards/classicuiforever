@@ -1,7 +1,7 @@
 local _, ns = ...
 local L = ns.L
 
--- Our window mover and its edit mode window (UI/), the one bag's reagent slots, beside Locales/enUS.lua.
+-- Our window mover and its edit mode window (UI/), the one bag's reagent slots and the bag bar pick, beside Locales/enUS.lua.
 -- UI/WindowHandles.lua
 L["UI_CHARACTER"] = "Character"
 L["UI_PROFESSIONS"] = "Professions"
@@ -73,3 +73,13 @@ L["OPT_reagentSlotsPlace_TIP"] = "Where the reagent bag's slots stand in the one
 L["OPTWIN_RESET_WINDOWS"] = "Reset windows"
 L["OPTWIN_PUTS_EVERY_WINDOW_BACK"] = "Puts every window back to its own size and spot, as if never moved or sized. Locks stay as they are."
 L["OPTWIN_RESET_WINDOWS_CONFIRM"] = "Put every window back to its own size and spot?"
+
+-- The bag bar pick (Bar/BandBagsShow.lua) and its fold arrow.
+L["OPT_showBags"] = "Bag bar: shown"
+L["OPT_hideBagsAlways"] = "Bag bar: hidden"
+L["OPT_hideBagsOpen"] = "Bag bar: until bags are open"
+L["OPT_hideBagsHover"] = "Bag bar: on hover"
+L["OPT_bagsBackpackOnly"] = "Bag bar: backpack only"
+L["BAGS_SHOW_BAGS"] = "Show the bags"
+L["BAGS_HIDE_BAGS"] = "Hide the bags"
+L["OPT_bagsShow_TIP"] = "The bag buttons shown, hidden, shown only while a bag window is open, only while the mouse is over their spot, or folded to the backpack behind an arrow. On the classic bar the bar closes up over hidden or folded bags and their sockets fade with them otherwise."

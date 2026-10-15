@@ -2,7 +2,7 @@ local _, ns = ...
 if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
--- Our window mover and its edit mode window (UI/), the one bag's reagent slots, beside Locales/itIT.lua.
+-- Our window mover and its edit mode window (UI/), the one bag's reagent slots and the bag bar pick, beside Locales/itIT.lua.
 L["UI_UNLOCKED_DRAG_THE_MAP_BY"] = "Sbloccata: trascina la mappa dalla barra del titolo, fuori dal combattimento. Clic per bloccarla."
 L["UI_LOCKED_CLICK_TO_DRAG_THE"] = "Bloccata. Clic per trascinare la mappa ovunque dalla barra del titolo, fuori dal combattimento."
 L["UI_UNLOCKED_DRAG_THE_WINDOW_BY"] = "Sbloccata: trascina la finestra dalla barra del titolo, fuori dal combattimento. Clic per bloccarla."
@@ -29,3 +29,13 @@ L["OPT_reagentSlotsPlace_TIP"] = "Dove stanno le caselle della borsa dei reagent
 L["OPTWIN_RESET_WINDOWS"] = "Ripristina finestre"
 L["OPTWIN_PUTS_EVERY_WINDOW_BACK"] = "Riporta ogni finestra alla sua dimensione e al suo posto, come se non fosse mai stata spostata o ridimensionata. I blocchi restano come sono."
 L["OPTWIN_RESET_WINDOWS_CONFIRM"] = "Riportare ogni finestra alla sua dimensione e al suo posto?"
+
+-- The bag bar pick (Bar/BandBagsShow.lua) and its fold arrow.
+L["OPT_showBags"] = "Barra delle borse: visibile"
+L["OPT_hideBagsAlways"] = "Barra delle borse: nascosta"
+L["OPT_hideBagsOpen"] = "Barra delle borse: finché le borse sono aperte"
+L["OPT_hideBagsHover"] = "Barra delle borse: al passaggio"
+L["OPT_bagsBackpackOnly"] = "Barra delle borse: solo lo zaino"
+L["BAGS_SHOW_BAGS"] = "Mostra le borse"
+L["BAGS_HIDE_BAGS"] = "Nascondi le borse"
+L["OPT_bagsShow_TIP"] = "I pulsanti delle borse visibili, nascosti, visibili solo mentre una finestra delle borse è aperta, solo mentre il mouse è sul loro posto, o ripiegati sullo zaino dietro una freccia. Sulla barra classica la barra si stringe sulle borse nascoste o ripiegate, altrimenti i loro alloggi sbiadiscono con loro."

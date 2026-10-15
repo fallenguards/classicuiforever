@@ -61,7 +61,7 @@ local function FloorRun(floor, tex, x, width, u0, u1, turn)
     tex:Show()
 end
 
-local function LayFloor(art, square, floating, buttonScale, level, backpack, turn)
+local function LayFloor(art, floating, buttonScale, level, backpack, turn)
     local floor = art.bagFloor
     if not floating then
         if floor then floor:Hide() end
@@ -70,7 +70,7 @@ local function LayFloor(art, square, floating, buttonScale, level, backpack, tur
     if not floor then
         floor = CreateFrame("Frame", nil, art)
         floor.tex = floor:CreateTexture(nil, "BACKGROUND")
-        floor.socket = floor:CreateTexture(nil, "BACKGROUND")
+        floor.units = { floor:CreateTexture(nil, "BACKGROUND"), floor:CreateTexture(nil, "BACKGROUND") }
         floor.rest = floor:CreateTexture(nil, "BACKGROUND")
         art.bagFloor = floor
     end
@@ -78,14 +78,24 @@ local function LayFloor(art, square, floating, buttonScale, level, backpack, tur
     local long = B.BagPart() - bag.trim
     if turn == "cw" or turn == "ccw" then floor:SetSize(BAND_H, long) else floor:SetSize(long, BAND_H) end
     local u0, s0, s1 = 256 - bag.part + bag.trim, bag.socketU0, bag.socketU1
-    if square then
-        local head, unit = s0 - u0, s1 - s0
+    local head, unit = s0 - u0, s1 - s0
+    local extra = B.BagExtraCells()
+    if B.BagsFolded() then
+        -- Backpack only: the head, then from four cells on (the backpack's cell and the end), one cell in all.
+        local tail = s0 + 4 * bag.socket
         FloorRun(floor, floor.tex, 0, head, u0, s0, turn)
-        FloorRun(floor, floor.socket, head, unit, s0, s1, turn)
-        FloorRun(floor, floor.rest, head + unit, 256 - s0, s0, 256, turn)
+        FloorRun(floor, floor.units[1], head, 256 - tail, tail, 256, turn)
+        floor.units[2]:Hide()
+        floor.rest:Hide()
+    elseif extra > 0 then
+        FloorRun(floor, floor.tex, 0, head, u0, s0, turn)
+        for i, tex in ipairs(floor.units) do
+            if i <= extra then FloorRun(floor, tex, head + (i - 1) * unit, unit, s0, s1, turn) else tex:Hide() end
+        end
+        FloorRun(floor, floor.rest, head + extra * unit, 256 - s0, s0, 256, turn)
     else
         FloorRun(floor, floor.tex, 0, 256 - u0, u0, 256, turn)
-        floor.socket:Hide()
+        for _, tex in ipairs(floor.units) do tex:Hide() end
         floor.rest:Hide()
     end
     floor:SetScale(buttonScale)
@@ -131,9 +141,16 @@ local function HoverCheck()
     for _, button in ipairs(RowButtons()) do
         if button and button:IsVisible() and button:IsMouseOver() then over = true break end
     end
-    if over then reagent:SetAlpha(1) end
-    ns.SetFrameAlphaIf(reagent, over and 1 or 0)
+    -- Not on a hidden, folded or faded row (BandBagsShow), where it takes no mouse either.
+    local may = B.ReagentMayLight()
+    local lit = over and may
+    if lit then reagent:SetAlpha(1) end
+    ns.SetFrameAlphaIf(reagent, lit and 1 or 0)
+    if reagent:IsMouseEnabled() ~= may then reagent:EnableMouse(may) end
 end
+-- The pick's painter (BandBagsShow) leaves the round reagent bag to this hover while it is wanted.
+B.ReagentHoverWanted, B.ReagentHoverCheck = HoverWanted, HoverCheck
+
 local function HookHover()
     if hoverHooked then return end
     hoverHooked = true
@@ -188,6 +205,43 @@ local function Chain(button, prev, grow, step)
     button:SetPoint(grow[1], prev, grow[2], -grow[3] * step, -grow[4] * step)
 end
 
+-- Button scale: on the band socket size, off it (moved, or one-bar corner) edit mode's Size with the band scale divided
+-- out. The player's Size counts on the band too; snapping back resets it: the size worn when last snapped counts as
+-- socket size (no layout write), a Size picked later is theirs.
+local function ButtonScale(piece, out)
+    if not piece then return 1 end
+    if out or OneBar() then return (piece:GetScale() or 1) / BandNow() end
+    local scale = piece:GetScale() or 1
+    local snap = ns.db and ns.db.bagsSnapScale or 0
+    if snap > 0 and ns.Near(scale, snap, 0.001) then return 1 end
+    return scale
+end
+
+-- After the row: the section, the client's own pieces faded, the pick applied (BandBagsShow).
+local function AfterRow(level)
+    B.LaySection(level)
+    if BagBarExpandToggle then BagBarExpandToggle:Hide() end
+    if BagsBar then FadeTextures(BagsBar, 0, BAGS_BAR_ART) end
+    B.BagDividers(0)
+    B.MainBarDividers(0)
+    B.ApplyBagsMode()
+end
+
+-- A fold changes a moved row's width: the piece is hung again by its backpack end before it is sized, so the bags come
+-- and go beside a backpack that stays where it is (edit mode's own anchor is kept for the hand-back).
+local END_CORNER = { cw = "BOTTOMLEFT", ccw = "TOPLEFT", mirror = "BOTTOMLEFT" }
+local function HoldBackpackEnd(piece, grow, boxW, boxH)
+    if piece.isDragging then return end
+    local w, h = piece:GetSize()
+    if math.abs((w or 0) - boxW) < 0.5 and math.abs((h or 0) - boxH) < 0.5 then return end
+    local corner = END_CORNER[grow.turn or ""] or "BOTTOMRIGHT"
+    local x = corner == "BOTTOMRIGHT" and piece:GetRight() or piece:GetLeft()
+    local y = corner == "TOPLEFT" and piece:GetTop() or piece:GetBottom()
+    if not (x and y) then return end
+    B.Remember(piece, true)
+    ns.SetPointIf(piece, corner, UIParent, "BOTTOMLEFT", x, y)
+end
+
 function B.LayoutBags()
     local backpack = MainMenuBarBackpackButton
     if not backpack then return end
@@ -201,34 +255,27 @@ function B.LayoutBags()
     local lift = (KEYRING_H - size) / 2
     local home, homePoint, homeY = art, "BOTTOMRIGHT", bag.y
     local homeX
-    local buttonScale = 1
-    local square = B.ReagentSlot()
-    local rowW = size + 4 * (size - gap)
+    -- Backpack only (BandBagsShow): the bags, reagent bag and key slot fold away, the backpack alone left; the arrow
+    -- that unfolds them floats beside it, no cell of its own.
+    local folded, arrowed = B.BagsFolded(), B.BagsMode() == "backpack"
+    local square = not folded and B.ReagentSlot()
+    local rowW = folded and size or size + 4 * (size - gap)
     if square then rowW = rowW + size - gap end
     -- The key slot's tenant: never the key ring (its own piece, BandSection.lua).
-    local slim = B.SlimReagent() and CharacterReagentBag0Slot or nil
+    local slim = not folded and B.SlimReagent() and CharacterReagentBag0Slot or nil
     if slim then rowW = rowW + KEYRING_W - KEYRING_GAP end
     -- The piece's box: a column swaps its sides, as the client's does.
     local boxW, boxH = rowW, KEYRING_H
     if vertical then boxW, boxH = KEYRING_H, rowW end
-    -- On the band: socket size. Off it (moved, or one-bar corner): edit mode's Size with the band scale divided out.
-    local band = BandNow()
-    if piece and (out or OneBar()) then
-        buttonScale = (piece:GetScale() or 1) / band
-    elseif piece then
-        -- The player's Size counts on the band too; snapping back resets it. The size worn when last snapped
-        -- counts as socket size (no layout write); a Size picked later is theirs.
-        buttonScale = piece:GetScale() or 1
-        local snap = ns.db and ns.db.bagsSnapScale or 0
-        if snap > 0 and ns.Near(buttonScale, snap, 0.001) then buttonScale = 1 end
-    end
+    local buttonScale = ButtonScale(piece, out)
     if out then
         home, homeX, homeY = piece, 0, lift
+        HoldBackpackEnd(piece, grow, boxW, boxH)
     else
         local relativeTo
         if OneBar() then
             -- Over the micro group while it stands in the corner, else on the floor.
-            local under = MicroOut() and 0 or BAND_H * MicroUserScale() / band
+            local under = MicroOut() and 0 or BAND_H * MicroUserScale() / BandNow()
             relativeTo, homeX, homeY = art.sideAnchor, CORNER_X - 4 * buttonScale, under + 6 * buttonScale
         else
             -- By the plan: the bags are not always last on the band.
@@ -249,11 +296,14 @@ function B.LayoutBags()
     end
     local level = ButtonLevel()
     local prev
+    local rowShown = B.BagsMode() ~= "hidden"
     -- Backpack at the piece's end the row grows from (the classic row: its right end), four bags a socket apart, then
-    -- the key ring hole.
+    -- the key ring hole; folded, the backpack alone.
     for _, name in ipairs(BAG_BUTTONS) do
         local button = _G[name]
-        if button then
+        if button and folded and name ~= "MainMenuBarBackpackButton" then
+            ns.SetShownIf(button, false)
+        elseif button then
             Seat(button, buttonScale, size, size, level)
             if prev then
                 Chain(button, prev, grow, gap)
@@ -263,7 +313,7 @@ function B.LayoutBags()
                 button:SetPoint("BOTTOMRIGHT", home, homePoint, homeX / buttonScale, homeY / buttonScale)
             end
             ns.SkinBagButton(button, size, name == "MainMenuBarBackpackButton")
-            button:Show()
+            ns.SetShownIf(button, rowShown)
             prev = button
         end
     end
@@ -273,7 +323,6 @@ function B.LayoutBags()
         Seat(reagent, buttonScale, size, size, level)
         Chain(reagent, prev, grow, gap)
         ns.SkinBagButton(reagent, size, false, false)
-        reagent:Show()
         ReagentSeen(reagent, true)
         prev = reagent
     end
@@ -282,7 +331,8 @@ function B.LayoutBags()
         Chain(slim, prev, grow, KEYRING_GAP)
         ns.SkinKeyRing(slim)
     end
-    if not square and KeyRingButton and CharacterReagentBag0Slot then
+    B.LayFoldArrow(arrowed and (slim or prev) or nil, grow, size, level, buttonScale)
+    if not square and not folded and KeyRingButton and CharacterReagentBag0Slot then
         -- Both (Forever): the reagent bag is the small round one, centred level with the bags between key ring and last bag.
         local reagent = CharacterReagentBag0Slot
         Seat(reagent, buttonScale, REAGENT_SIZE, REAGENT_SIZE, level + 2)
@@ -300,12 +350,8 @@ function B.LayoutBags()
     -- Once moved, the piece is only sized to its row.
     if piece and out then piece:SetSize(boxW, boxH) end
     -- The floor: a strip of the band from the backpack, turned with the row.
-    LayFloor(art, square, (out or OneBar()) and not ns.db.hideBagsArt, buttonScale, level, backpack, grow.turn)
-    B.LaySection(level)
-    if BagBarExpandToggle then BagBarExpandToggle:Hide() end
-    if BagsBar then FadeTextures(BagsBar, 0, BAGS_BAR_ART) end
-    B.BagDividers(0)
-    B.MainBarDividers(0)
+    LayFloor(art, (out or OneBar()) and not ns.db.hideBagsArt, buttonScale, level, backpack, grow.turn)
+    AfterRow(level)
 end
 
 -- The client's dividers between a bar's buttons (pooled frames on it): faded, 1 gives them back.

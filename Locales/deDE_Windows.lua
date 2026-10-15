@@ -2,7 +2,7 @@ local _, ns = ...
 if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
--- Our window mover and its edit mode window (UI/), the one bag's reagent slots, beside Locales/deDE.lua.
+-- Our window mover and its edit mode window (UI/), the one bag's reagent slots and the bag bar pick, beside Locales/deDE.lua.
 L["UI_UNLOCKED_DRAG_THE_MAP_BY"] = "Entsperrt: Zieh die Karte außerhalb des Kampfes an ihrer Titelleiste. Klicken zum Sperren."
 L["UI_LOCKED_CLICK_TO_DRAG_THE"] = "Gesperrt. Klicken, um die Karte außerhalb des Kampfes an ihrer Titelleiste überallhin zu ziehen."
 L["UI_UNLOCKED_DRAG_THE_WINDOW_BY"] = "Entsperrt: Zieh das Fenster außerhalb des Kampfes an seiner Titelleiste. Klicken zum Sperren."
@@ -29,3 +29,13 @@ L["OPT_reagentSlotsPlace_TIP"] = "Wo die Plätze der Reagenzientasche in der ein
 L["OPTWIN_RESET_WINDOWS"] = "Fenster zurücksetzen"
 L["OPTWIN_PUTS_EVERY_WINDOW_BACK"] = "Setzt jedes Fenster auf seine eigene Größe und Stelle zurück, als wäre es nie verschoben oder vergrößert worden. Sperren bleiben, wie sie sind."
 L["OPTWIN_RESET_WINDOWS_CONFIRM"] = "Jedes Fenster auf seine eigene Größe und Stelle zurücksetzen?"
+
+-- The bag bar pick (Bar/BandBagsShow.lua) and its fold arrow.
+L["OPT_showBags"] = "Taschenleiste: angezeigt"
+L["OPT_hideBagsAlways"] = "Taschenleiste: ausgeblendet"
+L["OPT_hideBagsOpen"] = "Taschenleiste: bis Taschen offen sind"
+L["OPT_hideBagsHover"] = "Taschenleiste: beim Überfahren"
+L["OPT_bagsBackpackOnly"] = "Taschenleiste: nur Rucksack"
+L["BAGS_SHOW_BAGS"] = "Taschen anzeigen"
+L["BAGS_HIDE_BAGS"] = "Taschen ausblenden"
+L["OPT_bagsShow_TIP"] = "Die Taschentasten angezeigt, ausgeblendet, nur solange ein Taschenfenster offen ist, nur solange die Maus über ihrem Platz ist, oder hinter einem Pfeil auf den Rucksack eingeklappt. Auf der klassischen Leiste rückt die Leiste über ausgeblendeten oder eingeklappten Taschen zusammen, sonst verblassen ihre Fassungen mit ihnen."

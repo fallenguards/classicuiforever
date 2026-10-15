@@ -215,6 +215,12 @@ ns.TOGGLES = {
     { "reagentSlotsLast", L["OPT_reagentSlotsLast"], L["OPT_reagentSlotsLast_TIP"], parent = "reagentBagCombined",
         radio = "reagentSlotsPlace", drop = true, search = "reagent slots bottom end order" },
     { "bagsBesideBars", L["OPT_bagsBesideBars"], L["OPT_bagsBesideBars_TIP"] },
+    { "showBags", L["OPT_showBags"], L["OPT_bagsShow_TIP"], radio = "bagsShow", drop = true,
+        search = "bag bar hide bags buttons backpack hover mouseover mouse over open" },
+    { "hideBagsAlways", L["OPT_hideBagsAlways"], L["OPT_bagsShow_TIP"], radio = "bagsShow", drop = true },
+    { "hideBagsOpen", L["OPT_hideBagsOpen"], L["OPT_bagsShow_TIP"], radio = "bagsShow", drop = true },
+    { "hideBagsHover", L["OPT_hideBagsHover"], L["OPT_bagsShow_TIP"], radio = "bagsShow", drop = true },
+    { "bagsBackpackOnly", L["OPT_bagsBackpackOnly"], L["OPT_bagsShow_TIP"], radio = "bagsShow", drop = true },
 
     { "minimap", L["OPT_minimap"], L["OPT_minimap_TIP"], group = L["GROUP_MINIMAP"] },
     { "showMinimapZone", L["OPT_showMinimapZone"], SHOW_TIP, parent = "minimap", radio = "minimapZoneShow", drop = true },
