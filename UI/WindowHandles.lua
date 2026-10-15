@@ -197,67 +197,6 @@ local function SaveFrom(entry, frame)
     SetPlace(entry, OnScreen(entry, frame, k, left * k, top * k))
 end
 
--- StartMoving calls no SetPoint: a window's followers (the spellbook's casting layer) are told each frame mid drag.
-local function FollowDragged()
-    for frame in pairs(moving) do
-        if frame.OnClassicPlaced then frame:OnClassicPlaced() end
-    end
-end
-local dragJob = ns.Sched.Job({ name = "windows.dragFollow", every = 0, awake = false, fn = FollowDragged })
-
-local function StripDragStart(self)
-    local frame = self:GetParent()
-    local entry = entryOf[frame]
-    if (InCombatLockdown() and (entry.calm or ns.WindowLocked(frame))) or Full(entry, frame) then return end
-    moving[frame] = true
-    ns.Sched.LetGo(frame, true)
-    -- Held on the screen while dragged.
-    clampWas[frame] = frame:IsClampedToScreen() and true or false
-    frame:SetClampedToScreen(true)
-    frame:SetMovable(true)
-    frame:StartMoving()
-    dragJob:Wake()
-end
-
--- StopMovingOrSizing drops the anchors of a frame others hang on: read where it was drawn first, then set it there.
-local function StripDragStop(self)
-    local frame = self:GetParent()
-    if not moving[frame] then return end
-    local entry = entryOf[frame]
-    SaveFrom(entry, frame)
-    frame:StopMovingOrSizing()
-    if frame.SetUserPlaced then pcall(frame.SetUserPlaced, frame, false) end
-    moving[frame] = nil
-    if not next(moving) then dragJob:Sleep() end
-    frame:SetClampedToScreen(clampWas[frame] == true)
-    -- All, so a window sharing the place is watched from its first one.
-    PlaceAll()
-    ns.Sched.LetGo(frame, false)
-end
-
--- The title strip that drags an unlocked window; nothing on a locked one.
-local function Strip(entry)
-    local frame = ns.WindowFrame(entry)
-    if not frame then return end
-    local strip = strips[frame]
-    if not IsFree(entry) or ns.MoverHolds(frame) then
-        if strip then strip:Hide() end
-        return
-    end
-    if not strip then
-        strip = ns.NewFrame("Frame", nil, frame)
-        strip:SetPoint("TOPLEFT", frame, "TOPLEFT", STRIP_LEFT, 0)
-        strip:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT", -(entry.stripRight or STRIP_RIGHT), -(entry.stripH or STRIP_H))
-        strip:EnableMouse(true)
-        strip:RegisterForDrag("LeftButton")
-        strip:SetScript("OnDragStart", StripDragStart)
-        strip:SetScript("OnDragStop", StripDragStop)
-        strips[frame] = strip
-    end
-    ns.SetLevelIf(strip, frame:GetFrameLevel() + STRIP_LIFT)
-    if not strip:IsShown() then strip:Show() end
-end
-
 -- Watched from the first place or unlock: placed as it shows, and put back the frame after anyone moves it.
 local function Watch(entry)
     local frame = ns.WindowFrame(entry)
@@ -265,7 +204,19 @@ local function Watch(entry)
     entryOf[frame] = entry
     local function Put() Apply(entry) end
     -- Before it draws, shown or moved (the map's quest toggle re-lays it through the panel manager): later, it flashed there.
-    ns.Sched.OnMove(frame, ns.Sched.AfterShow(frame, "windowPlace", Put))
+    local shown = ns.Sched.AfterShow(frame, "windowPlace", Put)
+    -- The game's windows (the map too), which another addon may drag: where one is drawn is kept for that drag.
+    if entry.client or entry.quests then
+        local drags = ns.windowEdit
+        ns.Sched.OnMove(frame, function()
+            drags.KeepDrawn(frame)
+            shown()
+        end)
+        ns.HookMethod(frame, "StartMoving", drags.ForeignDragStart)
+        ns.HookMethod(frame, "StopMovingOrSizing", drags.ForeignDragStop)
+    else
+        ns.Sched.OnMove(frame, shown)
+    end
 end
 
 local MAP_ENTRY = WINDOWS[5]
@@ -282,7 +233,7 @@ PlaceAll = function()
             Apply(entry)
         end
         -- Also off again: a strip made earlier goes.
-        if frame and (IsFree(entry) or strips[frame]) then Strip(entry) end
+        if frame and (IsFree(entry) or strips[frame]) then ns.windowEdit.Strip(entry) end
     end
     if ns.SyncWindowLocks then ns.SyncWindowLocks() end
 end
@@ -781,6 +732,8 @@ ns.windowEdit = {
     ShowHandle = ShowHandle, Set = Set, DialogKeys = DialogKeys, PlaceOf = PlaceOf, SetFree = SetFree, SetPlace = SetPlace,
     Leader = Leader, SizeKey = SizeKey, DrawnSize = DrawnSize, SaveFrom = SaveFrom,
     HideDialog = function() if dialog then dialog:Hide() end end,
+    -- The drags (UI/WindowDrags.lua): the tables they keep with us.
+    Moving = moving, EntryOf = entryOf, Strips = strips, ClampWas = clampWas, STRIP_RIGHT = STRIP_RIGHT, STRIP_H = STRIP_H,
 }
 
 -- The map's lock and option switch its Movable anytime too.

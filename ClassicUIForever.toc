@@ -69,6 +69,7 @@ UI\WindowList.lua
 UI\GameSpot.lua
 UI\WindowCloser.lua
 UI\WindowHandles.lua
+UI\WindowDrags.lua
 UI\WindowLayouts.lua
 UI\WindowsEditMode.lua
 UI\WindowLocks.lua
