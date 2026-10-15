@@ -100,16 +100,26 @@ end
 -- centering one, by its own anchor or by the offset on UIParent's) moves ours by as much. Read from where it is drawn,
 -- on its line, less Era's step left where the sheet stands at Era's spot; kept while no game window is up.
 local ERA_LEFT = 16
-local shift = 0
+local shift, shiftFrom = 0, nil
 local function Learn(left)
     local panel = _G.GetUIPanel and _G.GetUIPanel("left")
     if not (panel and panel:IsVisible()) or (ns.FramePlaced and ns.FramePlaced(panel)) or ns.MoverHolds(panel) then return end
+    -- The loot window is the game's left panel too, at its own edit mode spot (on the line, far right): never the row's.
+    local name = panel.GetName and panel:GetName()
+    if ns.WINDOW_FLOATS and ns.WINDOW_FLOATS[name or ""] then return end
     if (ns.WindowMoving and ns.WindowMoving(panel)) or ns.GameWindowOffLine(panel) then return end
     local x, k = Plain(panel:GetLeft()), ns.WindowRatio(panel)
     if not (x and k) then return end
     local era = ns.GameWindowAtEra(panel) and ERA_LEFT or 0
     shift = math.floor(x * k + era - left - (Offset(panel, "xoffset") or 0) + 0.5)
+    shiftFrom = name
 end
+
+-- Reset windows: the row starts where the game's layout says until a game window teaches it again.
+function ns.ForgetRowShift() shift, shiftFrom = 0, nil end
+
+-- For the dev probe (windowrow): the shift and the window it was last learned from.
+function ns.GameRowShift() return shift, shiftFrom end
 
 -- Where the game's row of windows starts, in UIParent units: left, and top (down from the screen's top, negative).
 -- Its layout's own values, which a layout addon may change, and the shift its left window was last seen at.

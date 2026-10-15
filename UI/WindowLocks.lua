@@ -189,6 +189,7 @@ ns.SyncWindowLocks = SyncLocks
 -- Every window back to its own size and spot (the options' Reset windows); locks stay. Sizes first, so each returns
 -- to the row at its own scale.
 function ns.ResetAllWindows()
+    ns.ForgetRowShift()
     local scales = W.Scales()
     for _, entry in ipairs(W.WINDOWS) do
         if not entry.piece then scales[W.SizeKey(entry)] = nil end

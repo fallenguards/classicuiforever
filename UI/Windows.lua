@@ -25,6 +25,7 @@ local LEAVE_OPEN = { PlayerSpellsFrame = true }
 local BESIDE = { CharacterFrame = true, MacroFrame = true }
 -- Client windows that float over ours, closing none and taking no room (loot: at the cursor or its edit mode place, as Era).
 local FLOATS = { LootFrame = true }
+ns.WINDOW_FLOATS = FLOATS
 -- Era's panel rule: a window opened where another stands closes it only when neither can be pushed aside (both
 -- pushable 0); otherwise they stand side by side. Ours carry Era's numbers (ns.RegisterClassicWindow), the game's its own.
 local function Pushable(frame)
