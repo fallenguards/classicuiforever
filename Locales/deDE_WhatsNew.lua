@@ -3,6 +3,18 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN37_1_TITLE"] = "Optionen in zwei Spalten"
+L["WN37_1_TEXT"] = "Die Optionen (/fcui) listen ihre Seiten links, mit der Suche, und zeigen die Seite rechts. Keine wählen und Optionen zurücksetzen gelten je Seite oder für alle, und Fenster zurücksetzen bringt jedes Fenster auf seine eigene Größe und Stelle zurück."
+L["WN37_2_TITLE"] = "Taschenleiste"
+L["WN37_2_TEXT"] = "Wähle Taschenleiste in den Optionen (/fcui) unter Taschenfenster: ausgeblendet, nur bis Taschen offen sind oder beim Überfahren, oder nur Rucksack, wobei ein kleiner Pfeil neben dem Rucksack, sichtbar solange die Maus darüber ist, die Taschen ausklappt."
+L["WN37_3_TITLE"] = "Leiste 2 neben Leiste 1"
+L["WN37_3_TEXT"] = "Wähle Leiste 2: rechts von Leiste 1 auf dem Band, oder links, in den Optionen (/fcui) unter Klassische Leiste: Leiste 2 an ihrem Standardplatz setzt die Steinfassungen des Bands neben Leiste 1 fort, mit dem Rest des Bands nach beiden."
+L["WN37_4_TITLE"] = "Optionsmenü des Zauberbuchs"
+L["WN37_4_TEXT"] = "Die Suchzeile des Zauberbuchs hat ein Optionsmenü: Passive ausblenden, Ähnliche Zauber in Aufklappmenüs gruppieren (sie lassen sich auch im Kampf auf die Leisten ziehen) und Alle Zauberränge anzeigen. Schalte sie dort ein, oder in den Optionen (/fcui) unter Zauberbuch."
+L["WN37_5_TITLE"] = "Fehlerbehebungen"
+L["WN37_5_TEXT"] = "Angriffe und Befehle eines Begleiters lassen sich im Kampf aus dem Begleiterreiter ziehen. Das Zauberbuch fliegt nach einem Kampf mit offenem Beutefenster nicht mehr weg, ein im Kampf geöffnetes Berufsfenster zeigt seine Kästen, das Ziehen der Karte mit einem Kartenaddon behält die Karte, und das Leuchten beim Überfahren eines Namensplaketts erlischt, wenn die Maus geht. Sieben neue Fragen in den FAQ."
+L["WN37_6_TITLE"] = "Fenster"
+L["WN37_6_TEXT"] = "Spielfenster, die ein Fensterbeweger hält, bleiben ihm überlassen. Ein Spielfenster schließt ein anderes nur, wenn beide von der Art sind, die Era schloss, die übrigen bleiben stehen, während eines aus der Reihe gezogen oder vergrößert wird, und ein Zurücksetzen stellt ein Spielfenster wieder auf seinen Platz."
 L["WN36_1_TITLE"] = "Vermächtnisbäume nebeneinander"
 L["WN36_1_TEXT"] = "Schalte in den Optionen (/fcui) unter Vermächtnisfenster Drei Bäume nebeneinander ein, um die drei Bäume des Vermächtnisfensters auf einmal zu sehen, mit einem Übernehmen für alle."
 L["WN36_2_TITLE"] = "Minikartentasten drücken sich"

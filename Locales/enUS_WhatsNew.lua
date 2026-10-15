@@ -2,6 +2,18 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN37_1_TITLE"] = "Options in two panes"
+L["WN37_1_TEXT"] = "The options (/fcui) list their pages on the left, with the search, and show the page on the right. Toggle none and Reset toggles work per page or for all, and Reset windows puts every window back to its own size and spot."
+L["WN37_2_TITLE"] = "Bag bar"
+L["WN37_2_TEXT"] = "Pick Bag bar in the options (/fcui), under Bag windows: hidden, shown only until bags are open or on hover, or backpack only, where a small arrow beside the backpack, seen while the mouse is over it, unfolds the bags."
+L["WN37_3_TITLE"] = "Bar 2 beside bar 1"
+L["WN37_3_TEXT"] = "Pick Bar 2: right of bar 1 on the band, or left, in the options (/fcui), under Classic bar: bar 2 at its default spot continues the band's stone sockets beside bar 1, with the rest of the band after both."
+L["WN37_4_TITLE"] = "Spellbook options menu"
+L["WN37_4_TEXT"] = "The spellbook's search row has an options menu: Hide passives, Group similar spells on flyouts (they drag to the bars in a fight too) and Show all spell ranks. Turn them on there, or in the options (/fcui) under Spellbook."
+L["WN37_5_TITLE"] = "Fixes"
+L["WN37_5_TEXT"] = "A pet's attacks and commands drag from the pet tab in a fight. The spellbook no longer flies off after a fight with the loot window open, a profession window opened in a fight shows its boxes, dragging the map with a map addon keeps the map, and the nameplate hover glow clears when the mouse leaves. Seven new questions in the FAQ."
+L["WN37_6_TITLE"] = "Windows"
+L["WN37_6_TEXT"] = "Game windows a window mover holds are left to it. One game window closes another only when both are of the kind Era closed, the rest stay put while one is dragged or sized out of the row, and a reset puts a game window back on its slot."
 L["WN36_1_TITLE"] = "Legacy trees side by side"
 L["WN36_1_TEXT"] = "Turn on Three trees side by side in the options (/fcui), under Legacy window, to see the Legacy window's three trees at once, with one Apply for all of them."
 L["WN36_2_TITLE"] = "Minimap buttons press"

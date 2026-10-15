@@ -3,6 +3,18 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN37_1_TITLE"] = "Options en deux volets"
+L["WN37_1_TEXT"] = "Les options (/fcui) listent leurs pages à gauche, avec la recherche, et affichent la page à droite. Aucune option et Réinitialiser les options agissent par page ou pour toutes, et Réinitialiser les fenêtres remet chaque fenêtre à sa taille et à sa place."
+L["WN37_2_TITLE"] = "Barre des sacs"
+L["WN37_2_TEXT"] = "Choisissez Barre des sacs dans les options (/fcui), sous Fenêtres de sacs : masquée, affichée seulement jusqu'à l'ouverture des sacs ou au survol, ou sac à dos seul, où une petite flèche à côté du sac à dos, visible tant que la souris le survole, déplie les sacs."
+L["WN37_3_TITLE"] = "Barre 2 à côté de la barre 1"
+L["WN37_3_TEXT"] = "Choisissez Barre 2 : à droite de la barre 1 sur la bande, ou à gauche, dans les options (/fcui), sous Barre classique : la barre 2 à son emplacement par défaut prolonge les logements de pierre de la bande à côté de la barre 1, le reste de la bande après les deux."
+L["WN37_4_TITLE"] = "Menu d'options du grimoire"
+L["WN37_4_TEXT"] = "La ligne de recherche du grimoire a un menu d'options : Masquer les passifs, Grouper les sorts semblables en menus déroulants (ils se glissent aussi sur les barres en combat) et Afficher tous les rangs de sort. Activez-les là, ou dans les options (/fcui) sous Grimoire."
+L["WN37_5_TITLE"] = "Corrections"
+L["WN37_5_TEXT"] = "Les attaques et ordres du familier se glissent depuis l'onglet du familier en combat. Le grimoire ne s'envole plus après un combat avec la fenêtre de butin ouverte, une fenêtre de métier ouverte en combat affiche ses cadres, déplacer la carte avec un addon de carte garde la carte, et la lueur de survol d'une plaque de nom s'éteint quand la souris part. Sept nouvelles questions dans la FAQ."
+L["WN37_6_TITLE"] = "Fenêtres"
+L["WN37_6_TEXT"] = "Les fenêtres du jeu qu'un déplaceur de fenêtres tient lui sont laissées. Une fenêtre du jeu n'en ferme une autre que si les deux sont du genre qu'Era fermait, les autres restent en place quand l'une est glissée ou redimensionnée hors de la rangée, et une réinitialisation remet une fenêtre du jeu sur son emplacement."
 L["WN36_1_TITLE"] = "Arbres de l'Héritage côte à côte"
 L["WN36_1_TEXT"] = "Activez Trois arbres côte à côte dans les options (/fcui), sous Fenêtre de l'Héritage, pour voir à la fois les trois arbres de la fenêtre de l'Héritage, avec un seul Appliquer pour tous."
 L["WN36_2_TITLE"] = "Les boutons de la minicarte s'enfoncent"

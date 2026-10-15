@@ -2,6 +2,27 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.29.0] - 2026-10-15
+
+### Added
+- The options window (/fcui) in two panes: its pages listed on the left with the search, the page shown on the right. Toggle none and Reset toggles for the page or for all pages, asking first, and Reset windows, which puts every window back to its own size and spot (#161).
+- Seven new questions in the FAQ, in every language: ten buttons on bar 1, the gryphons, the XP bar, the bar size, the button glow, the quest tracker and the nameplates.
+- Bag bar, under Bag windows in the options: shown, hidden, shown only until bags are open or on hover, or backpack only, where the bags fold away and a small arrow beside the backpack, seen while the mouse is over it, unfolds them. On the classic bar the band closes up over hidden or folded bags and their sockets fade with them otherwise; the bags fade in and out, and a pick made in a fight answers in it (#172, #128, #117).
+- Bar 2 right or left of bar 1 on the band, under Classic bar in the options: bar 2 at its default spot continues the band's stone sockets beside bar 1, at bar 1's icon size, with the page arrows, micro menu and bags after both (#122).
+- The spellbook's options menu, beside its search: Hide passives, Group similar spells on flyouts (they drag to the bars in a fight too) and Show all spell ranks.
+- Game windows a window mover holds are left to it; the addon's locks, handles and row stand aside from them.
+
+### Changed
+- One game window closes another only when both are of the kind Era closed (the character window and the spellbook, not the map); the rest stay put while one is dragged or sized out of the row, and a game window's reset puts it back on its slot even with one of ours there.
+- My Secondary Name follows Hide last names both ways; a fresh install needs no name repairs.
+
+### Fixed
+- A pet's attacks and commands drag to the action bars from the pet tab in a fight, from copies kept on the bonus pages' slots.
+- The spellbook no longer flies to the right of the screen after a fight with the loot window open: the loot window never teaches the row where the game's windows start, and Reset windows forgets a start it learned.
+- A profession window opened in a fight shows its list and detail boxes at once; before, it stood bare until the fight ended, and flashed bare on its first open.
+- Dragging the map with a map addon no longer loses the map or errors: the addon's move watch had left the map with no anchor, which that addon then saved (#173).
+- The nameplate hover glow clears when the mouse leaves the unit.
+
 ## [0.28.0] - 2026-10-14
 
 ### Added

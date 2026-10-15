@@ -3,6 +3,18 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN37_1_TITLE"] = "Opzioni in due riquadri"
+L["WN37_1_TEXT"] = "Le opzioni (/fcui) elencano le pagine a sinistra, con la ricerca, e mostrano la pagina a destra. Nessuna opzione e Ripristina opzioni valgono per pagina o per tutte, e Ripristina finestre riporta ogni finestra alla propria dimensione e posizione."
+L["WN37_2_TITLE"] = "Barra delle borse"
+L["WN37_2_TEXT"] = "Scegli Barra delle borse nelle opzioni (/fcui), sotto Finestre delle borse: nascosta, visibile solo finché le borse sono aperte o al passaggio del mouse, o solo lo zaino, dove una piccola freccia accanto allo zaino, visibile mentre il mouse è sopra, apre le borse."
+L["WN37_3_TITLE"] = "Barra 2 accanto alla barra 1"
+L["WN37_3_TEXT"] = "Scegli Barra 2: a destra della barra 1 sulla fascia, o a sinistra, nelle opzioni (/fcui), sotto Barra classica: la barra 2 nella sua posizione predefinita continua gli alloggi di pietra della fascia accanto alla barra 1, con il resto della fascia dopo entrambe."
+L["WN37_4_TITLE"] = "Menu delle opzioni del libro degli incantesimi"
+L["WN37_4_TEXT"] = "La riga di ricerca del libro degli incantesimi ha un menu delle opzioni: Nascondi passivi, Raggruppa incantesimi simili nei menu a comparsa (si trascinano sulle barre anche in combattimento) e Mostra tutti i gradi degli incantesimi. Attivali lì, o nelle opzioni (/fcui) sotto Libro degli incantesimi."
+L["WN37_5_TITLE"] = "Correzioni"
+L["WN37_5_TEXT"] = "Gli attacchi e i comandi del famiglio si trascinano dalla scheda del famiglio in combattimento. Il libro degli incantesimi non vola più via dopo un combattimento con la finestra del bottino aperta, una finestra di professione aperta in combattimento mostra i suoi riquadri, trascinare la mappa con un addon per le mappe mantiene la mappa, e il bagliore al passaggio su una targhetta si spegne quando il mouse se ne va. Sette nuove domande nelle FAQ."
+L["WN37_6_TITLE"] = "Finestre"
+L["WN37_6_TEXT"] = "Le finestre del gioco tenute da un addon che sposta le finestre restano a lui. Una finestra del gioco ne chiude un'altra solo quando entrambe sono del tipo che Era chiudeva, le altre restano ferme mentre una viene trascinata o ridimensionata fuori dalla fila, e un ripristino rimette una finestra del gioco al suo posto."
 L["WN36_1_TITLE"] = "Alberi dell'Eredità affiancati"
 L["WN36_1_TEXT"] = "Attiva Tre alberi affiancati nelle opzioni (/fcui), sotto Finestra dell'Eredità, per vedere insieme i tre alberi della finestra dell'Eredità, con un solo Applica per tutti."
 L["WN36_2_TITLE"] = "I pulsanti della minimappa si premono"

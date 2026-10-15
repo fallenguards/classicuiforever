@@ -3,6 +3,18 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN37_1_TITLE"] = "Opciones en dos paneles"
+L["WN37_1_TEXT"] = "Las opciones (/fcui) listan sus páginas a la izquierda, con la búsqueda, y muestran la página a la derecha. Ninguna opción y Restablecer opciones actúan por página o para todas, y Restablecer ventanas devuelve cada ventana a su propio tamaño y sitio."
+L["WN37_2_TITLE"] = "Barra de bolsas"
+L["WN37_2_TEXT"] = "Elige Barra de bolsas en las opciones (/fcui), en Ventanas de bolsas: oculta, visible solo hasta abrir las bolsas o al pasar el ratón, o solo la mochila, donde una flecha pequeña junto a la mochila, visible mientras el ratón está sobre ella, despliega las bolsas."
+L["WN37_3_TITLE"] = "Barra 2 junto a la barra 1"
+L["WN37_3_TEXT"] = "Elige Barra 2: a la derecha de la barra 1 en la banda, o a la izquierda, en las opciones (/fcui), en Barra clásica: la barra 2 en su sitio predeterminado continúa los huecos de piedra de la banda junto a la barra 1, con el resto de la banda tras ambas."
+L["WN37_4_TITLE"] = "Menú de opciones del libro de hechizos"
+L["WN37_4_TEXT"] = "La fila de búsqueda del libro de hechizos tiene un menú de opciones: Ocultar pasivos, Agrupar hechizos similares en desplegables (también se arrastran a las barras en combate) y Mostrar todos los rangos de hechizo. Actívalos ahí, o en las opciones (/fcui) en Libro de hechizos."
+L["WN37_5_TITLE"] = "Correcciones"
+L["WN37_5_TEXT"] = "Los ataques y órdenes de la mascota se arrastran desde la pestaña de mascota en combate. El libro de hechizos ya no sale volando tras un combate con la ventana de botín abierta, una ventana de profesión abierta en combate muestra sus recuadros, arrastrar el mapa con un addon de mapas conserva el mapa, y el brillo al pasar el ratón sobre una placa de nombre se apaga cuando el ratón se va. Siete preguntas nuevas en las FAQ."
+L["WN37_6_TITLE"] = "Ventanas"
+L["WN37_6_TEXT"] = "Las ventanas del juego que sostiene un movedor de ventanas se le dejan a él. Una ventana del juego cierra otra solo cuando ambas son del tipo que Era cerraba, las demás se quedan en su sitio mientras una se arrastra o se redimensiona fuera de la fila, y un restablecimiento devuelve una ventana del juego a su hueco."
 L["WN36_1_TITLE"] = "Árboles de Legado en paralelo"
 L["WN36_1_TEXT"] = "Activa Tres árboles en paralelo en las opciones (/fcui), en Ventana de Legado, para ver a la vez los tres árboles de la ventana de Legado, con un solo Aplicar para todos."
 L["WN36_2_TITLE"] = "Los botones del minimapa se pulsan"
