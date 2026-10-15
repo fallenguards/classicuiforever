@@ -25,6 +25,12 @@ local function RecentAllies()
     return tab and tab:GetText() or _G.CONTACTS_RECENT_ALLIES_TITLE or ""
 end
 
+-- The game's own label (its global string), or the name on a client without it.
+local function G(name) return _G[name] or name end
+-- An option named "Label: item": either half.
+local function Before(text) return text:match("^(.-):") or text end
+local function After(text) return text:match(":%s*(.+)$") or text end
+
 -- Question, answer, and the answer's values. ask: the question's values (else the addon's name). on = "forever" or
 -- on = "retail": that client's alone.
 local FAQ = {
@@ -58,10 +64,26 @@ local FAQ = {
         function() return L["OPT_reagentBagRound"], L["OPT_reagentBagSlot"] end },
     { "FAQ_REAGENT_Q", "FAQ_REAGENT_RETAIL_A", on = "retail", function() return L["OPT_reagentBagSlot"] end },
     { "FAQ_BARS_Q", "FAQ_BARS_A" },
+    -- The band follows Action Bar 1's own edit mode settings.
+    { "FAQ_TENBUTTONS_Q", "FAQ_TENBUTTONS_A", function()
+        return G("HUD_EDIT_MODE_SETTING_ACTION_BAR_NUM_ICONS"), G("HUD_EDIT_MODE_SETTING_ACTION_BAR_ICON_SIZE"),
+            L["OPT_classicBarSize"], L["GROUP_ACTION_BARS"]
+    end },
+    { "FAQ_GRYPHONS_Q", "FAQ_GRYPHONS_A", function()
+        return L["GROUP_ACTION_BARS"], Before(L["OPT_hideGryphonLeft"]), Before(L["OPT_hideGryphonRight"]),
+            After(L["OPT_hideGryphonLeft"])
+    end },
+    { "FAQ_XPBAR_Q", "FAQ_XPBAR_A", function() return L["BAR_HIDE_THIS_BAR"] end },
     { "FAQ_MOVE_Q", "FAQ_MOVE_A", function() return L["UI_CLASSICUI_FOREVER_WINDOWS"] end },
+    { "FAQ_SIZE_Q", "FAQ_SIZE_A", function() return L["UI_CLASSICUI_FOREVER_WINDOWS"], L["OPT_classicBarSize"] end },
     { "FAQ_SETTING_Q", "FAQ_SETTING_A", function() return L["OPTWIN_SEARCH_TOGGLES"] end },
     { "FAQ_FOREVER_Q", "FAQ_FOREVER_A", on = "forever" },
     { "FAQ_OWNLOOK_Q", "FAQ_OWNLOOK_A", on = "retail" },
+    { "FAQ_GLOW_Q", "FAQ_GLOW_A",
+        function() return L["GROUP_UNIT_FRAMES"], L["OPT_hideThreatGlow"], L["OPT_hideCombatGlow"] end },
+    { "FAQ_TRACKER_Q", "FAQ_TRACKER_A", function() return L["GROUP_QUESTS"], Before(L["OPT_questTracker"]) end },
+    { "FAQ_PLATES_Q", "FAQ_PLATES_A",
+        function() return G("NAMEPLATE_OPTIONS_LABEL"), L["OPTWIN_NAME_TEXT_SIZE"], L["GROUP_NAMEPLATES"] end },
     { "FAQ_OTHER_ADDON_Q", "FAQ_OTHER_ADDON_A" },
 }
 for i = #FAQ, 1, -1 do

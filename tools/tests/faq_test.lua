@@ -38,7 +38,8 @@ local chunk = source:sub(from, to - 1)
 local function Load(forever)
     local L = setmetatable({}, { __index = function(_, key) return key end })
     local env = { L = L, ns = { OnForever = function() return forever end }, table = table, _G = {},
-        KeyOf = function() return "key" end, RecentAllies = function() return "allies" end }
+        KeyOf = function() return "key" end, RecentAllies = function() return "allies" end,
+        G = function(name) return name end, Before = function(text) return text end, After = function(text) return text end }
     return assert(load(chunk .. "\nreturn FAQ", "faq", "t", env))()
 end
 
@@ -57,7 +58,8 @@ Check(retail.FAQ_QUICKJOIN_A and not forever.FAQ_QUICKJOIN_A, "the Quick Join ta
 Check(retail.FAQ_RETAILBUTTONS_A and not forever.FAQ_RETAILBUTTONS_A, "retail's own micro buttons are retail's alone")
 Check(forever.FAQ_LFG_A and not retail.FAQ_LFG_A and retail.FAQ_LFG_RETAIL_A, "each client has its own group finder answer")
 Check(forever.FAQ_REAGENT_A and not retail.FAQ_REAGENT_A and retail.FAQ_REAGENT_RETAIL_A, "each client has its own reagent bag answer")
-for _, shared in ipairs({ "FAQ_PROFESSIONS_A", "FAQ_COLLECTIONS_A", "FAQ_BARS_A", "FAQ_MOVE_A", "FAQ_SETTING_A", "FAQ_OTHER_ADDON_A" }) do
+for _, shared in ipairs({ "FAQ_PROFESSIONS_A", "FAQ_COLLECTIONS_A", "FAQ_BARS_A", "FAQ_MOVE_A", "FAQ_SETTING_A", "FAQ_OTHER_ADDON_A",
+    "FAQ_TENBUTTONS_A", "FAQ_GRYPHONS_A", "FAQ_XPBAR_A", "FAQ_SIZE_A", "FAQ_GLOW_A", "FAQ_TRACKER_A", "FAQ_PLATES_A" }) do
     Check(forever[shared] and retail[shared], shared .. " shows on both clients")
 end
 
@@ -68,7 +70,8 @@ local function Count(text)
     return n
 end
 local english = Strings("Locales/enUS_Help.lua")
-for _, path in ipairs({ "Locales/enUS_Help.lua", "Locales/deDE.lua", "Locales/esES.lua", "Locales/frFR.lua", "Locales/itIT.lua" }) do
+for _, path in ipairs({ "Locales/enUS_Help.lua", "Locales/deDE_Help.lua", "Locales/esES_Help.lua", "Locales/frFR_Help.lua",
+    "Locales/itIT_Help.lua" }) do
     local strings = Strings(path)
     for _, list in ipairs({ Load(true), Load(false) }) do
         for _, item in ipairs(list) do

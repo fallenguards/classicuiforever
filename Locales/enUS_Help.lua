@@ -1,7 +1,7 @@
 local _, ns = ...
 local L = ns.L
 
--- Options/HelpPanes.lua: the FAQ and Support tabs; English beside Locales/enUS.lua.
+-- Options/HelpPanes.lua: the FAQ and Support pages; English beside Locales/enUS.lua.
 L["FAQ_CAPTION"] = "Common questions, and where things went."
 L["FAQ_SEARCH"] = "Search questions"
 L["FAQ_NONE"] = "No question matches."
@@ -20,6 +20,20 @@ L["FAQ_REAGENT_Q"] = "Where is my reagent bag?"
 L["FAQ_REAGENT_A"] = "It is the small round bag between the key ring and your last bag, shown while the mouse is over your bags. To keep it in view, pick \"%s\", or \"%s\" for a slot like the other bags."
 L["FAQ_BARS_Q"] = "Where are action bars 6 to 8?"
 L["FAQ_BARS_A"] = "1.x had five bars. Bars 6 to 8 are the game's own: turn them on or off in its Options under Action Bars."
+L["FAQ_TENBUTTONS_Q"] = "Why does my main bar show 10 buttons, or the wrong size?"
+L["FAQ_TENBUTTONS_A"] = "The band follows Action Bar 1's settings in edit mode: \"%s\" and \"%s\". \"%s\" on the \"%s\" page gives 1.x's smaller buttons."
+L["FAQ_GRYPHONS_Q"] = "How do I hide the gryphons?"
+L["FAQ_GRYPHONS_A"] = "On the \"%s\" page, set \"%s\" or \"%s\" to \"%s\". In edit mode each gryphon is a piece of its own, to move or hide."
+L["FAQ_XPBAR_Q"] = "Can I hide the experience bar or move it off the band?"
+L["FAQ_XPBAR_A"] = "Yes, in edit mode. Click the experience or reputation bar: it can be dragged off the band, and its box has \"%s\"."
+L["FAQ_SIZE_Q"] = "Why are the windows smaller than the game's? Can I make them bigger?"
+L["FAQ_SIZE_A"] = "They are Classic Era's own sizes. Click the lock in a window's title bar and drag the grip in its corner, or size it in edit mode under \"%s\". The bars follow \"%s\" and the size in each bar's edit mode box."
+L["FAQ_GLOW_Q"] = "How do I turn off the red glow on my frames?"
+L["FAQ_GLOW_A"] = "On the \"%s\" page: \"%s\" for the red glow when something is on you, \"%s\" for the pulse on your player frame while you attack."
+L["FAQ_TRACKER_Q"] = "Can I get the old quest tracker back?"
+L["FAQ_TRACKER_A"] = "Yes. On the \"%s\" page, \"%s\" picks its look, Classic Era's quest watch among them."
+L["FAQ_PLATES_Q"] = "How do I make nameplates bigger?"
+L["FAQ_PLATES_A"] = "Their size is the game's own, under \"%s\" in its Options. \"%s\" on the \"%s\" page changes only the name."
 L["FAQ_MOVE_Q"] = "Can I move windows?"
 L["FAQ_MOVE_A"] = "Yes, out of combat. Hover a window's title bar and click its lock, then drag it by the title. Or place windows in edit mode under \"%s\". The red button beside the lock puts a window back where it opens by default."
 L["FAQ_SETTING_Q"] = "Can I change how something looks or works?"
