@@ -1,7 +1,8 @@
 local _, ns = ...
 local L = ns.L
 
--- The Profiles tab: the character's profile picked from a list, plus new, copy, rename and delete (Core/Profiles.lua).
+-- The Profiles page: the character's profile picked from a list, plus new, copy, rename and delete (Core/Profiles.lua),
+-- and the classic edit mode layout.
 
 local O = ns.options
 local ROW = 24
@@ -79,28 +80,44 @@ local BUTTONS = {
         function() StaticPopup_Show("FCUI_PROFILE_DELETE", ns.ProfileName(), nil, ns.ProfileName()) end, true },
 }
 
--- On the options frame: caption over buttons where the search and bulk buttons stand; rows on their own scroll child
--- that the tab swaps into the list. setRange(height) sizes the list's scroll bar.
-function O.ProfilesPane(frame, search, list, setRange, tip)
+local function ClassicLayout()
+    if ns.ClassicLayoutActive() then
+        StaticPopup_Show("FCUI_LAYOUT_RESET")
+    else
+        ns.CreateClassicLayout()
+    end
+end
+
+-- At the page's top (top): caption over the buttons; rows on their own scroll child that the page swaps into the list.
+-- setRange(height) sizes the list's scroll bar.
+function O.ProfilesPane(frame, top, list, setRange)
     local pane = ns.NewFrame("Frame", nil, frame)
     pane:SetAllPoints(frame)
     pane:Hide()
+    pane.headH = 52
     local caption = pane:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    caption:SetPoint("TOP", search, "TOP", 0, -3)
+    caption:SetPoint("TOPLEFT", top, "TOPLEFT", 2, 0)
     local child = ns.NewFrame("Frame", nil, list)
     child:SetSize(list:GetWidth(), 1)
     child:Hide()
     pane.child = child
     local rows, named = {}, {}
-    local x = -(#BUTTONS * 84 - 4) / 2
-    for i, spec in ipairs(BUTTONS) do
+    local x = 0
+    for _, spec in ipairs(BUTTONS) do
         local button = ns.PanelButton(pane, spec[1], 80)
-        button:SetPoint("TOPLEFT", search, "BOTTOM", x + (i - 1) * 84, -6)
+        button:SetPoint("TOPLEFT", top, "TOPLEFT", x, -20)
         button:SetScript("OnClick", spec[3])
         button.label, button.tooltip = spec[1], spec[2]
-        ns.AttachTip(button, tip)
+        ns.AttachTip(button, O.OPTION_TIP)
         if spec[4] then named[#named + 1] = button end
+        x = x + 84
     end
+    -- Not a profile's: the edit mode layout the bars stand in, at the row's end.
+    local layout = ns.PanelButton(pane, L["OPTWIN_CLASSIC_LAYOUT"], 130)
+    layout:SetPoint("TOPLEFT", top, "TOPLEFT", x + 16, -20)
+    layout:SetScript("OnClick", ClassicLayout)
+    layout.label, layout.tooltip = L["OPTWIN_CLASSIC_LAYOUT"], L["OPTWIN_ADDS_AN_EDIT_MODE_LAYOUT"]
+    ns.AttachTip(layout, O.OPTION_TIP)
 
     local function Row(i)
         local row = rows[i]

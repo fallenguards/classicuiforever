@@ -53,6 +53,13 @@ ns.db = { classicBarSize = true }
 ns.ResetToggles()
 Check(ns.db.classicBarSize == false, "at another interface size the bar size is the default")
 
+-- One page's Reset toggles: that page's boxes alone, the bar size only when the page holds it.
+uiScale = 0.9
+ns.db = { classicBar = false, classicBarSize = false, hideCombatGlow = true }
+ns.ResetToggles({ hideCombatGlow = true })
+Check(ns.db.hideCombatGlow == false and ns.db.classicBar == false and ns.db.classicBarSize == false,
+    "a page's reset leaves the other pages' boxes")
+
 -- Settings gone (a reinstall): the classic layout at Era's size gets the 36 px bar it was laid for, once.
 local function FreshLogin(scale, layout)
     uiScale, classicLayout, changed = scale, layout, nil

@@ -108,7 +108,6 @@ ns.DB_DEFAULTS = {
     nameBoxPlayer = false, nameBoxTarget = true, nameBoxFocus = true,
     profBookBig = false,
     profBookBands = false,
-    searchOnlyMatches = false,
     keyRingFlat = false,
     keyRingSnap = false,
     tradeSkillFull = false,

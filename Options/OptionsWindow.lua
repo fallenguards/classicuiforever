@@ -1,789 +1,478 @@
 local _, ns = ...
 local L = ns.L
 
--- The /fcui options dialog (ticked is the classic look), also the Settings page canvas.
+-- The /fcui options window: the pages down the left (the toggles' groups, then Profiles, FAQ and Support), the picked
+-- one on the right; typing in the search lists the matches from every page. The game's settings page shows this same
+-- window, moved in and scaled to its room.
 
 local O = ns.options
 local TITLE = O.TITLE
 local EMPTY = ns.EMPTY
-local WIDTH, ROW = 560, 24
--- Rows per column: the popout's, and the Settings page's on its fixed canvas.
-local LIST_ROWS, CANVAS_ROWS, INDENT, COLUMNS = 14, 16, 22, 2
-local C = ns.ART.CHECK
-local BTN = "Interface\\Buttons\\UI-"
--- Raw paths: no bronze swap.
-local OPTION_BOX = { set = "raw", checked = C .. "Check", disabledChecked = C .. "Check-Disabled", add = true }
--- UI-RadioButton's cells: ring, gold dot, glow, grey dot; 16 across in the 24 row.
-local RADIO = BTN .. "RadioButton"
-local OPTION_RADIO = { set = "raw", checked = RADIO, disabledChecked = RADIO, add = true, center = { 16, 16 },
-    states = { "Normal", "Highlight", "Checked", "DisabledChecked" },
-    coords = { Normal = { 0, 0.25, 0, 1 }, Checked = { 0.25, 0.5, 0, 1 }, Highlight = { 0.5, 0.75, 0, 1 },
-        DisabledChecked = { 0.75, 1, 0, 1 } } }
-O.RADIO, O.OPTION_RADIO = RADIO, OPTION_RADIO
-local RAW_ADD = { set = "raw", add = true }
-local TOPLEVEL = { toplevel = true }
-
-local function TipLabel(self) return self.label end
-local function TipBody(self) return self.tooltip end
--- White title, wrapped body; nothing without a body.
-local OPTION_TIP = { when = TipBody, text = TipLabel, r = 1, g = 1, b = 1, lines = { { TipBody, nil, nil, nil, true } } }
-local PREFERRED_TIP = { text = L["OPTWIN_WHY_GITHUB"], r = 1, g = 1, b = 1, lines = {
-    { L["OPTWIN_REPORTS_THERE_ARE_EASIER_TO"], nil, nil, nil, true },
-    { " ", nil, nil, nil, true },
-    { L["OPTWIN_YOU_NEED_A_GITHUB_ACCOUNT"], 1, 0.82, 0, true },
-} }
-
--- Not part of the classic look, so Toggle none leaves them (the minimap button leads back here), nor the radio picks.
-local NOT_IN_NONE = { minimapButton = true, welcomeNote = true, questLevels = true }
-local function InNone(key) return not NOT_IN_NONE[key] and not ns.TOGGLE_RADIO[key] end
-local NONE_PICKS = { "gameObjectiveTracker" }
-
-local window
-
--- Our standalone dialog shell, hidden: strata nil is DIALOG; opts.toplevel. Welcome and Status share it.
-function O.DialogWindow(name, y, strata, opts)
-    local frame = CreateFrame("Frame", name, UIParent, "BackdropTemplate")
-    ns.Backdrop(frame, ns.BACKDROP.DIALOG)
-    frame:SetFrameStrata(strata or "DIALOG")
-    if opts and opts.toplevel then frame:SetToplevel(true) end
-    frame:SetPoint("CENTER", UIParent, "CENTER", 0, y or 0)
-    ns.MakeDraggable(frame)
-    frame:Hide()
-    return frame
-end
-
--- Lowercased once for the search: the name side (label, keywords, its section's title) and the tooltip.
-local function Describe(row, key, label, tooltip)
-    row.key, row.label, row.tooltip = key, label, tooltip
-    row.keyLow, row.tipLow = label:lower(), (tooltip or ""):lower()
-    ns.AttachTip(row, OPTION_TIP)
-end
-O.Describe = Describe
-
--- A soft gold bar behind a matching row's label; the rest of its section is dimmed.
+local ROW, INDENT = O.ROW, O.INDENT
+local WIDTH, COLUMNS = 800, 2
+local SIDE_X, SIDE_W = 20, 166
+local PANE_X, PANE_TOP = 196, 34
+local PANE_W = WIDTH - PANE_X - 20
+local NAV_ROW, NAV_TOP = 18, 64
+-- The list inside the page box: under its title row, clear of the scroll bar.
+local LIST_X, LIST_TOP = PANE_X + 12, PANE_TOP + 38
+local LIST_W = PANE_W - 40
 local MATCH_DIM = 0.4
-local matchBar = setmetatable({}, { __mode = "k" })
-local function ShowMatch(box, on)
-    local bar = matchBar[box]
-    if not bar and on then
-        bar = box:CreateTexture(nil, "BACKGROUND")
-        bar:SetColorTexture(1, 0.82, 0, 0.16)
-        bar:SetPoint("TOPLEFT", box, "TOPLEFT", -2, -2)
-        bar:SetPoint("BOTTOMRIGHT", box.text, "BOTTOMRIGHT", 4, -4)
-        matchBar[box] = bar
-    end
-    if bar then bar:SetShown(on) end
+local LINE_COLOR = { 0.47, 0.47, 0.47, 0.63 }
+-- The 1.x options boxes: the tooltip edge in grey over a dark fill.
+local BOX_LOOK = { bg = { 0.15, 0.15, 0.15, 0.85 }, bgFirst = true, base = { 0.6, 0.6, 0.6, 1 } }
+local TOPLEVEL = { toplevel = true }
+local HIGHLIGHT = "Interface\\QuestFrame\\UI-QuestTitleHighlight"
+-- After the toggles' pages, the reading pages: title key and builder.
+local PANES = { { "OPTWIN_TAB_PROFILES", "ProfilesPane" }, { "OPTWIN_TAB_FAQ", "FaqPane" }, { "OPTWIN_TAB_SUPPORT", "SupportPane" } }
+
+local window, embedded
+
+-- keys: the toggles touched (nil: every one). Bulk writes skip ToggleChanged's per-key side effects on purpose; the
+-- reload ask runs before Refresh reads it.
+local function Finish()
+    ns.ApplyAll()
+    ns.AskReloadIfNeeded()
+    if window then window:Refresh() end
 end
 
-local function Arrow(row, kind, x)
-    local button = ns.NewFrame("Button", nil, row)
-    button:SetSize(16, 16)
-    button:SetPoint("LEFT", row, "LEFT", x, 0)
-    ns.DressStates(button, BTN .. kind .. "Button-Up", BTN .. kind .. "Button-Down", BTN .. kind .. "Button-Disabled", ns.ART.PLUS_GLOW, RAW_ADD)
+local function TurnOff(keys)
+    for _, entry in ipairs(ns.TOGGLES) do
+        local key = entry[1]
+        if (not keys or keys[key]) and O.InNone(key) then ns.db[key] = false end
+    end
+    -- A radio pick that is a classic piece: the game's own choice instead.
+    for _, key in ipairs(O.NONE_PICKS) do
+        if not keys or keys[key] then
+            for _, other in ipairs(ns.TOGGLE_RADIO[key] or EMPTY) do ns.db[other] = other == key end
+        end
+    end
+    Finish()
+end
+
+-- numbers: the number rows to put back too, through their setters so they apply live.
+local function Reset(keys, numbers)
+    ns.ResetToggles(keys)
+    for _, row in ipairs(numbers) do row.reset() end
+    Finish()
+end
+
+local function NumberRows(rows, page)
+    local out = {}
+    for _, row in ipairs(rows) do
+        if row.reset and (not page or row.page == page) then out[#out + 1] = row end
+    end
+    return out
+end
+
+ns.Popup("FCUI_ALL_NONE", {
+    text = L["OPTWIN_ALL_NONE_CONFIRM"],
+    button1 = OKAY,
+    button2 = CANCEL,
+    OnAccept = function() TurnOff(nil) end,
+})
+ns.Popup("FCUI_ALL_RESET", {
+    text = L["OPTWIN_ALL_RESET_CONFIRM"],
+    button1 = OKAY,
+    button2 = CANCEL,
+    OnAccept = function() Reset(nil, window and NumberRows(window.built.rows) or EMPTY) end,
+})
+
+local function Tip(region, label, tooltip)
+    region.label, region.tooltip = label, tooltip
+    ns.AttachTip(region, O.OPTION_TIP)
+end
+
+-- Drawn on host (a box), placed from the window's corner.
+local function Line(host, frame, x, y, w)
+    local line = host:CreateTexture(nil, "ARTWORK")
+    line:SetColorTexture(unpack(LINE_COLOR))
+    line:SetSize(w, 1)
+    line:SetPoint("TOPLEFT", frame, "TOPLEFT", x, -y)
+    return line
+end
+
+-- A page's name in the list: gold, white with the quest log's highlight while picked.
+local function NavButton(box, frame, label, y, onClick)
+    local button = ns.NewFrame("Button", nil, box)
+    button:SetSize(SIDE_W - 12, NAV_ROW)
+    button:SetPoint("TOPLEFT", frame, "TOPLEFT", SIDE_X + 6, -y)
+    local text = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    text:SetPoint("LEFT", button, "LEFT", 8, 0)
+    text:SetText(label)
+    button:SetFontString(text)
+    button:SetHighlightTexture(HIGHLIGHT, "ADD")
+    button:SetScript("OnClick", onClick)
+    function button:SetPicked(on)
+        text:SetFontObject(on and "GameFontHighlight" or "GameFontNormal")
+        if on then self:LockHighlight() else self:UnlockHighlight() end
+    end
     return button
 end
 
--- Number row (minus, value, plus, label) with the checkbox methods, so the list treats it alike.
-local function Stepper(parent, key, label, tooltip, low, high, apply)
-    local row = ns.NewFrame("Frame", nil, parent)
-    row:SetSize(24, 24)
-    row.minus = Arrow(row, "Minus", 4)
-    row.value = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    row.value:SetPoint("LEFT", row.minus, "RIGHT", 2, 0)
-    row.value:SetWidth(20)
-    row.value:SetJustifyH("CENTER")
-    row.plus = Arrow(row, "Plus", 42)
-    local text = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    text:SetPoint("LEFT", row.plus, "RIGHT", 4, 1)
-    text:SetJustifyH("LEFT")
-    text:SetWordWrap(false)
-    text:SetText(label)
-    row.text = text
-    function row:Sync()
-        local value = tonumber(ns.db[key]) or low
-        self.value:SetText(value)
-        self.minus:SetEnabled(self.on ~= false and value > low)
-        self.plus:SetEnabled(self.on ~= false and value < high)
-    end
-    function row:SetChecked() self:Sync() end
-    function row:SetEnabled(on)
-        self.on = on and true or false
-        self:Sync()
-    end
-    local function Step(by)
-        return function()
-            apply(math.max(low, math.min(high, (tonumber(ns.db[key]) or low) + by)))
-            row:Sync()
-        end
-    end
-    row.minus:SetScript("OnClick", Step(-1))
-    row.plus:SetScript("OnClick", Step(1))
-    row:EnableMouse(true)
-    Describe(row, key, label, tooltip)
-    return row
-end
-
--- A button for a mode that lasts while the options are open, not a saved setting; Done while on.
--- check: { key, label, tooltip, set } for a saved box beside it.
-local function ButtonRow(parent, key, label, tooltip, press, isOn, check)
-    local row = ns.NewFrame("Frame", nil, parent)
-    row:SetSize(24, 24)
-    local button = ns.PanelButton(row, label, check and 130 or 150)
-    button:SetPoint("LEFT", row, "LEFT", 4, 0)
-    row.button, row.text = button, button:GetFontString()
-    local box
-    if check then
-        box = ns.NewFrame("CheckButton", nil, row)
-        box:SetSize(24, 24)
-        box:SetPoint("LEFT", button, "RIGHT", 4, 0)
-        ns.DressStates(box, C .. "Up", C .. "Down", nil, C .. "Highlight", OPTION_BOX)
-        box.label, box.tooltip = check[2], check[3]
-        ns.AttachTip(box, OPTION_TIP)
-        box:SetScript("OnClick", function(self) check[4](check[1], self:GetChecked() and true or false) end)
-    end
-    function row.SetChecked()
-        local on = isOn()
-        button:SetText(on and (DONE or "Done") or label)
-        button:SetButtonState(on and "PUSHED" or "NORMAL", on)
-        if box then box:SetChecked(ns.db[check[1]] ~= false) end
-    end
-    function row.SetEnabled(_, on)
-        button:SetEnabled(on)
-        if box then box:SetEnabled(on) end
-    end
-    button:SetScript("OnClick", function() press() row:SetChecked() end)
-    Describe(row, key, label, tooltip)
-    return row
-end
-
--- ToggleChanged refreshes whichever copy of the panel is shown; a radio row only turns on.
-local function BoxClick(self)
-    ns.db[self.key] = (self.radio or self:GetChecked()) and true or false
-    ns.ToggleChanged(self.key)
-end
-
-local function Checkbox(parent, key, label, tooltip, radio)
-    local box = ns.NewFrame("CheckButton", nil, parent)
-    box:SetSize(24, 24)
-    if radio then
-        box.radio = true
-        ns.DressStates(box, RADIO, nil, nil, RADIO, OPTION_RADIO)
-    else
-        ns.DressStates(box, C .. "Up", C .. "Down", nil, C .. "Highlight", OPTION_BOX)
-    end
-    local text = box:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    text:SetPoint("LEFT", box, "RIGHT", 2, 1)
-    text:SetJustifyH("LEFT")
-    text:SetWordWrap(false)
-    text:SetText(label)
-    box.text = text
-    Describe(box, key, label, tooltip)
-    box:SetScript("OnClick", BoxClick)
-    return box
-end
-
-local DROP_W = 92
-local SWING_HANDS = { { "swingColorMain", L["OPTWIN_MAIN_HAND"] }, { "swingColorOff", L["OPTWIN_OFF_HAND"] }, { "swingColorRanged", L["OPTWIN_RANGED"] } }
-
--- Label, then the old drop down box; items(root) fills its menu.
-local function DropShell(parent, label, items)
-    local row = ns.NewFrame("Frame", nil, parent)
-    row:SetSize(24, 24)
-    local text = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    text:SetPoint("LEFT", row, "LEFT", 4, 1)
-    text:SetJustifyH("LEFT")
-    text:SetWordWrap(false)
-    text:SetText(label)
-    row.text = text
-    local dropdown = ns.NewFrame("DropdownButton", nil, row, "WowStyle1DropdownTemplate")
-    dropdown:SetWidth(DROP_W)
-    dropdown:SetPoint("LEFT", text, "RIGHT", 4, -1)
-    ns.SkinDropdown(dropdown)
-    dropdown:SetupMenu(function(_, root) items(root) end)
-    row.dropdown = dropdown
-    function row:SetChecked() self.dropdown:GenerateMenu() end
-    function row:SetEnabled(on) self.dropdown:SetEnabled(on) end
-    return row
-end
-
-local function PickToggle(key)
-    ns.db[key] = true
-    ns.ToggleChanged(key)
-end
-
-local function ToggleOn(key) return ns.db[key] == true end
-
-local function ChoiceTip(tip, choice)
-    GameTooltip_SetTitle(tip, choice.label)
-    GameTooltip_AddNormalLine(tip, choice.tip, true)
-end
-
--- A drop group's rows, label and tooltip. A row's "Label: item" names the group and the item; the first entry's dropLabel
--- and dropTip name and describe a group of plain labels. An item with words of its own shows them as its tooltip.
-local function DropGroup(field, group)
-    local rows, words, first = {}, {}, nil
+-- The toggles' pages: their groups' titles in list order.
+local function Pages()
+    local pages = {}
     for _, entry in ipairs(ns.TOGGLES) do
-        if entry[field] == group then
-            first = first or entry
-            local item = entry[2]:match(":%s*(.+)$") or entry[2]
-            rows[#rows + 1] = { key = entry[1], label = (item:gsub("^%l", string.upper)), tip = entry[3] }
-            words[#words + 1] = item .. " " .. (entry.search or "")
-        end
+        if entry.group then pages[#pages + 1] = entry.group end
     end
-    local label = first and (first.dropLabel or first[2]:match("^(.-):")) or group
-    local tip = first and (first.dropTip or first[3])
-    for _, choice in ipairs(rows) do
-        if choice.tip == tip then choice.tip = nil end
+    return pages
+end
+
+-- The page list as wide as its longest name in the game's language (Italian runs long); the window grows as much.
+local function FitNames(frame, pages)
+    local probe = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    local names = { unpack(pages) }
+    for _, spec in ipairs(PANES) do names[#names + 1] = L[spec[1]] end
+    local widest = 0
+    for _, name in ipairs(names) do
+        probe:SetText(name)
+        widest = math.max(widest, probe:GetStringWidth())
     end
-    return rows, label, tip, table.concat(words, " "):lower()
+    probe:Hide()
+    local extra = math.max(0, math.ceil(widest - (SIDE_W - 26)))
+    SIDE_W, PANE_X, WIDTH = SIDE_W + extra, PANE_X + extra, WIDTH + extra
+    LIST_X = PANE_X + 12
 end
 
-local function ItemTip(item, choice)
-    if not (choice.tip and item and item.SetOnEnter) then return end
-    item:SetOnEnter(function(button) MenuUtil.ShowTooltipEx(button, item:GetTooltipFrame(), ChoiceTip, choice) end)
-end
+-- The left side: search, then the pages' box with its All pages buttons at the foot. Returns its height.
+local function Sidebar(frame, pages)
+    local search = ns.SearchBox(frame, SIDE_W - 14, L["OPTWIN_SEARCH_TOGGLES"])
+    search:SetPoint("TOPLEFT", frame, "TOPLEFT", SIDE_X + 8, -38)
+    frame.search = search
 
--- A drop radio group as one row.
-local function DropRow(parent, group)
-    local rows, label, tip, words = DropGroup("radio", group)
-    local row = DropShell(parent, label, function(root)
-        for _, choice in ipairs(rows) do ItemTip(root:CreateRadio(choice.label, ToggleOn, PickToggle, choice.key), choice) end
-    end)
-    Describe(row, group, label, tip)
-    row.keyLow = row.keyLow .. " " .. words
-    return row
-end
-
-local function FlipToggle(key)
-    ns.db[key] = ns.db[key] ~= true
-    ns.ToggleChanged(key)
-end
-
--- Several toggles picked in one drop down, as checks (entries with checks = group).
-local function DropCheckRow(parent, group)
-    local rows, label, tip, words = DropGroup("checks", group)
-    local row = DropShell(parent, label, function(root)
-        for _, choice in ipairs(rows) do ItemTip(root:CreateCheckbox(choice.label, ToggleOn, FlipToggle, choice.key), choice) end
-    end)
-    Describe(row, group, label, tip)
-    row.keyLow = row.keyLow .. " " .. words
-    return row
-end
-
--- A setting holding one of a list's keys (choices: { key, label, tip }); apply(key, pick) saves and shows it.
--- preview(key) shows a choice while it is hovered, preview(nil) the setting again once the menu shuts.
-local function ValueDropRow(parent, key, label, tooltip, choices, apply, preview)
-    local row, shut
-    local function Hover(choice)
-        preview(choice)
-        shut = shut or ns.Sched.Job({ name = "options.preview." .. key, every = 0.2, awake = false, fn = function()
-            if row.dropdown:IsMenuOpen() then return end
-            preview(nil)
-            shut:Sleep()
-        end })
-        shut:Wake()
+    local box = ns.NewFrame("Frame", nil, frame, "BackdropTemplate")
+    ns.Backdrop(box, ns.BACKDROP.TIP16, BOX_LOOK)
+    box:SetPoint("TOPLEFT", frame, "TOPLEFT", SIDE_X, -NAV_TOP)
+    box:SetWidth(SIDE_W)
+    frame.nav = {}
+    local y = NAV_TOP + 9
+    for _, page in ipairs(pages) do
+        frame.nav[page] = NavButton(box, frame, page, y, function() frame:ShowPage(page) end)
+        y = y + NAV_ROW
     end
-    row = DropShell(parent, label, function(root)
-        for _, choice in ipairs(choices) do
-            local item = root:CreateRadio(choice.label, function(pick) return ns.db[key] == pick end,
-                function(pick) apply(key, pick) end, choice.key)
-            if (preview or choice.tip) and item and item.SetOnEnter then
-                item:SetOnEnter(function(button)
-                    if preview then Hover(choice.key) end
-                    if choice.tip then MenuUtil.ShowTooltipEx(button, item:GetTooltipFrame(), ChoiceTip, choice) end
-                end)
-                if preview then item:SetOnLeave(function() preview(nil) end) end
-            end
-        end
-    end)
-    Describe(row, key, label, tooltip)
-    return row
-end
-
--- A group's title over its toggles, in the old gold.
-local function GroupHead(parent, title, width)
-    local head = ns.NewFrame("Frame", nil, parent)
-    head:SetSize(width, ROW)
-    local text = head:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    text:SetPoint("BOTTOMLEFT", head, "BOTTOMLEFT", 2, 4)
-    text:SetText(title)
-    head:Hide()
-    return head
-end
-
--- Tabs under the window: toggles, then panes (profiles, FAQ, support); the one list scroll frame shows the tab's rows.
-local TAB_NAMES = { "OPTWIN_TAB_TOGGLES", "OPTWIN_TAB_PROFILES", "OPTWIN_TAB_FAQ", "OPTWIN_TAB_SUPPORT" }
--- The tab row under the window's foot: the art's top rows are clear, so they tuck behind our border, not under it.
-local SETTINGS_TABS_X = 11
-local SETTINGS_TABS_Y = 5
-local SETTINGS_TABS_GAP = -16
--- The reading tabs (profiles, FAQ, support) have no foot: their list runs down to this far over the window's bottom.
-local LIST_BOTTOM_MARGIN = 20
-local function AddTabs(frame, list, child, togglesOnly, listRows)
-    local function SetRange(height) frame.listBar:SetRange(math.max(0, height - list:GetHeight()), ROW) end
-    local function FitList(toggles)
-        local height = listRows * ROW
-        local top, bottom = list:GetTop(), frame:GetBottom()
-        if not toggles and top and bottom then height = math.max(height, top - bottom - LIST_BOTTOM_MARGIN) end
-        list:SetHeight(height)
+    Line(box, frame, SIDE_X + 10, y + 4, SIDE_W - 20)
+    y = y + 9
+    for _, spec in ipairs(PANES) do
+        local name = L[spec[1]]
+        frame.nav[name] = NavButton(box, frame, name, y, function() frame:ShowPage(name) end)
+        y = y + NAV_ROW
     end
-    local panes = {
-        [2] = O.ProfilesPane(frame, frame.search, list, SetRange, OPTION_TIP),
-        [3] = O.FaqPane(frame, frame.search, list, SetRange),
-        [4] = O.SupportPane(frame, frame.search, list, SetRange),
+    -- All pages: its name in the middle of the line, the line broken round it.
+    y = y + 9
+    local head = box:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    head:SetPoint("CENTER", frame, "TOPLEFT", SIDE_X + SIDE_W / 2, -y)
+    head:SetText(L["OPTWIN_ALL_PAGES"])
+    local half = head:GetStringWidth() / 2 + 6
+    Line(box, frame, SIDE_X + 10, y, SIDE_W / 2 - half - 10)
+    Line(box, frame, SIDE_X + SIDE_W / 2 + half, y, SIDE_W / 2 - half - 10)
+    y = y + 11
+    local buttons = {
+        { L["OPTWIN_TOGGLE_NONE"], L["OPTWIN_TURNS_EVERY_PIECE_OF_THE"], "FCUI_ALL_NONE" },
+        { L["OPTWIN_RESET_TOGGLES"], L["OPTWIN_PUTS_EVERY_CHECKBOX_AND_NUMBER"], "FCUI_ALL_RESET" },
+        { L["OPTWIN_RESET_WINDOWS"], L["OPTWIN_PUTS_EVERY_WINDOW_BACK"], "FCUI_WINDOWS_RESET" },
     }
-    local tabs = {}
-    local function Show(which)
-        frame.tab = which
-        local toggles = which == 1
-        for _, widget in ipairs(togglesOnly) do widget:SetShown(toggles) end
-        FitList(toggles)
-        for i, pane in pairs(panes) do
-            pane:SetShown(i == which)
-            pane.child:SetShown(i == which)
-        end
-        list:SetScrollChild(toggles and child or panes[which].child)
-        frame.listBar:SetValue(0)
-        if toggles then frame:PlaceBoxes(frame.search:GetText()) else panes[which]:Refresh() end
-        for i, tab in ipairs(tabs) do
-            if i == which then PanelTemplates_SelectTab(tab) else PanelTemplates_DeselectTab(tab) end
-        end
+    for _, spec in ipairs(buttons) do
+        local button = ns.PanelButton(box, spec[1], SIDE_W - 20)
+        button:SetPoint("TOPLEFT", frame, "TOPLEFT", SIDE_X + 10, -y)
+        button:SetScript("OnClick", function() StaticPopup_Show(spec[3]) end)
+        Tip(button, spec[1], spec[2])
+        y = y + 26
     end
-    -- On their own holder: the bottom tab skin lifts tabs anchored to their parent onto a client window's metal.
-    local holder = ns.NewFrame("Frame", nil, frame)
-    holder:SetAllPoints(frame)
-    for i, name in ipairs(TAB_NAMES) do
-        local tab = ns.NewFrame("Button", nil, holder, "PanelTabButtonTemplate")
-        tab:SetText(L[name])
-        if i == 1 then
-            tab:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", SETTINGS_TABS_X, SETTINGS_TABS_Y)
-        else
-            tab:SetPoint("LEFT", tabs[i - 1], "RIGHT", SETTINGS_TABS_GAP, 0)
-        end
-        ns.SkinBottomTab(tab)
-        tab:SetScript("OnClick", function() Show(i) end)
-        tabs[i] = tab
-    end
-    frame.panes = panes
-    Show(1)
+    box:SetHeight(y + 6 - NAV_TOP)
+    return y + 6
 end
 
--- Built at most twice: the standalone dialog and the Settings canvas.
-local function Build(canvas)
-    local width = canvas and (canvas:GetWidth() or WIDTH) or WIDTH
-    if width < WIDTH then width = WIDTH end
-    local listRows = canvas and CANVAS_ROWS or LIST_ROWS
-    local frame = canvas
-    if not frame then
-        -- HIGH, not DIALOG: on edit mode's strata its panel backing drew over our boxes.
-        frame = O.DialogWindow("ForeverClassicUIOptions", 0, "HIGH", TOPLEVEL)
-        -- The old backdrop is see-through; a dark fill keeps the list readable.
-        local fill = frame:CreateTexture(nil, "BACKGROUND", nil, -8)
-        fill:SetColorTexture(0.03, 0.03, 0.03, 0.45)
-        fill:SetPoint("TOPLEFT", frame, "TOPLEFT", 11, -12)
-        fill:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -12, 11)
-        ns.DialogHeader(frame, TITLE)
-        ns.DialogClose(frame, function() frame:Hide() end)
-    end
+-- The list's top under a reading page's header (headH), down to the box's foot.
+local function FitList(frame, headH)
+    local list = frame.list
+    ns.SetPointOnce(list, "TOPLEFT", frame, "TOPLEFT", LIST_X, -(LIST_TOP + headH))
+    list:SetSize(LIST_W, frame.listBottom - LIST_TOP - headH)
+end
 
-    -- Two scrolling columns, children indented; the bulk buttons sit between search and list.
-    local LIST_TOP, LIST_W = canvas and -76 or -110, width - 70
-    local list = ns.NewFrame("ScrollFrame", nil, frame)
-    list:SetPoint("TOPLEFT", frame, "TOPLEFT", 22, LIST_TOP)
-    list:SetSize(LIST_W, listRows * ROW)
+-- The right side: the page's box, its title, the page's own Toggle none and Reset toggles, the scrolling list; its foot
+-- level with the sidebar's (bottom).
+local function PageArea(frame, bottom)
+    local box = ns.NewFrame("Frame", nil, frame, "BackdropTemplate")
+    ns.Backdrop(box, ns.BACKDROP.TIP16, BOX_LOOK)
+    box:SetPoint("TOPLEFT", frame, "TOPLEFT", PANE_X, -PANE_TOP)
+    box:SetSize(PANE_W, bottom - PANE_TOP)
+    frame.pageBox = box
+    local title = box:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    title:SetPoint("TOPLEFT", box, "TOPLEFT", 14, -12)
+    frame.pageTitle = title
+    local reset = ns.PanelButton(box, L["OPTWIN_RESET_TOGGLES"], 110)
+    reset:SetPoint("TOPRIGHT", box, "TOPRIGHT", -12, -7)
+    reset:SetScript("OnClick", function() Reset(frame:PageKeys(), NumberRows(frame.built.rows, frame.page)) end)
+    Tip(reset, L["OPTWIN_RESET_TOGGLES"], L["OPTWIN_PAGE_RESET_TIP"])
+    local none = ns.PanelButton(box, L["OPTWIN_TOGGLE_NONE"], 110)
+    none:SetPoint("RIGHT", reset, "LEFT", -6, 0)
+    none:SetScript("OnClick", function() TurnOff(frame:PageKeys()) end)
+    Tip(none, L["OPTWIN_TOGGLE_NONE"], L["OPTWIN_PAGE_NONE_TIP"])
+    frame.pageButtons = { none, reset }
+
+    -- Where a reading page puts its caption and buttons, over its list.
+    local top = ns.NewFrame("Frame", nil, box)
+    top:SetPoint("TOPLEFT", frame, "TOPLEFT", LIST_X, -LIST_TOP)
+    top:SetSize(LIST_W, 1)
+    frame.pageTop = top
+    local list = ns.NewFrame("ScrollFrame", nil, box)
     list:SetClipsChildren(true)
+    list:EnableMouseWheel(true)
+    list:SetScript("OnMouseWheel", function(_, delta) frame.listBar:SetValue(frame.listBar:GetValue() - delta * ROW) end)
     local child = ns.NewFrame("Frame", nil, list)
     child:SetSize(LIST_W, 1)
     list:SetScrollChild(child)
-    list:EnableMouseWheel(true)
-    list:SetScript("OnMouseWheel", function(_, delta) frame.listBar:SetValue(frame.listBar:GetValue() - delta * ROW) end)
-    frame.listBar = ns.ClassicScrollBar(frame, list, function(value) list:SetVerticalScroll(value) end)
-    -- No arrows with nothing to scroll (a short profile list).
-    frame.listBar.hideWhenIdle = true
     frame.list, frame.listChild = list, child
+    frame.listBottom = bottom - 8
+    FitList(frame, 0)
+    frame.listBar = ns.ClassicScrollBar(box, list, function(value) list:SetVerticalScroll(value) end)
+    frame.listBar.hideWhenIdle = true
+end
 
-    -- boxes in list order; kids[key]: the rows under that key, in order; parentOf and depthOf by key (rows nest).
-    local boxes, kids, parentOf, depthOf = {}, {}, {}, {}
-    frame.boxes = boxes
-    local function Add(row, parent)
-        row.parent = parent
-        row.depth = parent and ((depthOf[parent] or 0) + 1) or 0
-        parentOf[row.key], depthOf[row.key] = parent, row.depth
-        boxes[#boxes + 1] = row
-        if parent then
-            local under = kids[parent]
-            if not under then
-                under = {}
-                kids[parent] = under
+-- Word starts in name, keywords or page title first, tooltip only when nothing matched those. A page shows its rows, each
+-- top-level row and its own with them a block for the columns; searching shows every page's matches with the boxes above
+-- them, each page under its title, matches lit and the boxes above dimmed.
+local function Blocks(built, text, page)
+    local words = {}
+    for word in text:gmatch("%S+") do words[#words + 1] = word:gsub("%p", "%%%0") end
+    local level, best = {}, 0
+    for _, row in ipairs(built.rows) do
+        level[row] = #words > 0 and ns.OptionMatchLevel(row, words) or 0
+        if level[row] > best then best = level[row] end
+    end
+    local matched = {}
+    for _, row in ipairs(built.rows) do matched[row] = best > 0 and level[row] == best end
+    local searching = text ~= ""
+    local hit = ns.OptionSearchHits(built.rows, matched, built.parentOf, searching)
+    local blocks, byPage, count = {}, {}, 0
+    local function NewBlock(head)
+        local block = { head = head, rows = head and 1 or 0 }
+        blocks[#blocks + 1] = block
+        count = count + block.rows
+        return block
+    end
+    local function Push(block, row)
+        block[#block + 1] = row
+        block.rows = block.rows + 1
+        count = count + 1
+    end
+    -- On a page a sub-heading starts a block of its own, so the columns may split before it.
+    local function AddKids(block, key)
+        for _, other in ipairs(built.kids[key] or EMPTY) do
+            if hit[other.key] then
+                if other.sub and not searching then block = NewBlock() end
+                Push(block, other)
+                block = AddKids(block, other.key)
             end
-            under[#under + 1] = row
+        end
+        return block
+    end
+    for _, row in ipairs(built.rows) do
+        local shown = hit[row.key] and (searching or row.page == page)
+        if not shown then
+            row:Hide()
+        elseif not row.parent then
+            -- Searching: one block per page under its title; a page: one per top-level row.
+            local block = searching and byPage[row.page]
+            if not block then
+                block = NewBlock(searching and built.heads[row.page] or nil)
+                if searching then byPage[row.page] = block end
+            end
+            Push(block, row)
+            AddKids(block, row.key)
         end
     end
-    -- heads[title]: the group's header row; a row's group is the last one named above it, and search finds it by that too.
-    local heads, group, dropped = {}, nil, {}
-    local function Grouped(row)
-        row.group = group
-        if group then row.keyLow = row.keyLow .. " " .. group:lower() end
+    return blocks, count, matched
+end
+
+local function PlaceRows(frame)
+    if not frame.built then return end
+    local built = frame.built
+    local text = (frame.search:GetText() or ""):lower():gsub("^%s+", ""):gsub("%s+$", "")
+    local blocks, count, matched = Blocks(built, text, frame.page)
+    for _, head in pairs(built.heads) do head:Hide() end
+    -- Column-major, whole blocks in order: split where the taller column is shortest.
+    local split, shortest, before = #blocks, math.huge, 0
+    for i = 0, #blocks do
+        if i > 0 then before = before + blocks[i].rows end
+        local taller = math.max(before, count - before)
+        if taller < shortest then split, shortest = i, taller end
     end
-    -- A stepper or a value drop down row under parent's toggle; words add to what search finds.
-    local function ExtraStep(parent, key, label, tip, low, high, apply, words)
-        local row = Stepper(child, key, label, tip, low, high, apply)
-        row.text:SetWidth(LIST_W / COLUMNS - 70 - INDENT)
-        if words then row.keyLow = row.keyLow .. " " .. words end
-        Grouped(row)
-        Add(row, parent)
-    end
-    local function ExtraDrop(parent, key, label, tip, choices, apply, words, depth, preview)
-        local row = ValueDropRow(child, key, label, tip, choices, apply, preview)
-        row.text:SetWidth(LIST_W / COLUMNS - 14 - DROP_W - (depth or 1) * INDENT)
-        row.keyLow = row.keyLow .. " " .. words
-        Grouped(row)
-        Add(row, parent)
-    end
-    for _, entry in ipairs(ns.TOGGLES) do
-        if entry.group then
-            group = entry.group
-            heads[group] = heads[group] or GroupHead(child, group, LIST_W / COLUMNS - 8)
-        end
-        local dropGroup = entry.checks or entry.radio
-        if entry.drop and not dropped[dropGroup] then
-            dropped[dropGroup] = true
-            local row = entry.checks and DropCheckRow(child, dropGroup) or DropRow(child, dropGroup)
-            Grouped(row)
-            Add(row, entry.parent)
-            row.text:SetWidth(LIST_W / COLUMNS - 14 - DROP_W - row.depth * INDENT)
-        elseif not entry.drop then
-            local box = Checkbox(child, entry[1], entry[2], entry[3], entry.radio)
-            box.needs = entry.needs
-            if entry.search then box.keyLow = box.keyLow .. " " .. entry.search:lower() end
-            Grouped(box)
-            Add(box, entry.parent)
-            box.text:SetWidth(LIST_W / COLUMNS - 30 - box.depth * INDENT)
-        end
-        -- Settings under their toggle; not toggles, so the bulk buttons skip them.
-        if entry[1] == "oneBag" then
-            ExtraStep("oneBag", "oneBagColumns", L["OPTWIN_COLUMNS"], L["OPTWIN_HOW_MANY_SLOTS_ACROSS_THE"],
-                ns.ONE_BAG_COLUMNS_MIN or 4, ns.ONE_BAG_COLUMNS_MAX or 16, ns.SetOneBagColumns)
-        end
-        if entry[1] == "hideKeyText" then
-            ExtraStep("buttons", "keyTextSize", L["OPTWIN_KEY_TEXT_SIZE"], L["OPTWIN_HOW_BIG_THE_KEY_NAMES"],
-                ns.KEY_TEXT_MIN or 8, ns.KEY_TEXT_MAX or 20, ns.SetKeyTextSize, "keybind font hotkey")
-        end
-        if entry[1] == "themeDark" then
-            local dark = O.DarknessRow(child, LIST_W / COLUMNS - 2 * INDENT - 14)
-            Grouped(dark)
-            Add(dark, "themeDark")
-        end
-        if entry[1] == "addonMessages" then
-            local head, camera = O.CameraRow(child, LIST_W / COLUMNS - 2 * INDENT - 14)
-            head.text:SetWidth(LIST_W / COLUMNS - 30)
-            Grouped(head)
-            Add(head)
-            Grouped(camera)
-            Add(camera, head.key)
-        end
-        if entry[1] == "themeCustom" then
-            local color = O.ColorRow(child, "themeColor", L["OPTWIN_COLOUR"],
-                L["OPTWIN_THE_CUSTOM_THEME_S_COLOUR"])
-            color.text:SetWidth(LIST_W / COLUMNS - 40 - INDENT)
-            color.keyLow = color.keyLow .. " rgb hex color theme"
-            Grouped(color)
-            Add(color, "themeCustom")
-        end
-        if entry[1] == "damageMeter" and ns.METER_BACKGROUNDS then
-            ExtraDrop("damageMeter", "meterBackground", L["OPTWIN_BACKGROUND"], L["OPTWIN_THE_METER_S_BACK_THE"],
-                ns.METER_BACKGROUNDS, ns.SetMeterBackground, "talent tree damage meter", nil, ns.PreviewMeterBackground)
-            ExtraStep("damageMeter", "meterHeader", L["OPTWIN_HEADER_HEIGHT"], L["OPTWIN_EXTRA_HEIGHT_OVER_THE_METER"],
-                ns.METER_HEADER_MIN or 0, ns.METER_HEADER_MAX or 16, ns.SetMeterHeader, "damage meter title")
-            local pan = ButtonRow(child, "meterPanArt", L["OPT_meterPanArt"], L["OPT_meterPanArt_TIP"],
-                function() ns.SetMeterPanning(not ns.MeterPanning()) end, ns.MeterPanning,
-                { "meterPanPreview", L["OPT_meterPanPreview"], L["OPT_meterPanPreview_TIP"], ns.SetMeterBackground })
-            pan.keyLow = pan.keyLow .. " drag align background art whole preview"
-            Grouped(pan)
-            Add(pan, "damageMeter")
-        end
-        if entry[1] == "thickHealthMana" and ns.ENEMY_HEALTH_COLORS then
-            ExtraDrop("thickHealth", "thickEnemyColor", L["OPTWIN_ENEMY_HEALTH"], L["OPTWIN_THE_COLOUR_OF_AN_ENEMY"],
-                ns.ENEMY_HEALTH_COLORS, ns.SetEnemyHealthColor, "colour color hostile red neutral yellow reaction aggro", 2)
-        end
-        if entry[1] == "unitFrames" and ns.SetUnitNameSize then
-            ExtraStep("unitFrames", "unitNameSize", L["OPTWIN_NAME_SIZE"], L["OPTWIN_TEXT_SIZE_OF_THE_PLAYER"],
-                ns.UNIT_NAME_MIN or 8, ns.UNIT_NAME_MAX or 16, ns.SetUnitNameSize, "font unit frame name text")
-        end
-        if entry[1] == "resourceDisplay" and ns.SetPrdGap then
-            ExtraStep("resourceDisplay", "prdGap", L["OPTWIN_BAR_GAP"], L["OPTWIN_SPACE_BETWEEN_THE_HEALTH_AND"],
-                ns.PRD_GAP_MIN or 0, ns.PRD_GAP_MAX or 20, ns.SetPrdGap, "personal resource padding spacing")
-        end
-        if entry[1] == "swingTimers" and ns.SWING_COLORS then
-            for _, hand in ipairs(SWING_HANDS) do
-                ExtraDrop("swingTimers", hand[1], hand[2], L["OPTWIN_THE_SWING_BAR_S_COLOUR"], ns.SWING_COLORS,
-                    ns.SetSwingLook, "swing colour color")
-            end
-            ExtraStep("swingTimers", "swingBorder", L["OPTWIN_BORDER_THICKNESS"], L["OPTWIN_HOW_THICK_THE_SWING_BARS"],
-                ns.SWING_BORDER_MIN or -1, ns.SWING_BORDER_MAX or 5, ns.SetSwingBorder, "swing")
-        end
-        if entry[1] == "classColorPlates" then
-            ExtraStep("namePlates", "plateNameSize", L["OPTWIN_NAME_TEXT_SIZE"], L["OPTWIN_POINTS_BIGGER_OR_SMALLER_THAN"],
-                ns.PLATE_NAME_MIN or -6, ns.PLATE_NAME_MAX or 6, ns.SetPlateNameSize, "font")
+    local colW = LIST_W / COLUMNS
+    local column, row, per = 0, 0, 0
+    local child = frame.listChild
+    local function Put(at, region, x)
+        ns.SetPointOnce(region, "TOPLEFT", child, "TOPLEFT", column * colW + x, -at * ROW)
+        region:Show()
+        if region.keyLow then
+            ns.SetAlphaIf(region, (text == "" or matched[region]) and 1 or MATCH_DIM)
+            O.ShowMatch(region, text ~= "" and matched[region] == true)
         end
     end
-
-    -- Word starts in name, keywords or section title first, tooltip only when nothing matched those; whole sections show,
-    -- their matches lit and the rest dimmed (Only show matches: the matching rows alone); empty: all.
-    local search = ns.SearchBox(frame, width - 60, L["OPTWIN_SEARCH_TOGGLES"])
-    search:SetPoint("TOP", frame, "TOP", 4, canvas and -16 or -50)
-    frame.search = search
-
-    function frame:PlaceBoxes(text)
-        text = (text or ""):lower():gsub("^%s+", ""):gsub("%s+$", "")
-        local words = {}
-        for word in text:gmatch("%S+") do words[#words + 1] = word:gsub("%p", "%%%0") end
-        -- The best level any row reaches decides which rows count as matches.
-        local level, best = {}, 0
-        for _, box in ipairs(boxes) do
-            level[box] = #words > 0 and ns.OptionMatchLevel(box, words) or 0
-            if level[box] > best then best = level[box] end
+    for i, block in ipairs(blocks) do
+        if column < COLUMNS - 1 and i == split + 1 and row > 0 then column, row = column + 1, 0 end
+        if block.head then
+            Put(row, block.head, 0)
+            row = row + 1
         end
-        local matched = {}
-        for _, box in ipairs(boxes) do matched[box] = best > 0 and level[box] == best end
-        local only = text ~= "" and ns.db.searchOnlyMatches == true
-        local hit = ns.OptionSearchHits(boxes, matched, kids, parentOf, text ~= "", only)
-        -- Sections in list order, head first, gathered under their group's header; a block is one header and its rows.
-        local blocks, byTitle, count = {}, {}, 0
-        -- Every row under key, depth first.
-        local function AddKids(block, key)
-            for _, other in ipairs(kids[key] or EMPTY) do
-                if hit[other.key] then
-                    block[#block + 1] = other
-                    block.rows = block.rows + 1
-                    count = count + 1
-                    AddKids(block, other.key)
-                end
-            end
+        for _, region in ipairs(block) do
+            Put(row, region, (region.depth or 0) * INDENT)
+            row = row + 1
         end
-        -- Only show matches: each match on its own line under its group header, its parent rows left out.
-        for _, box in ipairs(boxes) do
-            if not hit[box.key] then
-                box:Hide()
-            elseif only or not box.parent then
-                local title = box.group or ""
-                local block = byTitle[title]
-                if not block then
-                    block = { head = heads[title], rows = heads[title] and 1 or 0 }
-                    byTitle[title] = block
-                    blocks[#blocks + 1] = block
-                    count = count + block.rows
-                end
-                block[#block + 1] = box
-                block.rows = block.rows + 1
-                count = count + 1
-                if not only then AddKids(block, box.key) end
-            end
-        end
-        for title, head in pairs(heads) do
-            if not byTitle[title] then head:Hide() end
-        end
-        -- Column-major, whole groups in order: split where the taller column is shortest.
-        local split, shortest, before = #blocks, math.huge, 0
-        for i = 0, #blocks do
-            if i > 0 then before = before + blocks[i].rows end
-            local taller = math.max(before, count - before)
-            if taller < shortest then split, shortest = i, taller end
-        end
-        local colW = LIST_W / COLUMNS
-        local column, row, per = 0, 0, 0
-        local function Put(row_, box, x)
-            ns.SetPointOnce(box, "TOPLEFT", self.listChild, "TOPLEFT", column * colW + x, -row_ * ROW)
-            box:Show()
-            if box.keyLow then
-                ns.SetAlphaIf(box, (text == "" or matched[box]) and 1 or MATCH_DIM)
-                ShowMatch(box, text ~= "" and matched[box] == true)
-            end
-        end
-        for i, block in ipairs(blocks) do
-            if column < COLUMNS - 1 and i == split + 1 and row > 0 then
-                column, row = column + 1, 0
-            end
-            if block.head then
-                Put(row, block.head, 0)
-                row = row + 1
-            end
-            for _, box in ipairs(block) do
-                Put(row, box, only and 0 or (box.depth or 0) * INDENT)
-                row = row + 1
-            end
-            if row > per then per = row end
-        end
-        self.listChild:SetHeight(math.max(1, per * ROW))
-        self.listBar:SetRange(math.max(0, per * ROW - listRows * ROW), ROW)
-        self.search.hint:SetShown(text == "")
-        self.search.clear:SetShown(text ~= "")
+        if row > per then per = row end
     end
-    search:SetScript("OnTextChanged", function(self) frame:PlaceBoxes(self:GetText()) end)
-    frame:PlaceBoxes("")
-    -- Its box's left under the search bar's, on the bulk buttons' line.
-    local onlyMatches = ns.SmallCheck(frame, L["OPTWIN_ONLY_MATCHES"], 1, 0.82, 0)
-    onlyMatches:SetPoint("TOPLEFT", search, "BOTTOMLEFT", -8, -5)
-    onlyMatches:SetChecked(ns.db.searchOnlyMatches == true)
-    onlyMatches:SetScript("OnClick", function(self)
-        ns.CheckSound(self)
-        ns.db.searchOnlyMatches = self:GetChecked() and true or false
-        frame:PlaceBoxes(search:GetText())
-    end)
-    onlyMatches.tooltip = L["OPTWIN_ONLY_MATCHES_TIP"]
-    onlyMatches.label = L["OPTWIN_ONLY_MATCHES"]
-    ns.AttachTip(onlyMatches, OPTION_TIP)
+    child:SetHeight(math.max(1, per * ROW))
+    frame.listBar:SetRange(math.max(0, per * ROW - frame.list:GetHeight()), ROW)
+end
 
-    local note = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    note:SetPoint("BOTTOM", frame, "BOTTOM", 0, 78)
-    note:SetTextColor(1, 0.35, 0.25)
-    frame.note = note
-
-    -- Bulk writes skip ToggleChanged's per-key side effects on purpose; the reload ask runs before Refresh reads it.
-    local none = ns.PanelButton(frame, L["OPTWIN_TOGGLE_NONE"], 100)
-    none:SetPoint("TOPRIGHT", search, "BOTTOM", -3, -6)
-    none:SetScript("OnClick", function()
-        for _, entry in ipairs(ns.TOGGLES) do
-            if InNone(entry[1]) then ns.db[entry[1]] = false end
-        end
-        -- A radio pick that is a classic piece: the game's own choice instead.
-        for _, key in ipairs(NONE_PICKS) do
-            for _, other in ipairs(ns.TOGGLE_RADIO[key] or {}) do ns.db[other] = other == key end
-        end
-        ns.ApplyAll()
-        ns.AskReloadIfNeeded()
-        frame:Refresh()
-    end)
-    none.tooltip = L["OPTWIN_TURNS_EVERY_PIECE_OF_THE"]
-    none.label = L["OPTWIN_TOGGLE_NONE"]
-    ns.AttachTip(none, OPTION_TIP)
-
-    local defaults = ns.PanelButton(frame, L["OPTWIN_RESET_TOGGLES"], 100)
-    defaults:SetPoint("TOPLEFT", search, "BOTTOM", 3, -6)
-    defaults:SetScript("OnClick", function()
-        ns.ResetToggles()
-        -- The number rows too, through their setters so they apply live.
-        if ns.SetKeyTextSize then ns.SetKeyTextSize(ns.DB_DEFAULTS.keyTextSize) end
-        if ns.SetOneBagColumns then ns.SetOneBagColumns(ns.DB_DEFAULTS.oneBagColumns) end
-        if ns.SetPlateNameSize then ns.SetPlateNameSize(ns.DB_DEFAULTS.plateNameSize) end
-        ns.ApplyAll()
-        ns.AskReloadIfNeeded()
-        frame:Refresh()
-    end)
-    defaults.tooltip = L["OPTWIN_PUTS_EVERY_CHECKBOX_AND_NUMBER"]
-    defaults.label = L["OPTWIN_RESET_TOGGLES"]
-    ns.AttachTip(defaults, OPTION_TIP)
-    -- The foot joins this list once built: the other tabs are reading, not settings.
-    local togglesOnly = { search, onlyMatches, none, defaults, child }
-    AddTabs(frame, list, child, togglesOnly, listRows)
-
-    -- Foot left: layout button over Reload UI; on the classic layout it offers a reset.
-    local layout = ns.PanelButton(frame, L["OPTWIN_CLASSIC_LAYOUT"], 130)
-    layout:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 26, 46)
-    layout:SetScript("OnClick", function()
-        if ns.ClassicLayoutActive() then
-            StaticPopup_Show("FCUI_LAYOUT_RESET")
-        else
-            ns.CreateClassicLayout()
-        end
-    end)
-    layout.tooltip = L["OPTWIN_ADDS_AN_EDIT_MODE_LAYOUT"]
-    layout.label = L["OPTWIN_CLASSIC_LAYOUT"]
-    ns.AttachTip(layout, OPTION_TIP)
-
-    local reload = ns.PanelButton(frame, L["OPTWIN_RELOAD_UI"], 130)
-    reload:SetPoint("TOPLEFT", layout, "BOTTOMLEFT", 0, -4)
-    reload:SetScript("OnClick", function() StaticPopup_Show("FCUI_RELOAD_CONFIRM") end)
-
-    -- Foot right: feedback buttons, GitHub first (preferred), CurseForge under it.
-    local curse, github = O.FeedbackButtons(frame, 130)
-    github:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -26, 46)
-    github.tooltip = L["OPTWIN_COPIES_THE_ADDRESS_OF_THE"]
-    github.label = L["OPTWIN_GITHUB_ISSUES"]
-    ns.AttachTip(github, OPTION_TIP)
-    curse:SetPoint("TOPRIGHT", github, "BOTTOMRIGHT", 0, -4)
-    curse.tooltip = L["OPTWIN_COPIES_THE_ADDON_S_CURSEFORGE"]
-    curse.label = L["OPTWIN_CURSEFORGE"]
-    ns.AttachTip(curse, OPTION_TIP)
-    local preferred = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    preferred:SetPoint("BOTTOMLEFT", github, "TOPLEFT", 2, 3)
-    preferred:SetText(L["OPTWIN_PREFERRED"])
-    -- A font string takes no mouse: a frame over it carries the tip.
-    local preferredHover = ns.NewFrame("Frame", nil, frame)
-    preferredHover:SetAllPoints(preferred)
-    preferredHover:EnableMouse(true)
-    ns.AttachTip(preferredHover, PREFERRED_TIP)
-    local status = ns.PanelButton(frame, L["OPTWIN_STATUS_REPORT"], 130)
-    status:SetPoint("BOTTOM", frame, "BOTTOM", 0, 46)
-    status:SetScript("OnClick", function() ns.ShowStatus() end)
-    status.tooltip = L["OPTWIN_OPENS_A_WINDOW_WITH_YOUR"]
-    status.label = L["OPTWIN_STATUS_REPORT"]
-    ns.AttachTip(status, OPTION_TIP)
-    local windows = ns.PanelButton(frame, L["OPTWIN_RESET_WINDOWS"], 130)
-    windows:SetPoint("TOP", status, "BOTTOM", 0, -4)
-    windows:SetScript("OnClick", function() StaticPopup_Show("FCUI_WINDOWS_RESET") end)
-    windows.tooltip = L["OPTWIN_PUTS_EVERY_WINDOW_BACK"]
-    windows.label = L["OPTWIN_RESET_WINDOWS"]
-    ns.AttachTip(windows, OPTION_TIP)
-    local feedback = frame:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
-    feedback:SetPoint("BOTTOM", github, "TOP", 0, 18)
-    feedback:SetText(L["OPTWIN_BUG_REPORTS_FEEDBACK"])
-    for _, piece in ipairs({ note, layout, reload, curse, github, preferred, preferredHover, status, windows, feedback }) do
-        togglesOnly[#togglesOnly + 1] = piece
+-- What the right side shows: a toggles page, a reading page, or the search's matches from every page.
+local function Show(frame)
+    local searching = (frame.search:GetText() or "") ~= ""
+    local pane = not searching and frame.panes[frame.page]
+    frame.search.hint:SetShown(not searching)
+    frame.search.clear:SetShown(searching)
+    frame.pageTitle:SetText(searching and (_G.SEARCH or L["OPTWIN_SEARCH_TOGGLES"]) or frame.page)
+    for _, button in ipairs(frame.pageButtons) do button:SetShown(not searching and not pane) end
+    for name, other in pairs(frame.panes) do
+        other:SetShown(other == pane)
+        other.child:SetShown(other == pane)
+        if frame.nav[name] then frame.nav[name]:SetPicked(name == frame.page and not searching) end
     end
+    for name, button in pairs(frame.nav) do
+        if not frame.panes[name] then button:SetPicked(name == frame.page and not searching) end
+    end
+    FitList(frame, pane and pane.headH or 0)
+    frame.list:SetScrollChild(pane and pane.child or frame.listChild)
+    frame.listChild:SetShown(not pane)
+    frame.listBar:SetValue(0)
+    if pane then pane:Refresh() else PlaceRows(frame) end
+end
 
-    if not canvas then frame:SetSize(WIDTH, 110 + LIST_ROWS * ROW + 108) end
+-- The game's settings page shows this window; when it goes the window stands alone again.
+local function Embed(frame, host)
+    embedded = host
+    frame.chrome = frame.chrome or { frame.fill, frame.header, frame.title, frame.close }
+    for _, region in ipairs(frame.chrome) do if region then region:Hide() end end
+    frame:SetBackdrop(nil)
+    frame:RegisterForDrag()
+    frame:SetParent(host)
+    frame:SetFrameStrata(host:GetFrameStrata())
+    frame:SetFrameLevel(host:GetFrameLevel() + 1)
+    local scale = math.min(1, (host:GetWidth() or WIDTH) / WIDTH, (host:GetHeight() or frame:GetHeight()) / frame:GetHeight())
+    frame:SetScale(scale > 0 and scale or 1)
+    ns.SetPointOnce(frame, "TOPLEFT", host, "TOPLEFT", 0, 0)
+    frame:Show()
+end
+
+local function StandAlone(frame)
+    embedded = nil
+    for _, region in ipairs(frame.chrome or EMPTY) do if region then region:Show() end end
+    ns.Backdrop(frame, ns.BACKDROP.DIALOG)
+    frame:RegisterForDrag("LeftButton")
+    frame:SetParent(UIParent)
+    frame:SetFrameStrata("HIGH")
+    frame:SetScale(1)
+    ns.SetPointOnce(frame, "CENTER", UIParent, "CENTER", 0, 0)
+end
+
+local function Build()
+    -- HIGH, not DIALOG: on edit mode's strata its panel backing drew over our boxes.
+    local frame = O.DialogWindow("ForeverClassicUIOptions", 0, "HIGH", TOPLEVEL)
+    -- The old backdrop is see-through; a dark fill keeps the list readable.
+    local fill = frame:CreateTexture(nil, "BACKGROUND", nil, -8)
+    fill:SetColorTexture(0.03, 0.03, 0.03, 0.45)
+    fill:SetPoint("TOPLEFT", frame, "TOPLEFT", 11, -12)
+    fill:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -12, 11)
+    frame.fill = fill
+    frame.header, frame.title = ns.DialogHeader(frame, TITLE)
+    frame.close = ns.DialogClose(frame, function() frame:Hide() end)
+
+    local pages = Pages()
+    FitNames(frame, pages)
+    local bottom = Sidebar(frame, pages)
+    frame:SetSize(WIDTH, bottom + 20)
+    PageArea(frame, bottom)
+    frame.built = O.BuildRows(frame.listChild, LIST_W / COLUMNS)
+    local function SetRange(h) frame.listBar:SetRange(math.max(0, h - frame.list:GetHeight()), ROW) end
+    frame.panes = {}
+    for _, spec in ipairs(PANES) do
+        frame.panes[L[spec[1]]] = O[spec[2]](frame.pageBox, frame.pageTop, frame.list, SetRange)
+    end
+    frame.page = pages[1]
+
+    function frame:ShowPage(page)
+        self.page = page
+        if self.search:GetText() ~= "" then self.search:SetText("") else Show(self) end
+    end
+    -- This page's toggles, drop groups' items included.
+    function frame:PageKeys()
+        local keys = {}
+        for _, row in ipairs(self.built.rows) do
+            if row.page == self.page then
+                if row.toggle then keys[row.key] = true end
+                for _, key in ipairs(row.keys or EMPTY) do keys[key] = true end
+            end
+        end
+        return keys
+    end
+    function frame:Lay() Show(self) end
+    frame.search:SetScript("OnTextChanged", function() Show(frame) end)
 
     function frame:Refresh()
         -- The one box mirroring a game setting: read fresh.
         ns.ReadGameDamageNumbers()
-        for _, box in ipairs(self.boxes) do
-            box:SetChecked(ns.db[box.key] ~= false)
+        local parentOf = self.built.parentOf
+        for _, row in ipairs(self.built.rows) do
+            row:SetChecked(ns.db[row.key] ~= false)
             -- Disabled and grayed under any parent that is off.
-            local on, up = not (box.needs and ns.db[box.needs] == false), box.parent
+            local on, up = not (row.needs and ns.db[row.needs] == false), row.parent
             while up do
                 if ns.db[up] == false then on = false break end
                 up = parentOf[up]
             end
-            box:SetEnabled(on)
+            row:SetEnabled(on)
             -- A button row's label keeps the button's own fonts.
-            if not box.button then box.text:SetFontObject(on and "GameFontHighlight" or "GameFontDisable") end
+            if not row.button then row.text:SetFontObject(on and (row.font or "GameFontHighlight") or "GameFontDisable") end
         end
-        -- Same source as the reload prompt: a change still owed a reload.
-        local owed = ns.ReloadOwed()
-        self.note:SetText(owed and L["OPTWIN_RELOAD_THE_INTERFACE_TO_FINISH"] or "")
-        local pane = self.panes and self.panes[self.tab]
-        if pane then pane:Refresh() end
+        Show(self)
     end
     frame:SetScript("OnShow", frame.Refresh)
     frame:HookScript("OnHide", function() if ns.SetMeterPanning then ns.SetMeterPanning(false) end end)
-    -- After SetScript, which would wipe its OnShow hooks.
-    if not canvas then ns.CloseOnEscape(frame) end
+    -- After SetScript, which would wipe its OnShow hooks; inside the game's settings its own Escape closes it.
+    ns.CloseOnEscape(frame, nil, function() return not embedded end)
     return frame
 end
 
--- Settings page canvas, built once.
+local function Window()
+    window = window or Build()
+    return window
+end
+
+-- The game's settings page: the window moves in while it shows.
 function ns.OptionsCanvas()
     if ns.optionsCanvas then return ns.optionsCanvas end
     local canvas = CreateFrame("Frame", "ForeverClassicUIOptionsCanvas", UIParent)
-    canvas:SetSize(620, 560)
     canvas:Hide()
-    ns.optionsCanvas = Build(canvas)
-    return ns.optionsCanvas
+    canvas:SetScript("OnShow", function(self) Embed(Window(), self) end)
+    canvas:SetScript("OnHide", function()
+        if not embedded then return end
+        StandAlone(window)
+        window:Hide()
+    end)
+    ns.optionsCanvas = canvas
+    return canvas
 end
 
--- A toggle changed from outside the panel; either copy may be missing.
+-- A toggle changed from outside the window.
 function ns.RefreshOptionsWindow()
     if window and window:IsShown() then window:Refresh() end
-    local canvas = ns.optionsCanvas
-    if canvas and canvas:IsShown() then canvas:Refresh() end
 end
 
 function ns.OpenOptions()
-    if not window then window = Build() end
-    if window:IsShown() then
-        window:Hide()
-    else
-        window:Show()
-    end
+    local frame = Window()
+    -- Shown inside the game's settings: out to stand alone, open.
+    local inside = embedded ~= nil
+    if inside then StandAlone(frame) end
+    frame:SetShown(inside or not frame:IsShown())
 end

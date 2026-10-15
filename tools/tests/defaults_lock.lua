@@ -222,7 +222,6 @@ return {
     reagentSlotsFirst = true,
     reagentSlotsLast = false,
     resourceDisplay = true,
-    searchOnlyMatches = false,
     settingsPanel = true,
     shopMinimapButton = false,
     showAddonBag = true,

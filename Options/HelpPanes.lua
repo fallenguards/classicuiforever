@@ -1,13 +1,13 @@
 local _, ns = ...
 local L = ns.L
 
--- The FAQ and Support tabs: a caption where the search box stands, and text on their own scroll child that the tab swaps
--- into the list (as Profiles). Option names, tab names and key bindings are read as the tab shows, in the game's language.
+-- The FAQ and Support pages: a caption at the page's top, and text on their own scroll child that the page swaps into the
+-- list (as Profiles). Option names and key bindings are read as the page shows, in the game's language.
 
 local O = ns.options
 local TITLE = O.TITLE
 local ANSWER_GAP, ITEM_GAP, BUTTON_GAP = 3, 12, 6
-local BUTTON_W = 170
+local BUTTON_W, POST_W = 170, 220
 local EASYFIND_URL = "https://www.curseforge.com/wow/addons/easyfind"
 local DONATE_URL = "https://buymeacoffee.com/easyfind"
 
@@ -59,9 +59,9 @@ local FAQ = {
     { "FAQ_REAGENT_Q", "FAQ_REAGENT_RETAIL_A", on = "retail", function() return L["OPT_reagentBagSlot"] end },
     { "FAQ_BARS_Q", "FAQ_BARS_A" },
     { "FAQ_MOVE_Q", "FAQ_MOVE_A", function() return L["UI_CLASSICUI_FOREVER_WINDOWS"] end },
-    { "FAQ_SETTING_Q", "FAQ_SETTING_A", function() return L["OPTWIN_TAB_TOGGLES"] end },
-    { "FAQ_FOREVER_Q", "FAQ_FOREVER_A", on = "forever", function() return L["OPTWIN_TAB_TOGGLES"] end },
-    { "FAQ_OWNLOOK_Q", "FAQ_OWNLOOK_A", on = "retail", function() return L["OPTWIN_TAB_TOGGLES"] end },
+    { "FAQ_SETTING_Q", "FAQ_SETTING_A", function() return L["OPTWIN_SEARCH_TOGGLES"] end },
+    { "FAQ_FOREVER_Q", "FAQ_FOREVER_A", on = "forever" },
+    { "FAQ_OWNLOOK_Q", "FAQ_OWNLOOK_A", on = "retail" },
     { "FAQ_OTHER_ADDON_Q", "FAQ_OTHER_ADDON_A" },
 }
 for i = #FAQ, 1, -1 do
@@ -69,14 +69,16 @@ for i = #FAQ, 1, -1 do
     if on and (on == "forever") ~= ns.OnForever() then table.remove(FAQ, i) end
 end
 
-local function Pane(frame, search, list)
+-- top: the page's top under its title; headH: how much of the page the caption (and what stands under it) takes.
+local function Pane(frame, top, list, headH)
     local pane = ns.NewFrame("Frame", nil, frame)
     pane:SetAllPoints(frame)
     pane:Hide()
     local caption = pane:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    caption:SetPoint("TOP", search, "TOP", 0, -3)
+    caption:SetPoint("TOPLEFT", top, "TOPLEFT", 2, 0)
     caption:SetWidth(list:GetWidth())
-    pane.caption = caption
+    caption:SetJustifyH("LEFT")
+    pane.caption, pane.headH = caption, headH
     local child = ns.NewFrame("Frame", nil, list)
     child:SetSize(list:GetWidth(), 1)
     child:Hide()
@@ -120,12 +122,11 @@ local function Matches(row, words)
     return true
 end
 
-function O.FaqPane(frame, search, list, setRange)
-    local pane, child = Pane(frame, search, list)
+function O.FaqPane(frame, top, list, setRange)
+    local pane, child = Pane(frame, top, list, 50)
     pane.caption:SetText(L["FAQ_CAPTION"])
-    -- Under the caption, in the row the toggles' bulk buttons take on their tab.
-    local find = ns.SearchBox(pane, search:GetWidth(), L["FAQ_SEARCH"])
-    find:SetPoint("TOP", search, "BOTTOM", 0, -8)
+    local find = ns.SearchBox(pane, 240, L["FAQ_SEARCH"])
+    find:SetPoint("TOPLEFT", pane.caption, "BOTTOMLEFT", 4, -8)
     local pieces, rows = {}, {}
     for i = 1, #FAQ do
         local question, answer = Text(child, "GameFontNormal"), Text(child, "GameFontHighlight")
@@ -164,8 +165,8 @@ function O.FaqPane(frame, search, list, setRange)
     return pane
 end
 
-function O.SupportPane(frame, search, list, setRange)
-    local pane, child = Pane(frame, search, list)
+function O.SupportPane(frame, top, list, setRange)
+    local pane, child = Pane(frame, top, list, 22)
     pane.caption:SetText(L["SUPPORT_CAPTION"]:format(TITLE))
     local pieces = {}
     local function Add(font, text, gap)
@@ -173,15 +174,18 @@ function O.SupportPane(frame, search, list, setRange)
         region:SetText(text)
         pieces[#pieces + 1] = { region = region, gap = gap }
     end
-    local function Button(label, onClick, beside)
-        local button = ns.PanelButton(child, label, BUTTON_W)
+    local function Button(label, onClick, beside, width)
+        local button = ns.PanelButton(child, label, width or BUTTON_W)
         button:SetScript("OnClick", onClick)
         pieces[#pieces + 1] = { region = button, gap = BUTTON_GAP, beside = beside }
         return button
     end
     Add("GameFontNormal", L["SUPPORT_FEEDBACK_HEAD"], 0)
-    Add("GameFontHighlight", L["SUPPORT_FEEDBACK"], ANSWER_GAP)
-    local github = Button(L["OPTWIN_GITHUB_ISSUES"], O.CopyGitHub)
+    -- The status report first: what a report needs before it is posted.
+    Add("GameFontHighlight", L["SUPPORT_FEEDBACK"]:format(L["OPTWIN_STATUS_REPORT"]), ANSWER_GAP)
+    Button(L["OPTWIN_STATUS_REPORT"], ns.ShowStatus)
+    Add("GameFontHighlight", L["SUPPORT_POST"], ITEM_GAP)
+    local github = Button(L["OPTWIN_GITHUB_PREFERRED"], O.CopyGitHub, nil, POST_W)
     Button(L["OPTWIN_CURSEFORGE"], O.CopyCurseForge, github)
     Add("GameFontNormal", L["SUPPORT_MORE_HEAD"], ITEM_GAP)
     Add("GameFontHighlight", L["SUPPORT_MORE"], ANSWER_GAP)

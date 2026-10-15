@@ -222,6 +222,7 @@ Options\Options.lua
 Options\OptionsSearch.lua
 Options\ThemeRows.lua
 Options\CameraRow.lua
+Options\OptionsRows.lua
 Options\OptionsWindow.lua
 Options\Profiles.lua
 Options\HelpPanes.lua
