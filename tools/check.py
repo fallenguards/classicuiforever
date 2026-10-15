@@ -38,7 +38,7 @@ DUPFN_MIN = 3
 RULES = ["CVAR", "CVARREAD", "CVARLOGIN", "CVARREG", "REGISTRY", "HOOK", "ONUPDATE", "SINCE", "TIMER", "THROTTLEFRAME", "SEARCHBOX", "ADDONCHAR", "KEYONLY",
          "LOADADDON", "EDITMODE", "EDITQUERY", "SETTLE",
          "PANELMGR", "SECRET", "WALK", "REGEVENTS", "EVENTFRAME", "POINTONCE", "SETIF", "THEME", "ONCEFLAG",
-         "FRAMEFIELD", "GAMEMENU", "SHAREDART", "PLATES", "FORBIDDEN", "SYSBASE", "LAYOUTFIELD",
+         "FRAMEFIELD", "GAMEMENU", "SHAREDART", "PLATES", "FORBIDDEN", "SYSBASE", "LAYOUTFIELD", "CLIENTKEY",
          "PADART", "SECRETMOUSE", "UNITEVENTS", "DRAGPOINT", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "TOC"]
 # A hit of these on a line the change adds fails even within the baseline, so swapping one call for another fails.
 # SINCE, DEADNS, FRAMEFIELD, CVARLOGIN and THROTTLEFRAME stay count-only, so a kept line can still be rewritten.
@@ -46,7 +46,7 @@ LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", 
               "KEYONLY",
               "CVARREAD", "THEME", "POINTONCE", "SECRET", "SETIF", "REGEVENTS", "ONCEFLAG", "TIMER", "EDITQUERY",
               "PLATES", "FORBIDDEN", "EVENTFRAME",
-              "WALK", "GAMEMENU", "SHAREDART", "SYSBASE", "LAYOUTFIELD", "PADART", "SECRETMOUSE", "UNITEVENTS",
+              "WALK", "GAMEMENU", "SHAREDART", "SYSBASE", "LAYOUTFIELD", "CLIENTKEY", "PADART", "SECRETMOUSE", "UNITEVENTS",
               "DRAGPOINT", "ERASPOT", "WINDOWORIGIN", "CVARREG", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST",
               "POINTEXACT",
               "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE")
@@ -149,6 +149,8 @@ KEPT_API = frozenset((
 ))
 
 FIX = {
+    "CLIENTKEY": "leave the client's methods and child keys alone: put our size or look back after its pass "
+                 "(ns.Sched.AfterShow, a job on a child of ours) and keep our pieces in a table of ours",
     "OTHERADDON": "say what it does in plain words; never name another addon or UI in a shipped file (the settings "
                   "Support tab's own lines, SUPPORT_MORE and its links, are the one exception)",
     "LUA51": "WoW runs Lua 5.1: no statement starting with ';', no goto or labels, no // or bitwise operators "
@@ -422,6 +424,8 @@ NOT_A_CALL = {"and", "or", "not", "if", "elseif", "while", "until", "return", "i
               "type", "assert"}
 
 MESSAGES = {
+    "CLIENTKEY": "a method or child key written on a frame our code did not make (the client pass reading it then "
+                 "runs in our name: the loot window's GetPanelMaxHeight wrote edit mode's meter flag, #174)",
     "OTHERADDON": "another addon or UI named in a shipped file (the repo is public and players read it)",
     "LUA51": "syntax WoW's Lua 5.1 refuses (the file would not load at all)",
     "EDITSAVE": "a setting written straight to ns.db in the windows edit mode (Save never lights, Revert misses it)",
@@ -1313,6 +1317,29 @@ def drag_point_hits(lx, funcs):
     return found
 
 
+# A capitalized field written on a frame: a method or child key the client calls or reads.
+CLIENT_KEY_WRITE = re.compile(r"(?<![\w.:])([A-Za-z_]\w*)\s*\.\s*([A-Z][a-z]\w*)\s*=(?!=)")
+MADE_VALUE = r"\s*(?:[A-Za-z_][\w.:]*\s*\(|\{|ns\s*\.)"
+
+
+def client_key_hits(lx, funcs):
+    """X.Key = ... where X was not given a call's result, a table or an ns value in its function or at the file top."""
+    found = set()
+    for no, line in enumerate(lx.blank, 1):
+        for m in CLIENT_KEY_WRITE.finditer(line):
+            var = m.group(1)
+            if var in ("ns", "self", "_G"):
+                continue
+            v = re.escape(var)
+            made = re.compile(r"(?<![\w.:])" + v + r"\s*=(?!=)" + MADE_VALUE
+                              + r"|\blocal\s+[\w\s,]*\b" + v + r"\b[\w\s,]*=(?!=)" + MADE_VALUE)
+            start = min((s for s, e, _, _ in funcs if s <= no <= e), default=no)
+            top = [n for n in range(1, start) if not any(s <= n <= e for s, e, _, _ in funcs)]
+            if not any(made.search(lx.blank[n - 1]) for n in top + list(range(start, no + 1))):
+                found.add(("CLIENTKEY", no))
+    return found
+
+
 # Comments and strings count: names hid in a tooltip and a comment.
 def otheraddon_rx():
     """The names, from the main checkout's gitignored dev/otheraddons.txt (no name in the repo); None without it."""
@@ -1386,6 +1413,7 @@ def pattern_hits(path, lx, funcs):
                 found.add(("EDITSAVE", no))
     found |= structure_hits(path, lx)
     found |= drag_point_hits(lx, funcs)
+    found |= client_key_hits(lx, funcs)
     found |= check_label_hits(lx)
     found |= mouse_order_hits(lx)
     found |= self_box_hits(lx)
