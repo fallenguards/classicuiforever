@@ -74,6 +74,8 @@ ns.DB_DEFAULTS = {
     whoColumn = "zone",
     hideBuffArrow = true,
     spellBookTopRank = false,
+    spellBookHidePassives = false,
+    spellBookFlyouts = false,
     bagsBesideBars = true,
     gameDamageNumbers = true,
     -- The layout to go back to, and a pending switch to ours.
@@ -265,7 +267,7 @@ ns.MODULE_ORDER = {
     "castBars", "swingTimers", "resourceDisplay", "classicStatusFont", "plainNumbers", "mirrorTimers", "comboPoints", "minimap", "minimapButton", "microMinimapButtons", "minimapCollector", "namePlates", "classColorPlates",
     "fullPlates", "classicFonts", "questTracker", "hideObjectiveTracker", "questWatch", "questLog", "questLogDual", "questLevels", "questMapPane", "panels", "worldMap", "lootWindow", "classicChat", "lootRoll",
     "guildRoster", "whoList", "groupFinder", "hideLastNames", "mapFade", "oneBag", "bags", "characterSheet", "statPanes",
-    "spellBook", "spellBookTopRank", "spellBookSearch", "professionsBook", "tradeSkillSearch", "tradeSkill", "tradeSkillDual",
+    "spellBook", "spellBookTopRank", "spellBookHidePassives", "spellBookFlyouts", "spellBookSearch", "professionsBook", "tradeSkillSearch", "tradeSkill", "tradeSkillDual",
     "trainer", "talents", "legacyWindow", "options", "gameMenu", "tooltips", "clientMenus", "settingsPanel", "damageMeter", "gameArt",
 }
 

@@ -240,6 +240,8 @@ return {
     showMinimapZoomOut = true,
     showOptionsButton = true,
     spellBook = true,
+    spellBookFlyouts = false,
+    spellBookHidePassives = false,
     spellBookSearch = true,
     spellBookTopRank = false,
     spellbookMinimapButton = false,

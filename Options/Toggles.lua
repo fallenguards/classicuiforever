@@ -143,6 +143,9 @@ ns.TOGGLES = {
     { "weaponSkillDetail", L["OPT_weaponSkillDetail"], L["OPT_weaponSkillDetail_TIP"], parent = "characterSheet" },
     { "spellBook", L["OPT_spellBook"], L["OPT_spellBook_TIP"] },
     { "spellBookTopRank", L["OPT_spellBookTopRank"], L["OPT_spellBookTopRank_TIP"], parent = "spellBook" },
+    { "spellBookHidePassives", L["OPT_spellBookHidePassives"], L["OPT_spellBookHidePassives_TIP"], parent = "spellBook" },
+    { "spellBookFlyouts", L["OPT_spellBookFlyouts"], L["OPT_spellBookFlyouts_TIP"], parent = "spellBook",
+        search = "flyout group similar aspects tracking pet" },
     { "spellBookSearch", L["OPT_spellBookSearch"], L["OPT_spellBookSearch_TIP"], parent = "spellBook" },
     { "talents", L["OPT_talents"], ns.OnForever() and L["OPT_talents_TIP"] or L["OPT_talents_GAME_TIP"] },
 

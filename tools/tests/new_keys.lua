@@ -91,4 +91,6 @@ return {
     mapOptionsHover = "same for everyone: off by default; a second pick beside shown",
     mapOptionsHidden = "same for everyone: off by default; the filter hidden as before, a third pick",
     plateCastBeside = "on for everyone, a restyle: Era's nameplate cast bar (#121); checked gives the old one back",
+    spellBookHidePassives = "same for everyone: off by default; the book's options menu or the options window turns it on",
+    spellBookFlyouts = "same for everyone: off by default, every spell on its own as before; grouping is opt-in",
 }

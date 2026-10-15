@@ -28,7 +28,7 @@ read_globals = {
     "GREEN_FONT_COLOR_CODE", "RED_FONT_COLOR_CODE", "FONT_COLOR_CODE_CLOSE",
     "C_Map", "WORLD_MAP", "CONTINENT", "ZOOM_OUT", "ZOOM_OUT_BUTTON_TEXT", "MAP_OPTIONS_TEXT", "ItemTextGetMaterial", "ItemTextFramePageBg", "ItemTextPageText",
     "ItemTextIsFullPage", "ItemTextPageScrollChild", "ItemTextGetText", "ItemTextGetCreator", "ITEM_TEXT_FROM",
-    "date",
+    "date", "GetFlyoutInfo", "GetFlyoutSlotInfo",
     "InputUtil", "GetNumLootItems",
     "CLOSE", "DONE", "LOCALIZED_CLASS_NAMES_MALE", "UIParent", "Minimap", "MinimapCluster", "GetCursorPosition", "UnitLevel", "UnitEffectiveLevel", "GetCreatureDifficultyColor", "CASTBAR_CLASSIC_YELLOW", "CASTBAR_CLASSIC_GREEN", "CASTBAR_CLASSIC_GRAY", "CASTBAR_CLASSIC_RED", "CreateColor", "GameTooltip", "ColorPickerFrame",
     "hooksecurefunc", "wipe", "geterrorhandler",

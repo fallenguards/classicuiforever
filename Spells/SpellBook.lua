@@ -27,6 +27,7 @@ local ITEM_NONE = Enum.SpellBookItemType and Enum.SpellBookItemType.None or 0
 local GENERAL_LINE = Enum.SpellBookSkillLineIndex and Enum.SpellBookSkillLineIndex.General or 1
 
 local IsSecret = ns.IsSecret
+local EMPTY = ns.EMPTY
 
 -- Art specs, built once.
 local ADD_HL = { add = true }
@@ -37,8 +38,6 @@ local SB_QUARTERS = {   -- shared: the small professions book wears the same fra
     { key = "sbBotRight", layer = "BACKGROUND", w = 128, h = 256, point = "BOTTOMRIGHT" },
 }
 ns.SPELLBOOK_QUARTERS = SB_QUARTERS
-local CHECK = ns.ART.CHECK
-local RANKS_BOX = { set = "raw", checked = CHECK .. "Check", add = true, hit = { 0, -110, 0, 0 } }
 
 local active = false
 local book
@@ -124,12 +123,30 @@ local function SpellMatches(index, bank, query)
     return type(sub) == "string" and not IsSecret(sub) and sub:lower():find(query, 1, true) ~= nil
 end
 
--- Known player items only: future spells (1.x never listed them), flyouts (their spells are listed on their own), empty entries.
-local function Listed(slot)
+-- A yes from one of the game's own book checks; a secret answer counts as no.
+local function Says(check, slot)
+    local yes = check and check(slot, BANK_PLAYER)
+    return not IsSecret(yes) and yes == true
+end
+
+-- Known player items only, never future spells (1.x never listed them) nor empty entries. Grouped (spellBookFlyouts), a
+-- flyout stands for the spells it holds; else they stand alone, as 1.x listed them. Out of a search, Hide Passives and
+-- Top ranks only leave out what the game's own book does.
+local function Listed(slot, searching)
     local info = ItemInfo(slot, BANK_PLAYER)
     if not info then return false end
     local kind, name = info.itemType, info.name
-    if kind ~= nil and not IsSecret(kind) and (kind == ITEM_FUTURE or kind == ITEM_FLYOUT or kind == ITEM_NONE) then return false end
+    if kind ~= nil and not IsSecret(kind) and (kind == ITEM_FUTURE or kind == ITEM_NONE) then return false end
+    local db = ns.db or EMPTY
+    if kind == ITEM_FLYOUT then
+        if db.spellBookFlyouts ~= true then return false end
+    elseif db.spellBookFlyouts == true and Says(C_SpellBook.IsSpellBookItemLooseFlyoutMember, slot) then
+        return false
+    end
+    if not searching then
+        if db.spellBookHidePassives == true and info.isPassive then return false end
+        if db.spellBookTopRank == true and Says(C_SpellBook.IsSpellBookItemLowRank, slot) then return false end
+    end
     return IsSecret(name) or (type(name) == "string" and name ~= "")
 end
 
@@ -224,7 +241,7 @@ local function CollectAllSlots()
             local first = (info.itemIndexOffset or 0) + 1
             local last = (info.itemIndexOffset or 0) + (info.numSpellBookItems or 0)
             for i = first, last do
-                if Listed(i) and SpellMatches(i, BANK_PLAYER, query) then
+                if Listed(i, true) and SpellMatches(i, BANK_PLAYER, query) then
                     slots[#slots + 1] = i
                 end
             end
@@ -247,32 +264,7 @@ local function CollectAllSlots()
     if state.line == GENERAL_LINE then MergeTrade(slots, nil, true) end
 end
 
--- Optional top-rank fold: the highest of a ranked name keeps its place.
--- Unranked spells never fold: same-named ones differ (bear vs cat).
-local function CollectSlots()
-    CollectAllSlots()
-    if not (ns.db and ns.db.spellBookTopRank == true) or state.bank == BANK_PET then return end
-    local slots = state.slots
-    local best, rankOf = {}, {}
-    for _, index in ipairs(slots) do
-        local ok, name, sub = pcall(C_SpellBook.GetSpellBookItemName, index, BANK_PLAYER)
-        if ok and type(name) == "string" and not IsSecret(name) and type(sub) == "string" and not IsSecret(sub) then
-            local rank = tonumber(sub:match("%d+"))
-            if rank then
-                rankOf[index] = rank
-                local held = best[name]
-                if not held or rank >= rankOf[held] then best[name] = index end
-            end
-        end
-    end
-    local kept = {}
-    for _, index in ipairs(slots) do
-        local ok, name = pcall(C_SpellBook.GetSpellBookItemName, index, BANK_PLAYER)
-        if not rankOf[index] or not ok or best[name] == index then kept[#kept + 1] = index end
-    end
-    wipe(slots)
-    for i, index in ipairs(kept) do slots[i] = index end
-end
+local CollectSlots = CollectAllSlots
 
 local function PageCount()
     return math.max(1, math.ceil(#state.slots / SPELLS_PER_PAGE))
@@ -332,6 +324,8 @@ local function ArmSpell(btn, slot, bank)
     -- A profession's spell opens its window: the book goes down with the cast, in a fight too (the click wrap).
     local trade = id ~= nil and ns.prof and ns.prof.OpensTrade and ns.prof.OpensTrade(info) or nil
     btn:SetAttribute("trade", trade and true or nil)
+    -- A grouped flyout opens its row of spells instead (Spells/BookFlyouts.lua).
+    ns.ArmBookFlyout(btn, bank == BANK_PLAYER and info and info.itemType == ITEM_FLYOUT and info.actionID or nil)
 end
 
 local function UpdateCooldown(btn)
@@ -361,7 +355,8 @@ end
 -- spells plain out of combat, else a druid's bear spells sat dimmed all day.
 local function UpdateUsable(btn)
     local icon = btn.Icon
-    if not btn.slot or btn.isPassive or not C_SpellBook.IsSpellBookItemUsable or not InCombatLockdown() then
+    -- A grouped flyout is never usable to the game; its spells cast from its row, so it stays lit.
+    if not btn.slot or btn.isPassive or btn.isFlyout or not C_SpellBook.IsSpellBookItemUsable or not InCombatLockdown() then
         icon:SetVertexColor(1, 1, 1)
         return
     end
@@ -411,6 +406,7 @@ local function UpdateButton(btn)
     if not info then
         btn.slot = nil
         btn.isPassive = nil
+        btn.isFlyout = nil
         btn.Icon:Hide()
         btn.SpellName:Hide()
         btn.SpellSubName:Hide()
@@ -419,9 +415,12 @@ local function UpdateButton(btn)
         -- No Enable/Disable here: the client refuses it on casting buttons in combat.
         btn.normal:SetVertexColor(1, 1, 1)
         DimButton(btn, false)
+        ns.BookFlyoutArrow(btn, false)
         return
     end
     btn.isPassive = info.isPassive
+    btn.isFlyout = info.itemType == ITEM_FLYOUT
+    ns.BookFlyoutArrow(btn, btn.isFlyout)
     btn.Icon:SetTexture(info.iconID)
     btn.Icon:SetDesaturated(info.isOffSpec and true or false)
     btn.Icon:Show()
@@ -831,20 +830,32 @@ local function CreateBook()
     search:SetShown(ns.db.spellBookSearch ~= false)
     f.Search = search
 
-    -- 1.x rank box: ticked lists every rank; the inverse of spellBookTopRank.
-    local ranks = ns.NewFrame("CheckButton", nil, f)
-    ranks:SetSize(22, 22)
-    ranks:SetPoint("TOPLEFT", f, "TOPLEFT", 74, -46)
-    ns.DressStates(ranks, CHECK .. "Up", CHECK .. "Down", nil, CHECK .. "Highlight", RANKS_BOX)
-    local ranksText = ranks:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
-    ranksText:SetPoint("LEFT", ranks, "RIGHT", 0, 1)
-    ranksText:SetText(_G.SHOW_ALL_SPELL_RANKS or "Show all spell ranks")
-    ranks:SetScript("OnClick", function(self)
-        ns.db.spellBookTopRank = not self:GetChecked()
-        PlaySound(self:GetChecked() and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
-        if ns.ToggleChanged then ns.ToggleChanged("spellBookTopRank") else f:Refresh() end
+    -- The game's own book options under the old gold arrow, beside the search: our settings, so the game's book and its
+    -- listeners are never written to. A search shows passives and every rank, as the game's book does.
+    local options = ns.NewFrame("DropdownButton", nil, f, "WowStyle1DropdownTemplate")
+    options:SetSize(22, 22)
+    options:SetPoint("RIGHT", search, "LEFT", -9, 0)
+    for _, key in ipairs({ "Background", "Arrow", "Text" }) do
+        if options[key] then options[key]:Hide() end
+    end
+    if options:GetHighlightTexture() then options:GetHighlightTexture():SetAlpha(0) end
+    ns.DressDropArrow(options)
+    options:SetupMenu(function(_, root)
+        local searching = state.search ~= ""
+        local function Box(label, key, shownWhenOff, usable)
+            local box = root:CreateCheckbox(label, function() return (ns.db[key] == true) ~= shownWhenOff end,
+                function() ns.db[key] = ns.db[key] ~= true ns.ToggleChanged(key) end)
+            box:SetEnabled(usable ~= false)
+        end
+        Box(_G.SPELLBOOK_FILTER_PASSIVES or L["OPT_spellBookHidePassives"], "spellBookHidePassives", false, not searching)
+        Box(_G.SPELLBOOK_USE_FLYOUTS or L["OPT_spellBookFlyouts"], "spellBookFlyouts", false)
+        -- The game's book offers no ranks to rogues and warriors.
+        local _, class = UnitClass("player")
+        if class ~= "ROGUE" and class ~= "WARRIOR" then
+            Box(_G.SHOW_ALL_SPELL_RANKS or L["OPT_spellBookTopRank"], "spellBookTopRank", true, not searching)
+        end
     end)
-    f.Ranks = ranks
+    f.Options = options
 
     -- Casting buttons sit on their own layer so the book shows in combat. There
     -- we may not show or hide the layer and secure snippets do not compile here,
@@ -1667,11 +1678,8 @@ local function CreateBook()
 
     function f:Refresh()
         if not active then return end
-        if self.Ranks then
-            self.Ranks:SetChecked(not (ns.db and ns.db.spellBookTopRank == true))
-            -- The pet's spells have no ranks to fold.
-            self.Ranks:SetShown(state.bank ~= BANK_PET)
-        end
+        -- The options sort the player's book; the pet's has nothing they change.
+        if self.Options then self.Options:SetShown(state.bank ~= BANK_PET) end
         local fight = InCombatLockdown()
         if fight then
             -- The shown frames say which page is up.
@@ -2138,7 +2146,7 @@ function ns.SpellBookBuilt()
     return book
 end
 
--- Top-rank toggle: recollect.
+-- The book's options (ranks, passives, flyouts): recollect.
 local function RelistBook()
     if not book then return end
     book.Pages.dirty = true
@@ -2146,6 +2154,8 @@ local function RelistBook()
     if book:IsShown() and book.Refresh then book:Refresh() end
 end
 ns.RegisterModule("spellBookTopRank", { apply = RelistBook, restore = RelistBook })
+ns.RegisterModule("spellBookHidePassives", { apply = RelistBook, restore = RelistBook })
+ns.RegisterModule("spellBookFlyouts", { apply = RelistBook, restore = RelistBook })
 
 -- Search toggle; off clears any search.
 ns.RegisterModule("spellBookSearch", {
