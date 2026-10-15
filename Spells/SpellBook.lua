@@ -48,10 +48,18 @@ local heldLine
 -- Secure drag from our own casting buttons: the wrap hands the game "spell, id" and the game picks it up itself,
 -- in a fight too (SecureHandlers PickupAny). Nothing of the client's spellbook is borrowed.
 local dragWrap = CreateFrame("Frame", nil, UIParent, "SecureHandlerBaseTemplate")
--- A pet's entry is no "spell" to the game: it drags from the book out of combat (the plain drag).
+-- A pet's entry is no "spell" to the game: in a fight it comes from the first of its copies still on the pool
+-- (Spells/PetPool.lua), out of one from the book (the plain drag).
 local DRAG_BODY = [[
     local id = self:GetAttribute("dragspell")
     if id then return "spell", id end
+    if not PlayerInCombat() then return end
+    local i, slot = 1, self:GetAttribute("pool1")
+    while slot do
+        if HasAction(slot) then return "action", slot end
+        i = i + 1
+        slot = self:GetAttribute("pool" .. i)
+    end
 ]]
 
 -- Hosted, the window's footer keeps A for the game's own spell buttons: while a casting button is picked, A is bound
@@ -319,8 +327,13 @@ local function ArmSpell(btn, slot, bank)
         btn:SetAttribute("type1", nil)
         btn:SetAttribute("spell", nil)
     end
-    -- The secure drag takes our own spells by id.
+    -- The secure drag takes our own spells by id, a pet's entries from their copies on the pool.
     btn:SetAttribute("dragspell", bank == BANK_PLAYER and btn:GetAttribute("spell") or nil)
+    local pool = bank == BANK_PET and info and ns.PetPoolSlots(slot) or nil
+    for i = 1, math.max(btn.poolCount or 0, pool and #pool or 0) do
+        btn:SetAttribute("pool" .. i, pool and pool[i] or nil)
+    end
+    btn.poolCount = pool and #pool or 0
     -- A profession's spell opens its window: the book goes down with the cast, in a fight too (the click wrap).
     local trade = id ~= nil and ns.prof and ns.prof.OpensTrade and ns.prof.OpensTrade(info) or nil
     btn:SetAttribute("trade", trade and true or nil)
@@ -457,8 +470,7 @@ Button_OnEnter = function(self)
 end
 
 local function Button_OnDragStart(self)
-    -- Pickup is protected in combat and no secure type picks up a spell. The
-    -- button's own bank covers pages armed ahead.
+    -- Pickup is protected in combat: there the secure drag takes it. The button's own bank covers pages armed ahead.
     if not self.slot or self.isPassive or InCombatLockdown() then return end
     if self.spellOnly and C_Spell.PickupSpell then
         C_Spell.PickupSpell(self.spellOnly)
@@ -1386,6 +1398,8 @@ local function CreateBook()
             index = index + 1
             local c = containers[index] or NewContainer(index)
             c.kind, c.line, c.content = "pet", nil, nil
+            -- The pool first: the pet pages arm with its slots.
+            ns.SyncPetPool()
             Fill(c, SlotsFor(BANK_PET, state.line, ""), BANK_PET)
             petContainer = c
         end
@@ -1525,7 +1539,8 @@ local function CreateBook()
         rebuildQueued = true
         C_Timer.After(0.1, function()
             rebuildQueued = false
-            if self.Pages.dirty and not InCombatLockdown() then self:BuildPages() end
+            -- A fight's drags took pool copies: put back at its end.
+            if self.Pages.dirty and not InCombatLockdown() then self:BuildPages() else ns.SyncPetPool() end
             if self:IsShown() then self:Refresh() end
         end)
     end)

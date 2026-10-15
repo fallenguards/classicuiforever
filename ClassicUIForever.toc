@@ -192,6 +192,7 @@ Character\StatPanes.lua
 Character\EquipmentPane.lua
 Character\PvPDetail.lua
 Spells\BookLines.lua
+Spells\PetPool.lua
 Spells\BookFlyouts.lua
 Spells\SpellBook.lua
 Spells\SpellsHost.lua
