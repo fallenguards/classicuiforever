@@ -268,9 +268,11 @@ function B.LayoutBags()
     local boxW, boxH = rowW, KEYRING_H
     if vertical then boxW, boxH = KEYRING_H, rowW end
     local buttonScale = ButtonScale(piece, out)
+    -- The client's piece is protected in a fight (its buttons are): left as it stands, hung and sized again after.
+    local locked = InCombatLockdown()
     if out then
         home, homeX, homeY = piece, 0, lift
-        HoldBackpackEnd(piece, grow, boxW, boxH)
+        if not locked then HoldBackpackEnd(piece, grow, boxW, boxH) end
     else
         local relativeTo
         if OneBar() then
@@ -284,7 +286,7 @@ function B.LayoutBags()
         -- The row hangs from the client's bags piece, laid over it first, so edit mode's box sits on the bags
         -- and a drag carries them. A piece mid-drag stays in the player's hand.
         if piece then
-            if not piece.isDragging then
+            if not piece.isDragging and not locked then
                 -- Its own anchor kept: the hand-back puts it back without running edit mode's anchor pass.
                 B.Remember(piece, true)
                 ns.OverlayOnBand(piece, "BOTTOMRIGHT", homePoint, homeX, homeY - lift * buttonScale, boxW * buttonScale, boxH * buttonScale, relativeTo)
@@ -348,7 +350,10 @@ function B.LayoutBags()
     end
     art.bagsLast = prev
     -- Once moved, the piece is only sized to its row.
-    if piece and out then piece:SetSize(boxW, boxH) end
+    if piece and out and not locked then piece:SetSize(boxW, boxH) end
+    if piece and locked then
+        ns.WhenCalm("band.bagsPiece", function() if B.active and B.RowsBack then B.RowsBack() end end)
+    end
     -- The floor: a strip of the band from the backpack, turned with the row.
     LayFloor(art, (out or OneBar()) and not ns.db.hideBagsArt, buttonScale, level, backpack, grow.turn)
     AfterRow(level)

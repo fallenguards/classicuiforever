@@ -132,6 +132,8 @@ local function RowsBack()
     B.WhileApplying(LayRows)
     MarkRows()
 end
+-- The rows laid again after a fight that locked the bag piece (BandBags).
+B.RowsBack = RowsBack
 
 -- Tripwire answer: rows only, outside the burst guard (the bag bar re-lays on the player's cursor, not in answer to us).
 function B.hot.RowsFix()
