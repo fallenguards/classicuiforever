@@ -6,6 +6,7 @@ local L = ns.L
 -- of the first slot and Totemic Recall (spell changes).
 
 local MARGIN, BUTTON, PAGES, SLOTS = 3, 30, 3, 4
+local CELLS = SLOTS + 2   -- summon, the four slots, recall
 local NATIVE_W, NATIVE_H, NATIVE_GAP = 230, 38, 8
 local DEFAULTS = { totemOrientation = "horizontal", totemRows = 1, totemSize = 100, totemPadding = 8, totemKeepRoom = false }
 local EVENTS = { "PLAYER_ENTERING_WORLD", "UPDATE_MULTI_CAST_ACTIONBAR", "SPELLS_CHANGED" }
@@ -77,12 +78,12 @@ local function Lay()
         return
     end
     local list = Cells(ns.db.totemKeepRoom == true)
-    local count = #list
-    if count == 0 then return end
+    -- The bar holds every cell, as the game's own box does (edit mode shows the room); the buttons take their own
+    -- cells with room kept, else pack from the first.
     local scale = ns.db.totemSize / 100
     local cell, pad = BUTTON * scale, ns.db.totemPadding
-    local lines = math.min(ns.db.totemRows, count)
-    local perLine = math.ceil(count / lines)
+    local lines = math.min(ns.db.totemRows, CELLS)
+    local perLine = math.ceil(CELLS / lines)
     local vertical = ns.db.totemOrientation == "vertical"
     for k, entry in ipairs(list) do
         local along, across = (k - 1) % perLine, math.floor((k - 1) / perLine)

@@ -28,6 +28,8 @@ local function Panel(spec)
     panel.rows = 0
     spec.build(panel)
     panel:SetHeight(40 + panel.rows * ROW_H + FOOT + (panel.extraH or 0))
+    -- Made hidden: Follow fills a panel as it shows, and a new frame is shown (its first open drew empty sliders).
+    panel:Hide()
     panels[spec] = panel
     return panel
 end
