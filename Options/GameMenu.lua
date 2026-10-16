@@ -7,8 +7,10 @@ local PANEL_COORDS = ns.RED_COORDS
 
 -- The client adds its own gap (about 4) between buttons, so a button is just its art.
 local BUTTON_W, ART_H, GAP = 144, 21, 2
--- Room the client leaves for its taller header: lift the stack and shorten the box by this.
+-- Room the client leaves for its taller header: our box and plate start this far down. The stack stays where the
+-- client lays it (it lays the menu again after our pass, so a lifted stack dropped back for a moment).
 local TOP_TRIM = 18
+local HEADER_Y, PLATE_Y = 11, 12
 
 local MENU_BUTTON = { set = "file", highlightSet = "raw", coords = PANEL_COORDS, inset = { 0, -GAP / 2, 0, GAP / 2 }, add = true }
 local HEADER_BG = { "LeftBG", "RightBG", "CenterBG" }
@@ -37,27 +39,24 @@ local function SkinButtons()
     if InCombatLockdown() then return end
     for button in GameMenuFrame.buttonPool:EnumerateActive() do SkinButton(button) end
     -- Lay out again at our button size.
-    if not GameMenuFrame.Layout then return end
-    GameMenuFrame:Layout()
-    -- Read fresh from that layout, so the lift is never added twice.
-    for button in GameMenuFrame.buttonPool:EnumerateActive() do
-        local point, relativeTo, relativePoint, x, y = button:GetPoint(1)
-        if point then ns.SetPointOnce(button, point, relativeTo, relativePoint, x or 0, (y or 0) + TOP_TRIM) end
-    end
-    local height = GameMenuFrame:GetHeight()
-    if height and height > TOP_TRIM * 3 then GameMenuFrame:SetHeight(height - TOP_TRIM) end
+    if GameMenuFrame.Layout then GameMenuFrame:Layout() end
 end
 
 local function SkinMenu()
     local menu = GameMenuFrame
     if not menu or not ns.Once(menu, "gameMenu") then return end
     ns.FadeTextures(menu.Border, 0, CHILDREN)
-    ns.DialogBacking(menu)
+    local backing = ns.DialogBacking(menu)
+    backing:ClearAllPoints()
+    backing:SetPoint("TOPLEFT", menu, "TOPLEFT", 0, -TOP_TRIM)
+    backing:SetPoint("BOTTOMRIGHT", menu, "BOTTOMRIGHT", 0, 0)
     local header = menu.Header
     if header then
         ns.FadeKeys(header, HEADER_BG)
+        ns.SetPointOnce(header, "TOP", menu, "TOP", 0, HEADER_Y - TOP_TRIM)
         -- The old plate said Main Menu.
-        ns.DialogHeader(menu, MAIN_MENU, MENU_HEADER, header, header.Text)
+        local plate = ns.DialogHeader(menu, MAIN_MENU, MENU_HEADER, header, header.Text)
+        ns.SetPointOnce(plate, "TOP", menu, "TOP", 0, PLATE_Y - TOP_TRIM)
     end
     ns.HookMethod(menu, "InitButtons", SkinButtons)
     SkinButtons()
@@ -80,11 +79,11 @@ local function SkinInFight()
         local button = row.button
         local point, relativeTo, relativePoint, x, y = button:GetPoint(1)
         SkinButton(button)
-        if point then ns.SetPointOnce(button, point, relativeTo, relativePoint, x or 0, (y or 0) + lost + TOP_TRIM) end
+        if point then ns.SetPointOnce(button, point, relativeTo, relativePoint, x or 0, (y or 0) + lost) end
         lost = lost + row.height - button:GetHeight()
     end
     local height = menu:GetHeight()
-    if height and height > (lost + TOP_TRIM) * 2 then menu:SetHeight(height - lost - TOP_TRIM) end
+    if height and height > lost * 2 then menu:SetHeight(height - lost) end
     menu:SetWidth(BUTTON_W + (menu.leftPadding or 0) + (menu.rightPadding or 0))
 end
 
