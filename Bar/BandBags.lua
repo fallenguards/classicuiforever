@@ -131,8 +131,9 @@ local function RowButtons()
     list[#list + 1] = CharacterReagentBag0Slot
     return list
 end
+-- The band's own piece: off the band (classic bar off, or another addon's bars) the row's pick hands it back.
 local function HoverWanted()
-    return ns.db and ns.db.reagentBagHover == true and not B.ReagentSlot()
+    return B.active and ns.db ~= nil and ns.db.reagentBagHover == true and not B.ReagentSlot()
 end
 local function HoverCheck()
     local reagent = CharacterReagentBag0Slot

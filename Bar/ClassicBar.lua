@@ -417,6 +417,8 @@ local function Restore()
     ClientArtBack(bar)
     PageNumberBack(bar)
     DefaultSpots()
+    -- The bag row read again with the band down (showBags ran first): its round reagent bag's hover hands it back.
+    B.ApplyBagsMode()
     ns.needsReload = true
 end
 
