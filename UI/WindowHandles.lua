@@ -265,6 +265,18 @@ local handles = {}
 -- The map's placeholder: with its quest log pane (as it opens) or the map alone; one place and size for both.
 local mapOnly = false
 
+-- The map's scale of ours and, when the player placed it, its top left (UIParent units) for a box w x h, as Apply lays
+-- it: read ahead of a fight, when the fight layer lays the map (Map/WorldMapFight.lua).
+function ns.MapPlaceFor(w, h)
+    local entry = byKey.map
+    local scale = entry and Scales()[SizeKey(entry)] or 1
+    local left, top
+    if entry then left, top = PlaceOf(entry) end
+    if not left then return scale end
+    local screenW, screenH = UIParent:GetSize()
+    return scale, math.max(0, math.min(left, screenW - w * scale)), math.min(screenH, math.max(top, h * scale))
+end
+
 -- A game window our layout grew after the game laid it (the classic map opening at the game's height): raised as the
 -- game's own fit raises a tall window, its left kept. One the player placed stays.
 function ns.FitGameWindow(key)

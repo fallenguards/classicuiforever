@@ -677,6 +677,16 @@ end
 -- The Era art frame, or nil before the first lay (dev selftest map.fightmouse).
 function ns.ClassicMapArt() return art end
 
+-- For the fight layer (Map/WorldMapFight.lua): the layout header, the style worn and its box, quest pane open or shut.
+ns.MapFight = {
+    Map = Map, Layout = Layout, EraStyle = EraStyle, Target = Target, PANE_KEYS = PANE_KEYS,
+    FullScale = function(w, h) return FullScale({ w = w, h = h }) end,
+    Size = function(style, withPane)
+        if style == "classic" then return ns.MapLarge.Size(withPane and QUEST_PANE_W or nil) end
+        return withPane and PaneWindowW() or ERA_W, ERA_H
+    end,
+}
+
 -- How far the Era layout lifts the quest details' text (its Back button follows, Quest/QuestMapPane.lua).
 function ns.MapDetailsLift() return eraDressed and DETAILS_LIFT or 0 end
 
