@@ -59,6 +59,9 @@ ns.TEX = {
     groupIndicator = "CharacterFrame\\UI-CharacterFrame-GroupIndicator",
     -- The group tab's opening, flipped as the druid mana bar wears it: that bar's mask.
     druidManaMask = "!DruidManaMask.tga",
+    -- The player frame's glow carried round that tab, plain and elite (dev/tools/druid_tab_glow.py).
+    playerFlashTab = "!PlayerFlash-ManaTab.tga",
+    playerFlashTabElite = "!PlayerFlash-ManaTab-Elite.tga",
     -- cast bars
     castBorder = "CastingBar\\UI-CastingBar-Border",
     castBorderSmall = "CastingBar\\UI-CastingBar-Border-Small",

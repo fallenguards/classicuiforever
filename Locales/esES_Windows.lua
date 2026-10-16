@@ -48,3 +48,12 @@ L["OPT_plateCCAbove_TIP"] = "Los iconos de aturdimiento, enraizamiento y miedo a
 L["OPT_plateCCLeft"] = "Control: a la izquierda de la barra"
 L["OPT_plateCCLeft_TIP"] = "Los iconos de aturdimiento, enraizamiento y miedo a la izquierda de la barra de salud, tras una marca de banda; un segundo se añade a la izquierda."
 L["OPT_plateCC_TIP"] = "Dónde muestra una placa de nombre sus iconos de control."
+
+-- Options/Toggles.lua: how the player frame's glow meets the druid mana bar
+L["OPT_druidManaGlowAround"] = "Brillo: alrededor de la barra de maná"
+L["OPT_druidManaGlowAround_TIP"] = "El brillo del marco sigue el borde de la barra de maná."
+L["OPT_druidManaGlowBehind"] = "Brillo: detrás de la barra de maná"
+L["OPT_druidManaGlowBehind_TIP"] = "La barra de maná delante del brillo del marco, como en Wrath."
+L["OPT_druidManaGlowOver"] = "Brillo: sobre la barra de maná"
+L["OPT_druidManaGlowOver_TIP"] = "El brillo del marco cruza la parte superior de la barra de maná."
+L["OPT_druidManaGlow_TIP"] = "Cómo se une el brillo de amenaza y de combate del marco con la barra de maná."

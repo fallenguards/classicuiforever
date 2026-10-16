@@ -48,3 +48,12 @@ L["OPT_plateCCAbove_TIP"] = "Symbole für Betäubung, Bewegungsunfähigkeit und 
 L["OPT_plateCCLeft"] = "Kontrolleffekte: links der Leiste"
 L["OPT_plateCCLeft_TIP"] = "Symbole für Betäubung, Bewegungsunfähigkeit und Furcht links der Gesundheitsleiste, hinter einer Schlachtzugsmarkierung; ein zweites kommt links dazu."
 L["OPT_plateCC_TIP"] = "Wo eine Namensplakette ihre Symbole für Kontrolleffekte zeigt."
+
+-- Options/Toggles.lua: how the player frame's glow meets the druid mana bar
+L["OPT_druidManaGlowAround"] = "Leuchten: um die Manaleiste"
+L["OPT_druidManaGlowAround_TIP"] = "Das Leuchten des Fensters um den Rand der Manaleiste herumgeführt."
+L["OPT_druidManaGlowBehind"] = "Leuchten: hinter der Manaleiste"
+L["OPT_druidManaGlowBehind_TIP"] = "Die Manaleiste vor dem Leuchten des Fensters, wie in Wrath."
+L["OPT_druidManaGlowOver"] = "Leuchten: über der Manaleiste"
+L["OPT_druidManaGlowOver_TIP"] = "Das Leuchten des Fensters quer über den oberen Rand der Manaleiste."
+L["OPT_druidManaGlow_TIP"] = "Wie das Bedrohungs- und Kampfleuchten des Fensters auf die Manaleiste trifft."

@@ -102,3 +102,12 @@ L["OPT_plateCCAbove_TIP"] = "Stun, root and fear icons at the end of the debuff 
 L["OPT_plateCCLeft"] = "Crowd control: left of the bar"
 L["OPT_plateCCLeft_TIP"] = "Stun, root and fear icons left of the health bar, past a raid marker; a second one grows to the left."
 L["OPT_plateCC_TIP"] = "Where a nameplate shows its crowd control icons."
+
+-- Options/Toggles.lua: how the player frame's glow meets the druid mana bar
+L["OPT_druidManaGlowAround"] = "Glow: around the mana bar"
+L["OPT_druidManaGlowAround_TIP"] = "The frame's glow carried round the mana bar's edge."
+L["OPT_druidManaGlowBehind"] = "Glow: behind the mana bar"
+L["OPT_druidManaGlowBehind_TIP"] = "The mana bar in front of the frame's glow, as Wrath drew it."
+L["OPT_druidManaGlowOver"] = "Glow: over the mana bar"
+L["OPT_druidManaGlowOver_TIP"] = "The frame's glow across the top of the mana bar."
+L["OPT_druidManaGlow_TIP"] = "How the frame's threat and combat glow meets the mana bar."

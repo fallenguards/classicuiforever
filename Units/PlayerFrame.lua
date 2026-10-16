@@ -23,6 +23,10 @@ local FLASH = { coords = { 0.9453125, 0, 0, 0.181640625 }, w = 242, h = 93, poin
 -- The elite glow, mirrored from the target's (2 in and 9 up from its plain glow, so 2 out on the flipped side).
 local ELITE_FLASH = { coords = { 0.9453125, 0, 0.181640625, 0.400390625 }, w = 242, h = 112, point = "TOPLEFT", x = -8, y = 5,
     layer = "BACKGROUND" }
+-- The glow carried round the druid mana tab (dev/tools/druid_tab_glow.py): the same spots, the art not mirrored.
+local FLASH_TAB = { coords = { 0, 0.9453125, 0, 0.7265625 }, w = 242, h = 93, point = "TOPLEFT", x = -6, y = -4, layer = "BACKGROUND" }
+local ELITE_FLASH_TAB = { coords = { 0, 0.9453125, 0, 0.875 }, w = 242, h = 112, point = "TOPLEFT", x = -8, y = 5,
+    layer = "BACKGROUND" }
 local STATUS = { coords = { 0, 0.74609375, 0, 0.53125 }, w = 190, h = 66, point = "TOPLEFT", x = 16, y = -12, blend = "ADD" }
 local MASK = { w = PORTRAIT, h = PORTRAIT, point = "TOPLEFT", x = 23, y = -16 }
 local LEVEL_BG = { own = "levelBg", layer = "BORDER", w = BAR_W, h = 19, point = "TOPLEFT", x = BAR_X, y = NAME_Y, vertex = { 0, 0, 0 }, show = false }
@@ -50,11 +54,27 @@ local nameBg, classBand, bandLookedAt, bandLastSeen
 
 -- Thick health over the name: the game's status glow (gold resting, red in a fight) would light the bar in the name
 -- box, so ours rings the whole frame in its color and pulse, and the game's draws nothing.
-local RING = { own = "statusRing", coords = FLASH.coords, w = FLASH.w, h = FLASH.h, point = "TOPLEFT", x = FLASH.x,
-    y = FLASH.y, layer = "BACKGROUND", sublevel = 1, show = false }
-local ELITE_RING = { own = "statusRing", coords = ELITE_FLASH.coords, w = ELITE_FLASH.w, h = ELITE_FLASH.h, point = "TOPLEFT",
-    x = ELITE_FLASH.x, y = ELITE_FLASH.y, layer = "BACKGROUND", sublevel = 1, show = false }
+local function Ring(flash)
+    return { own = "statusRing", coords = flash.coords, w = flash.w, h = flash.h, point = "TOPLEFT", x = flash.x,
+        y = flash.y, layer = "BACKGROUND", sublevel = 1, show = false }
+end
+local RING, ELITE_RING, RING_TAB, ELITE_RING_TAB = Ring(FLASH), Ring(ELITE_FLASH), Ring(FLASH_TAB), Ring(ELITE_FLASH_TAB)
 local ringOn = false
+
+-- The threat glow and the status ring against the druid mana tab (#177): carried round it (the default), behind it
+-- as Wrath drew it, or over it.
+local function GlowRoute()
+    if not ns.DruidManaShown() or ns.db.druidManaGlowOver == true then return "over" end
+    return ns.db.druidManaGlowBehind == true and "behind" or "around"
+end
+
+local function FlashArt(elite, route)
+    if route == "around" then
+        return elite and "playerFlashTabElite" or "playerFlashTab", elite and ELITE_FLASH_TAB or FLASH_TAB,
+            elite and ELITE_RING_TAB or RING_TAB
+    end
+    return "targetingFlash", elite and ELITE_FLASH or FLASH, elite and ELITE_RING or RING
+end
 -- Its watcher hangs off UIParent: one under the protected frame could not wake in a fight.
 local ringWatch = ns.NewFrame("Frame", nil, UIParent)
 -- Hide combat glow took the status file: the game's glow is red.
@@ -93,7 +113,8 @@ local function DressStatus(status, frame)
     if ringOn then
         status:SetTexture(nil)
         local elite = ns.db and ns.db.eliteFrames == true and ns.db.eliteFramePlayer ~= false
-        ring = ns.DressNew(frame, "targetingFlash", elite and ELITE_RING or RING, frame)
+        local key, _, spec = FlashArt(elite, GlowRoute())
+        ring = ns.DressNew(frame, key, spec, frame)
         ring:SetDesaturated(true)
         ring:SetBlendMode("ADD")
         ringJob:Wake()
@@ -127,7 +148,14 @@ local function PlayerArt()
     local sheet = UF.ThickSheet(elite and "targetingElite" or "targetingFrame", "player")
     Dress(container.FrameTexture, sheet, ART, frame)
     Dress(container.AlternatePowerFrameTexture, sheet, ALT_ART, frame)
-    UF.DressGlow(container.FrameFlash, "targetingFlash", elite and ELITE_FLASH or FLASH, frame)
+    local route = GlowRoute()
+    local flashKey, flashSpec = FlashArt(elite, route)
+    local flash = container.FrameFlash
+    UF.DressGlow(flash, flashKey, flashSpec, frame)
+    -- Behind or round the tab: under it, on the frame itself as 1.x's flash was (the client places it by its parent,
+    -- the same box).
+    local holder = route == "over" and container or frame
+    if flash and flash:GetParent() ~= holder then flash:SetParent(holder) end
     local main = ns.Path(frame, "PlayerFrameContent", "PlayerFrameContentMain")
     DressStatus(main and main.StatusTexture, frame)
     -- Modern circles return with the art; 1.x had none.
@@ -375,11 +403,18 @@ local function RestorePlayer()
     if not PlayerFrame or not UF.frames.player then return end
     UF.frames.player = nil
     HideOwnPvp(PlayerFrame)
+    local container = PlayerFrame.PlayerFrameContainer
+    if container and container.FrameFlash then container.FrameFlash:SetParent(container) end
     if classBand then classBand:SetAlpha(1) end
     ns.Unfade(ns.Path(PlayerFrame, "PlayerFrameContent", "PlayerFrameContentContextual", "PVPIcon"))
     HideHost(PlayerFrame)
     FadeKeys(ns.Path(PlayerFrame, "PlayerFrameContent", "PlayerFrameContentMain"), CLIENT_BARS, 1)
     ns.needsReload = true
+end
+
+-- The druid mana tab came or went, or the glow's pick turned: flash and ring re-laid at once, in a fight too.
+function UF.PlayerGlowRoute()
+    if UF.active and On("player") and UF.frames.player then PlayerArt() end
 end
 
 UF.SkinPlayer, UF.RestorePlayer, UF.KeepPlayerArt = SkinPlayer, RestorePlayer, KeepPlayerArt

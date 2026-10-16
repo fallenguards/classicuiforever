@@ -48,3 +48,12 @@ L["OPT_plateCCAbove_TIP"] = "Le icone di stordimento, immobilizzazione e paura i
 L["OPT_plateCCLeft"] = "Controllo: a sinistra della barra"
 L["OPT_plateCCLeft_TIP"] = "Le icone di stordimento, immobilizzazione e paura a sinistra della barra della salute, dopo un segno di incursione; una seconda si aggiunge a sinistra."
 L["OPT_plateCC_TIP"] = "Dove una targhetta mostra le sue icone di controllo."
+
+-- Options/Toggles.lua: how the player frame's glow meets the druid mana bar
+L["OPT_druidManaGlowAround"] = "Bagliore: attorno alla barra del mana"
+L["OPT_druidManaGlowAround_TIP"] = "Il bagliore del riquadro segue il bordo della barra del mana."
+L["OPT_druidManaGlowBehind"] = "Bagliore: dietro la barra del mana"
+L["OPT_druidManaGlowBehind_TIP"] = "La barra del mana davanti al bagliore del riquadro, come in Wrath."
+L["OPT_druidManaGlowOver"] = "Bagliore: sopra la barra del mana"
+L["OPT_druidManaGlowOver_TIP"] = "Il bagliore del riquadro attraversa la parte alta della barra del mana."
+L["OPT_druidManaGlow_TIP"] = "Come il bagliore di minaccia e di combattimento del riquadro incontra la barra del mana."

@@ -111,7 +111,12 @@ function Update()
         bar:SetValue(now)
         Numbers(now, most)
     end
-    ns.SetShownIf(bar, show and true or false)
+    -- The frame's glow is routed by the tab (Units/PlayerFrame.lua): a form change re-lays it.
+    if ns.SetShownIf(bar, show and true or false) then UF.PlayerGlowRoute() end
+end
+
+function ns.DruidManaShown()
+    return bar ~= nil and bar:IsShown()
 end
 
 -- Druids only, with the classic player frame and the option on; called by the unit frame module and the switch.
@@ -131,7 +136,9 @@ function ns.DruidManaSync()
     if bar then Update() end
 end
 
--- The options pass waits out a fight: the switch answers at once.
+-- The options pass waits out a fight: the switch and the glow's pick answer at once.
+local GLOW_KEYS = { druidManaGlowAround = true, druidManaGlowBehind = true, druidManaGlowOver = true }
 ns.OnToggle(function(key)
     if key == "druidMana" then ns.DruidManaSync() end
+    if GLOW_KEYS[key] then UF.PlayerGlowRoute() end
 end)
