@@ -219,9 +219,11 @@ function UF.LayBars(frame, style)
     lay.health:SetHeight(height)
     local powerShown = style ~= "mana"
     ns.SetShownIf(lay.power, powerShown)
-    -- Its faded client bar over the health bar there: the mouse goes through to health.
-    if lay.clientPower and lay.clientPower:IsMouseEnabled() ~= powerShown then
-        pcall(lay.clientPower.EnableMouse, lay.clientPower, powerShown)
+    -- Its faded client bar over the health bar there: the mouse goes through to health. Motion only, as the game makes
+    -- it: a click goes on to the unit frame and opens its menu (#183).
+    local client = lay.clientPower
+    if client and client:IsMouseMotionEnabled() ~= powerShown then
+        pcall(client.SetMouseMotionEnabled, client, powerShown)
     end
     if lay.clientPower and UF.HoverSensing then UF.HoverSensing(lay.clientPower, powerShown) end
     for _, fs in ipairs(lay.powerTexts or {}) do ns.SetAlphaIf(fs, powerShown and 1 or 0) end
