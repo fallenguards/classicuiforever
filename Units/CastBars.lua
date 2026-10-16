@@ -140,7 +140,8 @@ local function Position(bar)
     end
     local container = parent:GetAuraContainer()
     local ok, _, relativeTo = pcall(bar.GetPoint, bar, 1)
-    local underAuras = ok and container ~= nil and relativeTo == container
+    -- Rows we hung over the frame (focus Buffs On Top of ours): the bar goes under the frame, not the rows.
+    local underAuras = ok and container ~= nil and relativeTo == container and not ns.UF.AurasOnTop(parent)
     if ns.OnSpellBarPlaced then ns.OnSpellBarPlaced(bar, underAuras, parent) end
     bar:ClearAllPoints()
     if underAuras then
@@ -156,6 +157,8 @@ local function Position(bar)
     end
     bar:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 43, y)
 end
+
+ns.PlaceUnitSpellBar = Position
 
 local function StopFinishAnims(bar)
     for _, key in ipairs(FINISH_ANIMS) do

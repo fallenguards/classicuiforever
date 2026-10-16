@@ -130,6 +130,7 @@ Units\RaidManager.lua
 Units\UnitFrames.lua
 Units\BuffArrow.lua
 Units\CastBars.lua
+Units\BuffsOnTop.lua
 Units\SwingTimers.lua
 Units\ResourceDisplay.lua
 Units\StatusFont.lua

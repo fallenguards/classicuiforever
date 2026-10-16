@@ -75,6 +75,20 @@ function ns.DialogExtraSlider(panel, label, init, onChange)
     return B.GuardedSlider(slider, init, onChange, { formatters = formatters, owner = panel })
 end
 
+-- A check row as the client's dialog draws one: get() -> on; set(on). Returns its fill function.
+function ns.DialogExtraCheck(panel, label, get, set)
+    local check = ns.NewFrame("CheckButton", nil, panel, "UICheckButtonTemplate")
+    check:SetSize(32, 32)
+    check:SetPoint("TOPLEFT", panel.title, "BOTTOMLEFT", -4, -10 - panel.rows * ROW_H)
+    ns.SkinCheckbox(check)
+    local text = check:CreateFontString(nil, "ARTWORK", "GameFontHighlightMedium")
+    text:SetPoint("LEFT", check, "RIGHT", 6, 0)
+    text:SetText(label)
+    panel.rows = panel.rows + 1
+    check:SetScript("OnClick", function(self) set(self:GetChecked() and true or false) end)
+    return function() check:SetChecked(get() == true) end
+end
+
 -- The client's default for each setting of a system, from the Modern preset, as the dialog shows them.
 function ns.ClientDefaults(frame)
     local presets = _G.EditModePresetLayoutManager

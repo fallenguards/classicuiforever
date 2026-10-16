@@ -179,6 +179,7 @@ ns.DB_DEFAULTS = {
     barArtHidden = false,
     statusBarBacking = true,
     xpTipRested = false,
+    focusBuffsOnTop = false, petBuffsOnTop = false,
     gryphonsOverBars = false,
     showGryphonLeft = true, hideGryphonLeft = false, showGryphonRight = true, hideGryphonRight = false,
     -- The game's own Hidden on a gryphon (its edit mode dialog, before ours) read into the choice once.
