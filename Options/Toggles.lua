@@ -265,9 +265,6 @@ ns.TOGGLES = {
     { "showMinimapCoords", L["OPT_showMinimapCoords"], SHOW_TIP, parent = "minimap", radio = "minimapCoordsShow", drop = true, search = "coords position" },
     { "hoverMinimapCoords", L["OPT_hoverMinimapCoords"], SHOW_TIP, parent = "minimap", radio = "minimapCoordsShow", drop = true },
     { "hideMinimapCoords", L["OPT_hideMinimapCoords"], SHOW_TIP, parent = "minimap", radio = "minimapCoordsShow", drop = true },
-    { "showMinimapDifficulty", L["OPT_showMinimapDifficulty"], SHOW_TIP, parent = "minimap", radio = "minimapDifficultyShow", drop = true, search = "dungeon raid heroic skull banner" },
-    { "hoverMinimapDifficulty", L["OPT_hoverMinimapDifficulty"], SHOW_TIP, parent = "minimap", radio = "minimapDifficultyShow", drop = true },
-    { "hideMinimapDifficulty", L["OPT_hideMinimapDifficulty"], SHOW_TIP, parent = "minimap", radio = "minimapDifficultyShow", drop = true },
     { "hideButtonBorders", L["OPT_hideButtonBorders"], L["OPT_hideButtonBorders_TIP"], parent = "minimap", search = "ring icons" },
     { "minimapButton", L["OPT_minimapButton"], L["OPT_minimapButton_TIP"] },
     { "showOptionsButton", L["OPT_showOptionsButton"], L["OPT_showOptionsButton_TIP"], parent = "minimapButton", radio = "optionsButtonShow", drop = true },
@@ -341,7 +338,16 @@ local FOREVER_ROWS = {
 }
 
 -- Retail's adventure guide and housing buttons, in the micro lists after Collections; Forever holds both off itself.
+-- Its difficulty flag after the coordinates; Forever's minimap has none.
 local RETAIL_ROWS = {
+    hideMinimapCoords = {
+        { "showMinimapDifficulty", L["OPT_showMinimapDifficulty"], SHOW_TIP, parent = "minimap", radio = "minimapDifficultyShow",
+            drop = true, search = "dungeon raid heroic skull banner" },
+        { "hoverMinimapDifficulty", L["OPT_hoverMinimapDifficulty"], SHOW_TIP, parent = "minimap", radio = "minimapDifficultyShow",
+            drop = true },
+        { "hideMinimapDifficulty", L["OPT_hideMinimapDifficulty"], SHOW_TIP, parent = "minimap", radio = "minimapDifficultyShow",
+            drop = true },
+    },
     hideMicroCollections = {
         { "hideMicroJournal", L["OPT_hideMicroJournal"], L["OPT_hideMicroJournal_TIP"], parent = "hideMicroButtons",
             checks = "hideMicroList", drop = true },

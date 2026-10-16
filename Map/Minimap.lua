@@ -598,7 +598,7 @@ local function Layout()
         MM.PlaceEye()
         MM.WatchEye()
     end
-    -- 1.x had no difficulty flag: hidden by default (the game shows it per instance).
+    -- Retail's difficulty flag (Forever's minimap has none): hidden by default, as 1.x had none.
     if cluster.InstanceDifficulty then
         ns.SetPointOnce(cluster.InstanceDifficulty, "TOPLEFT", cluster, "TOPLEFT", 22, -17)
         ns.MinimapShow(cluster.InstanceDifficulty, "MinimapDifficulty", true)
