@@ -137,6 +137,15 @@ function ns.EventFrame(events, onEvent, unit1, unit2)
     return frame
 end
 
+-- attach() now, else after each addon load until it answers true (a client addon's frames not made yet).
+function ns.AttachWhenLoaded(attach)
+    if attach() then return end
+    local wait
+    wait = ns.EventFrame("ADDON_LOADED", function()
+        if attach() then wait:UnregisterAllEvents() end
+    end)
+end
+
 -- fn(child, a1..a4) per child or region without building a table; returns the count.
 -- Forbidden frames (the bank has one) are never asked. Protected forms pcall the whole walk, never the getter:
 -- a pcall returning 22 or more values aborts the beta client (Lua's api check, lapi.c 577).

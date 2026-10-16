@@ -26,7 +26,7 @@ read_globals = {
     "GetCategoryList", "GetCategoryInfo", "GetCategoryNumAchievements", "GetAchievementInfo", "GetAchievementLink",
     "GetAchievementNumCriteria", "GetAchievementCriteriaInfo", "FormatShortDate", "C_MajorFactions", "RenownRewardUtil", "C_MountJournal",
     "GREEN_FONT_COLOR_CODE", "RED_FONT_COLOR_CODE", "FONT_COLOR_CODE_CLOSE",
-    "C_Map", "WORLD_MAP", "CONTINENT", "ZOOM_OUT", "ZOOM_OUT_BUTTON_TEXT", "MAP_OPTIONS_TEXT", "ItemTextGetMaterial", "ItemTextFramePageBg", "ItemTextPageText",
+    "C_Map", "C_Minimap", "CreateVector2D", "WORLD_MAP", "CONTINENT", "ZOOM_OUT", "ZOOM_OUT_BUTTON_TEXT", "MAP_OPTIONS_TEXT", "ItemTextGetMaterial", "ItemTextFramePageBg", "ItemTextPageText",
     "ItemTextIsFullPage", "ItemTextPageScrollChild", "ItemTextGetText", "ItemTextGetCreator", "ITEM_TEXT_FROM",
     "date", "GetFlyoutInfo", "GetFlyoutSlotInfo",
     "InputUtil", "GetNumLootItems",

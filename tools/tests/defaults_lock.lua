@@ -175,6 +175,7 @@ return {
     lootRoll = false,
     lootWindow = true,
     mapFade = false,
+    mapMarkers = true,
     mapNavBar = false,
     mapNavClassic = true,
     mapNavNone = false,

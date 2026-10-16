@@ -190,6 +190,7 @@ ns.DB_DEFAULTS = {
     questMapPane = true,
     worldMap = true,
     mapNavClassic = true,
+    mapMarkers = true,
     mapNavBar = false,
     mapNavNone = false,
     mapOptions = true,

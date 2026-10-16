@@ -197,6 +197,7 @@ ns.TOGGLES = {
     { "hideMapQuestButton", L["OPT_hideMapQuestButton"], L["OPT_hideMapQuestButton_TIP"], search = "quest list toggle side panel expand" },
     { "questMapPane", L["OPT_questMapPane"], L["OPT_questMapPane_TIP"] },
     { "mapFade", L["OPT_mapFade"], L["OPT_mapFade_TIP"] },
+    { "mapMarkers", L["OPT_mapMarkers"], L["OPT_mapMarkers_TIP"], search = "town city capital settlement icon marker tower house continent" },
     { "mapUnlocked", L["OPT_mapUnlocked"], L["OPT_mapUnlocked_TIP"], search = "move map lock" },
 
     { "whoList", L["OPT_whoList"], L["OPT_whoList_TIP"], group = L["GROUP_SOCIAL"] },

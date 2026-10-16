@@ -177,6 +177,7 @@ Map\WorldMapEraLarge.lua
 Map\WorldMapOptions.lua
 Map\WorldMapClassic.lua
 Map\WorldMapFight.lua
+Map\WorldMapMarkers.lua
 Windows\BagBand.lua
 Windows\Bags.lua
 Windows\BagReagent.lua

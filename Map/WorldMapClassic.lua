@@ -729,12 +729,7 @@ end
 -- At login, and after a fight that held off a lay.
 ns.EventFrame({ "PLAYER_ENTERING_WORLD", "PLAYER_REGEN_ENABLED" }, function() LayShut() end)
 
-if not Attach() then
-    local wait
-    wait = ns.EventFrame("ADDON_LOADED", function()
-        if Attach() then wait:UnregisterAllEvents() end
-    end)
-end
+ns.AttachWhenLoaded(Attach)
 
 local PASS_KEYS = { mapNavBar = true, mapNavClassic = true, mapNavNone = true, worldMap = true, hideMapQuestButton = true,
     mapOptions = true, mapOptionsHover = true, mapOptionsHidden = true }

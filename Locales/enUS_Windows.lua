@@ -3,6 +3,8 @@ local L = ns.L
 
 -- Our window mover and its edit mode window (UI/), the one bag's reagent slots and the bag bar pick, beside Locales/enUS.lua.
 -- UI/WindowHandles.lua
+L["OPT_leaveGameWindows"] = "Leave game windows to other addons"
+L["OPT_leaveGameWindows_TIP"] = "Stops placing, sizing and locking the game's own windows, so an addon that moves windows can have them. Our own windows keep their lock."
 L["UI_CHARACTER"] = "Character"
 L["UI_PROFESSIONS"] = "Professions"
 L["UI_TALENTS"] = "Talents"
