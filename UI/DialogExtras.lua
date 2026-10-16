@@ -6,6 +6,8 @@ local _, ns = ...
 
 -- FOOT: room under the last row, clear of the panel's border as the game's dialog keeps its own.
 local PANEL_W_PAD, ROW_H, FOOT = 26, 36, 22
+-- A row: its label, then the control to the value's column, which ends PANEL_W_PAD in (the panel takes the dialog's width).
+local LABEL_W, LABEL_GAP, VALUE_W, CONTROL_MIN = 130, 6, 52, 80
 local specs = {}     -- { match(system), title, build(panel), fill(panel) }
 local panels = {}    -- spec -> its panel
 local watching = false
@@ -34,6 +36,15 @@ local function Panel(spec)
     return panel
 end
 
+-- Sliders and drop downs to this panel's width, as it shows.
+local function FitRows(panel)
+    local width = panel:GetWidth()
+    if not width or width <= 0 then return end
+    local room = math.max(CONTROL_MIN, width - 2 * PANEL_W_PAD - LABEL_W - LABEL_GAP - VALUE_W)
+    for _, slider in ipairs(panel.sliders or ns.EMPTY) do slider:SetWidth(room) end
+    for _, dropdown in ipairs(panel.dropdowns or ns.EMPTY) do dropdown:SetWidth(room + VALUE_W) end
+end
+
 local function Follow()
     local dialog = Dialog()
     local system = dialog and dialog:IsShown() and dialog.attachedToSystem
@@ -45,6 +56,7 @@ local function Follow()
             ns.SetPointOnce(panel, "TOPLEFT", dialog, "BOTTOMLEFT", 0, 6)
             panel:SetPoint("TOPRIGHT", dialog, "BOTTOMRIGHT", 0, 6)
             if not panel:IsShown() then
+                FitRows(panel)
                 spec.fill(panel)
                 panel:Show()
             end
@@ -67,7 +79,7 @@ end
 local function RowLabel(panel, label)
     local text = panel:CreateFontString(nil, "ARTWORK", "GameFontHighlightMedium")
     text:SetPoint("TOPLEFT", panel.title, "BOTTOMLEFT", 0, -14 - panel.rows * ROW_H)
-    text:SetWidth(130)
+    text:SetWidth(LABEL_W)
     text:SetJustifyH("LEFT")
     text:SetText(label)
     panel.rows = panel.rows + 1
@@ -81,8 +93,10 @@ local function Whole(v) return tostring(math.floor(v + 0.5)) end
 function ns.DialogExtraSlider(panel, label, init, onChange, format)
     local B = ns.band
     local text = RowLabel(panel, label)
-    local slider, formatters = B.StepperSlider(panel, 180, text, 6, format or Whole)
+    local slider, formatters = B.StepperSlider(panel, 180, text, LABEL_GAP, format or Whole)
     if not slider then return function() end, text end
+    panel.sliders = panel.sliders or {}
+    panel.sliders[#panel.sliders + 1] = slider
     return B.GuardedSlider(slider, init, onChange, { formatters = formatters, owner = panel }), text
 end
 
@@ -91,7 +105,9 @@ function ns.DialogExtraDrop(panel, label, options, get, set)
     local text = RowLabel(panel, label)
     local dropdown = ns.NewFrame("DropdownButton", nil, panel, "WowStyle1DropdownTemplate")
     dropdown:SetWidth(180)
-    dropdown:SetPoint("LEFT", text, "RIGHT", 6, 0)
+    dropdown:SetPoint("LEFT", text, "RIGHT", LABEL_GAP, 0)
+    panel.dropdowns = panel.dropdowns or {}
+    panel.dropdowns[#panel.dropdowns + 1] = dropdown
     ns.SkinDropdown(dropdown)
     dropdown:SetupMenu(function(_, root)
         for _, option in ipairs(options) do

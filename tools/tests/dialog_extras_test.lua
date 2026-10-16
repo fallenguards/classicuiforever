@@ -17,11 +17,13 @@ local function Check(ok, what)
 end
 
 local function Frame()
-    local f = { shown = true, height = 0 }
+    local f = { shown = true, height = 0, width = 389 }
     function f:SetFrameStrata() end
     function f:SetFrameLevel() end
     function f:SetPoint() end
     function f:SetHeight(h) self.height = h end
+    function f:SetWidth(w) self.width = w end
+    function f:GetWidth() return self.width end
     function f:Show() self.shown = true end
     function f:Hide() self.shown = false end
     function f:IsShown() return self.shown end
@@ -95,6 +97,20 @@ follow()
 panel = seen[#seen]
 Check(panel and panel.height >= CONTENT_FOOT + BORDER + 8,
     "one row: the panel runs past it and its border, height " .. tostring(panel and panel.height))
+
+-- A slider row in the narrow Totem Bar dialog (389 wide): label, slider and its value inside the padding (its value
+-- once fell past the border).
+local pad, label, gap = 26, 130, 6
+local sliders = Frame()
+sliders.width = 180
+panel.sliders = { sliders }
+panel.shown = false
+dialog.attachedToSystem = nil
+follow()
+dialog.attachedToSystem = other
+follow()
+Check(pad + label + gap + sliders.width + 40 <= panel.width - pad,
+    "slider and value inside the panel, slider " .. sliders.width .. " in " .. panel.width)
 
 if failed > 0 then
     print(failed .. " check(s) failed")
