@@ -1343,6 +1343,12 @@ def client_key_hits(lx, funcs):
     return found
 
 
+# Our own addons name each other freely (EasyFind and its companions, ...): never a hit, whatever the list holds.
+OWN_ADDONS = {"easyfind", "easycalc", "easychat", "easyclipboard", "easyclock", "easycopypaste", "easygps", "easyguide",
+              "easyicons", "easyitems", "easyonboarding", "easyoptions", "easysettings", "easysnippets",
+              "transmoginspector", "boundtolearn", "mapzeroth", "classicuiforever", "classicuidamagemeter"}
+
+
 # Comments and strings count: names hid in a tooltip and a comment.
 def otheraddon_rx():
     """The names, from the main checkout's gitignored dev/otheraddons.txt (no name in the repo); None without it."""
@@ -1354,12 +1360,13 @@ def otheraddon_rx():
             names = [n.strip() for n in fh if n.strip() and not n.startswith("#")]
     except OSError:
         return None
+    names = [n for n in names if re.sub(r"[-\s]+", "", n.lower()) not in OWN_ADDONS]
     parts = [r"[-\s]*".join(re.escape(w) for w in re.split(r"[-\s]+", n)) for n in names]
     return re.compile(r"(?i)\b(?:" + "|".join(parts) + r")\b") if parts else None
 
 
 OTHERADDON_RX = otheraddon_rx()
-# The settings Support tab is the one place that names our other addon.
+# The settings Support tab's links and lines (SUPPORT_MORE) are never a hit.
 OTHERADDON_HOME = "Options/HelpPanes.lua"
 OTHERADDON_OK = re.compile(r"SUPPORT_MORE")
 
