@@ -157,12 +157,18 @@ P.WINDOWS = WINDOWS
 local watcher
 local done = {}   -- WINDOWS index -> dressed (for good)
 
+-- A window with its own row (the map, loot) by that row alone (#184); every other by Window frames.
+local function Wanted(entry)
+    if entry.toggle then return ns.ModuleInForce(entry.toggle) end
+    return P.active
+end
+
 -- Each entry doubles as SkinWindow's opts (read only).
 local function SkinKnown()
     local skinned = P.skinned
     for i = 1, #WINDOWS do
         local entry = WINDOWS[i]
-        if not done[i] and not (entry.toggle and ns.db[entry.toggle] == false) then
+        if not done[i] and Wanted(entry) then
             local frame = _G[entry[1]]
             if frame and entry.child then frame = frame[entry.child] end
             if frame then
@@ -176,12 +182,14 @@ local function SkinKnown()
     end
 end
 
+local function Watch()
+    watcher = watcher or ns.EventFrame("ADDON_LOADED", SkinKnown)
+end
+
 local function Apply()
     P.active = true
     SkinKnown()
-    if not watcher then
-        watcher = ns.EventFrame("ADDON_LOADED", function() if P.active then SkinKnown() end end)
-    end
+    Watch()
 end
 
 local function Restore()
@@ -194,12 +202,12 @@ end
 
 ns.RegisterModule("panels", { apply = Apply, restore = Restore })
 
--- A window with its own row (the entry's toggle): dressed by the panels pass while on; off, the strip goes and the
--- rest waits for the reload, as Window frames off does. Frame() is the dressed frame, once it exists.
+-- A window with its own row (the entry's toggle): dressed while that row is on, Window frames or not; off, the strip
+-- goes and the rest waits for the reload, as Window frames off does. Frame() is the dressed frame, once it exists.
 local stripOff = setmetatable({}, { __mode = "k" })   -- frame -> its row hid the strip (the loot skin hides its own)
 local function RowPass(Frame)
     local function Apply()
-        if not P.active then return end
+        Watch()
         local frame = Frame()
         if frame and stripOff[frame] then
             stripOff[frame] = nil

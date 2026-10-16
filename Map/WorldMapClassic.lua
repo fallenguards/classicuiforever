@@ -114,7 +114,7 @@ end
 
 -- The header style the map wears now, nil for the game's own.
 local function EraStyle()
-    local style = Map() and P.active and ns.db.worldMap ~= false and NavStyle()
+    local style = Map() and ns.ModuleInForce("worldMap") and NavStyle()
     if style and style ~= "forever" then return style end
 end
 
@@ -698,7 +698,7 @@ end
 
 -- The edit mode box: the size the header style draws, the client's for its own layout.
 function ns.ClassicMapSize()
-    local style = P.active and ns.db.worldMap ~= false and NavStyle()
+    local style = ns.ModuleInForce("worldMap") and NavStyle()
     if style == "classic" then
         local w, h = ns.MapLarge.Size(nil)
         return w, h, ns.MapLarge.Size(QUEST_PANE_W) - w
