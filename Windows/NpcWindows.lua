@@ -97,13 +97,35 @@ local function Trim(region, atLeast)
     if tall and tall > atLeast then region:SetHeight(tall - NPC_WINDOW_TRIM) end
 end
 
+-- The text area's foot over the window's bottom edge.
+local PAGE_FOOT = 27
+local MATERIAL_TOP = { "MaterialTopLeft", "MaterialTopRight" }
+local MATERIAL_BOTTOM = { "MaterialBotLeft", "MaterialBotRight" }
+
 -- Parchment sizes from its art, which the client re-sets when theming (it hung
 -- below the gossip window): pin its foot to end with the text area.
 local function Foot(ground, frame)
     if not ground or not ground.SetPoint then return end
     local point, _, _, x = ground:GetPoint(1)
     if point ~= "TOPLEFT" then return end
-    ground:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", x or 7, 27)
+    ground:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", x or 7, PAGE_FOOT)
+end
+
+-- A quest object's page material (stone, bronze) is four pieces sized for the tall window (#178): squeezed to the parchment.
+local function FitMaterial(panel, frame)
+    local topLeft, botLeft = panel.MaterialTopLeft, panel.MaterialBotLeft
+    if not topLeft or not botLeft then return end
+    local point, _, _, _, y = topLeft:GetPoint(1)
+    local top, bottom = topLeft:GetHeight(), botLeft:GetHeight()
+    local room = frame:GetHeight() + (y or 0) - PAGE_FOOT
+    if point ~= "TOPLEFT" or room <= 0 or top + bottom <= room then return end
+    local scale = room / (top + bottom)
+    for _, key in ipairs(MATERIAL_TOP) do
+        if panel[key] then panel[key]:SetHeight(top * scale) end
+    end
+    for _, key in ipairs(MATERIAL_BOTTOM) do
+        if panel[key] then panel[key]:SetHeight(bottom * scale) end
+    end
 end
 
 local function ShortenNpcWindow(frame, scrolls, panels, grounds)
@@ -123,6 +145,7 @@ local function ShortenNpcWindow(frame, scrolls, panels, grounds)
         panel = Resolve(panel)
         Trim(panel, 400)
         if panel and panel.Bg then Foot(panel.Bg, frame) end
+        if panel then FitMaterial(panel, frame) end
     end
     for _, ground in ipairs(grounds or EMPTY) do Foot(ground, frame) end
 end
