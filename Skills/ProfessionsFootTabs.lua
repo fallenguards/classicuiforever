@@ -24,7 +24,7 @@ local NARROW = { x = 54, step = 80, drawn = 74, overlap = -48, hit = 27, slot = 
 local BORDER_W = 338   -- the spellbook's border, 12 to 350
 local firstX   -- the first tab's centre as last laid (the row centred when it would stand off to the right)
 local function Spec()
-    return ns.CollectionsMicroHidden and ns.CollectionsMicroHidden() and NARROW or WIDE
+    return ns.BookCollectionsTab and ns.BookCollectionsTab() and NARROW or WIDE
 end
 
 -- Shown with its tab inside the window, never by the window: placed while it was shut, a pad went hidden for the fight.

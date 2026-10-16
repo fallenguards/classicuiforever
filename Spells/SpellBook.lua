@@ -1659,7 +1659,7 @@ local function CreateBook()
     end
 
     function f:UpdateBookTabs()
-        local narrow = ns.CollectionsMicroHidden and ns.CollectionsMicroHidden() or false
+        local narrow = ns.BookCollectionsTab and ns.BookCollectionsTab() or false
         local petCount, token = PetSpellCount()
         LayTabs(narrow, petCount > 0)
         narrow = laidNarrow
@@ -2193,7 +2193,8 @@ ns.RegisterModule("spellBookSearch", {
     end,
 })
 
--- The Collections tab comes and goes with its micro button.
+-- The Collections tab comes and goes with its micro button and its own option.
+local COLLECTIONS_TAB_KEYS = { hideMicroCollections = true, hideMicroButtons = true, spellBookCollectionsTab = true }
 ns.OnToggle(function(key)
-    if (key == "hideMicroCollections" or key == "hideMicroButtons") and book and book.Refresh then book:Refresh() end
+    if COLLECTIONS_TAB_KEYS[key] and book and book.Refresh then book:Refresh() end
 end)

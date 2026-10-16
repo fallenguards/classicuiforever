@@ -21,7 +21,7 @@ end
 -- Out of combat: tabs placed by points (the window holds nothing protected, so a fight changes nothing here).
 local function LayTabs()
     local pet = PetTitle()
-    local narrow = pet ~= nil or (ns.CollectionsMicroHidden and ns.CollectionsMicroHidden()) or false
+    local narrow = pet ~= nil or (ns.BookCollectionsTab and ns.BookCollectionsTab()) or false
     local spec = narrow and NARROW or WIDE
     local tabs = B.tabs
     local order = { tabs[1], tabs[2], tabs[3], pet and tabs[4] or nil }

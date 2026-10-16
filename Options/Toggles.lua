@@ -201,6 +201,8 @@ ns.TOGGLES = {
     { "spellBookFlyouts", L["OPT_spellBookFlyouts"], L["OPT_spellBookFlyouts_TIP"], parent = "spellBook",
         search = "flyout group similar aspects tracking pet" },
     { "spellBookSearch", L["OPT_spellBookSearch"], L["OPT_spellBookSearch_TIP"], parent = "spellBook" },
+    { "spellBookCollectionsTab", L["OPT_spellBookCollectionsTab"], L["OPT_spellBookCollectionsTab_TIP"], parent = "spellBook",
+        search = "collections tab foot mounts pets toys appearances hide" },
     { "talents", L["OPT_talents"], ns.OnForever() and L["OPT_talents_TIP"] or L["OPT_talents_GAME_TIP"] },
 
     { "professionsBook", L["OPT_professionsBook"], L["OPT_professionsBook_TIP"], group = L["GROUP_PROFESSIONS"] },

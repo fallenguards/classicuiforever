@@ -242,6 +242,11 @@ function ns.CollectionsMicroHidden()
     return db ~= nil and db.hideMicroButtons == true and db.hideMicroCollections == true
 end
 
+-- That tab, unless the player turned it off (Spellbook, Collections tab).
+function ns.BookCollectionsTab()
+    return ns.CollectionsMicroHidden() and ns.db.spellBookCollectionsTab ~= false
+end
+
 -- Off the row: the shop always; the ones picked under Hide micro buttons. Second value: left off by the option.
 -- Help hides by its own row even with Hide micro buttons off: it came with 0.14.0, and older installs keep it off.
 local function HiddenByOption(db, key)

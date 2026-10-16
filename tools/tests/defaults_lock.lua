@@ -301,6 +301,7 @@ return {
     showMinimapZoomOut = true,
     showOptionsButton = true,
     spellBook = true,
+    spellBookCollectionsTab = true,
     spellBookFlyouts = false,
     spellBookHidePassives = false,
     spellBookSearch = true,

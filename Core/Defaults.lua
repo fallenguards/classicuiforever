@@ -180,6 +180,7 @@ ns.DB_DEFAULTS = {
     barArtHidden = false,
     statusBarBacking = true,
     xpTipRested = false,
+    spellBookCollectionsTab = true,
     focusBuffsOnTop = false, petBuffsOnTop = false,
     panelAchievements = true,
     panelJournal = true,

@@ -5,6 +5,7 @@
 return {
     hideThreatGlow = "same for everyone: opt-in, off by default",
     xpTipRested = "same for everyone: opt-in, off by default",
+    spellBookCollectionsTab = "same for everyone: on by default, the Collections tab as before; off takes it away",
     panelAchievements = "same for everyone: on by default under Window frames, which dressed every window as before; unchecked leaves that window the game's",
     panelJournal = "same for everyone: on by default under Window frames, which dressed every window as before; unchecked leaves that window the game's",
     panelAddons = "same for everyone: on by default under Window frames, which dressed every window as before; unchecked leaves that window the game's",
