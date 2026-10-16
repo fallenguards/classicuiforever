@@ -60,3 +60,7 @@ L["OPT_druidManaGlow_TIP"] = "Come il bagliore di minaccia e di combattimento de
 
 -- Options/OptionsWindow.lua: the game's settings' ClassicUI Forever entry
 L["OPTWIN_SETTINGS_HOME"] = "Cerca tra tutte le opzioni qui sopra, o scegli una pagina sotto ClassicUI Forever a sinistra."
+L["OPT_themeIgnoreElitePlayer"] = "Riquadri: Giocatore"
+L["OPT_themeIgnoreEliteTarget"] = "Riquadri: Bersaglio"
+L["OPT_themeIgnoreEliteFocus"] = "Riquadri: Focus"
+L["OPT_themeIgnoreEliteFrames_TIP"] = "I riquadri il cui drago mantiene il proprio oro o argento; uno non spuntato prende il tema."

@@ -75,7 +75,7 @@ function ns.SetTex(texture, key, ...)
     elseif swapped[texture] then
         swapped[texture] = nil
     end
-    if B.METAL[key] and not B.EliteAsDrawn(key) then
+    if B.METAL[key] and not B.EliteAsDrawn(key, texture) then
         ns.BronzeTint(texture, SHARE[key])
     elseif B.tinted[texture] then
         -- Non-metal art, or a dragon kept as drawn: clear the tint.
@@ -146,12 +146,14 @@ function ns.SetButtonTex(button, which, key)
     return tex
 end
 
--- Ignore theme for elite frames or nameplate dragons turns at once, in a fight too (the options pass waits one out).
+-- Ignore theme for elite frames (or a frame under it) or nameplate dragons turns at once, in a fight too (the options
+-- pass waits one out).
 ns.OnToggle(function(key)
+    if B.ELITE_FRAME_KEYS[key] then key = "themeIgnoreElite" end
     if key ~= "themeIgnoreElite" and key ~= "themeIgnorePlateDragon" then return end
     for texture, art in pairs(B.artKey) do
         if B.AS_DRAWN[art] == key then
-            if B.EliteAsDrawn(art) then ns.UntintBronze(texture) else ns.BronzeTint(texture, SHARE[art]) end
+            if B.EliteAsDrawn(art, texture) then ns.UntintBronze(texture) else ns.BronzeTint(texture, SHARE[art]) end
         end
     end
 end)

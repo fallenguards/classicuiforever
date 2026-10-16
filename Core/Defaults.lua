@@ -56,6 +56,7 @@ ns.DB_DEFAULTS = {
     flatWindows = true,
     flatHideBorders = false,
     themeIgnoreElite = false,
+    themeIgnoreElitePlayer = true, themeIgnoreEliteTarget = true, themeIgnoreEliteFocus = true,
     themeIgnorePlateDragon = false,
     castAnim = true,
     professionsBook = true,

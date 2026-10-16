@@ -60,3 +60,7 @@ L["OPT_druidManaGlow_TIP"] = "Comment la lueur de menace et de combat du cadre r
 
 -- Options/OptionsWindow.lua: the game's settings' ClassicUI Forever entry
 L["OPTWIN_SETTINGS_HOME"] = "Cherchez parmi toutes les options ci-dessus, ou choisissez une page sous ClassicUI Forever à gauche."
+L["OPT_themeIgnoreElitePlayer"] = "Cadres : Joueur"
+L["OPT_themeIgnoreEliteTarget"] = "Cadres : Cible"
+L["OPT_themeIgnoreEliteFocus"] = "Cadres : Focus"
+L["OPT_themeIgnoreEliteFrames_TIP"] = "Les cadres dont le dragon garde son or ou son argent d'origine ; un cadre décoché prend le thème."

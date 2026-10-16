@@ -60,3 +60,7 @@ L["OPT_druidManaGlow_TIP"] = "Wie das Bedrohungs- und Kampfleuchten des Fensters
 
 -- Options/OptionsWindow.lua: the game's settings' ClassicUI Forever entry
 L["OPTWIN_SETTINGS_HOME"] = "Oben alle Optionen durchsuchen oder links unter ClassicUI Forever eine Seite wählen."
+L["OPT_themeIgnoreElitePlayer"] = "Fenster: Spieler"
+L["OPT_themeIgnoreEliteTarget"] = "Fenster: Ziel"
+L["OPT_themeIgnoreEliteFocus"] = "Fenster: Fokus"
+L["OPT_themeIgnoreEliteFrames_TIP"] = "Die Fenster, deren Drache sein eigenes Gold oder Silber behält; ein nicht markiertes nimmt das Design an."

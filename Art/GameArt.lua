@@ -61,8 +61,8 @@ end
 -- The game's elite and rare dragons: as drawn with Ignore theme for elite frames.
 local DRAGONS = { "portraiton%-boss%-gold", "portraiton%-boss%-rare%-silver" }
 local dragonAtlas = {}
-local function KeptDragon(atlas)
-    if not (ns.db and ns.db.themeIgnoreElite == true) then return false end
+local function KeptDragon(atlas, region)
+    if not (ns.db and ns.db.themeIgnoreElite == true and ns.bronze.EliteFrameKept(region)) then return false end
     local known = dragonAtlas[atlas]
     if known == nil then
         local name = atlas:lower()
@@ -81,7 +81,7 @@ local function Match(region)
     local atlas = region:GetAtlas()
     if ns.IsSecret(atlas) then return end
     if atlas then
-        if IsMetal(atlas) and not KeptDragon(atlas) then want[region] = true end
+        if IsMetal(atlas) and not KeptDragon(atlas, region) then want[region] = true end
     else
         local file = region:GetTexture()
         if not ns.IsSecret(file) and type(file) == "number" and METAL_FILES[file] then want[region] = true end
@@ -236,7 +236,7 @@ end)
 -- After every other module (last in ns.MODULE_ORDER), in a fight too: only colours change.
 ns.RegisterModule("bronzeTheme", { id = "gameArt", apply = Sync, restore = Sync, inFight = true })
 
--- Ignore theme for elite frames: the walk again at once, in a fight too.
+-- Ignore theme for elite frames or one of its frames: the walk again at once, in a fight too.
 ns.OnToggle(function(key)
-    if key == "themeIgnoreElite" and ns.ready then Sync() end
+    if (key == "themeIgnoreElite" or ns.bronze.ELITE_FRAME_KEYS[key]) and ns.ready then Sync() end
 end)

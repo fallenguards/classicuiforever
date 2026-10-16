@@ -114,3 +114,7 @@ L["OPT_druidManaGlow_TIP"] = "How the frame's threat and combat glow meets the m
 
 -- Options/OptionsWindow.lua: the game's settings' ClassicUI Forever entry
 L["OPTWIN_SETTINGS_HOME"] = "Search every option above, or pick a page under ClassicUI Forever on the left."
+L["OPT_themeIgnoreElitePlayer"] = "Frames: Player"
+L["OPT_themeIgnoreEliteTarget"] = "Frames: Target"
+L["OPT_themeIgnoreEliteFocus"] = "Frames: Focus"
+L["OPT_themeIgnoreEliteFrames_TIP"] = "The frames whose dragon keeps its own gold or silver; an unchecked one takes the theme."

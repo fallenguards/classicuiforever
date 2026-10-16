@@ -432,7 +432,23 @@ B.AS_DRAWN = {
     targetingRareEliteThickMana = "themeIgnoreElite", targetingRareEliteThickName = "themeIgnoreElite",
     plateElite = "themeIgnorePlateDragon", plateRare = "themeIgnorePlateDragon",
 }
-function B.EliteAsDrawn(key)
+-- Ignore theme for elite frames, each frame picked under it (on unless unchecked), found up the art's parents.
+local ELITE_FRAMES = { PlayerFrame = "themeIgnoreElitePlayer", TargetFrame = "themeIgnoreEliteTarget",
+    FocusFrame = "themeIgnoreEliteFocus" }
+B.ELITE_FRAME_KEYS = { themeIgnoreElitePlayer = true, themeIgnoreEliteTarget = true, themeIgnoreEliteFocus = true }
+function B.EliteFrameKept(region)
+    local frame = region and region:GetParent()
+    while frame do
+        for name, option in pairs(ELITE_FRAMES) do
+            if frame == _G[name] then return ns.db[option] ~= false end
+        end
+        frame = frame:GetParent()
+    end
+    return true
+end
+
+function B.EliteAsDrawn(key, texture)
     local option = B.AS_DRAWN[key]
-    return option ~= nil and ns.db ~= nil and ns.db[option] == true
+    if not (option ~= nil and ns.db ~= nil and ns.db[option] == true) then return false end
+    return option ~= "themeIgnoreElite" or B.EliteFrameKept(texture)
 end

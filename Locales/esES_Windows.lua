@@ -60,3 +60,7 @@ L["OPT_druidManaGlow_TIP"] = "Cómo se une el brillo de amenaza y de combate del
 
 -- Options/OptionsWindow.lua: the game's settings' ClassicUI Forever entry
 L["OPTWIN_SETTINGS_HOME"] = "Busca entre todas las opciones arriba o elige una página bajo ClassicUI Forever a la izquierda."
+L["OPT_themeIgnoreElitePlayer"] = "Marcos: Jugador"
+L["OPT_themeIgnoreEliteTarget"] = "Marcos: Objetivo"
+L["OPT_themeIgnoreEliteFocus"] = "Marcos: Foco"
+L["OPT_themeIgnoreEliteFrames_TIP"] = "Los marcos cuyo dragón conserva su propio oro o plata; uno sin marcar toma el tema."
