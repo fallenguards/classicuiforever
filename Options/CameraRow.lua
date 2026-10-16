@@ -7,6 +7,8 @@ local O = ns.options
 
 local CVAR = "cameraDistanceMaxZoomFactor"
 local LOW, HIGH, STEPS = 1, 4, 30
+-- The value ("4.0") stands 6 past the slider's right edge (the template's RightText): room for it before the reset.
+local VALUE_ROOM = 28
 
 local function Current() return tonumber(ns.GetCVar(CVAR)) or LOW end
 local function Write(value)
@@ -30,7 +32,7 @@ function O.CameraRow(parent, width)
     head.keyLow = head.keyLow .. " camera zoom distance far out view max slider"
 
     local row, reset = O.SliderRow(parent, width)
-    local slider, formatters = ns.band.StepperSlider(row, width - 34, row, 4, Tenths)
+    local slider, formatters = ns.band.StepperSlider(row, width - 34 - VALUE_ROOM, row, 4, Tenths)
     local Fill
     if slider then
         ns.SetPointOnce(slider, "LEFT", row, "LEFT", 2, 0)
