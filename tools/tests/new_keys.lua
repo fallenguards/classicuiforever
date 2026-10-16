@@ -5,6 +5,11 @@
 return {
     hideThreatGlow = "same for everyone: opt-in, off by default",
     xpTipRested = "same for everyone: opt-in, off by default",
+    oneBagSplitNone = "same for everyone: on by default, one bag laid as before",
+    oneBagSplitType = "same for everyone: opt-in, off by default",
+    oneBagSplitBag = "same for everyone: opt-in, off by default",
+    oneBagKeyring = "same for everyone: opt-in, off by default",
+    oneBagBagSlots = "same for everyone: opt-in, off by default",
     focusBuffsOnTop = "same for everyone: opt-in, off by default",
     petBuffsOnTop = "same for everyone: opt-in, off by default",
     totemOrientation = "same for everyone: the game's own totem bar layout until changed under its edit mode dialog",

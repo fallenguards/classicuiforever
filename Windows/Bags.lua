@@ -4,7 +4,8 @@ local _, ns = ...
 -- backpack sheet with its money strip, slots on the 41px pitch, the old ring per icon; client art faded.
 -- Combined bags (not in 1.x) are one tall backpack, four across unless picked.
 
-local NewBand = ns.bags.NewBand
+local B = ns.bags
+local NewBand = B.NewBand
 
 local WIDTH = 192
 local COLUMNS = 4
@@ -142,7 +143,7 @@ end
 local function Kept(frame, child)
     return child == frame.PortraitButton or child == frame.MoneyFrame or child == frame.CloseButton
         or child == frame.FilterIcon or child == BagItemSearchBox or child == BagItemAutoSortButton
-        or ns.IsReagentHolder(child)
+        or B.ownChildren[child]
 end
 
 local function FadeChild(child, frame, portrait)
@@ -390,6 +391,9 @@ local function LaySlots(frame, list, count, columns, combined, backpackExtra, ti
     return 1
 end
 
+-- For the sections' layout (Windows/BagSections.lua).
+B.COL, B.BLANK_H, B.SlotArt, B.Tint, B.Place, B.Blank = COL, BLANK_H, SlotArt, Tint, Place, Blank
+
 -- Our reagent slots into the list, last slot first: the combined bag's list runs from its foot to its top.
 local function AddReagentSlots(list, count, own, n)
     for i = n, 1, -1 do
@@ -399,8 +403,8 @@ local function AddReagentSlots(list, count, own, n)
     return count
 end
 
-local function LayoutItems(frame, backpackExtra, combined, plusTwo)
-    if not frame.EnumerateValidItems then return end
+-- The slots to lay, foot to top: the game's (locked ones out), ours for the reagent bag before or after (option).
+local function SlotList(frame, combined)
     local list = spare or {}
     spare = nil
     local count = 0
@@ -419,8 +423,20 @@ local function LayoutItems(frame, backpackExtra, combined, plusTwo)
         end
     end
     if not last then count = AddReagentSlots(list, count, own, n) end
-    local blanks = LaySlots(frame, list, count, ColumnsOf(frame), combined, backpackExtra,
-        combined and ns.db and ns.db.reagentBagTint == true, plusTwo)
+    return list, count
+end
+
+local function LayoutItems(frame, backpackExtra, combined, plusTwo)
+    if not frame.EnumerateValidItems then return end
+    local list, count = SlotList(frame, combined)
+    local tint = combined and ns.db and ns.db.reagentBagTint == true
+    local blanks
+    if combined and B.Sectioned() then
+        blanks = B.LaySections(frame, list, count, ColumnsOf(frame), backpackExtra, tint)
+    else
+        if combined then B.ClearSections(frame) end
+        blanks = LaySlots(frame, list, count, ColumnsOf(frame), combined, backpackExtra, tint, plusTwo)
+    end
     spare = list
     local made = Pieces(frame).blanks
     if made then for j = blanks + 1, #made do made[j]:Hide() end end
@@ -530,6 +546,12 @@ local function Skin(frame, part)
         local columns = ColumnsOf(frame)
         local own = combined and select(2, ns.OwnReagentSlots()) or 0
         local rows = math.ceil((size + own) / columns)
+        if combined and B.Sectioned() then
+            local list, count = SlotList(frame, true)
+            rows = B.SectionRows(list, count, columns)
+            wipe(list)
+            spare = list
+        end
         SetBandColumns(frame, columns)
         if ns.debugSink then
             ns.Persist(string.format("bags: skin %s size %d rows %d backpack %s", tostring(frame:GetName()), size, rows, tostring(frame.IsBackpack and frame:IsBackpack())))
@@ -730,7 +752,8 @@ end
 
 -- The options pass waits out a fight; these may change in one, so open bags turn at once.
 local RESKIN = { hideLockedSlots = true, reagentBagCombined = true, reagentBagTint = true, reagentSlotsFirst = true,
-    reagentSlotsLast = true }
+    reagentSlotsLast = true, oneBagSplitNone = true, oneBagSplitType = true, oneBagSplitBag = true, oneBagKeyring = true,
+    oneBagBagSlots = true }
 ns.OnToggle(function(key)
     if (key ~= "plainQuestItems" and not RESKIN[key]) or not active then return end
     for _, frame in ipairs(Frames()) do
@@ -756,8 +779,11 @@ local function Apply()
         Hook(frame)
         if frame:IsShown() then Skin(frame) end
     end
-    -- The reagent slots made now, out of combat, before a first open in a fight.
-    if not InCombatLockdown() then ns.OwnReagentSlots() end
+    -- Our slots made now, out of combat, before a first open in a fight.
+    if not InCombatLockdown() then
+        ns.OwnReagentSlots()
+        ns.OwnKeyringSlots()
+    end
 end
 
 local function Restore()

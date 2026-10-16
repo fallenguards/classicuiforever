@@ -97,4 +97,5 @@ function Band:Owns(region)
 end
 
 -- Shared with Bags.lua.
-ns.bags = { NewBand = NewBand }
+-- ownChildren: frames of ours on a bag window (slot holders, section rules), kept out of its art fade.
+ns.bags = { NewBand = NewBand, ownChildren = setmetatable({}, { __mode = "k" }) }

@@ -126,6 +126,7 @@ ns.DB_DEFAULTS = {
     reagentBagTint = true,
     reagentSlotsFirst = true,
     reagentSlotsLast = false,
+    oneBagSplitNone = true, oneBagSplitType = false, oneBagSplitBag = false, oneBagKeyring = false, oneBagBagSlots = false,
     hideKeyText = false,
     keyTextSize = 12,
     eliteFrames = false,
