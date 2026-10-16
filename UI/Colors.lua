@@ -183,9 +183,8 @@ local function ClassColored(unit)
     return key == nil or db[key] ~= false
 end
 
+-- A player's class color first, an enemy's too (the enemy color then marks NPCs only); then the enemy color.
 function ns.HealthColor(unit)
-    local enemy = unit and EnemyColor(unit)
-    if enemy then return enemy[1], enemy[2], enemy[3] end
     if ClassColored(unit) and UnitIsPlayer then
         local isPlayer = UnitIsPlayer(unit)
         if not IsSecret(isPlayer) and isPlayer then
@@ -194,6 +193,8 @@ function ns.HealthColor(unit)
             if r then return r, g, b end
         end
     end
+    local enemy = unit and EnemyColor(unit)
+    if enemy then return enemy[1], enemy[2], enemy[3] end
     return 0, 1, 0
 end
 
