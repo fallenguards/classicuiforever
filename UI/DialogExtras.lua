@@ -4,7 +4,8 @@ local _, ns = ...
 -- follows the dialog while one of those is picked. Our settings only; the client's are read, never written (a write
 -- from our code taints every edit mode system).
 
-local PANEL_W_PAD, ROW_H = 26, 36
+-- FOOT: room under the last row, clear of the panel's border as the game's dialog keeps its own.
+local PANEL_W_PAD, ROW_H, FOOT = 26, 36, 22
 local specs = {}     -- { match(system), title, build(panel), fill(panel) }
 local panels = {}    -- spec -> its panel
 local watching = false
@@ -26,7 +27,7 @@ local function Panel(spec)
     panel.title = title
     panel.rows = 0
     spec.build(panel)
-    panel:SetHeight(40 + panel.rows * ROW_H + (panel.extraH or 0))
+    panel:SetHeight(40 + panel.rows * ROW_H + FOOT + (panel.extraH or 0))
     panels[spec] = panel
     return panel
 end

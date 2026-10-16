@@ -187,7 +187,7 @@ ns.DialogExtra({
         note:SetPoint("BOTTOMRIGHT", reset, "TOPRIGHT", 0, 8)
         note:SetJustifyH("LEFT")
         panel.note = note
-        panel.extraH = 90
+        panel.extraH = 68
     end,
     fill = function(panel)
         panel.gap()
