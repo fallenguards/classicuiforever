@@ -72,15 +72,15 @@ local WINDOWS = {
     -- Its own row under Map (toggle): the pass skips it while that is off.
     { "WorldMapFrame", child = "BorderFrame", toggle = "worldMap", portrait = false, backing = false, lift = P.MAP_LIFT,
         left = P.MAP_LEFT, after = A.WorldMapFrame },
-    { "MerchantFrame", lift = 5, tabLift = MERCHANT_TAB_LIFT, after = A.MerchantFrame },
+    { "MerchantFrame", key = "panelMerchant", lift = 5, tabLift = MERCHANT_TAB_LIFT, after = A.MerchantFrame },
     -- Half lift: the send row sits near the bottom edge.
-    { "MailFrame", lift = 5, tabLift = MAIL_TAB_LIFT, after = function()
+    { "MailFrame", key = "panelMail", lift = 5, tabLift = MAIL_TAB_LIFT, after = function()
         ns.EraTabRow({ _G["MailFrameTab1"], _G["MailFrameTab2"] }, MAIL_TAB_STEP)
     end },
     -- The opened letter. Half lift: Reply, Delete and Close sit 4 up from the bottom edge.
-    { "OpenMailFrame", lift = 5 },
+    { "OpenMailFrame", key = "panelMail", lift = 5 },
     -- Smaller tab lift: the full one pushed the tabs through the border.
-    { "FriendsFrame", lift = 5, tabLift = 3, after = function(frame)
+    { "FriendsFrame", key = "panelSocial", lift = 5, tabLift = 3, after = function(frame)
         -- Classic Era's width (measured 338, as its macro window); the lists hang from its edges.
         if frame:GetWidth() and math.abs(frame:GetWidth() - 385) < 1 then frame:SetWidth(SOCIAL_WIDTH) end
         P.ShadeFloor(frame)
@@ -90,60 +90,60 @@ local WINDOWS = {
         ns.KeepScrollIcon(_G["FriendsFrameIcon"])
     end },
     -- The contacts tab's pop-out ignore list: no portrait, its button in the old red.
-    { "FriendsFrame", child = "IgnoreListWindow", portrait = false, lift = 5, after = function(frame)
+    { "FriendsFrame", key = "panelSocial", child = "IgnoreListWindow", portrait = false, lift = 5, after = function(frame)
         ns.SkinRedButton(frame.UnignorePlayerButton)
         if frame.Inset then ns.DrainSlice(frame.Inset.NineSlice) end
     end },
     -- Voice chat button's window. Half lift: Add and Settings sit near the bottom edge.
     -- Its after dresses the scroll bars without client hooks.
-    { "ChannelFrame", lift = 5, scrollBars = false, after = A.ChannelFrame },
+    { "ChannelFrame", key = "panelChannels", lift = 5, scrollBars = false, after = A.ChannelFrame },
     -- Half lift: Goodbye, Accept and Decline sit near the bottom edge.
-    { "QuestFrame", lift = 5, after = A.QuestFrame },
-    { "GossipFrame", lift = 5, after = A.GossipFrame },
-    { "TradeFrame", lift = 5, after = A.TradeFrame },
-    { "TaxiFrame" },
-    { "DressUpFrame", after = A.DressUpFrame },
-    { "PetStableFrame" },
+    { "QuestFrame", key = "panelQuest", lift = 5, after = A.QuestFrame },
+    { "GossipFrame", key = "panelGossip", lift = 5, after = A.GossipFrame },
+    { "TradeFrame", key = "panelTrade", lift = 5, after = A.TradeFrame },
+    { "TaxiFrame", key = "panelTaxi" },
+    { "DressUpFrame", key = "panelDressUp", after = A.DressUpFrame },
+    { "PetStableFrame", key = "panelStable" },
     -- Era's own title line, 15 right of the window's middle; its foot line low enough for the scroll column's end.
-    { "ItemTextFrame", lift = 5, titleSpan = { 72, -42 }, after = A.ItemTextFrame },
+    { "ItemTextFrame", key = "panelBooks", lift = 5, titleSpan = { 72, -42 }, after = A.ItemTextFrame },
     -- Half lift, as the vendor's: Accept, Purchase, Sign and Cancel sit 4 up from the bottom edge.
-    { "TabardFrame", lift = 5 },
-    { "GuildRegistrarFrame", lift = 5, after = A.GuildRegistrarFrame },
-    { "PetitionFrame", lift = 5 },
-    { "GuildControlUI", addon = "Blizzard_GuildControlUI", portrait = false, after = A.GuildControlUI },
-    { "BankFrame", after = function(frame) if ns.SkinBank then ns.SkinBank(frame) end end },
+    { "TabardFrame", key = "panelTabard", lift = 5 },
+    { "GuildRegistrarFrame", key = "panelCharter", lift = 5, after = A.GuildRegistrarFrame },
+    { "PetitionFrame", key = "panelCharter", lift = 5 },
+    { "GuildControlUI", key = "panelGuildControl", addon = "Blizzard_GuildControlUI", portrait = false, after = A.GuildControlUI },
+    { "BankFrame", key = "panelBank", after = function(frame) if ns.SkinBank then ns.SkinBank(frame) end end },
     { "LootFrame", toggle = "lootWindow", backing = false, after = A.LootFrame },
     -- Social window's lift, so the two read as one window when they swap.
-    { "LFGWhoListFrame", addon = "Blizzard_GroupFinder_VanillaStyle", lift = 5 },
-    { "InspectFrame", addon = "Blizzard_InspectUI", after = A.InspectFrame },
-    { "MacroFrame", addon = "Blizzard_MacroUI", topTabs = true, lift = 2, after = A.MacroFrame },
-    { "ClassTrainerFrame", addon = "Blizzard_TrainerUI" },
-    { "AuctionHouseFrame", addon = "Blizzard_AuctionHouseUI", lift = 9 },
-    { "CommunitiesFrame", addon = "Blizzard_Communities", after = A.CommunitiesFrame },
+    { "LFGWhoListFrame", key = "panelGroupFinder", addon = "Blizzard_GroupFinder_VanillaStyle", lift = 5 },
+    { "InspectFrame", key = "panelInspect", addon = "Blizzard_InspectUI", after = A.InspectFrame },
+    { "MacroFrame", key = "panelMacros", addon = "Blizzard_MacroUI", topTabs = true, lift = 2, after = A.MacroFrame },
+    { "ClassTrainerFrame", key = "panelTrainer", addon = "Blizzard_TrainerUI" },
+    { "AuctionHouseFrame", key = "panelAuction", addon = "Blizzard_AuctionHouseUI", lift = 9 },
+    { "CommunitiesFrame", key = "panelCommunities", addon = "Blizzard_Communities", after = A.CommunitiesFrame },
     -- Half lift: the Mount button sits on the foot. The tabs' tops on the metal line, as the vendor's.
-    { "CollectionsJournal", addon = "Blizzard_Collections", lift = 5, tabLift = MERCHANT_TAB_LIFT,
+    { "CollectionsJournal", key = "panelCollections", addon = "Blizzard_Collections", lift = 5, tabLift = MERCHANT_TAB_LIFT,
         after = A.CollectionsJournal },
-    { "EncounterJournal", addon = "Blizzard_EncounterJournal" },
-    { "AchievementFrame", addon = "Blizzard_AchievementUI" },
+    { "EncounterJournal", key = "panelJournal", addon = "Blizzard_EncounterJournal" },
+    { "AchievementFrame", key = "panelAchievements", addon = "Blizzard_AchievementUI" },
     -- Retail's has a tab row: the client's foot line, tabs unlifted.
-    { "ProfessionsFrame", addon = "Blizzard_Professions", lift = not ns.OnForever() and CLIENT_FOOT_LIFT or nil,
+    { "ProfessionsFrame", key = "panelProfessions", addon = "Blizzard_Professions", lift = not ns.OnForever() and CLIENT_FOOT_LIFT or nil,
         tabLift = not ns.OnForever() and 0 or nil },
-    { "ProfessionsBookFrame", addon = "Blizzard_ProfessionsBook" },
-    { "GuildBankFrame", addon = "Blizzard_GuildBankUI" },
-    { "CalendarFrame", addon = "Blizzard_Calendar", portrait = false },
-    { "ItemSocketingFrame", addon = "Blizzard_ItemSocketingUI" },
+    { "ProfessionsBookFrame", key = "panelProfessions", addon = "Blizzard_ProfessionsBook" },
+    { "GuildBankFrame", key = "panelGuildBank", addon = "Blizzard_GuildBankUI" },
+    { "CalendarFrame", key = "panelCalendar", addon = "Blizzard_Calendar", portrait = false },
+    { "ItemSocketingFrame", key = "panelSocketing", addon = "Blizzard_ItemSocketingUI" },
     -- scrollBars = false from here: no client hooks; the afters dress any bars they name.
     -- Half lift: its foot buttons sit 4 off the bottom edge.
-    { "AddonList", portrait = false, lift = 5, scrollBars = false, after = A.AddonList },
+    { "AddonList", key = "panelAddons", portrait = false, lift = 5, scrollBars = false, after = A.AddonList },
     -- Support window. Half lift: the browser runs to 4 off the bottom edge.
-    { "HelpFrame", portrait = false, lift = 5, scrollBars = false, after = A.HelpFrame },
+    { "HelpFrame", key = "panelHelp", portrait = false, lift = 5, scrollBars = false, after = A.HelpFrame },
     -- Half lift, as the map: its pages run to the bottom edge.
-    { "LegacySystemFrame", addon = "Blizzard_LegacySystem", portrait = false, lift = 5, scrollBars = false,
+    { "LegacySystemFrame", key = "panelLegacy", addon = "Blizzard_LegacySystem", portrait = false, lift = 5, scrollBars = false,
         after = A.LegacySystemFrame },
     -- Its globe stands in the portrait ring.
-    { "TimeManagerFrame", addon = "Blizzard_TimeManager", scrollBars = false, after = A.TimeManagerFrame },
-    { "ClickBindingFrame", addon = "Blizzard_ClickBindingUI", lift = 5, scrollBars = false, after = A.ClickBindingFrame },
-    { "CooldownViewerSettings", lift = 5, scrollBars = false, after = A.CooldownViewerSettings },
+    { "TimeManagerFrame", key = "panelClock", addon = "Blizzard_TimeManager", scrollBars = false, after = A.TimeManagerFrame },
+    { "ClickBindingFrame", key = "panelClickBinding", addon = "Blizzard_ClickBindingUI", lift = 5, scrollBars = false, after = A.ClickBindingFrame },
+    { "CooldownViewerSettings", key = "panelCooldowns", lift = 5, scrollBars = false, after = A.CooldownViewerSettings },
 }
 -- Retail's talents are the game's spells window; Forever's are our own (Skills/Talents.lua), its row either way.
 -- The client's foot line: its pages run to it, and its tab row's layout puts a lifted tab back.
@@ -157,10 +157,11 @@ P.WINDOWS = WINDOWS
 local watcher
 local done = {}   -- WINDOWS index -> dressed (for good)
 
--- A window with its own row (the map, loot) by that row alone (#184); every other by Window frames.
+-- A window with its own row (the map, loot) by that row alone (#184); every other by Window frames and its box there.
+function P.Dressing(key) return P.active and ns.db[key] ~= false end
 local function Wanted(entry)
     if entry.toggle then return ns.ModuleInForce(entry.toggle) end
-    return P.active
+    return P.Dressing(entry.key)
 end
 
 -- Each entry doubles as SkinWindow's opts (read only).
@@ -233,6 +234,21 @@ local function WindowRow(key, Frame)
     local apply, restore = RowPass(Frame)
     ns.RegisterModule(key, { apply = apply, restore = restore })
 end
+
+-- A window's box under Window frames: on, dressed now; off, its strip goes and the rest waits for the reload.
+local WINDOW_KEYS = {}
+for _, entry in ipairs(WINDOWS) do if entry.key then WINDOW_KEYS[entry.key] = true end end
+ns.OnToggle(function(key)
+    if not WINDOW_KEYS[key] or not P.active then return end
+    if ns.db[key] ~= false then return SkinKnown() end
+    for _, entry in ipairs(WINDOWS) do
+        local frame = entry.key == key and _G[entry[1]]
+        if frame and entry.child then frame = frame[entry.child] end
+        local strip = frame and P.skinned[frame] and frame.fcui and frame.fcui.titleStrip
+        if strip then strip:Hide() end
+    end
+    ns.needsReload = true
+end)
 
 WindowRow("worldMap", function() return WorldMapFrame and WorldMapFrame.BorderFrame end)
 WindowRow("lootWindow", function() return LootFrame end)

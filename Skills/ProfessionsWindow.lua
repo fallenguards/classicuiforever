@@ -676,7 +676,9 @@ local TAB_DRAIN_EVENTS = { "ADDON_LOADED", "PLAYER_ENTERING_WORLD", "PLAYER_REGE
 local tabDrain = CreateFrame("Frame")
 ns.RegisterEvents(tabDrain, TAB_DRAIN_EVENTS)
 tabDrain:SetScript("OnEvent", function(self)
-    if watch or (ns.panels and ns.panels.active and DrainTabs()) then self:UnregisterAllEvents() end
+    if watch or (ns.panels and ns.panels.Dressing and ns.panels.Dressing("panelProfessions") and DrainTabs()) then
+        self:UnregisterAllEvents()
+    end
 end)
 
 local function Apply()

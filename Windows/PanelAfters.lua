@@ -256,7 +256,7 @@ end
 
 -- After the game's own page pass (registered later, so it runs second).
 local function ItemTextPage()
-    if not P.active then return end
+    if not P.Dressing("panelBooks") then return end
     local material = ItemTextGetMaterial() or "Parchment"
     local large = material == "ParchmentLarge"
     for _, tex in ipairs(item.column) do tex:SetShown(not large) end

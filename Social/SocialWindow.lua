@@ -568,7 +568,7 @@ local alliesProxy
 local quickTabs = {}
 
 local function NoOp() end
-local function SwapWanted() return ns.panels and ns.panels.active end
+local function SwapWanted() return ns.panels and ns.panels.Dressing and ns.panels.Dressing("panelSocial") end
 
 local function AlliesTab()
     local header = _G.FriendsTabHeader
