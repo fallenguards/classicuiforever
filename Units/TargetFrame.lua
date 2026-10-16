@@ -321,6 +321,8 @@ local function SkinTarget(frame, unit)
         if tot.Name then
             tot.Name:SetParent(holder)
             tot.Name:SetWidth(100)
+            -- Era's left edge; the client centers it.
+            tot.Name:SetJustifyH("LEFT")
             ns.SetPointOnce(tot.Name, "BOTTOMLEFT", totArt, "BOTTOMLEFT", 42, 3)
         end
         BarBg(tot, nil, 46, 15, tot, 45, -15)
