@@ -110,6 +110,9 @@ local function EscTop()
     return top
 end
 
+-- One of ours up for Escape to close (dev selftest esc.held).
+function ns.EscOursOpen() return EscTop() ~= nil end
+
 -- Who holds the key: ours, the client (free) or another addon.
 local function EscHolder()
     if not GetBindingAction then return "" end
@@ -122,13 +125,17 @@ end
 
 -- Bound and freed through the secure header: an Escape binding set from plain Lua never fired (no session's dev log
 -- shows a press reaching our button), a secure one does, in a fight too.
+-- Kept here: another addon's override can sit over ours, so the key's action does not show that ours is set.
+local escBound = false
 local function EscBind()
     ClearOverrideBindings(escButton)
     escHeader:Execute([[ self:ClearBindings() self:SetBindingClick(true, "ESCAPE", "ForeverClassicUIEscButtonKey") ]])
+    escBound = true
 end
 local function EscUnbind()
     ClearOverrideBindings(escButton)
     escHeader:Execute([[ self:ClearBindings() ]])
+    escBound = false
 end
 
 local escBeat
@@ -143,7 +150,8 @@ local function EscUpdate()
     end
     local holder = EscHolder()
     if not want then
-        if holder == "ours" then EscUnbind() end
+        -- Under another addon's override ours stays set, and comes back when that one goes (the game menu dead).
+        if escBound or holder == "ours" then EscUnbind() end
     elseif holder ~= "ours" then
         EscBind()
     end
@@ -178,6 +186,7 @@ ns.EventFrame("PLAYER_REGEN_ENABLED", function()
     -- The fight's own binding goes; EscUpdate takes the key as it always has.
     escHeader:SetAttribute("armed", nil)
     ClearOverrideBindings(escHeader)
+    escBound = false
     EscUpdate()
 end)
 ns.EventFrame("PLAYER_REGEN_DISABLED", function()
