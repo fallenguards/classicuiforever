@@ -18,6 +18,9 @@ local rims = setmetatable({}, weak)    -- menu frame -> our rim
 local irons = setmetatable({}, weak)   -- menu frame -> Era's drop down art
 local reclamped = setmetatable({}, weak)   -- menu frame -> clamped again this open (secret-placed)
 local placed = setmetatable({}, weak)  -- menu frame -> { anchor frame, x, y } as we last put it
+local scrolls = setmetatable({}, weak) -- menu scroll bar -> in the classic look
+-- The classic arrows' width; the menu lays its list beside the bar's width, with 10 to spare (MenuProxyMixin).
+local SCROLL_W = 16
 
 local active = false
 local theme = {}             -- ThemeTurned state
@@ -167,6 +170,13 @@ local function Dress(frame, iron, isRoot)
     end
     if iron and isRoot then Settle(frame) end
     OnScreen(frame, shown)
+    -- A long list's scroll bar (every menu frame has one) in the classic look; rawget, the frame's own key.
+    local bar = rawget(frame, "ScrollBar")
+    if bar and not scrolls[bar] then
+        scrolls[bar] = true
+        bar:SetWidth(SCROLL_W)
+        ns.SkinMinimalScrollBar(bar)
+    end
 end
 
 local function Undress(frame)
