@@ -212,3 +212,37 @@ function ns.EachRegionProtected(frame, fn, a1, a2, a3, a4)
     local ok, n = pcall(VisitRegions, frame, fn, a1, a2, a3, a4)
     return ok and n or 0
 end
+
+-- A font family like base at our size and flags (roman: its Latin file in place of base's): the game's letters for
+-- every alphabet it ships. A plain SetFont keeps one file, so a Cyrillic name on a Latin client drew empty (#188).
+local ALPHABETS = { "roman", "korean", "simplifiedchinese", "traditionalchinese", "russian" }
+local families = {}
+local familyCount = 0
+function ns.FontFamily(base, size, flags, roman)
+    if not (base and base.GetFontObjectForAlphabet and _G.CreateFontFamily) then return nil end
+    local key = table.concat({ base:GetName() or "", size, flags or "", roman or "" }, "|")
+    if families[key] then return families[key] end
+    local members = {}
+    for _, alphabet in ipairs(ALPHABETS) do
+        local object = base:GetFontObjectForAlphabet(alphabet)
+        local file, _, ownFlags
+        if object then file, _, ownFlags = object:GetFont() end
+        if alphabet == "roman" and roman then file = roman end
+        if file then members[#members + 1] = { alphabet = alphabet, file = file, height = size, flags = flags or ownFlags or "" } end
+    end
+    if #members == 0 then return nil end
+    familyCount = familyCount + 1
+    local family = _G.CreateFontFamily("ClassicUIForeverFont" .. familyCount, members)
+    family:SetTextColor(base:GetTextColor())
+    family:SetShadowColor(base:GetShadowColor())
+    family:SetShadowOffset(base:GetShadowOffset())
+    families[key] = family
+    return family
+end
+
+-- text on that family, keeping the colour the game gave it (a font object brings its own).
+function ns.SetFontFamily(text, family)
+    local r, g, b, a = text:GetTextColor()
+    text:SetFontObject(family)
+    if r and not ns.AnySecret(r, g, b, a) then text:SetTextColor(r, g, b, a) end
+end

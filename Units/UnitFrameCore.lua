@@ -308,9 +308,8 @@ ns.UNIT_NAME_MIN, ns.UNIT_NAME_MAX, ns.UNIT_NAME_SIZE = 8, 16, 10
 function UF.NameFont(name)
     if not (name and GameFontNormalSmall) then return end
     local size = tonumber(ns.db and ns.db.unitNameSize) or ns.UNIT_NAME_SIZE
-    local font, _, flags = GameFontNormalSmall:GetFont()
-    local _, now = name:GetFont()
-    if font and now ~= size then name:SetFont(font, size, flags) end
+    local family = ns.FontFamily(GameFontNormalSmall, size)
+    if family and name:GetFontObject() ~= family then ns.SetFontFamily(name, family) end
 end
 
 -- Client name text over our bars, above the art.

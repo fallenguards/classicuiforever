@@ -373,7 +373,9 @@ local function NameSize(name, own)
     -- The drawn base first, then the height: a later SetFont does not undo a stretch (the client reads back the height).
     local drawn = classic and ERA_NAME_FONT or want
     if math.abs(size - want) > 0.05 or flags ~= wantFlags or own.nameFont ~= drawn then
-        name:SetFont(file, drawn, wantFlags)
+        -- The plate's own font for its other alphabets: a Cyrillic name keeps its letters (#188).
+        local family = ns.FontFamily(_G.SystemFont_NamePlate or GameFontNormal, drawn, wantFlags, file)
+        if family then ns.SetFontFamily(name, family) else name:SetFont(file, drawn, wantFlags) end
         name:SetTextHeight(want)
         own.nameFont = drawn
     end
