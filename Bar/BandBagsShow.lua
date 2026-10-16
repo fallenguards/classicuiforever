@@ -133,8 +133,24 @@ local function AnyBagOpen()
     return false
 end
 
--- The mouse over one of the row's buttons, or the arrow.
+-- The row's whole box (its buttons, the band's sockets or the floor under a moved row, the arrow) is one hover zone of
+-- ours: gaps and socket art count as over the row. Hover only, so a click goes through to what lies under it.
+local zone
+local box = {}
+
+local function Grow(region)
+    if not (region and region:IsVisible()) then return end
+    local l, b, w, h = region:GetRect()
+    if not l or ns.IsSecret(l) then return end
+    local k = region:GetEffectiveScale() / UIParent:GetEffectiveScale()
+    l, b, w, h = l * k, b * k, w * k, h * k
+    box.l, box.b = math.min(box.l or l, l), math.min(box.b or b, b)
+    box.r, box.t = math.max(box.r or l + w, l + w), math.max(box.t or b + h, b + h)
+end
+
+-- The mouse anywhere on the row's box, or over one of its buttons or the arrow.
 local function OverRow()
+    if zone and zone:IsVisible() and zone:IsMouseOver() then return true end
     for i = 1, Buttons(false) do
         local button = buttons[i]
         if button:IsVisible() and button:IsMouseOver() then return true end
@@ -163,6 +179,39 @@ local function HoverChanged()
 end
 -- Its own key: the reagent bag's hover (BandBags) queues under bags.hover on the same buttons, and the last one queued runs.
 local function HoverLeft() ns.Sched.NextFrame("bags.rowHover", HoverChanged) end
+
+local function HoverZone(wanted, n)
+    if not wanted then
+        if zone then zone:Hide() end
+        return
+    end
+    box.l, box.b, box.r, box.t = nil, nil, nil, nil
+    local level
+    for i = 1, n do
+        Grow(buttons[i])
+        level = math.min(level or buttons[i]:GetFrameLevel(), buttons[i]:GetFrameLevel())
+    end
+    local art = B.art
+    for _, tex in ipairs(art and art.bagRun or {}) do Grow(tex) end
+    Grow(art and art.bagFloor)
+    Grow(arrow)
+    if not box.l then
+        if zone then zone:Hide() end
+        return
+    end
+    if not zone then
+        zone = ns.NewFrame("Frame", nil, UIParent)
+        zone:SetScript("OnEnter", HoverChanged)
+        zone:SetScript("OnLeave", HoverLeft)
+        zone:EnableMouse(true)
+        zone:SetMouseClickEnabled(false)
+    end
+    ns.SetStrataIf(zone, buttons[1]:GetFrameStrata())
+    ns.SetLevelIf(zone, math.max(0, (level or 1) - 1))
+    ns.SetSizeIf(zone, box.r - box.l, box.t - box.b)
+    ns.SetPointIf(zone, "BOTTOMLEFT", UIParent, "BOTTOMLEFT", box.l, box.b)
+    zone:Show()
+end
 
 -- Bag windows seen opening and closing; the mouse entering and leaving the row's buttons (leave judged a frame later).
 local function Hook()
@@ -261,7 +310,8 @@ Apply = function(atOnce)
     local fold = B.BagsFolded()
     local seen = mode == "shown" or mode == "backpack" or (mode ~= "hidden" and revealed)
     local reagent = CharacterReagentBag0Slot
-    for i = 1, Buttons(band) do
+    local n = Buttons(band)
+    for i = 1, n do
         local button = buttons[i]
         local folds = fold and button ~= MainMenuBarBackpackButton and button ~= KeyRingButton
         local shown = band and button ~= reagent and (mode ~= "hidden" and not folds) or nil
@@ -277,6 +327,7 @@ Apply = function(atOnce)
     elseif arrow and mode ~= "backpack" then
         arrow:Hide()
     end
+    HoverZone(mode == "hover" or mode == "backpack", n)
     B.ReagentHoverCheck()
     FadeTo(seen and 1 or 0, (mode == "backpack" and arrowRevealed) and 1 or 0, atOnce)
 end
