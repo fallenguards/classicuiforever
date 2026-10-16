@@ -3,6 +3,10 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN38_1_TITLE"] = "Minicarte"
+L["WN38_1_TEXT"] = "Après la dernière mise à jour du jeu, le bouton de pistage et la barre de zone de la minicarte retrouvent leur aspect 1.x, et le nom de la zone retrouve la taille d'Era. Le jeu n'affiche plus d'indicateur de difficulté à cet endroit, donc son choix disparaît des options."
+L["WN38_2_TITLE"] = "Corrections"
+L["WN38_2_TEXT"] = "Attaquer ne déclenche plus d'erreur du compteur de dégâts nommant ClassicUI Forever, même avec le compteur de dégâts désactivé, et un combat ne déclenche plus d'erreur d'action bloquée sur la barre des sacs."
 L["WN37_1_TITLE"] = "Options en deux volets"
 L["WN37_1_TEXT"] = "Les options (/fcui) listent leurs pages à gauche, avec la recherche, et affichent la page à droite. Aucune option et Réinitialiser les options agissent par page ou pour toutes, et Réinitialiser les fenêtres remet chaque fenêtre à sa taille et à sa place."
 L["WN37_2_TITLE"] = "Barre des sacs"

@@ -2,6 +2,10 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN38_1_TITLE"] = "Minimap"
+L["WN38_1_TEXT"] = "After the game's latest update, the minimap's tracking button and zone bar show their 1.x art again, and the zone name is back to Era's size. The game no longer shows a difficulty flag there, so its choice is gone from the options."
+L["WN38_2_TITLE"] = "Fixes"
+L["WN38_2_TEXT"] = "Attacking no longer sets off a damage meter error naming ClassicUI Forever, even with the damage meter off, and a fight no longer sets off a blocked action error about the bag bar."
 L["WN37_1_TITLE"] = "Options in two panes"
 L["WN37_1_TEXT"] = "The options (/fcui) list their pages on the left, with the search, and show the page on the right. Toggle none and Reset toggles work per page or for all, and Reset windows puts every window back to its own size and spot."
 L["WN37_2_TITLE"] = "Bag bar"

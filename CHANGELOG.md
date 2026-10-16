@@ -2,6 +2,16 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.29.1] - 2026-10-15
+
+### Fixed
+- Attacking no longer sets off a damage meter error naming ClassicUI Forever, even with the damage meter off. It started once HUD Edit Mode was opened with its Loot box checked (#174).
+- On Forever's latest build, the minimap's tracking button and zone bar show their 1.x art again; the game's square tracking button and a second bar around the zone name had shown through. The zone name is back to Era's size.
+- A fight no longer sets off a blocked action error about the bag bar with the classic bar on (#174).
+
+### Removed
+- On Forever, the minimap's Instance difficulty choice is gone from the options, since the game no longer shows that flag.
+
 ## [0.29.0] - 2026-10-15
 
 ### Added

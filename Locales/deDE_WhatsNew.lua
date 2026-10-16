@@ -3,6 +3,10 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN38_1_TITLE"] = "Minikarte"
+L["WN38_1_TEXT"] = "Nach dem letzten Update des Spiels zeigen der Verfolgungsknopf und die Gebietsleiste der Minikarte wieder ihr 1.x-Aussehen, und der Gebietsname hat wieder die Größe aus Era. Das Spiel zeigt dort keine Schwierigkeitsanzeige mehr, daher ist ihre Auswahl aus den Optionen verschwunden."
+L["WN38_2_TITLE"] = "Fehlerbehebungen"
+L["WN38_2_TEXT"] = "Angriffe lösen keinen Fehler des Schadensmessers mehr aus, der ClassicUI Forever nennt, auch wenn der Schadensmesser aus ist, und im Kampf erscheint kein Fehler über eine blockierte Aktion an der Taschenleiste mehr."
 L["WN37_1_TITLE"] = "Optionen in zwei Spalten"
 L["WN37_1_TEXT"] = "Die Optionen (/fcui) listen ihre Seiten links, mit der Suche, und zeigen die Seite rechts. Keine wählen und Optionen zurücksetzen gelten je Seite oder für alle, und Fenster zurücksetzen bringt jedes Fenster auf seine eigene Größe und Stelle zurück."
 L["WN37_2_TITLE"] = "Taschenleiste"

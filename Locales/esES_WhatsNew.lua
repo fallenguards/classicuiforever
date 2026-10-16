@@ -3,6 +3,10 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN38_1_TITLE"] = "Minimapa"
+L["WN38_1_TEXT"] = "Tras la última actualización del juego, el botón de rastreo y la barra de zona del minimapa vuelven a mostrar su aspecto 1.x, y el nombre de la zona recupera el tamaño de Era. El juego ya no muestra ahí un indicador de dificultad, así que su elección desaparece de las opciones."
+L["WN38_2_TITLE"] = "Correcciones"
+L["WN38_2_TEXT"] = "Atacar ya no provoca un error del medidor de daño que nombra a ClassicUI Forever, aunque el medidor de daño esté desactivado, y en combate ya no aparece un error de acción bloqueada sobre la barra de bolsas."
 L["WN37_1_TITLE"] = "Opciones en dos paneles"
 L["WN37_1_TEXT"] = "Las opciones (/fcui) listan sus páginas a la izquierda, con la búsqueda, y muestran la página a la derecha. Ninguna opción y Restablecer opciones actúan por página o para todas, y Restablecer ventanas devuelve cada ventana a su propio tamaño y sitio."
 L["WN37_2_TITLE"] = "Barra de bolsas"
