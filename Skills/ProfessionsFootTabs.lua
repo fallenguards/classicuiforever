@@ -15,8 +15,9 @@ local bookTabs
 -- too (a pad on UIParent is placed out of combat only). Anchored to the window, never the tabs: the window turns
 -- protected by them, and every write on it here already waits for a fight's end; the tabs stay free.
 local bookPads
--- The small book's tabs on the spellbook's own spots: 61 over its frame's foot is 12 under this window's.
-local function TabY() return T.Big() and -7 or -12 end
+-- The book's tabs on the spellbook's own spots: 61 over its frame's foot is 12 under this window's.
+local TAB_Y = -12
+local function TabY() return TAB_Y end
 -- The spellbook's first tab centres (79 wide, 66 narrow) less its border's 12 in from its frame; Collections third.
 local WIDE = { x = 67, step = 108, drawn = 100, overlap = -20, hit = 14, slot = { 0, 1, 2 } }
 local NARROW = { x = 54, step = 80, drawn = 74, overlap = -48, hit = 27, slot = { 0, 1, 3, 2 } }
@@ -159,7 +160,7 @@ function T.BookTabs()
     local order = narrow and { 1, 2, 4, 3 } or { 1, 2, 3 }
     local petUp = on and ns.SpellBookPetTitle and ns.SpellBookPetTitle() ~= nil
     local count = (narrow and 3 or 2) + (petUp and 1 or 0)
-    firstX = ns.BalancedTabX(spec.x, spec.drawn, spec.step, count, 0, T.Big() and frame:GetWidth() or BORDER_W)
+    firstX = ns.BalancedTabX(spec.x, spec.drawn, spec.step, count, 0, BORDER_W)
     for n, i in ipairs(order) do
         local tab = bookTabs[i]
         if n == 1 then

@@ -10,18 +10,12 @@ T.built = false
 
 local SHEET = "Interface\\Spellbook\\ProfessionsBook"
 local PAGE_LEFT = "Interface\\Spellbook\\Professions-Book-Left"
-local PAGE_RIGHT = "Interface\\Spellbook\\Professions-Book-Right"
--- Rows, from the content frame's top left corner (rowY: two primaries, three secondaries): the full book (its second
--- primary raised 15 onto its band), or the 1.x window's size (option), each row on its own band of the page cut
--- off on the right, stacked with no spare parchment.
-local BIG = { rowX = 80, rowW = 437, ring = 72, ringX = 7, ringY = -12, textX = 100, nameY = -8, rankW = 182,
-    spellX = 288, plates = true, rowY = { -62, -153, -284, -355, -431 } }
--- Small, on the spellbook's parchment (it starts 63 down): no ring (the spell buttons carry the icon), the text at
--- the secondaries' left, the unlearn button after the bar's end, each primary in the middle of its band; the spells at
--- 4/5 size (two stacked fit a band) and the secondaries' in the primaries' column.
+-- Rows from the content frame's top left (rowY: two primaries, three secondaries) on the spellbook's parchment (63 down):
+-- no ring (the spell buttons carry the icon), text at the secondaries' left, unlearn after the bar, each primary mid-band;
+-- spells at 4/5 size (two stacked fit a band), the secondaries' in the primaries' column.
 local SMALL = { rowX = 17, rowW = 305, ring = 48, ringX = 4, ringY = -29, noRing = true, textX = 6, nameY = -31,
     missingY = -40, cardDrop = 11, unlearnRight = true, centerSpells = true, rankW = 97, spellX = 154, barW = 64,
-    plates = false, iconsX = 154, spellScale = 0.8, descX = 129, descSize = 9, rowY = { -46, -124, -230, -294, -358 },
+    iconsX = 154, spellScale = 0.8, descX = 129, descSize = 9, rowY = { -46, -124, -230, -294, -358 },
     segMid = { 106.5, 186.5 } }
 -- The banded page (option): its ring and spots from before.
 local SMALL_BANDED = setmetatable({ ringY = -23, noRing = false, textX = 58, nameY = -11, missingY = -20, cardDrop = 5,
@@ -65,21 +59,18 @@ local PRIMARY_H, SECONDARY_H = 100, 52
 
 function T.Big() return ns.db == nil or ns.db.profBookBig == true end
 local function Banded() return ns.db ~= nil and ns.db.profBookBands == true end
-local function Spec()
-    if T.Big() then return BIG end
-    return Banded() and SMALL_BANDED or SMALL
+local function Spec() return Banded() and SMALL_BANDED or SMALL end
+
+-- Full size (option or popout): this book drawn bigger, a size on top of the window's own (UI/WindowHandles.lua).
+local BIG_ZOOM = 1.25
+local zoomed = false
+function ns.ProfessionsZoom() return zoomed and BIG_ZOOM or 1 end
+function T.Zoom(on)
+    on = on and true or false
+    if on == zoomed or InCombatLockdown() then return end
+    zoomed = on
+    ns.PlaceSavedWindows()
 end
--- Bands are 76 apart, rows 70: each band is redrawn centred on its row (First
--- Aid by its emblem, high in the art). { art top, art bottom, drawn top, drawn
--- bottom } in the 512 px page.
-local BAND_X = 64 -- the page margin left of here runs straight down and stays put
-local BAND_STRIPS = {
-    { 286, 302, 236, 252 }, -- plain parchment under the ornament
-    { 236, 298, 252, 314 }, -- Cooking
-    { 304, 380, 314, 390 }, -- Fishing
-    { 380, 432, 390, 442 }, -- First Aid
-    { 432, 456, 442, 456 }, -- First Aid foot, squeezed to the book edge
-}
 -- Retail's book is a window of its own (ProfessionsBookFrame) with the same cards under other names.
 local FOREVER = ns.OnForever()
 -- The x the client gives a primary card's buttons from its left: Forever's from the foot, retail's from our 170's right.
@@ -451,21 +442,15 @@ function T.PlaceCards()
                     DressSpellButton(button)
                     -- Smaller, it keeps the row's middle.
                     local short = SizeSpell(button, spec)
-                    local named = spec.plates or n == 1
+                    local named = n == 1
                     if plates[button] then plates[button]:SetShown(named) end
                     ns.SetAlphaIf(button.spellString, named and 1 or 0)
                     ns.SetAlphaIf(button.subSpellString, named and 1 or 0)
                     button:ClearAllPoints()
-                    if not spec.plates then
-                        if previous then
-                            button:SetPoint("TOPRIGHT", previous, "TOPLEFT", -4, 0)
-                        else
-                            button:SetPoint("TOPLEFT", card, "TOPLEFT", spec.iconsX, -6 - short / 2)
-                        end
-                    elseif previous then
-                        button:SetPoint("TOPRIGHT", previous, "TOPLEFT", -109, 0)
+                    if previous then
+                        button:SetPoint("TOPRIGHT", previous, "TOPLEFT", -4, 0)
                     else
-                        button:SetPoint("TOPRIGHT", card, "TOPRIGHT", -109, -6)
+                        button:SetPoint("TOPLEFT", card, "TOPLEFT", spec.iconsX, -6 - short / 2)
                     end
                     previous = button
                 end
@@ -479,25 +464,6 @@ end
 -- The book
 ---------------------------------------------------------------------------
 
--- The full book's pages: the spellbook parchment's tones (Forever, our left page), or the Cataclysm page (option, and
--- retail, whose left page carries Archaeology). Only on a change.
-local function PaintFull()
-    local full = rows.full
-    local parchment = FOREVER and not Banded()
-    if not full or full.parchment == parchment then return end
-    full.parchment = parchment
-    local function Left(tex)
-        if parchment then ns.SetTex(tex, "professionsBookLeftParchment")
-        elseif not (FOREVER and ns.SetTex(tex, "professionsBookLeft")) then tex:SetTexture(PAGE_LEFT) end
-    end
-    Left(full.left)
-    for _, band in ipairs(full.strips) do
-        Left(band)
-        band:SetTexCoord(unpack(band.coords))
-    end
-    if parchment then ns.SetTex(full.right, "professionsBookRightParchment") else full.right:SetTexture(PAGE_RIGHT) end
-end
-
 function T.Build()
     local page, content = Page(), Content()
     if T.built or not page or not content then return T.built end
@@ -507,22 +473,6 @@ function T.Build()
         if not (FOREVER and ns.SetTex(tex, "professionsBookLeft")) then tex:SetTexture(PAGE_LEFT) end
     end
     local artHost = FOREVER and page or content
-    local left = artHost:CreateTexture(nil, "BACKGROUND", nil, 2)
-    left:SetSize(512, 512)
-    left:SetPoint("TOPLEFT", page, "TOPLEFT", 7, -25)
-    local right = artHost:CreateTexture(nil, "BACKGROUND", nil, 2)
-    right:SetPoint("TOPLEFT", left, "TOPRIGHT", 0, 0)
-    rows.art = { left, right }
-    rows.full = { left = left, right = right, strips = {} }
-    for _, strip in ipairs(BAND_STRIPS) do
-        local band = artHost:CreateTexture(nil, "BACKGROUND", nil, 3)
-        -- Both corners on the page texture, so neighbouring strips share an edge exactly.
-        band:SetPoint("TOPLEFT", left, "TOPLEFT", BAND_X, -strip[3])
-        band:SetPoint("BOTTOMRIGHT", left, "TOPRIGHT", 0, -strip[4])
-        band.coords = { BAND_X / 512, 1, strip[1] / 512, strip[2] / 512 }
-        rows.art[#rows.art + 1] = band
-        rows.full.strips[#rows.full.strips + 1] = band
-    end
     rows.small = {}
     -- Clipped to the window's inside: the page stands lower than the window, and the art ran past its foot.
     local clip = ns.NewFrame("Frame", nil, artHost)
@@ -580,7 +530,7 @@ function T.Lay()
 end
 
 -- Old book's mid-row spells: each fill resets them to 10 and 60 (whole offsets, no tie at 0.5); casting buttons, out of combat.
--- The full book's spots, set outright: the small page's centring may have moved them since the client's last fill.
+-- The banded page's spots, set outright: the parchment page's centring may have moved them since the client's last fill.
 local SPELL_LOW, SPELL_HIGH, SPELL_ONE = 15, 56, 46
 local Near = ns.Near
 local function Foot(button, want)
@@ -675,7 +625,6 @@ end
 function T.ShowOurs(on)
     if not T.built then return end
     T.shown = on
-    local big = T.Big()
     -- The small page's art inside the window's metal: the chrome's backing marks where the rails start.
     local host = T.Host()
     local fcui = host and host.fcui
@@ -686,10 +635,8 @@ function T.ShowOurs(on)
         rows.clip:SetAllPoints(backing)
     end
     local banded = Banded()
-    if big then PaintFull() end
-    for _, tex in ipairs(rows.art) do SetShownIf(tex, on and big) end
-    for _, tex in ipairs(rows.small) do SetShownIf(tex, on and not big and not banded) end
-    for _, tex in ipairs(rows.bands) do SetShownIf(tex, on and not big and banded) end
+    for _, tex in ipairs(rows.small) do SetShownIf(tex, on and not banded) end
+    for _, tex in ipairs(rows.bands) do SetShownIf(tex, on and banded) end
     for i = 1, 5 do
         if rows[i] then SetShownIf(rows[i], on) end
     end

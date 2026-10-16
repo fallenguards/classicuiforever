@@ -10,12 +10,12 @@ local ShowOurs, TightenSpells = T.ShowOurs, T.TightenSpells
 local EMPTY = ns.EMPTY
 
 local active = false
--- Full book or the spellbook's drawn border (339 x 425, option or popout), its corner on that border: the spellbook's
+-- The spellbook's drawn border (339 x 425; full size draws it bigger), its corner on that border: the spellbook's
 -- art starts at (12, -118) and the manager stands a left panel at (16, -116).
-local BIG_W, BIG_H, SMALL_W, SMALL_H = 550, 525, 339, 425
+local BOOK_W, BOOK_H = 339, 425
 local BOOK_X, BOOK_Y, SMALL_TELL_W = -4, -2, 380
-local function BookW() return T.Big() and BIG_W or SMALL_W end
-local function BookH() return T.Big() and BIG_H or SMALL_H end
+local function BookW() return BOOK_W end
+local function BookH() return BOOK_H end
 T.BookW, T.BookH = BookW, BookH
 local SizeButton
 local sizeWas
@@ -45,7 +45,7 @@ local function TellManager(frame, width, height)
         sizeWas.attrs = { PanelAttr(frame, "width"), PanelAttr(frame, "height"), PanelAttr(frame, "xoffset"),
             PanelAttr(frame, "yoffset") }
     end
-    local small = width == SMALL_W
+    local small = width == BOOK_W
     local wantWidth, wantHeight = small and SMALL_TELL_W or width or sizeWas.attrs[1], height or sizeWas.attrs[2]
     -- Book and trade skill page on one spot, the spellbook's border's: a page turn never moves the window.
     local wantX = width and BOOK_X or sizeWas.attrs[3]
@@ -575,7 +575,8 @@ local function WatchTick(self, elapsed)
     SizeButton(bookUp, craftUp)
     local trade = ns.tradeDual.On() and "tradeDual" or "trade"
     if active then T.PrepareEraFrames() end
-    T.EraFrame((bookUp and not T.Big()) and "book" or craftUp and trade or nil)
+    T.EraFrame(bookUp and "book" or craftUp and trade or nil)
+    T.Zoom(T.Big() and not craftUp)
     if bookUp or craftUp then ns.ProfessionPortrait(bookUp) end
     T.SyncBookPads()
     SyncTabs()

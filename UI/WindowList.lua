@@ -8,9 +8,10 @@ local L = ns.L
 -- choice: radio list; client: game window; follows: place, unlock (while followIf, or always), followSize: size; gameEdit.
 ns.WINDOW_LIST = {
     { key = "character", label = L["UI_CHARACTER"], name = "CharacterFrame", w = 354, h = 467, cut = { 30, 45 }, client = true },
-    -- The classic professions book wears the spellbook's frame, its corner on the book's art (homes 0, -104 and 12, -118).
+    -- The classic professions book wears the spellbook's frame, its corner on the book's art (homes 0, -104 and 12, -118);
+    -- zoom: full size draws it bigger (Skills/ProfessionsBook.lua).
     { key = "professions", label = L["UI_PROFESSIONS"], name = ns.OnForever() and "ProfessionsFrame" or "ProfessionsBookFrame",
-        w = 550, h = 525, client = true,
+        w = 339, h = 425, client = true, zoom = function() return ns.ProfessionsZoom and ns.ProfessionsZoom() or 1 end,
         follows = "spellBook", followIf = "professionsBook", followX = 12, followY = -14 },
     { key = "talents", label = L["UI_TALENTS"], name = "ClassicUIForeverTalents", w = 354, h = 467, cut = { 30, 45 },
         padHost = true },

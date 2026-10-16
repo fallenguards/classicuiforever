@@ -221,8 +221,6 @@ ns.TEX = {
     professionsEmblemsMod = "!Professions-Emblems-Mod.tga",
     professionsEmblemsAdd = "!Professions-Emblems-Add.tga",
     -- The full book's two pages in the spellbook parchment's tones (dev/tools/prof_emblems.py). Ours only.
-    professionsBookLeftParchment = "!Professions-Book-Left-Parchment.tga",
-    professionsBookRightParchment = "!Professions-Book-Right-Parchment.tga",
     -- Its primary bands and patterned strip the same way.
     professionsBandsMod = "!Professions-Bands-Mod.tga",
     professionsBandsAdd = "!Professions-Bands-Add.tga",

@@ -153,11 +153,22 @@ local PlaceAll
 local function OnRing(entry) return entry.ringKey ~= nil and (entry.ringIf == nil or ns.db[entry.ringIf] == true) end
 local function Fixed(entry) return entry.fixedIf ~= nil and ns.db[entry.fixedIf] == true end
 
+-- A new size on the game's own spot (no place of ours) keeps it on screen: the offsets count in the window's scale.
+local function ScaleKept(frame, scale)
+    local old = Plain(frame:GetScale())
+    if not ns.SetScaleIf(frame, scale) or not old or frame:GetNumPoints() ~= 1 then return end
+    local point, rel, relPoint, x, y = frame:GetPoint(1)
+    if Plain(x) and Plain(y) then frame:SetPoint(point, rel, relPoint, x * old / scale, y * old / scale) end
+end
+
 local function Apply(entry)
     local frame = ns.WindowFrame(entry)
     if not frame or moving[frame] or ns.MoverHolds(frame) then return end
     local left, top = PlaceOf(entry)
     local scale = Scales()[SizeKey(entry)]
+    -- A size the window's own look asks on top of the player's (the full size professions book).
+    local zoom = entry.zoom and entry.zoom() or 1
+    if zoom ~= 1 then scale = (scale or 1) * zoom end
     if Full(entry, frame) then left, scale = nil, FullScale() end
     if not (left or scale or scaled[frame]) then return end
     -- calm: its casting layer moves out of combat only.
@@ -167,10 +178,10 @@ local function Apply(entry)
     end
     -- No size of ours (or the map maximized): its own.
     if scale then
-        ns.SetScaleIf(frame, scale)
+        ScaleKept(frame, scale)
         scaled[frame] = true
     elseif scaled[frame] then
-        ns.SetScaleIf(frame, 1)
+        ScaleKept(frame, 1)
         scaled[frame] = nil
     end
     if not left then return end
@@ -228,7 +239,7 @@ PlaceAll = function()
         if ns.MakeWindowLock then ns.MakeWindowLock(entry) end
         if ns.MakeWindowGrip then ns.MakeWindowGrip(entry) end
         if PlaceOf(entry) or Scales()[SizeKey(entry)] or IsFree(entry) or (frame and scaled[frame])
-            or (entry.quests and FullScale()) then
+            or (entry.quests and FullScale()) or (entry.zoom and entry.zoom() ~= 1) then
             Watch(entry)
             Apply(entry)
         end

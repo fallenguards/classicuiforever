@@ -2,7 +2,7 @@ local _, ns = ...
 if ns.OnForever() then return end
 
 -- Retail's professions book is a window of its own (ProfessionsBookFrame): the old book's rows, art and foot tabs on it,
--- the small 1.x book or the full one (Skills/ProfessionsBook.lua, shared with Forever). Its cards cast, so all of it is
+-- the 1.x book at either size (Skills/ProfessionsBook.lua, shared with Forever). Its cards cast, so all of it is
 -- placed out of combat; a book first met in a fight stays the game's until the fight ends.
 
 local T = ns.prof
@@ -34,7 +34,8 @@ local function Pass()
         if not T.built then return end
         Fit(frame)
         FadeGameArt(frame)
-        T.SmallFrame(not T.Big())
+        T.SmallFrame(true)
+        T.Zoom(T.Big())
         if state.dirty or not state.placed then
             state.placed = T.PlaceCards() or state.placed
             state.dirty = false
