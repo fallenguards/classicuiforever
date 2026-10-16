@@ -29,7 +29,7 @@ local OPTION_TIP = { when = TipBody, text = TipLabel, r = 1, g = 1, b = 1,
 O.OPTION_TIP = OPTION_TIP
 
 -- Not part of the classic look, so Toggle none leaves them (the minimap button leads back here), nor the radio picks.
-local NOT_IN_NONE = { minimapButton = true, welcomeNote = true, questLevels = true }
+local NOT_IN_NONE = { minimapButton = true, welcomeNote = true, barsTakenNote = true, questLevels = true }
 function O.InNone(key) return not NOT_IN_NONE[key] and not ns.TOGGLE_RADIO[key] end
 -- A radio pick that is a classic piece: Toggle none picks the game's own choice instead.
 O.NONE_PICKS = { "gameObjectiveTracker" }
@@ -347,7 +347,8 @@ local function Extras(entry, child, colW, add)
             ns.KEY_TEXT_MIN or 8, ns.KEY_TEXT_MAX or 20, ns.SetKeyTextSize, "keybind font hotkey")
     elseif key == "themeDark" then
         add(O.DarknessRow(child, colW - 2 * INDENT - 14), "themeDark")
-    elseif key == "addonMessages" then
+    -- The Other page's last row: the camera block after it.
+    elseif key == "leaveGameWindows" then
         local head, camera = O.CameraRow(child, colW - 2 * INDENT - 14)
         head.text:SetWidth(colW - 30)
         add(head)

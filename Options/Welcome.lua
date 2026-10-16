@@ -576,7 +576,7 @@ function ns.FirstRun()
     end
     -- The welcome stands in for this list.
     ns.db.whatsNewSeen = LATEST
-    if ns.db.welcomeNote == false then
+    if ns.db.welcomeNote == false or ns.db.addonMessages == false then
         ns.db.welcomed = true
         ns.CheckLayoutPosition()
         return

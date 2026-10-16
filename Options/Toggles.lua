@@ -77,8 +77,6 @@ ns.TOGGLES = {
     { "hideMicroKeepWidth", L["OPT_hideMicroKeepWidth"], L["OPT_hideMicroKeepWidth_TIP"], parent = "hideMicroButtons", needs = "classicBar", search = "gap background" },
     { "hideMicroSpread", L["OPT_hideMicroSpread"], L["OPT_hideMicroSpread_TIP"], parent = "hideMicroKeepWidth", search = "gap spacing" },
     { "bandHoldsBars", L["OPT_bandHoldsBars"], L["OPT_bandHoldsBars_TIP"], parent = "hideMicroButtons", needs = "classicBar", search = "gap width bar 3" },
-    { "barsTakenNote", L["OPT_barsTakenNote"], L["OPT_barsTakenNote_TIP"],
-        search = "warning message chat login another addon action bars takeover" },
 
     { "unitFrames", L["OPT_unitFrames"], L["OPT_unitFrames_TIP"], group = L["GROUP_UNIT_FRAMES"] },
     { "unitFramePlayer", L["OPT_unitFramePlayer"], L["OPT_unitFramePlayer_TIP"], parent = "unitFrames", checks = "unitFrameList", drop = true, dropLabel = L["OPT_DROP_FRAMES"], dropTip = L["OPT_unitFrames_TIP"] },
@@ -306,10 +304,12 @@ ns.TOGGLES = {
 
     { "gameDamageNumbers", L["OPT_gameDamageNumbers"], L["OPT_gameDamageNumbers_TIP"], group = L["GROUP_OTHER"] },
     { "damageMeter", L["OPT_damageMeter"], L["OPT_damageMeter_TIP"], search = "dps meter recount details" },
+    { "addonMessages", L["OPT_addonMessages"], L["OPT_addonMessages_TIP"], search = "chat login lines quiet" },
+    { "welcomeNote", L["OPT_welcomeNote"], L["OPT_welcomeNote_TIP"], parent = "addonMessages" },
+    { "barsTakenNote", L["OPT_barsTakenNote"], L["OPT_barsTakenNote_TIP"], parent = "addonMessages",
+        search = "warning message chat login another addon action bars takeover" },
     { "leaveGameWindows", L["OPT_leaveGameWindows"], L["OPT_leaveGameWindows_TIP"],
         search = "moveany window mover move windows scale size lock conflict" },
-    { "welcomeNote", L["OPT_welcomeNote"], L["OPT_welcomeNote_TIP"] },
-    { "addonMessages", L["OPT_addonMessages"], L["OPT_addonMessages_TIP"], search = "chat login lines quiet" },
 }
 
 -- Our own text in English on another client language, part by part (Core/Localization.lua); account-wide.

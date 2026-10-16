@@ -34,7 +34,7 @@ ns.Popup("FCUI_BARS_TAKEN", { text = L["BARS_TAKEN"], button1 = OKAY or "Okay", 
 
 local function Tell()
     local db = ns.db
-    if not (db and ns.BarsTaken()) or db.classicBar == false then return end
+    if not (db and ns.BarsTaken()) or db.classicBar == false or db.addonMessages == false then return end
     if db.barsTakenNote ~= false then
         ns.Print(L["BARS_TAKEN"] .. " " .. string.format(L["BARS_TAKEN_OFF"], ns.ChatLink("barsnote", L["WELCOME_HERE"])))
     end
