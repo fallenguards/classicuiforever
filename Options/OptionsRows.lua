@@ -268,13 +268,16 @@ local function FlipToggle(key)
 end
 
 -- Several toggles picked in one drop down, as checks (entries with checks = group).
--- A long list scrolls past this many rows (the windows under Window frames).
-local DROP_SCROLL_ROWS, DROP_ROW_H = 16, 20
+-- A long list in columns of this many rows (the windows under Window frames). Never scrolled: a box's click refreshes
+-- the menu, and a scrolling one stacked its rows at its top.
+local DROP_COLUMN_ROWS = 17
 
 local function DropCheckRow(parent, group)
     local rows, label, tip, words, keys = DropGroup("checks", group)
     local row = DropShell(parent, label, function(root)
-        if #rows > DROP_SCROLL_ROWS and root.SetScrollMode then root:SetScrollMode(DROP_SCROLL_ROWS * DROP_ROW_H) end
+        if #rows > DROP_COLUMN_ROWS and root.SetGridMode and _G.MenuConstants then
+            root:SetGridMode(_G.MenuConstants.VerticalGridDirection, math.ceil(#rows / DROP_COLUMN_ROWS))
+        end
         for _, choice in ipairs(rows) do ItemTip(root:CreateCheckbox(choice.label, ToggleOn, FlipToggle, choice.key), choice) end
     end)
     Describe(row, group, label, tip)
