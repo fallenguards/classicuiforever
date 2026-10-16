@@ -341,6 +341,56 @@ local function PlaceGlass(tex, tracking, offset)
     ns.SetPointOnce(tex, "TOPLEFT", tracking, "TOPLEFT", offset, -offset)
 end
 
+-- Newer clients paint a header button with one StateTexture, set again on each hover and press, and a glow whose
+-- alpha they drive (AddTexture): the first faded, the glow's art dropped.
+local glows = setmetatable({}, { __mode = "k" })   -- glow -> its atlas, given back at restore
+local function ClientArtOff(button)
+    if not button then return end
+    ns.Fade(button.StateTexture)
+    local glow = button.AddTexture
+    if glow and glows[glow] == nil then
+        glows[glow] = ns.Safe(glow:GetAtlas()) or false
+        glow:SetAtlas(nil)
+    end
+end
+
+-- The glass in the client's Normal and Pushed atlases, dressed again as it puts them back; else in states of ours.
+local function DressGlass(button, tracking)
+    local stateArt = button.StateTexture ~= nil
+    if stateArt then
+        ClientArtOff(button)
+        ns.DressStates(button, "trackingNone", "trackingNone")
+    end
+    glass[1], glass[2] = button:GetNormalTexture(), button:GetPushedTexture()
+    PlaceGlass(glass[1], tracking, 6)
+    PlaceGlass(glass[2], tracking, 8)
+    if not stateArt then
+        OldGlass()
+        WatchGlass(tracking)
+    end
+    ns.DressStates(button, nil, nil, nil, "zoomHighlight", HL_RING)
+end
+
+-- Restore: the client's header art back; the glass states on a StateTexture button were ours.
+local function ClientArtBack(cluster)
+    for glow, atlas in pairs(glows) do
+        if atlas then glow:SetAtlas(atlas, true) end
+        glows[glow] = nil
+    end
+    local zone = cluster.ZoneTextButton
+    if zone then
+        ns.Unfade(zone.StateTexture)
+        ns.Unfade(zone.BorderTop)
+    end
+    local button = cluster.Tracking and cluster.Tracking.Button
+    if button and button.StateTexture then
+        ns.Unfade(button.StateTexture)
+        button:ClearNormalTexture()
+        button:ClearPushedTexture()
+        button:ClearHighlightTexture()
+    end
+end
+
 -- Sole writer of MM.active.
 local function SetActive(on)
     MM.active = on
@@ -385,6 +435,10 @@ local function Layout()
     if cluster.ZoneTextButton then cluster.ZoneTextButton:SetScale(1) end
     cluster:SetSize(CLUSTER, CLUSTER)
     if cluster.BorderTop then ns.Fade(cluster.BorderTop) end
+    if cluster.ZoneTextButton then
+        ClientArtOff(cluster.ZoneTextButton)
+        ns.Fade(cluster.ZoneTextButton.BorderTop)
+    end
     if cluster.MinimapContainer then
         cluster.MinimapContainer:SetSize(MAP, MAP)
         ns.SetPointOnce(cluster.MinimapContainer, "CENTER", cluster, "TOP", 9, -92)
@@ -419,6 +473,8 @@ local function Layout()
     end
     if MinimapZoneText then
         if MinimapZoneText:GetParent() ~= cluster.ZoneTextButton then MinimapZoneText:SetParent(zone) end
+        -- Era's font; SetFont leaves the zone's color to the client.
+        MinimapZoneText:SetFont(GameFontNormal:GetFont())
         MinimapZoneText:SetSize(MAP, 12)
         MinimapZoneText:SetJustifyH("CENTER")
         ns.SetPointOnce(MinimapZoneText, "CENTER", zone, "CENTER", 0, 0)
@@ -469,12 +525,7 @@ local function Layout()
             button:SetSize(32, 32)
             button:SetFrameLevel(above + 1)
             ns.SetPointOnce(button, "TOPLEFT", tracking, "TOPLEFT", 0, 0)
-            glass[1], glass[2] = button:GetNormalTexture(), button:GetPushedTexture()
-            PlaceGlass(glass[1], tracking, 6)
-            PlaceGlass(glass[2], tracking, 8)
-            OldGlass()
-            WatchGlass(tracking)
-            ns.DressStates(button, nil, nil, nil, "zoomHighlight", HL_RING)
+            DressGlass(button, tracking)
         end
     end
 
@@ -595,6 +646,7 @@ function ns.SkinCalendar()
     if not button or not MM.active then return end
     ns.DressStates(button, "calendarButton", "calendarButton", nil, "zoomHighlight", CALENDAR)
     ns.FadeTextures(button, 0, nil, button:GetNormalTexture(), button:GetPushedTexture(), button:GetHighlightTexture())
+    ClientArtOff(button)
     local day = C_DateAndTime and C_DateAndTime.GetCurrentCalendarTime and C_DateAndTime.GetCurrentCalendarTime().monthDay
     local fs = button:GetFontString()
     if not fs then
@@ -700,6 +752,7 @@ local function Restore()
         end
     end
     if MinimapCluster and MinimapCluster.BorderTop then ns.Unfade(MinimapCluster.BorderTop) end
+    if MinimapCluster then ClientArtBack(MinimapCluster) end
     ns.needsReload = true
 end
 
