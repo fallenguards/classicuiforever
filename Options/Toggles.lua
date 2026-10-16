@@ -111,6 +111,8 @@ ns.TOGGLES = {
     { "hideThreatGlow", L["OPT_hideThreatGlow"], L["OPT_hideThreatGlow_TIP"], parent = "unitFrames", search = "aggro red flash" },
     { "hideCombatGlow", L["OPT_hideCombatGlow"], L["OPT_hideCombatGlow_TIP"], parent = "unitFrames",
         search = "attack attacked red flash pulse health bar name" },
+    { "damageFlash", L["OPT_damageFlash"], L["OPT_damageFlash_TIP"], parent = "unitFrames",
+        search = "damage hit lost health red bar flash loss animation" },
     { "threatNumber", L["OPT_threatNumber"], L["OPT_threatNumber_TIP"], parent = "unitFrames", search = "aggro threat percent focus" },
     { "threatNumberGrouped", L["OPT_threatNumberGrouped"], L["OPT_threatNumberGrouped_TIP"], parent = "threatNumber",
         search = "party raid dungeon instance solo" },

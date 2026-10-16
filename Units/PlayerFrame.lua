@@ -223,9 +223,29 @@ function ns.ClassBandState()
     return classBand, nameBg, bandLookedAt, UF.keepers["player.classBand"] ~= nil
 end
 
--- The options pass waits out a fight: Name box color for the player answers at once.
+-- The game's flash of lost health (#85): 1.x had none, so shown only with Damage flash.
+local function LossShown(loss)
+    ns.SetAlphaIf(loss, ns.db.damageFlash == true and 1 or 0)
+end
+
+local function DressLoss(container, health)
+    local loss = container.PlayerFrameHealthBarAnimatedLoss
+    if not loss then return end
+    loss:SetParent(health)
+    loss:ClearAllPoints()
+    loss:SetAllPoints(health)
+    ns.SetBarFill(loss)
+    local tex, mask = loss:GetStatusBarTexture(), container.HealthBarMask
+    if tex and mask and tex.RemoveMaskTexture then pcall(tex.RemoveMaskTexture, tex, mask) end
+    LossShown(loss)
+end
+
+-- The options pass waits out a fight: Name box color and Damage flash answer at once.
 ns.OnToggle(function(key)
     if key == "nameBoxPlayer" then KeepClassBand() end
+    local loss = key == "damageFlash" and UF.frames.player
+        and ns.Path(PlayerFrame, "PlayerFrameContent", "PlayerFrameContentMain", "HealthBarsContainer", "PlayerFrameHealthBarAnimatedLoss")
+    if loss then LossShown(loss) end
 end)
 
 -- 1.x gold level: the client whitens it on every update. A scaled level keeps its green; a secret one goes gold.
@@ -266,15 +286,7 @@ local function SkinPlayer()
                 TEXTS, blizzHealth, "player", "player", false)
             AttachOverlays(blizzHealth, health, healthContainer.HealthBarMask)
         end
-        local loss = healthContainer.PlayerFrameHealthBarAnimatedLoss
-        if loss then
-            loss:SetParent(health)
-            loss:ClearAllPoints()
-            loss:SetAllPoints(health)
-            ns.SetBarFill(loss)
-            local tex = loss:GetStatusBarTexture()
-            if tex and healthContainer.HealthBarMask and tex.RemoveMaskTexture then pcall(tex.RemoveMaskTexture, tex, healthContainer.HealthBarMask) end
-        end
+        DressLoss(healthContainer, health)
     end
     if manaArea then
         ns.Fade(manaArea)

@@ -55,6 +55,7 @@ return {
     comboPoints = true,
     communitiesButton = false,
     communitiesNoGuildTab = true,
+    damageFlash = false,
     damageMeter = true,
     damageNumbersRepaired = false,
     dbVersion = 18,

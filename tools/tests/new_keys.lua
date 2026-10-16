@@ -101,7 +101,8 @@ return {
     bar2Over = "same for everyone: the default pick, bar 2 on its 1.x row over bar 1 as before",
     bar2Right = "same for everyone: opt-in, off by default",
     bar2Left = "same for everyone: opt-in, off by default",
-    mapMarkers = "on for everyone, a restyle: Era's tower on capitals and house on towns on the continent maps (#165); unchecked gives the game's markers back",
+    damageFlash = "off for everyone, a restyle: the game's red flash of lost health on the player frame goes, as 1.x had none (#85); checked brings it back",
+    mapMarkers ="on for everyone, a restyle: Era's tower on capitals and house on towns on the continent maps (#165); unchecked gives the game's markers back",
     leaveGameWindows ="same for everyone: opt-in, off by default; the game's windows keep our places, sizes and locks",
     bagsUnfolded = "same for everyone: off by default; the fold arrow's own state, nothing on screen without Bag bar: backpack only",
 }
