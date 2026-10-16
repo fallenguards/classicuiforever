@@ -10,15 +10,18 @@ local category
 
 local function BuildSettings()
     if not Settings or not Settings.RegisterAddOnCategory then return end
-    -- Our own panel as a canvas page.
+    -- Our own panel as canvas pages: the search and every page's buttons on our entry, each page under it as the game
+    -- lists other addons' pages.
     if Settings.RegisterCanvasLayoutCategory and ns.OptionsCanvas then
-        local canvas = ns.OptionsCanvas()
-        if canvas then
-            local cat = Settings.RegisterCanvasLayoutCategory(canvas, TITLE)
-            Settings.RegisterAddOnCategory(cat)
-            category = cat
-            return
+        local cat = Settings.RegisterCanvasLayoutCategory(ns.OptionsCanvas(), TITLE)
+        if Settings.RegisterCanvasLayoutSubcategory then
+            for _, page in ipairs(ns.OptionsPageNames()) do
+                Settings.RegisterCanvasLayoutSubcategory(cat, ns.OptionsCanvas(page), page)
+            end
         end
+        Settings.RegisterAddOnCategory(cat)
+        category = cat
+        return
     end
     -- Fallback: a plain checkbox list.
     if not Settings.RegisterVerticalLayoutCategory or not Settings.RegisterAddOnSetting then return end

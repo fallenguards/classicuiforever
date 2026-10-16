@@ -57,3 +57,6 @@ L["OPT_druidManaGlowBehind_TIP"] = "Die Manaleiste vor dem Leuchten des Fensters
 L["OPT_druidManaGlowOver"] = "Leuchten: über der Manaleiste"
 L["OPT_druidManaGlowOver_TIP"] = "Das Leuchten des Fensters quer über den oberen Rand der Manaleiste."
 L["OPT_druidManaGlow_TIP"] = "Wie das Bedrohungs- und Kampfleuchten des Fensters auf die Manaleiste trifft."
+
+-- Options/OptionsWindow.lua: the game's settings' ClassicUI Forever entry
+L["OPTWIN_SETTINGS_HOME"] = "Oben alle Optionen durchsuchen oder links unter ClassicUI Forever eine Seite wählen."

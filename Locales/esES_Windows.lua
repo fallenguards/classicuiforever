@@ -57,3 +57,6 @@ L["OPT_druidManaGlowBehind_TIP"] = "La barra de maná delante del brillo del mar
 L["OPT_druidManaGlowOver"] = "Brillo: sobre la barra de maná"
 L["OPT_druidManaGlowOver_TIP"] = "El brillo del marco cruza la parte superior de la barra de maná."
 L["OPT_druidManaGlow_TIP"] = "Cómo se une el brillo de amenaza y de combate del marco con la barra de maná."
+
+-- Options/OptionsWindow.lua: the game's settings' ClassicUI Forever entry
+L["OPTWIN_SETTINGS_HOME"] = "Busca entre todas las opciones arriba o elige una página bajo ClassicUI Forever a la izquierda."

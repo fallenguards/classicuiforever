@@ -111,3 +111,6 @@ L["OPT_druidManaGlowBehind_TIP"] = "The mana bar in front of the frame's glow, a
 L["OPT_druidManaGlowOver"] = "Glow: over the mana bar"
 L["OPT_druidManaGlowOver_TIP"] = "The frame's glow across the top of the mana bar."
 L["OPT_druidManaGlow_TIP"] = "How the frame's threat and combat glow meets the mana bar."
+
+-- Options/OptionsWindow.lua: the game's settings' ClassicUI Forever entry
+L["OPTWIN_SETTINGS_HOME"] = "Search every option above, or pick a page under ClassicUI Forever on the left."

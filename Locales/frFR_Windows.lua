@@ -57,3 +57,6 @@ L["OPT_druidManaGlowBehind_TIP"] = "La barre de mana devant la lueur du cadre, c
 L["OPT_druidManaGlowOver"] = "Lueur : sur la barre de mana"
 L["OPT_druidManaGlowOver_TIP"] = "La lueur du cadre en travers du haut de la barre de mana."
 L["OPT_druidManaGlow_TIP"] = "Comment la lueur de menace et de combat du cadre rencontre la barre de mana."
+
+-- Options/OptionsWindow.lua: the game's settings' ClassicUI Forever entry
+L["OPTWIN_SETTINGS_HOME"] = "Cherchez parmi toutes les options ci-dessus, ou choisissez une page sous ClassicUI Forever à gauche."

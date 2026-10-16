@@ -13,7 +13,9 @@ local WIDTH, COLUMNS = 800, 2
 local SIDE_X, SIDE_W = 20, 166
 local PANE_X, PANE_TOP = 196, 34
 local PANE_W = WIDTH - PANE_X - 20
-local NAV_ROW, NAV_TOP = 18, 64
+local NAV_ROW, NAV_TOP, SEARCH_Y = 18, 64, 38
+-- The game's settings' home page: its search row over the list, and the page it stands for.
+local HOME_HEAD, HOME = 30, {}
 -- The list inside the page box: under its title row, clear of the scroll bar.
 local LIST_X, LIST_TOP = PANE_X + 12, PANE_TOP + 38
 local LIST_W = PANE_W - 40
@@ -96,6 +98,19 @@ local function Tip(region, label, tooltip)
     ns.AttachTip(region, O.OPTION_TIP)
 end
 
+-- Every page's buttons: label, tooltip, popup.
+local ALL_BUTTONS = {
+    { "OPTWIN_TOGGLE_NONE", "OPTWIN_TURNS_EVERY_PIECE_OF_THE", "FCUI_ALL_NONE" },
+    { "OPTWIN_RESET_TOGGLES", "OPTWIN_PUTS_EVERY_CHECKBOX_AND_NUMBER", "FCUI_ALL_RESET" },
+    { "OPTWIN_RESET_WINDOWS", "OPTWIN_PUTS_EVERY_WINDOW_BACK", "FCUI_WINDOWS_RESET" },
+}
+local function AllPagesButton(parent, spec, width)
+    local button = ns.PanelButton(parent, L[spec[1]], width)
+    button:SetScript("OnClick", function() StaticPopup_Show(spec[3]) end)
+    Tip(button, L[spec[1]], L[spec[2]])
+    return button
+end
+
 -- Drawn on host (a box), placed from the window's corner.
 local function Line(host, frame, x, y, w)
     local line = host:CreateTexture(nil, "ARTWORK")
@@ -151,13 +166,14 @@ end
 -- The left side: search, then the pages' box with its All pages buttons at the foot. Returns its height.
 local function Sidebar(frame, pages)
     local search = ns.SearchBox(frame, SIDE_W - 14, L["OPTWIN_SEARCH_TOGGLES"])
-    search:SetPoint("TOPLEFT", frame, "TOPLEFT", SIDE_X + 8, -38)
+    search:SetPoint("TOPLEFT", frame, "TOPLEFT", SIDE_X + 8, -SEARCH_Y)
     frame.search = search
 
     local box = ns.NewFrame("Frame", nil, frame, "BackdropTemplate")
     ns.Backdrop(box, ns.BACKDROP.TIP16, BOX_LOOK)
     box:SetPoint("TOPLEFT", frame, "TOPLEFT", SIDE_X, -NAV_TOP)
     box:SetWidth(SIDE_W)
+    frame.navBox = box
     frame.nav = {}
     local y = NAV_TOP + 9
     for _, page in ipairs(pages) do
@@ -180,16 +196,8 @@ local function Sidebar(frame, pages)
     Line(box, frame, SIDE_X + 10, y, SIDE_W / 2 - half - 10)
     Line(box, frame, SIDE_X + SIDE_W / 2 + half, y, SIDE_W / 2 - half - 10)
     y = y + 11
-    local buttons = {
-        { L["OPTWIN_TOGGLE_NONE"], L["OPTWIN_TURNS_EVERY_PIECE_OF_THE"], "FCUI_ALL_NONE" },
-        { L["OPTWIN_RESET_TOGGLES"], L["OPTWIN_PUTS_EVERY_CHECKBOX_AND_NUMBER"], "FCUI_ALL_RESET" },
-        { L["OPTWIN_RESET_WINDOWS"], L["OPTWIN_PUTS_EVERY_WINDOW_BACK"], "FCUI_WINDOWS_RESET" },
-    }
-    for _, spec in ipairs(buttons) do
-        local button = ns.PanelButton(box, spec[1], SIDE_W - 20)
-        button:SetPoint("TOPLEFT", frame, "TOPLEFT", SIDE_X + 10, -y)
-        button:SetScript("OnClick", function() StaticPopup_Show(spec[3]) end)
-        Tip(button, spec[1], spec[2])
+    for _, spec in ipairs(ALL_BUTTONS) do
+        AllPagesButton(box, spec, SIDE_W - 20):SetPoint("TOPLEFT", frame, "TOPLEFT", SIDE_X + 10, -y)
         y = y + 26
     end
     box:SetHeight(y + 6 - NAV_TOP)
@@ -226,6 +234,20 @@ local function PageArea(frame, bottom)
     none:SetScript("OnClick", function() StaticPopup_Show("FCUI_PAGE_NONE", frame.page, nil, { keys = frame:PageKeys() }) end)
     Tip(none, L["OPTWIN_TOGGLE_NONE"], L["OPTWIN_PAGE_NONE_TIP"])
     frame.pageButtons = { none, reset }
+    -- The game's settings' home page (its ClassicUI Forever entry): every page's buttons in the header, the search
+    -- under it, a line while it is empty.
+    frame.homeButtons = {}
+    for i = #ALL_BUTTONS, 1, -1 do
+        local button = AllPagesButton(box, ALL_BUTTONS[i], 110)
+        local prev = frame.homeButtons[#frame.homeButtons]
+        if prev then button:SetPoint("RIGHT", prev, "LEFT", -6, 0) else button:SetPoint("TOPRIGHT", box, "TOPRIGHT", -12, -7) end
+        button:Hide()
+        frame.homeButtons[#frame.homeButtons + 1] = button
+    end
+    frame.homeHint = box:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    frame.homeHint:SetPoint("TOPLEFT", frame, "TOPLEFT", LIST_X + 4, -(LIST_TOP + HOME_HEAD))
+    frame.homeHint:SetText(L["OPTWIN_SETTINGS_HOME"])
+    frame.homeHint:Hide()
 
     -- Where a reading page puts its caption and buttons, over its list.
     local top = ns.NewFrame("Frame", nil, box)
@@ -345,11 +367,14 @@ end
 -- What the right side shows: a toggles page, a reading page, or the search's matches from every page.
 local function Show(frame)
     local searching = (frame.search:GetText() or "") ~= ""
+    local home = frame.page == HOME
     local pane = not searching and frame.panes[frame.page]
     frame.search.hint:SetShown(not searching)
     frame.search.clear:SetShown(searching)
-    frame.pageTitle:SetText(searching and (_G.SEARCH or L["OPTWIN_SEARCH_TOGGLES"]) or frame.page)
-    for _, button in ipairs(frame.pageButtons) do button:SetShown(not searching and not pane) end
+    frame.pageTitle:SetText(searching and (_G.SEARCH or L["OPTWIN_SEARCH_TOGGLES"]) or home and TITLE or frame.page)
+    for _, button in ipairs(frame.pageButtons) do button:SetShown(not searching and not pane and not home) end
+    for _, button in ipairs(frame.homeButtons) do button:SetShown(home) end
+    frame.homeHint:SetShown(home and not searching)
     for name, other in pairs(frame.panes) do
         other:SetShown(other == pane)
         other.child:SetShown(other == pane)
@@ -358,31 +383,46 @@ local function Show(frame)
     for name, button in pairs(frame.nav) do
         if not frame.panes[name] then button:SetPicked(name == frame.page and not searching) end
     end
-    FitList(frame, pane and pane.headH or 0)
+    FitList(frame, pane and pane.headH or home and HOME_HEAD or 0)
     frame.list:SetScrollChild(pane and pane.child or frame.listChild)
     frame.listChild:SetShown(not pane)
     frame.listBar:SetValue(0)
     if pane then pane:Refresh() else PlaceRows(frame) end
 end
 
--- The game's settings page shows this window; when it goes the window stands alone again.
-local function Embed(frame, host)
+-- The game's settings show this window on its subcategory page (nil: our entry, the home page with the search), the
+-- contents at the host's left on the game's own panel. Its bare left strip lies over the game's list: no mouse there.
+local function Embed(frame, host, page)
     embedded = host
     frame.chrome = frame.chrome or { frame.fill, frame.header, frame.title, frame.close }
     for _, region in ipairs(frame.chrome) do if region then region:Hide() end end
+    frame.navBox:Hide()
+    frame.pageBox:SetBackdrop(nil)
+    frame:EnableMouse(false)
+    frame.search:SetShown(page == nil)
+    ns.SetPointOnce(frame.search, "TOPLEFT", frame.pageTop, "TOPLEFT", 4, 0)
     frame:SetBackdrop(nil)
     frame:RegisterForDrag()
     frame:SetParent(host)
     frame:SetFrameStrata(host:GetFrameStrata())
     frame:SetFrameLevel(host:GetFrameLevel() + 1)
-    local scale = math.min(1, (host:GetWidth() or WIDTH) / WIDTH, (host:GetHeight() or frame:GetHeight()) / frame:GetHeight())
+    local shift = PANE_X - SIDE_X
+    local scale = math.min(1, (host:GetWidth() or WIDTH) / (WIDTH - shift),
+        (host:GetHeight() or frame:GetHeight()) / frame:GetHeight())
     frame:SetScale(scale > 0 and scale or 1)
-    ns.SetPointOnce(frame, "TOPLEFT", host, "TOPLEFT", 0, 0)
+    ns.SetPointOnce(frame, "TOPLEFT", host, "TOPLEFT", -shift, 0)
     frame:Show()
+    frame:ShowPage(page or HOME)
 end
 
 local function StandAlone(frame)
     embedded = nil
+    frame.navBox:Show()
+    ns.Backdrop(frame.pageBox, ns.BACKDROP.TIP16, BOX_LOOK)
+    frame:EnableMouse(true)
+    frame.search:Show()
+    ns.SetPointOnce(frame.search, "TOPLEFT", frame, "TOPLEFT", SIDE_X + 8, -SEARCH_Y)
+    if frame.page == HOME then frame.page = Pages()[1] end
     for _, region in ipairs(frame.chrome or EMPTY) do if region then region:Show() end end
     ns.Backdrop(frame, ns.BACKDROP.DIALOG)
     frame:RegisterForDrag("LeftButton")
@@ -466,19 +506,30 @@ local function Window()
     return window
 end
 
--- The game's settings page: the window moves in while it shows.
-function ns.OptionsCanvas()
-    if ns.optionsCanvas then return ns.optionsCanvas end
-    local canvas = CreateFrame("Frame", "ForeverClassicUIOptionsCanvas", UIParent)
+-- The game's settings: its ClassicUI Forever entry (page nil) and a subcategory per page, each a canvas the window
+-- moves into while it shows.
+local canvases = {}
+function ns.OptionsCanvas(page)
+    local key = page or HOME
+    if canvases[key] then return canvases[key] end
+    local canvas = CreateFrame("Frame", page == nil and "ForeverClassicUIOptionsCanvas" or nil, UIParent)
     canvas:Hide()
-    canvas:SetScript("OnShow", function(self) Embed(Window(), self) end)
-    canvas:SetScript("OnHide", function()
-        if not embedded then return end
+    canvas:SetScript("OnShow", function(self) Embed(Window(), self, page) end)
+    canvas:SetScript("OnHide", function(self)
+        -- Another page's canvas may have taken the window first.
+        if embedded ~= self then return end
         StandAlone(window)
         window:Hide()
     end)
-    ns.optionsCanvas = canvas
+    canvases[key] = canvas
     return canvas
+end
+
+-- The pages in list order, the game's settings' subcategories: the toggles' groups, then the reading pages.
+function ns.OptionsPageNames()
+    local names = Pages()
+    for _, spec in ipairs(PANES) do names[#names + 1] = L[spec[1]] end
+    return names
 end
 
 -- A toggle changed from outside the window.
