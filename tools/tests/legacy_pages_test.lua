@@ -71,9 +71,17 @@ local ns = {
     L = setmetatable({}, { __index = function(_, key) return key end }), EMPTY = {}, SIDE_TAB_SLOT = 0,
     db = { legacyThreePane = true },
     OnForever = function() return true end,
-    WindowMicro = function() return NOOP end,
-    WindowKey = function() return { Set = NOOP, PressFirst = NOOP, name = "key" } end,
-    OnGameSpellsRoom = NOOP,
+    WindowOpeners = function() return NOOP end,
+    GameText = function(_, key) return key end,
+    SideTabsFor = function(_, pages, onClick)
+        local out = {}
+        for i in ipairs(pages) do
+            out[i] = Tab()
+            out[i]:SetID(i)
+            out[i]:SetScript("OnClick", onClick)
+        end
+        return out
+    end,
     RegisterModule = function(_, spec) apply = spec.apply end,
     TalentWindow = function() window = Window() return window end,
     TalentTrees = TalentTrees, SetPointOnce = NOOP,

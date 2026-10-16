@@ -15,13 +15,17 @@ ns.WINDOW_LIST = {
     { key = "talents", label = L["UI_TALENTS"], name = "ClassicUIForeverTalents", w = 354, h = 467, cut = { 30, 45 },
         padHost = true },
     { key = "legacy", label = L["UI_LEGACY"], name = "ClassicUIForeverLegacy", w = 354, h = 467, cut = { 30, 45 } },
+    -- A page of the spellbook: on its spot, moved with it.
+    { key = "collections", label = L["UI_COLLECTIONS"], name = "ClassicUIForeverCollections", w = 350, h = 433, cut = { 34, 79 },
+        follows = "spellBook", followX = 0, followY = 0 },
     { key = "questLog", label = L["UI_QUEST_LOG"], name = "ForeverClassicUIQuestLog", w = 349, h = 437, cut = { 35, 75 } },
     { key = "map", label = L["UI_WORLD_MAP"], name = "WorldMapFrame", w = 1035, h = 534, stripH = 24, toggle = "mapUnlocked",
         quests = true },
     { key = "calendar", label = L["UI_CALENDAR"], name = "ForeverClassicUICalendarHome", w = 28, h = 28, section = L["UI_MINIMAP"],
         piece = true, ringKey = "calendarAngle", ringIf = "calendarRing", fixedIf = "calendarBehind", choice = "calendarSpot",
         choiceLabel = L["UI_MODE"] },
-    { key = "spellBook", label = L["UI_SPELLBOOK"], name = "ForeverClassicUISpellBook", w = 384, h = 512,
+    -- The spellbook art ends 34 short of its frame's right and 79 short of its foot (its foot tabs hang there).
+    { key = "spellBook", label = L["UI_SPELLBOOK"], name = "ForeverClassicUISpellBook", w = 350, h = 433, cut = { 34, 79 },
         calm = true, padHost = true },
     { key = "minimapZone", label = L["UI_ZONE_NAME"], name = "ForeverClassicUIMinimapZoneHome", w = 140, h = 12,
         section = L["UI_MINIMAP"], piece = true, choice = "minimapZoneShow", choiceLabel = L["UI_SHOW"] },

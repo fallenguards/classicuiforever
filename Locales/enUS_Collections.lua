@@ -1,0 +1,27 @@
+local _, ns = ...
+local L = ns.L
+
+-- Collections/: the classic Collections window, beside Locales/enUS.lua.
+L["COLL_PAGE"] = "Page %d / %d"
+L["COLL_ALL"] = "All"
+L["COLL_COLLECTED"] = "Collected"
+L["COLL_NOT_COLLECTED"] = "Not Collected"
+L["COLL_SEARCH"] = "Search"
+L["COLL_MOUNTS"] = "Mounts"
+L["COLL_MOUNT"] = "Mount"
+L["COLL_DISMOUNT"] = "Dismount"
+L["OPT_collectionsWindow"] = "Collections window"
+L["OPT_collectionsWindow_TIP"] = "Mounts, pets, toys, heirlooms and appearances in a classic window, each on its own side tab, opened by the Collections button, its minimap icon and key."
+L["UI_COLLECTIONS"] = "Collections"
+L["CORE_COLLECTIONS_BUTTON_OPENS"] = "The Collections button opens the game's own Collections window again after the interface reloads."
+L["COLL_PETS"] = "Pets"
+L["COLL_TOYS"] = "Toy Box"
+L["COLL_SUMMON"] = "Summon"
+L["COLL_DISMISS"] = "Dismiss"
+L["COLL_USE"] = "Use"
+L["COLL_APPEARANCES"] = "Appearances"
+L["COLL_FILTER"] = "Filter"
+L["COLL_CHECK_ALL"] = "Check All"
+L["COLL_UNCHECK_ALL"] = "Uncheck All"
+L["COLL_SOURCES"] = "Sources"
+L["COLL_CLASS"] = "Class"

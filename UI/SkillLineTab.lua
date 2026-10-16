@@ -26,3 +26,19 @@ function ns.SkillLineTab(parent, prev)
     tab:Hide()
     return tab
 end
+
+-- One shown tab per page (in tab order, each with its icon), ids from 1; the caller's click and tooltip.
+function ns.SideTabsFor(parent, pages, onClick, onEnter)
+    local tabs = {}
+    for i, page in ipairs(pages) do
+        local tab = ns.SkillLineTab(parent, tabs[i - 1])
+        tab:SetID(i)
+        tab:SetNormalTexture(page.icon)
+        tab:SetScript("OnClick", onClick)
+        tab:SetScript("OnEnter", onEnter)
+        tab:SetScript("OnLeave", GameTooltip_Hide)
+        tab:Show()
+        tabs[i] = tab
+    end
+    return tabs
+end

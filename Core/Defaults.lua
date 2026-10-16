@@ -69,6 +69,7 @@ ns.DB_DEFAULTS = {
     talentsTall = false,
     talentsSqueeze = false,
     legacyWindow = true,
+    collectionsWindow = true,
     legacyThreePane = false,
     professionTabs = false,
     professionTabsHover = true,
@@ -281,7 +282,7 @@ ns.MODULE_ORDER = {
     "fullPlates", "classicFonts", "questTracker", "hideObjectiveTracker", "questWatch", "questLog", "questLogDual", "questLevels", "questMapPane", "panels", "worldMap", "lootWindow", "classicChat", "lootRoll",
     "guildRoster", "whoList", "groupFinder", "hideLastNames", "mapFade", "oneBag", "bags", "characterSheet", "statPanes",
     "spellBook", "spellBookTopRank", "spellBookHidePassives", "spellBookFlyouts", "spellBookSearch", "professionsBook", "tradeSkillSearch", "tradeSkill", "tradeSkillDual",
-    "trainer", "talents", "legacyWindow", "options", "gameMenu", "tooltips", "clientMenus", "settingsPanel", "damageMeter", "gameArt",
+    "trainer", "talents", "legacyWindow", "collectionsWindow", "options", "gameMenu", "tooltips", "clientMenus", "settingsPanel", "damageMeter", "gameArt",
 }
 
 -- Reload-only toggles per direction with popup text; unlisted apply live. Owed for art or anchors left on client frames,
@@ -305,6 +306,8 @@ ns.RELOAD_KEYS = {
     talents = { off = L["CORE_THE_TALENTS_BUTTON_OPENS_THE"] },
     -- Same for the Legacy button's click (Legacy/LegacyWindow.lua TakeButton).
     legacyWindow = { off = L["CORE_LEGACY_BUTTON_OPENS_THE"] },
+    -- Same for the Collections button (Collections/CollectionsWindow.lua, through ns.WindowOpeners).
+    collectionsWindow = { off = L["CORE_COLLECTIONS_BUTTON_OPENS"] },
     -- Same for QuestLogMicroButton's click (QuestLog Restore).
     questLog = { off = L["CORE_THE_QUEST_LOG_BUTTON_OPENS"] },
     -- ToggleGuildFrame stays our wrapper once taken (Guild WrapGuildToggle).

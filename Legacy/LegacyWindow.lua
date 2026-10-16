@@ -11,12 +11,7 @@ ns.legacy = LG
 local frame, watch, current
 local tabs = {}
 
--- The game's own wording where this client has it.
-function LG.Text(global, key)
-    local text = _G[global]
-    if type(text) == "string" and text ~= "" then return text end
-    return L[key]
-end
+LG.Text = ns.GameText
 
 local LegacyConsts = Constants and Constants.LegacyConsts or ns.EMPTY
 LG.POINTS_CURRENCY = LegacyConsts.LEGACY_POINTS_TRAIT_CURRENCY_ID or 4225
@@ -139,16 +134,7 @@ local function Learn(tree)
 end
 
 local function BuildTabs()
-    for i, page in ipairs(LG.pages) do
-        local tab = ns.SkillLineTab(frame, tabs[i - 1])
-        tab:SetID(i)
-        tab:SetNormalTexture(page.icon)
-        tab:SetScript("OnClick", Tab_OnClick)
-        tab:SetScript("OnEnter", Tab_OnEnter)
-        tab:SetScript("OnLeave", GameTooltip_Hide)
-        tab:Show()
-        tabs[i] = tab
-    end
+    tabs = ns.SideTabsFor(frame, LG.pages, Tab_OnClick, Tab_OnEnter)
 end
 
 local function Build()
@@ -195,34 +181,19 @@ local function Toggle()
     frame:SetShown(not frame:IsShown())
 end
 
--- The Legacy micro button opens this window while on, and the minimap icon with it (it presses the button); in a fight
--- the frame after, as the talents button.
-local TakeButton = ns.WindowMicro({ "LegacyMicroButton" }, function()
-    if InCombatLockdown() then ns.Sched.NextFrame("legacy.open", Toggle) else Toggle() end
-end)
-
--- The game's Legacy key opens this window too.
-local key = ns.WindowKey("ClassicUIForeverLegacyBind", "TOGGLELEGACYSYSTEM", Toggle, "legacy")
-
--- While the game's spell window leaves ours no room, the key and the micro button close it first in the player's name
--- (UI/WindowCloser.lua): the key's own secure click, and a pad over the button that presses the key.
-local function CloserMacro()
-    if active and ns.GameSpellsCloser(frame) then return "/click " .. key.name end
-end
-ns.OnGameSpellsRoom(function() key:PressFirst(active and ns.GameSpellsCloser(frame) or nil) end)
+-- The Legacy micro button and key open this window while on, and the minimap icon with them (it presses the button).
+local Openers = ns.WindowOpeners({ name = "legacy", micro = "LegacyMicroButton", bind = "ClassicUIForeverLegacyBind",
+    binding = "TOGGLELEGACYSYSTEM", toggle = Toggle, frame = function() return frame end })
 
 local function Apply()
     if not Supported() then return end
     active = true
-    TakeButton(true)
-    key:Set(true)
-    if ns.MapPad and _G.LegacyMicroButton then ns.MapPad(_G.LegacyMicroButton, nil, nil, CloserMacro, function() return active end) end
+    Openers(true)
 end
 
 local function Restore()
     active = false
-    TakeButton(false)
-    key:Set(false)
+    Openers(false)
     if frame and frame:IsShown() then frame:Hide() end
 end
 

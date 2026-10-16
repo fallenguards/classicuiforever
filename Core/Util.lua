@@ -44,6 +44,13 @@ function ns.EraText(key)
     if type(text) == "string" and text ~= "" then return text end
 end
 
+-- The game's own wording where this client has it, else our string.
+function ns.GameText(global, key)
+    local text = _G[global]
+    if type(text) == "string" and text ~= "" then return text end
+    return ns.L[key]
+end
+
 function ns.AnySecret(...)
     if not secretTest then return false end
     for i = 1, select("#", ...) do

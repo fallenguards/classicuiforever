@@ -53,6 +53,7 @@ return {
     classicStatusFont = true,
     classicTracking = true,
     collectionsMinimapButton = false,
+    collectionsWindow = true,
     comboPoints = true,
     communitiesButton = false,
     communitiesNoGuildTab = true,

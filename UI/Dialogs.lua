@@ -251,6 +251,22 @@ function ns.DialogClose(frame, onClick, x, y)
     return close
 end
 
+-- A classic window's X: the old art at size, its centre off the window's top right, hiding the window; the lock finds it as
+-- frame.close (UI/WindowLocks.lua). A secure pad over it lets a fight's Escape binding go in the same click, unless hosted.
+function ns.WindowCloseX(frame, x, y, size, hosted)
+    local close = ns.NewFrame("Button", nil, frame)
+    -- Sized after the skin, which sets the stock 32.
+    ns.SkinCloseButton(close, true)
+    close:SetSize(size, size)
+    close:SetPoint("CENTER", frame, "TOPRIGHT", x, y)
+    close:SetScript("OnClick", function() frame:Hide() end)
+    frame.close = close
+    if ns.EscDisarmOnClick and not hosted then
+        ns.EscDisarmOnClick(ns.MapPad(close, "DIALOG", function() frame:Hide() end, ""))
+    end
+    return close
+end
+
 ---------------------------------------------------------------- popups
 
 -- nil takes the default; false leaves the field off.

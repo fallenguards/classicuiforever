@@ -363,17 +363,7 @@ local function BuildShell(name, spec)
     title:SetPoint("CENTER", frame, "TOP", 6, -24)
     frame.title = title
 
-    local close = ns.NewFrame("Button", nil, frame)
-    -- Sized after the skin, which sets the stock 32.
-    ns.SkinCloseButton(close, true)
-    close:SetSize(CLOSE_SIZE, CLOSE_SIZE)
-    close:SetPoint("CENTER", frame, "TOPRIGHT", CLOSE_X, CLOSE_Y)
-    close:SetScript("OnClick", function() frame:Hide() end)
-    frame.close = close
-    -- A secure pad over it: a fight's Escape binding (UI/Escape.lua) is let go in the same click.
-    if ns.EscDisarmOnClick and not spec.hosted then
-        ns.EscDisarmOnClick(ns.MapPad(close, "DIALOG", function() frame:Hide() end, ""))
-    end
+    ns.WindowCloseX(frame, CLOSE_X, CLOSE_Y, CLOSE_SIZE, spec.hosted)
     return frame
 end
 

@@ -348,6 +348,8 @@ local FOREVER_ROWS = {
         { "legacyWindow", L["OPT_legacyWindow"], L["OPT_legacyWindow_TIP"], search = "legacy points perks tree challenges rewards track" },
         { "legacyThreePane", L["OPT_legacyThreePane"], L["OPT_legacyThreePane_TIP"], parent = "legacyWindow",
             search = "legacy three trees side by side triple pane tripane all trees" },
+        { "collectionsWindow", L["OPT_collectionsWindow"], L["OPT_collectionsWindow_TIP"],
+            search = "mounts pets toys heirlooms appearances wardrobe transmog journal" },
     },
     communitiesNoGuildTab = {
         { "groupFinder", L["OPT_groupFinder"], L["OPT_groupFinder_TIP"] },

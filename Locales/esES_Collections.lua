@@ -1,0 +1,28 @@
+local _, ns = ...
+if ns.LOCALE ~= "esES" then return end
+local L = ns.L
+
+-- Collections/: the classic Collections window, beside Locales/esES.lua.
+L["COLL_PAGE"] = "Página %d / %d"
+L["COLL_ALL"] = "Todo"
+L["COLL_COLLECTED"] = "Conseguidos"
+L["COLL_NOT_COLLECTED"] = "No conseguidos"
+L["COLL_SEARCH"] = "Buscar"
+L["COLL_MOUNTS"] = "Monturas"
+L["COLL_MOUNT"] = "Montar"
+L["COLL_DISMOUNT"] = "Desmontar"
+L["OPT_collectionsWindow"] = "Ventana de colecciones"
+L["OPT_collectionsWindow_TIP"] = "Monturas, mascotas, juguetes, reliquias y apariencias en una ventana clásica, cada una en su pestaña lateral, abierta con el botón de Colecciones, su icono del minimapa y su tecla."
+L["UI_COLLECTIONS"] = "Colecciones"
+L["CORE_COLLECTIONS_BUTTON_OPENS"] = "El botón de Colecciones vuelve a abrir la ventana de colecciones del juego tras recargar la interfaz."
+L["COLL_PETS"] = "Mascotas"
+L["COLL_TOYS"] = "Caja de juguetes"
+L["COLL_SUMMON"] = "Invocar"
+L["COLL_DISMISS"] = "Retirar"
+L["COLL_USE"] = "Usar"
+L["COLL_APPEARANCES"] = "Apariencias"
+L["COLL_FILTER"] = "Filtro"
+L["COLL_CHECK_ALL"] = "Marcar todo"
+L["COLL_UNCHECK_ALL"] = "Desmarcar todo"
+L["COLL_SOURCES"] = "Orígenes"
+L["COLL_CLASS"] = "Clase"

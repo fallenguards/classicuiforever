@@ -85,6 +85,18 @@ local WINDOWS = {
             if n then return ns.TalentWindowButtonFor(frame, n) end
         end,
     },
+    collectionsWindow = {
+        -- arg: a page (mounts, pets, toys, heirlooms, appearances).
+        open = function(page) return ns.ShowCollections(page) end,
+        frame = function() return _G.ClassicUIForeverCollections end,
+        parts = {},
+        -- tab:<n> the collection tabs down the right edge.
+        patterns = { "tab:<n>" },
+        part = function(_, part)
+            local n = Numbered(part, "tab")
+            if n then return ns.CollectionsPageTab(n) end
+        end,
+    },
     tradeSkill = {
         -- arg: "recipe:<recipeID>": picked in the window open now (unfolded, scrolled to). Opening a profession is the
         -- game's protected call, refused to addons: the player's own click (its spell or button) opens it first.
@@ -179,7 +191,8 @@ end
 
 -- The secure buttons that open these windows as their keys do; see API.SecureOpener.
 local OPENERS = { spellBook = "ForeverClassicUISpellBookBind", talents = "ClassicUIForeverTalentsBind",
-    legacyWindow = "ClassicUIForeverLegacyBind", questLog = "ForeverClassicUIQuestLogBind" }
+    legacyWindow = "ClassicUIForeverLegacyBind", questLog = "ForeverClassicUIQuestLogBind",
+    collectionsWindow = "ClassicUIForeverCollectionsBind" }
 
 -- The global name of the secure button that opens this window as its own key does, or nil. Pressed from another
 -- addon's secure button (a click in the player's name: type "click" with it as clickbutton, or "/click <name>"), it

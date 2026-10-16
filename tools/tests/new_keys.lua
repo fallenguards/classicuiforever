@@ -112,4 +112,5 @@ return {
     druidManaGlowAround = "on for everyone, a fix (#177): the default pick; the frame's glow goes round the druid mana bar it crossed",
     druidManaGlowBehind = "same for everyone: off by default; a second pick, the bar in front of the glow",
     druidManaGlowOver = "same for everyone: off by default; a third pick, the glow over the bar as before",
+    collectionsWindow = "on for everyone, as the Legacy window: the classic Collections window in place of the game's",
 }

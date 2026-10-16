@@ -45,6 +45,30 @@ function ns.WindowKey(name, binding, press, escName)
     return key
 end
 
+-- A window of ours opened by a game micro button and key (Legacy, Collections). spec: name (Escape's), micro, bind,
+-- binding, toggle(), frame(), closers() (macro lines the button's pad runs first, or nil). Returns set(on): the button's
+-- click and the key while on, in a fight the frame after. The game's spell window in the way closes first too.
+function ns.WindowOpeners(spec)
+    local on = false
+    local take = ns.WindowMicro({ spec.micro }, function()
+        if InCombatLockdown() then ns.Sched.NextFrame(spec.name .. ".open", spec.toggle) else spec.toggle() end
+    end)
+    local key = ns.WindowKey(spec.bind, spec.binding, spec.toggle, spec.name)
+    local function CloserMacro()
+        if not on then return nil end
+        local first = spec.closers and spec.closers()
+        if first or ns.GameSpellsCloser(spec.frame()) then return (first or "") .. "/click " .. key.name end
+    end
+    ns.OnGameSpellsRoom(function() key:PressFirst(on and ns.GameSpellsCloser(spec.frame()) or nil) end)
+    return function(want)
+        on = want and true or false
+        take(on)
+        key:Set(on)
+        local button = _G[spec.micro]
+        if on and ns.MapPad and button then ns.MapPad(button, nil, nil, CloserMacro, function() return on end) end
+    end
+end
+
 -- WindowMicro(names, open) -> take(on): the named micro buttons' clicks run open() while on; off, each gets its own
 -- click back, which then runs in our name until a reload (RELOAD_KEYS). In quick keybind mode a click binds instead.
 function ns.WindowMicro(names, open)
