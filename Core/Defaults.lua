@@ -96,6 +96,7 @@ ns.DB_DEFAULTS = {
     swingFlash = true,
     resourceDisplay = true,
     damageMeter = true,
+    leaveGameWindows = false,
     classicStatusFont = true,
     castBarShake = false,
     castBarInterrupter = false,

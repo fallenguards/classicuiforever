@@ -75,6 +75,7 @@ local FAQ = {
     end },
     { "FAQ_XPBAR_Q", "FAQ_XPBAR_A", function() return L["BAR_HIDE_THIS_BAR"] end },
     { "FAQ_MOVE_Q", "FAQ_MOVE_A", function() return L["UI_CLASSICUI_FOREVER_WINDOWS"] end },
+    { "FAQ_MOVERS_Q", "FAQ_MOVERS_A", function() return L["OPT_leaveGameWindows"] end },
     { "FAQ_SIZE_Q", "FAQ_SIZE_A", function() return L["UI_CLASSICUI_FOREVER_WINDOWS"], L["OPT_classicBarSize"] end },
     { "FAQ_SETTING_Q", "FAQ_SETTING_A", function() return L["OPTWIN_SEARCH_TOGGLES"] end },
     { "FAQ_FOREVER_Q", "FAQ_FOREVER_A", on = "forever" },

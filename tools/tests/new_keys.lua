@@ -101,5 +101,6 @@ return {
     bar2Over = "same for everyone: the default pick, bar 2 on its 1.x row over bar 1 as before",
     bar2Right = "same for everyone: opt-in, off by default",
     bar2Left = "same for everyone: opt-in, off by default",
+    leaveGameWindows = "same for everyone: opt-in, off by default; the game's windows keep our places, sizes and locks",
     bagsUnfolded = "same for everyone: off by default; the fold arrow's own state, nothing on screen without Bag bar: backpack only",
 }

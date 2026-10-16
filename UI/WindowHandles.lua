@@ -240,6 +240,20 @@ end
 
 ns.OnToggle(function(key) if key == MAP_ENTRY.toggle then PlaceAll() end end)
 
+-- Leave game windows to other addons: a size ours gave one goes back to the game's; turned off, ours place them again.
+-- A protected one (professions) waits for calm.
+local function LeaveGameWindows()
+    if InCombatLockdown() then ns.WhenCalm("windowsLeft", LeaveGameWindows) return end
+    for frame in pairs(scaled) do
+        if ns.MoverHolds(frame) then
+            ns.SetScaleIf(frame, 1)
+            scaled[frame] = nil
+        end
+    end
+    PlaceAll()
+end
+ns.OnToggle(function(key) if key == "leaveGameWindows" then LeaveGameWindows() end end)
+
 -- Our windows are made on first open; client ones as their addon loads.
 ns.PlaceSavedWindows = PlaceAll
 ns.EventFrame({ "ADDON_LOADED", "PLAYER_LOGIN" }, function() if ns.db then PlaceAll() end end)

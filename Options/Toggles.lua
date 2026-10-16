@@ -301,6 +301,8 @@ ns.TOGGLES = {
 
     { "gameDamageNumbers", L["OPT_gameDamageNumbers"], L["OPT_gameDamageNumbers_TIP"], group = L["GROUP_OTHER"] },
     { "damageMeter", L["OPT_damageMeter"], L["OPT_damageMeter_TIP"], search = "dps meter recount details" },
+    { "leaveGameWindows", L["OPT_leaveGameWindows"], L["OPT_leaveGameWindows_TIP"],
+        search = "moveany window mover move windows scale size lock conflict" },
     { "welcomeNote", L["OPT_welcomeNote"], L["OPT_welcomeNote_TIP"] },
     { "addonMessages", L["OPT_addonMessages"], L["OPT_addonMessages_TIP"], search = "chat login lines quiet" },
 }

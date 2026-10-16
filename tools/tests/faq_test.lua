@@ -58,7 +58,7 @@ Check(retail.FAQ_QUICKJOIN_A and not forever.FAQ_QUICKJOIN_A, "the Quick Join ta
 Check(retail.FAQ_RETAILBUTTONS_A and not forever.FAQ_RETAILBUTTONS_A, "retail's own micro buttons are retail's alone")
 Check(forever.FAQ_LFG_A and not retail.FAQ_LFG_A and retail.FAQ_LFG_RETAIL_A, "each client has its own group finder answer")
 Check(forever.FAQ_REAGENT_A and not retail.FAQ_REAGENT_A and retail.FAQ_REAGENT_RETAIL_A, "each client has its own reagent bag answer")
-for _, shared in ipairs({ "FAQ_PROFESSIONS_A", "FAQ_COLLECTIONS_A", "FAQ_BARS_A", "FAQ_MOVE_A", "FAQ_SETTING_A", "FAQ_OTHER_ADDON_A",
+for _, shared in ipairs({ "FAQ_PROFESSIONS_A", "FAQ_COLLECTIONS_A", "FAQ_BARS_A", "FAQ_MOVE_A", "FAQ_MOVERS_A", "FAQ_SETTING_A", "FAQ_OTHER_ADDON_A",
     "FAQ_TENBUTTONS_A", "FAQ_GRYPHONS_A", "FAQ_XPBAR_A", "FAQ_SIZE_A", "FAQ_GLOW_A", "FAQ_TRACKER_A", "FAQ_PLATES_A" }) do
     Check(forever[shared] and retail[shared], shared .. " shows on both clients")
 end

@@ -370,8 +370,9 @@ local counted = {}
 local function AddGame(n, panel)
     if counted[panel] or not panel:IsShown() then return n end
     counted[panel] = true
-    -- Placed by the player (our edit mode, or a window mover off the row's line): out of the row.
-    if (ns.FramePlaced and ns.FramePlaced(panel)) or ns.GameWindowOffRow(panel) or ns.MoverHolds(panel) then return n end
+    -- Placed by the player (our edit mode, or a window mover off the row's line): out of the row. One merely left to
+    -- other addons still stands where the game puts it, so ours keep clear of it.
+    if (ns.FramePlaced and ns.FramePlaced(panel)) or ns.GameWindowOffRow(panel) or ns.MoverTakes(panel) then return n end
     local name = panel:GetName()
     local left, right = BlockSpan(name, panel)
     if not left then return n end
