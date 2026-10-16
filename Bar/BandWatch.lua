@@ -174,14 +174,16 @@ function ns.MicroDroppedInFight()
     MarkStatus()
 end
 
--- A bar the game holds moves as the game likes (B.GameHolds), and the XP holders have their own way back (StatusBack);
--- movedBy names the last frame that called for a pass.
+-- A bar the game holds moves as the game likes (B.GameHolds), but turned on or off its row still follows; the XP holders
+-- have their own way back (StatusBack). movedBy names the last frame that called for a pass.
 local function Moved(list)
     local frames = list or WatchList()
     local holders = StatusPair()
     for i = 1, #frames do
         local frame = frames[i]
-        if Differs(frame, baseline[frame]) and frame ~= holders[1] and frame ~= holders[2] and not B.GameHolds(frame) then
+        local b = baseline[frame]
+        if Differs(frame, b) and frame ~= holders[1] and frame ~= holders[2]
+            and (not B.GameHolds(frame) or (frame:IsShown() and true or false) ~= (b and b.shown)) then
             B.movedBy = frame
             return true
         end

@@ -67,13 +67,22 @@ local function Watch(frame)
     if not frame.Layout then ns.Sched.OnVisible(frame, "band.shown", OnShownOrHidden) end
 end
 
--- Edit mode (our child under its manager's Border, ignoreInLayout), a cast, open bag windows: awake while they show.
+-- Edit mode (our child under its manager's Border, ignoreInLayout), Options, a cast, open bag windows: awake while
+-- they show.
 local function Awake()
     if B.active then B.WakeLane() end
 end
 
-local function KeepAwake(host, name)
-    if host then ns.Sched.Attach(host, { name = name, every = 0, fn = Awake }) end
+local function KeepAwake(host, name, fn)
+    if host then ns.Sched.Attach(host, { name = name, every = 0, fn = fn or Awake }) end
+end
+
+-- Options up: looked at every frame, as in edit mode, so a bar toggled there lays on the next frame, not the beat.
+local function AwakeHot()
+    if not B.active then return end
+    local hot = B.hot
+    hot.untilAt = math.max(hot.untilAt, GetTime() + hot.SHORT)
+    B.WakeLane()
 end
 
 -- A bag window opening: the client shows it, then lays it at the screen corner (ContainerFrame_GenerateFrame), and a
@@ -94,6 +103,8 @@ local wakersMade = false
 local function MakeWakers()
     wakersMade = true
     KeepAwake(EditModeManagerFrame and EditModeManagerFrame.Border, "band.editWake")
+    -- The game's Options: its action bar toggles show and hide bars, layout frames no watch of ours can sit on.
+    KeepAwake(SettingsPanel, "band.settingsWake", AwakeHot)
     KeepAwake(PlayerCastingBarFrame, "band.castWake")
     WakeBags(ContainerFrameCombinedBags)
     for i = 1, _G.NUM_CONTAINER_FRAMES or 13 do WakeBags(_G["ContainerFrame" .. i]) end

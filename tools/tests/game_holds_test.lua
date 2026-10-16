@@ -80,7 +80,8 @@ Check(classic:find("pcall(B.HoldBandBoxes, not ns.EditMode.Live())", 1, true),
 
 local watch = Read("Bar/BandWatch.lua")
 local moved = Body(watch, "local function Moved(list)")
-Check(moved and moved:find("and not B.GameHolds(frame)", 1, true), "the watch calls for no pass when the game moves a bar it holds")
+Check(moved and moved:find("(not B.GameHolds(frame) or (frame:IsShown() and true or false) ~= (b and b.shown))", 1,
+    true), "the watch calls for no pass when the game moves a bar it holds, and does when one is turned on or off")
 Check(moved and moved:find("frame ~= holders[1] and frame ~= holders[2]", 1, true),
     "the game moving an XP holder calls for no full pass (its run found 14 to 25 ms of passes it called for)")
 local place = Body(watch, "local function PlaceNow(fromLane)")
