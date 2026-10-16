@@ -487,9 +487,19 @@ local function MacroText(name, rank, passive)
     return name
 end
 
--- Fires on press and release; links on release.
-local function Button_PostClick(self, _, down)
+-- Fires on press and release; links on release. Ctrl+right-click, which
+-- casts nothing here (left click only), opens the spell's EasyFind note.
+local function Button_PostClick(self, button, down)
     if down or not self.slot then return end
+    if button == "RightButton" and IsControlKeyDown() and not IsShiftKeyDown() and not IsAltKeyDown() then
+        local easyFind = _G.EasyFind
+        local info = ItemInfo(self.slot, self.bank or state.bank)
+        local id = info and (info.spellID or info.actionID)
+        if easyFind and easyFind.OpenObjectNote and type(id) == "number" and not IsSecret(id) then
+            easyFind:OpenObjectNote("spell", id, not IsSecret(info.name) and info.name or nil)
+        end
+        return
+    end
     local linking = IsModifiedClick("CHATLINK")
     -- The wrap hid the layer for a profession cast; the book follows. Not on a link click: nothing was cast.
     if not linking and self:GetAttribute("trade") and ns.HideSpellBook then ns.HideSpellBook() end
