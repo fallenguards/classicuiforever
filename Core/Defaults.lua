@@ -178,6 +178,7 @@ ns.DB_DEFAULTS = {
     -- Bar 1's Hide Bar Art as the player ticked it on our layout (Bar/BandBare.lua).
     barArtHidden = false,
     statusBarBacking = true,
+    xpTipRested = false,
     gryphonsOverBars = false,
     showGryphonLeft = true, hideGryphonLeft = false, showGryphonRight = true, hideGryphonRight = false,
     -- The game's own Hidden on a gryphon (its edit mode dialog, before ours) read into the choice once.

@@ -51,6 +51,7 @@ ns.TOGGLES = {
     { "hideGryphonRight", L["OPT_hideGryphonRight"], GRYPHON_TIP, parent = "classicBar", radio = "gryphonRightShow", drop = true },
     { "hideStanceBar", L["OPT_hideStanceBar"], L["OPT_hideStanceBar_TIP"], parent = "classicBar", search = "forms auras shapeshift" },
     { "statusBarBacking", L["OPT_statusBarBacking"], L["OPT_statusBarBacking_TIP"], parent = "classicBar", search = "experience rested reputation dark background transparent see-through" },
+    { "xpTipRested", L["OPT_xpTipRested"], L["OPT_xpTipRested_TIP"], parent = "classicBar", search = "experience rested tooltip amount" },
     { "microTips", L["OPT_microTips"], L["OPT_microTips_TIP"], parent = "classicBar", search = "tooltip" },
     { "hideMicroArt", L["OPT_hideMicroArt"], L["OPT_hideMicroArt_TIP"], parent = "classicBar" },
     { "hideLatencyBar", L["OPT_hideLatencyBar"], L["OPT_hideLatencyBar_TIP"], parent = "classicBar" },

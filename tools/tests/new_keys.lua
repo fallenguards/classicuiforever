@@ -4,6 +4,7 @@
 -- luacheck: std lua54
 return {
     hideThreatGlow = "same for everyone: opt-in, off by default",
+    xpTipRested = "same for everyone: opt-in, off by default",
     nameBoxPlayer = "same for everyone: off by default; the player's name box stays plain as in 1.x unless picked",
     nameBoxTarget = "same for everyone: on by default, the game's color on the target's name box as before; unchecked makes it plain",
     nameBoxFocus = "same for everyone: on by default, the game's color on the focus's name box as before; unchecked makes it plain",

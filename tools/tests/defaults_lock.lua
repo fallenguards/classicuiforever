@@ -328,4 +328,5 @@ return {
     windowLocksAlways = false,
     worldMap = true,
     worldMapMinimapButton = false,
+    xpTipRested = false,
 }
