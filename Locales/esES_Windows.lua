@@ -67,3 +67,4 @@ L["OPT_themeIgnoreEliteFrames_TIP"] = "Los marcos cuyo dragón conserva su propi
 L["OPT_xpTipRested"] = "PX de descanso en la descripción de la barra de PX"
 L["OPT_xpTipRested_TIP"] = "La descripción de la barra de PX también muestra cuántos PX de descanso tienes."
 L["UI_RESTED_XP_LINE"] = "PX de descanso: %s (%s%%)"
+L["TOTEM_KEEP_ROOM"] = "Reservar espacio para tótems no aprendidos"

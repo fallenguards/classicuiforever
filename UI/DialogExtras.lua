@@ -61,18 +61,41 @@ local function Watch()
     ns.Sched.OnVisible(host, "dialogExtras.shown", function(shown) if not shown then Follow() end end)
 end
 
--- A labelled stepper slider row: init() -> value, low, high, steps; onChange(value). Returns its fill function.
-function ns.DialogExtraSlider(panel, label, init, onChange)
-    local B = ns.band
+local function RowLabel(panel, label)
     local text = panel:CreateFontString(nil, "ARTWORK", "GameFontHighlightMedium")
     text:SetPoint("TOPLEFT", panel.title, "BOTTOMLEFT", 0, -14 - panel.rows * ROW_H)
     text:SetWidth(130)
     text:SetJustifyH("LEFT")
     text:SetText(label)
     panel.rows = panel.rows + 1
-    local slider, formatters = B.StepperSlider(panel, 180, text, 6, function(v) return tostring(math.floor(v + 0.5)) end)
-    if not slider then return function() end end
-    return B.GuardedSlider(slider, init, onChange, { formatters = formatters, owner = panel })
+    return text
+end
+
+local function Whole(v) return tostring(math.floor(v + 0.5)) end
+
+-- A labelled stepper slider row: init() -> value, low, high, steps; onChange(value); format(value) -> its text.
+-- Returns its fill function and label.
+function ns.DialogExtraSlider(panel, label, init, onChange, format)
+    local B = ns.band
+    local text = RowLabel(panel, label)
+    local slider, formatters = B.StepperSlider(panel, 180, text, 6, format or Whole)
+    if not slider then return function() end, text end
+    return B.GuardedSlider(slider, init, onChange, { formatters = formatters, owner = panel }), text
+end
+
+-- A labelled drop down row: options { value, text } each; get() -> value; set(value). Returns its fill function.
+function ns.DialogExtraDrop(panel, label, options, get, set)
+    local text = RowLabel(panel, label)
+    local dropdown = ns.NewFrame("DropdownButton", nil, panel, "WowStyle1DropdownTemplate")
+    dropdown:SetWidth(180)
+    dropdown:SetPoint("LEFT", text, "RIGHT", 6, 0)
+    ns.SkinDropdown(dropdown)
+    dropdown:SetupMenu(function(_, root)
+        for _, option in ipairs(options) do
+            root:CreateRadio(option.text, function() return get() == option.value end, function() set(option.value) end)
+        end
+    end)
+    return function() dropdown:GenerateMenu() end
 end
 
 -- A check row as the client's dialog draws one: get() -> on; set(on). Returns its fill function.

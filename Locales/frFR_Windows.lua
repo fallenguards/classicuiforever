@@ -67,3 +67,4 @@ L["OPT_themeIgnoreEliteFrames_TIP"] = "Les cadres dont le dragon garde son or ou
 L["OPT_xpTipRested"] = "XP de repos dans l'infobulle de la barre d'XP"
 L["OPT_xpTipRested_TIP"] = "L'infobulle de la barre d'XP montre aussi combien d'XP de repos vous avez."
 L["UI_RESTED_XP_LINE"] = "XP de repos : %s (%s %%)"
+L["TOTEM_KEEP_ROOM"] = "Garder la place des totems non appris"

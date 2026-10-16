@@ -121,3 +121,4 @@ L["OPT_themeIgnoreEliteFrames_TIP"] = "The frames whose dragon keeps its own gol
 L["OPT_xpTipRested"] = "Rested XP in the XP bar's tooltip"
 L["OPT_xpTipRested_TIP"] = "The XP bar's tooltip also shows how much rested XP you have."
 L["UI_RESTED_XP_LINE"] = "Rested XP: %s (%s%%)"
+L["TOTEM_KEEP_ROOM"] = "Keep room for unlearned totems"

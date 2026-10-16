@@ -67,3 +67,4 @@ L["OPT_themeIgnoreEliteFrames_TIP"] = "I riquadri il cui drago mantiene il propr
 L["OPT_xpTipRested"] = "PE di riposo nel suggerimento della barra PE"
 L["OPT_xpTipRested_TIP"] = "Il suggerimento della barra PE mostra anche quanti PE di riposo hai."
 L["UI_RESTED_XP_LINE"] = "PE di riposo: %s (%s%%)"
+L["TOTEM_KEEP_ROOM"] = "Lascia spazio ai totem non appresi"

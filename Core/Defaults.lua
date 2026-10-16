@@ -180,6 +180,7 @@ ns.DB_DEFAULTS = {
     statusBarBacking = true,
     xpTipRested = false,
     focusBuffsOnTop = false, petBuffsOnTop = false,
+    totemOrientation = "horizontal", totemRows = 1, totemSize = 100, totemPadding = 8, totemKeepRoom = false,
     gryphonsOverBars = false,
     showGryphonLeft = true, hideGryphonLeft = false, showGryphonRight = true, hideGryphonRight = false,
     -- The game's own Hidden on a gryphon (its edit mode dialog, before ours) read into the choice once.

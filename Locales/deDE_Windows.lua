@@ -67,3 +67,4 @@ L["OPT_themeIgnoreEliteFrames_TIP"] = "Die Fenster, deren Drache sein eigenes Go
 L["OPT_xpTipRested"] = "Erholte EP im Tooltip der EP-Leiste"
 L["OPT_xpTipRested_TIP"] = "Der Tooltip der EP-Leiste zeigt auch, wie viele erholte EP du hast."
 L["UI_RESTED_XP_LINE"] = "Erholte EP: %s (%s%%)"
+L["TOTEM_KEEP_ROOM"] = "Platz für nicht erlernte Totems freihalten"
