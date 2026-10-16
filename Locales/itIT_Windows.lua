@@ -39,3 +39,12 @@ L["OPT_bagsBackpackOnly"] = "Barra delle borse: solo lo zaino"
 L["BAGS_SHOW_BAGS"] = "Mostra le borse"
 L["BAGS_HIDE_BAGS"] = "Nascondi le borse"
 L["OPT_bagsShow_TIP"] = "I pulsanti delle borse visibili, nascosti, visibili solo mentre una finestra delle borse è aperta, solo mentre il mouse è sul loro posto, o ripiegati sullo zaino dietro una freccia. Sulla barra classica la barra si stringe sulle borse nascoste o ripiegate, altrimenti i loro alloggi sbiadiscono con loro."
+
+-- Options/Toggles.lua: where a nameplate's crowd control icons sit
+L["OPT_plateCCBeside"] = "Controllo: dopo il livello"
+L["OPT_plateCCBeside_TIP"] = "Le icone di stordimento, immobilizzazione e paura subito dopo il livello, lontano da un drago élite."
+L["OPT_plateCCAbove"] = "Controllo: con le penalità"
+L["OPT_plateCCAbove_TIP"] = "Le icone di stordimento, immobilizzazione e paura in fondo alla fila delle penalità sopra il nome."
+L["OPT_plateCCLeft"] = "Controllo: a sinistra della barra"
+L["OPT_plateCCLeft_TIP"] = "Le icone di stordimento, immobilizzazione e paura a sinistra della barra della salute, dopo un segno di incursione; una seconda si aggiunge a sinistra."
+L["OPT_plateCC_TIP"] = "Dove una targhetta mostra le sue icone di controllo."

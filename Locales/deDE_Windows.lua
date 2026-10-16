@@ -39,3 +39,12 @@ L["OPT_bagsBackpackOnly"] = "Taschenleiste: nur Rucksack"
 L["BAGS_SHOW_BAGS"] = "Taschen anzeigen"
 L["BAGS_HIDE_BAGS"] = "Taschen ausblenden"
 L["OPT_bagsShow_TIP"] = "Die Taschentasten angezeigt, ausgeblendet, nur solange ein Taschenfenster offen ist, nur solange die Maus über ihrem Platz ist, oder hinter einem Pfeil auf den Rucksack eingeklappt. Auf der klassischen Leiste rückt die Leiste über ausgeblendeten oder eingeklappten Taschen zusammen, sonst verblassen ihre Fassungen mit ihnen."
+
+-- Options/Toggles.lua: where a nameplate's crowd control icons sit
+L["OPT_plateCCBeside"] = "Kontrolleffekte: hinter der Stufe"
+L["OPT_plateCCBeside_TIP"] = "Symbole für Betäubung, Bewegungsunfähigkeit und Furcht gleich hinter der Stufe, frei von einem Elitedrachen."
+L["OPT_plateCCAbove"] = "Kontrolleffekte: bei den Schwächungen"
+L["OPT_plateCCAbove_TIP"] = "Symbole für Betäubung, Bewegungsunfähigkeit und Furcht am Ende der Schwächungsreihe über dem Namen."
+L["OPT_plateCCLeft"] = "Kontrolleffekte: links der Leiste"
+L["OPT_plateCCLeft_TIP"] = "Symbole für Betäubung, Bewegungsunfähigkeit und Furcht links der Gesundheitsleiste, hinter einer Schlachtzugsmarkierung; ein zweites kommt links dazu."
+L["OPT_plateCC_TIP"] = "Wo eine Namensplakette ihre Symbole für Kontrolleffekte zeigt."

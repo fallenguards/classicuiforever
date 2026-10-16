@@ -39,3 +39,12 @@ L["OPT_bagsBackpackOnly"] = "Barra de bolsas: solo la mochila"
 L["BAGS_SHOW_BAGS"] = "Mostrar las bolsas"
 L["BAGS_HIDE_BAGS"] = "Ocultar las bolsas"
 L["OPT_bagsShow_TIP"] = "Los botones de bolsa visibles, ocultos, visibles solo mientras una ventana de bolsa está abierta, solo mientras el ratón está sobre su sitio, o plegados en la mochila tras una flecha. En la barra clásica, la barra se cierra sobre las bolsas ocultas o plegadas y si no sus huecos se desvanecen con ellas."
+
+-- Options/Toggles.lua: where a nameplate's crowd control icons sit
+L["OPT_plateCCBeside"] = "Control: tras el nivel"
+L["OPT_plateCCBeside_TIP"] = "Los iconos de aturdimiento, enraizamiento y miedo justo tras el nivel, lejos de un dragón de élite."
+L["OPT_plateCCAbove"] = "Control: con los perjuicios"
+L["OPT_plateCCAbove_TIP"] = "Los iconos de aturdimiento, enraizamiento y miedo al final de la fila de perjuicios sobre el nombre."
+L["OPT_plateCCLeft"] = "Control: a la izquierda de la barra"
+L["OPT_plateCCLeft_TIP"] = "Los iconos de aturdimiento, enraizamiento y miedo a la izquierda de la barra de salud, tras una marca de banda; un segundo se añade a la izquierda."
+L["OPT_plateCC_TIP"] = "Dónde muestra una placa de nombre sus iconos de control."

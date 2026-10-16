@@ -106,4 +106,7 @@ return {
     mapMarkers ="on for everyone, a restyle: Era's tower on capitals and house on towns on the continent maps (#165); unchecked gives the game's markers back",
     leaveGameWindows ="same for everyone: opt-in, off by default; the game's windows keep our places, sizes and locks",
     bagsUnfolded = "same for everyone: off by default; the fold arrow's own state, nothing on screen without Bag bar: backpack only",
+    plateCCBeside = "on for everyone, a fix: the default pick; crowd control icons past the level slot they covered",
+    plateCCAbove = "same for everyone: off by default; a second pick of the crowd control spot",
+    plateCCLeft = "same for everyone: off by default; a third pick of the crowd control spot",
 }

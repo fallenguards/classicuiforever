@@ -93,3 +93,12 @@ L["OPT_reagentBagRound"] = "Reagent bag: round button"
 L["OPT_reagentBagRound_TIP"] = "A small round reagent bag between the key ring and the last bag; the bag row keeps its 1.x length."
 L["OPT_reagentBagHover"] = "Reagent bag: round on hover"
 L["OPT_reagentBagHover_TIP"] = "The round reagent bag shows only while the mouse is over the bags or the key ring, so the row reads as 1.x."
+
+-- Options/Toggles.lua: where a nameplate's crowd control icons sit
+L["OPT_plateCCBeside"] = "Crowd control: past the level"
+L["OPT_plateCCBeside_TIP"] = "Stun, root and fear icons just past the level, clear of an elite dragon."
+L["OPT_plateCCAbove"] = "Crowd control: with the debuffs"
+L["OPT_plateCCAbove_TIP"] = "Stun, root and fear icons at the end of the debuff row over the name."
+L["OPT_plateCCLeft"] = "Crowd control: left of the bar"
+L["OPT_plateCCLeft_TIP"] = "Stun, root and fear icons left of the health bar, past a raid marker; a second one grows to the left."
+L["OPT_plateCC_TIP"] = "Where a nameplate shows its crowd control icons."

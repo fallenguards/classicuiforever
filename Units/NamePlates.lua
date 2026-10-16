@@ -49,7 +49,7 @@ local PLATE_EVENTS = { "NAME_PLATE_UNIT_ADDED", "NAME_PLATE_UNIT_REMOVED",
     "PLAYER_FOCUS_CHANGED", "DISPLAY_SIZE_CHANGED", "UI_SCALE_CHANGED", "CVAR_UPDATE",
     "UNIT_SPELLCAST_START", "UNIT_SPELLCAST_STOP", "UNIT_SPELLCAST_CHANNEL_START",
     "UNIT_SPELLCAST_CHANNEL_STOP", "UNIT_SPELLCAST_INTERRUPTED", "UNIT_SPELLCAST_NOT_INTERRUPTIBLE",
-    "UNIT_SPELLCAST_INTERRUPTIBLE", "UPDATE_MOUSEOVER_UNIT" }
+    "UNIT_SPELLCAST_INTERRUPTIBLE", "UPDATE_MOUSEOVER_UNIT", "RAID_TARGET_UPDATE" }
 local CAST_EVENTS = { UNIT_SPELLCAST_START = true, UNIT_SPELLCAST_STOP = true, UNIT_SPELLCAST_CHANNEL_START = true,
     UNIT_SPELLCAST_CHANNEL_STOP = true, UNIT_SPELLCAST_INTERRUPTED = true, UNIT_SPELLCAST_NOT_INTERRUPTIBLE = true,
     UNIT_SPELLCAST_INTERRUPTIBLE = true }
@@ -232,6 +232,44 @@ local function UpdateDragon(unitFrame, health)
     if own.dragon then ns.SetShownIf(own.dragon, key ~= nil) end
 end
 
+-- Crowd control icons: the client puts them 5 past the bar, on our level slot. Past the level (and a dragon's tip), in
+-- the debuff row, or left of the bar past a raid marker. Gaps in plate units: the border art ends 2 in from its edge.
+local CC_FRAMES = { "CrowdControlListFrame", "LossOfControlFrame" }
+local CC_GAP, CLIENT_CC_GAP = 2, 5
+local DRAGON_TIP = LEVEL_X + DRAGON_X + DRAGON_WIDTH * 37 / 64
+
+local function PlaceCrowdControl(unitFrame)
+    local auras = unitFrame.AurasFrame
+    local health = ns.Path(unitFrame, "HealthBarsContainer", "healthBar")
+    local own = health and health.fcui
+    local border = own and own.border
+    if not auras or not border then return end
+    local scale = PlateScale()
+    for _, key in ipairs(CC_FRAMES) do
+        local icons = auras[key]
+        if icons and ns.db.plateCCAbove == true and auras.DebuffListFrame then
+            ns.SetPointIf(icons, "BOTTOMLEFT", auras.DebuffListFrame, "BOTTOMRIGHT", CC_GAP, 0)
+        elseif icons and ns.db.plateCCLeft == true then
+            local mark = unitFrame.RaidTargetFrame
+            local marked = mark ~= nil and mark:IsShown()
+            if IsSecret(marked) then marked = true end
+            ns.SetPointIf(icons, "RIGHT", marked and mark or border, "LEFT", -CC_GAP * (marked and 1 or scale), 0)
+        elseif icons then
+            local tip = own.dragon and own.dragon:IsShown() and DRAGON_TIP or 0
+            ns.SetPointIf(icons, "LEFT", border, "RIGHT", (tip + CC_GAP) * scale, 0)
+        end
+    end
+end
+
+-- The client's own spot back, as its next anchor pass lays it.
+local function UnplaceCrowdControl(unitFrame)
+    local auras, container = unitFrame.AurasFrame, unitFrame.HealthBarsContainer
+    if not auras or not container then return end
+    for _, key in ipairs(CC_FRAMES) do
+        if auras[key] then ns.SetPointIf(auras[key], "LEFT", container, "RIGHT", CLIENT_CC_GAP, 0) end
+    end
+end
+
 -- The client's bottom-up chain at 1.x sizes, bars scaled by Size; name and auras keep the client's sizing.
 local function LayChain(unitFrame, castContainer, container, health)
     local scale = PlateScale()
@@ -396,6 +434,7 @@ local function Layout(unitFrame)
             ns.SetTwoPointsIf(debuffs, "LEFT", border, "LEFT", 0, 0, "BOTTOM", name, "TOP", 0, AURA_GAP)
         end
     end
+    PlaceCrowdControl(unitFrame)
 
     LayCast(castContainer, unitFrame)
 end
@@ -428,6 +467,12 @@ local function EachPlate(fn, withForbidden)
     return seen
 end
 NP.EachPlate = EachPlate
+
+local function PlaceAllCrowdControl()
+    EachPlate(function(unitFrame)
+        if Pieces(unitFrame) then PlaceCrowdControl(unitFrame) end
+    end)
+end
 
 local function PlateText(unitFrame)
     local own = unitFrame.fcui
@@ -572,6 +617,9 @@ local function OnEvent(_, event, unit, _, _, interruptedBy)
         if unitFrame then UpdateLevel(unitFrame) end
     elseif event == "UPDATE_MOUSEOVER_UNIT" then
         OverGlow()
+    elseif event == "RAID_TARGET_UPDATE" then
+        -- Left of the bar goes past a marker, which the client shows in its own handler.
+        if ns.db.plateCCLeft == true then ns.Sched.NextFrame("namePlates.crowdControl", PlaceAllCrowdControl) end
     elseif CAST_EVENTS[event] then
         -- Cast start or stop re-lays only that plate's chain and cast bar; a channel's stop names who interrupted it.
         local unitFrame = unit and PlateFor(unit)
@@ -618,6 +666,7 @@ local function Restore()
                 if type(region) == "table" and region.Hide then region:Hide() end
             end
         end
+        UnplaceCrowdControl(unitFrame)
         if unitFrame.HealthBarsContainer then unitFrame.HealthBarsContainer:SetScale(1) end
         if unitFrame.CastBarsContainer then unitFrame.CastBarsContainer:SetScale(1) end
         local health = ns.Path(unitFrame, "HealthBarsContainer", "healthBar")
@@ -642,7 +691,8 @@ end
 
 ns.RegisterModule("namePlates", { apply = Apply, restore = Restore })
 
--- Elite dragons and the cast bar's look turn at once, in a fight too.
+-- Elite dragons, the cast bar's look and the crowd control spot turn at once, in a fight too.
+local CC_KEYS = { plateCCBeside = true, plateCCAbove = true, plateCCLeft = true }
 ns.OnToggle(function(key)
     if not NP.active then return end
     if key == "plateDragons" then
@@ -650,7 +700,10 @@ ns.OnToggle(function(key)
             local _, health = Pieces(unitFrame)
             if health then UpdateDragon(unitFrame, health) end
         end)
+        PlaceAllCrowdControl()
     elseif key == "plateCastBeside" then
         EachPlate(CastLayout)
+    elseif CC_KEYS[key] then
+        PlaceAllCrowdControl()
     end
 end)

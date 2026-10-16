@@ -39,3 +39,12 @@ L["OPT_bagsBackpackOnly"] = "Barre des sacs : sac à dos seul"
 L["BAGS_SHOW_BAGS"] = "Afficher les sacs"
 L["BAGS_HIDE_BAGS"] = "Masquer les sacs"
 L["OPT_bagsShow_TIP"] = "Les boutons de sac affichés, masqués, affichés seulement quand une fenêtre de sac est ouverte, seulement quand la souris survole leur emplacement, ou repliés sur le sac à dos derrière une flèche. Sur la barre classique, la barre se resserre sur les sacs masqués ou repliés et sinon leurs logements s'estompent avec eux."
+
+-- Options/Toggles.lua: where a nameplate's crowd control icons sit
+L["OPT_plateCCBeside"] = "Contrôle : après le niveau"
+L["OPT_plateCCBeside_TIP"] = "Les icônes d'étourdissement, d'immobilisation et de peur juste après le niveau, à l'écart d'un dragon d'élite."
+L["OPT_plateCCAbove"] = "Contrôle : avec les affaiblissements"
+L["OPT_plateCCAbove_TIP"] = "Les icônes d'étourdissement, d'immobilisation et de peur au bout de la rangée d'affaiblissements au-dessus du nom."
+L["OPT_plateCCLeft"] = "Contrôle : à gauche de la barre"
+L["OPT_plateCCLeft_TIP"] = "Les icônes d'étourdissement, d'immobilisation et de peur à gauche de la barre de vie, après un marqueur de raid ; une deuxième s'ajoute à gauche."
+L["OPT_plateCC_TIP"] = "Où une barre de nom affiche ses icônes de contrôle."
