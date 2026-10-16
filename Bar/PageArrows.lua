@@ -60,4 +60,4 @@ local function Restore()
 end
 
 -- Own id for module order; classicBar is the toggle key.
-ns.RegisterModule("classicBar", { id = "pageArrows", apply = Apply, restore = Restore, padOff = true })
+ns.RegisterModule("classicBar", { id = "pageArrows", apply = Apply, restore = Restore, padOff = true, barPiece = true })

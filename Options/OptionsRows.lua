@@ -22,8 +22,10 @@ local RAW_ADD = { set = "raw", add = true }
 
 local function TipLabel(self) return self.label end
 local function TipBody(self) return self.tooltip end
--- White title, wrapped body; nothing without a body.
-local OPTION_TIP = { when = TipBody, text = TipLabel, r = 1, g = 1, b = 1, lines = { { TipBody, nil, nil, nil, true } } }
+local function TipHeld(self) return self.key and ns.BarRowHeld(self.key) and L["BARS_TAKEN_TIP"] or nil end
+-- White title, wrapped body, and why it is grayed while another addon holds the bars; nothing without a body.
+local OPTION_TIP = { when = TipBody, text = TipLabel, r = 1, g = 1, b = 1,
+    lines = { { TipBody, nil, nil, nil, true }, { TipHeld, 1, 0.82, 0, true } } }
 O.OPTION_TIP = OPTION_TIP
 
 -- Not part of the classic look, so Toggle none leaves them (the minimap button leads back here), nor the radio picks.

@@ -109,6 +109,7 @@ Bar\BandHangers.lua
 Bar\BandWatch.lua
 Bar\BandSentinel.lua
 Bar\ClassicBar.lua
+Bar\BarsTaken.lua
 Bar\Buttons.lua
 Bar\CastAnim.lua
 Bar\PageArrows.lua

@@ -119,6 +119,8 @@ local function OnItemRef(link)
         ns.ShowBarsLook()
     elseif target == "curseforge" then
         CopyCurseForge()
+    elseif target == "barsnote" then
+        ns.OpenOptionsAt("barsTakenNote")
     end
 end
 

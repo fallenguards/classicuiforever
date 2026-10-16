@@ -110,4 +110,4 @@ local function Restore()
     StripAll()
 end
 
-ns.RegisterModule("castAnim", { apply = Apply, restore = Restore })
+ns.RegisterModule("castAnim", { apply = Apply, restore = Restore, barPiece = true })

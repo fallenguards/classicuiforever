@@ -17,10 +17,10 @@ local buttons = {}
 local lit = setmetatable({}, { __mode = "k" })   -- row button -> true while the row's alpha lights it
 local arrow
 
--- Edit mode shows the row whatever the pick: its box must be there to take.
+-- Edit mode shows the row whatever the pick: its box must be there to take. Bars another addon holds are its own.
 function B.BagsMode()
     local db = ns.db
-    if not db or ns.EditMode.Live() then return "shown" end
+    if not db or ns.EditMode.Live() or ns.BarsTaken() then return "shown" end
     for key, mode in pairs(MODES) do
         if db[key] == true then return mode end
     end
@@ -306,7 +306,7 @@ end
 Apply = function(atOnce)
     Hook()
     local mode = B.BagsMode()
-    local band = ns.ModuleInForce("classicBar") and B.art ~= nil
+    local band = ns.ModuleInForce("classicBar") and B.art ~= nil and not ns.BarsTaken()
     local fold = B.BagsFolded()
     local seen = mode == "shown" or mode == "backpack" or (mode ~= "hidden" and revealed)
     local reagent = CharacterReagentBag0Slot
@@ -342,4 +342,4 @@ ns.OnToggle(function(key)
     Apply(true)
 end)
 
-ns.RegisterModule("showBags", { apply = B.ApplyBagsMode, restore = B.ApplyBagsMode })
+ns.RegisterModule("showBags", { apply = B.ApplyBagsMode, restore = B.ApplyBagsMode, barPiece = true })

@@ -19,6 +19,7 @@ local function Picked(button)
     local key = GAME_HIDE[button:GetName() or ""]
     local db = ns.db
     return key ~= nil and db.hideMicroButtons == true and db[key] == true and not ns.ModuleInForce("classicBar")
+        and not ns.BarsTaken()
 end
 
 -- Out of a fight only: the game lays its menu out again on the hide.
@@ -47,7 +48,7 @@ local function Sync()
     end
 end
 
-ns.RegisterModule("hideMicroButtons", { apply = Sync, restore = Sync })
+ns.RegisterModule("hideMicroButtons", { apply = Sync, restore = Sync, barPiece = true })
 
 -- The achievements button (retail's; 1.x had none) became hidden by default: an install from before keeps it showing, in
 -- the account and every profile, until a classic layout reset. Runs before the defaults fill.

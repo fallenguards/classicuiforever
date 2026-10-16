@@ -596,4 +596,4 @@ local function Restore()
     ForEachButton(Unskin)
 end
 
-ns.RegisterModule("buttons", { apply = Apply, restore = Restore })
+ns.RegisterModule("buttons", { apply = Apply, restore = Restore, barPiece = true })

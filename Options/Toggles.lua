@@ -77,6 +77,8 @@ ns.TOGGLES = {
     { "hideMicroKeepWidth", L["OPT_hideMicroKeepWidth"], L["OPT_hideMicroKeepWidth_TIP"], parent = "hideMicroButtons", needs = "classicBar", search = "gap background" },
     { "hideMicroSpread", L["OPT_hideMicroSpread"], L["OPT_hideMicroSpread_TIP"], parent = "hideMicroKeepWidth", search = "gap spacing" },
     { "bandHoldsBars", L["OPT_bandHoldsBars"], L["OPT_bandHoldsBars_TIP"], parent = "hideMicroButtons", needs = "classicBar", search = "gap width bar 3" },
+    { "barsTakenNote", L["OPT_barsTakenNote"], L["OPT_barsTakenNote_TIP"],
+        search = "warning message chat login another addon action bars takeover" },
 
     { "unitFrames", L["OPT_unitFrames"], L["OPT_unitFrames_TIP"], group = L["GROUP_UNIT_FRAMES"] },
     { "unitFramePlayer", L["OPT_unitFramePlayer"], L["OPT_unitFramePlayer_TIP"], parent = "unitFrames", checks = "unitFrameList", drop = true, dropLabel = L["OPT_DROP_FRAMES"], dropTip = L["OPT_unitFrames_TIP"] },

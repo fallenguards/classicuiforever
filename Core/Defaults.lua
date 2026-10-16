@@ -133,6 +133,7 @@ ns.DB_DEFAULTS = {
     hideThreatGlow = true,
     hideCombatGlow = false,
     damageFlash = false,
+    barsTakenNote = true,
     threatNumber = true,
     threatNumberGrouped = false,
     druidMana = true,

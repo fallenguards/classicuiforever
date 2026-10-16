@@ -447,6 +447,7 @@ local function Build()
                 if ns.db[up] == false then on = false break end
                 up = parentOf[up]
             end
+            if on and ns.BarRowHeld(row.key) then on = false end
             row:SetEnabled(on)
             -- A button row's label keeps the button's own fonts.
             if not row.button then row.text:SetFontObject(on and (row.font or "GameFontHighlight") or "GameFontDisable") end
@@ -491,4 +492,17 @@ function ns.OpenOptions()
     local inside = embedded ~= nil
     if inside then StandAlone(frame) end
     frame:SetShown(inside or not frame:IsShown())
+end
+
+-- Open on one toggle (a chat link's "here"): its label searched, so its row shows lit.
+function ns.OpenOptionsAt(key)
+    local frame = Window()
+    if embedded ~= nil then StandAlone(frame) end
+    frame:Show()
+    for _, entry in ipairs(ns.TOGGLES) do
+        if entry[1] == key then
+            frame.search:SetText(entry[2])
+            return
+        end
+    end
 end

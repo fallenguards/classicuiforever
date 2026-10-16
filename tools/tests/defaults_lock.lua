@@ -24,6 +24,7 @@ return {
     barUnitTips = true,
     barsNote = false,
     barsNoteOff = false,
+    barsTakenNote = true,
     bronzeTheme = false,
     buttons = true,
     calendarBehind = false,

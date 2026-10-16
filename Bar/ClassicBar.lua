@@ -465,4 +465,4 @@ function ns.ClassicBarInfo()
     return string.format("art shown=%s left=%.0f bottom=%.0f scale=%.2f pending=false", tostring(art:IsShown()), art:GetLeft() or 0, art:GetBottom() or 0, art:GetScale())
 end
 
-ns.RegisterModule("classicBar", { init = Init, apply = Apply, restore = Restore, padOff = true })
+ns.RegisterModule("classicBar", { init = Init, apply = Apply, restore = Restore, padOff = true, barPiece = true })
