@@ -2,6 +2,25 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.30.0] - 2026-10-16
+
+### Added
+- Era's city and town markers on Forever's Kalimdor and Eastern Kingdoms maps: capitals show Era's gray tower instead of a small house, and the 33 towns Era marks show its yellow house, with the town's name on hover. On by default; Era city and town markers, under Map in the options (/fcui), turns it off (#165).
+- When another addon takes over the action bars, the classic bar and its button art, page arrows, micro menu and bag handling step aside instead of drawing under that addon's bars, and their rows in the options gray with a note why. A popup says so once, and a chat line at each login until Bar takeover warning is turned off; its link opens that option (#120).
+- Leave game windows to other addons, under Other in the options, off by default: the game's own windows get no place, size, lock or grip of ours, so a window mover addon can have them. The addon's own windows keep their lock. A new FAQ question, in every language, says why a window mover moves some windows and not others.
+- Damage flash, under Unit frames in the options, off by default: the red flash of the health just lost on the player frame, which 1.x never had (#85).
+
+### Changed
+- Addon messages, under Other in the options, now covers the welcome note and the bar takeover warning too: off keeps them all quiet.
+
+### Fixed
+- Bag bar on hover shows the bags while the mouse is anywhere over the row, gaps between bags and the socket art included (#117).
+- The round reagent bag's own hover belongs to the classic bar: with the classic bar off or another addon holding the bars, the reagent bag shows as normal instead of fading.
+- The classic world map opened, maximized or restored in a fight takes its classic size and spot at once, as out of a fight.
+- Escape works again after a profession window when another addon also binds the Escape key.
+- Turning an action bar on or off in the game's settings lays the classic bar out again at once.
+- The target of target's name is left-justified as in Era, and the max camera distance value no longer covers its reset button.
+
 ## [0.29.1] - 2026-10-15
 
 ### Fixed

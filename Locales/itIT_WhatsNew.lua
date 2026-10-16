@@ -3,6 +3,16 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN39_1_TITLE"] = "Indicatori della mappa di Era"
+L["WN39_1_TEXT"] = "Sulle mappe di Kalimdor e dei Regni Orientali, le capitali mostrano di nuovo la torre grigia di Era e i villaggi la sua casa gialla, con il nome del villaggio al passaggio del mouse. Attivo di base; Indicatori di città e villaggi di Era, in Mappa nelle opzioni (/fcui), lo disattiva."
+L["WN39_2_TITLE"] = "Altri addon delle barre delle azioni"
+L["WN39_2_TEXT"] = "Quando un altro addon prende le barre delle azioni, la barra classica si fa da parte invece di disegnarsi sotto. Una finestra lo dice una volta, e una riga in chat a ogni accesso finché non disattivi Avviso di barre occupate in Messaggi dell'addon nelle opzioni. Messaggi dell'addon ora zittisce anche la nota di benvenuto."
+L["WN39_3_TITLE"] = "Lampo di danno"
+L["WN39_3_TEXT"] = "Il riquadro del giocatore non fa più lampeggiare in rosso la salute appena persa, come nella 1.x. Disattivato di base; per riaverlo, attivalo nelle opzioni (/fcui): Lampo di danno, in Riquadri delle unità."
+L["WN39_4_TITLE"] = "Addon per spostare le finestre"
+L["WN39_4_TEXT"] = "Lascia le finestre del gioco ad altri addon smette di posizionare, ridimensionare e bloccare le finestre del gioco, così un addon che sposta le finestre può gestirle; le nostre mantengono il lucchetto. Disattivato di base; attivalo nelle opzioni, in Altro. Una nuova domanda nelle FAQ spiega perché un addon del genere sposta alcune finestre e altre no."
+L["WN39_5_TITLE"] = "Correzioni"
+L["WN39_5_TEXT"] = "La barra delle borse al passaggio mostra le borse finché il mouse è in qualunque punto della fila, anche tra due borse, e il passaggio proprio della borsa dei reagenti non la nasconde più fuori dalla barra classica. La mappa classica aperta in combattimento prende subito la sua dimensione e il suo posto classici, Esc funziona di nuovo dopo una finestra di professione, e attivare o disattivare una barra delle azioni risistema subito la barra classica."
 L["WN38_1_TITLE"] = "Minimappa"
 L["WN38_1_TEXT"] = "Dopo l'ultimo aggiornamento del gioco, il pulsante di tracciamento e la barra della zona della minimappa mostrano di nuovo il loro aspetto 1.x, e il nome della zona torna alla dimensione di Era. Il gioco non mostra più lì un indicatore di difficoltà, quindi la sua scelta è sparita dalle opzioni."
 L["WN38_2_TITLE"] = "Correzioni"

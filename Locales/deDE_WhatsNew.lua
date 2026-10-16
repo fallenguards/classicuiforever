@@ -3,6 +3,16 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN39_1_TITLE"] = "Era-Kartenmarkierungen"
+L["WN39_1_TEXT"] = "Auf den Karten von Kalimdor und den Östlichen Königreichen zeigen Hauptstädte wieder den grauen Turm aus Era und Orte das gelbe Haus, mit dem Namen des Orts beim Überfahren. Standardmäßig an; Era-Markierungen für Städte und Orte unter Karte in den Optionen (/fcui) schaltet es aus."
+L["WN39_2_TITLE"] = "Andere Aktionsleisten-Addons"
+L["WN39_2_TEXT"] = "Übernimmt ein anderes Addon die Aktionsleisten, tritt die klassische Leiste zurück, statt unter ihnen gezeichnet zu werden. Ein Fenster sagt es einmal und eine Chatzeile bei jedem Login, bis du Warnung bei übernommenen Leisten unter Addonnachrichten in den Optionen ausschaltest. Addonnachrichten schaltet jetzt auch die Willkommensnotiz stumm."
+L["WN39_3_TITLE"] = "Schadensblitz"
+L["WN39_3_TEXT"] = "Das Spielerfenster lässt die gerade verlorene Gesundheit nicht mehr rot aufblitzen, wie schon in 1.x. Standardmäßig aus; um ihn zurückzuholen, schalte ihn in den Optionen (/fcui) ein: Schadensblitz unter Einheitenfenster."
+L["WN39_4_TITLE"] = "Fensterverschieber-Addons"
+L["WN39_4_TEXT"] = "Spielfenster anderen Addons überlassen platziert, skaliert und sperrt die eigenen Fenster des Spiels nicht mehr, damit ein Fensterverschieber sie übernehmen kann; unsere behalten ihr Schloss. Standardmäßig aus; schalte es in den Optionen unter Sonstiges ein. Eine neue FAQ-Frage erklärt, warum ein Fensterverschieber manche Fenster bewegt und andere nicht."
+L["WN39_5_TITLE"] = "Fehlerbehebungen"
+L["WN39_5_TEXT"] = "Taschenleiste beim Überfahren zeigt die Taschen, solange die Maus irgendwo über der Reihe ist, auch zwischen zwei Taschen, und das eigene Überfahren der Reagenzientasche blendet sie abseits der klassischen Leiste nicht mehr aus. Die klassische Karte bekommt in einem Kampf sofort ihre klassische Größe und Stelle, Escape funktioniert wieder nach einem Berufsfenster, und eine Aktionsleiste ein- oder auszuschalten ordnet die klassische Leiste sofort neu."
 L["WN38_1_TITLE"] = "Minikarte"
 L["WN38_1_TEXT"] = "Nach dem letzten Update des Spiels zeigen der Verfolgungsknopf und die Gebietsleiste der Minikarte wieder ihr 1.x-Aussehen, und der Gebietsname hat wieder die Größe aus Era. Das Spiel zeigt dort keine Schwierigkeitsanzeige mehr, daher ist ihre Auswahl aus den Optionen verschwunden."
 L["WN38_2_TITLE"] = "Fehlerbehebungen"

@@ -2,6 +2,16 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN39_1_TITLE"] = "Era map markers"
+L["WN39_1_TEXT"] = "On the Kalimdor and Eastern Kingdoms maps, capitals show Era's gray tower and towns its yellow house again, with the town's name on hover. It is on by default; Era city and town markers, under Map in the options (/fcui), turns it off."
+L["WN39_2_TITLE"] = "Other action bar addons"
+L["WN39_2_TEXT"] = "When another addon takes over the action bars, the classic bar steps aside instead of drawing under them. A popup says so once, and a chat line at each login until you turn off Bar takeover warning, under Addon messages in the options. Addon messages now quiets the welcome note too."
+L["WN39_3_TITLE"] = "Damage flash"
+L["WN39_3_TEXT"] = "The player frame no longer flashes the health you just lost in red, as 1.x never did. Off by default; to bring it back, turn it on in the options (/fcui): Damage flash, under Unit frames."
+L["WN39_4_TITLE"] = "Window mover addons"
+L["WN39_4_TEXT"] = "Leave game windows to other addons stops placing, sizing and locking the game's own windows, so a window mover addon can have them; ours keep their lock. Off by default; turn it on in the options, under Other. A new FAQ question says why a window mover moves some windows and not others."
+L["WN39_5_TITLE"] = "Fixes"
+L["WN39_5_TEXT"] = "Bag bar on hover shows the bags while the mouse is anywhere over the row, gaps between bags included, and the reagent bag's own hover no longer fades it off the classic bar. The classic map opened in a fight gets its classic size and spot at once, Escape works again after a profession window, and turning an action bar on or off lays the classic bar out again at once."
 L["WN38_1_TITLE"] = "Minimap"
 L["WN38_1_TEXT"] = "After the game's latest update, the minimap's tracking button and zone bar show their 1.x art again, and the zone name is back to Era's size. The game no longer shows a difficulty flag there, so its choice is gone from the options."
 L["WN38_2_TITLE"] = "Fixes"

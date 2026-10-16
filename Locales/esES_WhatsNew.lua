@@ -3,6 +3,16 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN39_1_TITLE"] = "Marcadores del mapa de Era"
+L["WN39_1_TEXT"] = "En los mapas de Kalimdor y los Reinos del Este, las capitales vuelven a mostrar la torre gris de Era y los pueblos su casa amarilla, con el nombre del pueblo al pasar el ratón. Activado por defecto; Marcadores de ciudades y pueblos de Era, en Mapa en las opciones (/fcui), lo desactiva."
+L["WN39_2_TITLE"] = "Otros accesorios de barras de acción"
+L["WN39_2_TEXT"] = "Cuando otro accesorio se queda con las barras de acción, la barra clásica se aparta en lugar de dibujarse debajo. Una ventana lo avisa una vez, y una línea en el chat en cada inicio de sesión hasta que desactives Aviso de barras ocupadas en Mensajes del accesorio en las opciones. Mensajes del accesorio ahora también silencia la nota de bienvenida."
+L["WN39_3_TITLE"] = "Destello de daño"
+L["WN39_3_TEXT"] = "El marco del jugador ya no destella en rojo la salud que acabas de perder, como en la 1.x. Desactivado por defecto; para recuperarlo, actívalo en las opciones (/fcui): Destello de daño, en Marcos de unidad."
+L["WN39_4_TITLE"] = "Accesorios para mover ventanas"
+L["WN39_4_TEXT"] = "Dejar las ventanas del juego a otros addons deja de colocar, escalar y bloquear las ventanas propias del juego, para que un accesorio que mueve ventanas pueda encargarse de ellas; las nuestras mantienen su candado. Desactivado por defecto; actívalo en las opciones, en Otros. Una nueva pregunta frecuente explica por qué uno de esos accesorios mueve algunas ventanas y otras no."
+L["WN39_5_TITLE"] = "Correcciones"
+L["WN39_5_TEXT"] = "La barra de bolsas al pasar el ratón muestra las bolsas mientras el ratón está en cualquier parte de la fila, también entre dos bolsas, y el paso del ratón propio de la bolsa de componentes ya no la oculta fuera de la barra clásica. El mapa clásico abierto en combate toma al instante su tamaño y sitio clásicos, Escape vuelve a funcionar tras una ventana de profesión, y activar o desactivar una barra de acción recoloca la barra clásica al instante."
 L["WN38_1_TITLE"] = "Minimapa"
 L["WN38_1_TEXT"] = "Tras la última actualización del juego, el botón de rastreo y la barra de zona del minimapa vuelven a mostrar su aspecto 1.x, y el nombre de la zona recupera el tamaño de Era. El juego ya no muestra ahí un indicador de dificultad, así que su elección desaparece de las opciones."
 L["WN38_2_TITLE"] = "Correcciones"

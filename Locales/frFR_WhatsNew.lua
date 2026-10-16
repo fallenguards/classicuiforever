@@ -3,6 +3,16 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN39_1_TITLE"] = "Marqueurs de carte d'Era"
+L["WN39_1_TEXT"] = "Sur les cartes de Kalimdor et des Royaumes de l'Est, les capitales montrent de nouveau la tour grise d'Era et les villages sa maison jaune, avec le nom du village au survol. Activé par défaut ; Marqueurs de villes et villages d'Era, sous Carte dans les options (/fcui), le désactive."
+L["WN39_2_TITLE"] = "Autres addons de barres d'action"
+L["WN39_2_TEXT"] = "Quand un autre addon prend les barres d'action, la barre classique s'efface au lieu de se dessiner dessous. Une fenêtre le dit une fois, et une ligne dans la discussion à chaque connexion jusqu'à ce que vous désactiviez Avertissement de barres prises sous Messages de l'addon dans les options. Messages de l'addon fait aussi taire la note de bienvenue."
+L["WN39_3_TITLE"] = "Flash de dégâts"
+L["WN39_3_TEXT"] = "Le cadre du joueur ne fait plus clignoter en rouge la vie que vous venez de perdre, comme en 1.x. Désactivé par défaut ; pour le retrouver, activez-le dans les options (/fcui) : Flash de dégâts, sous Cadres d'unité."
+L["WN39_4_TITLE"] = "Addons de déplacement de fenêtres"
+L["WN39_4_TEXT"] = "Laisser les fenêtres du jeu aux autres addons cesse de placer, redimensionner et verrouiller les fenêtres propres au jeu, pour qu'un addon de déplacement de fenêtres puisse s'en charger ; les nôtres gardent leur cadenas. Désactivé par défaut ; activez-le dans les options, sous Autre. Une nouvelle question de la FAQ explique pourquoi un tel addon déplace certaines fenêtres et pas d'autres."
+L["WN39_5_TITLE"] = "Corrections"
+L["WN39_5_TEXT"] = "La barre des sacs au survol montre les sacs tant que la souris est n'importe où sur la rangée, entre deux sacs aussi, et le survol propre du sac de composants ne l'efface plus hors de la barre classique. La carte classique ouverte en combat prend tout de suite sa taille et sa place classiques, Échap fonctionne de nouveau après une fenêtre de métier, et activer ou désactiver une barre d'action replace aussitôt la barre classique."
 L["WN38_1_TITLE"] = "Minicarte"
 L["WN38_1_TEXT"] = "Après la dernière mise à jour du jeu, le bouton de pistage et la barre de zone de la minicarte retrouvent leur aspect 1.x, et le nom de la zone retrouve la taille d'Era. Le jeu n'affiche plus d'indicateur de difficulté à cet endroit, donc son choix disparaît des options."
 L["WN38_2_TITLE"] = "Corrections"
