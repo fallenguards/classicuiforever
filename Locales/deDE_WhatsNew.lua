@@ -3,6 +3,10 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN41_1_TITLE"] = "Eine Tasche"
+L["WN41_1_TEXT"] = "Die Reihe der Taschenplätze in der einen Tasche bringt deren Anordnung nicht mehr mit einem Fehler durcheinander, und mit Abschnitten nach Taschenart bekommen die Plätze des Schlüsselbunds einen eigenen Abschnitt."
+L["WN41_2_TITLE"] = "Zauberbuchtaste"
+L["WN41_2_TEXT"] = "Taste und Knopf des Zauberbuchs öffnen wieder das Zauberbuch statt der zuletzt gezeigten Berufs- oder Sammlungsseite."
 L["WN40_1_TITLE"] = "Sammlungsfenster"
 L["WN40_1_TEXT"] = "Reittiere, Haustiere, Spielzeuge, Erbstücke und Vorlagen in einem klassischen Fenster mit seitlichen Reitern, mit den Modellansichten des Spiels, einem Suchfeld und einem Filter-Menü. Es öffnet sich über den Sammlungen-Knopf oder die Taste und, wenn dieser Mikroknopf ausgeblendet ist, über einen Sammlungen-Reiter am Fuß des Zauberbuchs, als Seite des Buchs. Standardmäßig an; Sammlungsfenster unter Sonstiges in den Optionen (/fcui) schaltet es aus, und Sammlungen-Reiter unter Zauberbuch blendet den Reiter aus."
 L["WN40_2_TITLE"] = "Eine Leiste"

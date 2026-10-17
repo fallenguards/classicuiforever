@@ -3,6 +3,10 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN41_1_TITLE"] = "Un seul sac"
+L["WN41_1_TEXT"] = "Activer la rangée des emplacements de sac dans le sac unique ne casse plus sa disposition avec une erreur, et avec les sections par type de sac, les emplacements du trousseau ont leur propre section."
+L["WN41_2_TITLE"] = "Touche du grimoire"
+L["WN41_2_TEXT"] = "La touche et le bouton du grimoire ouvrent de nouveau le grimoire au lieu de la dernière page de métier ou de Collections montrée."
 L["WN40_1_TITLE"] = "Fenêtre des collections"
 L["WN40_1_TEXT"] = "Montures, mascottes, jouets, héritages et apparences dans une fenêtre classique à onglets latéraux, avec les vues de modèle du jeu, un champ de recherche et un seul menu Filtre. Elle s'ouvre par le bouton ou la touche Collections et, ce micro-bouton masqué, par un onglet Collections au pied du grimoire, comme une page du livre. Activée par défaut ; Fenêtre des collections, sous Autre dans les options (/fcui), la désactive, et Onglet Collections sous Grimoire masque l'onglet."
 L["WN40_2_TITLE"] = "Une seule barre"

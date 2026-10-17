@@ -2,6 +2,13 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.31.1] - 2026-10-17
+
+### Fixed
+- Turning on Bag slots in the one bag no longer stops the one bag's layout with an error, which left the game's own ten-column grid showing and the bag slots missing (#201).
+- With the one bag in sections by bag type, the key ring's slots get a section of their own instead of sharing the last bag's rows (#201).
+- The spellbook key and button open the spellbook again, instead of reopening the profession or Collections page shown last.
+
 ## [0.31.0] - 2026-10-17
 
 ### Added

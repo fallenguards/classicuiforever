@@ -2,6 +2,10 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN41_1_TITLE"] = "One bag"
+L["WN41_1_TEXT"] = "Turning on the bag slots row in the one bag no longer breaks the bag's layout with an error, and with sections by bag type the key ring's slots get a section of their own."
+L["WN41_2_TITLE"] = "Spellbook key"
+L["WN41_2_TEXT"] = "The spellbook key and button open the spellbook again, instead of the profession or Collections page shown last."
 L["WN40_1_TITLE"] = "Collections window"
 L["WN40_1_TEXT"] = "Mounts, pets, toys, heirlooms and appearances in a classic window on side tabs, with the game's own model views, a search box and one Filter menu. It opens from the Collections button or key and, with that micro button hidden, from a Collections tab at the foot of the spellbook, as a page of the book. On by default; Collections window, under Other in the options (/fcui), turns it off, and Collections tab under Spellbook hides the tab."
 L["WN40_2_TITLE"] = "One bar"

@@ -3,6 +3,10 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN41_1_TITLE"] = "Una bolsa"
+L["WN41_1_TEXT"] = "Activar la fila de ranuras de bolsa en la bolsa única ya no rompe su disposición con un error, y con secciones por tipo de bolsa las ranuras del llavero tienen su propia sección."
+L["WN41_2_TITLE"] = "Tecla del libro de hechizos"
+L["WN41_2_TEXT"] = "La tecla y el botón del libro de hechizos vuelven a abrir el libro de hechizos en lugar de la última página de profesión o de Colecciones mostrada."
 L["WN40_1_TITLE"] = "Ventana de colecciones"
 L["WN40_1_TEXT"] = "Monturas, mascotas, juguetes, reliquias y apariencias en una ventana clásica con pestañas laterales, con las vistas de modelo del propio juego, un cuadro de búsqueda y un menú Filtro. Se abre con el botón o la tecla de Colecciones y, con ese microbotón oculto, desde una pestaña Colecciones al pie del libro de hechizos, como una página del libro. Activada por defecto; Ventana de colecciones, en Otros en las opciones (/fcui), la desactiva, y Pestaña de colecciones en Libro de hechizos oculta la pestaña."
 L["WN40_2_TITLE"] = "Una barra"

@@ -3,6 +3,10 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN41_1_TITLE"] = "Una borsa"
+L["WN41_1_TEXT"] = "Attivare la riga degli spazi delle borse nella borsa unica non ne rompe più la disposizione con un errore, e con le sezioni per tipo di borsa gli spazi del portachiavi hanno una sezione tutta loro."
+L["WN41_2_TITLE"] = "Tasto del libro degli incantesimi"
+L["WN41_2_TEXT"] = "Il tasto e il pulsante del libro degli incantesimi riaprono il libro degli incantesimi invece dell'ultima pagina di professione o di Collezioni mostrata."
 L["WN40_1_TITLE"] = "Finestra delle collezioni"
 L["WN40_1_TEXT"] = "Cavalcature, mascotte, giocattoli, cimeli e aspetti in una finestra classica con schede laterali, con le viste modello del gioco, una casella di ricerca e un solo menu Filtro. Si apre dal pulsante o dal tasto Collezioni e, con quel micropulsante nascosto, da una scheda Collezioni ai piedi del libro degli incantesimi, come pagina del libro. Attiva di base; Finestra delle collezioni, in Altro nelle opzioni (/fcui), la disattiva, e Scheda Collezioni in Libro degli incantesimi nasconde la scheda."
 L["WN40_2_TITLE"] = "Una barra"
