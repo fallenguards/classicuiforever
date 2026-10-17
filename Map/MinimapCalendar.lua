@@ -70,11 +70,25 @@ local function SquareState(state)
     MM.SquareDay()
 end
 
+-- Behind day and night, the calendar shows in the day/night's place while the mouse is on it (#202); leaving puts the
+-- day/night back whatever the spot.
+local function BehindHover(button, over)
+    local behind = Spot() == "behind"
+    if MM.tod then ns.SetAlphaIf(MM.tod, behind and over and 0 or 1) end
+    if behind then ns.SetAlphaIf(button, over and 1 or 0) end
+end
+
 -- The client's button, unseen over the square, takes the mouse; the square follows its states.
 local function WatchButton(button)
     if not ns.Once(button, "calendarWatch") then return end
-    button:HookScript("OnEnter", function() SquareState("mouseover") end)
-    button:HookScript("OnLeave", function() SquareState("up") end)
+    button:HookScript("OnEnter", function(self)
+        SquareState("mouseover")
+        BehindHover(self, true)
+    end)
+    button:HookScript("OnLeave", function(self)
+        SquareState("up")
+        BehindHover(self, false)
+    end)
     button:HookScript("OnMouseDown", function() SquareState("down") end)
     button:HookScript("OnMouseUp", function(self) SquareState(self:IsMouseOver() and "mouseover" or "up") end)
 end
