@@ -194,4 +194,5 @@ Existing violations are recorded per rule and per file in `tools/check-baseline.
 | DUPFN | a local function, or a module-table function outside Core/, Art/ and UI/, whose body (3 lines or more) matches any function in another file, `ns.` ones included (reported instead of DUP) | one `ns.` copy in the shared layer, or call the twin |
 | DEADNS | count-only: an `ns.` field defined but never read, unless listed in `DEV_NAMES` or `KEPT_API` | delete it, or list it there with its reason |
 | TOC | an addon `.lua` missing from the .toc (untracked new files too), or a .toc entry that is not a file | fix the .toc |
+| EOL | a tracked file staged with CRLF line endings (its commit rewrites every line) | `git add --renormalize PATH`; `.gitattributes` keeps `* text=auto eol=lf` |
 | BASELINE | `--staged` only: a renamed file whose baseline entries still name the old path | `--carry-renames`, then stage the baseline |

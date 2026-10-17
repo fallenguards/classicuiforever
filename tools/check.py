@@ -271,6 +271,8 @@ FIX = {
     "BASELINE": "run python tools/check.py --carry-renames, then git add " + BASELINE_NAME,
     "NEWSOPTIN": "a What's New entry naming an off-by-default option says to turn it on in the options, and where",
     "USSPELL": "American spelling in English text: color, gray, center(ed), armor, -ize, check/checked (not tick)",
+    "EOL": "stage the file with LF line endings (git add --renormalize PATH; .gitattributes holds * text=auto eol=lf): "
+           "a CRLF commit rewrites every line of the file in the diff",
     "LOCALEKEYS": "every language file in Locales/ holds exactly the keys of Locales/enUS.lua, each with the same %s and "
                   "%d placeholders in the same order: translate a new or changed English string into every language "
                   "before committing (skill cuif-conventions, Localization)",
@@ -1853,6 +1855,17 @@ def spelling_hits():
     return hits
 
 
+def eol_hits(root, have_git):
+    if not have_git:
+        return []
+    hits = []
+    for entry in git(root, ["ls-files", "--eol", "-z"]).split(b"\0"):
+        if entry.startswith((b"i/crlf", b"i/mixed")):
+            path = entry.split(b"\t", 1)[1].decode("utf-8")
+            hits.append((path, 1, "EOL", "staged with CRLF line endings"))
+    return hits
+
+
 def toc_hits(tracked, toc_text):
     hits, listed = [], set()
     tracked_set = set(tracked)
@@ -2158,7 +2171,7 @@ def run(argv):
                 continue
         fail(path, line, rule, msg)
 
-    for path, line, rule, msg in locale_hits() + spelling_hits() + news_hits():
+    for path, line, rule, msg in locale_hits() + spelling_hits() + news_hits() + eol_hits(root, have_git):
         fail(path, line, rule, msg)
 
     elapsed = time.time() - started
