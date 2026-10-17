@@ -134,7 +134,7 @@ ALLOWED_BODIES = {
 # Names ClassicUIForeverDev reads; never reported by DEADNS.
 DEV_NAMES = frozenset((
     "walkFns", "stopped", "savedFirst", "MicroButtonList", "barMoved", "bandPasses", "stripPasses", "OnBarLaid", "OnMinimapLaid", "OnSpellBarPlaced",
-    "DevLabel", "EscOursOpen", "MapMarkers", "DevNoGuild", "DevFriendRequests", "DevLockedSlots", "WindowRowState",
+    "DevLabel", "EscOursOpen", "MapMarkers", "DevNoGuild", "DevFriendRequests", "DevLockedSlots", "WindowRowState", "WindowFightState",
     "CharacterCameraInfo", "db", "Persist", "Print", "BeginOutput", "FlushNotice", "debugSink", "debugFlushNotice",
     "missing", "mirrorLoaded", "SkinBank", "ClassicLayoutActive", "GetMainBar", "BandBarsToUnpinned", "SystemMoved",
     "DressLootRoll", "ToggleSpellBook", "CombatNumbersInfo", "ClassicBarActive", "hookFns", "MODULE_ORDER", "modules",

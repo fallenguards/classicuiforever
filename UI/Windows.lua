@@ -48,21 +48,21 @@ local PlaceClassicWindows   -- forward declared: must stay local
 -- The gamepad's windows close only by their own hand (Core/Gamepad.lua): ours then stand beside them.
 -- opener: ours, which closes a game window only as Era's rule says.
 local function HideClientPanels(opener, except)
-    if InCombatLockdown() or ns.GamepadUI() then return end
+    if ns.GamepadUI() then return end
+    -- In a fight the game refuses our panel calls: a plain hide, never on a protected one (UI/WindowPanels.lua).
+    local shut = InCombatLockdown() and ns.HidePanel or function(panel) pcall(HideUIPanel, panel) end
     for name in pairs(UIPanelWindows or {}) do
         local panel = _G[name]
         -- The guild window kept open unseen under our roster (note bridge).
         local ghost = ns.guildGhost and name == "CommunitiesFrame"
         if panel and panel ~= except and not LEAVE_OPEN[name] and not BESIDE[name] and not FLOATS[name] and not ghost
             and panel:IsShown() and HideUIPanel and Replaces(opener, panel) then
-            pcall(HideUIPanel, panel)
+            shut(panel)
         end
     end
     for _, name in ipairs(LOOSE_PANELS) do
         local panel = _G[name]
-        if panel and panel ~= except and panel:IsShown() and HideUIPanel then
-            pcall(HideUIPanel, panel)
-        end
+        if panel and panel ~= except and panel:IsShown() and HideUIPanel then shut(panel) end
     end
 end
 
@@ -208,6 +208,7 @@ local openings = { count = 0, game = 0 }
 
 local function ClientWindowOpened(name, panel)
     if FLOATS[name] then return end
+    ns.NoteWindowOpened(panel)
     openings.count = openings.count + 1
     openings.game = openings.count
     Release()
@@ -223,6 +224,9 @@ end
 -- Every frame while ours or the social window is up (ours must go the instant the client's shows).
 local function AnyOursUp()
     if FriendsFrame and FriendsFrame:IsShown() then return true end
+    for panel in pairs(ns.windowRawShown) do
+        if panel:IsShown() then return true end
+    end
     for frame in pairs(classicWindows) do
         if frame:IsShown() then return true end
     end
@@ -241,7 +245,7 @@ local function WindowPass()
             -- ClientUp inline: one read per window.
             local shown = panel:IsShown() and not (name == "CommunitiesFrame" and ns.guildGhost)
             if shown and not clientShown[name] then ClientWindowOpened(name, panel) end
-            if clientShown[name] and not shown then Release() end
+            if clientShown[name] and not shown then ns.NoteWindowClosed(panel) Release() end
             clientShown[name] = shown
         end
     end
@@ -279,7 +283,9 @@ end
 -- Ours that a window opened now replaces by Era's rule.
 function ns.HideReplacedWindows(opener)
     for frame in pairs(classicWindows) do
-        if frame ~= opener and frame:IsShown() and Replaces(opener, frame) then frame:Hide() end
+        -- One held or locked in a fight stays: hid, the spellbook comes straight back over its live layer.
+        local stays = (frame.fcuiHoldX and frame:fcuiHoldX()) or (InCombatLockdown() and ns.WindowLocked(frame))
+        if frame ~= opener and frame:IsShown() and Replaces(opener, frame) and not stays then frame:Hide() end
     end
 end
 
@@ -368,7 +374,7 @@ ns.windowRawShown = rawShown   -- UI/WindowPanels.lua adds to it
 local counted = {}
 
 local function AddGame(n, panel)
-    if counted[panel] or not panel:IsShown() then return n end
+    if counted[panel] or not Seen(panel) then return n end
     counted[panel] = true
     -- Placed by the player (our edit mode, or a window mover off the row's line): out of the row. One merely left to
     -- other addons still stands where the game puts it, so ours keep clear of it.
@@ -391,8 +397,9 @@ local function GameRow()
         local panel = getPanel and getPanel(slot)
         if IsWindow(panel) then n = AddGame(n, panel) end
     end
+    -- In a fight they are laid with the row instead (UI/WindowPanels.lua ns.LayFightRaw).
     for panel in pairs(rawShown) do
-        if panel:IsShown() then n = AddGame(n, panel) else rawShown[panel] = nil end
+        if not panel:IsShown() then rawShown[panel] = nil elseif not InCombatLockdown() then n = AddGame(n, panel) end
     end
     for _, name in ipairs(LOOSE_PANELS) do
         local panel = _G[name]
@@ -415,14 +422,15 @@ local function Describe(i, frame)
     local keep, right = frame.fcuiKeep and frame:fcuiKeep(), nil
     if keep and keep:IsShown() then right = select(2, Span(keep)) end
     w.keep = right and math.floor(right + 0.5) or nil
+    w.locked = InCombatLockdown() and Locked(frame) or nil
     return w
 end
 
--- Ours open and not moved, oldest first.
+-- Ours open and not moved, oldest first. One closed in a fight is faded, still shown: it takes no room (a gap held for it).
 local function OurRow()
     local n = 0
     for frame in pairs(classicWindows) do
-        if frame:IsShown() and not Moved(frame) then
+        if Seen(frame) and not Moved(frame) then
             n = n + 1
             order[n] = frame
         end
@@ -458,8 +466,11 @@ local function NoteLeavers()
     for _, block in ipairs(row.game) do
         if _G[block[3]] then now[_G[block[3]]] = true end
     end
+    for frame in pairs(rawShown) do
+        if Seen(frame) then now[frame] = true end
+    end
     for frame in pairs(classicWindows) do
-        if frame:IsShown() and not Moved(frame) then now[frame] = true end
+        if Seen(frame) and not Moved(frame) then now[frame] = true end
     end
     local left = false
     for frame in pairs(inRow) do left = left or (frame:IsShown() and not now[frame]) end
@@ -474,6 +485,7 @@ local function Solve(keep)
     GameRow()
     NoteLeavers()
     OurRow()
+    if InCombatLockdown() then ns.LayFightRaw(row) end
     local x, y = RowStart()
     row.start, row.screen, row.stay = x, UIParent:GetWidth(), keep
     ns.SolveWindowRow(row, laid)
@@ -483,7 +495,8 @@ end
 -- Never tell the client's manager where to stand its windows: that write made its opening run as ours, and its health
 -- text then compared a secret. Ours stand past the game's row, a held one stays; out of a fight the oldest closes for room.
 PlaceClassicWindows = function()
-    local y = Solve(InCombatLockdown())
+    -- In a fight too the oldest of ours gives way for room, as out of one (a locked one stays).
+    local y = Solve(false)
     for i, frame in ipairs(order) do
         local x = laid.x[i]
         if x and row.ours[i].held then
@@ -493,6 +506,7 @@ PlaceClassicWindows = function()
         end
     end
     solved = true
+    if InCombatLockdown() then ns.PlaceFightRaw() end
     StandingPass()
     -- Each close lays the row again from its OnHide.
     if laid.close[1] then
@@ -560,8 +574,21 @@ end
 function ns.WindowRowState() return row, laid, order end
 
 -- The manager counts the sheet as frame + 82 (mode tabs); we draw BESIDE_WIDTH, so the next stands at that edge.
-local SHEET_NEXT = { left = { "center", "right" }, center = { "right" } }
 local sheetGap
+
+-- The game's space between its row's windows (its PANEl_SPACING_X), read once.
+local function SheetGap()
+    if not sheetGap then
+        local layout = _G.GetUIPanelLayoutAttribute
+        local gap = layout and Plain(layout("PANEl_SPACING_X"))
+        sheetGap = type(gap) == "number" and gap or 32
+    end
+    return sheetGap
+end
+
+-- For the fight lay of the game's windows our code opened (UI/WindowPanels.lua), and a pass on demand.
+ns.windowParts = { Seen = Seen, BlockSpan = BlockSpan, Locked = Locked, SheetGap = SheetGap, ERA_X = ERA_X, ERA_Y = ERA_Y }
+function ns.LayWindowsNow() PlaceClassicWindows() end
 
 -- Moves a client window's left edge to x on its manager's anchor, on screen; nil if it cannot move.
 -- A protected client window moved by our code is tainted (PVEFrame's list then compares secrets): out of combat it
@@ -588,6 +615,7 @@ end
 local eraHost = ns.NewFrame("Frame", nil, UIParent)
 eraHost:SetSize(1, 1)
 eraHost:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0, 0)
+ns.windowParts.eraHost = eraHost
 
 local function StandAt(panel, x)
     if InCombatLockdown() and Locked(panel) then return end
@@ -610,33 +638,30 @@ local function StandAt(panel, x)
     return x
 end
 
-local function CloseSheetGap()
-    local getPanel, getWidth = _G.GetUIPanel, _G.GetUIPanelWidth
-    if not ForeverClassicUI_CharacterSheetActive or not getPanel or not getWidth then return end
-    local slot = (getPanel("left") == CharacterFrame and "left") or (getPanel("center") == CharacterFrame and "center")
-    local keys = slot and SHEET_NEXT[slot]
-    local first = keys and getPanel(keys[1])
-    if not (first and first:IsShown()) then return end
-    local ok, _, x = pcall(ClientSpan, "CharacterFrame", CharacterFrame)
-    if not (ok and x) then return end
-    if not sheetGap then
-        local layout = _G.GetUIPanelLayoutAttribute
-        local gap = layout and Plain(layout("PANEl_SPACING_X"))
-        sheetGap = type(gap) == "number" and gap or 32
-    end
-    for _, key in ipairs(keys) do
+-- Each game window in the row its spacing and x offset past the drawn edge of the one before: the sheet's art and the
+-- professions book are narrower than the widths the game lays them by. The sheet takes Era's step left (AtEraSpot).
+local GAP_SLOTS = { "left", "center", "right" }
+local function CloseGameGaps()
+    local getPanel = _G.GetUIPanel
+    if not ForeverClassicUI_CharacterSheetActive or not getPanel then return end
+    local cursor
+    for _, key in ipairs(GAP_SLOTS) do
         local panel = getPanel(key)
-        -- A native center window is centred, not in the row.
-        if not (panel and panel:IsShown()) or panel:GetAttribute("UIPanelLayout-area") == "center" then return end
-        if ns.MoverHolds(panel) then return end
-        -- A faded one (the spellbook's stand-in) takes no room and stays put.
-        if Seen(panel) then
-            local at = StandAt(panel, x + (Plain(panel:GetAttribute("UIPanelLayout-xoffset")) or 0) + sheetGap)
-            local okWidth, width = pcall(getWidth, panel)
-            width = okWidth and Plain(width)
-            -- One left where the manager put it keeps the next one in step.
-            if not at or type(width) ~= "number" then return end
-            x = at + width
+        if panel and panel:IsShown() then
+            -- A native center window is centred, not in the row.
+            if panel:GetAttribute("UIPanelLayout-area") == "center" or ns.MoverHolds(panel) then return end
+            -- A faded one (the spellbook's stand-in) takes no room and stays put.
+            if Seen(panel) then
+                if cursor then
+                    local shift = panel == CharacterFrame and ERA_X or 0
+                    local x = cursor + (Plain(panel:GetAttribute("UIPanelLayout-xoffset")) or 0) + SheetGap() + shift
+                    -- One left where the manager put it keeps the rest in step.
+                    if not StandAt(panel, x) then return end
+                end
+                local _, right = BlockSpan(panel:GetName() or "", panel)
+                if not right then return end
+                cursor = right
+            end
         end
     end
 end
@@ -716,9 +741,10 @@ end
 
 local function SheetPass()
     if (ns.WindowMoving and ns.WindowMoving(CharacterFrame)) or ns.MoverHolds(CharacterFrame) then return end
+    if InCombatLockdown() and ns.FightLaid(CharacterFrame) then return end
     AtEraSpot(CharacterFrame)
     SheetPastHeld()
-    CloseSheetGap()
+    CloseGameGaps()
 end
 
 -- Parented to the character window so it runs only while that is up.
@@ -758,7 +784,8 @@ function ns.RegisterClassicWindow(frame, pushable)
             end
         end
         -- fcuiKeep names the client window it belongs beside (the inspect window's talents).
-        HideClientPanels(self, self.fcuiKeep and self:fcuiKeep() or nil)
+        -- A held one showing itself again (its own comeback) closes nothing.
+        if not selfHeld then HideClientPanels(self, self.fcuiKeep and self:fcuiKeep() or nil) end
         PlaceClassicWindows()
         if ns.GameSpellsRoomChanged then ns.GameSpellsRoomChanged() end
     end)

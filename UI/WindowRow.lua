@@ -67,12 +67,12 @@ end
 local function Oldest(s, over)
     if s.stay then return nil end
     for i = 1, s.gameLast and over or over - 1 do
-        if not closed[i] and not s.ours[i].held then return i end
+        if not closed[i] and not s.ours[i].held and not s.ours[i].locked then return i end
     end
 end
 
 -- s: start, screen, stay (nothing closes), gameLast, game = { { left, right, name } }, ours = { { width, drawn, held,
--- shares, keep } } oldest first. Fills out.x[i] (nil: closing) and out.close (indexes, oldest first).
+-- locked, shares, keep } } oldest first (locked: shut only in a fight's end). Fills out.x[i] (nil: closing), out.close.
 function ns.SolveWindowRow(s, out)
     out.x, out.close = out.x or {}, out.close or {}
     for i in pairs(out.x) do out.x[i] = nil end
@@ -104,4 +104,41 @@ function ns.WindowRowEnd(s, out)
         if x and x + w.width > finish then finish = x + w.width end
     end
     return finish
+end
+
+-- In a fight, the game's side windows as its manager lays them (UpdateUIPanelPositions): by pushable, then opening; each
+-- its spacing and x offset past the last, round fixed ones ({ left, right, gap }). members: { width, xoff, pushable,
+-- opened, shift, drawn } (the sheet: Era's step left, what the next stands past). Fills out[i], x before the shift.
+local byOrder, members = {}, nil
+local function Before(a, b)
+    local ma, mb = members[a], members[b]
+    if ma.pushable ~= mb.pushable then return ma.pushable < mb.pushable end
+    return ma.opened < mb.opened
+end
+
+function ns.LayFightWindows(f, out)
+    members = f.members
+    for i = 1, #members do byOrder[i] = i end
+    for i = #members + 1, #byOrder do byOrder[i] = nil end
+    table.sort(byOrder, Before)
+    local cursor
+    for _, i in ipairs(byOrder) do
+        local m = members[i]
+        local shift, span = m.shift or 0, m.drawn or m.width
+        local x = (cursor and cursor + f.gap or f.start) + m.xoff
+        local moved = true
+        while moved do
+            moved = false
+            for _, block in ipairs(f.fixed) do
+                if x + shift < block[2] and block[1] < x + shift + span then
+                    x, moved = block[2] + (block[3] or f.gap) - shift, true
+                end
+            end
+        end
+        if x + shift + span > f.screen then x = math.max(0, math.floor(f.screen - span)) - shift end
+        out[i] = x
+        cursor = x + shift + span
+    end
+    for i = #members + 1, #out do out[i] = nil end
+    return out
 end

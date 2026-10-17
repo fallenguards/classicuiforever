@@ -75,6 +75,18 @@ local function Spot(frame, h, left, top)
     return left + (Offset(frame, "xoffset") or 0), down
 end
 
+-- A panel setting (attribute, else its registration) and the game's width for a window (its GetUIPanelWidthUnscaled).
+ns.GamePanelValue = Offset
+function ns.GamePanelWidth(frame) return (Offset(frame, "width") or Plain(frame:GetWidth()) or 0) + (Offset(frame, "extraWidth") or 0) end
+
+-- A window's x offset and how far down the game stands it (its y offset and its fit for a tall one), UIParent units.
+function ns.GameXOffset(frame) return Offset(frame, "xoffset") or 0 end
+function ns.GameDown(frame)
+    local h, k = Plain(frame:GetHeight()), ns.WindowRatio(frame)
+    local _, down = Spot(frame, h and k and h * k, 0, LayoutValue("TOP_OFFSET", GAME_TOP))
+    return down
+end
+
 -- The classic sheet stands 12 above the game's line (Era's spot, UI/Windows.lua); within LINE_SLACK is on the line.
 local ERA_RAISE, LINE_SLACK = 12, 1.5
 

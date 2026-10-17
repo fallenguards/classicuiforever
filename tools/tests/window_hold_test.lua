@@ -31,7 +31,10 @@ local env = setmetatable({
     ns = {},
     row = { game = {} },
     classicWindows = {},
+    rawShown = {},
     Moved = function(frame) return moved[frame] end,
+    -- Shown and not faded (UI/Windows.lua Seen): a window closed in a fight fades and takes no room.
+    Seen = function(frame) return frame:IsShown() and (frame.alpha or 1) > 0 end,
     wipe = function(t)
         for k in pairs(t) do t[k] = nil end
         return t

@@ -477,6 +477,8 @@ function Layout()
     for _, tex in ipairs(frame.singleArt) do tex:SetShown(not dual) end
     for _, tex in ipairs(frame.dualArt) do tex:SetShown(dual) end
     frame:SetSize(dual and DUAL.WIDTH or WIDTH, dual and DUAL.HEIGHT or HEIGHT)
+    -- Double, its art fills the frame: the next window stands past all of it (single: Era's 352 of a 384 frame).
+    ns.SetSlotWidth(frame, dual and DUAL.WIDTH or nil)
     frame:SetHitRectInsets(0, dual and 0 or 35, 0, dual and 0 or 75)
     local listW = dual and DUAL.LIST_W or LIST_W
     frame.listArea:ClearAllPoints()
