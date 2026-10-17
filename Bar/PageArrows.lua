@@ -22,9 +22,20 @@ local function Buttons()
     return pn, pn.UpButton, pn.DownButton
 end
 
+-- Main bar alone: faded and out of the mouse's way, as the game's Hide Bar Scrolling (its setting is never written).
+local faded = false
+local function Fade(pn, up, down, fade)
+    if fade == faded or InCombatLockdown() then return end
+    faded = fade
+    ns.SetAlphaIf(pn, fade and 0 or 1)
+    up:EnableMouse(not fade)
+    down:EnableMouse(not fade)
+end
+
 local function Apply()
     local pn, up, down = Buttons()
     if not pn then return end
+    Fade(pn, up, down, ns.band.OneBarAlone())
     if not saved then
         local _, _, _, _, upY = up:GetPoint(1)
         local _, _, _, _, downY = down:GetPoint(1)
@@ -46,6 +57,7 @@ local function Restore()
     if not saved then return end
     local pn, up, down = Buttons()
     if not pn then return end
+    Fade(pn, up, down, false)
     for _, button in ipairs({ up, down }) do
         local atlases = MODERN[(button == up) and "Up" or "Down"]
         for _, state in ipairs(STATES) do

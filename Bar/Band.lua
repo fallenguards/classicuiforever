@@ -50,10 +50,19 @@ B.TAIL_WINDOW, B.TAIL_SLOT = 7, 30   -- window's left column, key slot's centre
 -- Which halves stand on the band: not hidden, not moved off it (BandSection.lua).
 function B.TailParts()
     local db = ns.db
-    local latency = not (db and (db.hideLatencyBar == true or ns.ValidPlace(db.latencyPos)))
+    local latency = not (db and (db.hideLatencyBar == true or ns.ValidPlace(db.latencyPos) or B.OneBarAlone()))
     local key = KeyRingButton ~= nil and not (db and (db.hideKeyRing == true or ns.ValidPlace(db.keyRingPos)
-        or (db.keyRingSnap == true and db.keyRingFlat == true and B.BagsColumn and B.BagsColumn() ~= nil)))
+        or B.KeyRingWithBags()))
     return latency, key
+end
+-- The key ring off the band with the bags, at their row's far end: its option, Main bar alone, or laid flat and dropped
+-- by a column's end. Never while hidden: the bags' pick would show it in their row (the flicker on Hide key ring).
+function B.KeyRingWithBags()
+    local db, shape = ns.db, B.shape
+    if not (db and shape) or db.hideKeyRing == true or (shape.bags and not B.OneBar()) then return false end
+    if B.BagsMode and B.BagsMode() == "hidden" then return false end
+    return db.keyRingWithBags == true or B.OneBarAlone()
+        or (db.keyRingSnap == true and db.keyRingFlat == true and B.BagsColumn() ~= nil)
 end
 -- A client with no key ring: the reagent bag without a socket of its own ends the bag row in the key slot.
 function B.SlimReagent()

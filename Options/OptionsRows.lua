@@ -31,9 +31,24 @@ local function TipNeeds(self)
         if entry[1] == need then return L["OPT_NEEDS_TIP"]:format(entry[2]) end
     end
 end
--- White title, wrapped body, and why it is grayed (another addon holds the bars, or a toggle it needs is off).
+-- Grayed while another toggle does it for it (offBy, in force with its parent on).
+local function TipOffBy(self)
+    if not O.OffByOn(self.offBy) then return nil end
+    for _, entry in ipairs(ns.TOGGLES) do
+        if entry[1] == self.offBy then return L["OPT_OFF_BY_TIP"]:format(entry[2]) end
+    end
+end
+function O.OffByOn(key)
+    if not key or ns.db[key] == false then return false end
+    for _, entry in ipairs(ns.TOGGLES) do
+        if entry[1] == key then return not entry.parent or ns.db[entry.parent] == true end
+    end
+    return true
+end
+-- White title, wrapped body, and why it is grayed (another addon holds the bars, a toggle it needs is off, or one does it).
 local OPTION_TIP = { when = TipBody, text = TipLabel, r = 1, g = 1, b = 1,
-    lines = { { TipBody, nil, nil, nil, true }, { TipHeld, 1, 0.82, 0, true }, { TipNeeds, 1, 0.82, 0, true } } }
+    lines = { { TipBody, nil, nil, nil, true }, { TipHeld, 1, 0.82, 0, true }, { TipNeeds, 1, 0.82, 0, true },
+        { TipOffBy, 1, 0.82, 0, true } } }
 O.OPTION_TIP = OPTION_TIP
 
 -- Not part of the classic look, so Toggle none leaves them (the minimap button leads back here), nor the radio picks,
@@ -493,7 +508,7 @@ function O.BuildRows(child, colW)
             row.text:SetWidth(colW - 14 - DROP_W - row.depth * INDENT)
         elseif not entry.drop then
             local box = Checkbox(child, entry[1], entry[2], entry[3], entry.radio)
-            box.needs = entry.needs
+            box.needs, box.offBy = entry.needs, entry.offBy
             if entry.search then box.keyLow = box.keyLow .. " " .. entry.search:lower() end
             Add(box, entry.parent)
             box.text:SetWidth(colW - 30 - box.depth * INDENT)

@@ -78,7 +78,7 @@ local function ReadShape()
     if shape.regionRaw ~= raw then shape.regionRaw, shape.microTrim = raw, 0 end
     shape.region = math.max(MICRO_LEAD + MICRO_END_GAP, raw - (shape.microTrim or 0))
     shape.bagsReal, shape.microReal = shape.bags, shape.micro
-    shape.noPages = BarSetting(ns.GetMainBar(), "HideBarScrolling") == 1
+    shape.noPages = B.NoPages(ns.GetMainBar())
     local icons = BarSetting(ns.GetMainBar(), "NumIcons")
     if not icons or icons < 1 or icons > 12 then icons = 12 end
     shape.cut = (12 - math.floor(icons + 0.5)) * BUTTON_PITCH

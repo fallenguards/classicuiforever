@@ -20,7 +20,7 @@ local ELEMENTS = {
 }
 local LATENCY, KEYRING = ELEMENTS[1], ELEMENTS[2]
 
-local function Hidden(el) return ns.db[el.hideKey] == true end
+local function Hidden(el) return ns.db[el.hideKey] == true or (el == LATENCY and B.OneBarAlone()) end
 local function Moved(el) return ns.ValidPlace(ns.db[el.posKey]) end
 
 -- The key ring on its side (its dialog): off the band it lies flat, as the game's does by a column of bags, its cut of
@@ -28,7 +28,9 @@ local function Moved(el) return ns.ValidPlace(ns.db[el.posKey]) end
 -- bags' floor (BandBags FloorRun), nil upright.
 local SNAP_REACH = 24
 local function Flat(el) return el == KEYRING and ns.db.keyRingFlat == true end
-local function Snapped(el) return Flat(el) and ns.db.keyRingSnap == true and B.BagsFarEnd() ~= nil end
+local function Snapped(el) return el == KEYRING and B.KeyRingWithBags() and B.BagsFarEnd() ~= nil end
+-- The key ring off the band without its cut of art: its own Hide Bar Art, riding the bags or not.
+local function Bare(el) return el == KEYRING and ns.db.keyRingArtHidden == true end
 
 -- Hidden, or with no place of ours this layout, the client's key ring is hidden (it lays it beside its bags at its own size:
 -- the empty box left of the row). Hidden, not faded: an alpha animation on it undoes any fade. Given back as the band goes.
@@ -97,11 +99,15 @@ local DIALOG_H, FLAT_ROW = 136, 32
 local function RefreshDialog()
     if not (dialog and dialog:IsShown() and dialog.el) then return end
     local key = dialog.el == KEYRING
+    -- Its art is the band's while it stands there.
+    local artRow = key and (Moved(dialog.el) or Snapped(dialog.el))
     dialog.title:SetText(dialog.el.label)
     dialog.check:SetChecked(Hidden(dialog.el))
     dialog.flat:SetShown(key)
     dialog.flat:SetChecked(Flat(dialog.el))
-    dialog:SetHeight(key and DIALOG_H + FLAT_ROW or DIALOG_H)
+    dialog.art:SetShown(artRow)
+    dialog.art:SetChecked(ns.db.keyRingArtHidden == true)
+    dialog:SetHeight(DIALOG_H + (key and FLAT_ROW or 0) + (artRow and FLAT_ROW or 0))
     dialog.reset:SetEnabled(Moved(dialog.el) or (key and (ns.db.keyRingSnap == true or ns.db.keyRingFlat == true)))
 end
 
@@ -110,37 +116,44 @@ local function Save()
     ns.QueueApply()
 end
 
-local function Dialog()
-    if dialog then return dialog end
-    dialog = B.EditDialog("ForeverClassicUISectionDialog", 300, 136)
+-- One of the dialog's checks, under anchor (the dialog's top for the first).
+local function DialogCheck(anchor, first, text, onClick)
     local check = CreateFrame("CheckButton", nil, dialog, "UICheckButtonTemplate")
     check:SetSize(30, 30)
-    check:SetPoint("TOPLEFT", dialog, "TOPLEFT", 20, -46)
+    if first then
+        check:SetPoint("TOPLEFT", anchor, "TOPLEFT", 20, -46)
+    else
+        check:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, -2)
+    end
     ns.EditModeCheck(check)
     local label = check:CreateFontString(nil, "ARTWORK", "GameFontHighlightMedium")
     label:SetPoint("LEFT", check, "RIGHT", 4, 0)
-    label:SetText(L["BAR_HIDE"])
-    check:SetScript("OnClick", function(self)
+    label:SetText(text)
+    check:SetScript("OnClick", onClick)
+    return check
+end
+
+local function Dialog()
+    if dialog then return dialog end
+    dialog = B.EditDialog("ForeverClassicUISectionDialog", 300, 136)
+    dialog.check = DialogCheck(dialog, true, L["BAR_HIDE"], function(self)
         local key = dialog.el.hideKey
         ns.db[key] = self:GetChecked() and true or false
         ns.ToggleChanged(key)
         if ns.db[key] then dialog:Hide() end
     end)
-    dialog.check = check
     -- The key ring only: on its side off the band, to ride the far end of a column of bags.
-    local flat = CreateFrame("CheckButton", nil, dialog, "UICheckButtonTemplate")
-    flat:SetSize(30, 30)
-    flat:SetPoint("TOPLEFT", check, "BOTTOMLEFT", 0, -2)
-    ns.EditModeCheck(flat)
-    local flatLabel = flat:CreateFontString(nil, "ARTWORK", "GameFontHighlightMedium")
-    flatLabel:SetPoint("LEFT", flat, "RIGHT", 4, 0)
-    flatLabel:SetText(L["BAR_KEY_RING_FLAT"])
-    flat:SetScript("OnClick", function(self)
+    dialog.flat = DialogCheck(dialog.check, false, L["BAR_KEY_RING_FLAT"], function(self)
         ns.db.keyRingFlat = self:GetChecked() and true or false
         if not ns.db.keyRingFlat then ns.db.keyRingSnap = false end
         Save()
     end)
-    dialog.flat = flat
+    -- The key ring off the band only: its own cut of art.
+    dialog.art = DialogCheck(dialog.flat, false, HUD_EDIT_MODE_SETTING_ACTION_BAR_HIDE_BAR_ART or "Hide Bar Art",
+        function(self)
+            ns.db.keyRingArtHidden = self:GetChecked() and true or false
+            Save()
+        end)
     dialog.reset = B.EditDialogReset(dialog, function()
         ns.db[dialog.el.posKey] = nil
         if dialog.el == KEYRING then ns.db.keyRingSnap, ns.db.keyRingFlat = false, false end
@@ -286,15 +299,16 @@ local function Place(el, plan, level)
         return false
     end
     local home = Home(el)
-    ns.SetLevelIf(home, math.max(0, level - 1))
+    -- Riding the bags' floor: under it, so the floor's end post covers the cut's own.
+    ns.SetLevelIf(home, math.max(0, level - (snapped and 2 or 1)))
     local left   -- the sheet's u at the home's left edge
     local turn, scale = nil, 1
     if pos or snapped then
         left = el.u0 - el.cap
         local long = el.cap + el.u1 - el.u0
-        local frame, point, relPoint, rowScale
+        local frame, point, relPoint, rowScale, dx
         if snapped then
-            frame, point, relPoint, rowScale = B.BagsFarEnd()
+            frame, point, relPoint, rowScale, dx = B.BagsFarEnd()
             turn, scale = B.BagsColumn(), rowScale or 1
         elseif Flat(el) then
             turn = "cw"
@@ -302,12 +316,17 @@ local function Place(el, plan, level)
         ns.SetScaleIf(home, scale)
         if turn then home:SetSize(BAND_H, long) else home:SetSize(long, BAND_H) end
         if snapped and not el.moving then
-            ns.SetPointOnce(home, point, frame, relPoint, 0, 0)
+            ns.SetPointIf(home, point, frame, relPoint, dx or 0, 0)
         elseif not el.moving then
             ns.SetPointOnce(home, pos.point, UIParent, pos.relPoint, pos.x, pos.y)
         end
-        Cut(home, home.art, el.cap, el.u1 - el.u0, el.u0, el.u1, turn)
-        if home.cap then Cut(home, home.cap, 0, el.cap, el.u1, el.u1 - el.cap, turn) end
+        if Bare(el) then
+            home.art:Hide()
+            if home.cap then home.cap:Hide() end
+        else
+            Cut(home, home.art, el.cap, el.u1 - el.u0, el.u0, el.u1, turn)
+            if home.cap then Cut(home, home.cap, 0, el.cap, el.u1, el.u1 - el.cap, turn) end
+        end
     else
         left = plan.tailU0 + x - plan.tailStart
         ns.SetScaleIf(home, 1)

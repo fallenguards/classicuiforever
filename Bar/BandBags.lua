@@ -61,7 +61,8 @@ local function FloorRun(floor, tex, x, width, u0, u1, turn)
     tex:Show()
 end
 
-local function LayFloor(art, floating, buttonScale, level, backpack, turn)
+-- bare (Hide Bar Art): laid, its textures hidden, so what rides its far end stands where it would with the art.
+local function LayFloor(art, floating, bare, buttonScale, level, backpack, turn)
     local floor = art.bagFloor
     if not floating then
         if floor then floor:Hide() end
@@ -109,6 +110,12 @@ local function LayFloor(art, floating, buttonScale, level, backpack, turn)
         ns.SetPointOnce(floor, "BOTTOMLEFT", backpack, "BOTTOMLEFT", bag.x, -bag.y)
     else
         ns.SetPointOnce(floor, "BOTTOMRIGHT", backpack, "BOTTOMRIGHT", -bag.x, -bag.y)
+    end
+    if bare then
+        floor.tex:Hide()
+        floor.units[1]:Hide()
+        floor.units[2]:Hide()
+        floor.rest:Hide()
     end
     floor:Show()
 end
@@ -186,19 +193,30 @@ function B.BagsColumn()
     return (turn == "cw" or turn == "ccw") and turn or nil
 end
 
--- A column's far end, for the key ring lying flat to ride on (BandSection): the frame, the key ring home's point, the
--- frame's point and the row's scale; nil when there is no column.
+-- The row's far end, for the key ring to ride on (BandSection): the frame, the key ring home's point, the frame's
+-- point, the row's scale and an x offset; nil with no row. On a column it lies flat; on a row it stands upright, its
+-- own end post under the floor's (as the band draws the section before the bags).
+local SECTION_POST = 7
 function B.BagsFarEnd()
-    local turn, art = B.BagsColumn(), B.art
-    if not turn or not art then return nil end
-    local up = turn == "cw"
+    local art = B.art
+    if not art then return nil end
+    local turn = Grow().turn
     local floor, last = art.bagFloor, art.bagsLast
-    if floor and floor:IsShown() then
-        return floor, up and "BOTTOMLEFT" or "TOPLEFT", up and "TOPLEFT" or "BOTTOMLEFT", floor:GetScale()
+    local onFloor = floor and floor:IsShown()
+    if not onFloor and not (last and last:IsShown()) then return nil end
+    if turn == "cw" or turn == "ccw" then
+        local up = turn == "cw"
+        if onFloor then
+            return floor, up and "BOTTOMLEFT" or "TOPLEFT", up and "TOPLEFT" or "BOTTOMLEFT", floor:GetScale(), 0
+        end
+        return last, up and "BOTTOM" or "TOP", up and "TOP" or "BOTTOM", last:GetScale(), 0
     end
-    if last and last:IsShown() then
-        return last, up and "BOTTOM" or "TOP", up and "TOP" or "BOTTOM", last:GetScale()
+    local right = turn == "mirror"
+    if onFloor then
+        return floor, right and "BOTTOMLEFT" or "BOTTOMRIGHT", right and "BOTTOMRIGHT" or "BOTTOMLEFT", floor:GetScale(),
+            right and -SECTION_POST or SECTION_POST
     end
+    return last, right and "LEFT" or "RIGHT", right and "RIGHT" or "LEFT", last:GetScale(), 0
 end
 
 -- One more piece on the row, a step on from prev; step is the overlap between sockets (negative: a gap).
@@ -356,7 +374,7 @@ function B.LayoutBags()
         ns.WhenCalm("band.bagsPiece", function() if B.active and B.RowsBack then B.RowsBack() end end)
     end
     -- The floor: a strip of the band from the backpack, turned with the row.
-    LayFloor(art, (out or OneBar()) and not ns.db.hideBagsArt, buttonScale, level, backpack, grow.turn)
+    LayFloor(art, out or OneBar(), ns.db.hideBagsArt == true, buttonScale, level, backpack, grow.turn)
     AfterRow(level)
 end
 

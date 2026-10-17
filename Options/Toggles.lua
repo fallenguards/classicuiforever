@@ -6,8 +6,8 @@ local O = {}
 ns.options = O
 O.TITLE = "ClassicUI Forever"
 
--- key, label, tooltip; parent: indented sub-toggle, grayed while it (or needs) is off; group: a headed section; radio: one
--- on (drop: one drop down row); checks with drop: one drop down of boxes (dropLabel, dropTip on its first entry); search.
+-- key, label, tooltip; parent: indented sub-toggle, grayed while it (or needs) is off or offBy is in force; group: a
+-- headed section; radio: one on (drop: one drop down row); checks with drop: one drop down of boxes (dropLabel, dropTip).
 -- Order drives the options list, /fcui help and the reload prompt (Core ToggleTree); Status reads it. Kids follow their parent.
 local SHOW_TIP = L["OPT_TIP_SHOW_HOVER_HIDE"]
 local GRYPHON_TIP = L["OPT_TIP_GRYPHON"]
@@ -73,6 +73,8 @@ ns.TOGGLES = {
     { "classicBar", L["OPT_classicBar"], L["OPT_classicBar_TIP"], group = L["GROUP_ACTION_BARS"] },
     { "classicBarSize", L["OPT_classicBarSize"], L["OPT_classicBarSize_TIP"], parent = "classicBar", search = "scale size 1.25 small big large buttons 36 45 game era forever" },
     { "oneBar", L["OPT_oneBar"], L["OPT_oneBar_TIP"], parent = "classicBar" },
+    { "oneBarAlone", L["OPT_oneBarAlone"], L["OPT_oneBarAlone_TIP"], parent = "oneBar",
+        search = "page arrows bar scrolling latency key ring keyring bags" },
     { "gryphonsOverBars", L["OPT_gryphonsOverBars"], L["OPT_gryphonsOverBars_TIP"], parent = "classicBar" },
     { "bar2Over", L["OPT_bar2Over"], L["OPT_bar2Place_TIP"], parent = "classicBar", radio = "bar2Place", drop = true,
         search = "bar 2 beside side by side double row art stone sockets left right" },
@@ -87,8 +89,10 @@ ns.TOGGLES = {
     { "xpTipRested", L["OPT_xpTipRested"], L["OPT_xpTipRested_TIP"], parent = "classicBar", search = "experience rested tooltip amount" },
     { "microTips", L["OPT_microTips"], L["OPT_microTips_TIP"], parent = "classicBar", search = "tooltip" },
     { "hideMicroArt", L["OPT_hideMicroArt"], L["OPT_hideMicroArt_TIP"], parent = "classicBar" },
-    { "hideLatencyBar", L["OPT_hideLatencyBar"], L["OPT_hideLatencyBar_TIP"], parent = "classicBar" },
+    { "hideLatencyBar", L["OPT_hideLatencyBar"], L["OPT_hideLatencyBar_TIP"], parent = "classicBar", offBy = "oneBarAlone" },
     { "hideKeyRing", L["OPT_hideKeyRing"], L["OPT_hideKeyRing_TIP"], parent = "classicBar" },
+    { "keyRingWithBags", L["OPT_keyRingWithBags"], L["OPT_keyRingWithBags_TIP"], parent = "classicBar",
+        offBy = "oneBarAlone", search = "key ring keys keyring bags lump together" },
     { "eraBagSize", L["OPT_eraBagSize"], L["OPT_eraBagSize_TIP"], parent = "classicBar", search = "bags big large 37" },
     { "reagentBagSlot", L["OPT_reagentBagSlot"], L["OPT_reagentBagSlot_TIP"], parent = "classicBar", radio = "reagentBag", drop = true, dropTip = L["OPT_reagentBag_TIP"] },
     { "reagentBagRound", L["OPT_reagentBagRound"], L["OPT_reagentBagRound_TIP"], parent = "classicBar", radio = "reagentBag", drop = true },

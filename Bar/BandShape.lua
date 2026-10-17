@@ -22,6 +22,21 @@ B.SNAP_PX = SNAP_PX
 -- One-bar mode: the band ends after the twelve main slots, right gryphon beside them; micro menu and bags stay off.
 local function OneBar() return ns.db and ns.db.oneBar == true end
 B.OneBar = OneBar
+-- Main bar alone (its sub-option): no page arrows or latency bar, the key ring with the bags.
+function B.OneBarAlone() return OneBar() and ns.db.oneBarAlone ~= false end
+-- Hide Bar Scrolling, the game's setting for bar 1, or Main bar alone.
+function B.NoPages(bar) return B.OneBarAlone() or B.BarSetting(bar, "HideBarScrolling") == 1 end
+
+-- dbVersion 19: a save with One bar on keeps its band as it was (latency bar, key ring and page arrows on it).
+function ns.KeepOneBarLook()
+    local function Keep(t)
+        if t.oneBar == true and t.oneBarAlone == nil then t.oneBarAlone = false end
+    end
+    Keep(ns.db)
+    for _, shot in pairs(type(ns.db.profiles) == "table" and ns.db.profiles or {}) do
+        if type(shot) == "table" then Keep(shot) end
+    end
+end
 
 -- The micro menu moves by our handle, not the client's edit mode piece (re-laid constantly while edit mode is open);
 -- its spot and size live in saved settings.

@@ -644,7 +644,7 @@ local function EditTick(elapsed, isHot, editing)
     B.WatchArtTick(editing)
     if editing and mainBar and B.BarBare(mainBar) ~= (art.artHidden == true) then ns.QueueApply() end
     -- Hide Bar Scrolling toggled: the band is re-cut.
-    if editing and (BarSetting(ns.GetMainBar(), "HideBarScrolling") == 1) ~= (B.shape.noPages and true or false) then
+    if editing and B.NoPages(ns.GetMainBar()) ~= (B.shape.noPages and true or false) then
         ns.QueueApply()
     end
     if editing then HideSelections() end
