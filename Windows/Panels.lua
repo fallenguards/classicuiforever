@@ -68,6 +68,9 @@ local function GameSocialTabs()
     ns.SocialInsetBorder()
 end
 
+-- The professions window's frame comes with either of its options (book or crafting page), as the trainer's with its own.
+local PROFESSIONS = { "professionsBook", "tradeSkill" }
+
 local WINDOWS = {
     -- Its own row under Map (toggle): the pass skips it while that is off.
     { "WorldMapFrame", child = "BorderFrame", toggle = "worldMap", portrait = false, backing = false, lift = P.MAP_LIFT,
@@ -117,7 +120,7 @@ local WINDOWS = {
     { "LFGWhoListFrame", key = "panelGroupFinder", addon = "Blizzard_GroupFinder_VanillaStyle", lift = 5 },
     { "InspectFrame", key = "panelInspect", addon = "Blizzard_InspectUI", after = A.InspectFrame },
     { "MacroFrame", key = "panelMacros", addon = "Blizzard_MacroUI", topTabs = true, lift = 2, after = A.MacroFrame },
-    { "ClassTrainerFrame", key = "panelTrainer", addon = "Blizzard_TrainerUI" },
+    { "ClassTrainerFrame", toggle = "trainer", addon = "Blizzard_TrainerUI" },
     { "AuctionHouseFrame", key = "panelAuction", addon = "Blizzard_AuctionHouseUI", lift = 9 },
     { "CommunitiesFrame", key = "panelCommunities", addon = "Blizzard_Communities", after = A.CommunitiesFrame },
     -- Half lift: the Mount button sits on the foot. The tabs' tops on the metal line, as the vendor's.
@@ -126,9 +129,9 @@ local WINDOWS = {
     { "EncounterJournal", key = "panelJournal", addon = "Blizzard_EncounterJournal" },
     { "AchievementFrame", key = "panelAchievements", addon = "Blizzard_AchievementUI" },
     -- Retail's has a tab row: the client's foot line, tabs unlifted.
-    { "ProfessionsFrame", key = "panelProfessions", addon = "Blizzard_Professions", lift = not ns.OnForever() and CLIENT_FOOT_LIFT or nil,
+    { "ProfessionsFrame", toggle = PROFESSIONS, addon = "Blizzard_Professions", lift = not ns.OnForever() and CLIENT_FOOT_LIFT or nil,
         tabLift = not ns.OnForever() and 0 or nil },
-    { "ProfessionsBookFrame", key = "panelProfessions", addon = "Blizzard_ProfessionsBook" },
+    { "ProfessionsBookFrame", toggle = PROFESSIONS, addon = "Blizzard_ProfessionsBook" },
     { "GuildBankFrame", key = "panelGuildBank", addon = "Blizzard_GuildBankUI" },
     { "CalendarFrame", key = "panelCalendar", addon = "Blizzard_Calendar", portrait = false },
     { "ItemSocketingFrame", key = "panelSocketing", addon = "Blizzard_ItemSocketingUI" },
@@ -160,7 +163,14 @@ local done = {}   -- WINDOWS index -> dressed (for good)
 -- A window with its own row (the map, loot) by that row alone (#184); every other by Window frames and its box there.
 function P.Dressing(key) return P.active and ns.db[key] ~= false end
 local function Wanted(entry)
-    if entry.toggle then return ns.ModuleInForce(entry.toggle) end
+    local toggle = entry.toggle
+    if type(toggle) == "table" then
+        for _, key in ipairs(toggle) do
+            if ns.ModuleInForce(key) then return true end
+        end
+        return false
+    end
+    if toggle then return ns.ModuleInForce(toggle) end
     return P.Dressing(entry.key)
 end
 
@@ -235,10 +245,32 @@ local function WindowRow(key, Frame)
     ns.RegisterModule(key, { apply = apply, restore = restore })
 end
 
--- A window's box under Window frames: on, dressed now; off, its strip goes and the rest waits for the reload.
+-- A window's box under Classic style windows: on, dressed now; off, its strip goes and the rest waits for the reload.
 local WINDOW_KEYS = {}
 for _, entry in ipairs(WINDOWS) do if entry.key then WINDOW_KEYS[entry.key] = true end end
+-- A box turned off asks for the reload (Core/Defaults.lua RELOAD_KEYS), as Classic style windows off does.
+for key in pairs(WINDOW_KEYS) do ns.RELOAD_KEYS[key] = { off = ns.L["CORE_WINDOWS_ALREADY_OPENED_KEEP_THE"] } end
+
+-- dbVersion 19: Window frames became Classic style windows, which every window option needs. Off before, it stays as it
+-- looked: the switch on, every one of its windows unticked (the account and every profile).
+function ns.KeepGameWindowsOff()
+    local db = ns.db
+    local function Keep(t, profile)
+        if t.panels ~= false then return end
+        t.panels = not profile or nil
+        for key in pairs(WINDOW_KEYS) do t[key] = false end
+    end
+    Keep(db)
+    for _, shot in pairs(type(db.profiles) == "table" and db.profiles or {}) do
+        if type(shot) == "table" then Keep(shot, true) end
+    end
+    db.dbVersion = 19
+end
+
+-- A window option that brings a frame of this list (professions, trainer): on, dressed now.
+local ROW_TOGGLES = { trainer = true, professionsBook = true, tradeSkill = true }
 ns.OnToggle(function(key)
+    if ROW_TOGGLES[key] and ns.db[key] ~= false then return SkinKnown() end
     if not WINDOW_KEYS[key] or not P.active then return end
     if ns.db[key] ~= false then return SkinKnown() end
     for _, entry in ipairs(WINDOWS) do

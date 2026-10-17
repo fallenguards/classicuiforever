@@ -2,7 +2,7 @@ local _, ns = ...
 local L = ns.L
 
 ns.DB_DEFAULTS = {
-    dbVersion = 18,
+    dbVersion = 19,
     classicBar = true,
     oneBar = false,
     classicBarSize = false,
@@ -207,14 +207,12 @@ ns.DB_DEFAULTS = {
     panelLegacy = true,
     panelMacros = true,
     panelMail = true,
-    panelProfessions = true,
     panelQuest = true,
     panelSocial = true,
     panelSocketing = true,
     panelStable = true,
     panelTabard = true,
     panelTrade = true,
-    panelTrainer = true,
     panelMerchant = true,
     totemOrientation = "horizontal", totemRows = 1, totemSize = 100, totemPadding = 8, totemKeepRoom = false,
     gryphonsOverBars = false,
@@ -382,6 +380,8 @@ ns.RELOAD_KEYS = {
     panels = { off = L["CORE_WINDOWS_ALREADY_OPENED_KEEP_THE"] },
     worldMap = { off = L["CORE_THE_WORLD_MAP_KEEPS_THE"] },
     lootWindow = { off = L["CORE_THE_LOOT_WINDOW_KEEPS_THE"] },
+    -- Its frame of the window list stays on the game's trainer window.
+    trainer = { off = L["CORE_WINDOWS_ALREADY_OPENED_KEEP_THE"] },
     -- Restore changes nothing; the window keeps our size, buttons and side tabs.
     groupFinder = { off = L["CORE_THE_GROUP_FINDER_KEEPS_THE"] },
     -- Restore changes nothing; dressed bag windows keep the old art.

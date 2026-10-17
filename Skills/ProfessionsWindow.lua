@@ -670,17 +670,6 @@ local function StartWatch()
 end
 ns.StartProfessionsWatch = StartWatch
 
--- No watcher with both professions modules off, yet the panels chrome still silvers the window: drain its tabs once.
--- PLAYER_REGEN_ENABLED: modules applied in a login fight come up when it ends.
-local TAB_DRAIN_EVENTS = { "ADDON_LOADED", "PLAYER_ENTERING_WORLD", "PLAYER_REGEN_ENABLED" }
-local tabDrain = CreateFrame("Frame")
-ns.RegisterEvents(tabDrain, TAB_DRAIN_EVENTS)
-tabDrain:SetScript("OnEvent", function(self)
-    if watch or (ns.panels and ns.panels.Dressing and ns.panels.Dressing("panelProfessions") and DrainTabs()) then
-        self:UnregisterAllEvents()
-    end
-end)
-
 local function Apply()
     active = true
     -- Retail's book is its own window with no faces to turn: its driver (Skills/ProfessionsBookRetail.lua).

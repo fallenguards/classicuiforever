@@ -134,22 +134,26 @@ function ns.QueueApply()
     C_Timer.After(0, RunQueuedApply)
 end
 
-local toggleParent, toggleOrder
+local toggleParent, toggleOrder, toggleNeeds
 
 -- Toggle parents and order from ns.TOGGLES; lazy because Options loads later.
 local function ToggleTree()
     if toggleParent or type(ns.TOGGLES) ~= "table" then return end
-    toggleParent, toggleOrder = {}, {}
+    toggleParent, toggleOrder, toggleNeeds = {}, {}, {}
     for i, entry in ipairs(ns.TOGGLES) do
         toggleParent[entry[1]] = entry.parent
         toggleOrder[entry[1]] = i
+        toggleNeeds[entry[1]] = entry.needs
     end
 end
 
--- A module runs while its toggle and every parent toggle are on (a sub-toggle alone never applies).
+-- A module runs while its toggle, every parent toggle and the toggle it needs (on another page) are on (a sub-toggle
+-- alone never applies; the window options need Classic style windows).
 local function ModuleOn(key)
     if ns.db[key] == false then return false end
     ToggleTree()
+    local need = toggleNeeds and toggleNeeds[key]
+    if need and need ~= key and not ModuleOn(need) then return false end
     local parent = toggleParent and toggleParent[key]
     if parent and parent ~= key then return ModuleOn(parent) end
     return true
@@ -288,10 +292,11 @@ local RELOAD_LINES = 3
 local function ReloadText(hits)
     local changed = {}
     for _, hit in ipairs(hits) do changed[hit.key] = true end
-    local lines, more = {}, 0
+    local lines, more, said = {}, 0, {}
     for _, hit in ipairs(hits) do
         local parent = toggleParent and toggleParent[hit.key]
-        if not (parent and changed[parent]) then
+        if not (parent and changed[parent]) and not said[hit.text] then
+            said[hit.text] = true
             if #lines < RELOAD_LINES then lines[#lines + 1] = hit.text else more = more + 1 end
         end
     end
@@ -434,6 +439,7 @@ frame:SetScript("OnEvent", function(_, event, arg1)
         if saved and saved < 17 then ns.KeepQuestLogSingle() end
         if saved and saved < 17 then ns.KeepMapNav() end
         if saved and saved < 18 then ns.EyeSnapToDecide() end
+        if saved and saved < 19 then ns.KeepGameWindowsOff() end
         ns.CopyDefaults(ns.db, ns.DB_DEFAULTS)
         -- Nothing of ours was ever zeroed on a fresh install: the game settings it holds are the player's own.
         if not saved then ns.db.surnamesRepaired, ns.db.damageNumbersRepaired = true, true end

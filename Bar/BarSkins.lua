@@ -320,11 +320,10 @@ local function WindowUp(name)
         if frame and not ghost and frame.IsShown and frame:IsShown() and (frame:GetAlpha() or 1) > 0 then return true end
     end
     -- Where our window is off, the client's stands in: its spells/talents window, and the map (this client's quest log).
-    local db = ns.db or ns.EMPTY
     if SHARED[name] then
         -- Talents by the window itself: retail's row dresses the client's, ours never opens there.
         local off
-        if name == "SpellbookMicroButton" then off = db.spellBook == false else off = not ns.TalentsActive() end
+        if name == "SpellbookMicroButton" then off = not ns.ModuleInForce("spellBook") else off = not ns.TalentsActive() end
         local shared = _G["PlayerSpellsFrame"]
         if off and shared and shared:IsShown() then
             -- Each button follows its own half, as the client's update does.
@@ -332,7 +331,7 @@ local function WindowUp(name)
                 or (name == "TalentMicroButton" and shared.TalentsFrame) or nil
             if not half or half:IsShown() then return true end
         end
-    elseif name == "QuestLogMicroButton" and db.questLog == false then
+    elseif name == "QuestLogMicroButton" and not ns.ModuleInForce("questLog") then
         local map = _G["WorldMapFrame"]
         if map and map:IsShown() then return true end
     end

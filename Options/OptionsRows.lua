@@ -23,9 +23,17 @@ local RAW_ADD = { set = "raw", add = true }
 local function TipLabel(self) return self.label end
 local function TipBody(self) return self.tooltip end
 local function TipHeld(self) return self.key and ns.BarRowHeld(self.key) and L["BARS_TAKEN_TIP"] or nil end
--- White title, wrapped body, and why it is grayed while another addon holds the bars; nothing without a body.
+-- Grayed for a toggle on another page (needs): which one turns it back on.
+local function TipNeeds(self)
+    local need = self.needs
+    if not (need and ns.db[need] == false) then return nil end
+    for _, entry in ipairs(ns.TOGGLES) do
+        if entry[1] == need then return L["OPT_NEEDS_TIP"]:format(entry[2]) end
+    end
+end
+-- White title, wrapped body, and why it is grayed (another addon holds the bars, or a toggle it needs is off).
 local OPTION_TIP = { when = TipBody, text = TipLabel, r = 1, g = 1, b = 1,
-    lines = { { TipBody, nil, nil, nil, true }, { TipHeld, 1, 0.82, 0, true } } }
+    lines = { { TipBody, nil, nil, nil, true }, { TipHeld, 1, 0.82, 0, true }, { TipNeeds, 1, 0.82, 0, true } } }
 O.OPTION_TIP = OPTION_TIP
 
 -- Not part of the classic look, so Toggle none leaves them (the minimap button leads back here), nor the radio picks,
@@ -236,6 +244,18 @@ local function DropGroup(field, group)
             words[#words + 1] = item .. " " .. (entry.search or "")
             keys[#keys + 1] = entry[1]
         end
+    end
+    -- dropAlso: toggles of other pages shown here too, as themselves (a box flips that toggle); sorted in with the rest.
+    if first and first.dropAlso then
+        for _, entry in ipairs(ns.TOGGLES) do
+            for _, key in ipairs(first.dropAlso) do
+                if entry[1] == key then
+                    rows[#rows + 1] = { key = key, label = entry[2], tip = entry[3] }
+                    words[#words + 1] = entry[2]
+                end
+            end
+        end
+        table.sort(rows, function(a, b) return a.label < b.label end)
     end
     local label = first and (first.dropLabel or first[2]:match("^(.-):")) or group
     local tip = first and (first.dropTip or first[3])

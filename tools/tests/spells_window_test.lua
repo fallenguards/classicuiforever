@@ -31,6 +31,8 @@ local quiet = { __index = function() return function() end end }
 local function Addon(onForever)
     local modules, red, drops, drained, visible = {}, {}, {}, {}, {}
     local ns = setmetatable({ EMPTY = {} }, quiet)
+    ns.L = setmetatable({}, { __index = function(_, key) return key end })
+    ns.RELOAD_KEYS = {}
     ns.panels = setmetatable({ after = {}, active = true, skinned = {} }, quiet)
     ns.OnForever = function() return onForever end
     ns.RegisterModule = function(key, module) modules[key] = module end
