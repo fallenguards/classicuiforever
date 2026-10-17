@@ -76,12 +76,13 @@ local function BuildTabs(frame)
     B.tabs = tabs
 end
 
--- The book or the professions window coming up shuts this one; this one coming up shuts them (out of combat: in a fight
--- the micro button's pad already closed them, Collections/CollectionsWindow.lua).
+-- The book or the professions window coming up shuts this one; this one coming up shuts them. In a fight the book too:
+-- the tab's or the button's macro dropped its casting layer first, and its own hide fades it till the fight ends (it
+-- stayed up beside this window). The professions window only out of one (the pad's macro closes it there).
 local function OthersShut()
-    if InCombatLockdown() then return end
     local book = _G.ForeverClassicUISpellBook
-    if book and book:IsShown() then ns.HideSpellBook() end
+    if book and book:IsShown() and book:GetAlpha() > 0 then ns.HideSpellBook() end
+    if InCombatLockdown() then return end
     local prof = _G.ProfessionsFrame
     if prof and prof:IsShown() then ns.HidePanel(prof) end
 end
