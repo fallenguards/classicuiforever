@@ -453,6 +453,9 @@ frame:SetScript("OnEvent", function(_, event, arg1)
         ns.db.meterPanArt = nil
         ns.db.hideExtraBars = nil
         ns.db.searchOnlyMatches = nil
+        -- Crowd control left of the bar, gone after 0.30.0: its pick falls back to past the level.
+        if ns.db.plateCCLeft == true and ns.db.plateCCAbove ~= true then ns.db.plateCCBeside = true end
+        ns.db.plateCCLeft = nil
         -- Flat colour parts with no stone background, gone after 0.15.0.
         for _, key in ipairs({ "flatGryphons", "flatButtons", "flatUnitFrames", "flatMinimap", "flatNameplates" }) do
             ns.db[key] = nil

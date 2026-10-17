@@ -160,7 +160,6 @@ ns.DB_DEFAULTS = {
     plateCastBeside = false,
     plateCCBeside = true,
     plateCCAbove = false,
-    plateCCLeft = false,
     druidManaGlowAround = true,
     druidManaGlowBehind = false,
     druidManaGlowOver = false,

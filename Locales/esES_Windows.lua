@@ -45,8 +45,6 @@ L["OPT_plateCCBeside"] = "Control: tras el nivel"
 L["OPT_plateCCBeside_TIP"] = "Los iconos de aturdimiento, enraizamiento y miedo justo tras el nivel, lejos de un dragón de élite."
 L["OPT_plateCCAbove"] = "Control: con los perjuicios"
 L["OPT_plateCCAbove_TIP"] = "Los iconos de aturdimiento, enraizamiento y miedo al final de la fila de perjuicios sobre el nombre."
-L["OPT_plateCCLeft"] = "Control: a la izquierda de la barra"
-L["OPT_plateCCLeft_TIP"] = "Los iconos de aturdimiento, enraizamiento y miedo a la izquierda de la barra de salud, tras una marca de banda; un segundo se añade a la izquierda."
 L["OPT_plateCC_TIP"] = "Dónde muestra una placa de nombre sus iconos de control."
 
 -- Options/Toggles.lua: how the player frame's glow meets the druid mana bar

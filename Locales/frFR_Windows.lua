@@ -45,8 +45,6 @@ L["OPT_plateCCBeside"] = "Contrôle : après le niveau"
 L["OPT_plateCCBeside_TIP"] = "Les icônes d'étourdissement, d'immobilisation et de peur juste après le niveau, à l'écart d'un dragon d'élite."
 L["OPT_plateCCAbove"] = "Contrôle : avec les affaiblissements"
 L["OPT_plateCCAbove_TIP"] = "Les icônes d'étourdissement, d'immobilisation et de peur au bout de la rangée d'affaiblissements au-dessus du nom."
-L["OPT_plateCCLeft"] = "Contrôle : à gauche de la barre"
-L["OPT_plateCCLeft_TIP"] = "Les icônes d'étourdissement, d'immobilisation et de peur à gauche de la barre de vie, après un marqueur de raid ; une deuxième s'ajoute à gauche."
 L["OPT_plateCC_TIP"] = "Où une barre de nom affiche ses icônes de contrôle."
 
 -- Options/Toggles.lua: how the player frame's glow meets the druid mana bar

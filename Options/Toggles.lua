@@ -193,7 +193,6 @@ ns.TOGGLES = {
     { "plateCCBeside", L["OPT_plateCCBeside"], L["OPT_plateCCBeside_TIP"], parent = "namePlates", radio = "plateCC",
         drop = true, dropTip = L["OPT_plateCC_TIP"], search = "crowd control cc stun root fear loss of control icon" },
     { "plateCCAbove", L["OPT_plateCCAbove"], L["OPT_plateCCAbove_TIP"], parent = "namePlates", radio = "plateCC", drop = true },
-    { "plateCCLeft", L["OPT_plateCCLeft"], L["OPT_plateCCLeft_TIP"], parent = "namePlates", radio = "plateCC", drop = true },
     { "fullPlates", L["OPT_fullPlates"], L["OPT_fullPlates_TIP"] },
     { "platesOneSize", L["OPT_platesOneSize"], L["OPT_platesOneSize_TIP"], search = "scale distance target bigger" },
     { "hideLastNames", L["OPT_hideLastNames"], L["OPT_hideLastNames_TIP"] },

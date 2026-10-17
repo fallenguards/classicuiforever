@@ -260,7 +260,6 @@ return {
     plainQuestItems = false,
     plateCCAbove = false,
     plateCCBeside = true,
-    plateCCLeft = false,
     plateCastBeside = false,
     plateDragons = false,
     plateNameSize = 0,

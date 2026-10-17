@@ -45,8 +45,6 @@ L["OPT_plateCCBeside"] = "Controllo: dopo il livello"
 L["OPT_plateCCBeside_TIP"] = "Le icone di stordimento, immobilizzazione e paura subito dopo il livello, lontano da un drago élite."
 L["OPT_plateCCAbove"] = "Controllo: con le penalità"
 L["OPT_plateCCAbove_TIP"] = "Le icone di stordimento, immobilizzazione e paura in fondo alla fila delle penalità sopra il nome."
-L["OPT_plateCCLeft"] = "Controllo: a sinistra della barra"
-L["OPT_plateCCLeft_TIP"] = "Le icone di stordimento, immobilizzazione e paura a sinistra della barra della salute, dopo un segno di incursione; una seconda si aggiunge a sinistra."
 L["OPT_plateCC_TIP"] = "Dove una targhetta mostra le sue icone di controllo."
 
 -- Options/Toggles.lua: how the player frame's glow meets the druid mana bar

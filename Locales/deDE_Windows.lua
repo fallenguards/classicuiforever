@@ -45,8 +45,6 @@ L["OPT_plateCCBeside"] = "Kontrolleffekte: hinter der Stufe"
 L["OPT_plateCCBeside_TIP"] = "Symbole für Betäubung, Bewegungsunfähigkeit und Furcht gleich hinter der Stufe, frei von einem Elitedrachen."
 L["OPT_plateCCAbove"] = "Kontrolleffekte: bei den Schwächungen"
 L["OPT_plateCCAbove_TIP"] = "Symbole für Betäubung, Bewegungsunfähigkeit und Furcht am Ende der Schwächungsreihe über dem Namen."
-L["OPT_plateCCLeft"] = "Kontrolleffekte: links der Leiste"
-L["OPT_plateCCLeft_TIP"] = "Symbole für Betäubung, Bewegungsunfähigkeit und Furcht links der Gesundheitsleiste, hinter einer Schlachtzugsmarkierung; ein zweites kommt links dazu."
 L["OPT_plateCC_TIP"] = "Wo eine Namensplakette ihre Symbole für Kontrolleffekte zeigt."
 
 -- Options/Toggles.lua: how the player frame's glow meets the druid mana bar
