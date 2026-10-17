@@ -728,17 +728,20 @@ local function Handle(entry)
     if handle then return handle end
     handle = CreateFrame("Frame", nil, UIParent)
     handle.entry = entry
-    -- Over the windows it stands for, under our mode window and dialogs.
-    handle:SetFrameStrata("DIALOG")
-    handle:SetFrameLevel(50)
+    -- Over the windows it stands for, under our mode window and dialogs; a band piece (the gryphons) over the game's
+    -- boxes but under the band's smaller ones (key ring, latency bar, micro menu at 1010).
+    local strata, level = "DIALOG", 50
+    if entry.gameEdit then strata, level = "MEDIUM", 1004 end
+    handle:SetFrameStrata(strata)
+    handle:SetFrameLevel(level)
     ns.MakeDraggable(handle, HandleDropped)
     handle:SetScript("OnDragStart", HandleDragStart)
     handle:SetScript("OnMouseDown", HandleDown)
     handle:SetScript("OnMouseUp", HandleUp)
     -- Edit mode's selection box over it; the mouse stays the placeholder's.
     local sel = ns.band.SelectionHandle(handle, entry.label)
-    sel:SetFrameStrata("DIALOG")
-    sel:SetFrameLevel(51)
+    sel:SetFrameStrata(strata)
+    sel:SetFrameLevel(level + 1)
     sel:EnableMouse(false)
     sel:Show()
     handle.sel = sel
