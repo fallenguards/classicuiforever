@@ -2,7 +2,7 @@ local _, ns = ...
 
 -- Era's threat percent over the target frame (its TargetFrameNumericalThreat), as our own box, and the same over the
 -- focus frame: the game shows its own only with threatShowNumeric on, a setting no code of ours may write at load.
--- The game's own ones fade under ours.
+-- The game's own fades on our classic frames, under ours or with the option off (it showed with the option off).
 
 local UF = ns.UF
 local IsSecret = ns.IsSecret
@@ -85,15 +85,16 @@ function ns.ThreatNumberSync()
     local any = false
     for unit, name in pairs(FRAMES) do
         local frame = _G[name]
-        local on = frame ~= nil and UF.active and UF.On(unit) and ns.db.threatNumber ~= false
+        local classic = frame ~= nil and UF.active and UF.On(unit)
+        local on = classic and ns.db.threatNumber ~= false
         if on and not boxes[unit] then boxes[unit] = Build(frame) end
         live[unit] = on
         any = any or on
         local game = frame and GameNumber(frame)
-        -- The game's number back only where ours stood in for it.
-        if game and (on or faded[unit]) then
-            faded[unit] = on or nil
-            ns.SetAlphaIf(game, on and 0 or 1)
+        -- The game's number back only with the frame handed back, where we faded it.
+        if game and (classic or faded[unit]) then
+            faded[unit] = classic or nil
+            ns.SetAlphaIf(game, classic and 0 or 1)
         end
     end
     if any and not driver then
