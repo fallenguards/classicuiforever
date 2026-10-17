@@ -38,6 +38,7 @@ return {
     characterSheet = true,
     chatScrollBar = false,
     classColorHealth = false,
+    classColorHealthEnemies = true,
     classColorHealthFocus = true,
     classColorHealthPlayer = true,
     classColorHealthTarget = true,

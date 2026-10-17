@@ -106,6 +106,7 @@ ns.DB_DEFAULTS = {
     comboPoints = true,
     hideLastNames = false,
     classColorHealth = false,
+    classColorHealthEnemies = true,
     classColorHealthPlayer = true, classColorHealthTarget = true, classColorHealthFocus = true,
     hideProfessionsButton = true,
     eraBagSize = true,

@@ -132,6 +132,8 @@ ns.TOGGLES = {
     { "classColorHealthPlayer", L["OPT_classColorHealthPlayer"], L["OPT_classColorHealthPlayer_TIP"], parent = "classColorHealth", checks = "classColorHealthFrames", drop = true },
     { "classColorHealthTarget", L["OPT_classColorHealthTarget"], L["OPT_classColorHealthTarget_TIP"], parent = "classColorHealth", checks = "classColorHealthFrames", drop = true },
     { "classColorHealthFocus", L["OPT_classColorHealthFocus"], L["OPT_classColorHealthFocus_TIP"], parent = "classColorHealth", checks = "classColorHealthFrames", drop = true },
+    { "classColorHealthEnemies", L["OPT_classColorHealthEnemies"], L["OPT_classColorHealthEnemies_TIP"],
+        parent = "classColorHealth", search = "enemy players hostile pvp class color" },
     { "classicStatusFont", L["OPT_classicStatusFont"], L["OPT_classicStatusFont_TIP"], parent = "unitFrames", search = "numbers text size arial" },
     { "barUnitTips", L["OPT_barUnitTips"], L["OPT_barUnitTips_TIP"], parent = "unitFrames" },
     { "hoverBothNumbers", L["OPT_hoverBothNumbers"], L["OPT_hoverBothNumbers_TIP"], parent = "unitFrames" },

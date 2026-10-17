@@ -277,7 +277,7 @@ end
 
 -- Class colored health turned, or a frame picked under it: at once, in a fight too (the options pass waits one out).
 local CLASS_HEALTH = { classColorHealth = true, classColorHealthPlayer = true, classColorHealthTarget = true,
-    classColorHealthFocus = true }
+    classColorHealthFocus = true, classColorHealthEnemies = true }
 ns.OnToggle(function(key)
     if CLASS_HEALTH[key] and UF.active then RefillHealth() end
 end)

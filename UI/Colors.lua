@@ -183,11 +183,18 @@ local function ClassColored(unit)
     return key == nil or db[key] ~= false
 end
 
--- A player's class color first, an enemy's too (the enemy color then marks NPCs only); then the enemy color.
+-- One we can attack (a secret answer counts as not).
+local function Hostile(unit)
+    local hostile = UnitCanAttack("player", unit)
+    return not IsSecret(hostile) and hostile == true
+end
+
+-- A player's class color first, an enemy's too unless Enemy players too is off (theirs is then the enemy color or
+-- green); then the enemy color.
 function ns.HealthColor(unit)
     if ClassColored(unit) and UnitIsPlayer then
         local isPlayer = UnitIsPlayer(unit)
-        if not IsSecret(isPlayer) and isPlayer then
+        if not IsSecret(isPlayer) and isPlayer and (ns.db.classColorHealthEnemies ~= false or not Hostile(unit)) then
             local _, class = UnitClass(unit)
             local r, g, b = ns.ClassRGB(class)
             if r then return r, g, b end
@@ -196,6 +203,20 @@ function ns.HealthColor(unit)
     local enemy = unit and EnemyColor(unit)
     if enemy then return enemy[1], enemy[2], enemy[3] end
     return 0, 1, 0
+end
+
+-- dbVersion 19: enemy players took class colors over the enemy color; where both were picked, they keep the enemy color
+-- (the account and every profile).
+function ns.KeepEnemyPlayerColor()
+    local db = ns.db
+    local function Keep(t)
+        local color = t.thickEnemyColor
+        if t.classColorHealth == true and color ~= nil and color ~= "green" then t.classColorHealthEnemies = false end
+    end
+    Keep(db)
+    for _, shot in pairs(type(db.profiles) == "table" and db.profiles or {}) do
+        if type(shot) == "table" then Keep(shot) end
+    end
 end
 
 -- A player's class colour for the name box (option, each frame picked under it), or nil: NPCs and hidden units

@@ -32,6 +32,7 @@ local env = setmetatable({
     IsSecret = function() return false end,
     UnitIsPlayer = function(unit) return players[unit] == true end,
     UnitClass = function() return "Mage", "MAGE" end,
+    UnitCanAttack = function(_, unit) return unit == "target" end,
 }, { __index = _G })
 assert(load(source:sub(first, last - 1), "health color", "t", env))()
 
@@ -52,6 +53,12 @@ Check(Look("targettarget") == "class", "a bar with no pick of its own follows th
 players.target = false
 ns.db.classColorHealthTarget = true
 Check(Look("target") == "green", "a target that is no player stays green")
+-- Enemy players too: an enemy player keeps the class color unless unchecked; then green here (no enemy color picked).
+players.target = true
+Check(Look("target") == "class", "an enemy player wears the class color")
+ns.db.classColorHealthEnemies = false
+Check(Look("target") == "green" and Look("focus") == "class", "Enemy players too off: the enemy goes green, a friend keeps it")
+ns.db.classColorHealthEnemies = nil
 ns.db.classColorHealth = false
 Check(Look("focus") == "green", "the option off again: green, whatever is checked under it")
 
