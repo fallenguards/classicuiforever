@@ -54,7 +54,8 @@ local function LockShown(entry)
     local strip = W.StripOf(frame)
     if strip then ns.SetLevelIf(strip, level + W.STRIP_LIFT) end
     local over = ns.db.windowLocksAlways or zones[entry.key]:IsMouseOver() or lock:IsMouseOver() or reset:IsMouseOver()
-    local shown = over and not W.Full(entry, frame) and not ns.MoverHolds(frame)
+    -- Never on the map while our classic map is off: it is the game's then (#192).
+    local shown = over and not W.Full(entry, frame) and not ns.MoverHolds(frame) and W.Worn(entry)
     ns.SetShownIf(lock, shown)
     -- Only a window with a place of its own has one to reset.
     ns.SetShownIf(reset, shown and W.PlaceOf(entry) ~= nil)

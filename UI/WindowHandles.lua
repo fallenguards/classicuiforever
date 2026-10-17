@@ -63,6 +63,13 @@ local function SetPlace(entry, x, y)
     Places()[leader.key] = { x - dx, y - dy }
 end
 
+-- A game window wears our place, size, lock and grip while its restyle is on (UI/WindowList.lua dressed); off, it is the
+-- game's and other addons' (#192), ours kept for its return. Locked, a dressed one stays where it was put.
+local function Worn(entry)
+    if not entry.dressed then return true end
+    return entry.dressed() and true or false
+end
+
 -- A choice's rows: its radio group's toggles, the label past "Calendar: " as the item's own words.
 local function ChoiceRows(group)
     local rows = {}
@@ -99,7 +106,7 @@ function ns.WindowScale(key) return Scales()[byKey[key] and SizeKey(byKey[key]) 
 -- Mid drag by its title bar: the window placing passes leave it to the mouse.
 function ns.WindowMoving(frame) return moving[frame] == true end
 function ns.WindowPlaced(key)
-    if byKey[key] then return PlaceOf(byKey[key]) ~= nil end
+    if byKey[key] then return Worn(byKey[key]) and PlaceOf(byKey[key]) ~= nil end
     return Places()[key] ~= nil
 end
 -- A place carried over from an older record (the gryphons' old handle).
@@ -107,19 +114,17 @@ function ns.SetWindowPlace(key, x, y) SetPlace(byKey[key], x, y) end
 -- A window the player placed (ours or the game's): out of the windows' row.
 function ns.FramePlaced(frame)
     for _, entry in ipairs(WINDOWS) do
-        if not entry.piece and ns.WindowFrame(entry) == frame then return PlaceOf(entry) ~= nil end
+        if not entry.piece and ns.WindowFrame(entry) == frame then return Worn(entry) and PlaceOf(entry) ~= nil end
     end
     return false
 end
 
 local function IsFree(entry)
+    if not Worn(entry) then return false end
     if entry.toggle then return ns.db[entry.toggle] == true end
     return Freed()[Leader(entry).key] == true
 end
 
--- A window with its own toggle (Unlock Map) wears our place and size only while it is on; off, they stay saved and the
--- window is the game's and other addons' (#192).
-local function Worn(entry) return not entry.toggle or ns.db[entry.toggle] == true end
 
 local Ratio = ns.WindowRatio
 
@@ -247,13 +252,14 @@ local MAP_ENTRY = WINDOWS[5]
 PlaceAll = function()
     if not ns.db then return end
     for _, entry in ipairs(WINDOWS) do
-        local frame = ns.WindowFrame(entry)
-        if ns.MakeWindowLock then ns.MakeWindowLock(entry) end
-        if ns.MakeWindowGrip then ns.MakeWindowGrip(entry) end
-        if PlaceOf(entry) or Scales()[SizeKey(entry)] or IsFree(entry) or (frame and scaled[frame])
-            or (entry.quests and (FullScale() or (ns.MapWindowedScale and ns.MapWindowedScale())))
+        local frame, ours = ns.WindowFrame(entry), Worn(entry)
+        -- Nothing made or hooked on a game window that is not ours; one handed back (scaled) gets its size back.
+        if ours and ns.MakeWindowLock then ns.MakeWindowLock(entry) end
+        if ours and ns.MakeWindowGrip then ns.MakeWindowGrip(entry) end
+        if (ours and (PlaceOf(entry) or Scales()[SizeKey(entry)] or IsFree(entry))) or (frame and scaled[frame])
+            or (entry.quests and ours and (FullScale() or (ns.MapWindowedScale and ns.MapWindowedScale())))
             or (entry.zoom and entry.zoom() ~= 1) then
-            Watch(entry)
+            if ours then Watch(entry) end
             Apply(entry)
         end
         -- Also off again: a strip made earlier goes.
@@ -262,7 +268,7 @@ PlaceAll = function()
     if ns.SyncWindowLocks then ns.SyncWindowLocks() end
 end
 
-ns.OnToggle(function(key) if key == MAP_ENTRY.toggle then PlaceAll() end end)
+ns.OnToggle(function(key) if key == MAP_ENTRY.toggle or key == "worldMap" then PlaceAll() end end)
 
 -- Leave game windows to other addons: a size ours gave one goes back to the game's; turned off, ours place them again.
 -- A protected one (professions) waits for calm.
@@ -331,7 +337,7 @@ local function Return(entry)
         end
         ns.ReturnClassicWindow(frame)
         -- The map is a game window too: the game's left panel spot.
-        if (entry.client or entry.quests) and not Full(entry, frame) then
+        if (entry.client or entry.quests) and not Full(entry, frame) and Worn(entry) then
             ns.GameSpot(frame)
             -- Ours held for its leaving lay out again round it.
             ns.ReleaseWindowRow()
@@ -766,7 +772,7 @@ end
 -- One window's placeholder up or down; its dialog goes with it.
 local function ShowHandle(entry, on)
     -- A window a mover holds has no box here: it places that window.
-    if on and ns.MoverHolds(ns.WindowFrame(entry)) then on = false end
+    if on and (ns.MoverHolds(ns.WindowFrame(entry)) or not Worn(entry)) then on = false end
     if on then
         Handle(entry)
         LayHandle(entry)
@@ -791,4 +797,4 @@ ns.windowEdit = {
 }
 
 -- The map's lock and option switch its Movable anytime too.
-ns.OnToggle(function(key) if key == MAP_ENTRY.toggle or key == "mapFade" then Refresh() end end)
+ns.OnToggle(function(key) if key == MAP_ENTRY.toggle or key == "mapFade" or key == "worldMap" then Refresh() end end)

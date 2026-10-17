@@ -7,11 +7,14 @@ local L = ns.L
 -- quests: the map; section: heading; piece: laid by ns.LayPiece; ringKey: minimap angle (while ringIf); fixedIf: no drag then;
 -- choice: radio list; client: game window; follows: place, unlock (while followIf, or always), followSize: size; gameEdit.
 ns.WINDOW_LIST = {
-    { key = "character", label = L["UI_CHARACTER"], name = "CharacterFrame", w = 354, h = 467, cut = { 30, 45 }, client = true },
+    -- dressed: a game window is ours while its restyle is on; off, nothing of ours goes on it (#192).
+    { key = "character", label = L["UI_CHARACTER"], name = "CharacterFrame", w = 354, h = 467, cut = { 30, 45 }, client = true,
+        dressed = function() return ns.ModuleInForce("characterSheet") end },
     -- The classic professions book wears the spellbook's frame, its corner on the book's art (homes 0, -104 and 12, -118);
     -- zoom: full size draws it bigger (Skills/ProfessionsBook.lua).
     { key = "professions", label = L["UI_PROFESSIONS"], name = ns.OnForever() and "ProfessionsFrame" or "ProfessionsBookFrame",
         w = 339, h = 425, client = true, zoom = function() return ns.ProfessionsZoom and ns.ProfessionsZoom() or 1 end,
+        dressed = function() return ns.ModuleInForce("professionsBook") or ns.ModuleInForce("tradeSkill") end,
         follows = "spellBook", followIf = "professionsBook", followX = 12, followY = -14 },
     { key = "talents", label = L["UI_TALENTS"], name = "ClassicUIForeverTalents", w = 354, h = 467, cut = { 30, 45 },
         padHost = true },
@@ -21,7 +24,7 @@ ns.WINDOW_LIST = {
         follows = "spellBook", followX = 0, followY = 0 },
     { key = "questLog", label = L["UI_QUEST_LOG"], name = "ForeverClassicUIQuestLog", w = 349, h = 437, cut = { 35, 75 } },
     { key = "map", label = L["UI_WORLD_MAP"], name = "WorldMapFrame", w = 1035, h = 534, stripH = 24, toggle = "mapUnlocked",
-        quests = true },
+        quests = true, dressed = function() return ns.db.worldMap ~= false end },
     { key = "calendar", label = L["UI_CALENDAR"], name = "ForeverClassicUICalendarHome", w = 28, h = 28, section = L["UI_MINIMAP"],
         piece = true, ringKey = "calendarAngle", ringIf = "calendarRing", fixedIf = "calendarBehind", choice = "calendarSpot",
         choiceLabel = L["UI_MODE"] },
@@ -61,14 +64,18 @@ ns.WINDOW_LIST = {
         piece = true, gameEdit = true, choice = "gryphonLeftShow", choiceLabel = L["UI_SHOW"] },
     { key = "gryphonRight", label = L["UI_GRYPHON_RIGHT"], name = "ForeverClassicUIGryphonRight", w = 128, h = 128,
         piece = true, gameEdit = true, choice = "gryphonRightShow", choiceLabel = L["UI_SHOW"] },
-    { key = "social", label = L["UI_SOCIAL"], name = "FriendsFrame", w = 338, h = 424, client = true },
+    { key = "social", label = L["UI_SOCIAL"], name = "FriendsFrame", w = 338, h = 424, client = true,
+        dressed = function() return ns.panels and ns.panels.Dressing("panelSocial") end },
     -- Dressed as the social window, the group finder stands in its place at its size.
     { key = "groupFinder", label = L["OPT_groupFinder"], name = "LFGParentFrame", w = 338, h = 424, client = true,
-        follows = "social", followIf = "groupFinder", followX = 0, followY = 0 },
+        follows = "social", followIf = "groupFinder", followX = 0, followY = 0,
+        dressed = function() return ns.ModuleInForce("groupFinder") or (ns.panels and ns.panels.Dressing("panelGroupFinder")) end },
     -- The NPC's quest and gossip windows open on one spot: one place, lock and size.
-    { key = "questGiver", label = L["UI_QUEST_GIVER"], name = "QuestFrame", w = 338, h = 427, client = true },
+    { key = "questGiver", label = L["UI_QUEST_GIVER"], name = "QuestFrame", w = 338, h = 427, client = true,
+        dressed = function() return ns.panels and ns.panels.Dressing("panelQuest") end },
     { key = "gossip", label = L["UI_GOSSIP"], name = "GossipFrame", w = 338, h = 427, client = true,
-        follows = "questGiver", followX = 0, followY = 0, followSize = true },
+        follows = "questGiver", followX = 0, followY = 0, followSize = true,
+        dressed = function() return ns.panels and ns.panels.Dressing("panelGossip") end },
 }
 
 -- The other micro buttons on the minimap ring: Map/MinimapMicro.lua names its frames and angles the same way.

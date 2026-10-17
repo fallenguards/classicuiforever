@@ -261,7 +261,7 @@ ns.TOGGLES = {
     { "questMapPane", L["OPT_questMapPane"], L["OPT_questMapPane_TIP"] },
     { "mapFade", L["OPT_mapFade"], L["OPT_mapFade_TIP"] },
     { "mapMarkers", L["OPT_mapMarkers"], L["OPT_mapMarkers_TIP"], search = "town city capital settlement icon marker tower house continent" },
-    { "mapUnlocked", L["OPT_mapUnlocked"], L["OPT_mapUnlocked_TIP"], search = "move map lock" },
+    { "mapUnlocked", L["OPT_mapUnlocked"], L["OPT_mapUnlocked_TIP"], search = "move map lock", needs = "worldMap" },
 
     { "whoList", L["OPT_whoList"], L["OPT_whoList_TIP"], group = L["GROUP_SOCIAL"], needs = "panels" },
     { "guildRoster", L["OPT_guildRoster"], L["OPT_guildRoster_TIP"], needs = "panels" },
