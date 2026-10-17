@@ -2,12 +2,10 @@ local _, ns = ...
 
 -- The book's other pages: Collections while its tab stands for it, and the game's professions window on its book page.
 -- While one is up the spellbook's micro button stays pushed, and the book's key and button shut that page rather than
--- turn to the spells; shut, the key opens the book on it again. The bind decides in its own secure run, in a fight too.
+-- turn to the spells; shut, the key opens the spells. The bind decides in its own secure run, in a fight too.
 
 local SHUT_NAME = "ForeverClassicUICollectionsShut"
 local COLLECTIONS_FLAG = "fcui-collections-page"
--- The page the book showed last ("prof", "coll"; nil: the spells): out of a fight from what shows, in one from the pads.
-local LAST_PAGE = "fcui-last-page"
 local BOOK_BUTTONS = { "SpellbookMicroButton", "PlayerSpellsMicroButton" }
 local P = {}
 
@@ -43,12 +41,6 @@ function ns.BookPageTurn()
 end
 local function TurnOnUp(_, _, down) if not down then ns.BookPageTurn() end end
 
--- A page that just showed is the book's last (out of a fight; a shown edge, so the newest wins).
-local function Showed(page)
-    local bind = _G.ForeverClassicUISpellBookBind
-    if P.wired and bind and not InCombatLockdown() then bind:SetAttribute(LAST_PAGE, page) end
-end
-
 -- Collections cannot be read by the bind's secure run in a fight (a plain frame of ours): a flag on the bind stands for
 -- it, set by our code out of a fight and by the tab's secure pad in one; the press that shuts the page clears it.
 local function SyncFlag()
@@ -56,9 +48,8 @@ local function SyncFlag()
     if not P.wired or not bind or InCombatLockdown() then return end
     bind:SetAttribute(COLLECTIONS_FLAG, (ns.CollectionsBookPage and ns.CollectionsBookPage()) or nil)
 end
-function ns.CollectionsPageChanged(shown)
+function ns.CollectionsPageChanged()
     SyncFlag()
-    if shown and ns.CollectionsBookPage and ns.CollectionsBookPage() then Showed("coll") end
     ns.BookPagesChanged()
 end
 
@@ -78,12 +69,6 @@ local PRESS = [[
         and prof:IsShown() and page:IsShown() then
         return "Button6"
     end
-    local last = self:GetAttribute("]] .. LAST_PAGE .. [[")
-    if last == "prof" then return "Button7" end
-    if last == "coll" then
-        if not down then self:SetAttribute("]] .. COLLECTIONS_FLAG .. [[", true) end
-        return "Button8"
-    end
 ]]
 
 -- A page's foot tab turning to the spells presses the bind too (Skills/ProfessionsFootTabs.lua): it says so first,
@@ -97,7 +82,6 @@ local function WrapTurns()
             SecureHandlerWrapScript(pad, "OnClick", P.header, [[
                 local bind = control:GetFrameRef("bind")
                 bind:SetAttribute("]] .. TURN_FLAG .. [[", true)
-                bind:SetAttribute("]] .. LAST_PAGE .. [[", nil)
             ]])
         end
     end
@@ -109,8 +93,7 @@ function ns.BookTurnPad(pad)
     WrapTurns()
 end
 
--- A page's foot tab opening Collections (the professions window's): in its own secure run, the page is the last one
--- and up, in a fight too.
+-- A page's foot tab opening Collections (the professions window's): in its own secure run the page is up, in a fight too.
 local collPads = {}
 local function WrapCollPads()
     if not P.header or InCombatLockdown() then return end
@@ -119,9 +102,7 @@ local function WrapCollPads()
             collPads[pad] = true
             SecureHandlerWrapScript(pad, "OnClick", P.header, [[
                 if down then return end
-                local bind = control:GetFrameRef("bind")
-                bind:SetAttribute("]] .. LAST_PAGE .. [[", "coll")
-                bind:SetAttribute("]] .. COLLECTIONS_FLAG .. [[", true)
+                control:GetFrameRef("bind"):SetAttribute("]] .. COLLECTIONS_FLAG .. [[", true)
             ]])
         end
     end
@@ -131,11 +112,6 @@ function ns.BookCollectionsPad(pad)
     collPads[pad] = false
     pad:HookScript("PostClick", TurnOnUp)
     WrapCollPads()
-end
-
-local function ProfessionsShown()
-    if ProfessionsBookPage() then Showed("prof") end
-    ns.BookPagesChanged()
 end
 
 -- The game's professions window as a page of the book (our book on, its book page up): in the row it is ours, on the
@@ -155,8 +131,8 @@ local function WatchProfessions()
     ns.Sched.Attach(frame, { name = "bookPages.spot", every = 0, fn = ns.KeepBookPageSpot })
     P.header:SetFrameRef("prof", frame)
     P.header:SetFrameRef("profPage", frame.BookPage)
-    ns.Sched.OnVisible(frame, "bookPages.prof", ProfessionsShown)
-    ns.Sched.OnVisible(frame.BookPage, "bookPages.profPage", ProfessionsShown)
+    ns.Sched.OnVisible(frame, "bookPages.prof", ns.BookPagesChanged)
+    ns.Sched.OnVisible(frame.BookPage, "bookPages.profPage", ns.BookPagesChanged)
 end
 
 -- Out of combat, once the bind and the Collections tab's pad exist (the book's first build).
@@ -175,30 +151,21 @@ function ns.WireBookPages()
     bind:SetAttribute("macrotext5", "/click " .. SHUT_NAME)
     bind:SetAttribute("type6", "macro")
     bind:SetAttribute("macrotext6", "/click ProfessionsFrameCloseButton")
-    bind:SetAttribute("type7", "macro")
-    bind:SetAttribute("macrotext7", "/click ProfessionMicroButton")
-    bind:SetAttribute("type8", "macro")
-    bind:SetAttribute("macrotext8", "/click CollectionsMicroButton")
     SecureHandlerWrapScript(bind, "OnClick", P.header, PRESS)
     -- The book's own foot tabs to its other pages: pads while the layer is up, the tabs themselves otherwise.
     for i, key in pairs({ [2] = "prof", [4] = "coll" }) do
         local foot = book.FootPads and book.FootPads[key]
-        if foot then
-            foot:HookScript("PostClick", TurnOnUp)
+        if foot then foot:HookScript("PostClick", TurnOnUp) end
+        if foot and key == "coll" then
             SecureHandlerWrapScript(foot, "OnClick", P.header, [[
                 if down then return end
-                local bind = control:GetFrameRef("bind")
-                bind:SetAttribute("]] .. LAST_PAGE .. [[", "]] .. key .. [[")
-                if "]] .. key .. [[" == "coll" then bind:SetAttribute("]] .. COLLECTIONS_FLAG .. [[", true) end
+                control:GetFrameRef("bind"):SetAttribute("]] .. COLLECTIONS_FLAG .. [[", true)
             ]])
         end
         local tab = book.BookTabs and book.BookTabs[i]
         if tab then tab:HookScript("OnClick", ns.BookPageTurn) end
     end
-    ns.Sched.OnVisible(book, "bookPages.book", function(shown)
-        if shown then Showed(nil) end
-        ns.BookPagesChanged()
-    end)
+    ns.Sched.OnVisible(book, "bookPages.book", ns.BookPagesChanged)
     WatchProfessions()
     WrapTurns()
     WrapCollPads()
