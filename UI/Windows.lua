@@ -1,13 +1,13 @@
 local _, ns = ...
 
--- Our windows stay outside the client's panel system so they can open in combat;
--- they close the client's and vice versa, and stand side by side clear of the client's.
+-- Ours stay off the client's panel system (so they open in combat), close the client's and vice versa, and stand clear beside them.
 
 local classicWindows = {}
--- Ours held where they stand while one has left the row open (dragged or sized out of it), till the next opening, close
--- or reset: they slid into its gap before.
+-- Ours held where they stand while one has left the row (dragged or sized out), till the next opening, close or reset.
 local stay = setmetatable({}, { __mode = "k" })
 local inRow = setmetatable({}, { __mode = "k" })   -- the row's members last pass, ours and the game's
+local pageOpened = setmetatable({}, { __mode = "k" })   -- the book's page (a game window): its opening count
+local gapMoved = false   -- the gap pass moved a game window: the row is solved again (SheetPass)
 -- An opening, close or reset lays the row afresh: no hold, and members counted anew (a pass asleep missed a leaving).
 local function Release()
     wipe(stay)
@@ -26,8 +26,7 @@ local BESIDE = { CharacterFrame = true, MacroFrame = true }
 -- Client windows that float over ours, closing none and taking no room (loot: at the cursor or its edit mode place, as Era).
 local FLOATS = { LootFrame = true }
 ns.WINDOW_FLOATS = FLOATS
--- Era's panel rule: a window opened where another stands closes it only when neither can be pushed aside (both
--- pushable 0); otherwise they stand side by side. Ours carry Era's numbers (ns.RegisterClassicWindow), the game's its own.
+-- Era's panel rule: opened on another, a window closes it only when both are pushable 0; ours carry Era's numbers.
 local function Pushable(frame)
     if frame.fcuiPushable then return frame.fcuiPushable end
     local value = ns.Safe(frame:GetAttribute("UIPanelLayout-pushable"))
@@ -43,10 +42,9 @@ end
 local BESIDE_WIDTH = 352
 -- Pieces a client window hangs past its right edge.
 local SIDE_PIECES = { CharacterFrame = { "ModeTabs" } }
-local PlaceClassicWindows   -- forward declared: must stay local
+local PlaceClassicWindows, StandAt, SheetSettle   -- forward declared: must stay local
 
--- The gamepad's windows close only by their own hand (Core/Gamepad.lua): ours then stand beside them.
--- opener: ours, which closes a game window only as Era's rule says.
+-- The gamepad's windows close only by their own hand (Core/Gamepad.lua). opener: ours, closing by Era's rule alone.
 local function HideClientPanels(opener, except)
     if ns.GamepadUI() then return end
     -- In a fight the game refuses our panel calls: a plain hide, never on a protected one (UI/WindowPanels.lua).
@@ -77,9 +75,7 @@ for _, name in ipairs(NPC_WINDOWS) do npcWindow[name] = true end
 local clientShown = {}
 local windowWatch
 
--- Load-on-demand windows join the panel list as they load: rebuild on ADDON_LOADED and every 5 s.
--- Two tables in turn, so a rebuild mid-walk (a load set off by an opening) leaves the walked one whole.
--- watchFrames[i] is watchNames[i]'s frame, nil until it exists.
+-- Load-on-demand windows join the panel list as they load: rebuilt on ADDON_LOADED and every 5 s, two tables in turn.
 local watchNames, spareNames, watchHave = {}, {}, {}
 local watchFrames, spareFrames = {}, {}
 local namesAt   -- nil: rebuild on the next ask
@@ -121,7 +117,6 @@ local function WindowAt(names, frames, i)
     return panel
 end
 
--- Secret values read as nil for layout.
 local Plain = ns.Safe
 
 -- The spellbook's faded stand-in takes no room.
@@ -211,6 +206,7 @@ local function ClientWindowOpened(name, panel)
     ns.NoteWindowOpened(panel)
     openings.count = openings.count + 1
     openings.game = openings.count
+    pageOpened[panel] = pageOpened[panel] or openings.count
     Release()
     -- Talents and the sheet share the screen with ours, in combat too; anything else by Era's rule.
     if not (LEAVE_OPEN[name] or BESIDE[name]) then ns.HideReplacedWindows(panel) end
@@ -324,8 +320,7 @@ ns.WindowLocked = Locked
 local placedX = setmetatable({}, { __mode = "k" })
 local placedY = setmetatable({}, { __mode = "k" })
 
--- Moved off its slot: out of the row, left where it was put. A place of the player's, or another anchor (a window
--- mover); not the spellbook's own anchors, which its casting layer keeps.
+-- Moved off its slot (the player's place, or a mover's anchor; not the spellbook's own casting-layer anchors): out of the row.
 local function Moved(frame)
     if ns.FramePlaced and ns.FramePlaced(frame) then return true end
     local x = placedX[frame]
@@ -339,8 +334,7 @@ local function Moved(frame)
         or math.abs(ox - x) > 0.5 or math.abs(oy - (placedY[frame] or oy)) > 0.5
 end
 
--- Where a window must stay, or nil: its own fcuiHoldX (the spellbook under live casting buttons), held by one that left
--- the row, or in a fight a protected window's actual place.
+-- Where it must stay, or nil: its fcuiHoldX (the book under live buttons), held by a row leaver, or a protected one in a fight.
 local function HeldAt(frame)
     local at = frame.fcuiHoldX and frame:fcuiHoldX()
     if at then return at end
@@ -376,8 +370,9 @@ local counted = {}
 local function AddGame(n, panel)
     if counted[panel] or not Seen(panel) then return n end
     counted[panel] = true
-    -- Placed by the player (our edit mode, or a window mover off the row's line): out of the row. One merely left to
-    -- other addons still stands where the game puts it, so ours keep clear of it.
+    -- The book's page is ours in the row (Spells/BookPages.lua).
+    if ns.BookPageWindow and ns.BookPageWindow(panel) then return n end
+    -- Placed by the player (edit mode, or a mover off the line): out of the row; one left to other addons stays a block.
     if (ns.FramePlaced and ns.FramePlaced(panel)) or ns.GameWindowOffRow(panel) or ns.MoverTakes(panel) then return n end
     local name = panel:GetName()
     local left, right = BlockSpan(name, panel)
@@ -408,7 +403,10 @@ local function GameRow()
     for i = #row.game, n + 1, -1 do row.game[i] = nil end
 end
 
-local function ByOpening(a, b) return (a.fcuiShownAt or 0) < (b.fcuiShownAt or 0) end
+local function Opening(f) return f.fcuiShownAt or pageOpened[f] or 0 end
+local function ByOpening(a, b) return Opening(a) < Opening(b) end
+-- The page's art against the book's slot (the book's own art starts 12 in), UIParent units.
+local PAGE_ART_X = 12
 
 local function Describe(i, frame)
     local w = row.ours[i] or {}
@@ -435,12 +433,18 @@ local function OurRow()
             order[n] = frame
         end
     end
+    local page = ns.BookPageWindow and ns.BookPageWindow()
+    if page and Seen(page) and not (ns.FramePlaced and ns.FramePlaced(page)) then
+        if not pageOpened[page] then openings.count = openings.count + 1; pageOpened[page] = openings.count end
+        n = n + 1
+        order[n] = page
+    end
     for i = #order, n + 1, -1 do order[i] = nil end
     table.sort(order, ByOpening)
     for i, frame in ipairs(order) do Describe(i, frame).held = HeldAt(frame) end
     for i = #row.ours, n + 1, -1 do row.ours[i] = nil end
     -- A game window opened after all of ours: it stays, and ours give way to it.
-    row.gameLast = n > 0 and openings.game > (order[n].fcuiShownAt or 0)
+    row.gameLast = n > 0 and openings.game > Opening(order[n])
 end
 
 -- A floating client window on its own spot (loot off the cursor) stands past the row, as Era's loot; ours stay.
@@ -482,6 +486,8 @@ local function NoteLeavers()
 end
 
 local function Solve(keep)
+    -- The sheet on its spot first: the game pushes it aside as its windows open and close (a 16 px flash of ours).
+    if SheetSettle then SheetSettle() gapMoved = false end
     GameRow()
     NoteLeavers()
     OurRow()
@@ -492,14 +498,16 @@ local function Solve(keep)
     return y
 end
 
--- Never tell the client's manager where to stand its windows: that write made its opening run as ours, and its health
--- text then compared a secret. Ours stand past the game's row, a held one stays; out of a fight the oldest closes for room.
+-- Never told to the client's manager (that write made its opening ours; a secret compare). Ours stand past the game's row.
 PlaceClassicWindows = function()
     -- In a fight too the oldest of ours gives way for room, as out of one (a locked one stays).
     local y = Solve(false)
+    ns.windowParts.pageX = nil
     for i, frame in ipairs(order) do
         local x = laid.x[i]
-        if x and row.ours[i].held then
+        if x and pageOpened[frame] then
+            ns.windowParts.pageX = x + PAGE_ART_X
+        elseif x and row.ours[i].held then
             frame.fcuiSlotX = x
         elseif x then
             PlaceAt(frame, x, y)
@@ -573,7 +581,6 @@ end
 -- For the dev addon's row probe: the last pass's state, answer and our windows in it.
 function ns.WindowRowState() return row, laid, order end
 
--- The manager counts the sheet as frame + 82 (mode tabs); we draw BESIDE_WIDTH, so the next stands at that edge.
 local sheetGap
 
 -- The game's space between its row's windows (its PANEl_SPACING_X), read once.
@@ -587,12 +594,12 @@ local function SheetGap()
 end
 
 -- For the fight lay of the game's windows our code opened (UI/WindowPanels.lua), and a pass on demand.
-ns.windowParts = { Seen = Seen, BlockSpan = BlockSpan, Locked = Locked, SheetGap = SheetGap, ERA_X = ERA_X, ERA_Y = ERA_Y }
+ns.windowParts = { Seen = Seen, BlockSpan = BlockSpan, Locked = Locked, SheetGap = SheetGap, ERA_X = ERA_X, ERA_Y = ERA_Y,
+    StandAt = function(...) return StandAt(...) end }
 function ns.LayWindowsNow() PlaceClassicWindows() end
 
 -- Moves a client window's left edge to x on its manager's anchor, on screen; nil if it cannot move.
--- A protected client window moved by our code is tainted (PVEFrame's list then compares secrets): out of combat it
--- moves inside a snippet instead, which runs securely; in combat it is not moved at all.
+-- A protected client window moved by our code is tainted: out of combat a snippet moves it; in combat not at all.
 local positioner
 local POSITION_BODY = [[
     local f = self:GetFrameRef("f")
@@ -610,14 +617,13 @@ local function SecureTopLeft(panel, x, y)
     return true
 end
 
--- Era's spot stands on our own anchor at UIParent's corner: an addon that shifts the game's UIParent-anchored windows
--- (a centering one) took our moved x for a fresh one and shifted it a second time (#154).
+-- Era's spot on our own anchor at UIParent's corner: a centering addon shifted a UIParent-anchored x twice (#154).
 local eraHost = ns.NewFrame("Frame", nil, UIParent)
 eraHost:SetSize(1, 1)
 eraHost:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0, 0)
 ns.windowParts.eraHost = eraHost
 
-local function StandAt(panel, x)
+StandAt = function(panel, x)
     if InCombatLockdown() and Locked(panel) then return end
     local left, right, k = Span(panel)
     if not left then return end
@@ -638,26 +644,23 @@ local function StandAt(panel, x)
     return x
 end
 
--- Each game window in the row its spacing and x offset past the drawn edge of the one before: the sheet's art and the
--- professions book are narrower than the widths the game lays them by. The sheet takes Era's step left (AtEraSpot).
+-- Each game window from the row's start, its spacing and x offset past the drawn edge before it; the sheet Era's step left.
 local GAP_SLOTS = { "left", "center", "right" }
 local function CloseGameGaps()
     local getPanel = _G.GetUIPanel
-    if not ForeverClassicUI_CharacterSheetActive or not getPanel then return end
-    local cursor
+    if not ForeverClassicUI_CharacterSheetActive or not getPanel or getPanel("doublewide") then return end
+    local cursor, start = nil, (ns.GameRow())
     for _, key in ipairs(GAP_SLOTS) do
         local panel = getPanel(key)
-        if panel and panel:IsShown() then
+        if panel and panel:IsShown() and not (ns.BookPageWindow and ns.BookPageWindow(panel)) then
             -- A native center window is centred, not in the row.
             if panel:GetAttribute("UIPanelLayout-area") == "center" or ns.MoverHolds(panel) then return end
             -- A faded one (the spellbook's stand-in) takes no room and stays put.
             if Seen(panel) then
-                if cursor then
-                    local shift = panel == CharacterFrame and ERA_X or 0
-                    local x = cursor + (Plain(panel:GetAttribute("UIPanelLayout-xoffset")) or 0) + SheetGap() + shift
-                    -- One left where the manager put it keeps the rest in step.
-                    if not StandAt(panel, x) then return end
-                end
+                local shift = panel == CharacterFrame and ERA_X or 0
+                local x, was = (cursor and cursor + SheetGap() or start) + (Plain(panel:GetAttribute("UIPanelLayout-xoffset")) or 0) + shift, (Span(panel))
+                if not StandAt(panel, x) then return end
+                gapMoved = gapMoved or (was ~= nil and math.abs(was - x) >= 0.5)
                 local _, right = BlockSpan(panel:GetName() or "", panel)
                 if not right then return end
                 cursor = right
@@ -675,8 +678,7 @@ local function Rows(frame)
     return top * k, bottom * k
 end
 
--- Whether frame at a place (top left and drawn size, UIParent units) would cover another open window; except shares
--- its place (the spellbook for the classic professions book), so is never in the way.
+-- Whether frame at a place (top left, drawn size; UIParent units) would cover another open window; except never does.
 function ns.WindowCovers(frame, left, top, width, height, except)
     local right, bottom = left + width, top - height
     local function Covers(l, r, t, b) return l and t and l < right and r > left and t > bottom and b < top end
@@ -699,8 +701,7 @@ function ns.WindowCovers(frame, left, top, width, height, except)
     return false
 end
 
--- In a fight, a window of ours held over its casting layer where the client stands the sheet: the sheet stands past
--- it, as ours cannot move then. A sheet on its edit mode place (not the client's anchor) stays.
+-- In a fight the sheet stands past a window of ours held over its casting layer (ours cannot move then); a placed sheet stays.
 local function SheetPastHeld()
     if not InCombatLockdown() then return end
     local ok, sheetLeft, sheetRight = pcall(ClientSpan, "CharacterFrame", CharacterFrame)
@@ -719,9 +720,8 @@ local function SheetPastHeld()
     end
 end
 
--- The sheet at Era's spot (ERA_X, ERA_Y from the game's). Only the client's own anchor moves: a y we set stays (gap and
--- held passes keep y), and an edit mode place (anchored off the foot) is never touched; one that gave way to another
--- window is on the client's anchor, so it takes Era's height with the rest.
+-- The sheet at Era's spot (ERA_X, ERA_Y from the game's). Only the client's own anchor moves: a y we set stays, and an
+-- edit mode place (off the foot) is never touched; one that gave way is on the client's anchor, so it takes Era's height.
 
 -- The y this pass last set per window.
 local eraY = setmetatable({}, { __mode = "k" })
@@ -739,15 +739,18 @@ local function AtEraSpot(frame)
     pcall(frame.SetPoint, frame, "TOPLEFT", eraHost, "TOPLEFT", x + ERA_X, eraY[frame])
 end
 
-local function SheetPass()
-    if (ns.WindowMoving and ns.WindowMoving(CharacterFrame)) or ns.MoverHolds(CharacterFrame) then return end
-    if InCombatLockdown() and ns.FightLaid(CharacterFrame) then return end
+SheetSettle = function()
+    if not (CharacterFrame and CharacterFrame:IsShown()) or ns.MoverHolds(CharacterFrame) then return end
+    if (ns.WindowMoving and ns.WindowMoving(CharacterFrame)) or (InCombatLockdown() and ns.FightLaid(CharacterFrame)) then return end
     AtEraSpot(CharacterFrame)
     SheetPastHeld()
     CloseGameGaps()
 end
+local function SheetPass()
+    SheetSettle()
+    if gapMoved then gapMoved = false PlaceClassicWindows() end
+end
 
--- Parented to the character window so it runs only while that is up.
 if CharacterFrame then
     ns.Sched.OnFrame(ns.NewFrame("Frame", nil, CharacterFrame), { name = "windows.sheetGap", every = 0, fn = SheetPass })
 end
@@ -756,8 +759,7 @@ end
 function ns.RegisterClassicWindow(frame, pushable)
     if not frame or classicWindows[frame] then return end
     classicWindows[frame] = true
-    -- Built on the row's first slot (ns.ClassicSlot): that anchor is ours until something else moves it. Read before a
-    -- saved place takes it.
+    -- Built on the row's first slot (ns.ClassicSlot): that anchor is ours till something moves it; read before a saved place.
     if frame:GetNumPoints() == 1 then
         local point, rel, relPoint, x, y = frame:GetPoint(1)
         if point == "TOPLEFT" and relPoint == "TOPLEFT" and rel == UIParent then placedX[frame], placedY[frame] = x, y end
@@ -773,8 +775,7 @@ function ns.RegisterClassicWindow(frame, pushable)
         openings.count = openings.count + 1
         self.fcuiShownAt = openings.count
         Release()
-        -- A window held in a fight (the spellbook over its live casting layer) comes straight back when hidden, and
-        -- then hid this one: the two flashed in turn. A held one neither closes nor is closed; the rest lay out round it.
+        -- A held one (the spellbook over its live layer) came straight back when hidden and hid this one: the two flashed in turn.
         local selfHeld = self.fcuiHoldX and self:fcuiHoldX()
         for other in pairs(classicWindows) do
             local otherHeld = other.fcuiHoldX and other:fcuiHoldX()

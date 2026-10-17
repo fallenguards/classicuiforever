@@ -41,9 +41,15 @@ end
 -- A turn to another page: it opens, then this window shuts.
 local function TurnTo(open)
     ns.BookPageTurn()
-    if not open() then return end
+    -- Out of the row before the page opens (a row pass in the open stood the page past this window, a flash).
+    B.frame:SetAlpha(0)
+    if not open() then
+        B.frame:SetAlpha(1)
+        return
+    end
     PlaySound(SOUNDKIT.IG_ABILITY_PAGE_TURN)
     B.frame:Hide()
+    B.frame:SetAlpha(1)
 end
 
 local function OpenBook() return ns.ShowSpellBookBank(false) end

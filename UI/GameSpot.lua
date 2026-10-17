@@ -140,6 +140,8 @@ local function Learn(left)
     local name = panel.GetName and panel:GetName()
     if ns.WINDOW_FLOATS and ns.WINDOW_FLOATS[name or ""] then return end
     if (ns.WindowMoving and ns.WindowMoving(panel)) or ns.GameWindowOffLine(panel) then return end
+    -- The book's page stands on the book's spot by our own hand (UI/Windows.lua): no shift of the game's to read there.
+    if ns.BookPageWindow and ns.BookPageWindow(panel) then return end
     local x, k = Plain(panel:GetLeft()), ns.WindowRatio(panel)
     if not (x and k) then return end
     local era = ns.GameWindowAtEra(panel) and ERA_LEFT or 0

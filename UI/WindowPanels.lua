@@ -162,5 +162,15 @@ function ns.PlaceFightRaw()
     end
 end
 
+-- The book's page (the professions window) on the book's spot each frame it is up: the game's manager lays it in its
+-- left slot on every panel event, and a frame of that showed, over the sheet. Its first open lays the row at once.
+function ns.KeepBookPageSpot()
+    local P, page = ns.windowParts, ns.BookPageWindow and ns.BookPageWindow()
+    if not (page and P.Seen(page)) then return end
+    -- Its first open: the row (which settles the sheet first), then the page, this frame.
+    if not P.pageX then ns.LayWindowsNow() end
+    if P.pageX then P.StandAt(page, P.pageX) end
+end
+
 -- For the dev addon's fight probe: the last fight lay's input, answer and windows.
 function ns.WindowFightState() return fight, laidX, laidFrames end

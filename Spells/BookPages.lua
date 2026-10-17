@@ -138,10 +138,21 @@ local function ProfessionsShown()
     ns.BookPagesChanged()
 end
 
+-- The game's professions window as a page of the book (our book on, its book page up): in the row it is ours, on the
+-- book's spot past the game's windows, not the left slot the game's manager gives it (the sheet flipped sides).
+function ns.BookPageWindow(frame)
+    local prof = _G.ProfessionsFrame
+    if not prof or (frame and frame ~= prof) then return nil end
+    if ns.ModuleInForce("professionsBook") and ProfessionsBookPage() then return prof end
+end
+
 local function WatchProfessions()
     local frame = _G.ProfessionsFrame
     if P.profWatched or not (P.header and frame and frame.BookPage) or InCombatLockdown() then return end
     P.profWatched = true
+    -- Its profession tabs stand past its art, as the book's side tabs; on the book's spot each frame it is up.
+    if ns.SetSlotWidth then ns.SetSlotWidth(frame, ns.SIDE_TAB_SLOT) end
+    ns.Sched.Attach(frame, { name = "bookPages.spot", every = 0, fn = ns.KeepBookPageSpot })
     P.header:SetFrameRef("prof", frame)
     P.header:SetFrameRef("profPage", frame.BookPage)
     ns.Sched.OnVisible(frame, "bookPages.prof", ProfessionsShown)
