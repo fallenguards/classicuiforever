@@ -33,6 +33,8 @@ local function Key(button)
     if ns.db.oneBagSplitBag == true then return bag end
     if ns.db.oneBagSplitType ~= true then return "items" end
     if bag == REAGENT then return "reagent" end
+    -- The key ring reads as a plain bag's type.
+    if bag == KEYRING then return "keyring" end
     local _, family = GetFreeSlots(bag)
     return "family" .. tostring(family or 0)
 end
