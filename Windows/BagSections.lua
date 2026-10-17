@@ -1,11 +1,20 @@
 local _, ns = ...
 local B = ns.bags
 
--- The one bag in sections (#185): by bag type or by bag (option), then the key ring's slots and the equipped bags'
--- row (options), each from a new row with a rule over it. The slot list comes foot to top (Windows/Bags.lua).
+-- The one bag in sections (#185): by bag type or by bag (option), then the equipped bags' row (option), each from a
+-- new row with a rule over it. The slot list comes foot to top (Windows/Bags.lua), the key ring's slots in it.
 
-local KEYRING = Enum.BagIndex.Keyring
 local REAGENT = Enum.BagIndex.ReagentBag
+local KEYRING = Enum.BagIndex.Keyring
+-- Slot tints in the combined bag over the socket: the reagent slots a soft green (option), the key ring's the brass
+-- of its own bag's sheet (bagComponentsKeyring), always.
+local REAGENT_TINT = { 0.25, 0.8, 0.35, 0.3 }
+local KEYRING_TINT = { 0.85, 0.62, 0.22, 0.3 }
+function B.SlotTint(button, tint)
+    local bag = button:GetBagID()
+    if bag == KEYRING then return KEYRING_TINT end
+    return tint and bag == REAGENT and REAGENT_TINT or nil
+end
 local GetFreeSlots = C_Container.GetContainerNumFreeSlots
 local SLOT = 37
 local RULE_H, RULE_OVER = 2, 2   -- the rule in the gap over a section's first row, reaching past the grid each side
@@ -15,8 +24,7 @@ local rules = setmetatable({}, { __mode = "k" })   -- bag frame -> its rule text
 
 function B.Sectioned()
     local db = ns.db
-    return db ~= nil and (db.oneBagSplitType == true or db.oneBagSplitBag == true or db.oneBagKeyring == true
-        or db.oneBagBagSlots == true)
+    return db ~= nil and (db.oneBagSplitType == true or db.oneBagSplitBag == true or db.oneBagBagSlots == true)
 end
 
 -- A slot's section: its bag, its bag's type (family; the reagent bag its own), or one for all.
@@ -44,8 +52,6 @@ local function Group(list, count, columns)
     for _, key in ipairs(order) do wipe(groups[key]) end
     wipe(order)
     for i = count, 1, -1 do Add(Key(list[i]), list[i]) end
-    local keys, n = ns.OwnKeyringSlots()
-    for i = 1, n do Add(KEYRING, keys[i]) end
     for _, button in ipairs(B.BagSlotButtons()) do Add("bagSlots", button) end
     local rows = 0
     for _, key in ipairs(order) do rows = rows + math.ceil(#groups[key] / columns) end
@@ -95,7 +101,7 @@ function B.LaySections(frame, list, count, columns, backpackExtra, tint)
             B.SlotArt(button)
             local index = Index(top + math.floor((j - 1) / columns), (j - 1) % columns, rows, columns)
             B.Place(button, index, 0, 0, frame, columns, rows, 0, false, backpackExtra)
-            B.Tint(button, tint and button:GetBagID() == REAGENT)
+            B.Tint(button, B.SlotTint(button, tint))
         end
         local used = math.ceil(n / columns)
         local missing = used * columns - n
@@ -121,10 +127,9 @@ function B.LaySections(frame, list, count, columns, backpackExtra, tint)
     return blanks
 end
 
--- Sections off: rules, key ring slots and the bag row go.
+-- Sections off: rules and the bag row go.
 function B.ClearSections(frame)
     local made = rules[frame]
     if made then for _, rule in ipairs(made) do rule:Hide() end end
-    ns.OwnKeyringSlots()
     B.BagSlotButtons()
 end

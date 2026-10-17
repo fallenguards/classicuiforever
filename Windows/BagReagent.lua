@@ -87,6 +87,13 @@ local function OwnBag(bag, prefix, wanted, watch)
         FillSoon()
     end
 
+    -- The key ring's bag button lit while its slots show in the one bag, as the game lights a bag's for its open bag
+    -- (its own update knows the combined bag holds no key ring).
+    local function LitKey(lit)
+        local button = bag == KEYRING and KeyRingButton
+        if button and button.SlotHighlightTexture then button.SlotHighlightTexture:SetShown(lit) end
+    end
+
     -- Events only while the slots show.
     local function Listen(on)
         if on then
@@ -95,6 +102,7 @@ local function OwnBag(bag, prefix, wanted, watch)
         else
             R.events:UnregisterAllEvents()
         end
+        LitKey(on and R.shown > 0)
     end
 
     -- The bag number the template reads off its parent (never a field on the button: the click would read it as ours).
@@ -144,6 +152,7 @@ local function OwnBag(bag, prefix, wanted, watch)
             R.shown = n
             FillSoon()
         end
+        LitKey(n > 0 and R.holder ~= nil and R.holder:IsVisible())
         return R.list, n
     end
 

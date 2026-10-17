@@ -44,8 +44,6 @@ local active = false
 local KEYRING = Enum.BagIndex.Keyring
 local BACKPACK = Enum.BagIndex.Backpack
 local REAGENT = Enum.BagIndex.ReagentBag
--- The reagent slots' tint in the combined bag (option): a soft green over the slot's socket.
-local REAGENT_TINT = { 0.25, 0.8, 0.35, 0.3 }
 local hooked = setmetatable({}, { __mode = "k" })
 local tints = setmetatable({}, { __mode = "k" })    -- reagent button -> our tint over its socket
 local tinted = setmetatable({}, { __mode = "k" })   -- those tints, which the fade skips
@@ -355,18 +353,18 @@ end
 local spare = {}   -- the slot list, reused; a nested pass takes a new one
 
 -- On the slot's parent (our holder in the combined bag), under the slot and over the combined bag's sheet.
-local function Tint(button, on)
+local function Tint(button, color)
     local tex = tints[button]
-    if not on then
+    if not color then
         if tex then tex:Hide() end
         return
     end
     if not tex then
         tex = button:GetParent():CreateTexture(nil, "BACKGROUND")
-        tex:SetColorTexture(REAGENT_TINT[1], REAGENT_TINT[2], REAGENT_TINT[3], REAGENT_TINT[4])
         tex:SetAllPoints(button)
         tints[button], tinted[tex] = tex, true
     end
+    tex:SetColorTexture(color[1], color[2], color[3], color[4])
     tex:Show()
 end
 
@@ -379,7 +377,7 @@ local function LaySlots(frame, list, count, columns, combined, backpackExtra, ti
         list[i] = nil
         SlotArt(button)
         Place(button, i - 1, 0, 0, frame, columns, rows, count, combined, backpackExtra)
-        Tint(button, tint and button:GetBagID() == REAGENT)
+        Tint(button, B.SlotTint(button, tint))
     end
     local missing = rows * columns - count
     if noBlank or missing <= 0 then return 0 end
@@ -403,12 +401,14 @@ local function AddReagentSlots(list, count, own, n)
     return count
 end
 
--- The slots to lay, foot to top: the game's (locked ones out), ours for the reagent bag before or after (option).
+-- The slots to lay, foot to top: the game's (locked ones out), ours for the reagent bag before or after (option), the
+-- key ring's after everything (option), all in one grid.
 local function SlotList(frame, combined)
     local list = spare or {}
     spare = nil
     local count = 0
     local usable = LockedSlots()
+    if combined then count = AddReagentSlots(list, count, ns.OwnKeyringSlots()) end
     -- The reagent bag's slots before the backpack's, or after the last bag's (option), as another bag's.
     local own, n = EMPTY, 0
     if combined then own, n = ns.OwnReagentSlots() end
@@ -505,7 +505,7 @@ local function Park(frame)
     Header(frame, false)
     for _, button in frame:EnumerateValidItems() do
         Lock(button, true)
-        Tint(button, false)
+        Tint(button, nil)
     end
     frame:SetSize(1, 1)
     ns.SetPointOnce(frame, "TOPLEFT", ContainerFrameCombinedBags, "TOPLEFT", 0, 0)
@@ -544,7 +544,7 @@ local function Skin(frame, part)
     local tokenRow = main and TokenRow(frame)
     if part ~= "trim" then
         local columns = ColumnsOf(frame)
-        local own = combined and select(2, ns.OwnReagentSlots()) or 0
+        local own = combined and (select(2, ns.OwnReagentSlots()) + select(2, ns.OwnKeyringSlots())) or 0
         local rows = math.ceil((size + own) / columns)
         if combined and B.Sectioned() then
             local list, count = SlotList(frame, true)
