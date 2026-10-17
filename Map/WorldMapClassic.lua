@@ -133,6 +133,20 @@ local function Fill(k)
 end
 function ns.FullMapScale() return fullScale end
 
+-- Windowed, the header style (Era's full screen sheets, 768 tall) at the game's own map height: beside the other
+-- styles, not the screen's whole height. A size the player gives the map stands in for it.
+local windowedScale
+local function Windowed(k)
+    if k == windowedScale then return end
+    windowedScale = k
+    ns.PlaceSavedWindows()
+end
+function ns.MapWindowedScale() return windowedScale end
+local function WindowedScale()
+    local _, h = ns.MapLarge.Size(nil)
+    return (Map().minimizedHeight or FOREVER_H) / h
+end
+
 local function FullScale(t)
     local screenW, screenH = UIParent:GetSize()
     return math.min(screenH / t.h, (screenW - FULL_SIDE_MARGIN) / t.w)
@@ -657,19 +671,25 @@ local function Pass()
             DressEra(style)
             Unfade()
             Fill(map:IsMaximized() and FullScale(t) or nil)
+            Windowed(style == "classic" and not map:IsMaximized() and WindowedScale() or nil)
         elseif InCombatLockdown() and PictureLaid(t) then
             DressEra(style)
             FadeOutside(map, style)
         else
             Unfade()
             DressForever()
-            Fill(nil)
+            -- In a fight its size stays as it is (a pass that could not lay it is not the game's own look).
+            if not InCombatLockdown() then
+                Fill(nil)
+                Windowed(nil)
+            end
         end
     elseif touched then
         Unfade()
         DressForever()
         Lay(Target(nil))
         Fill(nil)
+        Windowed(nil)
     end
     Refit()
 end
@@ -681,6 +701,8 @@ function ns.ClassicMapArt() return art end
 ns.MapFight = {
     Map = Map, Layout = Layout, EraStyle = EraStyle, Target = Target, PANE_KEYS = PANE_KEYS,
     FullScale = function(w, h) return FullScale({ w = w, h = h }) end,
+    -- The style's own windowed size (the header style's), nil for the rest.
+    WindowedBase = function(style) return style == "classic" and WindowedScale() or nil end,
     Size = function(style, withPane)
         if style == "classic" then return ns.MapLarge.Size(withPane and QUEST_PANE_W or nil) end
         return withPane and PaneWindowW() or ERA_W, ERA_H

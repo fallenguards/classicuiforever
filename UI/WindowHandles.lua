@@ -176,6 +176,8 @@ local function Apply(entry)
     -- A size the window's own look asks on top of the player's (the full size professions book).
     local zoom = entry.zoom and entry.zoom() or 1
     if zoom ~= 1 then scale = (scale or 1) * zoom end
+    -- Windowed, the map's header style at its own size till the player gives it one.
+    if entry.quests and not scale and ns.MapWindowedScale then scale = ns.MapWindowedScale() end
     if Full(entry, frame) then left, scale = nil, FullScale() end
     if not (left or scale or scaled[frame]) then return end
     -- calm: its casting layer moves out of combat only.
@@ -183,8 +185,11 @@ local function Apply(entry)
         ns.WhenCalm("windowPlaces", PlaceAll)
         return
     end
+    -- In a fight the map keeps the size it wears: its look re-laid there gave it the game's own for a pass (huge).
+    if entry.quests and InCombatLockdown() then
+        ns.WhenCalm("windowPlaces", PlaceAll)
     -- No size of ours (or the map maximized): its own.
-    if scale then
+    elseif scale then
         ScaleKept(frame, scale)
         scaled[frame] = true
     elseif scaled[frame] then
@@ -246,7 +251,8 @@ PlaceAll = function()
         if ns.MakeWindowLock then ns.MakeWindowLock(entry) end
         if ns.MakeWindowGrip then ns.MakeWindowGrip(entry) end
         if PlaceOf(entry) or Scales()[SizeKey(entry)] or IsFree(entry) or (frame and scaled[frame])
-            or (entry.quests and FullScale()) or (entry.zoom and entry.zoom() ~= 1) then
+            or (entry.quests and (FullScale() or (ns.MapWindowedScale and ns.MapWindowedScale())))
+            or (entry.zoom and entry.zoom() ~= 1) then
             Watch(entry)
             Apply(entry)
         end
@@ -285,11 +291,12 @@ local mapOnly = false
 
 -- The map's scale of ours and, when the player placed it, its top left (UIParent units) for a box w x h, as Apply lays
 -- it: read ahead of a fight, when the fight layer lays the map (Map/WorldMapFight.lua).
-function ns.MapPlaceFor(w, h)
+function ns.MapPlaceFor(w, h, base)
     local entry = byKey.map
-    local scale = entry and Scales()[SizeKey(entry)] or 1
+    local worn = entry and Worn(entry)
+    local scale = (worn and Scales()[SizeKey(entry)]) or base or 1
     local left, top
-    if entry then left, top = PlaceOf(entry) end
+    if worn then left, top = PlaceOf(entry) end
     if not left then return scale end
     local screenW, screenH = UIParent:GetSize()
     return scale, math.max(0, math.min(left, screenW - w * scale)), math.min(screenH, math.max(top, h * scale))

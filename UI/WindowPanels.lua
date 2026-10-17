@@ -84,6 +84,8 @@ function ns.FightLaid(frame) return laidSet[frame] == true end
 -- A game side window the lay moves: seen, not locked, not placed by the player or a mover, standing in the row.
 local function Member(frame)
     local P = ns.windowParts
+    -- The map stands where the game puts it, in a fight as out of one: never laid with the row.
+    if frame == _G.WorldMapFrame then return false end
     if not P.Seen(frame) or P.Locked(frame) or ns.MoverTakes(frame) then return false end
     if (ns.FramePlaced and ns.FramePlaced(frame)) or ns.GameWindowOffRow(frame) then return false end
     return P.BlockSpan(frame:GetName(), frame) ~= nil

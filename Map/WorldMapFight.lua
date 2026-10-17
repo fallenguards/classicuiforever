@@ -52,7 +52,7 @@ local function FightValues()
     local screenH = UIParent:GetHeight()
     for v = 0, 1 do
         local w, h = MF.Size(style, v == 1)
-        local k, left, top = ns.MapPlaceFor(w, h)
+        local k, left, top = ns.MapPlaceFor(w, h, MF.WindowedBase(style))
         if not left then
             local down
             left, down = ns.GameHome(map, h * k)
