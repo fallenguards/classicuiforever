@@ -18,7 +18,7 @@ local function PetTitle()
     return ns.SpellBookPetTitle and ns.SpellBookPetTitle() or nil
 end
 
--- Out of combat: tabs placed by points (the window holds nothing protected, so a fight changes nothing here).
+-- Plain buttons on our own window: laid in a fight too (the pet's tab hung empty past the rest till one ended).
 local function LayTabs()
     local pet = PetTitle()
     local narrow = pet ~= nil or (ns.BookCollectionsTab and ns.BookCollectionsTab()) or false
@@ -65,7 +65,8 @@ local function BuildTabs(frame)
         local tab = ns.NewBookTab(frame, i, tabs[i - 1])
         local open = OPENERS[i]
         tab:SetScript("OnClick", function() if open then TurnTo(open) end end)
-        tab:Show()
+        -- The pet's only with a pet (LayTabs).
+        if i < 4 then tab:Show() end
         tabs[i] = tab
     end
     tabs[1]:SetText(SPELLBOOK or "Spellbook")
@@ -124,5 +125,5 @@ end
 function CW.FootShown()
     WatchOthers()
     OthersShut()
-    if B.tabs and not InCombatLockdown() then LayTabs() end
+    if B.tabs then LayTabs() end
 end
