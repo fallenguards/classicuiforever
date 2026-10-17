@@ -8,6 +8,7 @@ local _, ns = ...
 local PANEL_W_PAD, ROW_H, FOOT = 26, 36, 22
 -- A row: its label, then the control to the value's column, which ends PANEL_W_PAD in (the panel takes the dialog's width).
 local LABEL_W, LABEL_GAP, VALUE_W, CONTROL_MIN = 130, 6, 52, 80
+local NOTE_H = 30   -- a note's room: two lines of the small font
 local specs = {}     -- { match(system), title, build(panel), fill(panel) }
 local panels = {}    -- spec -> its panel
 local watching = false
@@ -43,6 +44,7 @@ local function FitRows(panel)
     local room = math.max(CONTROL_MIN, width - 2 * PANEL_W_PAD - LABEL_W - LABEL_GAP - VALUE_W)
     for _, slider in ipairs(panel.sliders or ns.EMPTY) do slider:SetWidth(room) end
     for _, dropdown in ipairs(panel.dropdowns or ns.EMPTY) do dropdown:SetWidth(room + VALUE_W) end
+    for _, note in ipairs(panel.notes or ns.EMPTY) do note:SetWidth(width - 2 * PANEL_W_PAD) end
 end
 
 local function Follow()
@@ -118,6 +120,18 @@ function ns.DialogExtraDrop(panel, label, options, get, set)
 end
 
 -- A check row as the client's dialog draws one: get() -> on; set(on). Returns its fill function.
+-- A gray note under the rows so far, up to two lines.
+function ns.DialogExtraNote(panel, text)
+    local note = panel:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
+    note:SetPoint("TOPLEFT", panel.title, "BOTTOMLEFT", 0, -14 - panel.rows * ROW_H)
+    note:SetJustifyH("LEFT")
+    note:SetText(text)
+    panel.notes = panel.notes or {}
+    panel.notes[#panel.notes + 1] = note
+    panel.extraH = (panel.extraH or 0) + NOTE_H
+    return note
+end
+
 function ns.DialogExtraCheck(panel, label, get, set)
     local check = ns.NewFrame("CheckButton", nil, panel, "UICheckButtonTemplate")
     check:SetSize(32, 32)

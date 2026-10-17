@@ -70,7 +70,10 @@ ns.DialogExtra({
         return system == FocusFrame and FocusFrame.smallSize and UF.active and UF.frames[FocusFrame] ~= nil
     end,
     build = function(panel)
-        panel.onTop = ns.DialogExtraCheck(panel, LABEL, function() return ns.db.focusBuffsOnTop end, SetFocusOnTop)
+        -- The game's small focus frame shows debuffs only (its SetSmallSize): the row is theirs.
+        panel.onTop = ns.DialogExtraCheck(panel, L["UNIT_DEBUFFS_ON_TOP"], function() return ns.db.focusBuffsOnTop end,
+            SetFocusOnTop)
+        ns.DialogExtraNote(panel, L["UNIT_SMALL_FOCUS_NOTE"]:format(_G.HUD_EDIT_MODE_SETTING_UNIT_FRAME_USE_LARGER_FRAME or ""))
     end,
     fill = function(panel) panel.onTop() end,
 })
