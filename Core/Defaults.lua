@@ -122,6 +122,7 @@ ns.DB_DEFAULTS = {
     keyRingSnap = false,
     keyRingWithBags = false,
     keyRingArtHidden = false,
+    keyRingArtWithBags = false,
     tradeSkillFull = false,
     reagentBagSlot = false,
     reagentBagRound = false,

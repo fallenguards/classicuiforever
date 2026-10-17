@@ -175,6 +175,7 @@ return {
     hoverOptionsButton = false,
     journalMinimapButton = true,
     keyRingArtHidden = false,
+    keyRingArtWithBags = false,
     keyRingFlat = false,
     keyRingSnap = false,
     keyRingWithBags = false,

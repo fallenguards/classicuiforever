@@ -30,8 +30,11 @@ local function Moved(el) return ns.ValidPlace(ns.db[el.posKey]) end
 local SNAP_REACH = 24
 local function Flat(el) return el == KEYRING and ns.db.keyRingFlat == true end
 local function Snapped(el) return el == KEYRING and B.KeyRingWithBags() and B.BagsFarEnd() ~= nil end
--- The key ring off the band without its cut of art: its own Hide Bar Art, riding the bags or not.
-local function Bare(el) return el == KEYRING and ns.db.keyRingArtHidden == true end
+-- The key ring off the band without its cut of art: its own Hide Bar Art, or the bags' with Hide key ring art too
+-- (#195), riding the bags or not.
+local function Bare(el)
+    return el == KEYRING and (ns.db.keyRingArtHidden == true or (ns.db.hideBagsArt == true and ns.db.keyRingArtWithBags == true))
+end
 
 -- Hidden, or with no place of ours this layout, the client's key ring is hidden (it lays it beside its bags at its own size:
 -- the empty box left of the row). Hidden, not faded: an alpha animation on it undoes any fade. Given back as the band goes.

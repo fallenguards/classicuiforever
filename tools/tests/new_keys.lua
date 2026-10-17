@@ -141,6 +141,7 @@ return {
     keyRingSnap = "same for everyone: off by default; set by dropping the flat key ring at a bag column's end",
     keyRingWithBags = "same for everyone: off by default; the key ring stays on the band as before",
     keyRingArtHidden = "same for everyone: off by default; the key ring's edit mode dialog hides its art off the band",
+    keyRingArtWithBags = "same for everyone: opt-in, off by default; Hide bags bar art takes the key ring's art too",
     bagsTight = "same for everyone: off by default; One bar turned on sets it, with the bag and micro art hidden",
     oneBarAlone = "kept as before: a dbVersion 19 migration (ns.KeepOneBarLook) keeps it off where One bar was on; else on, seen only with One bar",
     trackingSameSize = "on for everyone, a restyle: the tracking icon at Era's size (a 64 ring); checked gives the others' size back",

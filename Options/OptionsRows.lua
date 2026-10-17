@@ -504,6 +504,7 @@ function O.BuildRows(child, colW)
         if entry.drop and not dropped[dropGroup] then
             dropped[dropGroup] = true
             local row = entry.checks and DropCheckRow(child, dropGroup) or DropRow(child, dropGroup)
+            row.needs = entry.needs
             Add(row, entry.parent)
             row.text:SetWidth(colW - 14 - DROP_W - row.depth * INDENT)
         elseif not entry.drop then
