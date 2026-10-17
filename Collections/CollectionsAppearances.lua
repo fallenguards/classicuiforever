@@ -62,7 +62,32 @@ local function ByOrder(a, b)
     return (a.order or 0) < (b.order or 0)
 end
 
+-- The game starts the wardrobe's filters over each session: the player's picks are saved (db.collectionsShow.appearances)
+-- and put back the first time the page lists.
+local function Remember()
+    local saved = { collected = TC.GetCollectedShown(), missing = TC.GetUncollectedShown(), class = TC.GetClassFilter(),
+        sources = {} }
+    for i = 1, TC.GetNumTransmogSources() do
+        if TC.IsValidTransmogSource(i) then saved.sources[i] = TC.IsSourceTypeFilterChecked(i) end
+    end
+    ns.DbTable("collectionsShow").appearances = saved
+end
+
+local function Restore()
+    if A.restored then return end
+    A.restored = true
+    local saved = ns.DbTable("collectionsShow").appearances
+    if type(saved) ~= "table" then return end
+    if saved.collected ~= nil then TC.SetCollectedShown(saved.collected) end
+    if saved.missing ~= nil then TC.SetUncollectedShown(saved.missing) end
+    if saved.class then TC.SetClassFilter(saved.class) end
+    for i, on in pairs(saved.sources or ns.EMPTY) do
+        if TC.IsValidTransmogSource(i) then TC.SetSourceTypeFilter(i, on) end
+    end
+end
+
 local function List()
+    Restore()
     local location = Location(A.slot)
     local out = {}
     if not location then return out end
@@ -158,7 +183,11 @@ local function ClassEntries(after)
     return out
 end
 
-local function FilterEntries(after)
+local function FilterEntries(refiltered)
+    local function after()
+        Remember()
+        refiltered()
+    end
     local collected, toggleCollected = Check(TC.GetCollectedShown, TC.SetCollectedShown, after)
     local missing, toggleMissing = Check(TC.GetUncollectedShown, TC.SetUncollectedShown, after)
     return {

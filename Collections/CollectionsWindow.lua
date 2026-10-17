@@ -25,7 +25,7 @@ local CREATURE_ROOM, CREATURE_FACING = 1.3, math.pi / 5
 local ADD_HL = { add = true }
 
 -- Window state in one table (upvalue room): frame, box, search, filter pick, page, the current page and its lists.
-local W = { tabs = {}, cells = {}, page = 1, picked = {}, entries = {}, shown = {}, show = { collected = true, missing = true } }
+local W = { tabs = {}, cells = {}, page = 1, picked = {}, entries = {}, shown = {} }
 local active = false
 
 CW.Text = ns.GameText
@@ -56,10 +56,15 @@ function CW.ByCollectedName(a, b)
     return a.name < b.name
 end
 
+-- The window's two checks per page, kept across sessions (db.collectionsShow[page]); both on until changed.
+local SHOW_DEFAULT = { collected = true, missing = true }
+local function ShowState() return ns.DbTable("collectionsShow")[W.current.key] or SHOW_DEFAULT end
+
 -- The page's own filter state (the game's, for Appearances), else the window's two checks.
 local function Wanted(entry)
     if W.current.ownedOnly then return true end
-    local collected, missing = W.show.collected, W.show.missing
+    local show = ShowState()
+    local collected, missing = show.collected, show.missing
     if W.current.Shown then collected, missing = W.current.Shown() end
     if entry.collected then return collected end
     return missing
@@ -304,15 +309,22 @@ local function Refiltered()
     RefreshSoon()
 end
 
+local function Flip(field)
+    local all = ns.DbTable("collectionsShow")
+    local state = all[W.current.key] or { collected = true, missing = true }
+    state[field] = not state[field]
+    all[W.current.key] = state
+    Refiltered()
+end
+
 -- The Filter menu's rows: the page's own (Appearances: the wardrobe's), else Collected and Not Collected on this list.
 local function FilterEntries()
     if W.current.FilterEntries then return W.current.FilterEntries(Refiltered) end
-    local show = W.show
     return {
-        { CW.Text("COLLECTED", "COLL_COLLECTED"), check = function() return show.collected end,
-            toggle = function() show.collected = not show.collected Refiltered() end },
-        { CW.Text("NOT_COLLECTED", "COLL_NOT_COLLECTED"), check = function() return show.missing end,
-            toggle = function() show.missing = not show.missing Refiltered() end },
+        { CW.Text("COLLECTED", "COLL_COLLECTED"), check = function() return ShowState().collected end,
+            toggle = function() Flip("collected") end },
+        { CW.Text("NOT_COLLECTED", "COLL_NOT_COLLECTED"), check = function() return ShowState().missing end,
+            toggle = function() Flip("missing") end },
     }
 end
 
