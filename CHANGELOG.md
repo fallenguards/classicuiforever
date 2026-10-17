@@ -2,6 +2,43 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.31.0] - 2026-10-17
+
+### Added
+- Collections on Forever: a classic window for mounts, pets, toys, heirlooms and appearances on side tabs, with the game's own model scenes, a search and one Filter menu. It opens from the Collections button and key, and as a page of the spellbook from a Collections tab at the spellbook's foot while the Collections button is hidden; Collections tab, under Spellbook in the options (/fcui), turns that tab off. On by default; Collections window under Other turns the window off.
+- One bar: Main bar alone, on by default under One bar, takes bar 1's page arrows and the latency bar off the band and puts the key ring with the bags. Turning One bar on also hides the bag, micro menu and key ring art and stands the bag buttons close together, with the micro menu flush in the screen's corner and the bags on it. Key ring with the bags and Bags close together, under Classic bar, do each on their own.
+- Totem bar in edit mode: orientation, rows, icon size and padding, as the stance bar has, with the box holding every cell (#179).
+- Buffs On Top for the focus and pet frames, from their edit mode dialogs; the small focus frame shows its debuffs above too, with a note that its buffs stay where the game puts them (#179).
+- One bag: sections by bag type or by bag, the key ring's slots in it (after the last bag's, in the key ring's brass, and the key ring button then opens the one bag) and the equipped bag slots, each under One bag in the options, off by default (#185).
+- Rested XP in tooltip, under Classic bar, off by default: the XP bar's tooltip says how much rested XP is left (#182).
+- Enemy players, under Class colored health, on by default: enemy players' thick health bars in their class color.
+- Elite dragons for players and for monsters as separate picks under the elite option, so each can be kept or themed on its own.
+- Buff arrow as one drop down: shown, on hover or hidden (#190).
+- Ctrl+right-click on a spellbook spell opens its note in EasyFind, when EasyFind is installed.
+- Our options pages listed as subcategories under ClassicUI Forever in the game's own settings.
+- Inspecting a player always shows the Character and PvP tabs, and Guild when they have one, on the Era tab row.
+
+### Changed
+- Window frames is now Classic style windows, on the Look page: one switch with a box per window under it in a scrolling list with a search. While it is off, the window options on the other pages gray out with a tip saying what to turn on, and turning it or a window's box off or on asks for a reload, since open windows keep the frame they were built with (#184).
+- Full size on the professions book is the classic book drawn bigger, not the game's page (#187).
+- The classic world map's header style opens at the game's map height in a window, instead of filling the screen's height, and keeps that size and spot through a fight.
+- A game window whose classic look is off is left to the game and other addons: no place, size, lock, grip or drag strip of ours, and another addon's drags are not saved as ours. Unlock Map grays while the classic world map is off (#192).
+- Reset toggles is now Default toggles, and with the ClassicUI Forever layout on, classic-sized bars count as the default at any UI scale.
+- The key ring's edit mode box gets Hide Bar Art off the band, and the one bag's key ring group has the size the game gives its key ring.
+
+### Fixed
+- Right-clicking a unit frame's power bar opens its menu again (#183).
+- Cyrillic names show on the unit frames and nameplates (#188).
+- Windows opened in a fight follow the game's spacing and order more closely. The spellbook held open over its casting buttons stays where it is, and the professions page keeps the book's spot beside the character sheet instead of swapping sides with it.
+- Professions and Collections count as pages of the spellbook: the spellbook button stays pressed on them, the spellbook key or button closes the page, and the book reopens on the page last shown. Turning between the pages keeps the character sheet still.
+- The Collections tab pressed in a fight opens our page instead of a separate window, with no stray pet tab beside the foot tabs.
+- Threat percent off hides the game's own number on our frames too.
+- Clicking a quest in a quest tracker addon opens our quest log, not the map's quest panel.
+- A quest's page background no longer runs past the window's foot (#178).
+- A minimap button hidden through its own addon's setting stays hidden (#191).
+- Nameplate crowd control icons sit clear of the level slot, the druid's mana glow goes round the frame's tab, the game menu's box starts lower over the game's own button stack, and long lists in the game's menus get the classic scroll bar.
+- Edit mode: the gryphon boxes sit under the key ring's and follow the gryphons as the band changes length, and the dialog extras' sliders and drop downs fit their panel. The small focus frame's preview shows its debuff row, and the pet's Buffs On Top row sits over the pet's name.
+
 ## [0.30.0] - 2026-10-16
 
 ### Added

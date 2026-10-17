@@ -2,6 +2,22 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN40_1_TITLE"] = "Collections window"
+L["WN40_1_TEXT"] = "Mounts, pets, toys, heirlooms and appearances in a classic window on side tabs, with the game's own model views, a search box and one Filter menu. It opens from the Collections button or key and, with that micro button hidden, from a Collections tab at the foot of the spellbook, as a page of the book. On by default; Collections window, under Other in the options (/fcui), turns it off, and Collections tab under Spellbook hides the tab."
+L["WN40_2_TITLE"] = "One bar"
+L["WN40_2_TEXT"] = "With One bar on, Main bar alone takes the page arrows and the latency bar off it and puts the key ring with the bags. Turning One bar on now also hides the bag, micro menu and key ring art, stands the bag buttons close together and sets the micro menu in the screen's corner with the bags on it. One bar is off by default; turn it on in the options (/fcui), under Action bars, where Key ring with the bags and Bags close together are boxes of their own too."
+L["WN40_3_TITLE"] = "Classic style windows"
+L["WN40_3_TEXT"] = "Window frames is now Classic style windows, on the Look page of the options: one switch, with a box per window under it in a scrolling list with a search. While it is off, the window options on the other pages gray out and their tip says what to turn on. Turning it, or one window's box, off or on asks for a reload, since an open window keeps the frame it was built with."
+L["WN40_4_TITLE"] = "Edit mode"
+L["WN40_4_TEXT"] = "The totem bar has the stance bar's settings in edit mode: orientation, rows, icon size and padding. Buffs On Top is in the focus and pet frames' dialogs too, and the small focus frame shows its debuffs above as well. The buff arrow is one drop down in the options now: shown, on hover or hidden."
+L["WN40_5_TITLE"] = "One bag"
+L["WN40_5_TEXT"] = "One bag can show sections by bag type or by bag, the key ring's slots after the last bag's, in the key ring's brass (the key ring button then opens the one bag), and the equipped bag slots. Each is a box under One bag in the options (/fcui), under Bags, and off by default; turn it on there."
+L["WN40_6_TITLE"] = "Spellbook pages and the map"
+L["WN40_6_TEXT"] = "Professions and Collections count as pages of the spellbook: its button stays pressed on them, its key closes the page, and the book reopens on the page last shown. The classic world map opens at the game's map height in a window and keeps its size and spot through a fight."
+L["WN40_7_TITLE"] = "Unit frames and the XP bar"
+L["WN40_7_TEXT"] = "Enemy players' thick health bars show their class color, on by default (Enemy players too, under Class colored health). Elite frames picks Players and NPCs apart, so each keeps or themes its dragon. The XP bar's tooltip can say how much rested XP is left: Rested XP in the XP bar's tooltip, under Action bars, off by default; turn it on in the options (/fcui)."
+L["WN40_8_TITLE"] = "Fixes"
+L["WN40_8_TEXT"] = "Right-clicking a unit frame's power bar opens its menu again, Cyrillic names show on the unit frames and nameplates, Threat percent off hides the game's own number too, a quest clicked in a tracker addon opens our quest log, and a minimap button hidden by its own addon stays hidden. The professions book's full size is the classic book drawn bigger. A game window whose classic look is off is left to the game and other addons, nothing of ours on it, and the map's unlock box grays then. Inspecting a player always shows the character and PvP tabs. Default toggles (once Reset toggles) counts classic-sized bars as the default with our layout. Nameplate crowd control icons, the druid mana glow, the game menu's box, long client menus and the edit mode boxes got small fixes."
 L["WN39_1_TITLE"] = "Era map markers"
 L["WN39_1_TEXT"] = "On the Kalimdor and Eastern Kingdoms maps, capitals show Era's gray tower and towns its yellow house again, with the town's name on hover. It is on by default; Era city and town markers, under Map in the options (/fcui), turns it off."
 L["WN39_2_TITLE"] = "Other action bar addons"
