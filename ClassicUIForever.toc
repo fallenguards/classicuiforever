@@ -89,6 +89,7 @@ UI\DividerBar.lua
 UI\EraSkills.lua
 UI\WindowOpeners.lua
 UI\Menus.lua
+UI\CheckList.lua
 UI\ClientMenus.lua
 UI\Escape.lua
 UI\SecurePad.lua

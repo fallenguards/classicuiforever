@@ -108,10 +108,25 @@ local function Follow(self, frame)
     frame:HookScript("OnHide", function() self:Hide() end)
 end
 
--- Entries are { text, onPick, isChosen }: Era's iron list, a radio per row.
-function ns.DropList(entries)
+-- Era's iron list, shut by a press anywhere but on it or its owner (list.owner), and by Escape: our drop downs.
+local function IronList()
     local list = NewMenu("FULLSCREEN_DIALOG")
     Dress(list, IRON_BOX, IRON_MARGIN, IRON_OUT, IRON_FILL)
+    ns.RegisterEvents(list, MOUSE_DOWN)
+    list:SetScript("OnEvent", function(self)
+        if not self:IsShown() or self:IsMouseOver() then return end
+        -- Leave a press on the owner to the owner, or the list reopens at once.
+        if self.owner and self.owner:IsMouseOver() then return end
+        self:Hide()
+    end)
+    list.Follow = Follow
+    ns.CloseOnEscape(list)
+    return list
+end
+
+-- Entries are { text, onPick, isChosen }: Era's iron list, a radio per row.
+function ns.DropList(entries)
+    local list = IronList()
     list.items = {}
     local widest = 0
     for i, entry in ipairs(entries) do
@@ -140,16 +155,6 @@ function ns.DropList(entries)
     list:SetSize(math.ceil(widest) + RADIO_SIZE + RADIO_GAP + IRON_INSET[1] + IRON_INSET[3],
         #entries * MENU_ROW + IRON_INSET[2] + IRON_INSET[4])
 
-    ns.RegisterEvents(list, MOUSE_DOWN)
-    list:SetScript("OnEvent", function(self)
-        if not self:IsShown() or self:IsMouseOver() then return end
-        -- Leave a press on the owner to the owner, or the list reopens at once.
-        if self.owner and self.owner:IsMouseOver() then return end
-        self:Hide()
-    end)
-
-    list.Follow = Follow
-
     function list:Toggle(owner)
         if self:IsShown() then self:Hide() return end
         self.owner = owner
@@ -161,7 +166,6 @@ function ns.DropList(entries)
         self:Show()
         self:Raise()
     end
-    ns.CloseOnEscape(list)
     return list
 end
 
@@ -450,3 +454,12 @@ function ns.TreeMenu(entries)
     ns.CloseOnEscape(root)
     return root
 end
+
+-- For lists of our own on the iron art (UI/CheckList.lua): the list and its insets, a row's gold tick, a row's glow.
+function ns.IronList() return IronList(), IRON_INSET end
+function ns.IronTick(tex)
+    ns.SetTex(tex, "dropdownClassic")
+    Coords(tex, CHECK_MARK)
+    tex:SetSize(CHECK_SIZE, CHECK_SIZE)
+end
+ns.MenuHighlight = Highlight

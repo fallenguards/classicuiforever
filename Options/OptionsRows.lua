@@ -213,7 +213,7 @@ local function DropShell(parent, label, items)
     dropdown:SetWidth(DROP_W)
     dropdown:SetPoint("LEFT", text, "RIGHT", 4, -1)
     ns.SkinDropdown(dropdown)
-    dropdown:SetupMenu(function(_, root) items(root) end)
+    if items then dropdown:SetupMenu(function(_, root) items(root) end) end
     row.dropdown = dropdown
     function row:SetChecked() self.dropdown:GenerateMenu() end
     function row:SetEnabled(on) self.dropdown:SetEnabled(on) end
@@ -287,17 +287,49 @@ local function FlipToggle(key)
     ns.ToggleChanged(key)
 end
 
--- Several toggles picked in one drop down, as checks (entries with checks = group).
--- A long list in columns of this many rows (the windows under Window frames). Never scrolled: a box's click refreshes
--- the menu, and a scrolling one stacked its rows at its top.
-local DROP_COLUMN_ROWS = 17
+-- Past this many boxes a group opens our scrolling list with a search (UI/CheckList.lua) in place of the game's menu:
+-- the game's scrolling menu stacked its rows at its top on a tick, and columns made a wall.
+local DROP_LIST_ROWS = 17
 
+-- The long group's row: the same drop down box, its count of ticks, our list under it.
+local function CheckListRow(parent, rows, label)
+    local row = DropShell(parent, label)
+    local dropdown = row.dropdown
+    local function Count()
+        local on = 0
+        for _, choice in ipairs(rows) do
+            if ToggleOn(choice.key) then on = on + 1 end
+        end
+        dropdown:OverrideText(L["OPTWIN_N_OF_N"]:format(on, #rows))
+    end
+    local list
+    dropdown:HookScript("OnMouseDown", function(self)
+        if not self:IsEnabled() then return end
+        if not list then
+            list = ns.CheckList(rows, ToggleOn, function(key)
+                FlipToggle(key)
+                Count()
+            end)
+            list:Follow(row)
+        end
+        list:Toggle(self)
+    end)
+    row.SetChecked = Count
+    Count()
+    return row
+end
+
+-- Several toggles picked in one drop down, as checks (entries with checks = group).
 local function DropCheckRow(parent, group)
     local rows, label, tip, words, keys = DropGroup("checks", group)
+    if #rows > DROP_LIST_ROWS then
+        local row = CheckListRow(parent, rows, label)
+        Describe(row, group, label, tip)
+        row.keyLow = row.keyLow .. " " .. words
+        row.keys = keys
+        return row
+    end
     local row = DropShell(parent, label, function(root)
-        if #rows > DROP_COLUMN_ROWS and root.SetGridMode and _G.MenuConstants then
-            root:SetGridMode(_G.MenuConstants.VerticalGridDirection, math.ceil(#rows / DROP_COLUMN_ROWS))
-        end
         for _, choice in ipairs(rows) do ItemTip(root:CreateCheckbox(choice.label, ToggleOn, FlipToggle, choice.key), choice) end
     end)
     Describe(row, group, label, tip)
