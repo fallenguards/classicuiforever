@@ -46,8 +46,11 @@ local function Holder()
         Fill()
     end)
     holder:SetScript("OnHide", function() events:UnregisterAllEvents() end)
+    -- starts shown: made inside an open bag, its first OnShow never comes.
+    if holder:IsVisible() then ns.RegisterEvents(events, EVENTS) end
     for i, bag in ipairs(BAGS) do
-        local button = ns.NewFrame("ItemButton", "ForeverClassicUIOneBagSlot" .. i, holder, "ItemButtonTemplate")
+        -- The bare ItemButton type: no client has an ItemButtonTemplate.
+        local button = ns.NewFrame("ItemButton", "ForeverClassicUIOneBagSlot" .. i, holder)
         button:SetID(bag)
         button:SetSize(37, 37)
         button:RegisterForDrag("LeftButton")
