@@ -35,7 +35,7 @@ local window, embedded
 local function Finish()
     ns.ApplyAll()
     ns.AskReloadIfNeeded()
-    if window then window:Refresh() end
+    if window then window:Refresh(true) end
 end
 
 local function TurnOff(keys)
@@ -364,8 +364,9 @@ local function PlaceRows(frame)
     frame.listBar:SetRange(math.max(0, per * ROW - frame.list:GetHeight()), ROW)
 end
 
--- What the right side shows: a toggles page, a reading page, or the search's matches from every page.
-local function Show(frame)
+-- What the right side shows: a toggles page, a reading page, or the search's matches from every page. keepScroll: a
+-- refresh after a toggle stays where the player is; a new page, a search or an open starts at the top (#197).
+local function Show(frame, keepScroll)
     local searching = (frame.search:GetText() or "") ~= ""
     local home = frame.page == HOME
     local pane = not searching and frame.panes[frame.page]
@@ -384,10 +385,13 @@ local function Show(frame)
         if not frame.panes[name] then button:SetPicked(name == frame.page and not searching) end
     end
     FitList(frame, pane and pane.headH or home and HOME_HEAD or 0)
-    frame.list:SetScrollChild(pane and pane.child or frame.listChild)
+    local child = pane and pane.child or frame.listChild
+    if frame.list:GetScrollChild() ~= child then frame.list:SetScrollChild(child) end
     frame.listChild:SetShown(not pane)
-    frame.listBar:SetValue(0)
+    if not keepScroll then frame.listBar:SetValue(0) end
     if pane then pane:Refresh() else PlaceRows(frame) end
+    -- The range clamps the bar's value; the list follows it even when the value did not change.
+    if keepScroll then frame.list:SetVerticalScroll(frame.listBar:GetValue()) end
 end
 
 -- The game's settings show this window on its subcategory page (nil: our entry, the home page with the search), the
@@ -475,7 +479,7 @@ local function Build()
     function frame:Lay() Show(self) end
     frame.search:SetScript("OnTextChanged", function() Show(frame) end)
 
-    function frame:Refresh()
+    function frame:Refresh(keepScroll)
         -- The one box mirroring a game setting: read fresh.
         ns.ReadGameDamageNumbers()
         local parentOf = self.built.parentOf
@@ -494,9 +498,9 @@ local function Build()
             -- A button row's label keeps the button's own fonts.
             if not row.button then row.text:SetFontObject(on and (row.font or "GameFontHighlight") or "GameFontDisable") end
         end
-        Show(self)
+        Show(self, keepScroll)
     end
-    frame:SetScript("OnShow", frame.Refresh)
+    frame:SetScript("OnShow", function(self) self:Refresh() end)
     frame:HookScript("OnHide", function() if ns.SetMeterPanning then ns.SetMeterPanning(false) end end)
     -- After SetScript, which would wipe its OnShow hooks; inside the game's settings its own Escape closes it.
     ns.CloseOnEscape(frame, nil, function() return not embedded end)
@@ -536,7 +540,7 @@ end
 
 -- A toggle changed from outside the window.
 function ns.RefreshOptionsWindow()
-    if window and window:IsShown() then window:Refresh() end
+    if window and window:IsShown() then window:Refresh(true) end
 end
 
 function ns.OpenOptions()
