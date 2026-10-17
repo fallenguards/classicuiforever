@@ -38,10 +38,10 @@ end
 function B.ReagentSlot()
     return CharacterReagentBag0Slot ~= nil and ns.db ~= nil and ns.db.reagentBagSlot ~= false
 end
--- Folded to the backpack: its cell alone; else the five plus the extra cells (BandBagsShow).
+-- Folded to the backpack: its cell and the reagent bag's (#195); else the five plus the extra cells (BandBagsShow).
 function B.BagPart()
     local bag = B.Bag()
-    if B.BagsFolded() then return bag.part - 4 * bag.socket end
+    if B.BagsFolded() then return bag.part - 4 * bag.socket + B.BagExtraCells() * bag.socket end
     return bag.part + B.BagExtraCells() * bag.socket
 end
 -- Latency and key ring section, cut from the 1.x key ring sheet (Era's, the fifth piece): left post, the window the latency

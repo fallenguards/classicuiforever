@@ -264,10 +264,15 @@ function B.Segments()
         local head, unit = s0 - u0, s1 - s0
         local extra = B.BagExtraCells()
         if B.BagsFolded() then
-            -- Backpack only: the head, then from four cells on (the backpack's cell and the end), one cell in all.
-            local tail = s0 + 4 * bag.socket
+            -- Backpack only: the head, the reagent bag's cell while it stays, then from four cells on (the backpack's
+            -- cell and the end).
+            local tail, at = s0 + 4 * bag.socket, x + head
             list[#list + 1] = { x, head, sheet, u0 / 256, s0 / 256, "bags" }
-            list[#list + 1] = { x + head, 256 - tail, sheet, tail / 256, 1, "bags" }
+            if extra > 0 then
+                list[#list + 1] = { at, unit, sheet, s0 / 256, s1 / 256, "bags" }
+                at = at + unit
+            end
+            list[#list + 1] = { at, 256 - tail, sheet, tail / 256, 1, "bags" }
         elseif extra > 0 then
             -- Up to the first socket's far wall, the wall-and-socket unit once per extra cell, then the rest from that wall.
             list[#list + 1] = { x, head, sheet, u0 / 256, s0 / 256, "bags" }

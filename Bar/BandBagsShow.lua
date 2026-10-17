@@ -27,7 +27,7 @@ function B.BagsMode()
     return "shown"
 end
 
--- Backpack only, folded: the bags, reagent bag and key slot away (the arrow's own state, saved).
+-- Backpack only, folded: the bags away, the reagent bag kept, the key ring back on hover (the arrow's own state, saved).
 function B.BagsFolded() return B.BagsMode() == "backpack" and not (ns.db and ns.db.bagsUnfolded == true) end
 
 -- Cells past the five sockets: the reagent slot's.
@@ -42,7 +42,7 @@ end
 -- The reagent bag's own hover (BandBags) may light it: never on a hidden, folded or faded row.
 function B.ReagentMayLight()
     local mode = B.BagsMode()
-    if mode == "hidden" or B.BagsFolded() then return false end
+    if mode == "hidden" then return false end
     return mode == "shown" or mode == "backpack" or revealed
 end
 
@@ -75,11 +75,15 @@ end
 -- regions again first (unlit, the frame's alpha alone hides them).
 local rowAlpha, rowTarget, arrowAlpha, arrowTarget = 1, 1, 0, 0
 local lastTick
+-- Backpack only, folded: the key ring riding the row comes and goes with the arrow, on hover (#195).
+local keyWithArrow = false
 
 local function Paint()
     for i = 1, #buttons do
         local button = buttons[i]
-        SetFrameAlphaIf(button, lit[button] and rowAlpha or 0)
+        local alpha = lit[button] and rowAlpha or 0
+        if keyWithArrow and button == KeyRingButton then alpha = arrowAlpha end
+        SetFrameAlphaIf(button, alpha)
     end
     local art = B.art
     if art then
@@ -293,7 +297,8 @@ local function LayArrowOnGameBar()
     local a = Arrow()
     if a:GetParent() ~= UIParent then a:SetParent(UIParent) end
     local reagent = CharacterReagentBag0Slot
-    local beside = B.BagsFolded() and backpack or (reagent and reagent:IsShown() and reagent) or _G.CharacterBag3Slot or backpack
+    local beside = (reagent and reagent:IsShown() and reagent) or (B.BagsFolded() and backpack) or _G.CharacterBag3Slot
+        or backpack
     Beside(a, beside, LEFTWARD, backpack:GetWidth() or 30, backpack:GetFrameLevel() + 1,
         backpack:GetEffectiveScale() / UIParent:GetEffectiveScale())
 end
@@ -310,10 +315,11 @@ Apply = function(atOnce)
     local fold = B.BagsFolded()
     local seen = mode == "shown" or mode == "backpack" or (mode ~= "hidden" and revealed)
     local reagent = CharacterReagentBag0Slot
+    keyWithArrow = fold
     local n = Buttons(band)
     for i = 1, n do
         local button = buttons[i]
-        local folds = fold and button ~= MainMenuBarBackpackButton and button ~= KeyRingButton
+        local folds = fold and button ~= MainMenuBarBackpackButton and button ~= KeyRingButton and button ~= reagent
         local shown = band and button ~= reagent and (mode ~= "hidden" and not folds) or nil
         if shown ~= nil then SetShownIf(button, shown) end
         local lights = seen and not folds

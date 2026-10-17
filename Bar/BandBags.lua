@@ -83,11 +83,17 @@ local function LayFloor(art, floating, bare, buttonScale, level, backpack, turn)
     local head, unit = s0 - u0, s1 - s0
     local extra = B.BagExtraCells()
     if B.BagsFolded() then
-        -- Backpack only: the head, then from four cells on (the backpack's cell and the end), one cell in all.
-        local tail = s0 + 4 * bag.socket
+        -- Backpack only: the head, the reagent bag's cell while it stays, then from four cells on (the backpack's cell
+        -- and the end).
+        local tail, at, last = s0 + 4 * bag.socket, head, floor.units[1]
         FloorRun(floor, floor.tex, 0, head, u0, s0, turn)
-        FloorRun(floor, floor.units[1], head, 256 - tail, tail, 256, turn)
-        floor.units[2]:Hide()
+        if extra > 0 then
+            FloorRun(floor, floor.units[1], head, unit, s0, s1, turn)
+            at, last = head + unit, floor.units[2]
+        else
+            floor.units[2]:Hide()
+        end
+        FloorRun(floor, last, at, 256 - tail, tail, 256, turn)
         floor.rest:Hide()
     elseif extra > 0 then
         FloorRun(floor, floor.tex, 0, head, u0, s0, turn)
@@ -285,14 +291,14 @@ function B.LayoutBags()
     local lift = (KEYRING_H - size) / 2
     local home, homePoint, homeY = art, "BOTTOMRIGHT", bag.y
     local homeX
-    -- Backpack only (BandBagsShow): the bags, reagent bag and key slot fold away, the backpack alone left; the arrow
-    -- that unfolds them floats beside it, no cell of its own.
+    -- Backpack only (BandBagsShow): the bags fold away, the backpack and the reagent bag left (#195); the arrow that
+    -- unfolds them floats beside them, no cell of its own.
     local folded, arrowed = B.BagsFolded(), B.BagsMode() == "backpack"
-    local square = not folded and B.ReagentSlot()
+    local square = B.ReagentSlot()
     local rowW = folded and size or size + 4 * (size - gap)
     if square then rowW = rowW + size - gap end
     -- The key slot's tenant: never the key ring (its own piece, BandSection.lua).
-    local slim = not folded and B.SlimReagent() and CharacterReagentBag0Slot or nil
+    local slim = B.SlimReagent() and CharacterReagentBag0Slot or nil
     if slim then rowW = rowW + KEYRING_W - KEYRING_GAP end
     -- The piece's box: a column swaps its sides, as the client's does.
     local boxW, boxH = rowW, KEYRING_H
@@ -362,7 +368,7 @@ function B.LayoutBags()
         ns.SkinKeyRing(slim)
     end
     B.LayFoldArrow(arrowed and (slim or prev) or nil, grow, size, level, buttonScale)
-    if not square and not folded and KeyRingButton and CharacterReagentBag0Slot then
+    if not square and KeyRingButton and CharacterReagentBag0Slot then
         -- Both (Forever): the reagent bag is the small round one, centred level with the bags between key ring and last bag.
         local reagent = CharacterReagentBag0Slot
         Seat(reagent, buttonScale, REAGENT_SIZE, REAGENT_SIZE, level + 2)
