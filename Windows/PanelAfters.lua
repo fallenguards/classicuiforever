@@ -358,17 +358,18 @@ end
 
 ------------------------------------------------------------------ inspect
 
--- Every frame: side tabs stay hidden; the old foot tabs show only while there is
--- a guild tab (none for a lone player).
+-- Every frame: side tabs stay hidden; the old foot tabs stand in, Character and PvP always, Guild while there is one
+-- (PvP once showed only with a guild, read as the guild's tab).
 local function HoldInspectTabs(side)
     ns.SetAlphaIf(side, 0)
     for _, tab in ipairs(side.Tabs or EMPTY) do
         if tab:IsMouseEnabled() then tab:EnableMouse(false) end
     end
     local guild = side.GuildTab and side.GuildTab:IsShown() and true or false
-    local first, second = Named("InspectFrameTab1"), Named("InspectFrameTab2")
-    if first then ns.SetShownIf(first, guild) end
-    if second then ns.SetShownIf(second, guild) end
+    local character, pvp, guildTab = Named("InspectFrameTab1"), Named("InspectFrameTab2"), Named("InspectFrameTab3")
+    if character then ns.SetShownIf(character, true) end
+    if pvp then ns.SetShownIf(pvp, true) end
+    if guildTab then ns.SetShownIf(guildTab, guild) end
 end
 
 function A.InspectFrame(frame)
@@ -378,6 +379,11 @@ function A.InspectFrame(frame)
         if slot and slot.BorderFrame then slot.BorderFrame:SetAlpha(0) end
         if slot then ns.BronzeRim(slot, nil, 3) end
     end
+    -- The old foot tabs on Era's row: fitted to their labels and stepped as the sheet's (the game left them at its
+    -- widths, gaps between).
+    local tabs = {}
+    for i = 1, 3 do tabs[#tabs + 1] = Named("InspectFrameTab" .. i) end
+    ns.EraTabRow(tabs)
     local side = frame.ModeTabs
     if side then ns.Sched.Attach(frame, { name = "inspect.tabs", every = 0, fn = function() HoldInspectTabs(side) end }) end
 end
