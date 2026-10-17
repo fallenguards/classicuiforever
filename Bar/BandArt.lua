@@ -194,6 +194,8 @@ local function LayCapHome(key, w, anyway)
     if ns.WindowMoving(home) and not anyway then return end
     if ns.WindowPlaced(GRYPHON_KEYS[key]) and not anyway then return end
     if not ns.IsAt(home, "BOTTOM", foot, "BOTTOM", 0, 0) then ns.SetPointOnce(home, "BOTTOM", foot, "BOTTOM", 0, 0) end
+    -- Its edit mode box with it (it stayed on the old band end as the bags left the band).
+    if ns.LayWindowHandle then ns.LayWindowHandle(GRYPHON_KEYS[key]) end
 end
 B.LayCapHome = LayCapHome
 

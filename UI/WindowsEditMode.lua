@@ -8,6 +8,14 @@ local W = ns.windowEdit
 local WINDOWS, Clean, ValidFlag, Places, Scales, Freed = W.WINDOWS, W.Clean, W.ValidFlag, W.Places, W.Scales, W.Freed
 local Set, DialogKeys = W.Set, W.DialogKeys
 local Ratio, PlaceAll, LayHandle, Refresh = W.Ratio, W.PlaceAll, W.LayHandle, W.Refresh
+
+-- A piece moved by its own layout (a gryphon as the band changes length): its box follows while shown.
+function ns.LayWindowHandle(key)
+    if not W.HandleShown(key) then return end
+    for _, entry in ipairs(WINDOWS) do
+        if entry.key == key then LayHandle(entry) end
+    end
+end
 local ShowHandle, Return = W.ShowHandle, W.Return
 local Plain = ns.Safe
 
