@@ -41,7 +41,7 @@ local GROUPS = {
 
 -- Modules whose hand-back gives the game's parts back: turned on and off again it must still write, once. Only those
 -- whose apply runs under the stub client.
-local HANDS_BACK = { castAnim = true, comboPoints = true, mirrorTimers = true, hideBuffArrow = true, questTracker = true }
+local HANDS_BACK = { castAnim = true, comboPoints = true, mirrorTimers = true, buffArrow = true, questTracker = true }
 
 ------------------------------------------------------------------ the stub client
 

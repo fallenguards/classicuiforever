@@ -77,7 +77,7 @@ ns.DB_DEFAULTS = {
     professionTabsHidden = false,
     whoTabs = false,
     whoColumn = "zone",
-    hideBuffArrow = true,
+    buffArrowShown = false, buffArrowHover = true, buffArrowHidden = false,
     spellBookTopRank = false,
     spellBookHidePassives = false,
     spellBookFlyouts = false,
@@ -316,7 +316,7 @@ ns.DB_DEFAULTS = {
 -- Module walk order by id, applied at login before any init so .toc moves never reorder modules.
 -- Matches the registration order.
 ns.MODULE_ORDER = {
-    "bronzeTheme", "hideMicroButtons", "showBags", "classicBar", "buttons", "castAnim", "pageArrows", "unitFrames", "hideBuffArrow",
+    "bronzeTheme", "hideMicroButtons", "showBags", "classicBar", "buttons", "castAnim", "pageArrows", "unitFrames", "buffArrow",
     "castBars", "swingTimers", "resourceDisplay", "classicStatusFont", "plainNumbers", "mirrorTimers", "comboPoints", "minimap", "minimapButton", "microMinimapButtons", "minimapCollector", "namePlates", "classColorPlates",
     "fullPlates", "classicFonts", "questTracker", "hideObjectiveTracker", "questWatch", "questLog", "questLogDual", "questLevels", "questMapPane", "panels", "worldMap", "lootWindow", "classicChat", "lootRoll",
     "guildRoster", "whoList", "groupFinder", "hideLastNames", "mapFade", "oneBag", "bags", "characterSheet", "statPanes",

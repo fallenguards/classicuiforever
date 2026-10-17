@@ -171,7 +171,10 @@ ns.TOGGLES = {
     { "mirrorTimers", L["OPT_mirrorTimers"], L["OPT_mirrorTimers_TIP"] },
     { "comboPoints", L["OPT_comboPoints"], L["OPT_comboPoints_TIP"] },
     { "resourceDisplay", L["OPT_resourceDisplay"], L["OPT_resourceDisplay_TIP"], search = "prd health power under character" },
-    { "hideBuffArrow", L["OPT_hideBuffArrow"], L["OPT_hideBuffArrow_TIP"] },
+    { "buffArrowShown", L["OPT_buffArrowShown"], L["OPT_buffArrow_TIP"], radio = "buffArrowShow", drop = true,
+        dropTip = L["OPT_buffArrow_TIP"], search = "buff arrow collapse fold hover hide mouse" },
+    { "buffArrowHover", L["OPT_buffArrowHover"], L["OPT_buffArrow_TIP"], radio = "buffArrowShow", drop = true },
+    { "buffArrowHidden", L["OPT_buffArrowHidden"], L["OPT_buffArrowHidden_TIP"], radio = "buffArrowShow", drop = true },
     { "plainNumbers", L["OPT_plainNumbers"], L["OPT_plainNumbers_TIP"], search = "commas thousands separators digits large" },
 
     { "namePlates", L["OPT_namePlates"], L["OPT_namePlates_TIP"], group = L["GROUP_NAMEPLATES"] },

@@ -1,6 +1,7 @@
 local _, ns = ...
 
--- Buff collapse arrow (1.x had none): alpha 0, not hidden, no BuffFrame calls (it handles secret values).
+-- Buff collapse arrow (1.x had none): shown, on hover or hidden (one drop down, #190). Alpha 0, not hidden, no BuffFrame
+-- calls (it handles secret values).
 
 local arrowHidden = false
 local arrowJob, watch
@@ -13,24 +14,23 @@ local function Arrow()
     return BuffFrame and BuffFrame.CollapseAndExpandButton
 end
 
--- Still shows under the mouse: already folded buffs would have no way back. Unseen, it has no hover to test.
+-- On hover it shows under the mouse. Hidden it never shows and takes no click, but while the buffs are folded (the
+-- arrow unchecked) the mouse still finds it: they would have no way back. Unseen, it has no hover to test.
 local function SetBuffArrow(hidden)
     local button = Arrow()
     if not button then return end
+    local gone = hidden and ns.db.buffArrowHidden == true and button:GetChecked() == true
     local alpha = 1
-    if hidden and not (button:IsVisible() and button.IsMouseOver and button:IsMouseOver(6, -6, -6, 6)) then alpha = 0 end
+    if gone or (hidden and not (button:IsVisible() and button:IsMouseOver(6, -6, -6, 6))) then alpha = 0 end
+    if button:IsMouseEnabled() == gone then button:EnableMouse(not gone) end
+    if alpha == shownAlpha then return end
     ns.SetAlphaIf(button, alpha, 0.01)
     shownAlpha = alpha
 end
 
--- Runs only while the arrow shows and is hidden: the mouse is all that changes.
+-- Runs only while the arrow shows and is hidden: the mouse and the fold are all that change.
 local function ArrowPass()
-    local button = Arrow()
-    if not arrowHidden or not button or not button.IsMouseOver then return end
-    local alpha = button:IsMouseOver(6, -6, -6, 6) and 1 or 0
-    if alpha == shownAlpha then return end
-    ns.SetAlphaIf(button, alpha, 0.01)
-    shownAlpha = alpha
+    if arrowHidden then SetBuffArrow(true) end
 end
 
 -- Sole writer of the job's wake: awake exactly while the arrow shows and is hidden.
@@ -75,14 +75,36 @@ local function SetArrowHidden(on)
     Refresh()
 end
 
-ns.RegisterModule("hideBuffArrow", {
-    apply = function()
-        SetArrowHidden(true)
-        SetBuffArrow(true)
-    end,
-    restore = function()
-        if not arrowHidden then return end
-        SetArrowHidden(false)
-        SetBuffArrow(false)
-    end,
-})
+local function HandBack()
+    if not arrowHidden then return end
+    SetArrowHidden(false)
+    SetBuffArrow(false)
+end
+
+-- The pick: the game's own arrow, or ours on hover or hidden.
+local function Sync()
+    if ns.db.buffArrowShown == true then return HandBack() end
+    SetArrowHidden(true)
+    SetBuffArrow(true)
+end
+
+-- A pick turns at once, in a fight too (the options pass waits one out).
+local PICKS = { buffArrowShown = true, buffArrowHover = true, buffArrowHidden = true }
+ns.OnToggle(function(key)
+    if PICKS[key] then Sync() end
+end)
+
+-- dbVersion 19: Hide buff arrow became this drop down; unticked, it picks shown (the account and every profile).
+function ns.BuffArrowChoice()
+    local db = ns.db
+    local function Pick(t)
+        if t.hideBuffArrow == false then t.buffArrowShown, t.buffArrowHover = true, false end
+        t.hideBuffArrow = nil
+    end
+    Pick(db)
+    for _, shot in pairs(type(db.profiles) == "table" and db.profiles or {}) do
+        if type(shot) == "table" then Pick(shot) end
+    end
+end
+
+ns.RegisterModule("buffArrow", { apply = Sync, restore = HandBack })

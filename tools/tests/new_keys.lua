@@ -5,6 +5,9 @@
 return {
     hideThreatGlow = "same for everyone: opt-in, off by default",
     xpTipRested = "same for everyone: opt-in, off by default",
+    buffArrowShown = "kept as before: dbVersion 19 (Units/BuffArrow.lua BuffArrowChoice) picks it where Hide buff arrow was off",
+    buffArrowHover = "same for everyone: on by default, the arrow under the mouse as Hide buff arrow gave it",
+    buffArrowHidden = "same for everyone: opt-in, off by default",
     classColorHealthEnemies = "kept as before: dbVersion 19 (UI/Colors.lua KeepEnemyPlayerColor) turns it off where class colored health and an enemy color other than green were both picked",
     spellBookCollectionsTab = "same for everyone: on by default, the Collections tab as before; off takes it away",
     panelAchievements = "same for everyone: on by default under Window frames, which dressed every window as before; unchecked leaves that window the game's",

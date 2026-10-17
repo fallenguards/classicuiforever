@@ -50,7 +50,7 @@ function O.InNone(key)
     return not NOT_IN_NONE[key] and not ns.TOGGLE_RADIO[key] and not picks[key]
 end
 -- A radio pick that is a classic piece: Toggle none picks the game's own choice instead.
-O.NONE_PICKS = { "gameObjectiveTracker" }
+O.NONE_PICKS = { "gameObjectiveTracker", "buffArrowShown" }
 
 -- Our standalone dialog shell, hidden: strata nil is DIALOG; opts.toplevel. Welcome and Status share it.
 function O.DialogWindow(name, y, strata, opts)
