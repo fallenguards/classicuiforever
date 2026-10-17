@@ -13,7 +13,7 @@ local SAME = { size = 32, ring = 52, icon = 22, round = true }
 local TRACK_BORDER = { layer = "ARTWORK", w = 52, h = 52, point = "TOPLEFT" }
 local TRACK_EVENTS = { "MINIMAP_UPDATE_TRACKING", "SPELLS_CHANGED", "PLAYER_ENTERING_WORLD" }
 
-local function TrackingOn() return MM.active and ns.db and ns.db.classicTracking ~= false end
+local function TrackingOn() return MM.active and MM.ShowState("MinimapTrackingIcon") ~= "hide" end
 MM.TrackingOn = TrackingOn
 
 -- The frame, ring and icon at Era's size or the others'; Era's icon square, its edges under the ring.
@@ -131,8 +131,11 @@ function MM.TrackingFrame(backdrop, level)
         ns.RegisterEvents(frame, TRACK_EVENTS)
         UpdateTracking()
     end
+    -- Hidden: stashed; on hover: faded till the mouse is near; its tracking read again, so a pick shows at once.
+    ns.MinimapShow(frame, "MinimapTrackingIcon", true)
     frame:SetFrameLevel(level)
     PlaceTracking()
+    UpdateTracking()
 end
 
 -- Seen at once, in a fight too: a plain frame of ours.

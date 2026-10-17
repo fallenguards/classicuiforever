@@ -52,8 +52,8 @@ local PIECES = {
     minimapCoords = { home = "ForeverClassicUIMinimapCoordsHome", show = "MinimapCoords" },
 }
 MM.PIECE_KEYS = PIECES
-local SHOW_IDS = { "MinimapZone", "MinimapTracking", "MinimapMail", "MinimapZoomIn", "MinimapZoomOut", "MinimapClock",
-    "MinimapDiel", "MinimapCalendar", "MinimapCoords", "MinimapDifficulty" }
+local SHOW_IDS = { "MinimapZone", "MinimapTracking", "MinimapTrackingIcon", "MinimapMail", "MinimapZoomIn", "MinimapZoomOut",
+    "MinimapClock", "MinimapDiel", "MinimapCalendar", "MinimapCoords", "MinimapDifficulty" }
 local ZOOM_R = 79
 local ZOOM_DISC = 18
 local discMasks = setmetatable({}, { __mode = "k" })
@@ -240,8 +240,12 @@ function ns.MinimapShow(frame, id, client)
     HoverTick(hoverJob)
 end
 
--- Old saves: one hide key for both zoom buttons, the calendar on or off.
+-- Old saves: one hide key for both zoom buttons, the calendar and the tracking icon on or off.
 function ns.MigrateMinimapShow(db)
+    if db.classicTracking ~= nil then
+        if db.classicTracking == false then db.hideMinimapTrackingIcon = true end
+        db.classicTracking = nil
+    end
     if db.hideMinimapZoom ~= nil then
         if db.hideMinimapZoom then db.hideMinimapZoomIn, db.hideMinimapZoomOut = true, true end
         db.hideMinimapZoom = nil

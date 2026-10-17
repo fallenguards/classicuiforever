@@ -4,6 +4,9 @@
 -- luacheck: std lua54
 return {
     hideThreatGlow = "same for everyone: opt-in, off by default",
+    showMinimapTrackingIcon = "kept as before: Map/Minimap.lua MigrateMinimapShow picks hidden where the old Tracking icon box was off; shown where it was on, its default",
+    hoverMinimapTrackingIcon = "same for everyone: opt-in, off by default",
+    hideMinimapTrackingIcon = "kept as before: Map/Minimap.lua MigrateMinimapShow turns it on where the old Tracking icon box was off",
     xpTipRested = "same for everyone: opt-in, off by default",
     eliteUnitPlayers = "same for everyone: on by default, players wear the dragon as before",
     eliteUnitNPCs = "kept as before: dbVersion 19 (Units/TargetFrame.lua KeepEliteNPCs) turns it on where Elite frames was on",
