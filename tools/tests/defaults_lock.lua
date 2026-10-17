@@ -147,6 +147,7 @@ return {
     hideMinimapDifficulty = true,
     hideMinimapHeader = false,
     hideMinimapMail = false,
+    hideMinimapNorth = false,
     hideMinimapTracking = false,
     hideMinimapTrackingIcon = false,
     hideMinimapZone = false,

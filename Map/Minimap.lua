@@ -471,7 +471,7 @@ local function Layout()
     if MinimapCompassTextureUnderlay then ns.Fade(MinimapCompassTextureUnderlay) end
     local rotate = ns.GetCVarBool("rotateMinimap")
     if MinimapCompassTexture then MinimapCompassTexture:SetShown(rotate and true or false) end
-    if cluster.fcuiNorth then cluster.fcuiNorth:SetShown(not rotate) end
+    if cluster.fcuiNorth then cluster.fcuiNorth:SetShown(not rotate and ns.db.hideMinimapNorth ~= true) end
 
     -- Buttons over the map's edge must stand above it to take clicks.
     local above = map:GetFrameLevel() + 5
@@ -772,7 +772,7 @@ ns.RegisterModule("minimap", { apply = Apply, restore = Restore })
 
 -- A piece's Shown / On hover / Hidden picked: laid again at once.
 ns.OnToggle(function(key)
-    if key == "hideMinimapBorder" or key == "hideMinimapHeader" then LayoutIfActive() return end
+    if key == "hideMinimapBorder" or key == "hideMinimapHeader" or key == "hideMinimapNorth" then LayoutIfActive() return end
     if key == "hideButtonBorders" then ButtonBordersApply() return end
     for _, id in ipairs(SHOW_IDS) do
         if key == "show" .. id or key == "hover" .. id or key == "hide" .. id then LayoutIfActive() return end
