@@ -21,13 +21,14 @@ local function SizeOff()
     return target ~= nil and type(now) == "number" and math.abs(now - target) > 0.005
 end
 
--- Reset toggles: every box at its default and, as the classic layout pairs them, the 36 px bar at Era's interface size.
--- keys: one page's toggles (nil: every one).
+-- Default toggles: every box at its default and, as the classic layout pairs them, the 36 px bar with that layout (or
+-- at the Era interface size without it). keys: one page's toggles (nil: every one).
 function ns.ResetToggles(keys)
     for _, entry in ipairs(ns.TOGGLES) do
         if not keys or keys[entry[1]] then ns.db[entry[1]] = ns.DB_DEFAULTS[entry[1]] end
     end
-    if (not keys or keys.classicBarSize) and EraScale() ~= nil and not SizeOff() then ns.db.classicBarSize = true end
+    local classic = ns.ClassicLayoutActive and ns.ClassicLayoutActive()
+    if (not keys or keys.classicBarSize) and (classic or (EraScale() ~= nil and not SizeOff())) then ns.db.classicBarSize = true end
 end
 
 -- Settings gone with the classic layout kept at Era's size (a reinstall): the 36 px bar that layout was laid for. Both

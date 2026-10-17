@@ -47,11 +47,19 @@ ns.ResetToggles()
 Check(ns.db.classicBar == true and ns.db.hideCombatGlow == false, "every box back to its default")
 Check(ns.db.classicBarSize == true, "at Era's interface size the bars come back classic-sized, as the classic layout sets them")
 
--- The game's default scale: the game-sized bar, the default.
+-- The game default scale with the classic layout: still classic-sized, as that layout pairs them.
 uiScale = 0.71
+classicLayout = true
+ns.db = { classicBarSize = false }
+ns.ResetToggles()
+Check(ns.db.classicBarSize == true, "with the classic layout the bars come back classic-sized at any interface size")
+
+-- Without the classic layout at the game default scale: the game-sized bar, the default.
+classicLayout = false
 ns.db = { classicBarSize = true }
 ns.ResetToggles()
-Check(ns.db.classicBarSize == false, "at another interface size the bar size is the default")
+Check(ns.db.classicBarSize == false, "at another interface size without the classic layout the bar size is the default")
+classicLayout = true
 
 -- One page's Reset toggles: that page's boxes alone, the bar size only when the page holds it.
 uiScale = 0.9
