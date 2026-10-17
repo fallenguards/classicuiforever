@@ -300,6 +300,12 @@ USE_PATTERNS = {
     "PLATES": re.compile(r"\bGetNamePlates\b"),
 }
 REGISTRY_METHODS = re.compile(r"(?:RegisterCallback|RegisterCallbackWithHandle|UnregisterCallback|TriggerEvent)$")
+# The client registry calls allowed, by file: the exact call on code with strings kept, and why.
+REGISTRY_SITES = {
+    # The game's menu show signal names every menu frame, submenus too, before it draws; its listeners run in
+    # protected calls, as Menu.ModifyMenu's do (#199, 2026-10-17).
+    "UI/ClientMenus.lua": re.compile(r'\bEventRegistry\s*:\s*(?:Register|Unregister)Callback\s*\(\s*"MenuProxy\.OnShow"'),
+}
 # A client object calling a registry method: Upper.chain:Method
 CLIENT_METHOD_OWNER = re.compile(r"[A-Z]\w*(?:\s*\.\s*\w+)*\s*:\s*$")
 HOOK_RX = re.compile(r"\bhooksecurefunc\b")
@@ -1432,6 +1438,8 @@ def pattern_hits(path, lx, funcs):
                     continue
                 if (rule == "REGISTRY" and REGISTRY_METHODS.match(m.group(0))
                         and not CLIENT_METHOD_OWNER.fullmatch(qual)):
+                    continue
+                if rule == "REGISTRY" and path in REGISTRY_SITES and REGISTRY_SITES[path].search(lx.keep[no - 1]):
                     continue
                 if is_use(line, qs, m.end()):
                     found.add((rule, no))

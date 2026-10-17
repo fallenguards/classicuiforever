@@ -1,6 +1,7 @@
 -- Offline test for the client menus' look (UI/ClientMenus.lua) under Lua 5.4: a menu opened from a drop down button
 -- gets Classic Era's iron list, a right-click menu the thin rim. The game keeps what it writes on an open menu in a
 -- side table behind the frame's metatable, so a raw read of the owner finds nothing and every menu got the rim.
+-- A submenu is dressed as the game's show signal names it: a session's first one kept the game's art until hovered (#199).
 -- Run from the addon root: lua tools/tests/client_menus_test.lua (CI runs every tools/tests/*_test.lua).
 -- luacheck: std lua54
 -- luacheck: ignore 111 112 113 121 212
@@ -31,7 +32,7 @@ local function Art(kind)
 end
 
 -- A menu frame as the game hands it out: its mixin's keys on the frame, then the metatable that redirects writes.
-local function OpenMenu(owner)
+local function OpenMenu(owner, submenu)
     local frame = { InitScrollLayout = MenuProxyMixin.InitScrollLayout, GetOwnerRegion = MenuProxyMixin.GetOwnerRegion }
     local back = { GetAtlas = function() return "common-dropdown-bg" end, GetParent = function() return frame end,
         GetAlpha = function() return 0 end }
@@ -69,7 +70,9 @@ local function OpenMenu(owner)
     })
     frame.ownerRegion = owner
     insets[frame], spot[frame], moves[frame] = { 0, 0, 0, 0 }, { 0, 0 }, 0
-    for other in pairs(shown) do shown[other] = false end
+    if not submenu then
+        for other in pairs(shown) do shown[other] = false end
+    end
     shown[frame] = true
     return frame
 end
@@ -81,6 +84,15 @@ end }
 -- The watcher never walks the game's frames (70 ms a frame on retail with a menu open, read live 2026-10-04).
 EnumerateFrames = function() error("the menu watcher walked the game's frames") end
 CreateFrame = function() return { SetScript = function() end, UnregisterAllEvents = function() end } end
+local showSignal             -- the game's menu show signal as the module listens to it
+EventRegistry = {
+    RegisterCallback = function(_, event, fn, owner)
+        if event == "MenuProxy.OnShow" then showSignal = { fn = fn, owner = owner } end
+    end,
+    UnregisterCallback = function(_, event, owner)
+        if event == "MenuProxy.OnShow" and showSignal and showSignal.owner == owner then showSignal = nil end
+    end,
+}
 UIParent = {}
 
 ------------------------------------------------------------------ the stub addon
@@ -150,6 +162,26 @@ iron, rim = Look(nil)
 Check(rim and not iron, "a menu with no owner wears the rim")
 
 Check(#copied == 0, "no key of the menu frame's own is read through its metatable (" .. table.concat(copied, ", ") .. ")")
+
+-- The show signal, with no tick and no hover: the root shows before the game lists it as the open menu.
+local function Shows(owner)
+    local root = OpenMenu(owner)
+    openMenu = nil
+    showSignal.fn(nil, root)
+    openMenu = root
+    local sub = OpenMenu(nil, true)
+    showSignal.fn(nil, sub)
+    return made[root] or {}, made[sub] or {}
+end
+Check(showSignal ~= nil, "the module listens to the game's menu show signal")
+local rootArt, subArt = Shows({})
+Check(rootArt.rim and rootArt.rim.shown, "a right-click menu wears the rim as it shows")
+Check(subArt.rim and subArt.rim.shown and not subArt.iron, "its submenu wears the rim as it shows, before any hover")
+rootArt, subArt = Shows({ GenerateMenu = DropdownButtonMixin.GenerateMenu })
+Check(rootArt.iron and rootArt.iron.shown, "a drop down button's menu wears the iron as it shows")
+Check(subArt.iron and subArt.iron.shown and not subArt.rim, "its submenu wears the iron as it shows, before any hover")
+module.restore()
+Check(showSignal == nil, "turned off, the module stops listening")
 
 if failed > 0 then
     print(failed .. " check(s) failed")

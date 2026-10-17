@@ -1,15 +1,15 @@
 local _, ns = ...
 
 -- Every client menu (drop downs, right-click menus) in the 1.x dialog rim (tinted with a theme); the bronze theme gives
--- back Forever's own.
--- Watch only: menu frames are pooled and discard their keys on close, so all state lives here in weak tables.
+-- back Forever's own. The game's menu show signal names each menu frame as it shows; frames are pooled and discard
+-- their keys on close, so all state lives here in weak tables.
 
 local ART = ns.ART
 local pairs, rawget, select = pairs, rawget, select
 
 local ATLAS = "common-dropdown-bg"
 local BG_ALPHA = 0.925       -- MenuStyle1Mixin:Generate
-local GRACE = 3              -- ticks a click keeps the watch up with no menu open yet
+local GRACE = 3              -- ticks the watch stays up with no menu listed open (a root shows before it is)
 
 local weak = { __mode = "k" }
 local known = setmetatable({}, weak)   -- menu frame -> true
@@ -26,7 +26,8 @@ local active = false
 local theme = {}             -- ThemeTurned state
 local clientArt              -- last painted: true Forever's own, false our rim, nil never
 local grace = 0
-local events, host, job
+local host, job
+local signal = {}             -- our handle on the game's menu show signal
 
 local function Manager()
     return Menu and Menu.GetManager and Menu.GetManager()
@@ -37,21 +38,6 @@ local function IsMenuFrame(f)
     local mixin = _G.MenuProxyMixin
     return mixin and type(f) == "table" and f.IsForbidden and not f:IsForbidden()
         and rawget(f, "InitScrollLayout") == mixin.InitScrollLayout
-end
-
--- A submenu's frame is learned from the mouse the first time it is hovered; the pool hands the same frames out again,
--- so it is dressed as it opens from then on. Never by walking the game's frames (70 ms a frame on retail).
-local function UnderMouse()
-    local foci = GetMouseFoci and GetMouseFoci()
-    local f = foci and foci[1]
-    for _ = 1, 6 do
-        if type(f) ~= "table" or not f.GetParent then return end
-        if IsMenuFrame(f) then
-            known[f] = true
-            return
-        end
-        f = f:GetParent()
-    end
 end
 
 local function IsBack(region)
@@ -208,7 +194,6 @@ local function Tick()
         known[root] = true
         iron = FromDropdown(root)
     end
-    UnderMouse()
     -- One menu tree opens at a time: its submenus wear the root's style.
     for frame in pairs(known) do
         if frame:IsShown() then Dress(frame, iron, frame == root) end
@@ -219,6 +204,19 @@ local function Wake()
     if not active or clientArt ~= false then return end
     grace = GRACE
     job:Wake()
+end
+
+-- Placed, not yet drawn: dressed now, so even a session's first submenu never shows the game's art (#199). The one
+-- client registry we listen to besides Menu.ModifyMenu; it runs its listeners in protected calls.
+local function OnMenuShow(_, frame)
+    if not active or clientArt ~= false or not IsMenuFrame(frame) then return end
+    known[frame] = true
+    local m = Manager()
+    -- The root shows before the game lists it as the open menu.
+    local root = m and m:IsAnyMenuOpen() and m:GetOpenMenu()
+    if not IsMenuFrame(root) then root = frame end
+    Dress(frame, FromDropdown(root), frame == root)
+    Wake()
 end
 
 -------------------------------------------------- social window buttons
@@ -280,19 +278,15 @@ end
 
 ------------------------------------------------------------------ module
 
-local CLICKS = { "GLOBAL_MOUSE_DOWN", "GLOBAL_MOUSE_UP" }
-
 -- Every pass calls these: work only on a change.
 local function Apply()
-    if not events then
-        events = CreateFrame("Frame")
-        events:SetScript("OnEvent", Wake)
+    if not job then
         host = CreateFrame("Frame")
         job = ns.Sched.OnFrame(host, { name = "clientMenus.watch", every = 0, fn = Tick, awake = false })
     end
     if not active then
         active = true
-        ns.RegisterEvents(events, CLICKS)
+        EventRegistry:RegisterCallback("MenuProxy.OnShow", OnMenuShow, signal)
     end
     if ns.ThemeTurned(theme) and (ns.ThemeLook(true) == "client") ~= clientArt then
         clientArt = ns.ThemeLook(true) == "client"
@@ -304,7 +298,7 @@ end
 local function Restore()
     if not active then return end
     active, theme.on, clientArt = false, nil, nil
-    events:UnregisterAllEvents()
+    EventRegistry:UnregisterCallback("MenuProxy.OnShow", signal)
     job:Sleep()
     UndressAll()
     PaintButtons()
