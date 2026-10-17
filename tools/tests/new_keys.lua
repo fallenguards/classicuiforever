@@ -5,6 +5,13 @@
 return {
     hideThreatGlow = "same for everyone: opt-in, off by default",
     hideMinimapNorth = "same for everyone: opt-in, off by default",
+    hideChatButtonsHover = "same for everyone: opt-in, off by default",
+    showChatTabs = "same for everyone: on by default, the tabs as the game shows them",
+    hoverChatTabs = "same for everyone: opt-in, off by default",
+    hideChatTabs = "same for everyone: opt-in, off by default",
+    showChatEditFrame = "same for everyone: on by default, the typing box's border as the game shows it",
+    hoverChatEditFrame = "same for everyone: opt-in, off by default",
+    hideChatEditFrame = "same for everyone: opt-in, off by default",
     showMinimapAddonButtons = "same for everyone: on by default, other addons' buttons shown as before",
     hoverMinimapAddonButtons = "same for everyone: opt-in, off by default",
     hideMinimapAddonButtons = "same for everyone: opt-in, off by default",

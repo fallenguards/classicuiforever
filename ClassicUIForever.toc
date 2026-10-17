@@ -166,6 +166,7 @@ Quest\QuestLogDetail.lua
 Quest\QuestLog.lua
 Quest\QuestMapPane.lua
 Windows\Chat.lua
+Windows\ChatHover.lua
 Windows\WindowChrome.lua
 Windows\Tabs.lua
 Windows\Loot.lua

@@ -340,7 +340,7 @@ local PART_KEYS = {}
 for _, key in pairs(PARTS) do PART_KEYS[key] = true end
 
 local function Off(part)
-    if not (active and ns.db.hideChatButtons) then return false end
+    if not (active and ns.db.hideChatButtons) or ns.db.hideChatButtonsHover then return false end
     if part ~= "all" then return ns.db[PARTS[part]] ~= false end
     for key in pairs(PART_KEYS) do
         if ns.db[key] == false then return false end
@@ -647,7 +647,7 @@ local function Release(button)
 end
 
 local function HoldPicked(button, part)
-    if Off(part) then HoldOne(button, part) else Release(button) end
+    if Off(part) or ns.ChatButtonFaded(part) then HoldOne(button, part) else Release(button) end
 end
 
 -- Edit mode's box keeps 32 px left of the chat for the buttons (EditModeChatFrameSystemTemplate) and holds that box on
@@ -795,6 +795,6 @@ end
 ns.RegisterModule("classicChat", { apply = Apply, restore = Restore })
 
 ns.OnToggle(function(key)
-    if key == "hideChatButtons" or PART_KEYS[key] then ChatButtonsOption() end
+    if key == "hideChatButtons" or key == "hideChatButtonsHover" or PART_KEYS[key] then ChatButtonsOption() end
     if key == "chatScrollBar" and active then DressAll() end
 end)
