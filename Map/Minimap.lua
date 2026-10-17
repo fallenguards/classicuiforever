@@ -416,6 +416,14 @@ local function RingShown()
     if ringHeader then ns.SetAlphaIf(ringHeader, ns.db.hideMinimapHeader and 0 or 1) end
 end
 
+-- An addon's ring button back on our ring (LibDBIcon's Refresh places it by the map's width). Refresh also shows any
+-- button its saved hide flag leaves on: one its addon hid by LibDBIcon's Hide stays hidden (#191).
+local function RefreshAddonButton(ldbi, name, button)
+    local hidden = button and not button:IsShown()
+    pcall(ldbi.Refresh, ldbi, name)
+    if hidden and button:IsShown() then button:Hide() end
+end
+
 local function Layout()
     local cluster = MinimapCluster
     local backdrop = MinimapBackdrop
@@ -616,7 +624,7 @@ local function Layout()
     if ldbi and ldbi.GetButtonList and ldbi.Refresh then
         for _, name in ipairs(ldbi:GetButtonList()) do
             local button = ldbi.GetMinimapButton and ldbi:GetMinimapButton(name)
-            if not (ns.MinimapCollected and ns.MinimapCollected(button)) then pcall(ldbi.Refresh, ldbi, name) end
+            if not (ns.MinimapCollected and ns.MinimapCollected(button)) then RefreshAddonButton(ldbi, name, button) end
             if button then ns.ThemeAddonRing(button) end
         end
     end
