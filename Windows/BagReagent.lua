@@ -59,6 +59,8 @@ local function OwnBag(bag, prefix, wanted, watch)
     -- Its size; made ahead even with the option off, so turning it on in a fight answers at once.
     local function BagSize()
         if not (bag and ContainerFrameCombinedBags) then return 0 end
+        -- The key ring as the game sizes its own window: the rows its keys fill, never the container (32, most locked).
+        if bag == KEYRING and type(GetKeyRingSize) == "function" then return math.max(GetKeyRingSize() or 0, 4) end
         return GetNumSlots(bag) or 0
     end
 

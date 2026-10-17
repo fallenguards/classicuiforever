@@ -732,6 +732,8 @@ local function RingClick()
     if click.skip then return end
     local combined = ContainerFrameSettingsManager and ContainerFrameSettingsManager:IsUsingCombinedBags(KEYRING)
     if ns.GetCVarBool("showKeyring") and not combined then return end
+    -- Keys in the one bag (its option): the client's own toggle of the one bag stands.
+    if combined and ns.db.oneBagKeyring == true then return end
     -- Undo the client's combined bag toggle.
     local bags = ContainerFrameCombinedBags
     if bags and combined then
