@@ -39,7 +39,7 @@ RULES = ["CVAR", "CVARREAD", "CVARLOGIN", "CVARREG", "REGISTRY", "HOOK", "ONUPDA
          "LOADADDON", "EDITMODE", "EDITQUERY", "SETTLE",
          "PANELMGR", "SECRET", "WALK", "REGEVENTS", "EVENTFRAME", "POINTONCE", "SETIF", "THEME", "ONCEFLAG",
          "FRAMEFIELD", "GAMEMENU", "SHAREDART", "PLATES", "FORBIDDEN", "SYSBASE", "LAYOUTFIELD", "CLIENTKEY",
-         "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS", "DRAGPOINT", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "TOC"]
+         "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS", "DRAGPOINT", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "CLIENTTEMPLATE", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "TOC"]
 # A hit of these on a line the change adds fails even within the baseline, so swapping one call for another fails.
 # SINCE, DEADNS, FRAMEFIELD, CVARLOGIN and THROTTLEFRAME stay count-only, so a kept line can still be rewritten.
 LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", "EDITMODE", "PANELMGR", "SEARCHBOX", "ADDONCHAR",
@@ -49,7 +49,8 @@ LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", 
               "WALK", "GAMEMENU", "SHAREDART", "SYSBASE", "LAYOUTFIELD", "CLIENTKEY", "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS",
               "DRAGPOINT", "ERASPOT", "WINDOWORIGIN", "CVARREG", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST",
               "POINTEXACT",
-              "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE")
+              "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE",
+              "CLIENTTEMPLATE")
 
 # The files allowed to hold each pattern, each with its reason; an entry ending in / is a folder.
 ALLOWED = {
@@ -168,6 +169,9 @@ FIX = {
     "SECRETALPHA": "read it into a local and test it with ns.IsSecret before the compare, and skip the work when secret",
     "SECRETATLAS": "test it with ns.IsSecret before a method call or table key on it, and skip that region when secret",
     "NAMEDTEMPLATE": "give the frame a name of ours: retail's copy of the template anchors its pieces by $parent names",
+    "CLIENTTEMPLATE": "run python tools/client_templates.py: it checks the name in Forever's and retail's XML "
+                      "and lists it in tools/client_templates.txt; a name neither client has needs the bare "
+                      "frame type instead",
     "ADDONFORBID": "route it through a secure pad clicking the client's own button, or leave it to the client's code",
     "PLATESHIELD": "set it blind (SetSize, ClearAllPoints, SetPoint) and give it back with the client's own values "
                    "(EraShield in Units/NamePlates.lua)",
@@ -447,6 +451,9 @@ MESSAGES = {
     "PLATESHIELD": "a cast bar shield measured (a plate's is restricted: Can't measure restricted regions)",
     "PASSWRITE": "a blind scale or anchor write in the band pass (it runs on every stance change: a missed frame)",
     "ADDONFORBID": "a call the game forbids to addons (ADDON_ACTION_FORBIDDEN, out of combat too)",
+    "CLIENTTEMPLATE": "a client template not checked against Forever's and retail's XML (0.31.0's bag slot row "
+                      "inherited ItemButtonTemplate, which neither client has: every one bag pass with it on "
+                      "failed)",
     "NAMEDTEMPLATE": "a nameless frame from a client template that anchors by $parent names on retail (the profession "
                      "bars' backs ran from one bar to another: a black box over the book)",
     "SECRETLAYER": "a draw layer read with no secret test beside it (a nameplate's pieces answer secret: 0.16.1, 1381 errors)",
@@ -876,6 +883,34 @@ def call_args(text, start):
         i += 1
     return None
 
+
+
+FRAME_CALL_RX = re.compile(r"\b(?:CreateFrame|NewFrame)\s*\(")
+TEMPLATE_LIST = os.path.join(os.path.dirname(os.path.abspath(__file__)), "client_templates.txt")
+
+
+def template_names(lx):
+    """(line, name) for each template a CreateFrame/NewFrame call names as a string literal."""
+    text = "\n".join(lx.keep)
+    for m in FRAME_CALL_RX.finditer(text):
+        args = call_args(text, m.end() - 1)
+        if not args or len(args) < 4:
+            continue
+        literal = re.fullmatch(r'"([^"]*)"', args[3])
+        if literal:
+            no = text.count("\n", 0, m.start()) + 1
+            for name in literal.group(1).split(","):
+                if name.strip():
+                    yield no, name.strip()
+
+
+def client_template_hits(lx):
+    try:
+        with open(TEMPLATE_LIST, encoding="utf-8") as fh:
+            known = {line.strip() for line in fh if line.strip() and not line.startswith("#")}
+    except OSError:
+        known = set()
+    return {("CLIENTTEMPLATE", no) for no, name in template_names(lx) if name not in known}
 
 def unit_event_hits(path, lx):
     """Registrations of UNIT_ events with no unit filter, unless the list (or first event) is allowed as a site."""
@@ -1437,6 +1472,7 @@ def pattern_hits(path, lx, funcs):
     found |= secret_bar_hits(path, lx)
     found |= cvar_login_hits(lx, funcs)
     found |= held_cvar_hits(lx, funcs)
+    found |= client_template_hits(lx)
     if not allowed("THROTTLEFRAME", path):
         found |= throttle_frame_hits(lx)
     if not allowed("SEARCHBOX", path):

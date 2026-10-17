@@ -1,0 +1,18 @@
+# Client templates our frames inherit, each defined on Forever and retail (tools/client_templates.py).
+BackdropTemplate
+ContainerFrameItemButtonTemplate
+CooldownFrameTemplate
+DialogBorderDarkTemplate
+InputBoxTemplate
+PanelTabButtonTemplate
+PanelTopTabButtonTemplate
+SecureActionButtonTemplate
+SecureFrameTemplate
+SecureHandlerBaseTemplate
+SecureHandlerShowHideTemplate
+SecureHandlerStateTemplate
+TooltipBackdropTemplate
+UICheckButtonTemplate
+UIPanelButtonTemplate
+UIPanelCloseButton
+WowStyle1DropdownTemplate
