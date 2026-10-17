@@ -46,6 +46,7 @@ local W = {
     Moving = {}, EntryOf = { [map] = entry }, Strips = {}, ClampWas = {},
     Full = function() return false end, IsFree = function() return true end,
     PlaceOf = function(e) return e.placed end,
+    Worn = function(e) return e.worn ~= false end,
     SaveFrom = function(e, f) log[#log + 1] = "save" end,
     PlaceAll = function() log[#log + 1] = "place" end,
     STRIP_LEFT = 0, STRIP_RIGHT = 0, STRIP_H = 0, STRIP_LIFT = 0,
@@ -76,6 +77,13 @@ Check(W.Moving[map] == true and job.awake and Log() == "loose", "a clean start l
 W.ForeignDragStop(map)
 Check(W.Moving[map] == nil and not job.awake, "the drag is over")
 Check(Log() == "loose,anchor,save,pinned" and At(100, 500), "the stop anchors it where drawn, saves, pins (" .. Log() .. ")")
+
+-- #192: placed by us once, Unlock Map since turned off: that addon's drag is its own, not saved as ours.
+log, entry.worn = {}, false
+W.ForeignDragStart(map)
+W.ForeignDragStop(map)
+Check(Log() == "loose,anchor,pinned", "a place of ours not worn (toggle off) takes no drag (" .. Log() .. ")")
+entry.worn = nil
 
 -- A window we never placed: nothing saved, so ours never moves it from where that addon puts it.
 log, entry.placed = {}, nil

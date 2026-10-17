@@ -114,7 +114,7 @@ local function ForeignDragStop(frame)
         Anchor(frame, left, top)
     end
     local entry = W.EntryOf[frame]
-    if W.PlaceOf(entry) then W.SaveFrom(entry, frame) end
+    if W.PlaceOf(entry) and W.Worn(entry) then W.SaveFrom(entry, frame) end
     ns.Sched.LetGo(frame, false)
 end
 

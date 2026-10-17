@@ -117,6 +117,10 @@ local function IsFree(entry)
     return Freed()[Leader(entry).key] == true
 end
 
+-- A window with its own toggle (Unlock Map) wears our place and size only while it is on; off, they stay saved and the
+-- window is the game's and other addons' (#192).
+local function Worn(entry) return not entry.toggle or ns.db[entry.toggle] == true end
+
 local Ratio = ns.WindowRatio
 
 -- Maximized, the map fills the screen: none of our place or size, the game's own or an Era style's scale.
@@ -164,8 +168,11 @@ end
 local function Apply(entry)
     local frame = ns.WindowFrame(entry)
     if not frame or moving[frame] or ns.MoverHolds(frame) then return end
-    local left, top = PlaceOf(entry)
-    local scale = Scales()[SizeKey(entry)]
+    local left, top, scale
+    if Worn(entry) then
+        left, top = PlaceOf(entry)
+        scale = Scales()[SizeKey(entry)]
+    end
     -- A size the window's own look asks on top of the player's (the full size professions book).
     local zoom = entry.zoom and entry.zoom() or 1
     if zoom ~= 1 then scale = (scale or 1) * zoom end
@@ -769,7 +776,7 @@ ns.windowEdit = {
     WINDOWS = WINDOWS, Return = Return, Clean = Clean, ValidFlag = ValidFlag, Places = Places, Scales = Scales, Freed = Freed,
     Ratio = Ratio, PlaceAll = PlaceAll, LayHandle = LayHandle, Refresh = Refresh, IsFree = IsFree, Full = Full, Reset = Reset,
     STRIP_LEFT = STRIP_LEFT, STRIP_LIFT = STRIP_LIFT, StripOf = function(frame) return strips[frame] end,
-    ShowHandle = ShowHandle, Set = Set, DialogKeys = DialogKeys, PlaceOf = PlaceOf, SetFree = SetFree, SetPlace = SetPlace,
+    ShowHandle = ShowHandle, Set = Set, DialogKeys = DialogKeys, PlaceOf = PlaceOf, SetFree = SetFree, SetPlace = SetPlace, Worn = Worn,
     Leader = Leader, SizeKey = SizeKey, DrawnSize = DrawnSize, SaveFrom = SaveFrom,
     HideDialog = function() if dialog then dialog:Hide() end end,
     -- The drags (UI/WindowDrags.lua): the tables they keep with us.
