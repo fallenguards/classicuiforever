@@ -5,6 +5,9 @@
 return {
     hideThreatGlow = "same for everyone: opt-in, off by default",
     hideMinimapNorth = "same for everyone: opt-in, off by default",
+    showMinimapAddonButtons = "same for everyone: on by default, other addons' buttons shown as before",
+    hoverMinimapAddonButtons = "same for everyone: opt-in, off by default",
+    hideMinimapAddonButtons = "same for everyone: opt-in, off by default",
     showMinimapTrackingIcon = "kept as before: Map/Minimap.lua MigrateMinimapShow picks hidden where the old Tracking icon box was off; shown where it was on, its default",
     hoverMinimapTrackingIcon = "same for everyone: opt-in, off by default",
     hideMinimapTrackingIcon = "kept as before: Map/Minimap.lua MigrateMinimapShow turns it on where the old Tracking icon box was off",

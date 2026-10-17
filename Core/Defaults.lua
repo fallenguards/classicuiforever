@@ -270,6 +270,7 @@ ns.DB_DEFAULTS = {
     showMinimapTracking = true, hoverMinimapTracking = false, hideMinimapTracking = false,
     showMinimapTrackingIcon = true, hoverMinimapTrackingIcon = false, hideMinimapTrackingIcon = false,
     hideMinimapNorth = false,
+    showMinimapAddonButtons = true, hoverMinimapAddonButtons = false, hideMinimapAddonButtons = false,
     showMinimapMail = true, hoverMinimapMail = false, hideMinimapMail = false,
     showMinimapZoomIn = true, hoverMinimapZoomIn = false, hideMinimapZoomIn = false,
     showMinimapZoomOut = true, hoverMinimapZoomOut = false, hideMinimapZoomOut = false,

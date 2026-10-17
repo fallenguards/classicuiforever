@@ -53,7 +53,7 @@ local PIECES = {
 }
 MM.PIECE_KEYS = PIECES
 local SHOW_IDS = { "MinimapZone", "MinimapTracking", "MinimapTrackingIcon", "MinimapMail", "MinimapZoomIn", "MinimapZoomOut",
-    "MinimapClock", "MinimapDiel", "MinimapCalendar", "MinimapCoords", "MinimapDifficulty" }
+    "MinimapClock", "MinimapDiel", "MinimapCalendar", "MinimapCoords", "MinimapDifficulty", "MinimapAddonButtons" }
 local ZOOM_R = 79
 local ZOOM_DISC = 18
 local discMasks = setmetatable({}, { __mode = "k" })
@@ -632,6 +632,7 @@ local function Layout()
             if button then ns.ThemeAddonRing(button) end
         end
     end
+    if ns.ShowAddonRingButtons then ns.ShowAddonRingButtons() end
     ns.EachChild(map, RingOfChild)
     if ns.OnMinimapLaid then ns.OnMinimapLaid(ldbi) end
 end
@@ -744,6 +745,7 @@ local function Restore()
     HideOwn(MinimapBackdrop)
     MM.HideCalendar()
     for _, home in pairs(homes) do ns.MinimapShow(home, nil) end
+    if ns.AddonRingButtonsBack then ns.AddonRingButtonsBack() end
     if MinimapCluster and MinimapCluster.InstanceDifficulty then ns.MinimapShow(MinimapCluster.InstanceDifficulty, nil, true) end
     for tex in pairs(buttonBorders) do ns.SetAlphaIf(tex, 1) end
     -- Day/night and coordinates back in the client's frames at its spots.

@@ -72,15 +72,64 @@ end
 -- Minimap children no addon's button by name or type, never looked at again (the sweep runs every frame).
 local notAddon = setmetatable({}, { __mode = "k" })
 
-local function TakeNamed(child)
-    if notAddon[child] then return end
+local function NamedAddonButton(child)
+    if notAddon[child] then return false end
     local name = child.GetName and child:GetName()
     if not name or NOT_ADDONS[name] or name:find(OUR_PREFIX) or name:find("^[Mm]ini[Mm]ap")
         or not name:lower():find("minimap", 1, true) or not child:IsObjectType("Button") then
         notAddon[child] = true
-        return
+        return false
     end
-    if child:IsShown() then Take(child) end
+    return true
+end
+
+local function TakeNamed(child)
+    if NamedAddonButton(child) and child:IsShown() then Take(child) end
+end
+
+-- Other addons' ring buttons (LibDBIcon's and named map buttons), ours and the collected ones left out.
+local function VisitNamed(child, fn)
+    if NamedAddonButton(child) and not ns.MinimapCollected(child) then fn(child) end
+end
+function ns.EachAddonRingButton(fn)
+    local lib = DBIcon()
+    if lib and lib.GetButtonList and lib.GetMinimapButton then
+        for _, name in ipairs(lib:GetButtonList()) do
+            local button = lib:GetMinimapButton(name)
+            if button and not ns.MinimapCollected(button) then fn(button) end
+        end
+    end
+    if Minimap then ns.EachChild(Minimap, VisitNamed, fn) end
+end
+
+-- Their Shown / On hover / Hidden on our ring (#194): one never touched is left as its addon shows it (it may fade it
+-- itself), one we hid or faded is given back.
+local ringPicked = setmetatable({}, { __mode = "k" })
+local ringListener
+local function RingButtonShow(button)
+    local state = ns.MM.ShowState("MinimapAddonButtons")
+    if state == nil and not ringPicked[button] then return end
+    ringPicked[button] = state ~= nil or nil
+    ns.MinimapShow(button, "MinimapAddonButtons", true)
+end
+
+-- The minimap's pass (Map/Minimap.lua); a LibDBIcon button made later takes the pick as it comes.
+function ns.ShowAddonRingButtons()
+    ns.EachAddonRingButton(RingButtonShow)
+    local lib = DBIcon()
+    if ringListener or not (lib and lib.RegisterCallback) then return end
+    ringListener = {}
+    lib.RegisterCallback(ringListener, "LibDBIcon_IconCreated", function(_, button)
+        if ns.MM.active and not ns.MinimapCollected(button) then RingButtonShow(button) end
+    end)
+end
+
+-- Our minimap off: every button we hid or faded given back.
+function ns.AddonRingButtonsBack()
+    for button in pairs(ringPicked) do
+        ns.MinimapShow(button, nil, true)
+        ringPicked[button] = nil
+    end
 end
 
 -- Named map buttons, which LibDBIcon says nothing of, and our options button.
@@ -235,6 +284,8 @@ local function Apply()
     Popout()
     if not active then
         active = true
+        -- Our ring's hidden or faded ones back on the map first: a hidden one is under our stash, out of the scan's sight.
+        ns.AddonRingButtonsBack()
         Scan()
         Listen()
         sweepUntil = GetTime() + SWEEP_FOR
