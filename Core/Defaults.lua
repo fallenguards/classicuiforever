@@ -382,12 +382,13 @@ ns.RELOAD_KEYS = {
     questTracker = { off = L["CORE_THE_OBJECTIVE_TRACKER_KEEPS_THE"] },
     -- Restore hides the floor and parchment; the rows keep the old dress.
     questMapPane = { off = L["CORE_THE_MAP_S_QUEST_LIST"] },
-    -- Restore hides the title strips only; dressed windows keep the old frame.
-    panels = { off = L["CORE_WINDOWS_ALREADY_OPENED_KEEP_THE"] },
-    worldMap = { off = L["CORE_THE_WORLD_MAP_KEEPS_THE"] },
-    lootWindow = { off = L["CORE_THE_LOOT_WINDOW_KEEPS_THE"] },
+    -- Restore hides the title strips only; dressed windows keep the old frame. Turned on, windows built while it was
+    -- off keep the plain one: a reload either way.
+    panels = { on = L["CORE_WINDOWS_ALREADY_OPENED_KEEP_THE"], off = L["CORE_WINDOWS_ALREADY_OPENED_KEEP_THE"] },
+    worldMap = { on = L["CORE_THE_WORLD_MAP_KEEPS_THE"], off = L["CORE_THE_WORLD_MAP_KEEPS_THE"] },
+    lootWindow = { on = L["CORE_THE_LOOT_WINDOW_KEEPS_THE"], off = L["CORE_THE_LOOT_WINDOW_KEEPS_THE"] },
     -- Its frame of the window list stays on the game's trainer window.
-    trainer = { off = L["CORE_WINDOWS_ALREADY_OPENED_KEEP_THE"] },
+    trainer = { on = L["CORE_WINDOWS_ALREADY_OPENED_KEEP_THE"], off = L["CORE_WINDOWS_ALREADY_OPENED_KEEP_THE"] },
     -- Restore changes nothing; the window keeps our size, buttons and side tabs.
     groupFinder = { off = L["CORE_THE_GROUP_FINDER_KEEPS_THE"] },
     -- Restore changes nothing; dressed bag windows keep the old art.

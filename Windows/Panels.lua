@@ -248,8 +248,11 @@ end
 -- A window's box under Classic style windows: on, dressed now; off, its strip goes and the rest waits for the reload.
 local WINDOW_KEYS = {}
 for _, entry in ipairs(WINDOWS) do if entry.key then WINDOW_KEYS[entry.key] = true end end
--- A box turned off asks for the reload (Core/Defaults.lua RELOAD_KEYS), as Classic style windows off does.
-for key in pairs(WINDOW_KEYS) do ns.RELOAD_KEYS[key] = { off = ns.L["CORE_WINDOWS_ALREADY_OPENED_KEEP_THE"] } end
+-- A box turned off or on asks for the reload (Core/Defaults.lua RELOAD_KEYS), as Classic style windows does.
+for key in pairs(WINDOW_KEYS) do
+    local text = ns.L["CORE_WINDOWS_ALREADY_OPENED_KEEP_THE"]
+    ns.RELOAD_KEYS[key] = { on = text, off = text }
+end
 
 -- dbVersion 19: Window frames became Classic style windows, which every window option needs. Off before, it stays as it
 -- looked: the switch on, every one of its windows unticked (the account and every profile).
