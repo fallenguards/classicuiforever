@@ -209,6 +209,13 @@ function API.SpellOnButton(button)
     return ns.SpellBookButtonSpell(button)
 end
 
+-- Another addon's round button wearing the game's minimap ring (MiniMap-TrackingBorder) where our scan of the map
+-- cannot see it (not a child of the map): our ring, its tint and Hide button borders, as the map's buttons get.
+-- Safe to call again each time the button repaints.
+function API.ThemeMinimapButton(button)
+    if button then ns.ThemeAddonRing(button) end
+end
+
 -- Room in the Era quest watch for another addon's block, above the quests (side "top") or under them ("bottom"), one
 -- block a side: height and width in the watch's scale, height nil gives it back. The block draws itself at
 -- GetFrame("questWatch")'s top left or bottom left; false while the watch is not the pick.
