@@ -1,6 +1,7 @@
 local _, ns = ...
 
--- Micro button, quest log key and tracker clicks open our log instead of the map's quest panel.
+-- Micro button, quest log key, tracker clicks and every "open the log at this quest" (the game's quest timer, another
+-- addon's tracker) open our log instead of the map's quest panel.
 
 local QL = ns.QL
 
@@ -25,12 +26,17 @@ local function BindClick(_, _, down)
     if not down and QL.active then ns.ToggleQuestLog() end
 end
 
--- Inside the client's click pass: add no work; hide the map, never toggle it.
-local function TrackerHeaderClick(_, block, button)
-    if not QL.active or button == "RightButton" then return end
-    if IsModifiedClick("CHATLINK") or IsModifiedClick("QUESTWATCHTOGGLE") then return end
+-- After the game opened the map at a quest: hide the map, never toggle it, and show the quest in ours.
+local function QuestDetailsOpened(questID)
+    if not QL.active then return end
     if WorldMapFrame and WorldMapFrame:IsShown() then ns.HidePanel(WorldMapFrame) end
-    ns.ShowQuestLog(block and block.id)
+    ns.ShowQuestLog(questID)
+end
+
+-- Inside the client's click pass: add no work.
+local function TrackerHeaderClick(_, block, button)
+    if button == "RightButton" or IsModifiedClick("CHATLINK") or IsModifiedClick("QUESTWATCHTOGGLE") then return end
+    QuestDetailsOpened(block and block.id)
 end
 
 local function MicroClick()
@@ -71,6 +77,8 @@ local function Init()
         local tracker = _G[name]
         if tracker then ns.HookMethod(tracker, "OnBlockHeaderClick", TrackerHeaderClick) end
     end
+    -- Callers outside those trackers: another addon's tracker finds no classic log of its own and opens the map's.
+    ns.HookGlobal("QuestMapFrame_OpenToQuestDetails", QuestDetailsOpened)
     -- Escape is handled in QuestLogWindow's Build.
     ns.CloseWithGameMenu(QL.Frame, ns.HideQuestLog)
 end
