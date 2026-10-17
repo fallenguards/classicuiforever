@@ -94,13 +94,29 @@ local function KeepAuraRow(frame, force)
     ns.SetPointOnce(auras, want, art, wantRel, wantX, wantY)
 end
 
--- Elite frames (Target, Focus): every unit wears the dragon; rares the rare elite one, the small frame stays small.
+-- Elite frames (Target, Focus): the units picked under it (players by default, NPCs too if picked) wear the dragon;
+-- rares the rare elite one, the small frame stays small. A secret answer counts as an NPC.
 local FORCED = { normal = "elite", rare = "rareelite" }
 local ELITE_KEY = { target = "eliteFrameTarget", focus = "eliteFrameFocus" }
 local function ForcedElite(unit, classification)
     local key = ELITE_KEY[unit]
     if not (key and ns.db and ns.db.eliteFrames == true and ns.db[key] ~= false) then return classification end
+    local isPlayer = UnitIsPlayer(unit)
+    local kind = (not IsSecret(isPlayer) and isPlayer) and "eliteUnitPlayers" or "eliteUnitNPCs"
+    if ns.db[kind] ~= true then return classification end
     return FORCED[classification] or classification
+end
+
+-- dbVersion 19: Elite frames forced the dragon on every target; on before, NPCs keep it (the account and every profile).
+function ns.KeepEliteNPCs()
+    local db = ns.db
+    local function Keep(t)
+        if t.eliteFrames == true and t.eliteUnitNPCs == nil then t.eliteUnitNPCs = true end
+    end
+    Keep(db)
+    for _, shot in pairs(type(db.profiles) == "table" and db.profiles or {}) do
+        if type(shot) == "table" then Keep(shot) end
+    end
 end
 
 -- The game colours the name box only as the unit changes (its CheckFaction): grey on a tapped mob, else the unit's

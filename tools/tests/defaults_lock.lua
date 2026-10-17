@@ -73,6 +73,8 @@ return {
     eliteFramePlayer = true,
     eliteFrameTarget = true,
     eliteFrames = false,
+    eliteUnitNPCs = false,
+    eliteUnitPlayers = true,
     englishMessages = false,
     englishNews = false,
     englishSettings = false,

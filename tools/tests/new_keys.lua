@@ -5,6 +5,8 @@
 return {
     hideThreatGlow = "same for everyone: opt-in, off by default",
     xpTipRested = "same for everyone: opt-in, off by default",
+    eliteUnitPlayers = "same for everyone: on by default, players wear the dragon as before",
+    eliteUnitNPCs = "kept as before: dbVersion 19 (Units/TargetFrame.lua KeepEliteNPCs) turns it on where Elite frames was on",
     buffArrowShown = "kept as before: dbVersion 19 (Units/BuffArrow.lua BuffArrowChoice) picks it where Hide buff arrow was off",
     buffArrowHover = "same for everyone: on by default, the arrow under the mouse as Hide buff arrow gave it",
     buffArrowHidden = "same for everyone: opt-in, off by default",

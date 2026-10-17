@@ -134,6 +134,7 @@ ns.DB_DEFAULTS = {
     eliteFramePlayer = true,
     eliteFrameTarget = true,
     eliteFrameFocus = true,
+    eliteUnitPlayers = true, eliteUnitNPCs = false,
     hideThreatGlow = true,
     hideCombatGlow = false,
     damageFlash = false,

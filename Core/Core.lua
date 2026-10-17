@@ -441,6 +441,7 @@ frame:SetScript("OnEvent", function(_, event, arg1)
         if saved and saved < 18 then ns.EyeSnapToDecide() end
         if saved and saved < 19 then ns.KeepEnemyPlayerColor() end
         if saved and saved < 19 then ns.BuffArrowChoice() end
+        if saved and saved < 19 then ns.KeepEliteNPCs() end
         if saved and saved < 19 then ns.KeepGameWindowsOff() end
         ns.CopyDefaults(ns.db, ns.DB_DEFAULTS)
         -- Nothing of ours was ever zeroed on a fresh install: the game settings it holds are the player's own.
