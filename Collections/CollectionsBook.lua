@@ -40,6 +40,7 @@ end
 
 -- A turn to another page: it opens, then this window shuts.
 local function TurnTo(open)
+    ns.BookPageTurn()
     if not open() then return end
     PlaySound(SOUNDKIT.IG_ABILITY_PAGE_TURN)
     B.frame:Hide()
@@ -115,9 +116,19 @@ function CW.BookCloserLines()
     return lines ~= "" and lines or nil
 end
 
+-- A page of the book while the book's Collections tab stands for it (its micro button hidden): Spells/BookPages.lua.
+function ns.CollectionsBookPage()
+    return B.frame ~= nil and B.frame:IsShown() and ns.BookCollectionsTab ~= nil and ns.BookCollectionsTab() == true
+end
+function ns.ShutCollectionsPage()
+    if B.frame and B.frame:IsShown() then B.frame:Hide() end
+end
+
 -- Called as the window is built and each time it shows.
 function CW.BuildFoot(frame)
     B.frame = frame
+    -- Our own watch: the window's SetScripts after this wipe a hook on it.
+    ns.Sched.OnVisible(frame, "collections.page", ns.CollectionsPageChanged)
     if not (ns.NewBookTab and ns.SpellBookActive and ns.SpellBookActive()) then return end
     BuildTabs(frame)
 end
@@ -126,4 +137,5 @@ function CW.FootShown()
     WatchOthers()
     OthersShut()
     if B.tabs then LayTabs() end
+    ns.WireBookPages()
 end

@@ -89,6 +89,7 @@ function T.BookTabs()
             tab:SetScript("OnClick", function()
                 if i == 2 then return end
                 if i == 4 then
+                    ns.BookPageTurn()
                     if _G.CollectionsMicroButton then _G.CollectionsMicroButton:Click() end
                     return
                 end
@@ -113,6 +114,7 @@ function T.BookTabs()
                 pad:SetAttribute("type", "click")
                 pad:SetAttribute("clickbutton", key)
                 if ns.SpellBookTurnPad then ns.SpellBookTurnPad(pad, i == 3) end
+                if ns.BookTurnPad then ns.BookTurnPad(pad) end
                 pad:SetScript("PostClick", function(_, _, down)
                     if down or not ns.SpellBookTurnTo(i == 3) then return end
                     PlaySound(SOUNDKIT.IG_ABILITY_PAGE_TURN)
@@ -141,6 +143,7 @@ function T.BookTabs()
                 pad:SetAttribute("useOnKeyDown", false)
                 pad:SetAttribute("type", "click")
                 pad:SetAttribute("clickbutton", coll)
+                if ns.BookCollectionsPad then ns.BookCollectionsPad(pad) end
                 pad:SetScript("OnMouseDown", function() tab:SetButtonState("PUSHED") end)
                 pad:SetScript("OnMouseUp", function() tab:SetButtonState("NORMAL") end)
                 pad:SetScript("OnEnter", function() tab:LockHighlight() end)

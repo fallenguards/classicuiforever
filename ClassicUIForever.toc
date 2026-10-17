@@ -237,6 +237,7 @@ Legacy\LegacyChallenges.lua
 Legacy\LegacyRewards.lua
 Collections\CollectionsWindow.lua
 Collections\CollectionsBook.lua
+Spells\BookPages.lua
 Collections\CollectionsMounts.lua
 Collections\CollectionsPets.lua
 Collections\CollectionsToys.lua

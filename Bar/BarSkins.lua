@@ -308,6 +308,8 @@ local windowFrames = {}
 for name in pairs(MICRO_WINDOWS) do windowFrames[name] = {} end
 
 local function WindowUp(name)
+    -- The book's other pages are the book (Spells/BookPages.lua).
+    if name == "SpellbookMicroButton" and ns.BookPageUp and ns.BookPageUp() then return true end
     local names, frames = MICRO_WINDOWS[name], windowFrames[name]
     for i = 1, #names do
         local frame = frames[i]

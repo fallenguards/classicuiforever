@@ -1511,7 +1511,7 @@ local function CreateBook()
     end)
     if ns.MicroButtonFollows and not Hosted() then
         for _, name in ipairs({ "SpellbookMicroButton", "PlayerSpellsMicroButton" }) do
-            ns.MicroButtonFollows(_G[name], function() return f:IsShown() end, f)
+            ns.MicroButtonFollows(_G[name], function() return f:IsShown() or ns.BookPageUp() end, f)
         end
     end
     -- Event names differ between clients; a missing one is skipped.
@@ -2076,6 +2076,8 @@ function ns.SpellBookPetTitle()
 end
 function ns.ShowSpellBookBank(pet)
     if not active then return false end
+    -- One page of the book at a time, as the key's macro does: the professions window shut first.
+    if _G.ProfessionsFrame and _G.ProfessionsFrame:IsShown() and not InCombatLockdown() then ns.HidePanel(_G.ProfessionsFrame) end
     state.bank = pet and BANK_PET or BANK_PLAYER
     Show()
     if book and book:IsShown() then book:Refresh() end
