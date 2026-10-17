@@ -626,16 +626,21 @@ function B.LayoutMicroButtons()
         rowIn = row - groupX
     end
     local groupW = (not out and plan.microEnd) and (plan.microEnd - groupX) or ((ART_W / 2 + region) - MICRO_GROUP_X)
+    -- Off the band with no art the box is the row itself (its lead kept on the left), and in the one-bar corner it
+    -- meets the screen's edge.
+    local bare = out and ns.db.hideMicroArt == true
+    local groupH = BAND_H
+    if bare then groupW, groupH = rowIn + region - MICRO_LEAD - MICRO_END_GAP, MICRO_Y + MICRO_H * scale end
     home:SetFrameLevel(math.max(0, level - 1))
     if not home.moving then
-        home:SetSize(groupW, BAND_H)
+        home:SetSize(groupW, groupH)
         home:SetScale(homeScale)
         home:ClearAllPoints()
         local pos = ns.db.microPos
         if ns.ValidPlace(pos) then
             home:SetPoint(pos.point, UIParent, pos.relPoint, pos.x, pos.y)
         elseif OneBar() then
-            home:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", CORNER_X, 0)
+            home:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", bare and 0 or CORNER_X, 0)
         else
             home:SetPoint("BOTTOMLEFT", art, "BOTTOMLEFT", groupX, 0)
         end

@@ -26,6 +26,21 @@ B.OneBar = OneBar
 function B.OneBarAlone() return OneBar() and ns.db.oneBarAlone ~= false end
 -- Hide Bar Scrolling, the game's setting for bar 1, or Main bar alone.
 function B.NoPages(bar) return B.OneBarAlone() or B.BarSetting(bar, "HideBarScrolling") == 1 end
+-- Bags off the band with their art hidden: the buttons side by side (its option), not a socket apart over nothing.
+function B.BagsTight() return ns.db ~= nil and ns.db.hideBagsArt == true and ns.db.bagsTight == true end
+
+-- One bar turned on: its look by default, each changeable after: no bar art under the bags, the micro menu or the key
+-- ring, the bags close together.
+local ONE_BAR_LOOK = { "hideBagsArt", "hideMicroArt", "keyRingArtHidden", "bagsTight" }
+ns.OnToggle(function(key)
+    local db = ns.db
+    if key ~= "oneBar" or not db or db.oneBar ~= true then return end
+    local set = false
+    for _, k in ipairs(ONE_BAR_LOOK) do
+        if db[k] ~= true then db[k], set = true, true end
+    end
+    if set then ns.TogglesChanged(ONE_BAR_LOOK) end
+end)
 
 -- dbVersion 19: a save with One bar on keeps its band as it was (latency bar, key ring and page arrows on it).
 function ns.KeepOneBarLook()

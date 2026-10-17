@@ -10,6 +10,7 @@ local BAND_H, BAND_RUN = B.BAND_H, B.BAND_RUN
 local Seat, CurrentPlan = B.Seat, B.CurrentPlan
 local SHEET = B.PIECES[5]
 local KEY_Y = 21
+local KEY_PAD, TIGHT_GAP = 0, 0   -- the bare key ring: its home the key itself, touching the bags (its art has its own rim)
 local RUN = {}
 
 -- u0, u1: the piece standing alone. The shared post between window and slot is wider than the end posts: the latency bar
@@ -303,18 +304,27 @@ local function Place(el, plan, level)
     ns.SetLevelIf(home, math.max(0, level - (snapped and 2 or 1)))
     local left   -- the sheet's u at the home's left edge
     local turn, scale = nil, 1
+    -- No art: the home is the key itself (across too, so the key centres on the bags at any size), and against the bags
+    -- it stands as close as they stand to each other.
+    local bare, cross = Bare(el), BAND_H
     if pos or snapped then
         left = el.u0 - el.cap
         local long = el.cap + el.u1 - el.u0
+        if bare then
+            cross = B.KEYRING_H + 2 * KEY_PAD
+            long = B.KEYRING_W + 2 * KEY_PAD
+            left = B.TAIL_SLOT - long / 2 + 0.5
+        end
         local frame, point, relPoint, rowScale, dx
         if snapped then
             frame, point, relPoint, rowScale, dx = B.BagsFarEnd()
             turn, scale = B.BagsColumn(), rowScale or 1
+            if bare and dx and dx ~= 0 then dx = dx > 0 and TIGHT_GAP or -TIGHT_GAP end
         elseif Flat(el) then
             turn = "cw"
         end
         ns.SetScaleIf(home, scale)
-        if turn then home:SetSize(BAND_H, long) else home:SetSize(long, BAND_H) end
+        if turn then home:SetSize(cross, long) else home:SetSize(long, cross) end
         if snapped and not el.moving then
             ns.SetPointIf(home, point, frame, relPoint, dx or 0, 0)
         elseif not el.moving then
@@ -344,7 +354,7 @@ local function Place(el, plan, level)
     else
         local keyRing = KeyRingButton
         -- The key's middle on the upright cut, turned with the home.
-        local px, py = B.TAIL_SLOT - left + 0.5, KEY_Y
+        local px, py = B.TAIL_SLOT - left + 0.5, bare and cross / 2 or KEY_Y
         if turn then
             Seat(keyRing, scale, B.KEYRING_H, B.KEYRING_W, level)
         else
@@ -353,7 +363,7 @@ local function Place(el, plan, level)
         if turn == "cw" then
             keyRing:SetPoint("CENTER", home, "TOPLEFT", py, -px)
         elseif turn == "ccw" then
-            keyRing:SetPoint("CENTER", home, "BOTTOMLEFT", BAND_H - py, px)
+            keyRing:SetPoint("CENTER", home, "BOTTOMLEFT", cross - py, px)
         else
             keyRing:SetPoint("CENTER", home, "BOTTOMLEFT", px, py)
         end

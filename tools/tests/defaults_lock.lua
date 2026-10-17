@@ -10,6 +10,7 @@ return {
     bagsFirst = false,
     bagsHeld = false,
     bagsSnapScale = 0,
+    bagsTight = false,
     bagsUnfolded = false,
     bandHandedBack = false,
     bandHoldsBars = false,

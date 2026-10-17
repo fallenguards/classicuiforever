@@ -98,6 +98,7 @@ ns.TOGGLES = {
     { "reagentBagRound", L["OPT_reagentBagRound"], L["OPT_reagentBagRound_TIP"], parent = "classicBar", radio = "reagentBag", drop = true },
     { "reagentBagHover", L["OPT_reagentBagHover"], L["OPT_reagentBagHover_TIP"], parent = "classicBar", radio = "reagentBag", drop = true },
     { "hideBagsArt", L["OPT_hideBagsArt"], L["OPT_hideBagsArt_TIP"], parent = "classicBar" },
+    { "bagsTight", L["OPT_bagsTight"], L["OPT_bagsTight_TIP"], parent = "hideBagsArt", search = "bags gap tight together spacing" },
     { "bagsAboveRow", L["OPT_bagsAboveRow"], L["OPT_bagsAboveRow_TIP"], parent = "classicBar" },
     { "hideMicroButtons", L["OPT_hideMicroButtons"], L["OPT_hideMicroButtons_TIP"], search = "micro menu buttons character spellbook talents professions quest guild group finder collections achievements legacy journal housing help" },
     { "hideMicroCharacter", L["OPT_hideMicroCharacter"], L["OPT_hideMicroCharacter_TIP"], parent = "hideMicroButtons", checks = "hideMicroList", drop = true, dropLabel = L["OPT_DROP_BUTTONS"], dropTip = L["OPT_hideMicroButtons_TIP"] },

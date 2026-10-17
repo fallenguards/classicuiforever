@@ -9,12 +9,13 @@ local BAND_H, CORNER_X = B.BAND_H, B.CORNER_X
 local BAG_BUTTONS, PIECES = B.BAG_BUTTONS, B.PIECES
 -- Buttons sit centred on the sheet's sockets (B.Bag: size, gap, backpack corner).
 local KEYRING_W, KEYRING_H, KEYRING_GAP = 18, 39, -5
+local TIGHT_GAP = 2   -- bags close together: a hair apart, as the game's own row
 B.KEYRING_W, B.KEYRING_H = KEYRING_W, KEYRING_H
 -- Round reagent bag (reagentBagSlot off): a small button at the top corner between key ring and last bag. On, it takes a
 -- full slot left of the last bag (the band's extra socket) and the key ring moves out past it.
 local REAGENT_SIZE = 17
 local BandNow, Seat, OneBar, MicroOut = B.BandNow, B.Seat, B.OneBar, B.MicroOut
-local MicroUserScale, CurrentPlan, ButtonLevel = B.MicroUserScale, B.CurrentPlan, B.ButtonLevel
+local CurrentPlan, ButtonLevel = B.CurrentPlan, B.ButtonLevel
 local Dress, FadeTextures = ns.Dress, ns.FadeTextures
 
 -- The bag part from its post as a floor (with the reagent slot: head, the extra socket, the rest).
@@ -202,7 +203,8 @@ function B.BagsFarEnd()
     if not art then return nil end
     local turn = Grow().turn
     local floor, last = art.bagFloor, art.bagsLast
-    local onFloor = floor and floor:IsShown()
+    -- With the bag art hidden the floor is a bare frame as wide as the socket run, wider than a close row: the last bag.
+    local onFloor = floor and floor:IsShown() and ns.db.hideBagsArt ~= true
     if not onFloor and not (last and last:IsShown()) then return nil end
     if turn == "cw" or turn == "ccw" then
         local up = turn == "cw"
@@ -216,7 +218,7 @@ function B.BagsFarEnd()
         return floor, right and "BOTTOMLEFT" or "BOTTOMRIGHT", right and "BOTTOMRIGHT" or "BOTTOMLEFT", floor:GetScale(),
             right and -SECTION_POST or SECTION_POST
     end
-    return last, right and "LEFT" or "RIGHT", right and "RIGHT" or "LEFT", last:GetScale(), 0
+    return last, right and "LEFT" or "RIGHT", right and "RIGHT" or "LEFT", last:GetScale(), right and TIGHT_GAP or -TIGHT_GAP
 end
 
 -- One more piece on the row, a step on from prev; step is the overlap between sockets (negative: a gap).
@@ -261,6 +263,14 @@ local function HoldBackpackEnd(piece, grow, boxW, boxH)
     ns.SetPointIf(piece, corner, UIParent, "BOTTOMLEFT", x, y)
 end
 
+-- One bar: on the micro group box while it stands in the corner (flush with no bag art, 6 up with it), else on the floor.
+local function CornerHome(art, buttonScale)
+    local micro = not MicroOut() and art.microHome
+    if not micro then return art.sideAnchor, "BOTTOMRIGHT", CORNER_X - 4 * buttonScale, 6 * buttonScale end
+    local bare = ns.db.hideBagsArt == true
+    return micro, "TOPRIGHT", bare and 0 or -4 * buttonScale, bare and 0 or 6 * buttonScale
+end
+
 function B.LayoutBags()
     local backpack = MainMenuBarBackpackButton
     if not backpack then return end
@@ -271,6 +281,7 @@ function B.LayoutBags()
     local out = piece and not shape.bags
     local bag = B.Bag()
     local size, gap = bag.size, bag.gap
+    if (out or OneBar()) and B.BagsTight() then gap = -TIGHT_GAP end
     local lift = (KEYRING_H - size) / 2
     local home, homePoint, homeY = art, "BOTTOMRIGHT", bag.y
     local homeX
@@ -295,9 +306,7 @@ function B.LayoutBags()
     else
         local relativeTo
         if OneBar() then
-            -- Over the micro group while it stands in the corner, else on the floor.
-            local under = MicroOut() and 0 or BAND_H * MicroUserScale() / BandNow()
-            relativeTo, homeX, homeY = art.sideAnchor, CORNER_X - 4 * buttonScale, under + 6 * buttonScale
+            relativeTo, homePoint, homeX, homeY = CornerHome(art, buttonScale)
         else
             -- By the plan: the bags are not always last on the band.
             homePoint, homeX = "BOTTOMLEFT", (CurrentPlan().bagsEnd or CurrentPlan().width) + bag.x

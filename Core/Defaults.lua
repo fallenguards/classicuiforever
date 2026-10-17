@@ -181,6 +181,7 @@ ns.DB_DEFAULTS = {
     hideKeyRing = false,
     hideBagsArt = false,
     hideMicroArt = false,
+    bagsTight = false,
     -- Bar 1's Hide Bar Art as the player ticked it on our layout (Bar/BandBare.lua).
     barArtHidden = false,
     statusBarBacking = true,
