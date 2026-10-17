@@ -62,18 +62,27 @@ local UNIT_TARGET = { "UNIT_TARGET" }
 local AURA_X, AURA_Y = 5, 9
 -- Buffs On Top (edit mode): the row stands over the frame, its bottom this far down the art's top, growing upward.
 local AURA_TOP_X, AURA_TOP_Y = 5, -10
--- The game's Buffs On Top, or ours on the small focus frame (Units/BuffsOnTop.lua; the game's needs the larger frame).
+-- The game's Buffs On Top, but ours alone on the small focus frame (Units/BuffsOnTop.lua): the game hides its own box
+-- there and keeps its value, so one ticked on the larger frame held the row on top whatever ours said.
 function UF.AurasOnTop(frame)
-    if frame.buffsOnTop == true then return true end
-    return frame == FocusFrame and frame.smallSize == true and ns.db.focusBuffsOnTop == true
+    if frame == FocusFrame and frame.smallSize == true then return ns.db.focusBuffsOnTop == true end
+    return frame.buffsOnTop == true
+end
+
+-- The row's spot on the art: point, the art, its point, x, y (Units/BuffsOnTop.lua's edit mode preview stands there too).
+function UF.AuraSpot(frame)
+    local art = frame.TargetFrameContainer and frame.TargetFrameContainer.FrameTexture
+    if not art then return nil end
+    if UF.AurasOnTop(frame) then return "BOTTOMLEFT", art, "TOPLEFT", AURA_TOP_X, AURA_TOP_Y end
+    return "TOPLEFT", art, "BOTTOMLEFT", AURA_X, AURA_Y
 end
 
 local function KeepAuraRow(frame, force)
     local auras = frame.GetAuraContainer and frame:GetAuraContainer()
-    local art = frame.TargetFrameContainer and frame.TargetFrameContainer.FrameTexture
-    if not auras or not art then return end
-    local want, wantRel, wantX, wantY = "TOPLEFT", "BOTTOMLEFT", AURA_X, AURA_Y
-    if UF.AurasOnTop(frame) then want, wantRel, wantX, wantY = "BOTTOMLEFT", "TOPLEFT", AURA_TOP_X, AURA_TOP_Y end
+    if not auras then return end
+    if frame == FocusFrame and UF.FocusPreview then UF.FocusPreview() end
+    local want, art, wantRel, wantX, wantY = UF.AuraSpot(frame)
+    if not want then return end
     local point, relativeTo, relativePoint, x, y = auras:GetPoint(1)
     -- Secret in combat, never compared; a blind put re-lays the whole row, so only when forced.
     local hidden = IsSecret(point) or IsSecret(x) or IsSecret(y) or IsSecret(relativePoint)

@@ -141,6 +141,7 @@ local function Position(bar)
     local container = parent:GetAuraContainer()
     local ok, _, relativeTo = pcall(bar.GetPoint, bar, 1)
     -- Rows we hung over the frame (focus Buffs On Top of ours): the bar goes under the frame, not the rows.
+    -- Only where the game hung it on the rows itself: it marks the bar for that first, and ours on its own is refused.
     local underAuras = ok and container ~= nil and relativeTo == container and not ns.UF.AurasOnTop(parent)
     if ns.OnSpellBarPlaced then ns.OnSpellBarPlaced(bar, underAuras, parent) end
     bar:ClearAllPoints()

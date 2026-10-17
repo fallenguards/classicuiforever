@@ -9,39 +9,56 @@ local LABEL = _G.HUD_EDIT_MODE_SETTING_UNIT_FRAME_BUFFS_ON_TOP
 -- The pet's aura row: the game's spot under the bars, or 2 over the pet's name, 5 left of it (the name stands over the
 -- art's bar box, and the row on the box ran into it).
 local PET_AURA_X, PET_AURA_Y, NAME_X, NAME_GAP = 48, -42, -5, 2
--- The row holds the pet's debuffs only, so in edit mode an empty one shows where it goes: four marks, as its icons.
-local PREVIEW_ICONS, PREVIEW_SIZE, PREVIEW_GAP = 4, 15, 2
+-- The pet's row and the small focus frame's hold debuffs only, so in edit mode an empty one shows where it goes: four
+-- marks as its icons, on the frame, never in the row (the pet's lays out its children).
+local PREVIEW_ICONS, PREVIEW_GAP, PET_ICON, FOCUS_ICON = 4, 2, 15, 17
 local PREVIEW_ICON = "Interface\\Icons\\INV_Misc_QuestionMark"
 local petTaken = false
-local preview
+local previews = {}   -- host frame -> its marks
+
+-- want: shown; the rest its spot (point, relative frame, its point, x, y) and its frame level.
+local function ShowPreview(host, size, want, level, point, rel, relPoint, x, y)
+    local preview = previews[host]
+    if not want then
+        if preview then preview:Hide() end
+        return
+    end
+    if not preview then
+        preview = ns.NewFrame("Frame", nil, host)
+        preview:SetSize(PREVIEW_ICONS * (size + PREVIEW_GAP) - PREVIEW_GAP, size)
+        for i = 1, PREVIEW_ICONS do
+            local icon = preview:CreateTexture(nil, "ARTWORK")
+            icon:SetTexture(PREVIEW_ICON)
+            icon:SetSize(size, size)
+            icon:SetPoint("LEFT", preview, "LEFT", (i - 1) * (size + PREVIEW_GAP), 0)
+        end
+        previews[host] = preview
+    end
+    ns.SetLevelIf(preview, level)
+    ns.SetPointIf(preview, point, rel, relPoint, x, y)
+    preview:Show()
+end
 
 local function Preview()
     local row = PetFrame and PetFrame.AuraFrameContainer
     if not row then return end
     local pool = PetFrame.AuraFramePool
     local empty = not (pool and pool:GetNumActive() > 0)
-    if not (ns.EditMode.state == true and empty and PetFrame:IsShown()) then
-        if preview then preview:Hide() end
-        return
-    end
-    if not preview then
-        -- On the pet frame, never in the row: the row lays out its children.
-        preview = ns.NewFrame("Frame", nil, PetFrame)
-        preview:SetSize(PREVIEW_ICONS * (PREVIEW_SIZE + PREVIEW_GAP) - PREVIEW_GAP, PREVIEW_SIZE)
-        for i = 1, PREVIEW_ICONS do
-            local icon = preview:CreateTexture(nil, "ARTWORK")
-            icon:SetTexture(PREVIEW_ICON)
-            icon:SetSize(PREVIEW_SIZE, PREVIEW_SIZE)
-            icon:SetPoint("LEFT", preview, "LEFT", (i - 1) * (PREVIEW_SIZE + PREVIEW_GAP), 0)
-        end
-    end
-    ns.SetLevelIf(preview, row:GetFrameLevel())
-    if ns.db.petBuffsOnTop == true then
-        ns.SetPointOnce(preview, "BOTTOMLEFT", row, "BOTTOMLEFT", 0, 0)
-    else
-        ns.SetPointOnce(preview, "TOPLEFT", row, "TOPLEFT", 0, 0)
-    end
-    preview:Show()
+    local want = ns.EditMode.state == true and empty and PetFrame:IsShown()
+    local point = ns.db.petBuffsOnTop == true and "BOTTOMLEFT" or "TOPLEFT"
+    ShowPreview(PetFrame, PET_ICON, want, row:GetFrameLevel(), point, row, point, 0, 0)
+end
+
+-- The small focus frame's, on the row's own spot (UF.AuraSpot), with no focus at all (its auras are never read: the
+-- game refuses that while they are secret); kept by the aura upkeep.
+function UF.FocusPreview()
+    local frame = FocusFrame
+    if not frame then return end
+    local open = ns.EditMode.state == true and frame.smallSize == true and UF.active and UF.frames[frame] ~= nil
+    local focus = open and UnitExists("focus")
+    local none = open and not ns.IsSecret(focus) and not focus
+    local point, art, relPoint, x, y = UF.AuraSpot(frame)
+    ShowPreview(frame, FOCUS_ICON, none and point ~= nil, frame:GetAuraContainer():GetFrameLevel(), point, art, relPoint, x, y)
 end
 
 local function PlacePetAuras()
@@ -91,4 +108,7 @@ ns.DialogExtra({
 })
 
 ns.EventFrame("PLAYER_LOGIN", PlacePetAuras)
-ns.OnEditMode(Preview)
+ns.OnEditMode(function()
+    Preview()
+    UF.FocusPreview()
+end)

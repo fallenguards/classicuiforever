@@ -39,14 +39,14 @@ RULES = ["CVAR", "CVARREAD", "CVARLOGIN", "CVARREG", "REGISTRY", "HOOK", "ONUPDA
          "LOADADDON", "EDITMODE", "EDITQUERY", "SETTLE",
          "PANELMGR", "SECRET", "WALK", "REGEVENTS", "EVENTFRAME", "POINTONCE", "SETIF", "THEME", "ONCEFLAG",
          "FRAMEFIELD", "GAMEMENU", "SHAREDART", "PLATES", "FORBIDDEN", "SYSBASE", "LAYOUTFIELD", "CLIENTKEY",
-         "PADART", "SECRETMOUSE", "BARCLICK", "UNITEVENTS", "DRAGPOINT", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "TOC"]
+         "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS", "DRAGPOINT", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "TOC"]
 # A hit of these on a line the change adds fails even within the baseline, so swapping one call for another fails.
 # SINCE, DEADNS, FRAMEFIELD, CVARLOGIN and THROTTLEFRAME stay count-only, so a kept line can still be rewritten.
 LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", "EDITMODE", "PANELMGR", "SEARCHBOX", "ADDONCHAR",
               "KEYONLY",
               "CVARREAD", "THEME", "POINTONCE", "SECRET", "SETIF", "REGEVENTS", "ONCEFLAG", "TIMER", "EDITQUERY",
               "PLATES", "FORBIDDEN", "EVENTFRAME",
-              "WALK", "GAMEMENU", "SHAREDART", "SYSBASE", "LAYOUTFIELD", "CLIENTKEY", "PADART", "SECRETMOUSE", "BARCLICK", "UNITEVENTS",
+              "WALK", "GAMEMENU", "SHAREDART", "SYSBASE", "LAYOUTFIELD", "CLIENTKEY", "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS",
               "DRAGPOINT", "ERASPOT", "WINDOWORIGIN", "CVARREG", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST",
               "POINTEXACT",
               "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE")
@@ -231,6 +231,7 @@ FIX = {
                  "show box.hint and box.clear by the text in OnTextChanged",
     "SECRETMOUSE": "read it into a local first, then test `not IsSecret(over) and over` (ns.IsSecret)",
     "BARCLICK": "turn on motion only (SetMouseMotionEnabled), as the game makes its unit bars: a click goes on to the frame",
+    "AURAREAD": "decide from what can always be read (UnitExists, the frame the game draws), never a unit's aura list",
     "UNITEVENTS": "register with the units the handler serves (ns.RegisterEvents(frame, LIST, unit1, unit2)), or drop "
                   "other units first thing in the handler and list the site in ALLOWED_SITES with its reason",
     "SYSBASE": "use ns.SetPointOnce / ns.SetPointIf / ns.SetScaleIf, or ns.BaseSetters(frame) for two points "
@@ -319,6 +320,7 @@ LINE_PATTERNS = {
     "FRAMEFIELD": re.compile(r"\.\s*fcui[A-Z]\w*\s*=(?!=)"),
     "SECRETMOUSE": re.compile(r"(?:\bif\b|\band\b|\bor\b|\bnot\b|\breturn\b)[^\n]*:\s*IsMouseOver\s*\(\s*\)"),
     "BARCLICK": re.compile(r"\b(?:client\w*|\w*(?:Health|Mana|Power)Bar\w*)\s*[.:]\s*EnableMouse\b"),
+    "AURAREAD": re.compile(r"\bGetAuraDataBy\w+\s*\(|\b(?:UnitAura|UnitBuff|UnitDebuff)\s*\(|\bAuraUtil\s*\.\s*\w+\s*\("),
     "LAYOUTFIELD": re.compile(r"\.\s*(?:ignoreInLayout|includeInLayout|layoutIndex|includeAsLayoutChildWhenHidden"
                               r"|ignoreAllChildren|expand|align|topPadding|bottomPadding|leftPadding|rightPadding)\s*=(?!=)"),
     "SYSBASE": re.compile(
@@ -494,6 +496,7 @@ MESSAGES = {
                  "alone: /fcui off turned off nothing)",
     "SECRETMOUSE": "a unit frame bar's IsMouseOver() tested directly (it can answer a secret in a fight or an instance)",
     "BARCLICK": "EnableMouse on a client unit bar (clicks on too: the bar took the frame's right click, no menu, #183)",
+    "AURAREAD": "a unit's auras read from our code (refused with an error whenever they are secret, 12x from the focus preview)",
     "UNITEVENTS": "UNIT_ events registered for every unit (each nameplate and group member's copy runs the handler)",
     "SYSBASE": "anchor or scale of a bar or edit mode system through the client's wrapper (its snap note taints the next drag)",
     "SHAREDART": "shared control art copied (clear icon, red button coords or page arrow paths)",
