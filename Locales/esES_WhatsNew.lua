@@ -3,6 +3,16 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN42_1_TITLE"] = "Minimapa"
+L["WN42_1_TEXT"] = "Los botones de minimapa de otros accesorios, y nuestro botón de opciones, pueden verse, verse al pasar el ratón u ocultarse sin agruparlos: Botones de accesorios, en Minimapa en las opciones (/fcui). El icono de rastreo también es un menú desplegable: visible, al pasar el ratón u oculto. Ocultar la N (norte) quita la N de lo alto del borde del minimapa; está desactivado por defecto, actívalo en Minimapa en las opciones. Con el calendario detrás de día y noche, pasar el ratón por ese icono muestra el calendario en su lugar."
+L["WN42_2_TITLE"] = "Chat"
+L["WN42_2_TEXT"] = "Las pestañas del chat y el marco de la caja de texto pueden verse, verse al pasar el ratón u ocultarse cada uno: Pestañas del chat y Marco de la caja de texto, en Chat en las opciones (/fcui). Mostrarlos al pasar el ratón, bajo Ocultar botones de chat, devuelve los botones ocultos mientras el ratón está sobre el chat; está desactivado por defecto, actívalo ahí en las opciones."
+L["WN42_3_TITLE"] = "Bolsas"
+L["WN42_3_TEXT"] = "Las opciones de la barra de bolsas están ahora en la página Bolsas. Ocultar también el arte del llavero, bajo Ocultar arte de la barra de bolsas, quita el arte del llavero con el de las bolsas mientras el llavero no está en la barra; está desactivado por defecto, actívalo en las opciones (/fcui), en Bolsas. Con la barra de bolsas en solo la mochila y plegada, la bolsa de componentes se queda y el llavero vuelve al pasar el ratón. En la bolsa única, pasar el ratón por un botón de bolsa vuelve a iluminar sus ranuras, también las del llavero."
+L["WN42_4_TITLE"] = "Fundido al pasar el ratón"
+L["WN42_4_TEXT"] = "Todo lo que aparece al pasar el ratón ahora aparece y desaparece con un breve fundido en vez de saltar."
+L["WN42_5_TITLE"] = "Correcciones"
+L["WN42_5_TEXT"] = "Con las Ventanas de profesión desactivadas, el libro de profesiones ya no muestra un recuadro oscuro más allá de su borde. Cambiar una opción en nuestras páginas de los ajustes del juego ya no pone el borde de nuestra ventana sobre la del juego, y esas páginas llegan hasta su pie; la página de opciones también conserva su posición de desplazamiento. Los menús y submenús reciben el aspecto clásico antes de mostrarse. La ventana de colecciones conserva sus filtros, y con un accesorio que mueve ventanas, el tamaño completo del libro de profesiones funciona y el libro de hechizos ya no salta."
 L["WN41_1_TITLE"] = "Una bolsa"
 L["WN41_1_TEXT"] = "Activar la fila de ranuras de bolsa en la bolsa única ya no rompe su disposición con un error, y con secciones por tipo de bolsa las ranuras del llavero tienen su propia sección."
 L["WN41_2_TITLE"] = "Tecla del libro de hechizos"

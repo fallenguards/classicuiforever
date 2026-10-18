@@ -3,6 +3,16 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN42_1_TITLE"] = "Minicarte"
+L["WN42_1_TEXT"] = "Les boutons de minicarte des autres addons, et notre bouton d'options, peuvent être affichés, affichés au survol ou masqués sans les regrouper : Boutons d'addons, sous Minicarte dans les options (/fcui). L'icône de pistage est aussi un menu déroulant : affichée, au survol ou masquée. Masquer le N (nord) retire le N du haut du bord de la minicarte ; désactivé par défaut, active-le sous Minicarte dans les options. Avec le calendrier derrière jour et nuit, survoler cette icône montre le calendrier à sa place."
+L["WN42_2_TITLE"] = "Discussion"
+L["WN42_2_TEXT"] = "Les onglets du chat et le cadre de la zone de saisie peuvent chacun être affichés, affichés au survol ou masqués : Onglets du chat et Cadre de la zone de saisie, sous Discussion dans les options (/fcui). Les afficher au survol, sous Masquer les boutons de discussion, ramène les boutons masqués tant que la souris est sur le chat ; désactivé par défaut, active-le là dans les options."
+L["WN42_3_TITLE"] = "Sacs"
+L["WN42_3_TEXT"] = "Les options de la barre des sacs sont maintenant sur la page Sacs. Masquer aussi les graphismes du trousseau, sous Masquer les graphismes de la barre des sacs, retire les graphismes du trousseau avec ceux des sacs tant que le trousseau n'est pas sur la barre ; désactivé par défaut, active-le dans les options (/fcui), sous Sacs. Avec la barre des sacs sur sac à dos seul et repliée, le sac de composants reste et le trousseau revient au survol. Dans le sac unique, survoler un bouton de sac éclaire de nouveau ses emplacements, ceux du trousseau aussi."
+L["WN42_4_TITLE"] = "Fondu au survol"
+L["WN42_4_TEXT"] = "Tout ce qui s'affiche au survol apparaît et disparaît maintenant en un bref fondu au lieu de surgir."
+L["WN42_5_TITLE"] = "Corrections"
+L["WN42_5_TEXT"] = "Avec les Fenêtres de métier désactivées, le livre des métiers ne montre plus de cadre sombre au-delà de son bord. Changer une option sur nos pages dans les réglages du jeu ne pose plus le bord de notre fenêtre sur celle du jeu, et ces pages descendent jusqu'à son pied ; la page des options garde aussi sa position de défilement. Les menus et sous-menus prennent l'aspect classique avant de s'afficher. La fenêtre des collections garde ses filtres, et avec un addon qui déplace les fenêtres, la grande taille du livre des métiers fonctionne et le grimoire ne saute plus."
 L["WN41_1_TITLE"] = "Un seul sac"
 L["WN41_1_TEXT"] = "Activer la rangée des emplacements de sac dans le sac unique ne casse plus sa disposition avec une erreur, et avec les sections par type de sac, les emplacements du trousseau ont leur propre section."
 L["WN41_2_TITLE"] = "Touche du grimoire"

@@ -3,6 +3,16 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN42_1_TITLE"] = "Minimappa"
+L["WN42_1_TEXT"] = "I pulsanti della minimappa degli altri addon, e il nostro pulsante delle opzioni, si possono mostrare, mostrare al passaggio o nascondere senza raccoglierli: Pulsanti degli addon, sotto Minimappa nelle opzioni (/fcui). Anche l'icona di tracciamento è un menu a tendina: visibile, al passaggio o nascosta. Nascondi la N (nord) toglie la N dalla cima del bordo della minimappa; è disattivata in modo predefinito, attivala sotto Minimappa nelle opzioni. Con il calendario dietro giorno e notte, passare su quell'icona mostra il calendario al suo posto."
+L["WN42_2_TITLE"] = "Chat"
+L["WN42_2_TEXT"] = "Le schede della chat e la cornice della casella di testo si possono mostrare, mostrare al passaggio o nascondere ciascuna: Schede della chat e Cornice della casella di testo, sotto Chat nelle opzioni (/fcui). Mostrali al passaggio, sotto Nascondi pulsanti della chat, riporta i pulsanti nascosti finché il mouse è sulla chat; è disattivata in modo predefinito, attivala lì nelle opzioni."
+L["WN42_3_TITLE"] = "Borse"
+L["WN42_3_TEXT"] = "Le opzioni della barra delle borse ora sono nella pagina Borse. Nascondi anche la grafica del portachiavi, sotto Nascondi grafica della barra delle borse, toglie la grafica del portachiavi con quella delle borse finché il portachiavi non è sulla barra; è disattivata in modo predefinito, attivala nelle opzioni (/fcui), sotto Borse. Con la barra delle borse su solo lo zaino e ripiegata, la borsa dei reagenti resta e il portachiavi torna al passaggio. Nella borsa unica, passare su un pulsante di borsa illumina di nuovo i suoi spazi, anche quelli del portachiavi."
+L["WN42_4_TITLE"] = "Dissolvenza al passaggio"
+L["WN42_4_TEXT"] = "Tutto ciò che appare al passaggio ora compare e scompare con una breve dissolvenza invece di saltare fuori."
+L["WN42_5_TITLE"] = "Correzioni"
+L["WN42_5_TEXT"] = "Con le Finestre delle professioni disattivate, il libro delle professioni non mostra più un riquadro scuro oltre il suo bordo. Cambiare un'opzione nelle nostre pagine delle impostazioni del gioco non mette più il bordo della nostra finestra sopra quella del gioco, e quelle pagine arrivano fino al suo fondo; la pagina delle opzioni mantiene anche il punto di scorrimento. Menu e sottomenu prendono l'aspetto classico prima di mostrarsi. La finestra delle collezioni mantiene i suoi filtri, e con un addon che sposta le finestre, la grandezza piena del libro delle professioni funziona e il libro degli incantesimi non salta più."
 L["WN41_1_TITLE"] = "Una borsa"
 L["WN41_1_TEXT"] = "Attivare la riga degli spazi delle borse nella borsa unica non ne rompe più la disposizione con un errore, e con le sezioni per tipo di borsa gli spazi del portachiavi hanno una sezione tutta loro."
 L["WN41_2_TITLE"] = "Tasto del libro degli incantesimi"

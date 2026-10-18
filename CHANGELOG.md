@@ -2,6 +2,31 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.32.0] - 2026-10-18
+
+### Added
+- Addon buttons on the minimap, under Minimap in the options (/fcui): shown, on hover or hidden, for the other addons' buttons on the minimap's rim and our options button, without turning on Collect addon buttons. Shown by default; while Collect addon buttons is on, its own choice holds (#194).
+- The tracking icon on the minimap as one drop down: shown, on hover or hidden. A Tracking icon box turned off before stays hidden (#194).
+- Hide the N (north), under Minimap, off by default: takes the N off the top of the minimap's rim (#194).
+- With the calendar's spot behind day and night, hovering the day and night icon shows the calendar in its place (#202).
+- Chat tabs and Typing box frame, under Chat: each shown, on hover or hidden, shown by default. Show them on hover, under Hide chat buttons, brings the hidden chat buttons back while the mouse is over the chat (#196).
+- Hide key ring art too, under Hide bags bar art, off by default: with the key ring off the bar, its art goes with the bags' (#195).
+
+### Changed
+- Anything set to show on hover fades in and out briefly instead of popping on and off.
+- The bag bar's options (key ring, bag size, reagent bag, bag art) are on the Bags page now, still under Classic bar (#195).
+- The Collections window keeps each page's filters across reloads and logins.
+- The calendar spot grays while the calendar is hidden (#194).
+
+### Fixed
+- With the bag bar on backpack only and folded, the reagent bag stays on the bar and the key ring comes back on hover with the arrow (#195).
+- One bag: hovering a bag button lights that bag's slots in the one bag again, and hovering the key ring lights the key ring's slots.
+- With Profession windows off, the professions book no longer shows a dark box past its top and right edge (#203).
+- Turning an option on our pages in the game's settings no longer puts our own window's border over the game's window, and those pages run down to the window's foot like the game's own (#203).
+- Turning an option keeps the options page where it was scrolled (#197).
+- Menus and their submenus get the classic look before they show, the first submenu of a session included (#199).
+- With a window mover addon holding the professions window, Full size works, and the spellbook stands where the mover keeps the professions page instead of jumping when you turn to it.
+
 ## [0.31.1] - 2026-10-17
 
 ### Fixed

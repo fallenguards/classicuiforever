@@ -2,6 +2,16 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN42_1_TITLE"] = "Minimap"
+L["WN42_1_TEXT"] = "Other addons' minimap buttons, and our options button, can be shown, shown on hover or hidden without collecting them: Addon buttons, under Minimap in the options (/fcui). The tracking icon is one drop down too: shown, on hover or hidden. Hide the N (north) takes the N off the top of the minimap's rim; it is off by default, so turn it on under Minimap in the options. With the calendar behind day and night, hovering that icon shows the calendar in its place."
+L["WN42_2_TITLE"] = "Chat"
+L["WN42_2_TEXT"] = "The chat tabs and the frame round the typing box can each be shown, shown on hover or hidden: Chat tabs and Typing box frame, under Chat in the options (/fcui). Show them on hover, under Hide chat buttons, brings the hidden buttons back while the mouse is over the chat; it is off by default, so turn it on there in the options."
+L["WN42_3_TITLE"] = "Bags"
+L["WN42_3_TEXT"] = "The bag bar's options are on the Bags page now. Hide key ring art too, under Hide bags bar art, takes the key ring's art away with the bags' while the key ring is off the bar; it is off by default, so turn it on in the options (/fcui), under Bags. With the bag bar on backpack only and folded, the reagent bag stays and the key ring comes back on hover. In the one bag, hovering a bag button lights its slots again, the key ring's too."
+L["WN42_4_TITLE"] = "Fading on hover"
+L["WN42_4_TEXT"] = "Anything set to show on hover now fades in and out briefly instead of popping on and off."
+L["WN42_5_TITLE"] = "Fixes"
+L["WN42_5_TEXT"] = "With Profession windows off, the professions book no longer shows a dark box past its edge. Turning an option on our pages in the game's settings no longer puts our window's border over the game's window, and those pages run down to its foot; the options page also keeps its scroll spot. Menus and submenus get the classic look before they show. The Collections window keeps its filters, and with a window mover addon, the professions book's full size works and the spellbook no longer jumps."
 L["WN41_1_TITLE"] = "One bag"
 L["WN41_1_TEXT"] = "Turning on the bag slots row in the one bag no longer breaks the bag's layout with an error, and with sections by bag type the key ring's slots get a section of their own."
 L["WN41_2_TITLE"] = "Spellbook key"

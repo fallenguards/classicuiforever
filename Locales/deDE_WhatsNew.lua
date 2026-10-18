@@ -3,6 +3,16 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN42_1_TITLE"] = "Minikarte"
+L["WN42_1_TEXT"] = "Die Minikartentasten anderer Addons und unsere Optionstaste lassen sich zeigen, beim Überfahren zeigen oder ausblenden, ohne sie zu sammeln: Addontasten, unter Minikarte in den Optionen (/fcui). Auch das Verfolgungssymbol ist ein Auswahlmenü: angezeigt, beim Überfahren oder ausgeblendet. N (Norden) ausblenden nimmt das N oben vom Rand der Minikarte; es ist standardmäßig aus, schalte es unter Minikarte in den Optionen ein. Mit dem Kalender hinter Tag und Nacht zeigt das Überfahren dieses Symbols den Kalender an seiner Stelle."
+L["WN42_2_TITLE"] = "Chat"
+L["WN42_2_TEXT"] = "Die Chat-Reiter und der Rahmen um das Eingabefeld lassen sich je zeigen, beim Überfahren zeigen oder ausblenden: Chat-Reiter und Rahmen des Eingabefelds, unter Chat in den Optionen (/fcui). Beim Überfahren zeigen, unter Chattasten ausblenden, holt die ausgeblendeten Tasten zurück, solange die Maus über dem Chat ist; es ist standardmäßig aus, schalte es dort in den Optionen ein."
+L["WN42_3_TITLE"] = "Taschen"
+L["WN42_3_TEXT"] = "Die Optionen der Taschenleiste stehen jetzt auf der Seite Taschen. Auch Schlüsselbundgrafik ausblenden, unter Grafik der Taschenleiste ausblenden, nimmt die Grafik des Schlüsselbunds mit der der Taschen weg, solange der Schlüsselbund nicht auf der Leiste ist; es ist standardmäßig aus, schalte es in den Optionen (/fcui) unter Taschen ein. Mit der Taschenleiste auf nur Rucksack und eingeklappt bleibt die Reagenzientasche, und der Schlüsselbund kommt beim Überfahren zurück. In der einen Tasche leuchten beim Überfahren einer Taschentaste wieder deren Plätze auf, die des Schlüsselbunds auch."
+L["WN42_4_TITLE"] = "Einblenden beim Überfahren"
+L["WN42_4_TEXT"] = "Alles, was beim Überfahren erscheint, blendet jetzt kurz ein und aus, statt plötzlich aufzutauchen und zu verschwinden."
+L["WN42_5_TITLE"] = "Korrekturen"
+L["WN42_5_TEXT"] = "Mit ausgeschalteten Berufsfenstern zeigt das Berufsbuch keinen dunklen Kasten mehr über seinen Rand hinaus. Eine Option auf unseren Seiten in den Spieleinstellungen legt nicht mehr den Rahmen unseres Fensters über das Fenster des Spiels, und diese Seiten reichen bis zu seinem unteren Rand; die Optionsseite behält auch ihre Scrollstelle. Menüs und Untermenüs bekommen den klassischen Look, bevor sie erscheinen. Das Sammlungsfenster behält seine Filter, und mit einem Fensterverschiebe-Addon funktioniert die volle Größe des Berufsbuchs und das Zauberbuch springt nicht mehr."
 L["WN41_1_TITLE"] = "Eine Tasche"
 L["WN41_1_TEXT"] = "Die Reihe der Taschenplätze in der einen Tasche bringt deren Anordnung nicht mehr mit einem Fehler durcheinander, und mit Abschnitten nach Taschenart bekommen die Plätze des Schlüsselbunds einen eigenen Abschnitt."
 L["WN41_2_TITLE"] = "Zauberbuchtaste"
