@@ -178,6 +178,8 @@ end
 -- Edge sheets with a theme copy (dialog border, slider track) swap instead, keeping the fill colour.
 function ns.BronzeBackdrop(frame, r, g, b, a)
     if not frame or not frame.SetBackdropBorderColor then return end
+    -- One taken off stays off: the options window inside the game's settings had its dialog back on each repaint (#203).
+    if not frame.backdropInfo then return end
     local base = bordered[frame]
     if r or type(base) ~= "table" then
         base = { r or 1, g or r or 1, b or r or 1, a or 1, info = type(base) == "table" and base.info or nil }
