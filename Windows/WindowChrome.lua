@@ -316,6 +316,8 @@ function ns.SkinWindow(frame, opts)
         streaks:Show()
         PlaceBacking(frame, opts, lines)
         local inset = frame.Inset or (name and _G[name .. "Inset"])
+        -- Named after the window, laid on one of its pages: Forever's professions one, on its crafting page (#203).
+        if inset and inset ~= frame.Inset and inset.GetParent and inset:GetParent() ~= frame then inset = nil end
         local floor = ns.OwnTexture(frame, "insetFloor", "BACKGROUND", -1)
         if inset and inset.GetObjectType and inset:GetObjectType() == "Frame" then
             -- The inset's thin border reads as a gap inside the metal.
