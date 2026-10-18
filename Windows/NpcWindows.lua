@@ -101,6 +101,8 @@ end
 local PAGE_FOOT = 27
 local MATERIAL_TOP = { "MaterialTopLeft", "MaterialTopRight" }
 local MATERIAL_BOTTOM = { "MaterialBotLeft", "MaterialBotRight" }
+-- The bottom pieces' art (ItemText-<material>-BotLeft, 128 rows) is solid to row 99, clear below.
+local MATERIAL_BOTTOM_SOLID = 100 / 128
 
 -- Parchment sizes from its art, which the client re-sets when theming (it hung
 -- below the gossip window): pin its foot to end with the text area.
@@ -111,21 +113,36 @@ local function Foot(ground, frame)
     ground:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", x or 7, PAGE_FOOT)
 end
 
--- A quest object's page material (stone, bronze) is four pieces sized for the tall window (#178): squeezed to the parchment.
-local function FitMaterial(panel, frame)
-    local topLeft, botLeft = panel.MaterialTopLeft, panel.MaterialBotLeft
-    if not topLeft or not botLeft then return end
-    local point, _, _, _, y = topLeft:GetPoint(1)
-    local top, bottom = topLeft:GetHeight(), botLeft:GetHeight()
-    local room = frame:GetHeight() + (y or 0) - PAGE_FOOT
-    if point ~= "TOPLEFT" or room <= 0 or top + bottom <= room then return end
-    local scale = room / (top + bottom)
+-- A quest object's page material (stone, bronze) is four pieces sized for the tall window (#178): squeezed in
+-- proportion so the art's solid edge meets the parchment's foot, measured as each page shows.
+local materialArt = setmetatable({}, { __mode = "k" })   -- panel -> its pieces' own heights, top and bottom
+local materialPanels = {}
+local function FitMaterial(panel)
+    local topLeft, ground = panel.MaterialTopLeft, panel.Bg
+    local art = materialArt[panel]
+    local top, foot = topLeft:GetTop(), ground and ground:GetBottom()
+    if not (top and foot) or top <= foot then return end
+    local scale = (top - foot) / (art[1] + art[2] * MATERIAL_BOTTOM_SOLID)
     for _, key in ipairs(MATERIAL_TOP) do
-        if panel[key] then panel[key]:SetHeight(top * scale) end
+        if panel[key] then panel[key]:SetHeight(art[1] * scale) end
     end
     for _, key in ipairs(MATERIAL_BOTTOM) do
-        if panel[key] then panel[key]:SetHeight(bottom * scale) end
+        if panel[key] then panel[key]:SetHeight(art[2] * scale) end
     end
+end
+local function FitShownMaterials()
+    for _, panel in ipairs(materialPanels) do
+        if panel:IsShown() then FitMaterial(panel) end
+    end
+end
+local function WatchMaterial(panel)
+    local topLeft, botLeft = panel.MaterialTopLeft, panel.MaterialBotLeft
+    if not (topLeft and botLeft) or materialArt[panel] then return end
+    materialArt[panel] = { topLeft:GetHeight(), botLeft:GetHeight() }
+    materialPanels[#materialPanels + 1] = panel
+    ns.Sched.OnVisible(panel, "npc.material", function(shown)
+        if shown then ns.Sched.NextFrame("npc.material", FitShownMaterials) end
+    end)
 end
 
 local function ShortenNpcWindow(frame, scrolls, panels, grounds)
@@ -145,7 +162,7 @@ local function ShortenNpcWindow(frame, scrolls, panels, grounds)
         panel = Resolve(panel)
         Trim(panel, 400)
         if panel and panel.Bg then Foot(panel.Bg, frame) end
-        if panel then FitMaterial(panel, frame) end
+        if panel then WatchMaterial(panel) end
     end
     for _, ground in ipairs(grounds or EMPTY) do Foot(ground, frame) end
 end
