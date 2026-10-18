@@ -122,6 +122,19 @@ function ns.BookPageWindow(frame)
     if ns.ModuleInForce("professionsBook") and ProfessionsBookPage() then return prof end
 end
 
+-- A mover holds the page on its own spot: the book stands where the page is (the page's corner 12, -14 off the book's,
+-- as edit mode pairs them), so the pages still turn in place.
+local PAGE_X, PAGE_Y = 12, -14
+function ns.BookFollowsPage(page)
+    local book = _G.ForeverClassicUISpellBook
+    if not book or (InCombatLockdown() and ns.WindowLocked(book)) then return end
+    local left, top, scale = page:GetLeft(), page:GetTop(), page:GetEffectiveScale()
+    if ns.AnySecret(left, top, scale) or not (left and top) then return end
+    local toUI, k = scale / UIParent:GetEffectiveScale(), ns.WindowRatio(book) or 1
+    local x, y = left * toUI - PAGE_X, top * toUI - PAGE_Y - UIParent:GetHeight()
+    ns.SetPointIf(book, "TOPLEFT", UIParent, "TOPLEFT", x / k, y / k)
+end
+
 local function WatchProfessions()
     local frame = _G.ProfessionsFrame
     if P.profWatched or not (P.header and frame and frame.BookPage) or InCombatLockdown() then return end

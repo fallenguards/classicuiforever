@@ -167,6 +167,7 @@ end
 function ns.KeepBookPageSpot()
     local P, page = ns.windowParts, ns.BookPageWindow and ns.BookPageWindow()
     if not (page and P.Seen(page)) then return end
+    if ns.MoverTakes(page) then return ns.BookFollowsPage(page) end
     -- Its first open: the row (which settles the sheet first), then the page, this frame.
     if not P.pageX then ns.LayWindowsNow() end
     if P.pageX then P.StandAt(page, P.pageX) end
