@@ -286,8 +286,11 @@ local function RefreshSize()
     local frame = ProfessionsFrame
     if not frame or not sizeWrap or InCombatLockdown() then return end
     sizeWrap:SetFrameRef("prof", frame)
-    sizeWrap:SetAttribute("scale", ns.WindowScale and ns.WindowScale("professions") or 1)
+    -- The player's size (none while a mover holds it) times the full size book's.
+    local size = not ns.MoverHolds(frame) and ns.WindowScale and ns.WindowScale("professions") or 1
+    sizeWrap:SetAttribute("scale", size * ns.ProfessionsZoom())
 end
+T.RefreshSize = RefreshSize
 -- Our book openers (key, micro button, spellbook tab): the window recasts the profession picked last as it shows, inside
 -- the click, so a trade skill opening in it is that recast (TRADE_SKILL_SHOW below).
 local function MarkBookAsked() T.bookAskedAt = GetTime() end
@@ -295,10 +298,18 @@ function ns.ProfessionsSizeWrap(button)
     if not button then return end
     button:HookScript("PreClick", MarkBookAsked)
     sizeWrap = sizeWrap or CreateFrame("Frame", nil, UIParent, "SecureHandlerBaseTemplate")
+    -- The client's top left kept through the size, as the windows pass keeps it (ScaleKept).
     SecureHandlerWrapScript(button, "OnClick", sizeWrap, [[ if not down then return nil, "size" end ]], [[
         local f = control:GetFrameRef("prof")
         local s = control:GetAttribute("scale")
-        if f and s and f:IsShown() then f:SetScale(s) end
+        if not (f and s and f:IsShown()) then return end
+        local old, l, b, w, h = f:GetScale(), f:GetRect()
+        if old == s then return end
+        f:SetScale(s)
+        if l then
+            f:ClearAllPoints()
+            f:SetPoint("TOPLEFT", "$parent", "BOTTOMLEFT", l * old / s, (b + h) * old / s)
+        end
     ]])
     RefreshSize()
 end

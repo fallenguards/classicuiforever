@@ -70,6 +70,7 @@ function T.Zoom(on)
     if on == zoomed or InCombatLockdown() then return end
     zoomed = on
     ns.PlaceSavedWindows()
+    if T.RefreshSize then T.RefreshSize() end
 end
 -- Retail's book is a window of its own (ProfessionsBookFrame) with the same cards under other names.
 local FOREVER = ns.OnForever()

@@ -172,18 +172,18 @@ end
 
 local function Apply(entry)
     local frame = ns.WindowFrame(entry)
-    if not frame or moving[frame] or ns.MoverHolds(frame) then return end
-    local left, top, scale
-    if Worn(entry) then
+    if not frame or moving[frame] then return end
+    local held, left, top, scale = ns.MoverHolds(frame)
+    if Worn(entry) and not held then
         left, top = PlaceOf(entry)
         scale = Scales()[SizeKey(entry)]
     end
-    -- A size the window's own look asks on top of the player's (the full size professions book).
+    -- A size the window's own look asks on top of the player's (the full size book); a mover's window wears only it.
     local zoom = entry.zoom and entry.zoom() or 1
     if zoom ~= 1 then scale = (scale or 1) * zoom end
     -- Windowed, the map's header style at its own size till the player gives it one.
-    if entry.quests and not scale and ns.MapWindowedScale then scale = ns.MapWindowedScale() end
-    if Full(entry, frame) then left, scale = nil, FullScale() end
+    if entry.quests and not (scale or held) and ns.MapWindowedScale then scale = ns.MapWindowedScale() end
+    if not held and Full(entry, frame) then left, scale = nil, FullScale() end
     if not (left or scale or scaled[frame]) then return end
     -- calm: its casting layer moves out of combat only.
     if InCombatLockdown() and (entry.calm or ns.WindowLocked(frame)) then
