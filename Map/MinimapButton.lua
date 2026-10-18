@@ -236,10 +236,10 @@ local function Build(ring)
     ns.RingPressable(b, b.icon)
     ns.DressStates(b, nil, nil, nil, "zoomHighlight", HL_RING)
     b:SetScript("OnClick", ring.onClick)
-    -- Shift, as other addons' minimap buttons move; a pad over the button hands its drag here (UI/SecurePad.lua), and
-    -- follows the button only out of a fight.
+    -- Shift-drag, or a plain one with Shift to drag off (ns.MinimapDragOK); a pad over the button hands its drag here
+    -- (UI/SecurePad.lua), and follows the button only out of a fight.
     b:SetScript("OnDragStart", function()
-        if not IsShiftKeyDown() or InCombatLockdown() then return end
+        if not ns.MinimapDragOK() then return end
         ring.dragX = nil
         dragJob:Wake()
     end)

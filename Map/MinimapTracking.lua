@@ -86,7 +86,7 @@ local function TrackingEnter(self)
     GameTooltip:Show()
 end
 
--- Era's rim spot, in our backdrop's coordinates, until it is dragged round the ring (shift-drag, or edit mode): then at
+-- Era's rim spot, in our backdrop's coordinates, until it is dragged round the ring (a drag, or edit mode): then at
 -- its angle, as far from the map's middle as Era's spot is.
 local TRACK_KEY, TRACK_ANGLE, TRACK_R = "minimapTrackingIcon", "trackingIconAngle", 83.6
 local function PlaceTracking()
@@ -110,14 +110,14 @@ function MM.TrackingFrame(backdrop, level)
         trackFrame = frame
         frame:Hide()
         frame:EnableMouse(true)
-        -- Shift-drag round the ring, as our ring buttons move.
+        -- Dragged round the ring as our ring buttons are (ns.MinimapDragOK).
         frame:RegisterForDrag("LeftButton")
         local drag = ns.Sched.OnFrame(ns.NewFrame("Frame", nil, frame), { name = "minimap.trackingDrag", every = 0,
             awake = false, fn = function()
                 ns.db[TRACK_ANGLE] = ns.MinimapCursorAngle()
                 PlaceTracking()
             end })
-        frame:SetScript("OnDragStart", function() if IsShiftKeyDown() then drag:Wake() end end)
+        frame:SetScript("OnDragStart", function() if ns.MinimapDragOK() then drag:Wake() end end)
         frame:SetScript("OnDragStop", function() drag:Sleep() end)
         if ns.PlaceSavedWindows then ns.PlaceSavedWindows() end
         frame.border = ns.DressNew(frame, "trackingBorder", TRACK_BORDER)

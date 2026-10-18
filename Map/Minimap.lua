@@ -639,6 +639,11 @@ end
 
 -- Ring maths for pieces dragged round the minimap: the cursor's angle about its middle (degrees, 0 = right, counter-
 -- clockwise), and a frame's middle at an angle and radius (map units; k: the frame's scale over the map's).
+-- Our minimap buttons move by Shift-drag, or a plain drag with Shift to drag off (#180); never in a fight.
+function ns.MinimapDragOK()
+    return not InCombatLockdown() and (ns.db.minimapShiftDrag == false or IsShiftKeyDown())
+end
+
 function ns.MinimapCursorAngle()
     local mx, my = Minimap:GetCenter()
     local scale = Minimap:GetEffectiveScale()

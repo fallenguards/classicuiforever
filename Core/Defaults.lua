@@ -285,6 +285,7 @@ ns.DB_DEFAULTS = {
     showMinimapCoords = true, hoverMinimapCoords = false, hideMinimapCoords = false,
     hideMinimapBorder = false, hideMinimapHeader = false, hideButtonBorders = false,
     showOptionsButton = true, hoverOptionsButton = false,
+    minimapShiftDrag = true,
     showAddonBag = true, hoverAddonBag = false,
     microMinimapButtons = true, lfgMinimapButton = true, legacyMinimapButton = true,
     showGroupFinderButton = true, hoverGroupFinderButton = false,

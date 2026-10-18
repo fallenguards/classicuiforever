@@ -99,7 +99,7 @@ MapPad = function(button, strata, after, target, when, editMode)
         if leave then leave(button) end
         GameTooltip:Hide()
     end)
-    -- A drag belongs to the button under the pad (a minimap ring button's shift-drag).
+    -- A drag belongs to the button under the pad (a minimap ring button's).
     mapPad:RegisterForDrag("LeftButton")
     mapPad:SetScript("OnDragStart", function()
         local start = button:GetScript("OnDragStart")

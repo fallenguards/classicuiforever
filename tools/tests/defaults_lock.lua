@@ -219,6 +219,7 @@ return {
     minimapButton = true,
     minimapButtonAngle = 213,
     minimapCollector = false,
+    minimapShiftDrag = true,
     mirrorTimers = true,
     nameBoxFocus = true,
     nameBoxPlayer = false,

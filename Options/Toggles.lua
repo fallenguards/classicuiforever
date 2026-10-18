@@ -359,6 +359,7 @@ ns.TOGGLES = {
     { "minimapButton", L["OPT_minimapButton"], L["OPT_minimapButton_TIP"] },
     { "showOptionsButton", L["OPT_showOptionsButton"], L["OPT_showOptionsButton_TIP"], parent = "minimapButton", radio = "optionsButtonShow", drop = true },
     { "hoverOptionsButton", L["OPT_hoverOptionsButton"], L["OPT_hoverOptionsButton_TIP"], parent = "minimapButton", radio = "optionsButtonShow", drop = true },
+    { "minimapShiftDrag", L["OPT_minimapShiftDrag"], L["OPT_minimapShiftDrag_TIP"], search = "move drag shift minimap button ring" },
     { "microMinimapButtons", L["OPT_microMinimapButtons"], L["OPT_microMinimapButtons_TIP"],
         search = "icon micro menu hidden legacy lfg eye dungeon" },
     { "characterMinimapButton", L["OPT_hideMicroCharacter"], nil, parent = "microMinimapButtons", checks = "microMinimapList", drop = true, dropLabel = L["OPT_DROP_BUTTONS"], dropTip = L["OPT_microMinimapButtons_TIP"] },
