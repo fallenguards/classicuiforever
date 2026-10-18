@@ -77,6 +77,9 @@ end
 -- How far beside the arrows' line the knob stands, per bar (ScrollTrackArt's spec).
 local knobOffset = setmetatable({}, { __mode = "k" })
 function ns.KnobOffset(bar, x) knobOffset[bar] = x end
+-- Bars whose knob stays at the top with nothing to scroll, as Era's text boxes kept theirs.
+local knobStays = setmetatable({}, { __mode = "k" })
+function ns.KnobStays(bar) knobStays[bar] = true end
 
 -- The client's thumb stretches with the content, so the knob is placed by scroll fraction.
 function ns.ClassicKnob(bar)
@@ -86,15 +89,18 @@ function ns.ClassicKnob(bar)
     FadeKeys(thumb, KEYS.THUMB)
     local knob = ns.DressNew(track, "scrollKnob", OWN_KNOB)
     local function Place()
-        -- Nothing to scroll: no knob, as the client hides its thumb (the wheel still moves pct).
+        local pct = bar.fcuiPct or 0
+        -- Nothing to scroll: no knob, as the client hides its thumb (the wheel still moves pct), or one held at the top.
         if bar.HasScrollableExtent then
             local ok, can = pcall(bar.HasScrollableExtent, bar)
             if ok and not can then
-                knob:Hide()
-                return
+                if not knobStays[bar] then
+                    knob:Hide()
+                    return
+                end
+                pct = 0
             end
         end
-        local pct = bar.fcuiPct or 0
         -- The client's track stops 3 px short of its arrows; the old knob ran up to them.
         local reach = knobReach[bar] or bar.fcuiKnobReach or 3
         local foot = knobFoot[bar] or reach

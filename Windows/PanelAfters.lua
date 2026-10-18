@@ -418,6 +418,12 @@ function A.MacroFrame(frame)
             bar:SetPoint("BOTTOMRIGHT", selector, "BOTTOMRIGHT", -4, 2)
         end
     end
+    -- Era's knob on the text box even with nothing to scroll; its arrows grey out.
+    local text = _G["MacroFrameScrollFrame"]
+    if text and text.ScrollBar then
+        ns.KnobStays(text.ScrollBar)
+        ns.ClassicKnob(text.ScrollBar)
+    end
     -- Text box border is bronze on this client: drain to silver, keep the dark middle.
     local box = _G["MacroFrameTextBackground"]
     local slice = box and box.NineSlice
