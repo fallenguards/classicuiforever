@@ -159,19 +159,38 @@ local function OwnBag(bag, prefix, wanted, watch)
     return R
 end
 
--- The reagent bag's button lights our slots on hover, as the game's bag buttons light theirs (bag row out only).
+-- A hovered bag button lights its slots in the combined bag, as the game's own do.
+local function Light(R, on)
+    for i, slot in ipairs(R.slots) do slot.BagIndicator:SetShown(on and i <= R.shown) end
+end
+
+-- The reagent bag's band button, bag row out only (the game's rule for its own).
 local function LightReagent(R)
-    local function Light(button, on)
-        on = on and button:GetIsBarExpanded()
-        for i, slot in ipairs(R.slots) do slot.BagIndicator:SetShown(on and i <= R.shown) end
-    end
-    ns.HookScriptOnce(CharacterReagentBag0Slot, "OnEnter", function(button) Light(button, true) end, "reagentSlots")
-    ns.HookScriptOnce(CharacterReagentBag0Slot, "OnLeave", function(button) Light(button, false) end, "reagentSlots")
+    local function Lit(button, on) Light(R, on and button:GetIsBarExpanded()) end
+    ns.HookScriptOnce(CharacterReagentBag0Slot, "OnEnter", function(button) Lit(button, true) end, "reagentSlots")
+    ns.HookScriptOnce(CharacterReagentBag0Slot, "OnLeave", function(button) Lit(button, false) end, "reagentSlots")
+end
+
+-- The key ring's band button; the game's own light knows nothing of these slots.
+local function LightKeyring(R)
+    if not KeyRingButton then return end
+    ns.HookScriptOnce(KeyRingButton, "OnEnter", function() Light(R, true) end, "keyringSlots")
+    ns.HookScriptOnce(KeyRingButton, "OnLeave", function() Light(R, false) end, "keyringSlots")
 end
 
 local reagent = OwnBag(REAGENT, "ForeverClassicUIReagentSlot", function() return ns.db and ns.db.reagentBagCombined end,
     LightReagent)
-local keyring = OwnBag(KEYRING, "ForeverClassicUIKeyringSlot", function() return ns.db and ns.db.oneBagKeyring == true end)
+local keyring = OwnBag(KEYRING, "ForeverClassicUIKeyringSlot", function() return ns.db and ns.db.oneBagKeyring == true end,
+    LightKeyring)
 
 ns.OwnReagentSlots = reagent.Slots
 ns.OwnKeyringSlots = keyring.Slots
+
+-- The one bag's own bag buttons (Windows/BagSlotRow.lua): our slots for ours, the game's light for its.
+function ns.LightBagSlots(bag, on)
+    if bag == REAGENT or bag == KEYRING then
+        Light(bag == REAGENT and reagent or keyring, on)
+    elseif ContainerFrameCombinedBags then
+        ContainerFrameCombinedBags:SetItemsMatchingBagHighlighted(bag, on)
+    end
+end

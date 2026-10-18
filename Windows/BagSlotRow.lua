@@ -24,10 +24,16 @@ local function Fill()
     end
 end
 
-local function Tip(button)
+-- Its tip and its bag's slots lit, as the band's bag buttons do.
+local function Enter(button)
     GameTooltip:SetOwner(button, "ANCHOR_LEFT")
     if not GameTooltip:SetInventoryItem("player", Slot(button)) then GameTooltip:SetText(_G.EQUIP_CONTAINER or "") end
     GameTooltip:Show()
+    ns.LightBagSlots(button:GetID(), true)
+end
+local function Leave(button)
+    GameTooltip:Hide()
+    ns.LightBagSlots(button:GetID(), false)
 end
 
 local function PutOn(button) _G.PutItemInBag(Slot(button)) end
@@ -57,8 +63,8 @@ local function Holder()
         button:SetScript("OnClick", Click)
         button:SetScript("OnDragStart", function(self) _G.PickupBagFromSlot(Slot(self)) end)
         button:SetScript("OnReceiveDrag", PutOn)
-        button:SetScript("OnEnter", Tip)
-        button:SetScript("OnLeave", GameTooltip_Hide)
+        button:SetScript("OnEnter", Enter)
+        button:SetScript("OnLeave", Leave)
         S.buttons[i] = button
     end
     S.holder = holder
