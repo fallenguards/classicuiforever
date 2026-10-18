@@ -33,3 +33,13 @@ function ns.FadeSquareBorders(on)
         faded[frame] = nil
     end
 end
+
+-- Square minimap (our own option): the map square, its border Era's ring made square, our rim pieces along its edge.
+local MM = ns.MM
+function MM.Square()
+    return MM.active and ns.db.minimapSquare == true
+end
+-- Other addons' minimap buttons ask the shape (the convention minimap button libraries follow); kept if one exists.
+if _G.GetMinimapShape == nil then
+    function _G.GetMinimapShape() return MM.Square() and "SQUARE" or "ROUND" end
+end

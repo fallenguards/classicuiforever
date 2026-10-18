@@ -43,6 +43,7 @@ local ns = {
     Sched = { OnFrame = function() return { Wake = noop, Sleep = noop } end, Attach = noop,
         Job = function() return { Wake = noop, Sleep = noop } end },
     RingPoint = function(frame, degrees) frame.angle = degrees end,
+    MM = { Square = function() return false end },
     DressNew = noop, RoundIcon = noop, MinimapButtonBorder = noop, DressStates = noop, AttachTip = noop, MinimapShow = noop,
     HookMethod = noop, HookScriptOnce = noop, OnToggle = noop, Dress = noop, PlaceSavedWindows = noop,
     RegisterModule = function(key, spec)

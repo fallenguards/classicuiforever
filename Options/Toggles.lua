@@ -309,6 +309,7 @@ ns.TOGGLES = {
     { "hideMinimapZone", L["OPT_hideMinimapZone"], SHOW_TIP, parent = "minimap", radio = "minimapZoneShow", drop = true },
     { "hideMinimapHeader", L["OPT_hideMinimapHeader"], L["OPT_hideMinimapHeader_TIP"], parent = "minimap", search = "zone bar top" },
     { "hideMinimapBorder", L["OPT_hideMinimapBorder"], L["OPT_hideMinimapBorder_TIP"], parent = "minimap", search = "ring frame" },
+    { "minimapSquare", L["OPT_minimapSquare"], L["OPT_minimapSquare_TIP"], parent = "minimap", search = "square shape corners" },
     { "hideMinimapNorth", L["OPT_hideMinimapNorth"], L["OPT_hideMinimapNorth_TIP"], parent = "minimap", search = "north n compass letter" },
     { "eyeSnapMinimap", L["OPT_eyeSnapMinimap"], L["OPT_eyeSnapMinimap_TIP"], parent = "minimap",
         search = "group finder lfg queue eye snap rim edit mode" },

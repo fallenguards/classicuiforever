@@ -404,13 +404,14 @@ end
 
 ------------------------------------------------------------------- layout
 
-local ringBorder, ringHeader
+local ringBorder, ringHeader, ringSquare
 local function BuildRing()
     local cluster = MinimapCluster
     local backdrop = MinimapBackdrop
     if not cluster or not backdrop then return end
+    ringSquare = MM.Square()
     ringHeader = ns.DressNew(cluster, "minimapBorder", RING_TOP)
-    ringBorder = ns.DressNew(backdrop, "minimapBorder", RING)
+    ringBorder = ns.DressNew(backdrop, ringSquare and "minimapBorderSquare" or "minimapBorder", RING)
     cluster.fcuiNorth = ns.DressNew(backdrop, "compassNorth", NORTH, Minimap)
 end
 
@@ -462,7 +463,8 @@ local function Layout()
     else
         map:SetPoint("CENTER", cluster, "TOP", 9, -92)
     end
-    if map.SetMaskTexture then map:SetMaskTexture((ns.TexPath("portraitMask"))) end
+    if map.SetMaskTexture then map:SetMaskTexture((ns.TexPath(MM.Square() and "squareMask" or "portraitMask"))) end
+    if ringSquare ~= MM.Square() then BuildRing() end
     ns.FadeSquareBorders(true)
     backdrop:SetSize(CLUSTER, CLUSTER)
     ns.SetPointOnce(backdrop, "CENTER", cluster, "CENTER", 0, -20)
@@ -653,9 +655,15 @@ function ns.MinimapCursorAngle()
     return angle
 end
 
+-- On a square map the spot slides out along the angle to the square of that radius.
 function ns.RingPoint(frame, degrees, radius, k)
     local a, f = math.rad(degrees), 1 / (k or 1)
-    ns.SetPointOnce(frame, "CENTER", Minimap, "CENTER", math.cos(a) * radius * f, math.sin(a) * radius * f)
+    local x, y = math.cos(a), math.sin(a)
+    if MM.Square() then
+        local out = 1 / math.max(math.abs(x), math.abs(y))
+        x, y = x * out, y * out
+    end
+    ns.SetPointOnce(frame, "CENTER", Minimap, "CENTER", x * radius * f, y * radius * f)
 end
 
 -- The 1.x calendar button: the day number on the stone calendar art.
@@ -736,7 +744,10 @@ end
 -- Runs on every ApplyAll while off: only what Apply took this session goes back, the game's pieces are not ours to
 -- place otherwise. OwnTexture never re-shows, so the ring needs a reload.
 local function Restore()
+    local wasSquare = MM.Square()
     SetActive(false)
+    -- The round mask back (the client's own shape).
+    if wasSquare and Minimap and Minimap.SetMaskTexture then Minimap:SetMaskTexture((ns.TexPath("portraitMask"))) end
     for region, file in pairs(eraRings) do
         region:SetTexture(file)
         eraRings[region] = nil
@@ -778,8 +789,9 @@ end
 ns.RegisterModule("minimap", { apply = Apply, restore = Restore })
 
 -- A piece's Shown / On hover / Hidden picked: laid again at once.
+local RELAY_KEYS = { hideMinimapBorder = true, hideMinimapHeader = true, hideMinimapNorth = true, minimapSquare = true }
 ns.OnToggle(function(key)
-    if key == "hideMinimapBorder" or key == "hideMinimapHeader" or key == "hideMinimapNorth" then LayoutIfActive() return end
+    if RELAY_KEYS[key] then LayoutIfActive() return end
     if key == "hideButtonBorders" then ButtonBordersApply() return end
     for _, id in ipairs(SHOW_IDS) do
         if key == "show" .. id or key == "hover" .. id or key == "hide" .. id then LayoutIfActive() return end

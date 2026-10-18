@@ -186,6 +186,7 @@ return {
     druidManaGlowBehind = "same for everyone: off by default; a second pick, the bar in front of the glow",
     druidManaGlowOver = "same for everyone: off by default; a third pick, the glow over the bar as before",
     collectionsWindow = "on for everyone, as the Legacy window: the classic Collections window in place of the game's",
+    minimapSquare = "same for everyone: off, the round map as before; on squares it, Era's border made square",
     minimapShiftDrag = "same for everyone: on, as before (Shift to drag our minimap buttons); off lets a plain drag move them (#180)",
     levelUpBanner = "off for everyone, a restyle: the game's level-up banners go, as 1.x had none; checked brings them back",
 }

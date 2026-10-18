@@ -15,7 +15,7 @@ local GROUPS = {
         "Character/CharacterLists.lua", "Character/SkillDetail.lua", "Character/ReputationDetail.lua",
         "Character/CurrencyDetail.lua", "Character/CharacterSheet.lua", "Character/PetView.lua", "Character/StatPanes.lua",
         "Character/EquipmentPane.lua" },
-    { "Map/MapFade.lua" }, { "Map/Minimap.lua", "Map/MinimapTracking.lua" }, { "Map/MinimapButton.lua", "Map/MinimapMicro.lua", "Map/MinimapCollector.lua" },
+    { "Map/MapFade.lua" }, { "Map/Minimap.lua", "Map/MinimapSquare.lua", "Map/MinimapTracking.lua" }, { "Map/MinimapButton.lua", "Map/MinimapMicro.lua", "Map/MinimapCollector.lua" },
     { "Quest/QuestTracker.lua", "Quest/QuestWatch.lua" },
     { "Quest/QuestLogData.lua", "Quest/QuestLogShare.lua", "Quest/QuestLogWindow.lua", "Quest/QuestLogDetail.lua",
         "Quest/QuestLog.lua" },

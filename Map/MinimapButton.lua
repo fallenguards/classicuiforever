@@ -120,8 +120,11 @@ local function Position(ring)
     local degrees = Angle(ring)
     local r = Radius()
     local k = button:GetEffectiveScale() / Minimap:GetEffectiveScale()
-    if degrees == ring.placedAngle and r == ring.placedRadius and k == ring.placedScale then return end
-    ring.placedAngle, ring.placedRadius, ring.placedScale = degrees, r, k
+    local square = ns.MM.Square()
+    if degrees == ring.placedAngle and r == ring.placedRadius and k == ring.placedScale and square == ring.placedSquare then
+        return
+    end
+    ring.placedAngle, ring.placedRadius, ring.placedScale, ring.placedSquare = degrees, r, k, square
     ns.RingPoint(button, degrees, r, k)
 end
 

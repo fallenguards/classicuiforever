@@ -71,6 +71,9 @@ ns.TEX = {
     castFlashSmall = "CastingBar\\UI-CastingBar-Flash-Small",
     -- minimap
     minimapBorder = "Minimap\\UI-Minimap-Border",
+    -- Square minimap: Era's ring unrolled round a square. Ours only.
+    minimapBorderSquare = "!UI-Minimap-Border-Square.tga",
+    squareMask = "=Buttons\\WHITE8X8",
     minimapBackground = "Minimap\\UI-Minimap-Background",
     compassNorth = "Minimap\\CompassNorthTag",
     compassRing = "Minimap\\CompassRing",
@@ -414,7 +417,7 @@ local METAL = {
     targetingRareEliteThickMana = true, targetingRareEliteThickName = true,
     targetingMinus = true, targetOfTarget = true, smallTargetingFrame = true, partyFrame = true,
     castBorder = true, castBorderSmall = true, castSmallShield = true,
-    minimapBorder = true, trackingBorder = true, clockBackground = true,
+    minimapBorder = true, minimapBorderSquare = true, trackingBorder = true, clockBackground = true,
     zoomInUp = true, zoomInDown = true, zoomInDisabled = true, zoomOutUp = true, zoomOutDown = true, zoomOutDisabled = true,
     frameMetal = true, frameMetalH = true, frameMetalV = true,
     tabActive = true, tabInactive = true,
