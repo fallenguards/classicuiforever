@@ -400,6 +400,7 @@ ns.TOGGLES = {
     { "hideChatEditFrame", L["OPT_hideChatEditFrame"], L["OPT_chatEditFrame_TIP"], radio = "chatEditFrameShow", drop = true },
 
     { "gameDamageNumbers", L["OPT_gameDamageNumbers"], L["OPT_gameDamageNumbers_TIP"], group = L["GROUP_OTHER"] },
+    { "levelUpBanner", L["OPT_levelUpBanner"], L["OPT_levelUpBanner_TIP"], search = "level up ding banner toast popup reached" },
     { "damageMeter", L["OPT_damageMeter"], L["OPT_damageMeter_TIP"], search = "dps meter recount details", needs = "panels" },
     { "addonMessages", L["OPT_addonMessages"], L["OPT_addonMessages_TIP"], search = "chat login lines quiet" },
     { "welcomeNote", L["OPT_welcomeNote"], L["OPT_welcomeNote_TIP"], parent = "addonMessages" },

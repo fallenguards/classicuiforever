@@ -97,6 +97,7 @@ UI\Menus.lua
 UI\CheckList.lua
 UI\ClientMenus.lua
 UI\Escape.lua
+UI\LevelBanner.lua
 UI\SecurePad.lua
 Bar\BarSkins.lua
 Bar\Band.lua

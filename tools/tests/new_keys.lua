@@ -186,4 +186,5 @@ return {
     druidManaGlowBehind = "same for everyone: off by default; a second pick, the bar in front of the glow",
     druidManaGlowOver = "same for everyone: off by default; a third pick, the glow over the bar as before",
     collectionsWindow = "on for everyone, as the Legacy window: the classic Collections window in place of the game's",
+    levelUpBanner = "off for everyone, a restyle: the game's level-up banners go, as 1.x had none; checked brings them back",
 }

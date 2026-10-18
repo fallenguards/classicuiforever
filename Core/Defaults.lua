@@ -84,6 +84,7 @@ ns.DB_DEFAULTS = {
     spellBookFlyouts = false,
     bagsBesideBars = true,
     gameDamageNumbers = true,
+    levelUpBanner = false,
     -- The layout to go back to, and a pending switch to ours.
     previousLayout = "",
     layoutSelectPending = false,

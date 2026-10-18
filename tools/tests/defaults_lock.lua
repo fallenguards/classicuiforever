@@ -196,6 +196,7 @@ return {
     legacyMinimapButton = true,
     legacyThreePane = false,
     legacyWindow = true,
+    levelUpBanner = false,
     lfgMinimapButton = true,
     lootRoll = false,
     lootWindow = true,
