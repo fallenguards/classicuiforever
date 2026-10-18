@@ -198,7 +198,7 @@ local function HoverTick(job)
     end
     -- Our ring button inside the addon bag stays lit there.
     for frame in pairs(hovering) do
-        if not (ns.MinimapCollected and ns.MinimapCollected(frame)) then ns.SetAlphaIf(frame, over and 1 or 0) end
+        if not (ns.MinimapCollected and ns.MinimapCollected(frame)) then ns.FadeTo(frame, over and 1 or 0) end
     end
 end
 
@@ -235,7 +235,7 @@ function ns.MinimapShow(frame, id, client, also)
         ns.SetShownIf(frame, state ~= "hide")
     end
     hovering[frame] = state == "hover" or nil
-    if state == nil then ns.SetAlphaIf(frame, 1) end
+    if state == nil then ns.FadeTo(frame, 1, nil, true) end
     if not next(hovering) or not MinimapCluster then return end
     hoverJob = hoverJob or ns.Sched.Job({ name = "minimap.hover", every = 0.1, awake = false, fn = HoverTick })
     hoverJob:Wake()

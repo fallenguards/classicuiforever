@@ -27,14 +27,14 @@ local function Near()
     return false
 end
 
--- Only what we faded is given back.
-local function Paint(region, alpha)
+-- Only what we faded is given back; now: at once (a pick turned, a tab made), else a fade.
+local function Paint(region, alpha, now)
     if alpha == 1 and not painted[region] then return end
     painted[region] = alpha < 1 or nil
-    ns.SetAlphaIf(region, alpha)
+    ns.FadeTo(region, alpha, nil, now)
 end
-local function PaintTexture(region, alpha)
-    if region:IsObjectType("Texture") then Paint(region, alpha) end
+local function PaintTexture(region, alpha, now)
+    if region:IsObjectType("Texture") then Paint(region, alpha, now) end
 end
 
 local function Want(id, near)
@@ -53,9 +53,9 @@ local function Lay(force)
     for i = 1, #list do
         local name = list[i]
         local tab, flash, box = _G[name .. "Tab"], _G[name .. "TabFlash"], _G[name .. "EditBox"]
-        if tab then ns.EachRegion(tab, Paint, tabs) end
-        if flash then ns.EachRegion(flash, Paint, tabs) end
-        if box then ns.EachRegion(box, PaintTexture, frame) end
+        if tab then ns.EachRegion(tab, Paint, tabs, force) end
+        if flash then ns.EachRegion(flash, Paint, tabs, force) end
+        if box then ns.EachRegion(box, PaintTexture, frame, force) end
     end
 end
 

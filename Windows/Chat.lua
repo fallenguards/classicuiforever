@@ -623,7 +623,7 @@ local function Stash(button)
 end
 
 local function HoldOne(button, part)
-    ns.SetAlphaIf(button, 0)
+    ns.FadeTo(button, 0, nil, Off(part))
     if button:IsMouseEnabled() then button:EnableMouse(false) end
     if part == "bottom" then Stash(button) end
     -- Each pass: a theme turn dresses the faces again.
@@ -641,7 +641,7 @@ local function Release(button)
         button:SetFrameStrata(info.strata)
         button:SetFrameLevel(info.level)
     end
-    button:SetAlpha(1)
+    ns.FadeTo(button, 1)
     button:EnableMouse(true)
     FacesFollow(button, false)
 end

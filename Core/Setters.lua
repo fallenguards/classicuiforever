@@ -113,6 +113,52 @@ function ns.SetFrameAlphaIf(frame, alpha, tol)
     return true
 end
 
+-- On hover picks: in quick, out a little slower; one driver for every fading piece.
+ns.FADE_IN, ns.FADE_OUT = 0.15, 0.3
+local fades = {}   -- object -> { alpha, target, frameAlpha }
+local fadeJob, fadeAt
+
+local function PutAlpha(obj, alpha, frameAlpha)
+    if frameAlpha then ns.SetFrameAlphaIf(obj, alpha) else ns.SetAlphaIf(obj, alpha) end
+end
+
+local function FadeStep(job)
+    local now = GetTime()
+    local elapsed = now - (fadeAt or now)
+    fadeAt = now
+    for obj, fade in pairs(fades) do
+        local alpha, target = fade.alpha, fade.target
+        if target > alpha then
+            alpha = math.min(target, alpha + elapsed / ns.FADE_IN)
+        else
+            alpha = math.max(target, alpha - elapsed / ns.FADE_OUT)
+        end
+        fade.alpha = alpha
+        PutAlpha(obj, alpha, fade.frameAlpha)
+        if alpha == target then fades[obj] = nil end
+    end
+    if not next(fades) then job:Sleep() end
+end
+
+-- Toward alpha from where it stands; frameAlpha: the frame's own (item buttons); now: at once (a pick turned).
+function ns.FadeTo(obj, alpha, frameAlpha, now)
+    local fade = fades[obj]
+    if now then
+        fades[obj] = nil
+        PutAlpha(obj, alpha, frameAlpha)
+    elseif fade then
+        fade.target = alpha
+    else
+        local from = obj:GetAlpha()
+        if IsSecret(from) then return PutAlpha(obj, alpha, frameAlpha) end
+        if Same(from, alpha) then return end
+        if not next(fades) then fadeAt = nil end
+        fades[obj] = { alpha = from, target = alpha, frameAlpha = frameAlpha }
+        fadeJob = fadeJob or ns.Sched.Job({ name = "hover.fade", every = 0, awake = false, fn = FadeStep })
+        fadeJob:Wake()
+    end
+end
+
 -- Compares IsShown (the frame's own flag), not visibility.
 function ns.SetShownIf(region, shown)
     if IsSecret(shown) then

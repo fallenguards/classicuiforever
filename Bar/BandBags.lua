@@ -131,7 +131,7 @@ end
 -- compare reading the frame); seen, those regions are lit again through it.
 local function ReagentSeen(reagent, seen)
     if seen then reagent:SetAlpha(1) end
-    ns.SetFrameAlphaIf(reagent, seen and 1 or 0)
+    ns.FadeTo(reagent, seen and 1 or 0, true, true)
     if reagent:IsMouseEnabled() ~= seen then reagent:EnableMouse(seen) end
 end
 
@@ -149,7 +149,8 @@ end
 local function HoverWanted()
     return B.active and ns.db ~= nil and ns.db.reagentBagHover == true and not B.ReagentSlot()
 end
-local function HoverCheck()
+-- now: a lay (any option turned) lands at once; only the mouse coming and going fades.
+local function HoverCheck(now)
     local reagent = CharacterReagentBag0Slot
     if not reagent or not HoverWanted() then return end
     local over = false
@@ -160,7 +161,7 @@ local function HoverCheck()
     local may = B.ReagentMayLight()
     local lit = over and may
     if lit then reagent:SetAlpha(1) end
-    ns.SetFrameAlphaIf(reagent, lit and 1 or 0)
+    ns.FadeTo(reagent, lit and 1 or 0, true, now)
     if reagent:IsMouseEnabled() ~= may then reagent:EnableMouse(may) end
 end
 -- The pick's painter (BandBagsShow) leaves the round reagent bag to this hover while it is wanted.
@@ -171,7 +172,7 @@ local function HookHover()
     hoverHooked = true
     for _, button in ipairs(RowButtons()) do
         if button then
-            ns.HookScriptOnce(button, "OnEnter", HoverCheck)
+            ns.HookScriptOnce(button, "OnEnter", function() HoverCheck() end)
             ns.HookScriptOnce(button, "OnLeave", function() ns.Sched.NextFrame("bags.hover", HoverCheck) end)
         end
     end
@@ -377,7 +378,7 @@ function B.LayoutBags()
         if HoverWanted() then
             ReagentSeen(reagent, true)
             HookHover()
-            HoverCheck()
+            HoverCheck(true)
         else
             ReagentSeen(reagent, true)
         end

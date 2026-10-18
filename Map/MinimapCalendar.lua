@@ -74,8 +74,8 @@ end
 -- day/night back whatever the spot.
 local function BehindHover(button, over)
     local behind = Spot() == "behind"
-    if MM.tod then ns.SetAlphaIf(MM.tod, behind and over and 0 or 1) end
-    if behind then ns.SetAlphaIf(button, over and 1 or 0) end
+    if MM.tod then ns.FadeTo(MM.tod, behind and over and 0 or 1) end
+    if behind then ns.FadeTo(button, over and 1 or 0) end
 end
 
 -- The client's button, unseen over the square, takes the mouse; the square follows its states.
@@ -162,20 +162,20 @@ function MM.PlaceCalendar(cluster, map, above)
         button:SetScale(1)
         button:SetSize(box:GetSize())
         button:SetHitRectInsets(0, 0, 0, 0)
-        ns.SetAlphaIf(button, 0)
+        ns.FadeTo(button, 0, nil, true)
     elseif spot == "zone" then
         square:Show()
         button:SetScale(1)
         button:SetSize(SQUARE_W, SQUARE_H)
         button:SetHitRectInsets(0, 0, 0, 0)
-        ns.SetAlphaIf(button, 0)
+        ns.FadeTo(button, 0, nil, true)
         MM.SquareDay()
     else
         square:Hide()
         button:SetScale(diel and RING_SCALE or 1)
         button:SetSize(RING, RING)
         button:SetHitRectInsets(6, 0, 5, 10)
-        ns.SetAlphaIf(button, 1)
+        ns.FadeTo(button, 1, nil, true)
     end
     ns.SetPointOnce(button, "CENTER", box, "CENTER", 0, 0)
 end

@@ -112,6 +112,7 @@ ns.NewFrame = CreateFrame
 ns.SetPointOnce = function(frame, ...) frame:ClearAllPoints() frame:SetPoint(...) end
 ns.SetShownIf = function(frame, on) frame:SetShown(on) end
 ns.SetAlphaIf = function(frame, a) frame:SetAlpha(a) end
+ns.FadeTo = function(frame, a) frame:SetAlpha(a) end
 ns.BaseSetters = function() return nil, Frame.ClearAllPoints, Frame.SetPoint end
 ns.Near = function(a, b, d) return math.abs((a or 0) - (b or 0)) <= d end
 ns.AnySecret = function() return false end

@@ -9,7 +9,6 @@ local B = ns.band
 local BAG_BUTTONS = B.BAG_BUTTONS
 local SetFrameAlphaIf, SetShownIf = ns.SetFrameAlphaIf, ns.SetShownIf
 local MODES = { hideBagsAlways = "hidden", hideBagsOpen = "open", hideBagsHover = "hover", bagsBackpackOnly = "backpack" }
-local FADE = 0.25
 local revealed = false        -- a bag window open (open), or the mouse over the row (hover)
 local arrowRevealed = false   -- the mouse over the row or the arrow
 local hooked = false
@@ -95,17 +94,18 @@ local function Paint()
     if arrow then arrow:SetAlpha(arrowAlpha) end
 end
 
-local function Toward(value, target, step)
-    if value < target then return math.min(target, value + step) end
-    return math.max(target, value - step)
+-- The hover fade's timings (ns.FADE_IN, ns.FADE_OUT in Core/Setters.lua).
+local function Toward(value, target, elapsed)
+    if value < target then return math.min(target, value + elapsed / ns.FADE_IN) end
+    return math.max(target, value - elapsed / ns.FADE_OUT)
 end
 
 local fadeJob
 local function FadeStep()
     local now = GetTime()
-    local step = (now - (lastTick or now)) / FADE
+    local elapsed = now - (lastTick or now)
     lastTick = now
-    rowAlpha, arrowAlpha = Toward(rowAlpha, rowTarget, step), Toward(arrowAlpha, arrowTarget, step)
+    rowAlpha, arrowAlpha = Toward(rowAlpha, rowTarget, elapsed), Toward(arrowAlpha, arrowTarget, elapsed)
     Paint()
     if rowAlpha == rowTarget and arrowAlpha == arrowTarget then fadeJob:Sleep() end
 end
@@ -334,7 +334,7 @@ Apply = function(atOnce)
         arrow:Hide()
     end
     HoverZone(mode == "hover" or mode == "backpack", n)
-    B.ReagentHoverCheck()
+    B.ReagentHoverCheck(atOnce)
     FadeTo(seen and 1 or 0, (mode == "backpack" and arrowRevealed) and 1 or 0, atOnce)
 end
 B.ApplyBagsMode = function() Apply(true) end
