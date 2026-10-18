@@ -274,6 +274,7 @@ local function SkinTarget(frame, unit)
 
     if blizzHealth then
         ns.Fade(blizzHealth)
+        UF.HoldCover(healthContainer, health)
         BarTexts(frame, contextual, health, { blizzHealth.TextString, healthContainer.LeftText, healthContainer.RightText,
             healthContainer.DeadText, healthContainer.UnconsciousText }, TEXTS, blizzHealth, frame, unit, false)
         AttachOverlays(blizzHealth, health, healthContainer.HealthBarMask)

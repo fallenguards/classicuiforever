@@ -172,6 +172,20 @@ end
 local OVERLAY_BARS = { "MyHealPredictionBar", "OtherHealPredictionBar", "HealAbsorbBar", "TotalAbsorbBar" }
 local OVERLAY_GLOWS = { "OverAbsorbGlow", "OverHealAbsorbGlow" }
 
+-- The game lays each heal and absorb segment's mask off its own fill's end (StatusBarOverlaySegment.lua), on every
+-- health change too; under ours that fill can run longer (Forever sizes its target bar by its container) and stand
+-- thin. Watched while the segment shows: put back off our fill's end, the game's offset and width kept.
+local function FollowOurFill(piece, clientBar, bar)
+    local mask = piece.FillMask
+    local theirs, ours = clientBar:GetStatusBarTexture(), bar:GetStatusBarTexture()
+    if not (mask and theirs and ours) then return end
+    local _, rel, _, x = mask:GetPoint(1)
+    if rel ~= theirs then return end
+    mask:ClearAllPoints()
+    mask:SetPoint("TOPLEFT", ours, "TOPRIGHT", x or 0, 0)
+    mask:SetPoint("BOTTOMLEFT", ours, "BOTTOMRIGHT", x or 0, 0)
+end
+
 -- Client heal prediction and absorb pieces follow our bar.
 function UF.AttachOverlays(source, bar, mask)
     for _, key in ipairs(OVERLAY_BARS) do
@@ -182,6 +196,9 @@ function UF.AttachOverlays(source, bar, mask)
             piece:SetAllPoints(bar)
             if mask and piece.Fill and piece.Fill.RemoveMaskTexture then pcall(piece.Fill.RemoveMaskTexture, piece.Fill, mask) end
             if piece.Fill then piece.Fill:SetTexture((ns.TexPath("statusBar"))) end
+            if piece.FillMask then
+                ns.Sched.Attach(piece, { name = "uf.healFollow", every = 0, fn = function() FollowOurFill(piece, source, bar) end })
+            end
         end
     end
     for _, key in ipairs(OVERLAY_GLOWS) do
@@ -217,6 +234,8 @@ function UF.LayBars(frame, style)
     local height = UF.BAR_H + (style == "name" and NAME_RISE or style == "mana" and MANA_DROP or 0)
     ns.SetPointOnce(lay.health, "TOPLEFT", lay.host, "TOPLEFT", lay.x, top)
     lay.health:SetHeight(height)
+    -- Its own size too: re-placed at one corner (UF.HoldCover), it stays ours.
+    if lay.clientHealth then lay.clientHealth:SetHeight(height) end
     local powerShown = style ~= "mana"
     ns.SetShownIf(lay.power, powerShown)
     -- Its faded client bar over the health bar there: the mouse goes through to health. Motion only, as the game makes
@@ -266,6 +285,16 @@ end
 function UF.Cover(clientBar, bar)
     ns.SetPointOnce(clientBar, "TOPLEFT", bar, "TOPLEFT", 0, 0)
     clientBar:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", 0, 0)
+    clientBar:SetSize(bar:GetSize())
+end
+
+-- Forever's target and focus put their health bar back on each target change, in a fight too (Camelot TargetFrame.lua
+-- UpdateHealthBarVisuals: its top left 3 over its container's, its own size kept). Container pinned under ours and the
+-- size kept ours, it lands on ours: the heal and absorb fills, masked to that bar's texture, keep our height (thick).
+local CLIENT_BAR_RISE = 3
+function UF.HoldCover(container, bar)
+    if not ns.OnForever() then return end
+    container:SetPoint("TOPLEFT", bar, "TOPLEFT", 0, -CLIENT_BAR_RISE)
 end
 
 -- Bars under the art, art under icons and text; protected children are re-levelled only when different.
@@ -283,7 +312,8 @@ function UF.BuildBars(frame, container, contextual, x, bgH, bgY, unit, clientHea
     if clientHealth then UF.Cover(clientHealth, health) end
     if clientMana then UF.Cover(clientMana, power) end
     lays[frame] = { host = host, health = health, power = power, bg = bg, x = x, bgY = bgY, bgH = bgH,
-        powerTexts = lays[frame] and lays[frame].powerTexts, style = nil, kind = unit, clientPower = clientMana }
+        powerTexts = lays[frame] and lays[frame].powerTexts, style = nil, kind = unit, clientPower = clientMana,
+        clientHealth = clientHealth }
     UF.LayBars(frame, UF.Thick(unit))
     return host, health, power, bg
 end
