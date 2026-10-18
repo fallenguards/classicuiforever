@@ -16,6 +16,32 @@ local loadWatch, chatWatch
 -- The report box draws its title and rock insets under its border frame: the old edge only, its own fill stays.
 local REPORT_EDGE = ns.DialogEdge(32)
 local NAME_EDGES = { "IconSelectorPopupNameLeft", "IconSelectorPopupNameMiddle", "IconSelectorPopupNameRight" }
+-- Icon pickers' scroll bar: the bar off the icon grid, its pieces off the bar's own edges (x + right, y + up):
+local ICON_PICKER_SCROLL_X = 0
+local ICON_PICKER_SCROLL_TOP = 30
+local ICON_PICKER_SCROLL_BOTTOM = -5
+local ICON_PICKER_SCROLL_WIDTH = 25
+local ICON_PICKER_UP_ARROW_X = 4
+local ICON_PICKER_UP_ARROW_Y = -4
+local ICON_PICKER_DOWN_ARROW_X = 4
+local ICON_PICKER_DOWN_ARROW_Y = 4
+local ICON_PICKER_KNOB_X = 4
+local ICON_PICKER_KNOB_TOP = -22
+local ICON_PICKER_KNOB_BOTTOM = 22
+local ICON_PICKER_COLUMN_X = 0
+local ICON_PICKER_COLUMN_TOP = 0
+local ICON_PICKER_COLUMN_BOTTOM = 0
+local ICON_PICKER_BACKING_LEFT = 2
+local ICON_PICKER_BACKING_TOP = -3
+local ICON_PICKER_BACKING_RIGHT = -3
+local ICON_PICKER_BACKING_BOTTOM = 3
+local ICON_PICKER_SCROLL = {
+    width = ICON_PICKER_SCROLL_WIDTH, upX = ICON_PICKER_UP_ARROW_X, upY = ICON_PICKER_UP_ARROW_Y,
+    downX = ICON_PICKER_DOWN_ARROW_X, downY = ICON_PICKER_DOWN_ARROW_Y, knobX = ICON_PICKER_KNOB_X,
+    trackTop = ICON_PICKER_KNOB_TOP, trackBottom = ICON_PICKER_KNOB_BOTTOM, columnX = ICON_PICKER_COLUMN_X,
+    columnTop = ICON_PICKER_COLUMN_TOP, columnBottom = ICON_PICKER_COLUMN_BOTTOM, plateLeft = ICON_PICKER_BACKING_LEFT,
+    plateTop = ICON_PICKER_BACKING_TOP, plateRight = ICON_PICKER_BACKING_RIGHT, plateBottom = ICON_PICKER_BACKING_BOTTOM,
+}
 local INPUT_EDGES = { "TopLeftTex", "TopRightTex", "TopTex", "BottomLeftTex", "BottomRightTex", "BottomTex",
     "LeftTex", "RightTex" }
 local CHAT_REDS = { "ChatConfigFrameDefaultButton", "ChatConfigFrameRedockButton", "CombatLogDefaultButton",
@@ -128,13 +154,14 @@ end
 
 ------------------------------------------------------------ icon pickers
 
--- IconSelectorPopupFrameTemplate (SharedUIPanelTemplates.xml:1714): Forever's macropopup rim is the only border,
--- so the old edge goes on it; the popup's own dark fill stays (a fill at the BorderBox's level 50 would cover the grid).
+-- IconSelectorPopupFrameTemplate (SharedUIPanelTemplates.xml:1714): its macropopup rim is Era's own art (the name
+-- strip's divider and the button footer drawn in), so it stays, drained to silver; the popup's dark fill stays too
+-- (a fill at the BorderBox's level 50 would cover the grid).
 local function DressIconPopup(popup, key)
     if ns.IsForbidden(popup) then return end
     local box = popup.BorderBox
     if box then
-        chrome:Border(box, REPORT_EDGE)
+        ns.DrainSlice(box, nil, Drain)
         ns.EachKey(box.IconSelectorEditBox, NAME_EDGES, Drain, ns.INPUT_GREY)
         ns.SkinDropdown(box.IconTypeDropdown)
         ns.SkinRedButton(box.OkayButton)
@@ -144,7 +171,13 @@ local function DressIconPopup(popup, key)
     end
     local selector = popup.IconSelector
     if selector then
-        ns.QuietScrollBar(selector.ScrollBar, "iconPopup.knob." .. key, true)
+        -- Era's trim bar beside the grid, its ends tuned in game.
+        local bar = selector.ScrollBar
+        if bar then
+            ns.SetTwoPointsIf(bar, "TOPRIGHT", selector, "TOPRIGHT", ICON_PICKER_SCROLL_X, ICON_PICKER_SCROLL_TOP,
+                "BOTTOMRIGHT", selector, "BOTTOMRIGHT", ICON_PICKER_SCROLL_X, ICON_PICKER_SCROLL_BOTTOM)
+            ns.TrimScrollBar(bar, "iconPopup.knob." .. key, ICON_PICKER_SCROLL)
+        end
         ns.TintSelectorSlots(selector.ScrollBox, selector, "iconPopup.slots." .. key)
     end
 end

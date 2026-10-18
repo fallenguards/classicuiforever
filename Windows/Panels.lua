@@ -119,7 +119,8 @@ local WINDOWS = {
     -- Social window's lift, so the two read as one window when they swap.
     { "LFGWhoListFrame", key = "panelGroupFinder", addon = "Blizzard_GroupFinder_VanillaStyle", lift = 5 },
     { "InspectFrame", key = "panelInspect", addon = "Blizzard_InspectUI", lift = 5, tabLift = 3, after = A.InspectFrame },
-    { "MacroFrame", key = "panelMacros", addon = "Blizzard_MacroUI", topTabs = true, lift = 2, after = A.MacroFrame },
+    { "MacroFrame", key = "panelMacros", addon = "Blizzard_MacroUI", topTabs = true, lift = 4, scrollBars = false,
+        after = A.MacroFrame },
     { "ClassTrainerFrame", toggle = "trainer", addon = "Blizzard_TrainerUI" },
     { "AuctionHouseFrame", key = "panelAuction", addon = "Blizzard_AuctionHouseUI", lift = 9 },
     { "CommunitiesFrame", key = "panelCommunities", addon = "Blizzard_Communities", after = A.CommunitiesFrame },

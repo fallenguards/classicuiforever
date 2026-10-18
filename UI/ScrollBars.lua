@@ -162,6 +162,182 @@ function ns.SkinMinimalScrollBar(bar)
     Arrow(bar.Forward, "Down")
 end
 
+-- Era's trim bar (WowTrimScrollBar) on a client minimal bar by its atlases (same art on every client): plate, capped
+-- column, arrows, three piece knob on the client's thumb (its length and travel kept). Metal drained, gold arrows kept.
+-- Era's numbers (TrimScrollBar.xml), from the bar's own edges (x + right, y + up):
+local ERA_SCROLL_WIDTH = 25
+local ERA_SCROLL_UP_ARROW_X = 4
+local ERA_SCROLL_UP_ARROW_Y = -4
+local ERA_SCROLL_DOWN_ARROW_X = 4
+local ERA_SCROLL_DOWN_ARROW_Y = 4
+local ERA_SCROLL_KNOB_X = 4
+local ERA_SCROLL_TRACK_TOP = -22
+local ERA_SCROLL_TRACK_BOTTOM = 22
+local ERA_SCROLL_COLUMN_X = 0
+local ERA_SCROLL_COLUMN_TOP = 0
+local ERA_SCROLL_COLUMN_BOTTOM = 0
+local ERA_SCROLL_PLATE_LEFT = 2
+local ERA_SCROLL_PLATE_TOP = -3
+local ERA_SCROLL_PLATE_RIGHT = -3
+local ERA_SCROLL_PLATE_BOTTOM = 3
+-- Era's own, for a bar that brings no numbers of its own (ns.TrimScrollBar's spec).
+local ERA_SCROLL = {
+    width = ERA_SCROLL_WIDTH,
+    upX = ERA_SCROLL_UP_ARROW_X,
+    upY = ERA_SCROLL_UP_ARROW_Y,
+    downX = ERA_SCROLL_DOWN_ARROW_X,
+    downY = ERA_SCROLL_DOWN_ARROW_Y,
+    knobX = ERA_SCROLL_KNOB_X,
+    trackTop = ERA_SCROLL_TRACK_TOP,
+    trackBottom = ERA_SCROLL_TRACK_BOTTOM,
+    columnX = ERA_SCROLL_COLUMN_X,
+    columnTop = ERA_SCROLL_COLUMN_TOP,
+    columnBottom = ERA_SCROLL_COLUMN_BOTTOM,
+    plateLeft = ERA_SCROLL_PLATE_LEFT,
+    plateTop = ERA_SCROLL_PLATE_TOP,
+    plateRight = ERA_SCROLL_PLATE_RIGHT,
+    plateBottom = ERA_SCROLL_PLATE_BOTTOM,
+}
+local TRIM_ARROW_W, TRIM_ARROW_H = 18, 16
+local TRIM_KNOB_W, TRIM_CAP_H, TRIM_KNOB_IN, TRIM_CENTER_H = 18, 21, 5, 1022
+local TRIM_KNOB = {
+    up = { "UI-ScrollBar-Knob-EndCap-Top", "UI-ScrollBar-Knob-Center", "UI-ScrollBar-Knob-EndCap-Bottom" },
+    over = { "UI-ScrollBar-Knob-MouseOver-EndCap-Top", "UI-ScrollBar-Knob-MouseOver-Center",
+        "UI-ScrollBar-Knob-MouseOver-EndCap-Bottom" },
+    off = { "UI-ScrollBar-Knob-EndCap-Top-Disabled", "UI-ScrollBar-Knob-Center-Disabled",
+        "UI-ScrollBar-Knob-EndCap-Bottom-Disabled" },
+}
+
+local function TrimArrow(bar, button, art, point, x, y)
+    if button.Texture then button.Texture:SetAlpha(0) end
+    button:SetSize(TRIM_ARROW_W, TRIM_ARROW_H)
+    ns.SetPointOnce(button, point, bar, point, x, y)
+    local face = ns.OwnTexture(button, "trimFace", "ARTWORK")
+    local over = ns.OwnTexture(button, "trimOver", "OVERLAY")
+    over:SetAtlas(art .. "-Highlight")
+    over:SetAllPoints(face)
+    local function State(down)
+        local on = button:IsEnabled()
+        face:SetAtlas(art .. (not on and "-Disabled" or down and "-Down" or "-Up"))
+        -- Pressed: a pixel down and right, as Era's arrows.
+        local d = on and down and 1 or 0
+        ns.SetTwoPointsIf(face, "TOPLEFT", button, "TOPLEFT", d, -d, "BOTTOMRIGHT", button, "BOTTOMRIGHT", d, -d)
+        over:SetShown(on and button:IsMouseOver())
+    end
+    State(false)
+    return State
+end
+
+local function HookArrow(button, State)
+    local function Rest() State(false) end
+    button:HookScript("OnEnable", Rest)
+    button:HookScript("OnDisable", Rest)
+    button:HookScript("OnMouseDown", function() State(true) end)
+    button:HookScript("OnMouseUp", Rest)
+    button:HookScript("OnEnter", Rest)
+    button:HookScript("OnLeave", Rest)
+end
+
+local function TrimKnob(thumb)
+    FadeKeys(thumb, KEYS.THUMB)
+    -- On our own frame over the thumb: shown and hidden with it, sized by its own script (no client hook on size).
+    local ear = ns.NewFrame("Frame", nil, thumb)
+    ear:SetAllPoints(thumb)
+    local top = ear:CreateTexture(nil, "ARTWORK", nil, 2)
+    local mid = ear:CreateTexture(nil, "ARTWORK", nil, 1)
+    local bottom = ear:CreateTexture(nil, "ARTWORK", nil, 2)
+    top:SetSize(TRIM_KNOB_W, TRIM_CAP_H)
+    top:SetPoint("TOP", ear, "TOP", 0, 0)
+    bottom:SetSize(TRIM_KNOB_W, TRIM_CAP_H)
+    bottom:SetPoint("BOTTOM", ear, "BOTTOM", 0, 0)
+    mid:SetWidth(TRIM_KNOB_W)
+    mid:SetPoint("TOP", ear, "TOP", 0, -TRIM_KNOB_IN)
+    mid:SetPoint("BOTTOM", ear, "BOTTOM", 0, TRIM_KNOB_IN)
+    ns.DrainBronze(top)
+    ns.DrainBronze(mid)
+    ns.DrainBronze(bottom)
+    local function Paint()
+        local set = not thumb:IsEnabled() and TRIM_KNOB.off or thumb:IsMouseOver() and TRIM_KNOB.over or TRIM_KNOB.up
+        top:SetAtlas(set[1])
+        mid:SetAtlas(set[2])
+        bottom:SetAtlas(set[3])
+        -- Era's centre strip is cut to the knob's length, never stretched.
+        local h = math.max(0, (ear:GetHeight() or 0) - 2 * TRIM_KNOB_IN)
+        mid:SetTexCoord(0, 1, 0, math.min(1, h / TRIM_CENTER_H))
+    end
+    ear:SetScript("OnSizeChanged", Paint)
+    Paint()
+    return Paint
+end
+
+-- No client hooks (a quiet dialog): a watch while the bar shows repaints an arrow or the knob when its state changes.
+local function QuietTrim(bar, name, arrows, thumb, paintKnob)
+    local seen = {}
+    ns.Sched.OnFrame(ns.NewFrame("Frame", nil, bar), { name = name, every = 0, fn = function()
+        for button, State in pairs(arrows) do
+            local down = button:IsEnabled() and button:GetButtonState() == "PUSHED"
+            local now = (button:IsEnabled() and 1 or 0) + (down and 2 or 0) + (button:IsMouseOver() and 4 or 0)
+            if seen[button] ~= now then
+                seen[button] = now
+                State(down)
+            end
+        end
+        local now = (thumb:IsEnabled() and 1 or 0) + (thumb:IsMouseOver() and 2 or 0)
+        if seen[thumb] ~= now then
+            seen[thumb] = now
+            paintKnob()
+        end
+    end })
+end
+
+-- quiet: a watch name instead of hooks on the client's arrows and thumb; spec: its own numbers, as ERA_SCROLL.
+function ns.TrimScrollBar(bar, quiet, spec)
+    local track = bar and bar.Track
+    if not (track and track.Thumb) or not ns.Once(bar, "trimBar") then return end
+    spec = spec or ERA_SCROLL
+    bar:SetWidth(spec.width)
+    local plate = ns.OwnTexture(bar, "trimPlate", "BACKGROUND")
+    plate:SetColorTexture(0, 0, 0, 0.75)
+    ns.SetTwoPointsIf(plate, "TOPLEFT", bar, "TOPLEFT", spec.plateLeft, spec.plateTop,
+        "BOTTOMRIGHT", bar, "BOTTOMRIGHT", spec.plateRight, spec.plateBottom)
+    local head = ns.OwnTexture(bar, "trimHead", "ARTWORK")
+    head:SetAtlas("UI-ScrollBar-EndCap-Top", true)
+    ns.SetPointOnce(head, "TOPLEFT", bar, "TOPLEFT", spec.columnX, spec.columnTop)
+    local foot = ns.OwnTexture(bar, "trimFoot", "ARTWORK")
+    foot:SetAtlas("UI-ScrollBar-EndCap-Bottom", true)
+    ns.SetPointOnce(foot, "BOTTOMLEFT", bar, "BOTTOMLEFT", spec.columnX, spec.columnBottom)
+    local run = ns.OwnTexture(bar, "trimRun", "ARTWORK")
+    run:SetAtlas("!UI-ScrollBar-Center", true)
+    ns.SetTwoPointsIf(run, "TOPLEFT", head, "BOTTOMLEFT", 0, 0, "BOTTOMRIGHT", foot, "TOPRIGHT", 0, 0)
+    ns.DrainBronze(head)
+    ns.DrainBronze(foot)
+    ns.DrainBronze(run)
+    -- Era's track in from each end; the client thumb (8 wide, centred) runs on it, the knob centred over it.
+    FadeKeys(track, KEYS.THUMB)
+    ns.SetTwoPointsIf(track, "TOPLEFT", bar, "TOPLEFT", spec.knobX, spec.trackTop,
+        "BOTTOMRIGHT", bar, "BOTTOMLEFT", spec.knobX + TRIM_KNOB_W, spec.trackBottom)
+    local thumb = track.Thumb
+    local paintKnob = TrimKnob(thumb)
+    local arrows = {}
+    if bar.Back then
+        arrows[bar.Back] = TrimArrow(bar, bar.Back, "UI-ScrollBar-ScrollUpButton", "TOPLEFT",
+            spec.upX, spec.upY)
+    end
+    if bar.Forward then
+        arrows[bar.Forward] = TrimArrow(bar, bar.Forward, "UI-ScrollBar-ScrollDownButton", "BOTTOMLEFT",
+            spec.downX, spec.downY)
+    end
+    if quiet then
+        QuietTrim(bar, quiet, arrows, thumb, paintKnob)
+        return
+    end
+    for button, State in pairs(arrows) do HookArrow(button, State) end
+    thumb:HookScript("OnEnter", paintKnob)
+    thumb:HookScript("OnLeave", paintKnob)
+    thumb:HookScript("OnEnable", paintKnob)
+    thumb:HookScript("OnDisable", paintKnob)
+end
+
 -- Scroll column: a head up to 256 tall, a 108 foot, the head's plain run stretched between.
 local TRACK_FOOT = 108
 -- The column's see-through channel: from its left edge to its right, in from its ends.
@@ -215,6 +391,7 @@ end
 -- knob beside the arrows' line and its run past the track's ends. Head and up arrow 2 higher, foot and down 2 lower.
 local TRACK_SPEC = { houseX = -10.5, houseTop = 7, houseFoot = -6, upX = 0, upY = 2, downX = 0, downY = -2,
     knobX = 1, knobReach = 7 }
+ns.TRACK_SPEC = TRACK_SPEC
 
 function ns.ScrollTrackArt(bar, spec)
     spec = spec or TRACK_SPEC

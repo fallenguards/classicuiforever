@@ -171,6 +171,8 @@ ns.TEX = {
     marbleBg = "!UI-Background-Marble",
     rockBg = "!UI-Background-Rock",
     frameSheet = "!_UI-Frame",
+    -- Era's frame corner sheet (the button bar's end posts); the client's copy is the same file.
+    frameCorners = "=FrameGeneral\\UI-Frame",
     merchantBottom = "!UI-Merchant-BottomBorder",
     merchantLabelSlots = "!UI-Merchant-LabelSlots",
     -- Old bag sheets: the shared bag pieces and the backpack's own.

@@ -396,8 +396,41 @@ local function SwapBarPiece(region, barFile)
     end
 end
 
--- Era's tabs, silver text box, the foot row in an iron box (as professions),
--- bottom border low under it.
+-- Icons' scroll bar off the icon area (Era's MACRO_SCROLL_BAR_OFFSET_*; x + right, y + up):
+local MACRO_ICONS_SCROLL_X = 0
+local MACRO_ICONS_SCROLL_TOP = 5
+local MACRO_ICONS_SCROLL_BOTTOM = -4
+-- Text box's scroll bar off the text area (the client's spot), its arrows off the client's, its knob (x + right, y + up):
+local MACRO_TEXT_SCROLL_X = 9
+local MACRO_TEXT_SCROLL_TOP = -1
+local MACRO_TEXT_SCROLL_BOTTOM = 2
+local MACRO_TEXT_SCROLL_UP_ARROW_X = 0
+local MACRO_TEXT_SCROLL_UP_ARROW_Y = 2
+local MACRO_TEXT_SCROLL_DOWN_ARROW_X = 0
+local MACRO_TEXT_SCROLL_DOWN_ARROW_Y = -2
+local MACRO_TEXT_SCROLL_KNOB_X = 1.5
+local MACRO_TEXT_SCROLL_KNOB_TOP_REACH = 7
+local MACRO_TEXT_SCROLL_KNOB_BOTTOM_REACH = 7
+-- Era's button bar (ButtonFrameTemplate): end posts and the line under the buttons, from UI-Frame and _UI-Frame.
+local FOOT_POST_W, FOOT_POST_H, FOOT_LINE_H = 12, 32, 3
+local FOOT_POST_LEFT = { 0.8984375, 0.9921875, 0.28125, 0.53125 }
+local FOOT_POST_RIGHT = { 0.1328125, 0.2265625, 0.6328125, 0.8828125 }
+local FOOT_LINE = { vert = false, coords = { 0, 1, 0.046875, 0.0703125 } }
+-- Era's text box middle, read off its screen: a flat near black (3, 3, 6).
+local MACRO_TEXT_BG = { 3 / 255, 3 / 255, 6 / 255 }
+
+local function FootPost(frame, key, coords, point, x)
+    local post = ns.OwnTexture(frame, key, "BORDER", 1)
+    ns.SetTex(post, "frameCorners")
+    post:SetTexCoord(coords[1], coords[2], coords[3], coords[4])
+    ns.DrainBronze(post)
+    post:SetSize(FOOT_POST_W, FOOT_POST_H)
+    ns.SetPointOnce(post, point, frame, point, x, -1)
+    return post
+end
+
+-- Era 1:1 (its Blizzard_MacroUI.xml and ButtonFrameTemplate): tabs, slots at their stock spot under Era's trim bar,
+-- the inset border round the whole body, the text box's bar, and the button bar along the foot.
 function A.MacroFrame(frame)
     local first, second = _G["MacroFrameTab1"], _G["MacroFrameTab2"]
     if first and second then
@@ -406,45 +439,47 @@ function A.MacroFrame(frame)
         ns.SetPointOnce(second, "LEFT", first, "RIGHT", 0, 0)
         ns.SkinTopTab(second, -15, 130)
     end
-    -- Slots 5 left; their bar 5 right and 8 taller at the top (it hung free of the
-    -- border). The bar hangs from the slots' frame, so it offsets that 5 plus 5.
     local selector = frame.MacroSelector
-    if selector then
-        ns.SetPointOnce(selector, "TOPLEFT", frame, "TOPLEFT", 7, -63)
-        local bar = selector.ScrollBar
-        if bar then
-            bar:ClearAllPoints()
-            bar:SetPoint("TOPRIGHT", selector, "TOPRIGHT", -4, 0)
-            bar:SetPoint("BOTTOMRIGHT", selector, "BOTTOMRIGHT", -4, 2)
-        end
+    local bar = selector and selector.ScrollBar
+    if bar then
+        ns.SetTwoPointsIf(bar, "TOPRIGHT", selector, "TOPRIGHT", MACRO_ICONS_SCROLL_X, MACRO_ICONS_SCROLL_TOP,
+            "BOTTOMRIGHT", selector, "BOTTOMRIGHT", MACRO_ICONS_SCROLL_X, MACRO_ICONS_SCROLL_BOTTOM)
+        ns.TrimScrollBar(bar)
     end
     -- Era's knob on the text box even with nothing to scroll; its arrows grey out.
     local text = _G["MacroFrameScrollFrame"]
-    if text and text.ScrollBar then
-        ns.KnobStays(text.ScrollBar)
-        ns.ClassicKnob(text.ScrollBar)
+    local textBar = text and text.ScrollBar
+    if textBar then
+        ns.SetTwoPointsIf(textBar, "TOPLEFT", text, "TOPRIGHT", MACRO_TEXT_SCROLL_X, MACRO_TEXT_SCROLL_TOP,
+            "BOTTOMLEFT", text, "BOTTOMRIGHT", MACRO_TEXT_SCROLL_X, MACRO_TEXT_SCROLL_BOTTOM)
+        ns.KnobStays(textBar)
+        ns.KnobReach(textBar, MACRO_TEXT_SCROLL_KNOB_TOP_REACH, MACRO_TEXT_SCROLL_KNOB_BOTTOM_REACH)
+        ns.SkinMinimalScrollBar(textBar)
+        ns.ScrollTrackArt(textBar, setmetatable({ upX = MACRO_TEXT_SCROLL_UP_ARROW_X, upY = MACRO_TEXT_SCROLL_UP_ARROW_Y,
+            downX = MACRO_TEXT_SCROLL_DOWN_ARROW_X, downY = MACRO_TEXT_SCROLL_DOWN_ARROW_Y,
+            knobX = MACRO_TEXT_SCROLL_KNOB_X }, { __index = ns.TRACK_SPEC }))
     end
-    -- Text box border is bronze on this client: drain to silver, keep the dark middle.
+    -- Text box border is bronze on this client: drain to silver; its middle Era's near black.
     local box = _G["MacroFrameTextBackground"]
     local slice = box and box.NineSlice
     if slice then ns.DrainSlice(slice, ns.INPUT_GREY) end
+    if box and box.SetBackdropColor then box:SetBackdropColor(MACRO_TEXT_BG[1], MACRO_TEXT_BG[2], MACRO_TEXT_BG[3], 1) end
     -- Trainer's bar between slots and macro; the unnamed right piece is found by
     -- the left's file.
     local barLeft = _G["MacroHorizontalBarLeft"]
     local barFile = barLeft and barLeft:GetTexture()
     if barFile then ns.EachRegion(frame, SwapBarPiece, barFile) end
-    -- Slot inset and slot frames are silver: bronze with the theme.
-    local slotBox = frame.Inset or _G["MacroFrameInset"]
-    if slotBox then ns.TintSlice(slotBox.NineSlice) end
+    -- Era's inset border, from under the tabs to over the buttons; slot frames bronze with the theme.
+    local inset = frame.Inset or _G["MacroFrameInset"]
+    if inset then ns.ShowInsetBorder(inset.NineSlice, true) end
     ns.TintSelectorSlots(selector and selector.ScrollBox, frame, "macro.slots")
-    -- Delete, New and Exit in an iron box along the foot.
-    if ns.SkillInsetBox and not frame.fcuiFoot then
-        local foot = ns.SkillInsetBox(frame, 20, true)
-        foot:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", -1, 34)
-        foot:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 1, 0)
-        foot:SetFrameLevel(frame:GetFrameLevel())
-        frame.fcuiFoot = foot
-    end
+    local left = FootPost(frame, "footPostLeft", FOOT_POST_LEFT, "BOTTOMLEFT", -2)
+    local right = FootPost(frame, "footPostRight", FOOT_POST_RIGHT, "BOTTOMRIGHT", 0)
+    local line = ns.OwnTexture(frame, "footLine", "BORDER", 1)
+    ns.TileTex(line, "frameSheet", FOOT_LINE)
+    line:SetHeight(FOOT_LINE_H)
+    ns.SetTwoPointsIf(line, "BOTTOMLEFT", left, "BOTTOMRIGHT", 0, FOOT_LINE_H,
+        "BOTTOMRIGHT", right, "BOTTOMLEFT", 0, FOOT_LINE_H)
 end
 
 ------------------------------------------------------------ chat channels
