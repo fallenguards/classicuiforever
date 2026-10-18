@@ -372,6 +372,13 @@ end
 
 local function HeadEnter(head) WakeBar(head:GetParent()) end
 
+-- Each character's own pick, as Era kept them; until it picks, the pick all characters shared before.
+local function Picked(pane)
+    local own = ns.char and ns.char[pane.side]
+    if own ~= nil then return own end
+    return ns.db[pane.side]
+end
+
 local function Pane(parent, side, fallback)
     local pane = ns.NewFrame("Frame", nil, parent)
     pane:SetSize(PANE_W, ROWS_TOP + ROWS * PANE_ROW + 2)
@@ -402,7 +409,7 @@ local function Pane(parent, side, fallback)
     pane.lines = {}
 
     local function Pick(section)
-        ns.db[pane.side] = section.key
+        if ns.char then ns.char[pane.side] = section.key end
         pane.offset = 0
         ns.UpdateStatPanes()
         -- Withheld in combat: the shown section still goes back to its top with the offset.
@@ -415,7 +422,7 @@ local function Pane(parent, side, fallback)
             local entries = {}
             for _, section in ipairs(Sections()) do
                 entries[#entries + 1] = { section.label, function() Pick(section) end, function()
-                    return SectionByKey(ns.db[pane.side], pane.fallback) == section
+                    return SectionByKey(Picked(pane), pane.fallback) == section
                 end }
             end
             pane.list = ns.DropList(entries)
@@ -460,7 +467,7 @@ local function Build()
 end
 
 local function UpdatePane(pane)
-    local section = SectionByKey(ns.db[pane.side], pane.fallback)
+    local section = SectionByKey(Picked(pane), pane.fallback)
     pane.head.text:SetText(section.label)
     local shown, lines = pane.shown, pane.lines
     wipe(shown)
