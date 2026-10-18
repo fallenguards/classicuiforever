@@ -211,6 +211,13 @@ local function FitList(frame, headH)
     list:SetSize(LIST_W, frame.listBottom - LIST_TOP - headH)
 end
 
+-- The window's foot (bottom): the page box and its list down to it.
+local function SetFoot(frame, bottom)
+    frame:SetHeight(bottom + 20)
+    frame.pageBox:SetHeight(bottom - PANE_TOP)
+    frame.listBottom = bottom - 8
+end
+
 -- The right side: the page's box, its title, the page's own Toggle none and Reset toggles, the scrolling list; its foot
 -- level with the sidebar's (bottom).
 local function PageArea(frame, bottom)
@@ -410,10 +417,13 @@ local function Embed(frame, host, page)
     frame:SetParent(host)
     frame:SetFrameStrata(host:GetFrameStrata())
     frame:SetFrameLevel(host:GetFrameLevel() + 1)
+    -- Scaled to the room's width, the page down to its foot as the game's own pages run.
     local shift = PANE_X - SIDE_X
-    local scale = math.min(1, (host:GetWidth() or WIDTH) / (WIDTH - shift),
-        (host:GetHeight() or frame:GetHeight()) / frame:GetHeight())
-    frame:SetScale(scale > 0 and scale or 1)
+    local scale = math.min(1, (host:GetWidth() or WIDTH) / (WIDTH - shift))
+    if scale <= 0 then scale = 1 end
+    frame:SetScale(scale)
+    local roomH = host:GetHeight() or 0
+    SetFoot(frame, roomH > 0 and math.max(PANE_TOP + 120, roomH / scale - 20) or frame.standBottom)
     ns.SetPointOnce(frame, "TOPLEFT", host, "TOPLEFT", -shift, 0)
     frame:Show()
     frame:ShowPage(page or HOME)
@@ -433,6 +443,7 @@ local function StandAlone(frame)
     frame:SetParent(UIParent)
     frame:SetFrameStrata("HIGH")
     frame:SetScale(1)
+    SetFoot(frame, frame.standBottom)
     ns.SetPointOnce(frame, "CENTER", UIParent, "CENTER", 0, 0)
 end
 
@@ -452,6 +463,7 @@ local function Build()
     FitNames(frame, pages)
     local bottom = Sidebar(frame, pages)
     frame:SetSize(WIDTH, bottom + 20)
+    frame.standBottom = bottom
     PageArea(frame, bottom)
     frame.built = O.BuildRows(frame.listChild, LIST_W / COLUMNS)
     local function SetRange(h) frame.listBar:SetRange(math.max(0, h - frame.list:GetHeight()), ROW) end
