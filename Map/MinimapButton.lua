@@ -252,11 +252,8 @@ local function Build(ring)
 end
 
 -- spec: { name, key (edit mode entry), angleKey, angle (default degrees), free (nearest clear spot), show (on hover id),
--- piece (the map's own), face(texture), onClick(button, mouse), tip, ride() (a frame it sits on, at its size), addonButton
--- (Addon buttons' pick too while the collector is off) }; returns show and hide.
-local ADDON_PICK = "MinimapAddonButtons"
-local ADDON_KEYS = { showMinimapAddonButtons = true, hoverMinimapAddonButtons = true, hideMinimapAddonButtons = true,
-    minimapCollector = true }
+-- piece (the map's own), face(texture), onClick(button, mouse), tip, ride() (a frame it sits on, at its size) };
+-- returns show and hide. Each holds its own shown or on hover pick, apart from Addon buttons' (#180).
 function ns.RingButton(spec)
     rings[#rings + 1] = spec
     local function Show()
@@ -270,7 +267,7 @@ function ns.RingButton(spec)
         end
         Position(spec)
         spec.button:Show()
-        ns.MinimapShow(spec.button, spec.show, nil, spec.addonButton and not ns.db.minimapCollector and ADDON_PICK or nil)
+        ns.MinimapShow(spec.button, spec.show)
         HookMap()
     end
     local function Hide()
@@ -283,7 +280,7 @@ function ns.RingButton(spec)
     -- Shown or on hover picked in the options.
     ns.OnToggle(function(key)
         if not spec.active then return end
-        if key == "show" .. spec.show or key == "hover" .. spec.show or (spec.addonButton and ADDON_KEYS[key]) then Show() end
+        if key == "show" .. spec.show or key == "hover" .. spec.show then Show() end
     end)
     return Show, Hide
 end
@@ -294,7 +291,6 @@ local ShowOptions, HideOptions = ns.RingButton({
     angleKey = "minimapButtonAngle",
     angle = 213,   -- clear of the tracking glass (186) under the tracking spell
     show = "OptionsButton",
-    addonButton = true,
     face = function(icon) ns.Dress(icon, "gryphonIcon", GRYPHON) end,
     onClick = function(_, mouse)
         if mouse == "RightButton" then

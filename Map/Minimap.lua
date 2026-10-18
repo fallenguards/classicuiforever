@@ -223,12 +223,10 @@ local function Stash(frame, hide)
     end
 end
 
-local HIDES_MORE = { hover = 1, hide = 2 }
--- client: a frame the client shows and hides itself (never shown from here); also: a second pick, the stricter wins.
-function ns.MinimapShow(frame, id, client, also)
+-- client: a frame the client shows and hides itself (never shown from here).
+function ns.MinimapShow(frame, id, client)
     if not frame then return end
-    local state, other = MM.ShowState(id), MM.ShowState(also)
-    if other and HIDES_MORE[other] > (HIDES_MORE[state] or 0) then state = other end
+    local state = MM.ShowState(id)
     if client then
         Stash(frame, state == "hide")
     else
