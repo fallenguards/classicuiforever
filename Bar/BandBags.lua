@@ -429,8 +429,16 @@ local function FadeAgainAfter()
     FadeAgain()
     ns.Sched.NextFrame("bar.dividersAfter", FadeAgain)
 end
+-- The mouse entering a bar 1 button forces its action update (ActionButton.lua OnEnter, for the new action glow), which
+-- lays them again with no event: faded right after, before the frame draws.
+local function HookButtonEnter()
+    local buttons = MainActionBar and MainActionBar.actionButtons
+    if type(buttons) ~= "table" then return end
+    for _, button in pairs(buttons) do ns.HookScriptOnce(button, "OnEnter", FadeAgain, "dividers") end
+end
 ns.EventFrame({ "ACTIONBAR_PAGE_CHANGED", "UPDATE_BONUS_ACTIONBAR", "ACTIONBAR_SLOT_CHANGED", "UPDATE_SHAPESHIFT_FORM",
     "UPDATE_OVERRIDE_ACTIONBAR", "PLAYER_ENTERING_WORLD" }, function()
+    HookButtonEnter()
     if not B.active then return end
     B.MainBarDividers(0)
     ns.Sched.NextFrame("bar.dividersNext", FadeAgainAfter)
