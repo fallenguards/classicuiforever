@@ -46,6 +46,13 @@ L["OPT_plateCCBeside_TIP"] = "Le icone di stordimento, immobilizzazione e paura 
 L["OPT_plateCCAbove"] = "Controllo: con le penalità"
 L["OPT_plateCCAbove_TIP"] = "Le icone di stordimento, immobilizzazione e paura in fondo alla fila delle penalità sopra il nome."
 L["OPT_plateCC_TIP"] = "Dove una targhetta mostra le sue icone di controllo."
+L["OPT_plateHealthTextRight"] = "Numeri della salute: a destra: 42 100%"
+L["OPT_plateHealthTextRightSwap"] = "Numeri della salute: a destra: 100% 42"
+L["OPT_plateHealthTextSplit"] = "Numeri della salute: divisi: 42 | 100%"
+L["OPT_plateHealthTextSplitSwap"] = "Numeri della salute: divisi: 100% | 42"
+L["OPT_plateHealthTextLeft"] = "Numeri della salute: a sinistra: 42 100%"
+L["OPT_plateHealthTextLeftSwap"] = "Numeri della salute: a sinistra: 100% 42"
+L["OPT_plateHealthText_TIP"] = "Dove stanno i numeri della salute del gioco sulle nostre barre del nome: 42 è il valore, 100% la percentuale. Informazioni barre del nome nelle opzioni del gioco sceglie quali mostrare."
 
 -- Options/Toggles.lua: how the player frame's glow meets the druid mana bar
 L["OPT_druidManaGlowAround"] = "Bagliore: attorno alla barra del mana"

@@ -46,6 +46,13 @@ L["OPT_plateCCBeside_TIP"] = "Symbole für Betäubung, Bewegungsunfähigkeit und
 L["OPT_plateCCAbove"] = "Kontrolleffekte: bei den Schwächungen"
 L["OPT_plateCCAbove_TIP"] = "Symbole für Betäubung, Bewegungsunfähigkeit und Furcht am Ende der Schwächungsreihe über dem Namen."
 L["OPT_plateCC_TIP"] = "Wo eine Namensplakette ihre Symbole für Kontrolleffekte zeigt."
+L["OPT_plateHealthTextRight"] = "Gesundheitszahlen: rechts: 42 100%"
+L["OPT_plateHealthTextRightSwap"] = "Gesundheitszahlen: rechts: 100% 42"
+L["OPT_plateHealthTextSplit"] = "Gesundheitszahlen: geteilt: 42 | 100%"
+L["OPT_plateHealthTextSplitSwap"] = "Gesundheitszahlen: geteilt: 100% | 42"
+L["OPT_plateHealthTextLeft"] = "Gesundheitszahlen: links: 42 100%"
+L["OPT_plateHealthTextLeftSwap"] = "Gesundheitszahlen: links: 100% 42"
+L["OPT_plateHealthText_TIP"] = "Wo die Gesundheitszahlen des Spiels auf unseren Namensplaketten stehen: 42 ist der Wert, 100% die Prozent. Namensplakette-Informationen in den Spieloptionen wählt, welche erscheinen."
 
 -- Options/Toggles.lua: how the player frame's glow meets the druid mana bar
 L["OPT_druidManaGlowAround"] = "Leuchten: um die Manaleiste"

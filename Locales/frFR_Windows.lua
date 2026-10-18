@@ -46,6 +46,13 @@ L["OPT_plateCCBeside_TIP"] = "Les icônes d'étourdissement, d'immobilisation et
 L["OPT_plateCCAbove"] = "Contrôle : avec les affaiblissements"
 L["OPT_plateCCAbove_TIP"] = "Les icônes d'étourdissement, d'immobilisation et de peur au bout de la rangée d'affaiblissements au-dessus du nom."
 L["OPT_plateCC_TIP"] = "Où une barre de nom affiche ses icônes de contrôle."
+L["OPT_plateHealthTextRight"] = "Chiffres de vie : à droite : 42 100%"
+L["OPT_plateHealthTextRightSwap"] = "Chiffres de vie : à droite : 100% 42"
+L["OPT_plateHealthTextSplit"] = "Chiffres de vie : répartis : 42 | 100%"
+L["OPT_plateHealthTextSplitSwap"] = "Chiffres de vie : répartis : 100% | 42"
+L["OPT_plateHealthTextLeft"] = "Chiffres de vie : à gauche : 42 100%"
+L["OPT_plateHealthTextLeftSwap"] = "Chiffres de vie : à gauche : 100% 42"
+L["OPT_plateHealthText_TIP"] = "Où se placent les chiffres de vie du jeu sur nos barres de nom : 42 est la valeur, 100% le pourcentage. Informations des barres de nom dans les options du jeu choisit lesquels s'affichent."
 
 -- Options/Toggles.lua: how the player frame's glow meets the druid mana bar
 L["OPT_druidManaGlowAround"] = "Lueur : autour de la barre de mana"

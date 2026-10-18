@@ -43,6 +43,50 @@ local BAR_FILL = { coords = FULL }
 local HEALTH_ART = { "bgTexture", "selectedBorder", "deselectedOverlay" }
 -- The game's health numbers, shown by its Nameplate Information setting: over our border.
 local HEALTH_TEXTS = { "Text", "LeftText", "RightText" }
+-- Health numbers pick: each number's side and, sharing one, which stands at the edge. The game names them backwards:
+-- RightText holds the value, LeftText the percent, Text one number alone (Blizzard_NamePlateUnitFrame.lua).
+local TEXT_IN, TEXT_GAP = 4, 2
+local HEALTH_LAYOUTS = {
+    plateHealthTextRight = { value = "RIGHT", percent = "RIGHT", edge = "percent" },
+    plateHealthTextRightSwap = { value = "RIGHT", percent = "RIGHT", edge = "value" },
+    plateHealthTextSplit = { value = "LEFT", percent = "RIGHT" },
+    plateHealthTextSplitSwap = { value = "RIGHT", percent = "LEFT" },
+    plateHealthTextLeft = { value = "LEFT", percent = "LEFT", edge = "value" },
+    plateHealthTextLeftSwap = { value = "LEFT", percent = "LEFT", edge = "percent" },
+}
+local HEALTH_LAYOUT_ORDER = { "plateHealthTextRight", "plateHealthTextRightSwap", "plateHealthTextSplit",
+    "plateHealthTextSplitSwap", "plateHealthTextLeft", "plateHealthTextLeftSwap" }
+
+local function AtEdge(text, health, side)
+    ns.SetPointOnce(text, side, health, side, side == "LEFT" and TEXT_IN or -TEXT_IN, 0)
+end
+
+local function PlaceHealthTexts(health)
+    local value, percent, single = health.RightText, health.LeftText, health.Text
+    if not (value and percent and single) then return end
+    local lay = HEALTH_LAYOUTS.plateHealthTextRight
+    for _, key in ipairs(HEALTH_LAYOUT_ORDER) do
+        if ns.db[key] then
+            lay = HEALTH_LAYOUTS[key]
+            break
+        end
+    end
+    if lay.value == lay.percent then
+        local outer, inner = percent, value
+        if lay.edge == "value" then outer, inner = value, percent end
+        AtEdge(outer, health, lay.value)
+        if lay.value == "RIGHT" then
+            ns.SetPointOnce(inner, "RIGHT", outer, "LEFT", -TEXT_GAP, 0)
+        else
+            ns.SetPointOnce(inner, "LEFT", outer, "RIGHT", TEXT_GAP, 0)
+        end
+    else
+        AtEdge(value, health, lay.value)
+        AtEdge(percent, health, lay.percent)
+    end
+    -- One number alone stands on that number's side (the game's own flags say which shows).
+    AtEdge(single, health, health.showPercentage and not health.showNumeric and lay.percent or lay.value)
+end
 -- The client's classic-style glow too: ours shows in every style, theirs would add to it.
 local BADGES = { "LevelFrame", "PlayerLevelDiffFrame", "ClassificationFrame", "selectionHighlight" }
 local CAST_ART = { "Background", "Border" }
@@ -404,6 +448,7 @@ local function Layout(unitFrame)
         local text = health[key]
         if text then text:SetDrawLayer("OVERLAY", 4) end
     end
+    PlaceHealthTexts(health)
     FadeKeys(unitFrame, BADGES)
 
     -- Level in the border slot, a skull when unknown.
@@ -695,7 +740,12 @@ ns.RegisterModule("namePlates", { apply = Apply, restore = Restore })
 local CC_KEYS = { plateCCBeside = true, plateCCAbove = true }
 ns.OnToggle(function(key)
     if not NP.active then return end
-    if key == "plateDragons" then
+    if HEALTH_LAYOUTS[key] then
+        EachPlate(function(unitFrame)
+            local _, health = Pieces(unitFrame)
+            if health then PlaceHealthTexts(health) end
+        end)
+    elseif key == "plateDragons" then
         EachPlate(function(unitFrame)
             local _, health = Pieces(unitFrame)
             if health then UpdateDragon(unitFrame, health) end

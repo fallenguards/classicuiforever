@@ -187,6 +187,12 @@ return {
     druidManaGlowOver = "same for everyone: off by default; a third pick, the glow over the bar as before",
     collectionsWindow = "on for everyone, as the Legacy window: the classic Collections window in place of the game's",
     minimapSquare = "same for everyone: off, the round map as before; on squares it, Era's border made square",
+    plateHealthTextRight = "same for everyone: on, the game's own spot for the plate health numbers (both right, percent at the edge)",
+    plateHealthTextRightSwap = "same for everyone: off; both right, the value at the edge",
+    plateHealthTextSplit = "same for everyone: off; the value left and the percent right",
+    plateHealthTextSplitSwap = "same for everyone: off; the percent left and the value right",
+    plateHealthTextLeft = "same for everyone: off; both left, the value at the edge",
+    plateHealthTextLeftSwap = "same for everyone: off; both left, the percent at the edge",
     minimapShiftDrag = "same for everyone: on, as before (Shift to drag our minimap buttons); off lets a plain drag move them (#180)",
     levelUpBanner = "off for everyone, a restyle: the game's level-up banners go, as 1.x had none; checked brings them back",
 }

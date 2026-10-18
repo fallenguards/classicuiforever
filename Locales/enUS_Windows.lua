@@ -100,6 +100,13 @@ L["OPT_plateCCBeside_TIP"] = "Stun, root and fear icons just past the level, cle
 L["OPT_plateCCAbove"] = "Crowd control: with the debuffs"
 L["OPT_plateCCAbove_TIP"] = "Stun, root and fear icons at the end of the debuff row over the name."
 L["OPT_plateCC_TIP"] = "Where a nameplate shows its crowd control icons."
+L["OPT_plateHealthTextRight"] = "Health numbers: right: 42 100%"
+L["OPT_plateHealthTextRightSwap"] = "Health numbers: right: 100% 42"
+L["OPT_plateHealthTextSplit"] = "Health numbers: split: 42 | 100%"
+L["OPT_plateHealthTextSplitSwap"] = "Health numbers: split: 100% | 42"
+L["OPT_plateHealthTextLeft"] = "Health numbers: left: 42 100%"
+L["OPT_plateHealthTextLeftSwap"] = "Health numbers: left: 100% 42"
+L["OPT_plateHealthText_TIP"] = "Where the game's health numbers sit on our plates: 42 is the value, 100% the percent. Nameplate Information in the game's options picks which show."
 
 -- Options/Toggles.lua: how the player frame's glow meets the druid mana bar
 L["OPT_druidManaGlowAround"] = "Glow: around the mana bar"

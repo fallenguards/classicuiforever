@@ -46,6 +46,13 @@ L["OPT_plateCCBeside_TIP"] = "Los iconos de aturdimiento, enraizamiento y miedo 
 L["OPT_plateCCAbove"] = "Control: con los perjuicios"
 L["OPT_plateCCAbove_TIP"] = "Los iconos de aturdimiento, enraizamiento y miedo al final de la fila de perjuicios sobre el nombre."
 L["OPT_plateCC_TIP"] = "Dónde muestra una placa de nombre sus iconos de control."
+L["OPT_plateHealthTextRight"] = "Números de salud: derecha: 42 100%"
+L["OPT_plateHealthTextRightSwap"] = "Números de salud: derecha: 100% 42"
+L["OPT_plateHealthTextSplit"] = "Números de salud: repartidos: 42 | 100%"
+L["OPT_plateHealthTextSplitSwap"] = "Números de salud: repartidos: 100% | 42"
+L["OPT_plateHealthTextLeft"] = "Números de salud: izquierda: 42 100%"
+L["OPT_plateHealthTextLeftSwap"] = "Números de salud: izquierda: 100% 42"
+L["OPT_plateHealthText_TIP"] = "Dónde van los números de salud del juego en nuestras placas: 42 es el valor, 100% el porcentaje. Información de placas en las opciones del juego elige cuáles se ven."
 
 -- Options/Toggles.lua: how the player frame's glow meets the druid mana bar
 L["OPT_druidManaGlowAround"] = "Brillo: alrededor de la barra de maná"
