@@ -40,7 +40,9 @@ local BORDER_L = { own = "borderL", layer = "OVERLAY", sublevel = 2, w = BORDER_
 local BORDER_R = { own = "borderR", layer = "OVERLAY", sublevel = 2, w = BORDER_W / 2, h = BORDER_H, coords = { 0.5, 0, 0.5, 1 },
     point = "TOPRIGHT", x = INSET_L, y = INSET_T, show = true }
 local BAR_FILL = { coords = FULL }
-local HEALTH_ART = { "bgTexture", "selectedBorder", "deselectedOverlay", "Text", "LeftText", "RightText" }
+local HEALTH_ART = { "bgTexture", "selectedBorder", "deselectedOverlay" }
+-- The game's health numbers, shown by its Nameplate Information setting: over our border.
+local HEALTH_TEXTS = { "Text", "LeftText", "RightText" }
 -- The client's classic-style glow too: ours shows in every style, theirs would add to it.
 local BADGES = { "LevelFrame", "PlayerLevelDiffFrame", "ClassificationFrame", "selectionHighlight" }
 local CAST_ART = { "Background", "Border" }
@@ -398,6 +400,10 @@ local function Layout(unitFrame)
     NP.ClassColor(unitFrame)
     local border = Border(health)
     FadeKeys(health, HEALTH_ART)
+    for _, key in ipairs(HEALTH_TEXTS) do
+        local text = health[key]
+        if text then text:SetDrawLayer("OVERLAY", 4) end
+    end
     FadeKeys(unitFrame, BADGES)
 
     -- Level in the border slot, a skull when unknown.
