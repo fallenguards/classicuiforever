@@ -265,12 +265,13 @@ for _, name in ipairs({ "CharacterNightElf", "Spellbook", "Talents", "Achievemen
 end
 
 -- Redrawn by the client under the old names: Socials (a guild banner), Quest ("!" for the goblet), the game menu,
--- the "no tracking" minimap icon, the targeting sheets (oval level ring) and the tabs (a gold rim on the picked one).
+-- the "no tracking" minimap icon, the targeting sheets (oval level ring), the tabs (a gold rim on the picked one)
+-- and the minimap clock's plate (a gold rim, wings at its top corners).
 B.PREFER = {}
 for _, key in ipairs({ "microSocialsUp", "microSocialsDown", "microSocialsDisabled", "microQuestUp", "microQuestDown",
     "microQuestDisabled", "microMainMenuUp", "microMainMenuDown", "microMainMenuDisabled", "trackingNone",
     "targetingFrame", "targetingElite", "targetingRare", "targetingRareElite", "targetingMinus",
-    "targetingFlash", "targetingMinusFlash", "tabActive", "tabInactive" }) do
+    "targetingFlash", "targetingMinusFlash", "tabActive", "tabInactive", "clockBackground" }) do
     B.PREFER[key] = true
 end
 
