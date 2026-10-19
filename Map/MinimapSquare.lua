@@ -43,3 +43,9 @@ end
 if _G.GetMinimapShape == nil then
     function _G.GetMinimapShape() return MM.Square() and "SQUARE" or "ROUND" end
 end
+
+-- Our minimap off: the client's round shape, and the map open.
+function MM.MapBack(wasSquare)
+    MM.Reopen()
+    if wasSquare and Minimap and Minimap.SetMaskTexture then Minimap:SetMaskTexture((ns.TexPath("portraitMask"))) end
+end

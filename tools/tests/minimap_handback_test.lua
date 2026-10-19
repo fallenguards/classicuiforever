@@ -35,6 +35,7 @@ local ns = setmetatable({
 }, { __index = function() return Any end })
 assert(loadfile(ROOT .. "/Map/Minimap.lua"))("ClassicUIForever", ns)
 assert(loadfile(ROOT .. "/Map/MinimapSquare.lua"))("ClassicUIForever", ns)
+assert(loadfile(ROOT .. "/Map/MinimapToggle.lua"))("ClassicUIForever", ns)
 assert(loadfile(ROOT .. "/Map/MinimapTracking.lua"))("ClassicUIForever", ns)
 assert(loadfile(ROOT .. "/Map/MinimapDiel.lua"))("ClassicUIForever", ns)
 assert(module and module.apply and module.restore, "the minimap module registers apply and restore")

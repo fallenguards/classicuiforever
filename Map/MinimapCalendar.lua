@@ -13,6 +13,7 @@ local SQUARE_W, SQUARE_H = 21, 19 -- the client's ui-hud-calendar atlases
 local RING_R = 73        -- ring spot: its middle's distance from the map's middle
 local RING_ANGLE = 8     -- ring spot: default angle under the day/night (degrees, 0 = right, + counterclockwise)
 local RING_ANGLE_BARE = 40 -- ring spot without a day/night frame: the client's own corner
+local BY_TOGGLE_X = -38  -- zone spot with the minimap close button on: just left of the X's art
 
 local home, square
 local squareState = "up"
@@ -123,7 +124,8 @@ local function PlaceHome(box, cluster, map, spot, diel)
     if spot == "zone" then
         -- Where 1.x had the minimap toggle, on the zone name's right end.
         local _, plateY = MM.HeaderOffsets()
-        ns.SetPointOnce(box, "CENTER", cluster, "TOPRIGHT", -15 / k, (-13 + plateY) / k)
+        local x = MM.ToggleShown() and BY_TOGGLE_X or -15
+        ns.SetPointOnce(box, "CENTER", cluster, "TOPRIGHT", x / k, (-13 + plateY) / k)
     else
         local angle = tonumber(ns.db.calendarAngle) or (diel and RING_ANGLE or RING_ANGLE_BARE)
         ns.RingPoint(box, angle, RING_R, box:GetEffectiveScale() / map:GetEffectiveScale())

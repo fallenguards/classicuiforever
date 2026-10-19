@@ -179,7 +179,7 @@ local homes = {}
 function MM.ShowState(id)
     local db = ns.db
     if not id or not db then return nil end
-    if db["hide" .. id] then return "hide" end
+    if db["hide" .. id] or (MM.closed and id ~= "MinimapZone") then return "hide" end
     if db["hover" .. id] then return "hover" end
 end
 
@@ -586,6 +586,7 @@ local function Layout()
         ns.Sched.Attach(coords, { name = "minimap.coordsComma", every = 0.1, fn = function() CommaShift(coords) end })
     end
     RingShown()
+    MM.LayToggle(cluster, ringHeader, above)
     if GameTimeFrame then
         MM.PlaceCalendar(cluster, map, above)
         ns.SkinCalendar()
@@ -746,7 +747,7 @@ local function Restore()
     local wasSquare = MM.Square()
     SetActive(false)
     -- The round mask back (the client's own shape).
-    if wasSquare and Minimap and Minimap.SetMaskTexture then Minimap:SetMaskTexture((ns.TexPath("portraitMask"))) end
+    MM.MapBack(wasSquare)
     for region, file in pairs(eraRings) do
         region:SetTexture(file)
         eraRings[region] = nil
@@ -788,7 +789,8 @@ end
 ns.RegisterModule("minimap", { apply = Apply, restore = Restore })
 
 -- A piece's Shown / On hover / Hidden picked: laid again at once.
-local RELAY_KEYS = { hideMinimapBorder = true, hideMinimapHeader = true, hideMinimapNorth = true, minimapSquare = true }
+local RELAY_KEYS = { hideMinimapBorder = true, hideMinimapHeader = true, hideMinimapNorth = true, minimapSquare = true,
+    minimapToggleButton = true }
 ns.OnToggle(function(key)
     if RELAY_KEYS[key] then LayoutIfActive() return end
     if key == "hideButtonBorders" then ButtonBordersApply() return end

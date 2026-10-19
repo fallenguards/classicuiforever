@@ -221,6 +221,7 @@ return {
     minimapCollector = false,
     minimapShiftDrag = true,
     minimapSquare = false,
+    minimapToggleButton = false,
     mirrorTimers = true,
     nameBoxFocus = true,
     nameBoxPlayer = false,

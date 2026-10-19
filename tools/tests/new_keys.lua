@@ -186,6 +186,7 @@ return {
     druidManaGlowBehind = "same for everyone: off by default; a second pick, the bar in front of the glow",
     druidManaGlowOver = "same for everyone: off by default; a third pick, the glow over the bar as before",
     collectionsWindow = "on for everyone, as the Legacy window: the classic Collections window in place of the game's",
+    minimapToggleButton = "same for everyone: off; on shows Era's X on the zone bar that hides the map",
     minimapSquare = "same for everyone: off, the round map as before; on squares it, Era's border made square",
     plateNameHover = "same for everyone: on, Era's yellow name on the moused-over plate (#206)",
     plateHealthTextRight = "same for everyone: on, the game's own spot for the plate health numbers (both right, percent at the edge)",
