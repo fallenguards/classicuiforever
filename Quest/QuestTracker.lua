@@ -314,3 +314,41 @@ function ns.SyncGameTracker()
 end
 
 ns.RegisterModule("hideObjectiveTracker", { apply = HideApply, restore = HideRestore })
+
+------------------------------------------------------------------ the All Objectives header hidden
+
+-- Painted out and deaf whenever the game shows it (#209); the room above the first section is the tracker's own.
+local headerTaken = false
+
+local function HeaderMouse()
+    local header = ObjectiveTrackerFrame and ObjectiveTrackerFrame.Header
+    if not header then return end
+    if header.MinimizeButton then header.MinimizeButton:EnableMouse(not headerTaken) end
+    if header.FilterButton then header.FilterButton:EnableMouse(not headerTaken) end
+end
+
+local function PaintHeader()
+    local header = ObjectiveTrackerFrame and ObjectiveTrackerFrame.Header
+    if not header then return end
+    ns.SetAlphaIf(header, headerTaken and 0 or 1)
+    ns.WhenCalm("tracker.headerMouse", HeaderMouse)
+end
+
+local function HeaderApply()
+    headerTaken = true
+    PaintHeader()
+end
+
+local function HeaderRestore()
+    if not headerTaken then return end
+    headerTaken = false
+    PaintHeader()
+end
+
+ns.RegisterModule("hideTrackerHeader", { apply = HeaderApply, restore = HeaderRestore })
+
+-- In a fight too: the options pass waits one out.
+ns.OnToggle(function(key)
+    if key ~= "hideTrackerHeader" then return end
+    if ns.ModuleInForce(key) then HeaderApply() else HeaderRestore() end
+end)

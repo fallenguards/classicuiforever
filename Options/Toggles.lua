@@ -341,6 +341,8 @@ ns.TOGGLES = {
         drop = true },
     { "hideObjectiveTracker", L["OPT_hideObjectiveTracker"], L["OPT_hideObjectiveTracker_TIP"], radio = "objectiveTracker",
         drop = true, search = "hide another addon" },
+    { "hideTrackerHeader", L["OPT_hideTrackerHeader"]:format(_G.TRACKER_ALL_OBJECTIVES or "All Objectives"),
+        L["OPT_hideTrackerHeader_TIP"], search = "all objectives header title top line tracker" },
 
     { "worldMap", L["OPT_worldMap"], L["OPT_worldMap_TIP"], group = L["GROUP_MAP"], needs = "panels" },
     { "mapNavClassic", L["OPT_mapNavClassic"], L["OPT_mapNavClassic_TIP"], parent = "worldMap", radio = "mapNavStyle",

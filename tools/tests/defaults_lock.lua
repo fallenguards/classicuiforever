@@ -163,6 +163,7 @@ return {
     hideStatusMain = false,
     hideStatusSecond = false,
     hideThreatGlow = true,
+    hideTrackerHeader = false,
     housingMinimapButton = true,
     hoverAddonBag = false,
     hoverBothNumbers = true,
