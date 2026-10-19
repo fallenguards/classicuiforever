@@ -18,11 +18,14 @@ local GetTime = GetTime
 
 -- A watcher child under a client frame, made round the gamepad's CreateFrame hook (ns.NewFrame). Never in a layout
 -- frame (its pass reads every child and runs in our name; one swelled the game's popups): its out-of-layout border
--- takes it instead, or nothing does (nil).
-local function Child(host)
+-- takes it instead, or nothing does (nil, and a line in the dev output: that job never runs).
+local function Child(host, name)
     if host.IsLayoutFrame and host:IsLayoutFrame() then
         local border = host.Border
-        if not (border and border.ignoreInLayout and border.IsObjectType and border:IsObjectType("Frame")) then return nil end
+        if not (border and border.ignoreInLayout and border.IsObjectType and border:IsObjectType("Frame")) then
+            ns.Persist("sched: " .. tostring(name) .. " refused on a layout frame, no watcher made")
+            return nil
+        end
         host = border
     end
     if ns.NewFrame then return ns.NewFrame("Frame", nil, host) end
@@ -391,7 +394,7 @@ function Sched.Attach(host, spec)
     end
     local job = byName[spec.name]
     if job then return job, false end
-    local child = Child(host)
+    local child = Child(host, spec.name)
     if not child then return nil, false end
     job = Sched.OnFrame(child, spec)
     byName[spec.name] = job
@@ -416,7 +419,7 @@ function Sched.OnVisible(host, name, fn)
     end
     local child = byName[name]
     if child then return child end
-    child = Child(host)
+    child = Child(host, name)
     if not child then return nil end
     child:SetScript("OnShow", function() fn(true) end)
     child:SetScript("OnHide", function() fn(false) end)
@@ -435,7 +438,7 @@ function Sched.AfterShow(host, name, fn)
         shownChildren[host] = byName
     end
     if byName[name] then return byName[name] end
-    local child = Child(host)
+    local child = Child(host, name)
     if not child then return nil end
     local function Run(self)
         self:SetScript("OnUpdate", nil)
@@ -518,7 +521,7 @@ end
 function Sched.OnHover(host, fn, pad)
     -- The client refuses mouse propagation in a fight (blocked, though pcall says ok): poll instead.
     if InCombatLockdown() then return false end
-    local child = Child(host)
+    local child = Child(host, "hover")
     if not child then return false end
     pad = pad or 0
     child:SetPoint("TOPLEFT", host, "TOPLEFT", -pad, pad)
