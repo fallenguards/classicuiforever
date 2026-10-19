@@ -374,10 +374,13 @@ end
 
 local function HeadEnter(head) WakeBar(head:GetParent()) end
 
--- Each character's own pick, as Era kept them; until it picks, the pick all characters shared before.
+-- The profile's pick, as every other look setting; a pick 0.33.0 kept per character goes into the profile once.
 local function Picked(pane)
     local own = ns.char and ns.char[pane.side]
-    if own ~= nil then return own end
+    if own ~= nil then
+        ns.db[pane.side] = own
+        ns.char[pane.side] = nil
+    end
     return ns.db[pane.side]
 end
 
@@ -411,7 +414,7 @@ local function Pane(parent, side, fallback)
     pane.lines = {}
 
     local function Pick(section)
-        if ns.char then ns.char[pane.side] = section.key end
+        ns.db[pane.side] = section.key
         pane.offset = 0
         ns.UpdateStatPanes()
         -- Withheld in combat: the shown section still goes back to its top with the offset.
