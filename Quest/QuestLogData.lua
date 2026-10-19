@@ -78,10 +78,11 @@ function QL.TagFor(info)
     return nil
 end
 
--- Forever's titles carry the game's level prefix whatever Show Quest Levels says (build 70291, #140): taken off here
--- while Quest levels is off. "[17] " or "[17+] ", inside a colour code too.
+-- Forever's titles carry the game's level prefix whatever Show Quest Levels says (build 70291, #140): taken off
+-- while it is off, read live (the map's filter rebuilds its list before our copy of the setting hears the change).
+-- "[17] " or "[17+] ", inside a color code too.
 function ns.StripQuestLevel(text)
-    if not text or ns.db.questLevels or not ns.OnForever() then return end
+    if not text or not ns.OnForever() or tostring(ns.GetCVar("showQuestLevel")) == "1" then return end
     local title = text:GetText()
     if ns.IsSecret(title) or type(title) ~= "string" then return end
     local bare = title:gsub("^(|c%x%x%x%x%x%x%x%x)%[%d+%+?%] ", "%1", 1)

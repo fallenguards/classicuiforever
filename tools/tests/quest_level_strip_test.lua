@@ -17,7 +17,9 @@ local function Check(ok, what)
 end
 
 local forever = true
-local ns = { db = { questLevels = false } }
+local cvar = "0"
+local ns = {}
+ns.GetCVar = function(name) return name == "showQuestLevel" and cvar or nil end
 ns.OnForever = function() return forever end
 ns.IsSecret = function() return false end
 assert(loadfile(ROOT .. "/Quest/QuestLogData.lua"))("ClassicUIForever", ns)
@@ -36,9 +38,9 @@ Check(Stripped("[24+] Elite Quest (Elite)") == "Elite Quest (Elite)", "an elite 
 Check(Stripped("|cff40c040[12] Wolves|r") == "|cff40c040Wolves|r", "inside a difficulty colour the colour stays")
 Check(Stripped("The [5] Pillars") == "The [5] Pillars", "brackets inside a title stay")
 Check(Stripped("Wolves") == "Wolves", "a title with no prefix is left alone")
-ns.db.questLevels = true
+cvar = "1"
 Check(Stripped("[17] Wolves") == "[17] Wolves", "with Quest levels on the prefix stays")
-ns.db.questLevels = false
+cvar = "0"
 forever = false
 Check(Stripped("[17] Wolves") == "[17] Wolves", "retail's prefix follows its own setting, left alone")
 
