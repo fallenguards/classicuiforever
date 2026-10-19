@@ -592,10 +592,10 @@ local function Layout()
         ns.SkinCalendar()
     end
 
-    -- Clock at the map's bottom: the client's plate faded, our stone plate kept.
+    -- Clock at the map's bottom (Era: 68 under its middle): the client's plate faded, our stone plate kept.
     if TimeManagerClockButton then
         local clock = TimeManagerClockButton
-        local clockHome = LayHome("minimapClock", map, above, 60, 28, map, "CENTER", 0, -75)
+        local clockHome = LayHome("minimapClock", map, above, 60, 28, map, "CENTER", 0, -68)
         clock:SetParent(clockHome)
         clock:SetFrameLevel(above + 1)
         clock:SetSize(60, 28)

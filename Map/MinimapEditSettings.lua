@@ -8,7 +8,7 @@ local MM = ns.MM
 local RING_UP = 22
 local PLATE_Y = -146
 local MAP_FOOT = 140   -- the map's bottom in the cluster, gone up
-local COORDS_Y = -23   -- the coordinates under the map's bottom, with the header on top
+local COORDS_Y = -16   -- the coordinates under the map's bottom and the clock, with the header on top
 
 local function Setting(read, key)
     local cluster = MinimapCluster
