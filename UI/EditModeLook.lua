@@ -315,7 +315,7 @@ end
 -- Steppers, scroll arrows and dropdowns reset their desaturation on each state change, and
 -- red buttons their file on show, press and enable: put ours back before the frame draws.
 local function Hold()
-    local asDrawn = ns.ThemeLook(true) == "client"
+    local asDrawn = ns.ThemeLook(true, "themePartWindows") == "client"
     local drained = chrome.drained
     for region in pairs(held) do
         if not region:IsDesaturated() then

@@ -210,7 +210,7 @@ end
 local InkFrame
 
 local function InkRegion(region)
-    if region:IsObjectType("FontString") then region:SetTextColor(INK_R, INK_G, INK_B) end
+    if region:IsObjectType("FontString") then region:SetTextColor(ns.PageInk(INK_R, INK_G, INK_B)) end
 end
 
 local function InkChild(child)
@@ -254,6 +254,12 @@ local function DetailsWatch()
     inkedID = QuestMapFrame.DetailsFrame.questID
     SkinDetails()
 end
+
+-- The page's ink follows the theme at once.
+ns.OnToggle(function(key)
+    local details = QuestMapFrame and QuestMapFrame.DetailsFrame
+    if ns.ThemeKey(key) and details and details:IsVisible() then SkinDetails() end
+end)
 
 ------------------------------------------------------------------ header band
 
@@ -389,6 +395,7 @@ local function Build()
         -- Parchment is the top-left 300x336 of the 512 sheet; the rest is dark.
         parchmentTex:SetTexture(ns.TexPath("questParchment"))
         parchmentTex:SetTexCoord(PARCHMENT_U0, PARCHMENT_U1, PARCHMENT_V0, PARCHMENT_V1)
+        ns.InkPage(parchmentTex)
         parchmentTex:SetPoint("TOPLEFT", details, "TOPLEFT", QUEST_DETAILS_PARCHMENT_LEFT, QUEST_DETAILS_PARCHMENT_TOP)
         parchmentTex:SetPoint("BOTTOMRIGHT", details, "BOTTOMRIGHT", QUEST_DETAILS_PARCHMENT_RIGHT, QUEST_DETAILS_PARCHMENT_BOTTOM)
         headerTex = ns.OwnTexture(details, "header", "BACKGROUND", -2)

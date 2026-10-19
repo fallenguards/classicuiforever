@@ -170,6 +170,110 @@ end
 local QUEST_SCROLLS = { "QuestDetailScrollFrame", "QuestProgressScrollFrame", "QuestRewardScrollFrame", "QuestGreetingScrollFrame" }
 local QUEST_PANELS = { "QuestFrameDetailPanel", "QuestFrameProgressPanel", "QuestFrameRewardPanel", "QuestFrameGreetingPanel" }
 
+------------------------------------------------------------ the page under a theme
+
+-- A theme inks the page as the quest log's (ns.InkPage); a dark one takes the text near white, as the log's. Painted
+-- after the game's pass for each page; the game's own colors come back once the page is light again.
+local QUEST_TITLES = { "QuestInfoTitleHeader", "QuestInfoDescriptionHeader", "QuestInfoObjectivesHeader",
+    "QuestProgressTitleText", "QuestProgressRequiredItemsText", "CurrentQuestsText", "AvailableQuestsText" }
+local QUEST_TEXTS = { "QuestInfoDescriptionText", "QuestInfoObjectivesText", "QuestInfoGroupSize", "QuestInfoRewardText",
+    "QuestInfoTimerText", "QuestInfoSpellObjectiveLearnLabel", "QuestProgressText", "GreetingText" }
+local REWARD_TEXTS = { "ItemChooseText", "ItemReceiveText", "PlayerTitleText", "QuestSessionBonusReward" }
+local lit = setmetatable({}, { __mode = "k" })   -- font string -> true while ours is on it
+
+-- The game's colors for the page: its light text setting reads as stone.
+local function GameColors()
+    local material = QuestFrame_GetMaterial and QuestFrame_GetMaterial() or "Parchment"
+    if QuestTextContrast and QuestTextContrast.UseLightText() then material = "Stone" end
+    return GetMaterialTextColors(material)
+end
+
+-- fixed: a button's text, held from its hover color while ours is on it.
+local function PaintLine(fs, title, dark, fixed)
+    if not fs then return end
+    if dark then
+        lit[fs] = true
+        if fixed then fs:SetFixedColor(true) end
+        fs:SetTextColor(unpack(ns.PAGE_INK))
+    elseif lit[fs] then
+        lit[fs] = nil
+        if fixed then fs:SetFixedColor(false) end
+        local text, head = GameColors()
+        local c = title and head or text
+        fs:SetTextColor(c[1], c[2], c[3])
+    end
+end
+
+-- A quest object's page (stone, bronze) keeps the game's text colors.
+local function QuestPageDark()
+    return ns.PageDark() and (not QuestFrame_GetMaterial or QuestFrame_GetMaterial() == "Parchment")
+end
+
+local function PaintQuestPage()
+    local dark = QuestPageDark()
+    for _, name in ipairs(QUEST_PANELS) do
+        local panel = _G[name]
+        if panel and panel.Bg then ns.InkPage(panel.Bg) end
+    end
+    for _, name in ipairs(QUEST_TITLES) do PaintLine(_G[name], true, dark) end
+    for _, name in ipairs(QUEST_TEXTS) do PaintLine(_G[name], false, dark) end
+    local rewards = QuestInfoRewardsFrame
+    if rewards then
+        PaintLine(rewards.Header, true, dark)
+        for _, key in ipairs(REWARD_TEXTS) do PaintLine(rewards[key], false, dark) end
+        PaintLine(ns.Path(rewards, "XPFrame", "ReceiveText"), false, dark)
+    end
+    local pool = QuestFrameGreetingPanel and QuestFrameGreetingPanel.titleButtonPool
+    if pool then
+        for button in pool:EnumerateActive() do PaintLine(button:GetFontString(), false, dark, true) end
+    end
+end
+
+-- Gossip: its greeting and every option, looked at while it shows. The game paints them all dark again on each update
+-- (its theme container), so a line is read, not remembered.
+local gossipDark = false
+local function Inked(fs)
+    local r, g, b = fs:GetTextColor()
+    local ink = ns.PAGE_INK
+    return ns.Near(r, ink[1], 0.01) and ns.Near(g, ink[2], 0.01) and ns.Near(b, ink[3], 0.01)
+end
+local function PaintGossipRow(row)
+    local fs = row.GreetingText or (row.GetFontString and row:GetFontString())
+    if not fs or (gossipDark and Inked(fs)) or (not gossipDark and not lit[fs]) then return end
+    PaintLine(fs, false, gossipDark, row.GreetingText == nil)
+end
+local function PaintGossipRows()
+    gossipDark = ns.PageDark()
+    local list = ns.Path(GossipFrame, "GreetingPanel", "ScrollBox")
+    if list and list.ForEachFrame then list:ForEachFrame(PaintGossipRow) end
+end
+local function PaintGossipPage()
+    if GossipFrame.Background then ns.InkPage(GossipFrame.Background) end
+    PaintGossipRows()
+end
+
+local watching = false
+local function WatchPages()
+    if watching then return end
+    watching = true
+    for _, name in ipairs(QUEST_PANELS) do
+        ns.Sched.OnVisible(_G[name], "npc.page", function(shown)
+            if shown then ns.Sched.NextFrame("npc.questPage", PaintQuestPage) end
+        end)
+    end
+    if not GossipFrame then return end
+    ns.Sched.OnVisible(GossipFrame, "npc.page", function(shown)
+        if shown then ns.Sched.NextFrame("npc.gossipPage", PaintGossipPage) end
+    end)
+    ns.Sched.Attach(GossipFrame, { name = "npc.gossipRows", every = 0.2, fn = PaintGossipRows })
+end
+
+ns.OnToggle(function(key)
+    if not ns.ThemeKey(key) then return end
+    if QuestFrame and QuestFrame:IsShown() then PaintQuestPage() end
+    if GossipFrame and GossipFrame:IsShown() then PaintGossipPage() end
+end)
+
 function P.after.QuestFrame(frame)
     ShortenNpcWindow(frame, QUEST_SCROLLS, QUEST_PANELS)
     if frame.Inset then ns.ShowInsetBorder(frame.Inset.NineSlice, true) end
@@ -177,10 +281,12 @@ function P.after.QuestFrame(frame)
     for _, name in ipairs(QUEST_PANELS) do ns.Fade(ns.Path(_G[name], "SealMaterialBG")) end
     ns.SkinQuestRewards()
     WatchRewards()
+    WatchPages()
 end
 
 function P.after.GossipFrame(frame)
     local panel = frame.GreetingPanel
     ShortenNpcWindow(frame, { panel and panel.ScrollBox }, { panel }, { frame.Background })
     if frame.Inset then ns.ShowInsetBorder(frame.Inset.NineSlice, true, true) end
+    WatchPages()
 end

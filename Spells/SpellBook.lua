@@ -294,6 +294,7 @@ end
 ---------------------------------------------------------------------------
 
 local SUB_FONT = _G.SubSpellFont and "SubSpellFont" or "GameFontHighlightSmall"
+local subColor, pageColor   -- the rank and page fonts' own colors, read once
 
 -- Player: actionID (the entry's own spell), not the current override, which
 -- changes in combat while a secure button keeps what it got out of combat;
@@ -426,7 +427,7 @@ local function UpdateButton(btn)
         btn.cooldown:Clear()
         btn.checkedTex:Hide()
         -- No Enable/Disable here: the client refuses it on casting buttons in combat.
-        btn.normal:SetVertexColor(1, 1, 1)
+        ns.RetintBronze(btn.normal)
         DimButton(btn, false)
         ns.BookFlyoutArrow(btn, false)
         return
@@ -441,6 +442,8 @@ local function UpdateButton(btn)
     local sub = info.subName or ""
     if sub == "" and info.isPassive then sub = SPELL_PASSIVE end
     btn.SpellSubName:SetText(sub)
+    subColor = subColor or { btn.SpellSubName:GetTextColor() }
+    btn.SpellSubName:SetTextColor(ns.PageInk(unpack(subColor)))
     btn.SpellName:ClearAllPoints()
     btn.SpellName:SetPoint("LEFT", btn, "RIGHT", 5, sub == "" and 1 or 3)
     btn.SpellName:Show()
@@ -449,7 +452,7 @@ local function UpdateButton(btn)
         btn.normal:SetVertexColor(0, 0, 0)
         btn.SpellName:SetTextColor(PASSIVE_SPELL_FONT_COLOR:GetRGB())
     else
-        btn.normal:SetVertexColor(1, 1, 1)
+        ns.RetintBronze(btn.normal)
         btn.SpellName:SetTextColor(NORMAL_FONT_COLOR:GetRGB())
     end
     btn.checkedTex:Hide()
@@ -1697,6 +1700,8 @@ local function CreateBook()
         local page = math.min(CurrentPage(), pages)
         SetPage(page)
         self.PageText:SetFormattedText(PAGE_NUMBER, page)
+        pageColor = pageColor or { self.PageText:GetTextColor() }
+        self.PageText:SetTextColor(ns.PageInk(unpack(pageColor)))
         self.PrevPage:SetEnabled(page > 1)
         self.NextPage:SetEnabled(page < pages)
     end
@@ -2198,5 +2203,5 @@ ns.RegisterModule("spellBookSearch", {
 -- The Collections tab comes and goes with its micro button and its own option.
 local COLLECTIONS_TAB_KEYS = { hideMicroCollections = true, hideMicroButtons = true, spellBookCollectionsTab = true }
 ns.OnToggle(function(key)
-    if COLLECTIONS_TAB_KEYS[key] and book and book.Refresh then book:Refresh() end
+    if (COLLECTIONS_TAB_KEYS[key] or ns.ThemeKey(key)) and book and book.Refresh then book:Refresh() end
 end)

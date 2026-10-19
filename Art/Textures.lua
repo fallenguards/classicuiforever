@@ -7,7 +7,7 @@ local BronzeCopy = ns.BronzeCopy
 
 -- Last SetTexture result per key, for /fcui debug.
 ns.texStatus = {}
--- texture -> the TEX key it shows (flat colour finds its copy by it)
+-- texture -> the TEX key it shows
 B.artKey = setmetatable({}, { __mode = "k" })
 
 -- A key's client path, our copy's path and whether a theme copy exists (our copy's path, else false), made on first use.
@@ -38,9 +38,10 @@ function ns.TexPaths(key)
 end
 local TexPaths = ns.TexPaths
 
-function ns.TexPath(key)
+-- texture: the piece it is for, whose part may be left out of the theme.
+function ns.TexPath(key, texture)
     local builtin, bundled, bronze = TexPaths(key)
-    if bronze and ns.BronzeOn() then return BronzeCopy(bronze), bundled end
+    if bronze and (texture and ns.ThemeFor(texture) or not texture and ns.BronzeOn()) then return BronzeCopy(bronze), bundled end
     -- The client redrew some files under the old names: ours first.
     if B.PREFER[key] or (ns.db and ns.db.textureSource == "bundled") then return bundled, builtin end
     return builtin, bundled
@@ -59,7 +60,7 @@ local SHARE = { slotNormal = 0.9, trackingBorder = { dark = 1.28 }, minimapBorde
 
 -- Falls back to the other copy so a missing file never leaves a blank region; extra args go to SetTexture.
 function ns.SetTex(texture, key, ...)
-    local primary, fallback = ns.TexPath(key)
+    local primary, fallback = ns.TexPath(key, texture)
     local ok = texture:SetTexture(primary, ...)
     if ok == false then
         ok = texture:SetTexture(fallback, ...)
@@ -81,7 +82,8 @@ function ns.SetTex(texture, key, ...)
         -- Non-metal art, or a dragon kept as drawn: clear the tint.
         ns.UntintBronze(texture)
     end
-    ns.PaintCopy(texture, swapped[texture] ~= nil and ns.BronzeOn() and primary or nil)
+    ns.PaintCopy(texture, swapped[texture] ~= nil and ns.ThemeFor(texture) and primary or nil)
+    ns.InkChrome(texture, primary)
     return ok ~= false
 end
 
@@ -97,7 +99,7 @@ function ns.ThemeAs(texture, piece)
         texture:SetVertexColor(piece:GetVertexColor())
         texture:SetDesaturated(piece:IsDesaturated())
     end
-    ns.PaintCopy(texture, key and swap ~= nil and ns.BronzeOn() and (ns.TexPath(key)) or nil)
+    ns.PaintCopy(texture, key and swap ~= nil and ns.ThemeFor(texture) and (ns.TexPath(key, texture)) or nil)
 end
 
 -- By file; swaps to its bronze copy with the theme.
@@ -107,7 +109,7 @@ function ns.SetFile(texture, path, ...)
     local copy = BronzeCopy(path)
     B.swapped[texture] = copy and path or nil
     B.swapArgs[texture] = (copy and select("#", ...) > 0) and { ... } or nil
-    local onCopy = copy and ns.ThemeLook() == "themed"
+    local onCopy = copy and ns.ThemeLook(nil, texture) == "themed"
     local ok = SetWithFallback(texture, onCopy and copy or path, copy and path, ...)
     ns.PaintCopy(texture, onCopy and copy or nil, ...)
     return ok ~= false

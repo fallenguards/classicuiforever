@@ -131,8 +131,8 @@ end
 local function Apply()
     if not watch then watch = ns.EventFrame("ADDON_LOADED", OnAddonLoaded) end
     active = true
-    if ns.ThemeTurned(theme) and (ns.ThemeLook(true) == "client") ~= clientArt then
-        clientArt = ns.ThemeLook(true) == "client"
+    if ns.ThemeTurned(theme, "themePartTooltips") and (ns.ThemeLook(true, "themePartTooltips") == "client") ~= clientArt then
+        clientArt = ns.ThemeLook(true, "themePartTooltips") == "client"
         for tip, rim in pairs(rims) do
             if rim then ns.SafeCall(Paint, tip, clientArt) end
         end

@@ -38,7 +38,7 @@ end
 -- Theme on: Forever's bronze tab (drained to the theme unless it shows client art); off: the mainline one, or the
 -- bronze drained when that sheet is missing.
 local function MirroredAtlas(tex, atlas, mirror)
-    local look = ns.ThemeLook(true)
+    local look = ns.ThemeLook(true, "themePartUnits")
     local on = look ~= "classic"
     ns.UndrainBronze(tex)
     if not on and MainlineTab(tex, atlas, mirror) then return true end

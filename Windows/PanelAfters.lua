@@ -267,6 +267,7 @@ local function ItemTextPage()
     local ours = not large and (material ~= "Parchment" or not bg or bg:GetAtlas() == "QuestBG-Parchment")
     item.page:SetShown(ours)
     if bg then ns.SetAlphaIf(bg, ours and 0 or 1) end
+    ns.InkBookText(ours)
     if large then return end
     local font = _G.ItemTextFontNormal or _G.QuestFont_Large
     local file, size, flags = font:GetFont()
@@ -302,6 +303,7 @@ function A.ItemTextFrame(frame)
         item.frame = frame
         item.page = ns.OwnTexture(frame, "eraPage", "BACKGROUND", 1)
         ns.SetTex(item.page, "mailPage")
+        ns.InkPage(item.page)
         item.page:SetSize(512, 512)
         ns.SetPointOnce(item.page, "TOPLEFT", frame, "TOPLEFT", 7, -62)
         ItemTextColumn(frame, scroll)

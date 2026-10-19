@@ -263,7 +263,7 @@ end
 local function PaintButtons()
     local want
     if active and ns.db and ns.db.panels ~= false then
-        want = ns.ThemeLook(true)
+        want = ns.ThemeLook(true, "themePartWindows")
     elseif buttonsPainted then
         want = "client"
     end
@@ -288,8 +288,8 @@ local function Apply()
         active = true
         EventRegistry:RegisterCallback("MenuProxy.OnShow", OnMenuShow, signal)
     end
-    if ns.ThemeTurned(theme) and (ns.ThemeLook(true) == "client") ~= clientArt then
-        clientArt = ns.ThemeLook(true) == "client"
+    if ns.ThemeTurned(theme, "themePartTooltips") and (ns.ThemeLook(true, "themePartTooltips") == "client") ~= clientArt then
+        clientArt = ns.ThemeLook(true, "themePartTooltips") == "client"
         if clientArt then UndressAll() else Wake() end
     end
     PaintButtons()

@@ -10,6 +10,7 @@ local repFactionID
 local MarkRepRows   -- assigned at the first build: it works on that box
 
 local PAGE_COORDS = { 0, 0.58, 0, 0.3 }
+local PAGE_DIM = { 0.55, 0.47, 0.35 }   -- the page dimmed under light words; a theme's color in its place
 local SEGMENT_BG = { bg = { 0, 0, 0, 1 } }
 local REP_MARK = {
     -- Cut at row 27: cutting at the cap's top line (row 32) drew a faint dash.
@@ -134,7 +135,8 @@ function T.NewDetailBox(name, parent)
     local page = upper:CreateTexture(nil, "BORDER")
     page:SetTexture("Interface\\QuestFrame\\QuestBG")
     page:SetTexCoord(unpack(PAGE_COORDS))
-    page:SetVertexColor(0.55, 0.47, 0.35)
+    page:SetVertexColor(unpack(PAGE_DIM))
+    ns.InkPage(page, PAGE_DIM)
     page:SetPoint("TOPLEFT", upper, "TOPLEFT", 10, -10)
     page:SetPoint("BOTTOMRIGHT", upper, "BOTTOMRIGHT", -10, 10)
     Segment(-134, -203, 1)

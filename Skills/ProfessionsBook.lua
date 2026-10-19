@@ -123,6 +123,8 @@ end
 -- The rows
 ---------------------------------------------------------------------------
 
+-- The bar's back: the book sheet's metal, in the theme's paint. Its caps are the fill's own ends, as the fill.
+local BAR_ART = { "BGLeft", "BGRight", "BGMiddle" }
 local function NewBar(parent, index)
     -- The old bar is still a client template; made from here it is ours. Named: retail's template hangs its
     -- pieces by $parent names, and nameless bars' backs ran from one bar to another.
@@ -135,8 +137,14 @@ local function NewBar(parent, index)
         bar.rankText:SetPoint("CENTER", 0, 2)
     end
     if bar.capped then bar.capped:Hide() end
+    for _, key in ipairs(BAR_ART) do
+        if bar[key] then ns.BronzeTint(bar[key]) end
+    end
     return bar
 end
+
+-- An unlearned profession's words in parchment ink: near white on a dark page (ns.PageInk), as the quest log's.
+local MISSING_INK, MISSING_HEAD_INK = { 0.1, 0.05, 0.05 }, { 0.15, 0.1, 0.1 }
 
 local function NewRow(content, primary, index)
     local row = ns.NewFrame("Frame", nil, content)
@@ -151,12 +159,12 @@ local function NewRow(content, primary, index)
     row.missingText = row:CreateFontString(nil, "ARTWORK")
     Font(row.missingText, "SubSpellFont", "GameFontHighlightSmall")
     row.missingText:SetJustifyH("LEFT")
-    row.missingText:SetTextColor(0.1, 0.05, 0.05)
 
     if primary then
         local ring = row:CreateTexture(nil, "ARTWORK", nil, 1)
         ring:SetTexture(SHEET)
         ring:SetTexCoord(0.43359375, 0.72265625, 0.14843750, 0.72656250)
+        ns.BronzeTint(ring)
         row.ring = ring
         local icon = row:CreateTexture(nil, "ARTWORK", nil, 0)
         row.icon = icon
@@ -180,7 +188,6 @@ local function NewRow(content, primary, index)
         row.name:SetPoint("BOTTOMRIGHT", row.rank, "TOPRIGHT", 0, 2)
 
         Font(row.missingHeader, "QuestFont_Large", "GameFontNormalLarge")
-        row.missingHeader:SetTextColor(0.15, 0.1, 0.1)
         row.missingHeader:SetPoint("TOPLEFT", row, "TOPLEFT", 4, -15)
         row.missingText:SetPoint("RIGHT", row, "RIGHT", -5, 0)
     end
@@ -284,6 +291,8 @@ local function FillRow(row, index, slot)
         local words = MISSING[slot] or MISSING[1]
         row.missingHeader:SetText(_G[words.header] or "")
         row.missingText:SetText(_G[words.text] or "")
+        row.missingText:SetTextColor(ns.PageInk(unpack(MISSING_INK)))
+        if not row.primary then row.missingHeader:SetTextColor(ns.PageInk(unpack(MISSING_HEAD_INK))) end
         return
     end
     row.name:SetText(name)
@@ -322,6 +331,7 @@ local function SpellPlate(button)
     plates[button] = plate
     plate:SetTexture(SHEET)
     plate:SetTexCoord(0.00390625, 0.42578125, 0.14843750, 0.46875000)
+    ns.BronzeTint(plate)
     plate:SetSize(108, 41)
     plate:SetPoint("LEFT", button, "RIGHT", 1, 0)
     return plate
@@ -336,6 +346,11 @@ function T.FillRows()
     FillRow(rows[4], fish, 4)
     FillRow(rows[5], faid, 5)
 end
+
+-- The page's ink follows the theme at once.
+ns.OnToggle(function(key)
+    if ns.ThemeKey(key) then T.FillRows() end
+end)
 
 ---------------------------------------------------------------------------
 -- The client's cards
@@ -359,6 +374,7 @@ local function DressSpellButton(button)
     -- Retail's button still carries the old plate and icon.
     if not FOREVER then
         plates[button] = _G[button:GetName() .. "NameFrame"]
+        ns.TintGameArt(plates[button])
         return
     end
     SpellPlate(button)
@@ -471,7 +487,9 @@ function T.Build()
     -- Forever: our left page has First Aid's emblem where the client's has Archaeology's (Art/Textures.lua).
     -- Retail keeps the client's page, drawn on the content frame: on the window itself it lies under the chrome.
     local function PageArt(tex)
-        if not (FOREVER and ns.SetTex(tex, "professionsBookLeft")) then tex:SetTexture(PAGE_LEFT) end
+        if FOREVER and ns.SetTex(tex, "professionsBookLeft") then return end
+        tex:SetTexture(PAGE_LEFT)
+        ns.InkChrome(tex, PAGE_LEFT)
     end
     local artHost = FOREVER and page or content
     rows.small = {}
@@ -495,8 +513,8 @@ function T.Build()
     for _, b in ipairs(BANDS) do
         for _, layer in ipairs(BAND_LAYERS) do
             local tex = clip:CreateTexture(nil, "BACKGROUND", nil, 2)
-            ns.SetTex(tex, layer[1])
             tex:SetBlendMode(layer[2])
+            ns.SetTex(tex, layer[1])
             tex:SetTexCoord(PARCH_CUT_L / 512, (PARCH_BAND_W - PARCH_CUT_R) / 512, b[3] / 128, (b[3] + b[2]) / 128)
             tex:SetPoint("TOPLEFT", page, "TOPLEFT", PARCH_BAND_X + PARCH_CUT_L, -b[1])
             tex:SetSize(PARCH_BAND_W - PARCH_CUT_L - PARCH_CUT_R, b[2])
@@ -506,8 +524,8 @@ function T.Build()
     for _, e in ipairs(EMBLEMS) do
         for _, layer in ipairs(EMBLEM_LAYERS) do
             local tex = clip:CreateTexture(nil, "BACKGROUND", nil, 2)
-            ns.SetTex(tex, layer[1])
             tex:SetBlendMode(layer[2])
+            ns.SetTex(tex, layer[1])
             tex:SetTexCoord(0, e[3] / 128, e[5] * 64 / 256, (e[5] * 64 + e[4]) / 256)
             tex:SetPoint("TOPLEFT", page, "TOPLEFT", e[1], -e[2])
             tex:SetSize(e[3], e[4])

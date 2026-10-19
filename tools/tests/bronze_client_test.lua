@@ -57,6 +57,7 @@ ns.OnToggle, ns.RegisterEvents, ns.UntintGameArt, ns.PaintCopy, ns.BronzeRim = n
 ns.FollowLayers = noop
 ns.EventFrame = function() return {} end
 ns.ThemeTurned = function() return false end
+ns.ThemePartOn = function() return true end
 -- One client window of the list, open.
 CharacterFrame = { GetRegions = noop, IsShown = function() return true end }
 

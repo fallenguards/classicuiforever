@@ -115,7 +115,7 @@ local function BronzeClient(texture, off)
     -- Our own pieces: the theme already handles them.
     if B.tinted[texture] or B.swapped[texture] then return end
     local was = clientWas[texture]
-    if off or not themeOn then
+    if off or not themeOn or not ns.ThemePartOn(texture) then
         if was then
             clientWas[texture] = nil
             if was.atlas then

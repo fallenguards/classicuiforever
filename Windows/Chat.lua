@@ -59,7 +59,7 @@ function ns.ChatIconButton(button, name, set, fixed)
     local prefix = Prefix(name)
     local bronze = SetHasBronze(set)
     local swap = bronze and not fixed
-    local copy = not swap and bronze and ns.ThemeLook() == "themed"
+    local copy = not swap and bronze and ns.ThemeLook(nil, "themePartChat") == "themed"
     ns.DressStates(button, FacePath(prefix, "Normal", copy), FacePath(prefix, "Pushed", copy),
         FacePath(prefix, "Disabled", copy), HILIGHT, swap and FACE_SWAP or FACE_SET)
     if not swap then
@@ -551,7 +551,7 @@ end
 local function Watch()
     if not active then return end
     local list = _G.CHAT_FRAMES
-    if ns.ThemeTurned(theme) then
+    if ns.ThemeTurned(theme, "themePartChat") then
         Redress(theme.was ~= nil)
     elseif list and #list ~= knownFrames then
         DressAll()
@@ -759,7 +759,7 @@ local function Apply()
         ns.EventFrame(WATCH_EVENTS, WatchSoon)
     end
     primaryChat = _G.ChatFrame1
-    Redress(ns.ThemeTurned(theme) and theme.was ~= nil)
+    Redress(ns.ThemeTurned(theme, "themePartChat") and theme.was ~= nil)
     WatchNextFrame()
     ChatButtonsOption()
 end

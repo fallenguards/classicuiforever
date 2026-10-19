@@ -7,12 +7,6 @@ local _, ns = ...
 local B = ns.bronze
 local SetWithFallback, BronzeCopy, THEMES, ThemeName = B.SetWithFallback, ns.BronzeCopy, B.THEMES, ns.ThemeName
 
--- The theme on, or nil.
-local function Theme()
-    local name = ThemeName()
-    return name and THEMES[name]
-end
-
 local weak = { __mode = "k" }
 local ONE = { 1, 1, 1 }
 local tinted = setmetatable({}, weak)    -- texture -> share, or true for full
@@ -37,17 +31,18 @@ function B.PlainTree(frame)
 end
 
 -- The theme rule in one place. Off: "classic" (1.x art). On: "themed" (1.x shapes in the theme's copies or tints),
--- or "client" for pieces a theme shows in Forever's own art (bronze: tooltips, menus).
-function ns.ThemeLook(clientArt)
-    local theme = Theme()
+-- or "client" for pieces a theme shows in Forever's own art (bronze: tooltips, menus). where: the piece or part asked
+-- about (ns.ThemePartOn), its part left out of the theme reads "classic".
+function ns.ThemeLook(clientArt, where)
+    local theme = ns.ThemeFor(where)
     if not theme then return "classic" end
     return (clientArt and theme.client) and "client" or "themed"
 end
 
 -- Pull latch in a module's own pass: true once per theme change; state.on is the theme name last painted (false: off),
--- state.was the one before.
-function ns.ThemeTurned(state)
-    local on = ThemeName() or false
+-- state.was the one before. where: the module's part, off while left out of the theme.
+function ns.ThemeTurned(state, where)
+    local on = ns.ThemeFor(where) and ThemeName() or false
     if state.on == on then return false end
     state.was, state.on = state.on, on
     return true
@@ -58,6 +53,13 @@ ns.BRONZE_SOFT = 0.9
 -- Drained and tinted to the theme (share: of its colour, or by theme name; shade: times this), or as drawn without
 -- one (silver: drained grey).
 local function Paint(texture, theme, share, silver)
+    -- The one color look: the theme's color whole, as every piece of its part (Art/ThemeLayers.lua Ink).
+    if theme and ns.FlatOn(texture) then
+        local t = theme.tint
+        texture:SetDesaturated(true)
+        texture:SetVertexColor(t[1], t[2], t[3])
+        return
+    end
     if theme then
         local tint = theme.tint
         local shade = 1
@@ -68,18 +70,16 @@ local function Paint(texture, theme, share, silver)
         local r, g, b = max(0, 1 + (tint[1] - 1) * share) * shade, max(0, 1 + (tint[2] - 1) * share) * shade,
             max(0, 1 + (tint[3] - 1) * share) * shade
         texture:SetVertexColor(r, g, b)
-        ns.PaintFlat(texture, r, g, b)
     else
         -- share.off: the shade it keeps with no theme (a grey icon).
         local off = type(share) == "table" and share.off or 1
         texture:SetDesaturated(silver == true)
         texture:SetVertexColor(off, off, off)
-        ns.PaintFlat(texture)
     end
 end
 
 local function PaintTint(texture)
-    if texture.SetDesaturated then Paint(texture, Theme(), tinted[texture], silvered[texture]) end
+    if texture.SetDesaturated then Paint(texture, ns.ThemeFor(texture), tinted[texture], silvered[texture]) end
 end
 
 -- The game's own art where our piece is off (Art/GameArt.lua): as drawn with no theme or one showing client art,
@@ -90,7 +90,7 @@ local function OnCopy(texture)
 end
 local function PaintGame(texture)
     if OnCopy(texture) then return end
-    local theme = Theme()
+    local theme = ns.ThemeFor(texture)
     Paint(texture, not (theme and theme.client) and theme or nil, gameArt[texture])
 end
 
@@ -103,7 +103,6 @@ end
 function ns.UntintGameArt(texture)
     if not texture or gameArt[texture] == nil then return end
     gameArt[texture] = nil
-    ns.PaintFlat(texture)
     if OnCopy(texture) then return end
     texture:SetDesaturated(false)
     texture:SetVertexColor(1, 1, 1)
@@ -124,15 +123,19 @@ function ns.UntintBronze(texture)
     if not texture then return end
     tinted[texture] = nil
     silvered[texture] = nil
-    ns.PaintFlat(texture)
     if not texture.SetDesaturated then return end
     texture:SetDesaturated(false)
     texture:SetVertexColor(1, 1, 1)
 end
 
+-- A tinted piece back in its theme paint after a color of its own (a spell slot's rim after a passive's black).
+function ns.RetintBronze(texture)
+    if tinted[texture] then PaintTint(texture) end
+end
+
 -- Client bronze hidden for the old look, shown only with the theme.
 local function PaintKeep(region)
-    region:SetAlpha(ns.BronzeOn() and 1 or 0)
+    region:SetAlpha(ns.ThemeFor(region) and 1 or 0)
 end
 
 function ns.BronzeKeep(region)
@@ -188,7 +191,7 @@ function ns.BronzeBackdrop(frame, r, g, b, a, grey)
     if not base.info and plain and plain.edgeFile and BronzeCopy(plain.edgeFile) then base.info = { plain = plain } end
     if grey then base.grey = grey end
     bordered[frame] = base
-    local name = ThemeName()
+    local name = ns.ThemeFor(frame) and ThemeName() or nil
     -- No theme: a box may keep its own grey, as Era's stat boxes.
     local rim = (not name and base.grey) or base
     if base.info and frame.SetBackdrop then
@@ -217,11 +220,16 @@ local function PaintDrain(region, tint)
         if region.SetVertexColor then region:SetVertexColor(1, 1, 1) end
         return
     end
-    local theme = Theme()
+    local theme = ns.ThemeFor(region)
+    if theme and ns.FlatOn(region) and region.SetVertexColor then
+        local t = theme.tint
+        region:SetDesaturated(true)
+        region:SetVertexColor(t[1], t[2], t[3])
+        return
+    end
     if theme and theme.client then
         region:SetDesaturated(false)
         if region.SetVertexColor then region:SetVertexColor(1, 1, 1) end
-        ns.PaintFlat(region)
         return
     end
     region:SetDesaturated(true)
@@ -231,9 +239,6 @@ local function PaintDrain(region, tint)
     if theme then
         local t = theme.tint
         r, g, b = r * t[1], g * t[2], b * t[3]
-        ns.PaintFlat(region, r, g, b)
-    else
-        ns.PaintFlat(region)
     end
     region:SetVertexColor(r, g, b)
 end
@@ -256,7 +261,6 @@ end
 function ns.UndrainBronze(region)
     if not region or not region.SetDesaturated then return end
     drained[region] = nil
-    ns.PaintFlat(region)
     region:SetDesaturated(false)
     if region.SetVertexColor then region:SetVertexColor(1, 1, 1) end
 end
@@ -264,7 +268,7 @@ end
 -- Drained once; drained again when the client resets its desaturation (an unreadable state counts as right).
 function ns.KeepDrained(region, r, g, b)
     if not region or not region.SetDesaturated then return end
-    local grey = ns.ThemeLook(true) ~= "client"
+    local grey = ns.ThemeLook(true, region) ~= "client"
     if drained[region] == nil or (region.IsDesaturated and ns.Safe(region:IsDesaturated(), grey) ~= grey) then
         ns.DrainBronze(region, r, g, b)
     end
@@ -316,17 +320,24 @@ function ns.RepaintBronze()
     for texture, what in pairs(swapped) do
         if what:find("[\\/]") then
             local args = swapArgs[texture]
-            local want = ns.BronzeOn() and ns.BronzeCopy(what) or what
+            local want = ns.ThemeFor(texture) and ns.BronzeCopy(what) or what
             if args then SetWithFallback(texture, want, what, unpack(args)) else SetWithFallback(texture, want, what) end
             local copy = want ~= what and want or nil
             if args then ns.PaintCopy(texture, copy, unpack(args)) else ns.PaintCopy(texture, copy) end
         else
-            local primary, fallback = ns.TexPath(what)
+            local primary, fallback = ns.TexPath(what, texture)
             SetWithFallback(texture, primary, fallback)
-            ns.PaintCopy(texture, ns.BronzeOn() and select(3, ns.TexPaths(what)) and primary or nil)
+            ns.PaintCopy(texture, ns.ThemeFor(texture) and select(3, ns.TexPaths(what)) and primary or nil)
         end
     end
 end
+
+-- A part taken out of the theme or put back: its tints at once, in a fight too; file swaps with the apply pass.
+ns.OnToggle(function(key)
+    if not ns.IsThemePart(key) then return end
+    ns.RepaintTints()
+    for region in pairs(kept) do PaintKeep(region) end
+end)
 
 -- First module, so the repaint runs before every other apply.
 ns.RegisterModule("bronzeTheme", { apply = function() ns.RepaintBronze() end, restore = function() ns.RepaintBronze() end })

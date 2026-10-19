@@ -171,7 +171,7 @@ local function PetFace()
     local host = _G.PetFrameHappiness
     local game = host and host.Texture
     if not game then return end
-    local on = ns.BronzeOn()
+    local on = ns.ThemeFor(game) ~= nil
     if on and not face then
         face = host:CreateTexture(nil, "BACKGROUND", nil, 1)
         face:SetAllPoints(game)
@@ -238,5 +238,5 @@ ns.RegisterModule("bronzeTheme", { id = "gameArt", apply = Sync, restore = Sync,
 
 -- Ignore theme for elite frames or one of its frames: the walk again at once, in a fight too.
 ns.OnToggle(function(key)
-    if (key == "themeIgnoreElite" or ns.bronze.ELITE_FRAME_KEYS[key]) and ns.ready then Sync() end
+    if (key == "themeIgnoreElite" or ns.bronze.ELITE_FRAME_KEYS[key] or ns.IsThemePart(key)) and ns.ready then Sync() end
 end)

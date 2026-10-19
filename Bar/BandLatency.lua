@@ -53,6 +53,8 @@ local TUBE_TIP = { text = TipText, r = 1, g = 1, b = 1, lines = { { TipDesc, 1, 
 function B.MakeTube(parent)
     local tube = parent:CreateTexture(nil, "BACKGROUND", nil, -7)
     ns.SetTex(tube, "latencyBar")
+    -- Its green, yellow or red in every theme: Dark's metal layer over the tube drew it gray.
+    ns.UnswapBronze(tube)
     -- From the tube art's second row: its first is nearly clear and left a gap under the window's frame.
     tube:SetTexCoord(0, 7 / 8, 1 / 64, 38 / 64)
     tube:SetVertexColor(0, 1, 0)

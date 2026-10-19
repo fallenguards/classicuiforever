@@ -20,8 +20,8 @@ local ROWS = {
     { "themeColor", "themeCustom", "color rgb hex color theme look" },
     { "themeDark", "bronzeTheme", "dark look" },
     { "themeDarkness", "themeDark", "dark black grey gray shade slider theme look" },
-    { "themeFlat", "bronzeTheme", "flat color flat solid plain texture look" },
-    { "flatHideBorders", "themeFlat", "hide inner borders look" },
+    { "themeTextured", "bronzeTheme", "textured color texture textured flat solid plain stone grain look" },
+    { "texturedWindows", "themeTextured", "other windows look" },
     { "themeIgnoreElite", "bronzeTheme", "ignore theme for elite frames look" },
     { "classicBar", nil, "classic bar action bars" },
     { "shadedBars", "classicBar", "shaded xp and reputation bars darker action bars" },
@@ -70,7 +70,7 @@ end
 
 Check("the matches and the boxes above them, no other rows of their sections", Search("dark"),
     "bronzeTheme themeDark themeDarkness classicBar shadedBars")
-Check("a nested match brings every box above it", Search("hide inner"), "bronzeTheme themeFlat flatHideBorders")
+Check("a nested match brings every box above it", Search("other windows"), "bronzeTheme themeTextured texturedWindows")
 Check("a match brings the box it needs", Search("same size"), "classicBar classicTracking trackingSameSize")
 Check("no search shows everything", Search(""), table.concat((function()
     local all = {}

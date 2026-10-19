@@ -324,8 +324,8 @@ local THEMES = {
 }
 B.THEMES = THEMES
 -- Toggles that change the theme.
-B.THEME_KEYS = { bronzeTheme = true, themeBronze = true, themeDark = true, themeCustom = true, themeFlat = true,
-    flatBars = true, flatCharacter = true, flatSpellbook = true, flatWindows = true, flatHideBorders = true }
+B.THEME_KEYS = { bronzeTheme = true, themeBronze = true, themeDark = true, themeCustom = true, themeTextured = true,
+    texturedBars = true, texturedCharacter = true, texturedSpellbook = true, texturedWindows = true }
 
 -- "rrggbb" to 0-1 channels, or nil.
 function ns.HexColor(hex)
@@ -364,10 +364,6 @@ end
 
 local ART = "\n" .. (ns.THEME_ART or "")
 local ART_LOWER = ART:lower()
-local FLAT = "\n" .. (ns.FLAT_ART or "")
-local FLAT_LOWER = FLAT:lower()
-local FLAT_ALL = "\n" .. (ns.FLAT_ART_ALL or "")
-local FLAT_ALL_LOWER = FLAT_ALL:lower()
 local function Lookup(path, dir, list, lower)
     local base = path:match("([^\\/]+)$")
     if not base then return false end
@@ -376,23 +372,29 @@ local function Lookup(path, dir, list, lower)
     return at and (dir .. (list or ART):sub(at + 1, at + #key - 2) .. ".tga") or false
 end
 
--- A file's flat color copy (its panels; with Hide inner borders, the lines between them too), or nil; memoized.
-local flatCopies = { [false] = {}, [true] = {} }
-function ns.FlatCopy(path)
-    if type(path) ~= "string" then return nil end
-    local all = ns.db ~= nil and ns.db.flatHideBorders == true
-    local memo = flatCopies[all]
-    local copy = memo[path]
-    if copy == nil then
-        if all then
-            copy = Lookup(path, BUNDLED .. "custom-flat-all\\", FLAT_ALL, FLAT_ALL_LOWER)
-        else
-            copy = Lookup(path, BUNDLED .. "custom-flat\\", FLAT, FLAT_LOWER)
+-- A lookup in one of Art/ThemeArt.lua's lists: path -> its file in dir (dir "": true), or false; memoized.
+local function ListLookup(list, dir)
+    list = "\n" .. (list or "")
+    local lower, memo = list:lower(), {}
+    return function(path)
+        if type(path) ~= "string" then return false end
+        local known = memo[path]
+        if known == nil then
+            known = Lookup(path, dir, list, lower)
+            if known and dir == "" then known = true end
+            memo[path] = known
         end
-        memo[path] = copy
+        return known
     end
-    return copy or nil
 end
+-- A chrome sheet (frames, floors, parchment pages), which the one color look draws whole.
+ns.ChromeArt = ListLookup(ns.CHROME_ART, "")
+-- A sheet's parchment alone, which Textured color tints over it; false for none.
+ns.ParchCopy = ListLookup(ns.PARCH_ART, BUNDLED .. "custom-parch\\")
+-- Parchment all over (the spellbook's empty slot), which any theme draws whole.
+ns.ParchWhole = ListLookup(ns.PARCH_WHOLE, "")
+-- A sheet's picture alone (Era's backpack in its ring), laid over it as drawn under any theme; false for none.
+ns.PictureCopy = ListLookup(ns.PICTURE_ART, BUNDLED .. "custom-picture\\")
 
 -- A file's copy in the theme on (bronze while off, for callers asking whether one exists), memoized per theme.
 local function BronzeCopy(path)

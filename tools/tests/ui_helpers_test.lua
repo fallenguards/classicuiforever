@@ -206,6 +206,7 @@ Load("Core/Scheduler.lua")
 Load("Core/Setters.lua")
 Load("Art/ThemeArt.lua")
 Load("Art/TextureData.lua")
+Load("Art/ThemeParts.lua")
 Load("Art/Textures.lua")
 Load("Art/Bronze.lua")
 Load("Art/ThemeFlat.lua")
@@ -306,8 +307,8 @@ Test("Dress overrides and partial size", function()
     Check(ns.Dress(nil, "barBody", {}) == nil, "nil texture is a no-op")
 end)
 
-Test("Dress tint share, vertex after tint, hide, alpha", function()
-    ns.db.bronzeTheme = true
+Test("Dress tint share (textured), vertex after tint, hide, alpha", function()
+    ns.db.bronzeTheme, ns.db.themeTextured = true, true
     local frame = CreateFrame("Frame")
     local tex = frame:CreateTexture()
     ns.Dress(tex, "barBody", { tint = 0.9, show = false, alpha = 0.6 })
@@ -318,6 +319,7 @@ Test("Dress tint share, vertex after tint, hide, alpha", function()
     local bg = frame:CreateTexture()
     ns.Dress(bg, "levelBackground", { w = 100, h = 19, vertex = { 0, 0, 0 }, show = false })
     Check(Same(bg._vertex, { 0, 0, 0 }), "vertex colour wins over any tint")
+    ns.db.themeTextured = nil
     local vc = Calls(bg, "SetVertexColor")
     Check(vc[#vc].n == 3, "three-value vertex passes three arguments")
     local full = frame:CreateTexture()
@@ -351,33 +353,27 @@ Test("Themes: dark tint, a copy folder per theme, the look rule", function()
     Check(ns.BronzeCopy(BORDER) ~= nil, "off still answers whether a copy exists")
 end)
 
-Test("Flat colour: a part's stone panels in the theme's colour over the art; its row off takes them away", function()
-    ns.db.bronzeTheme, ns.db.themeDark, ns.db.themeFlat, ns.db.flatWindows = true, true, true, true
+Test("One color, a theme's default: a part's pieces whole in the theme's color; Textured color keeps its tint", function()
+    ns.db.bronzeTheme, ns.db.themeDark = true, true
     local frame = CreateFrame("Frame")
     local tex = frame:CreateTexture()
     ns.Dress(tex, "barBody", { tint = true })
-    local cells
-    for _, region in ipairs(frame._regions) do
-        if region ~= tex and type(region._tex) == "string" and region._tex:find("custom-flat", 1, true) then cells = region end
-    end
-    Check(cells ~= nil and cells._shown == true, "stone panels shown")
-    Check(cells and cells._tex:find("UI-MainMenuBar-Dwarf", 1, true) ~= nil, "the piece's own panels")
-    Check(cells and Near(cells._vertex[1], 0.38), "in the theme's colour")
-    ns.db.flatWindows = false
+    Check(tex._desat == true and Near(tex._vertex[1], 0.38) and Near(tex._vertex[3], 0.40), "the piece in the theme's colour")
+    ns.db.themeTextured = true
     ns.RepaintBronze()
-    Check(cells and cells._shown == false, "row off: no panels")
-    ns.db.themeFlat, ns.db.flatWindows, ns.db.themeDark, ns.db.bronzeTheme = nil, nil, false, false
+    Check(tex._desat == true and Near(tex._vertex[1], 0.38), "textured: the theme's own tint")
+    ns.db.themeTextured, ns.db.themeDark, ns.db.bronzeTheme = nil, false, false
     ns.UntintBronze(tex)
 end)
 
-Test("Theme rim: the theme colour as dark as the window metal, not its full colour", function()
-    ns.db.bronzeTheme, ns.db.themeDark = true, false
+Test("Theme rim (textured): the theme colour as dark as the window metal, not its full colour", function()
+    ns.db.bronzeTheme, ns.db.themeDark, ns.db.themeTextured = true, false, true
     local button = CreateFrame("Button")
     button.icon = button:CreateTexture()
     ns.BronzeRim(button)
     local v = button.fcuiBronzeRim._vertex
     Check(Near(v[1], 0.9 * 0.55) and Near(v[2], 0.62 * 0.55) and Near(v[3], 0.32 * 0.55), "bronze rim shaded")
-    ns.db.bronzeTheme = false
+    ns.db.bronzeTheme, ns.db.themeTextured = false, nil
     ns.RepaintBronze()
 end)
 

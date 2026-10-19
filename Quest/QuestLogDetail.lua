@@ -21,7 +21,10 @@ local FONT_TITLE = FirstFont("QuestTitleFont", "QuestFont_Large", "GameFontNorma
 local FONT_BODY = FirstFont("QuestFont", "QuestFontNormalSmall", "GameFontNormal")
 local FONT_SMALL = FirstFont("QuestFontNormalSmall", "GameFontNormalSmall")
 local INK_R, INK_G, INK_B = 0.18, 0.12, 0.06    -- parchment ink
-local DONE_R, DONE_G, DONE_B = 0.2, 0.2, 0.2    -- a finished objective
+-- A finished objective; lighter on a page a dark theme darkened.
+local DONE, PALE_DONE = { 0.2, 0.2, 0.2 }, { 0.6, 0.6, 0.6 }
+local function Ink() return ns.PageInk(INK_R, INK_G, INK_B) end
+local function Done() return unpack(ns.PageDark() and PALE_DONE or DONE) end
 
 -- The log window; FillDetail sets it before any piece is made.
 local frame
@@ -41,7 +44,7 @@ local function DetailString(font, width, x, y, anchor, relPoint)
     fs:SetJustifyH("LEFT")
     fs:SetWidth(width)
     ns.SetPointOnce(fs, "TOPLEFT", anchor or frame.detailChild, relPoint or "TOPLEFT", x or 0, y or 0)
-    fs:SetTextColor(INK_R, INK_G, INK_B)
+    fs:SetTextColor(Ink())
     fs:Show()
     return fs
 end
@@ -182,7 +185,7 @@ function QL.FillDetail(window, info, detailH, setHasTimer)
         if not text or text == "" then text = kind end
         local line = DetailString(FONT_SMALL, TEXT_W, 0, i == 1 and -10 or -2, last, "BOTTOMLEFT")
         if finished then
-            line:SetTextColor(DONE_R, DONE_G, DONE_B)
+            line:SetTextColor(Done())
             text = text .. " (" .. (COMPLETE or "Complete") .. ")"
         end
         line:SetText(text)
@@ -193,7 +196,7 @@ function QL.FillDetail(window, info, detailH, setHasTimer)
     if required > 0 then
         local line = DetailString(FONT_SMALL, TEXT_W, 0, numObjectives > 0 and -4 or -10, last, "BOTTOMLEFT")
         line:SetText((REQUIRED_MONEY or "Required Money:") .. " " .. Coins(required))
-        if required > GetMoney() then line:SetTextColor(1, 0.1, 0.1) else line:SetTextColor(DONE_R, DONE_G, DONE_B) end
+        if required > GetMoney() then line:SetTextColor(1, 0.1, 0.1) else line:SetTextColor(Done()) end
         last = line
     end
 

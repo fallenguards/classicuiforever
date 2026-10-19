@@ -60,6 +60,7 @@ Core\EditMode.lua
 Core\Hooks.lua
 Art\ThemeArt.lua
 Art\TextureData.lua
+Art\ThemeParts.lua
 Art\Textures.lua
 Art\Bronze.lua
 Art\ThemeFlat.lua
@@ -178,6 +179,7 @@ Windows\Loot.lua
 Windows\LootRoll.lua
 Windows\NpcWindows.lua
 Windows\PanelAfters.lua
+Windows\PageInk.lua
 Windows\Panels.lua
 Windows\Bank.lua
 Social\SocialWindow.lua
