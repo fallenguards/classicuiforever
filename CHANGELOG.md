@@ -2,6 +2,33 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.33.0] - 2026-10-19
+
+### Added
+- Square minimap, under Minimap in the options (/fcui), off by default: the map square, in the round border's metal, with the buttons on its rim along its edge. While the game's Rotate Minimap is on (Edit Mode, Minimap) the map stays round and the option is grayed, its tooltip saying why.
+- Minimap close button, under Minimap, off by default: Era's X on the zone bar's end hides the map and the buttons round it, the zone bar staying; another click brings them back. With the calendar by the zone name, it moves left of the X.
+- Edit mode's Header Underneath works on our minimap: the zone bar hangs under the map as on Classic Era, the coordinates under it.
+- The game's health numbers on our nameplates, under Nameplates: on the right, split or on the left, the value or the percent first. Our plates now show the numbers the game's Nameplate Information options pick.
+- Yellow name on hover, under Nameplates, on by default: the name of the plate under the mouse turns yellow, as on Classic Era (#206).
+- Level-up banner, under Other, off by default: the game's big level-up banner and the new spell banners after it stay hidden, as 1.x had none.
+- Shift to drag minimap buttons, under Minimap, on by default: turned off, a plain drag moves our minimap buttons (#180).
+
+### Changed
+- The macro window and its icon picker in Era's look: the trim scroll bars, the inset border, the icon picker's rim with its divider, and the button bar; the macro text box keeps its scroll knob with nothing to scroll (#89).
+- The character sheet's stat boxes take Era's gray rim with no theme, a theme's color with one; each character keeps its own stat pane picks.
+- The Statistics tab's sub headers use the classic plus and minus.
+- Default toggles turns Classic-sized bars on at any interface size; a chat line says how to undo it.
+- Our options button on the minimap keeps its own shown, on hover or hidden pick (#180).
+- The minimap clock sits at Era's spot, in Era's plate instead of Forever's redrawn one.
+
+### Fixed
+- On target and focus with Thick health bars, incoming heals fill the whole bar and start right where the health ends.
+- The map's Show Quest Levels filter no longer works backwards.
+- Bar 1's dividers stay faded when the mouse enters a button.
+- A quest object's page material ends with its parchment instead of running past it (#178).
+- With Hide button borders, the calendar's ring comes off too and the tracking glass sits centered on its disc.
+- Grayed options show their tooltip again, which says why they are grayed.
+
 ## [0.32.0] - 2026-10-18
 
 ### Added

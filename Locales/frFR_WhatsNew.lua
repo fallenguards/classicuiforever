@@ -3,6 +3,18 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN43_1_TITLE"] = "Minicarte carrée"
+L["WN43_1_TEXT"] = "Minicarte carrée rend la carte carrée, dans le métal de la bordure ronde, les boutons de la bordure suivant son bord. Elle est désactivée par défaut, activez-la dans les options (/fcui), sous Minicarte. Tant que Rotation de la minicarte du jeu est activée, la carte reste ronde."
+L["WN43_2_TITLE"] = "Minicarte"
+L["WN43_2_TEXT"] = "Bouton de fermeture de la minicarte met le X d'Era sur la barre de zone : un clic masque la carte, un autre la fait revenir. Il est désactivé par défaut, activez-le dans les options, sous Minicarte. En mode Édition, la barre de zone peut maintenant passer sous la carte, l'horloge est à la place d'Era, dans le cadre d'Era, et Maj pour déplacer les boutons de la minicarte peut être désactivé pour un simple glisser."
+L["WN43_3_TITLE"] = "Barres de nom"
+L["WN43_3_TEXT"] = "Les chiffres de vie du jeu sur nos barres peuvent se placer à droite, répartis ou à gauche : choisissez-le sous Barres de nom dans les options (/fcui). Nos barres affichent maintenant les chiffres que choisissent les options d'information des barres de nom du jeu, et le nom de la barre sous la souris devient jaune, comme dans Classic Era."
+L["WN43_4_TITLE"] = "Bannière de niveau"
+L["WN43_4_TEXT"] = "La grande bannière de niveau du jeu est maintenant masquée, la 1.x n'en avait pas. Pour la revoir, activez Bannière de niveau dans les options (/fcui), sous Autre."
+L["WN43_5_TITLE"] = "Fenêtres"
+L["WN43_5_TEXT"] = "La fenêtre des macros et son sélecteur d'icônes prennent l'aspect d'Era. Sur la fiche du personnage, les cadres de caractéristiques prennent le bord gris d'Era, chaque personnage garde son propre choix de volets de caractéristiques, et les sous-titres de l'onglet Statistiques utilisent le plus et le moins classiques. Options par défaut active maintenant aussi Barres à la taille classique ; une ligne de discussion dit comment l'annuler."
+L["WN43_6_TITLE"] = "Corrections"
+L["WN43_6_TEXT"] = "Sur la cible et la focalisation avec des barres de vie épaisses, les soins entrants remplissent toute la barre et commencent juste où finit la vie. Le filtre Afficher les niveaux des quêtes de la carte ne fonctionne plus à l'envers. Les séparateurs de la barre 1 restent estompés sous la souris, la page d'un objet de quête ne dépasse plus son parchemin, avec les bordures de boutons masquées l'anneau du calendrier disparaît aussi et la loupe de suivi est centrée, et les options grisées affichent de nouveau leur info-bulle."
 L["WN42_1_TITLE"] = "Minicarte"
 L["WN42_1_TEXT"] = "Les boutons de minicarte des autres addons, et notre bouton d'options, peuvent être affichés, affichés au survol ou masqués sans les regrouper : Boutons d'addons, sous Minicarte dans les options (/fcui). L'icône de pistage est aussi un menu déroulant : affichée, au survol ou masquée. Masquer le N (nord) retire le N du haut du bord de la minicarte ; désactivé par défaut, active-le sous Minicarte dans les options. Avec le calendrier derrière jour et nuit, survoler cette icône montre le calendrier à sa place."
 L["WN42_2_TITLE"] = "Discussion"

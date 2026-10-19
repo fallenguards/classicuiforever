@@ -3,6 +3,18 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN43_1_TITLE"] = "Eckige Minikarte"
+L["WN43_1_TEXT"] = "Eckige Minikarte macht die Karte eckig, im Metall des runden Rands, die Tasten am Rand folgen der Kante. Sie ist standardmäßig aus, schalte sie in den Optionen (/fcui) unter Minikarte ein. Solange Minikarte drehen im Spiel an ist, bleibt die Karte rund."
+L["WN43_2_TITLE"] = "Minikarte"
+L["WN43_2_TEXT"] = "Schließen-Knopf der Minikarte setzt Eras X auf die Zonenleiste: ein Klick blendet die Karte aus, ein weiterer holt sie zurück. Er ist standardmäßig aus, schalte ihn in den Optionen unter Minikarte ein. Im Bearbeitungsmodus lässt sich die Zonenleiste jetzt unter die Karte setzen, die Uhr steht an Eras Stelle in Eras Rahmen, und Umschalt zum Ziehen der Minikartentasten lässt sich für einfaches Ziehen ausschalten."
+L["WN43_3_TITLE"] = "Namensplaketten"
+L["WN43_3_TEXT"] = "Die Gesundheitszahlen des Spiels auf unseren Plaketten stehen rechts, geteilt oder links: wähle es unter Namensplaketten in den Optionen (/fcui). Unsere Plaketten zeigen jetzt die Zahlen, die die Namensplaketten-Informationen des Spiels wählen, und der Name der Plakette unter der Maus wird gelb, wie in Classic Era."
+L["WN43_4_TITLE"] = "Stufenaufstieg-Banner"
+L["WN43_4_TEXT"] = "Das große Stufenaufstieg-Banner des Spiels ist jetzt ausgeblendet, 1.x hatte keins. Um es wieder zu sehen, schalte Stufenaufstieg-Banner in den Optionen (/fcui) unter Sonstiges ein."
+L["WN43_5_TITLE"] = "Fenster"
+L["WN43_5_TEXT"] = "Das Makrofenster und seine Symbolauswahl haben Eras Aussehen. Auf dem Charakterbogen haben die Wertekästen Eras grauen Rand, jeder Charakter behält seine eigene Auswahl der Wertebereiche, und die Unterüberschriften im Statistik-Reiter nutzen das klassische Plus und Minus. Standardoptionen schaltet jetzt auch Leisten in klassischer Größe ein; eine Chatzeile sagt, wie man es rückgängig macht."
+L["WN43_6_TITLE"] = "Behoben"
+L["WN43_6_TEXT"] = "Bei Ziel und Fokus mit dicken Gesundheitsleisten füllt eingehende Heilung die ganze Leiste und beginnt genau am Ende der Gesundheit. Der Filter Questlevel anzeigen der Karte wirkt nicht mehr verkehrt herum. Die Trennlinien von Leiste 1 bleiben unter der Maus ausgeblendet, die Seite eines Questgegenstands läuft nicht mehr über ihr Pergament hinaus, mit ausgeblendeten Tastenrändern verschwindet auch der Ring des Kalenders und die Lupe der Verfolgung sitzt mittig, und ausgegraute Optionen zeigen wieder ihren Tooltip."
 L["WN42_1_TITLE"] = "Minikarte"
 L["WN42_1_TEXT"] = "Die Minikartentasten anderer Addons und unsere Optionstaste lassen sich zeigen, beim Überfahren zeigen oder ausblenden, ohne sie zu sammeln: Addontasten, unter Minikarte in den Optionen (/fcui). Auch das Verfolgungssymbol ist ein Auswahlmenü: angezeigt, beim Überfahren oder ausgeblendet. N (Norden) ausblenden nimmt das N oben vom Rand der Minikarte; es ist standardmäßig aus, schalte es unter Minikarte in den Optionen ein. Mit dem Kalender hinter Tag und Nacht zeigt das Überfahren dieses Symbols den Kalender an seiner Stelle."
 L["WN42_2_TITLE"] = "Chat"

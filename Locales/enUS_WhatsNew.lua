@@ -2,6 +2,18 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN43_1_TITLE"] = "Square minimap"
+L["WN43_1_TEXT"] = "Square minimap makes the map square, in the round border's metal, with the buttons on its rim along the edge. It is off by default, so turn it on in the options (/fcui), under Minimap. While the game's Rotate Minimap is on, the map stays round."
+L["WN43_2_TITLE"] = "Minimap"
+L["WN43_2_TEXT"] = "Minimap close button puts Era's X on the zone bar: one click hides the map, another brings it back. It is off by default, so turn it on in the options, under Minimap. Edit mode's Header Underneath now moves the zone bar under the map, the clock sits at Era's spot in Era's plate, and Shift to drag minimap buttons can be turned off for a plain drag."
+L["WN43_3_TITLE"] = "Nameplates"
+L["WN43_3_TEXT"] = "The game's health numbers on our plates can sit on the right, split or on the left: pick one under Nameplates in the options (/fcui). Our plates now show the numbers the game's own Nameplate Information options pick, and the name of the plate under the mouse turns yellow, as on Classic Era."
+L["WN43_4_TITLE"] = "Level-up banner"
+L["WN43_4_TEXT"] = "The game's big level-up banner is hidden now, as 1.x had none. To see it again, turn on Level-up banner in the options (/fcui), under Other."
+L["WN43_5_TITLE"] = "Windows"
+L["WN43_5_TEXT"] = "The macro window and its icon picker take Era's look. On the character sheet the stat boxes take Era's gray rim, each character keeps its own stat pane picks, and the Statistics tab's sub headers use the classic plus and minus. Clicking Default toggles in the options now makes Classic-sized bars turn on too; a chat line says how to undo it."
+L["WN43_6_TITLE"] = "Fixes"
+L["WN43_6_TEXT"] = "On target and focus with thick health bars, incoming heals fill the whole bar and start right where the health ends. The map's Show Quest Levels filter no longer works backwards. Bar 1's dividers stay faded under the mouse, a quest object's page no longer runs past its parchment, with button borders hidden the calendar's ring comes off and the tracking glass sits centered, and grayed options show their tooltip again."
 L["WN42_1_TITLE"] = "Minimap"
 L["WN42_1_TEXT"] = "Other addons' minimap buttons, and our options button, can be shown, shown on hover or hidden without collecting them: Addon buttons, under Minimap in the options (/fcui). The tracking icon is one drop down too: shown, on hover or hidden. Hide the N (north) takes the N off the top of the minimap's rim; it is off by default, so turn it on under Minimap in the options. With the calendar behind day and night, hovering that icon shows the calendar in its place."
 L["WN42_2_TITLE"] = "Chat"

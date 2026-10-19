@@ -3,6 +3,18 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN43_1_TITLE"] = "Minimapa cuadrado"
+L["WN43_1_TEXT"] = "Minimapa cuadrado hace el mapa cuadrado, con el metal del borde redondo, y los botones del borde siguen el canto. Está desactivado por defecto, actívalo en las opciones (/fcui), en Minimapa. Mientras Rotar minimapa del juego esté activado, el mapa sigue redondo."
+L["WN43_2_TITLE"] = "Minimapa"
+L["WN43_2_TEXT"] = "Botón para cerrar el minimapa pone la X de Era en la barra de zona: un clic oculta el mapa y otro lo devuelve. Está desactivado por defecto, actívalo en las opciones, en Minimapa. En el modo edición, la barra de zona ya puede ir bajo el mapa, el reloj está en el sitio de Era, con el marco de Era, y Mayús para arrastrar botones del minimapa se puede desactivar para arrastrar sin más."
+L["WN43_3_TITLE"] = "Placas de nombre"
+L["WN43_3_TEXT"] = "Los números de salud del juego en nuestras placas pueden ir a la derecha, repartidos o a la izquierda: elígelo en Placas de nombre en las opciones (/fcui). Nuestras placas ya muestran los números que eligen las opciones de información de placas del juego, y el nombre de la placa bajo el ratón se vuelve amarillo, como en Classic Era."
+L["WN43_4_TITLE"] = "Cartel de subida de nivel"
+L["WN43_4_TEXT"] = "El gran cartel de subida de nivel del juego ahora está oculto, ya que la 1.x no tenía. Para volver a verlo, activa Cartel de subida de nivel en las opciones (/fcui), en Otros."
+L["WN43_5_TITLE"] = "Ventanas"
+L["WN43_5_TEXT"] = "La ventana de macros y su selector de iconos tienen el aspecto de Era. En la hoja de personaje, los recuadros de atributos tienen el borde gris de Era, cada personaje guarda su propia elección de paneles de atributos, y los subencabezados de la pestaña de estadísticas usan el más y el menos clásicos. Opciones por defecto ahora también activa Barras de tamaño clásico; una línea en el chat dice cómo deshacerlo."
+L["WN43_6_TITLE"] = "Correcciones"
+L["WN43_6_TEXT"] = "En objetivo y foco con barras de salud gruesas, la sanación entrante llena toda la barra y empieza justo donde acaba la salud. El filtro Mostrar niveles de misión del mapa ya no funciona al revés. Los divisores de la barra 1 siguen difuminados bajo el ratón, la página de un objeto de misión ya no se sale de su pergamino, con los bordes de botón ocultos también desaparece el aro del calendario y la lupa de rastreo queda centrada, y las opciones en gris vuelven a mostrar su descripción."
 L["WN42_1_TITLE"] = "Minimapa"
 L["WN42_1_TEXT"] = "Los botones de minimapa de otros accesorios, y nuestro botón de opciones, pueden verse, verse al pasar el ratón u ocultarse sin agruparlos: Botones de accesorios, en Minimapa en las opciones (/fcui). El icono de rastreo también es un menú desplegable: visible, al pasar el ratón u oculto. Ocultar la N (norte) quita la N de lo alto del borde del minimapa; está desactivado por defecto, actívalo en Minimapa en las opciones. Con el calendario detrás de día y noche, pasar el ratón por ese icono muestra el calendario en su lugar."
 L["WN42_2_TITLE"] = "Chat"

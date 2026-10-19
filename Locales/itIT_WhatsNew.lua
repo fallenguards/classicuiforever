@@ -3,6 +3,18 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN43_1_TITLE"] = "Minimappa quadrata"
+L["WN43_1_TEXT"] = "Minimappa quadrata rende la mappa quadrata, nel metallo del bordo rotondo, con i pulsanti del bordo lungo il suo lato. È disattivata di base, attivala nelle opzioni (/fcui), sotto Minimappa. Finché Ruota minimappa del gioco è attivo, la mappa resta rotonda."
+L["WN43_2_TITLE"] = "Minimappa"
+L["WN43_2_TEXT"] = "Pulsante di chiusura della minimappa mette la X di Era sulla barra della zona: un clic nasconde la mappa, un altro la riporta. È disattivato di base, attivalo nelle opzioni, sotto Minimappa. In modalità modifica la barra della zona ora può stare sotto la mappa, l'orologio è al posto di Era, nella cornice di Era, e Maiusc per trascinare i pulsanti della minimappa si può disattivare per un trascinamento semplice."
+L["WN43_3_TITLE"] = "Targhette"
+L["WN43_3_TEXT"] = "I numeri della salute del gioco sulle nostre targhette possono stare a destra, divisi o a sinistra: sceglilo sotto Targhette nelle opzioni (/fcui). Le nostre targhette ora mostrano i numeri scelti dalle opzioni di informazioni sulle targhette del gioco, e il nome della targhetta sotto il mouse diventa giallo, come in Classic Era."
+L["WN43_4_TITLE"] = "Banner di salita di livello"
+L["WN43_4_TEXT"] = "Il grande banner di salita di livello del gioco ora è nascosto, la 1.x non lo aveva. Per rivederlo, attiva Banner di salita di livello nelle opzioni (/fcui), sotto Altro."
+L["WN43_5_TITLE"] = "Finestre"
+L["WN43_5_TEXT"] = "La finestra delle macro e il suo selettore di icone prendono l'aspetto di Era. Nella scheda del personaggio i riquadri delle statistiche prendono il bordo grigio di Era, ogni personaggio tiene la propria scelta dei pannelli delle statistiche, e i sottotitoli della scheda Statistiche usano il più e il meno classici. Opzioni predefinite ora attiva anche Barre di dimensione classica; una riga in chat dice come annullarlo."
+L["WN43_6_TITLE"] = "Correzioni"
+L["WN43_6_TEXT"] = "Su bersaglio e focus con barre della salute spesse, le cure in arrivo riempiono tutta la barra e partono proprio dove finisce la salute. Il filtro Mostra livelli delle missioni della mappa non funziona più al contrario. I divisori della barra 1 restano sfumati sotto il mouse, la pagina di un oggetto di missione non va più oltre la sua pergamena, con i bordi dei pulsanti nascosti sparisce anche l'anello del calendario e la lente del tracciamento è centrata, e le opzioni in grigio mostrano di nuovo il loro suggerimento."
 L["WN42_1_TITLE"] = "Minimappa"
 L["WN42_1_TEXT"] = "I pulsanti della minimappa degli altri addon, e il nostro pulsante delle opzioni, si possono mostrare, mostrare al passaggio o nascondere senza raccoglierli: Pulsanti degli addon, sotto Minimappa nelle opzioni (/fcui). Anche l'icona di tracciamento è un menu a tendina: visibile, al passaggio o nascosta. Nascondi la N (nord) toglie la N dalla cima del bordo della minimappa; è disattivata in modo predefinito, attivala sotto Minimappa nelle opzioni. Con il calendario dietro giorno e notte, passare su quell'icona mostra il calendario al suo posto."
 L["WN42_2_TITLE"] = "Chat"
