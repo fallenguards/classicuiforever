@@ -450,6 +450,8 @@ L["MAP_DRAG_TO_MOVE_AROUND_THE"] = "Shift-drag to move around the ring"
 
 -- Map/MinimapCollector.lua
 L["MAP_NO_ADDON_BUTTONS"] = "No addon buttons"
+L["MAP_PICKS_OVERRIDE"] = "Override:"
+L["MAP_PICKS_SAME"] = "Same as all"
 L["MAP_ADDON_BUTTONS"] = "Addon buttons"
 L["MAP_LEFT_CLICK_THE_OTHER_ADDONS"] = "Left-click: the other addons' minimap buttons"
 

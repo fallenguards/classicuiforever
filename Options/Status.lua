@@ -57,6 +57,11 @@ local function ChangedSettings()
             changed[#changed + 1] = key .. "=false"
         end
     end
+    -- Addon buttons with a pick of their own.
+    local picks = ns.db and ns.db.minimapButtonPicks
+    if type(picks) == "table" then
+        for key, value in pairs(picks) do changed[#changed + 1] = "minimapButtonPicks." .. key .. "=" .. tostring(value) end
+    end
     table.sort(changed)
     return changed
 end

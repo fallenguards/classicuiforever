@@ -66,6 +66,19 @@ Check(ns.RenameProfile("Default", "X") == nil, "Default keeps its name")
 ns.DeleteProfile("Default")
 Check(ns.db.profiles.Default ~= nil, "Default can't be deleted")
 
+-- A table setting (the addon buttons' picks) goes in and out as a copy: a change in one profile never reaches another.
+ns.db.minimapButtonPicks = { Details = "hide" }
+ns.NewProfile("Picks", true)
+ns.db.minimapButtonPicks.Details = "hover"
+ns.UseProfile("Default")
+Check(ns.db.minimapButtonPicks.Details == "hide", "a copied profile's picks are its own")
+ns.UseProfile("Picks")
+Check(ns.db.minimapButtonPicks.Details == "hover", "a profile's picks come back as it left them")
+ns.db.minimapButtonPicks = {}
+ns.UseProfile("Default")
+Check(ns.db.profiles.Picks.minimapButtonPicks == nil, "empty picks are stored as none")
+ns.DeleteProfile("Picks")
+
 -- Damaged saved data: a non-table entry and a broken rename map are dropped at login, not erred on.
 ns.db.profiles.Broken = 5
 ns.db.profileMoved = "junk"

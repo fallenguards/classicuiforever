@@ -9,7 +9,7 @@ local DEFAULT = "Default"
 local NAME_MAX = 32
 local EXTRA = { "themeColor", "themeDarkness", "barScale", "microScale", "oneBagColumns", "keyTextSize", "plateNameSize",
     "swingColorMain", "swingColorOff", "swingColorRanged", "swingBorder", "meterBackground", "prdGap", "meterHeader", "unitNameSize", "thickEnemyColor", "meterArtPan",
-    "meterPanPreview", "statPaneLeft", "statPaneRight" }
+    "meterPanPreview", "statPaneLeft", "statPaneRight", "minimapButtonPicks" }
 -- The game's own setting mirrored, and the English text picks (read before the profile loads): account-wide.
 local SKIP = { gameDamageNumbers = true, englishSettings = true, englishNews = true, englishMessages = true,
     englishWindows = true }
@@ -26,12 +26,21 @@ local function Keys()
     return keys
 end
 
--- Only what differs from the defaults is kept (all scalars).
+-- A table setting (the addon buttons' picks) goes in and out as a copy, so no two profiles share one; empty is none.
+local function Copy(v)
+    if type(v) ~= "table" then return v end
+    if next(v) == nil then return nil end
+    local copy = {}
+    for k, item in pairs(v) do copy[k] = item end
+    return copy
+end
+
+-- Only what differs from the defaults is kept.
 local function Snapshot()
     local db, defaults, shot = ns.db, ns.DB_DEFAULTS, {}
     for _, k in ipairs(Keys()) do
         local v = db[k]
-        if v ~= nil and v ~= defaults[k] then shot[k] = v end
+        if v ~= nil and v ~= defaults[k] then shot[k] = Copy(v) end
     end
     return shot
 end
@@ -43,7 +52,7 @@ local function Fill(shot)
         local v = shot[k]
         if v == nil then v = defaults[k] end
         if db[k] ~= v then
-            db[k] = v
+            db[k] = Copy(v)
             changed[#changed + 1] = k
         end
     end

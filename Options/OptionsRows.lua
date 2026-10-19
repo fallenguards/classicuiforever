@@ -300,12 +300,32 @@ local function ItemTip(item, choice)
     item:SetOnEnter(function(button) MenuUtil.ShowTooltipEx(button, item:GetTooltipFrame(), ChoiceTip, choice) end)
 end
 
+-- A group whose drop down opens a panel of ours (panel(rows, pick, isOn) makes it) in place of the game's menu.
+local function PanelDrop(row, rows, panel)
+    local dropdown, list = row.dropdown, nil
+    function row.SetChecked()
+        for _, choice in ipairs(rows) do
+            if ToggleOn(choice.key) then dropdown:OverrideText(choice.label) end
+        end
+    end
+    dropdown:HookScript("OnMouseDown", function(self)
+        if not self:IsEnabled() then return end
+        if not list then
+            list = panel(rows, PickToggle, ToggleOn)
+            list:Follow(row)
+        end
+        list:Toggle(self)
+    end)
+    row.SetChecked()
+end
+
 -- A drop radio group as one row; keys: the toggles it holds (a page's Toggle none and Reset toggles reach them).
-local function DropRow(parent, group)
+local function DropRow(parent, group, panel)
     local rows, label, tip, words, keys = DropGroup("radio", group)
-    local row = DropShell(parent, label, function(root)
+    local row = DropShell(parent, label, not panel and function(root)
         for _, choice in ipairs(rows) do ItemTip(root:CreateRadio(choice.label, ToggleOn, PickToggle, choice.key), choice) end
     end)
+    if panel then PanelDrop(row, rows, panel) end
     Describe(row, group, label, tip)
     row.keyLow = row.keyLow .. " " .. words
     row.keys = keys
@@ -518,7 +538,7 @@ function O.BuildRows(child, colW)
         local dropGroup = entry.checks or entry.radio
         if entry.drop and not dropped[dropGroup] then
             dropped[dropGroup] = true
-            local row = entry.checks and DropCheckRow(child, dropGroup) or DropRow(child, dropGroup)
+            local row = entry.checks and DropCheckRow(child, dropGroup) or DropRow(child, dropGroup, entry.dropPanel)
             row.needs, row.grayWhen, row.grayIf, row.grayTip = entry.needs, entry.grayWhen, entry.grayIf, entry.grayTip
             Add(row, entry.parent)
             row.text:SetWidth(colW - 14 - DROP_W - row.depth * INDENT)

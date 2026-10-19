@@ -14,10 +14,46 @@ local function RowTip(button)
     GameTooltip:Show()
 end
 
+-- A list's search box and classic bar over area: shown gets the rows ({ label } each) the search matches, visible at a
+-- time from the bar's offset; draw(offset) redraws. Sets list:Toggle(owner), opening it under owner after
+-- list:OnOpen() if it has one. Returns the bar.
+function ns.ListSearch(list, area, search, rows, shown, visible, draw)
+    local bar = ns.ClassicScrollBar(list, area, function(value) draw(math.floor(value + 0.5)) end)
+    local function Filter()
+        local text = search:GetText():lower()
+        wipe(shown)
+        for _, row in ipairs(rows) do
+            if text == "" or row.label:lower():find(text, 1, true) then shown[#shown + 1] = row end
+        end
+        bar:SetValue(0)
+        bar:SetRange(#shown - visible)
+        draw(0)
+    end
+    search:HookScript("OnTextChanged", function(self)
+        local blank = self:GetText() == ""
+        self.hint:SetShown(blank)
+        self.clear:SetShown(not blank)
+        Filter()
+    end)
+    list:EnableMouseWheel(true)
+    list:SetScript("OnMouseWheel", function(_, delta) bar:SetValue(bar:GetValue() - delta) end)
+    function list:Toggle(owner)
+        if self:IsShown() then self:Hide() return end
+        self.owner = owner
+        if self.OnOpen then self:OnOpen() end
+        search:SetText("")
+        Filter()
+        ns.SetPointOnce(self, "TOPLEFT", owner, "BOTTOMLEFT", 0, -2)
+        self:Show()
+        self:Raise()
+    end
+    return bar
+end
+
 -- rows: { key, label, tip } each; isOn(key) and flip(key). Returns the list; list:Toggle(owner) opens it under owner.
 function ns.CheckList(rows, isOn, flip)
     local list, inset = ns.IronList()
-    local shown, buttons, offset = {}, {}, 0
+    local shown, buttons = {}, {}
 
     local probe = list:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
     local widest = 0
@@ -35,7 +71,7 @@ function ns.CheckList(rows, isOn, flip)
     area:SetPoint("TOPLEFT", list, "TOPLEFT", inset[1], -inset[2] - SEARCH_H)
     area:SetSize(innerW - BAR_ROOM, VISIBLE * ROW_H)
 
-    local function Draw()
+    local function Draw(offset)
         for i, button in ipairs(buttons) do
             local row = shown[offset + i]
             button.row = row
@@ -46,23 +82,7 @@ function ns.CheckList(rows, isOn, flip)
             button:SetShown(row ~= nil)
         end
     end
-
-    local bar = ns.ClassicScrollBar(list, area, function(value)
-        offset = math.floor(value + 0.5)
-        Draw()
-    end)
-
-    local function Filter()
-        local text = search:GetText():lower()
-        wipe(shown)
-        for _, row in ipairs(rows) do
-            if text == "" or row.label:lower():find(text, 1, true) then shown[#shown + 1] = row end
-        end
-        offset = 0
-        bar:SetValue(0)
-        bar:SetRange(#shown - VISIBLE)
-        Draw()
-    end
+    ns.ListSearch(list, area, search, rows, shown, VISIBLE, Draw)
 
     for i = 1, VISIBLE do
         local button = ns.NewFrame("Button", nil, area)
@@ -83,25 +103,6 @@ function ns.CheckList(rows, isOn, flip)
         button:SetScript("OnEnter", RowTip)
         button:SetScript("OnLeave", GameTooltip_Hide)
         buttons[i] = button
-    end
-
-    search:HookScript("OnTextChanged", function(self)
-        local empty = self:GetText() == ""
-        self.hint:SetShown(empty)
-        self.clear:SetShown(not empty)
-        Filter()
-    end)
-    list:EnableMouseWheel(true)
-    list:SetScript("OnMouseWheel", function(_, delta) bar:SetValue(bar:GetValue() - delta) end)
-
-    function list:Toggle(owner)
-        if self:IsShown() then self:Hide() return end
-        self.owner = owner
-        search:SetText("")
-        Filter()
-        ns.SetPointOnce(self, "TOPLEFT", owner, "BOTTOMLEFT", 0, -2)
-        self:Show()
-        self:Raise()
     end
     return list
 end

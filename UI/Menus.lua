@@ -115,8 +115,9 @@ local function IronList()
     ns.RegisterEvents(list, MOUSE_DOWN)
     list:SetScript("OnEvent", function(self)
         if not self:IsShown() or self:IsMouseOver() then return end
-        -- Leave a press on the owner to the owner, or the list reopens at once.
+        -- Leave a press on the owner to the owner, or the list reopens at once; one on a list it opened (child) stays in.
         if self.owner and self.owner:IsMouseOver() then return end
+        if self.child and self.child:IsShown() and self.child:IsMouseOver() then return end
         self:Hide()
     end)
     list.Follow = Follow
@@ -463,3 +464,23 @@ function ns.IronTick(tex)
     tex:SetSize(CHECK_SIZE, CHECK_SIZE)
 end
 ns.MenuHighlight = Highlight
+-- A row's radio mark (made once, then on or off), the divider between a list's parts and their rows' heights.
+function ns.IronRadio(tex)
+    ns.SetTex(tex, "dropdownClassic")
+    tex:SetSize(RADIO_SIZE, RADIO_SIZE)
+end
+function ns.IronRadioOn(tex, on) Coords(tex, on and RADIO_ON or RADIO_OFF) end
+function ns.IronDivider(parent)
+    local divider = parent:CreateTexture(nil, "ARTWORK")
+    divider:SetTexture(DIVIDER_FILE)
+    divider:SetHeight(MENU_DIVIDER)
+    return divider
+end
+ns.MENU_ROW, ns.MENU_DIVIDER = MENU_ROW, MENU_DIVIDER
+-- A list opened from inside another: drawn over it (on its strata it drew under the outer list's rows, whatever Raise
+-- did), a press in it keeps the outer one open, and it goes with it.
+function ns.NestList(outer, inner)
+    inner:SetFrameStrata("TOOLTIP")
+    outer.child = inner
+    inner:Follow(outer)
+end

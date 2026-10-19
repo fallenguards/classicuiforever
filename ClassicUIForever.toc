@@ -145,6 +145,7 @@ Units\StatusFont.lua
 Units\MirrorTimers.lua
 Units\ComboPoints.lua
 Map\Minimap.lua
+Map\MinimapShow.lua
 Map\MinimapEditSettings.lua
 Map\MinimapTracking.lua
 Map\MinimapDiel.lua
@@ -154,6 +155,7 @@ Map\MinimapEye.lua
 Map\MinimapButton.lua
 Map\MinimapMicro.lua
 Map\MinimapCollector.lua
+Map\MinimapButtonPicks.lua
 Map\MinimapSquare.lua
 Map\MinimapToggle.lua
 UI\ClassicFonts.lua

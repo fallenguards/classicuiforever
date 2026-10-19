@@ -59,6 +59,7 @@ local children = {}
 local ns = {
     L = setmetatable({}, { __index = function(_, key) return key end }),
     db = {},
+    MM = { OUR_BUTTON = "ForeverClassicUIMinimapButton" },
     RingButton = function() return noop, noop end,
     RegisterModule = function(key, spec)
         if key == "minimapCollector" then apply, restore = spec.apply, spec.restore end

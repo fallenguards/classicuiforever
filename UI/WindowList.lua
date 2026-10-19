@@ -52,8 +52,7 @@ ns.WINDOW_LIST = {
         section = L["UI_MINIMAP"], piece = true, choice = "minimapCoordsShow", choiceLabel = L["UI_SHOW"] },
     -- Our buttons on the ring (Map/MinimapButton.lua); the options button is fixed while the addon bag holds it.
     { key = "minimapOptionsButton", label = L["OPT_minimapButton"], name = "ForeverClassicUIMinimapButton", w = 32, h = 32,
-        section = L["UI_MINIMAP"], piece = true, ringKey = "minimapButtonAngle", fixedIf = "minimapCollector",
-        choice = "optionsButtonShow", choiceLabel = L["UI_SHOW"] },
+        section = L["UI_MINIMAP"], piece = true, ringKey = "minimapButtonAngle", fixedIf = "minimapCollector" },
     { key = "minimapAddonBag", label = L["MAP_ADDON_BUTTONS"], name = "ForeverClassicUIMinimapCollector", w = 32, h = 32,
         section = L["UI_MINIMAP"], piece = true, ringKey = "minimapCollectorAngle", choice = "addonBagShow", choiceLabel = L["UI_SHOW"] },
     -- Era's quest watch (Quest/QuestWatch.lua), under the minimap until placed.

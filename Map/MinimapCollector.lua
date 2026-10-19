@@ -11,7 +11,7 @@ local BAG_ICON = "Interface\\Icons\\INV_Misc_Bag_08"
 -- joins, by name below.
 local NOT_ADDONS = { ExpansionLandingPageMinimapButton = true, GarrisonLandingPageMinimapButton = true }
 local OUR_PREFIX = "^ForeverClassicUI"
-local OURS = "ForeverClassicUIMinimapButton"
+local OURS = ns.MM.OUR_BUTTON
 -- Over the pop-out's backing, which is a frame at the pop-out's own level.
 local ABOVE_BACKING = 5
 -- Every button drawn this wide, whatever size its addon gave it.
@@ -102,20 +102,49 @@ function ns.EachAddonRingButton(fn)
     if Minimap then ns.EachChild(Minimap, VisitNamed, fn) end
 end
 
--- Their Shown / On hover / Hidden on our ring (#194): one never touched is left as its addon shows it (it may fade it
--- itself), one we hid or faded is given back.
+-- Their Shown / On hover / Hidden on our ring, each its own or Addon buttons' (#194): one never touched is left as its
+-- addon shows it (it may fade it itself), one we hid or faded is given back.
 local ringPicked = setmetatable({}, { __mode = "k" })
+local known = setmetatable({}, { __mode = "k" })    -- every addon button seen on the ring -> its key in the picks
 local ringListener
+local function Know(button)
+    known[button] = known[button] or ns.MM.AddonButtonKey(button)
+end
 local function RingButtonShow(button)
-    local state = ns.MM.ShowState("MinimapAddonButtons")
+    Know(button)
+    local state = ns.MM.AddonButtonState(known[button])
     if state == nil and not ringPicked[button] then return end
     ringPicked[button] = state ~= nil or nil
-    ns.MinimapShow(button, "MinimapAddonButtons", true)
+    ns.MinimapShowAs(button, state, true)
+end
+
+-- A list's name for a button: its frame name's minimap words cut off.
+local function Label(key)
+    local short = key:gsub("_?[Mm]ini[Mm]ap_?[Bb]utton$", ""):gsub("_?[Mm]ini[Mm]ap$", "")
+    return short ~= "" and short or key
+end
+local function ByLabel(a, b) return a.label:lower() < b.label:lower() end
+
+-- The buttons Addon buttons' list offers: ours first while it is on, then each seen one its addon shows, by name.
+function ns.AddonRingButtons()
+    local list = {}
+    for button, key in pairs(known) do
+        if key and button:IsShown() and not ns.MinimapCollected(button) then
+            list[#list + 1] = { key = key, label = Label(key) }
+        end
+    end
+    table.sort(list, ByLabel)
+    if ns.db.minimapButton then table.insert(list, 1, { key = ns.MM.OUR_BUTTON, label = L["MAP_CLASSICUI_FOREVER"] }) end
+    return list
 end
 
 -- The minimap's pass (Map/Minimap.lua); a LibDBIcon button made later takes the pick as it comes.
 function ns.ShowAddonRingButtons()
-    ns.EachAddonRingButton(RingButtonShow)
+    ns.EachAddonRingButton(Know)
+    -- Every one seen: a named button we hid sits under our stash, off the map's children.
+    for button in pairs(known) do
+        if not ns.MinimapCollected(button) then RingButtonShow(button) end
+    end
     local lib = DBIcon()
     if ringListener or not (lib and lib.RegisterCallback) then return end
     ringListener = {}

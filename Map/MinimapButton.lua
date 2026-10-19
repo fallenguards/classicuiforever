@@ -255,8 +255,8 @@ local function Build(ring)
 end
 
 -- spec: { name, key (edit mode entry), angleKey, angle (default degrees), free (nearest clear spot), show (on hover id),
--- piece (the map's own), face(texture), onClick(button, mouse), tip, ride() (a frame it sits on, at its size) };
--- returns show and hide. Each holds its own shown or on hover pick, apart from Addon buttons' (#180).
+-- piece (the map's own), face(texture), onClick(button, mouse), tip, ride() (a frame it sits on, at its size),
+-- addonButton (one of Addon buttons, with a pick of its own over theirs, #194) }; returns show and hide.
 function ns.RingButton(spec)
     rings[#rings + 1] = spec
     local function Show()
@@ -270,7 +270,11 @@ function ns.RingButton(spec)
         end
         Position(spec)
         spec.button:Show()
-        ns.MinimapShow(spec.button, spec.show)
+        if spec.addonButton then
+            ns.MinimapShowAs(spec.button, ns.MM.AddonButtonState(spec.name))
+        else
+            ns.MinimapShow(spec.button, spec.show)
+        end
         HookMap()
     end
     local function Hide()
@@ -280,10 +284,14 @@ function ns.RingButton(spec)
             spec.button:Hide()
         end
     end
-    -- Shown or on hover picked in the options.
+    -- Shown, on hover or hidden picked in the options.
+    local id = spec.addonButton and "MinimapAddonButtons" or spec.show
     ns.OnToggle(function(key)
         if not spec.active then return end
-        if key == "show" .. spec.show or key == "hover" .. spec.show then Show() end
+        if key == "show" .. id or key == "hover" .. id or key == "hide" .. id
+            or (spec.addonButton and key == "minimapButtonPicks") then
+            Show()
+        end
     end)
     return Show, Hide
 end
@@ -293,7 +301,7 @@ local ShowOptions, HideOptions = ns.RingButton({
     key = "minimapOptionsButton",
     angleKey = "minimapButtonAngle",
     angle = 213,   -- clear of the tracking glass (186) under the tracking spell
-    show = "OptionsButton",
+    addonButton = true,
     face = function(icon) ns.Dress(icon, "gryphonIcon", GRYPHON) end,
     onClick = function(_, mouse)
         if mouse == "RightButton" then

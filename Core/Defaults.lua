@@ -2,7 +2,7 @@ local _, ns = ...
 local L = ns.L
 
 ns.DB_DEFAULTS = {
-    dbVersion = 19,
+    dbVersion = 20,
     classicBar = true,
     oneBar = false,
     oneBarAlone = true,
@@ -291,7 +291,6 @@ ns.DB_DEFAULTS = {
     showMinimapCalendar = true, hoverMinimapCalendar = false, hideMinimapCalendar = false,
     showMinimapCoords = true, hoverMinimapCoords = false, hideMinimapCoords = false,
     hideMinimapBorder = false, hideMinimapHeader = false, hideButtonBorders = false,
-    showOptionsButton = true, hoverOptionsButton = false,
     minimapShiftDrag = true,
     minimapSquare = false,
     minimapToggleButton = false,
