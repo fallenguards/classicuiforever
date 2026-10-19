@@ -24,6 +24,7 @@ end
 
 function ns.FadeSquareBorders(on)
     if not Minimap then return end
+    ns.MM.BlobRings(on and ns.MM.Square())
     if on then
         ns.EachChild(Minimap, Fade)
         return
@@ -39,6 +40,19 @@ end
 local MM = ns.MM
 function MM.Square()
     return MM.active and ns.db.minimapSquare == true and not ns.GetCVarBool("rotateMinimap")
+end
+-- The game rings a quest, bonus objective or dig site area round the map's round edge (a hatched band): off on the
+-- square map, back at the engine's 1 once round (the client never sets them).
+local RING_SETTERS = { "SetQuestBlobRingAlpha", "SetQuestBlobRingScalar", "SetTaskBlobRingAlpha",
+    "SetTaskBlobRingScalar", "SetArchBlobRingAlpha", "SetArchBlobRingScalar" }
+local ringsOff = false
+function MM.BlobRings(off)
+    off = off and true or false
+    if off == ringsOff then return end
+    ringsOff = off
+    for _, name in ipairs(RING_SETTERS) do
+        if Minimap[name] then Minimap[name](Minimap, off and 0 or 1) end
+    end
 end
 -- Other addons' minimap buttons ask the shape (the convention minimap button libraries follow); kept if one exists.
 if _G.GetMinimapShape == nil then
