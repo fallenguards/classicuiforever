@@ -10,6 +10,9 @@ local SMALL_PITCH, SMALL_BUTTON = 33, 30    -- 30 px buttons on the pet and stan
 local SIDE_BAR_X, SIDE_BAR_Y, SIDE_BAR_GAP = -2, 98, 6   -- right bars hang from the bottom right corner
 local PAGE_X, PAGE_UP_Y, PAGE_DOWN_Y = 522, -22, -42
 local PAGE_OVER_BUTTONS = 2
+-- Modern page arrows: the game's spot (MainActionBar.xml), 4 left of bar 1's first button and 9 up, at its 17 x 14.
+local MODERN_X, MODERN_Y, MODERN_W, MODERN_H, MODERN_STEP = 4, 9, 17, 14, 10
+local ROW_Y = B.ROW_Y
 local Remember, BarSetting, BarVertical, BarRows = B.Remember, B.BarSetting, B.BarVertical, B.BarRows
 local IconScale, BandScale, BandNow, MatchScale = B.IconScale, B.BandScale, B.BandNow, B.MatchScale
 local CurrentPlan = B.CurrentPlan
@@ -345,14 +348,20 @@ function B.LayoutPageArrows(bar)
     local art = B.art
     local pageX = CurrentPlan().base + (PAGE_X - ART_W / 2)
     local midY = (PAGE_UP_Y + PAGE_DOWN_Y) / 2
-    ns.SetPointOnce(pn, "CENTER", art, "TOPLEFT", pageX, midY)
-    pn:SetSize(32, 76)
     pn:SetScale(BandNow())
     -- Over the band's buttons but in their layer: a window or the full map that covers the bars covers these too.
     ns.SetStrataIf(pn, "MEDIUM")
     ns.SetLevelIf(pn, B.ButtonLevel() + PAGE_OVER_BUTTONS)
     -- Hide Bar Scrolling: the client hides them for it.
     pn:SetShown(BarSetting(bar, "HideBarScrolling") ~= 1)
+    if B.ModernPages() then
+        ns.SetPointIf(pn, "BOTTOMRIGHT", art, "BOTTOMLEFT", CurrentPlan().bar1X - MODERN_X, ROW_Y + MODERN_Y)
+        ns.SetSizeIf(pn, MODERN_W, MODERN_H * 2 + MODERN_STEP)
+        B.PlacePageArrows(pn, MODERN_W, MODERN_H, 0, 0, pn, "CENTER", 0, MODERN_STEP, -MODERN_STEP, "GameFontNormal", -1, 0)
+        return
+    end
+    ns.SetPointOnce(pn, "CENTER", art, "TOPLEFT", pageX, midY)
+    pn:SetSize(32, 76)
     B.PlacePageArrows(pn, 32, 32, 6, 7, art, "TOPLEFT", pageX, PAGE_UP_Y, PAGE_DOWN_Y, "GameFontNormalSmall",
         pageX + 20, midY + 0.5)
 end

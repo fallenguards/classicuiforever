@@ -21,7 +21,7 @@ local ELEMENTS = {
 }
 local LATENCY, KEYRING = ELEMENTS[1], ELEMENTS[2]
 
-local function Hidden(el) return ns.db[el.hideKey] == true or (el == LATENCY and B.OneBarAlone()) end
+local function Hidden(el) return ns.db[el.hideKey] == true end
 local function Moved(el) return ns.ValidPlace(ns.db[el.posKey]) end
 
 -- The key ring on its side (its dialog): off the band it lies flat, as the game's does by a column of bags, its cut of

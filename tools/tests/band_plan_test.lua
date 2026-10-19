@@ -109,15 +109,14 @@ end end end end end end end end end
 -- A hidden key ring never rides the bags: their pick shows every button riding the row (Main bar alone flickered it).
 KeyRingButton = keyRingStub
 B.shape.bags = false
-for _, alone in ipairs({ true, false }) do
 for _, withBags in ipairs({ true, false }) do
-    ns.db.oneBar, ns.db.oneBarAlone, ns.db.keyRingWithBags, ns.db.hideKeyRing = true, alone, withBags, true
+    ns.db.oneBar, ns.db.keyRingWithBags, ns.db.hideKeyRing = true, withBags, true
     cases = cases + 1
     if B.KeyRingWithBags() then
         failures = failures + 1
-        print(string.format("FAIL hidden key ring rides the bags: alone=%s withBags=%s", tostring(alone), tostring(withBags)))
+        print(string.format("FAIL hidden key ring rides the bags: withBags=%s", tostring(withBags)))
     end
-end end
+end
 ns.db.oneBar, ns.db.hideKeyRing, ns.db.keyRingWithBags = false, false, true
 cases = cases + 1
 if not B.KeyRingWithBags() then

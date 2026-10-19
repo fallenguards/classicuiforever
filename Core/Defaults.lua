@@ -2,10 +2,9 @@ local _, ns = ...
 local L = ns.L
 
 ns.DB_DEFAULTS = {
-    dbVersion = 21,
+    dbVersion = 22,
     classicBar = true,
     oneBar = false,
-    oneBarAlone = true,
     classicBarSize = false,
     hideStanceBar = false,
     hideMicroButtons = true,
@@ -52,6 +51,7 @@ ns.DB_DEFAULTS = {
     classicFonts = true,
     platesOneSize = false,
     texturedBars = true,
+    modernPageArrows = false,
     themePartParchment = true, themePartUnits = true, themePartMinimap = true, themePartBars = true, themePartBags = true,
     themePartTooltips = true, themePartChat = true, themePartWindows = true,
     texturedCharacter = true,

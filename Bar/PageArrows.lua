@@ -32,14 +32,37 @@ local function Fade(pn, up, down, fade)
     down:EnableMouse(not fade)
 end
 
+local function Refill(tex, state, button)
+    tex:ClearAllPoints()
+    tex:SetAllPoints(button)
+    if state == "Highlight" then tex:SetBlendMode("BLEND") end
+end
+
+-- The game's own arrow art, as its file draws it.
+local function ModernFaces(up, down)
+    for _, button in ipairs({ up, down }) do
+        local atlases = MODERN[(button == up) and "Up" or "Down"]
+        for _, state in ipairs(STATES) do
+            button[ATLAS_SETTER[state]](button, atlases[state])
+        end
+        ns.EachState(button, STATES, Refill, button)
+    end
+end
+
+-- One bar fades them, unless its Modern page arrows option shows the game's own on the left gryphon (#207).
 local function Apply()
     local pn, up, down = Buttons()
     if not pn then return end
-    Fade(pn, up, down, ns.band.OneBarAlone())
+    local modern = ns.band.ModernPages()
+    Fade(pn, up, down, ns.band.OneBar() and not modern)
     if not saved then
         local _, _, _, _, upY = up:GetPoint(1)
         local _, _, _, _, downY = down:GetPoint(1)
         saved = { w = up:GetWidth(), h = up:GetHeight(), upY = upY or 10, downY = downY or -10 }
+    end
+    if modern then
+        ModernFaces(up, down)
+        return
     end
     for _, button in ipairs({ up, down }) do
         local keys = STONE[(button == up) and "Up" or "Down"]
@@ -47,25 +70,13 @@ local function Apply()
     end
 end
 
-local function Refill(tex, state, button)
-    tex:ClearAllPoints()
-    tex:SetAllPoints(button)
-    if state == "Highlight" then tex:SetBlendMode("BLEND") end
-end
-
 local function Restore()
     if not saved then return end
     local pn, up, down = Buttons()
     if not pn then return end
     Fade(pn, up, down, false)
-    for _, button in ipairs({ up, down }) do
-        local atlases = MODERN[(button == up) and "Up" or "Down"]
-        for _, state in ipairs(STATES) do
-            button[ATLAS_SETTER[state]](button, atlases[state])
-        end
-        ns.EachState(button, STATES, Refill, button)
-        button:SetSize(saved.w, saved.h)
-    end
+    ModernFaces(up, down)
+    for _, button in ipairs({ up, down }) do button:SetSize(saved.w, saved.h) end
     ns.SetPointOnce(up, "CENTER", pn, "CENTER", 0, saved.upY)
     ns.SetPointOnce(down, "CENTER", pn, "CENTER", 0, saved.downY)
     saved = nil

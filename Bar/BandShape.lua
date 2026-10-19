@@ -22,16 +22,16 @@ B.SNAP_PX = SNAP_PX
 -- One-bar mode: the band ends after the twelve main slots, right gryphon beside them; micro menu and bags stay off.
 local function OneBar() return ns.db and ns.db.oneBar == true end
 B.OneBar = OneBar
--- Main bar alone (its sub-option): no page arrows or latency bar, the key ring with the bags.
-function B.OneBarAlone() return OneBar() and ns.db.oneBarAlone ~= false end
--- Hide Bar Scrolling, the game's setting for bar 1, or Main bar alone.
-function B.NoPages(bar) return B.OneBarAlone() or B.BarSetting(bar, "HideBarScrolling") == 1 end
+-- One bar's page arrows, its option: the game's own small ones on the left gryphon (#207); the band has no room for ours.
+function B.ModernPages() return OneBar() and ns.db.modernPageArrows == true end
+-- No page arrows on the band: Hide Bar Scrolling, the game's setting for bar 1, or One bar.
+function B.NoPages(bar) return OneBar() or B.BarSetting(bar, "HideBarScrolling") == 1 end
 -- Bags off the band with their art hidden: the buttons side by side (its option), not a socket apart over nothing.
 function B.BagsTight() return ns.db ~= nil and ns.db.hideBagsArt == true and ns.db.bagsTight == true end
 
--- One bar turned on: its look by default, each changeable after: no bar art under the bags, the micro menu or the key
--- ring, the bags close together.
-local ONE_BAR_LOOK = { "hideBagsArt", "hideMicroArt", "keyRingArtHidden", "bagsTight" }
+-- One bar turned on: its look by default, each changeable after in its own place: no bar art under the bags, the micro
+-- menu or the key ring, the bags close together, no latency bar, the key ring with the bags.
+local ONE_BAR_LOOK = { "hideBagsArt", "hideMicroArt", "keyRingArtHidden", "bagsTight", "hideLatencyBar", "keyRingWithBags" }
 ns.OnToggle(function(key)
     local db = ns.db
     if key ~= "oneBar" or not db or db.oneBar ~= true then return end
@@ -51,6 +51,24 @@ function ns.KeepOneBarLook()
     for _, shot in pairs(type(ns.db.profiles) == "table" and ns.db.profiles or {}) do
         if type(shot) == "table" then Keep(shot) end
     end
+end
+
+-- dbVersion 22: Main bar alone is gone; One bar alone sets its pieces' own options. A band that was alone keeps its
+-- look through them; one that kept its pieces keeps its page arrows, now the modern ones on the gryphon.
+function ns.OneBarAloneGone()
+    local function Move(t)
+        if t.oneBar == true and t.oneBarAlone ~= false then
+            t.hideLatencyBar, t.keyRingWithBags = true, true
+        elseif t.oneBar == true then
+            t.modernPageArrows = true
+        end
+        t.oneBarAlone = nil
+    end
+    Move(ns.db)
+    for _, shot in pairs(type(ns.db.profiles) == "table" and ns.db.profiles or {}) do
+        if type(shot) == "table" then Move(shot) end
+    end
+    ns.db.dbVersion = 22
 end
 
 -- The micro menu moves by our handle, not the client's edit mode piece (re-laid constantly while edit mode is open);
