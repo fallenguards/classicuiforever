@@ -12,6 +12,7 @@ local layers = setmetatable({}, weak)   -- copy piece -> { tex, cells, on, metal
 local flats = setmetatable({}, weak)    -- tinted piece -> { cells, on, flat, drawLayer, sub }
 local LISTS = { layers, flats }
 local own = setmetatable({}, weak)       -- our layer textures
+local worn = setmetatable({}, weak)      -- piece -> the mask it wears (ns.WearMask), its layers' too
 -- A piece's frame -> { layer -> piece }: the layers hang on that frame and go with it, so an unseen frame's are left alone.
 local frames = setmetatable({}, weak)
 local job
@@ -140,7 +141,24 @@ local function NewTex(piece)
     local tex = piece:GetParent():CreateTexture(nil, "ARTWORK")
     own[tex] = true
     tex:SetAllPoints(piece)
+    if worn[piece] then tex:AddMaskTexture(worn[piece]) end
     return tex
+end
+
+local function Wear(tex, mask, on)
+    if not tex then return end
+    if on then tex:AddMaskTexture(mask) else tex:RemoveMaskTexture(mask) end
+end
+-- A mask on or off a piece and its layers: a layer draws the whole copy, so a ring the mask cuts showed on it (#194).
+function ns.WearMask(piece, mask, on)
+    Wear(piece, mask, on)
+    worn[piece] = on and mask or nil
+    local layer, flat = layers[piece], flats[piece]
+    if layer then
+        Wear(layer.tex, mask, on)
+        Wear(layer.cells, mask, on)
+    end
+    if flat then Wear(flat.cells, mask, on) end
 end
 
 -- True when the layer had to change.

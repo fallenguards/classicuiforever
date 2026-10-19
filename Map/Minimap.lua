@@ -114,7 +114,7 @@ local function CutDisc(tex)
     local on = MM.active and ns.db.hideButtonBorders == true
     if (cut[tex] or false) == on then return end
     cut[tex] = on or nil
-    if on then tex:AddMaskTexture(discs[tex]) else tex:RemoveMaskTexture(discs[tex]) end
+    ns.WearMask(tex, discs[tex], on)
 end
 -- A round mask d across, centred on owner, for its textures' discs.
 function ns.MinimapDiscMask(owner, d)

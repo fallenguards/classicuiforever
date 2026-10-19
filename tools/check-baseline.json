@@ -190,6 +190,13 @@
       "Bar/BandStatusHide.lua": 1,
       "Bar/BandWatch.lua": 4,
       "Bar/ClassicBar.lua": 7
+    },
+    "MASKWEAR": {
+      "Bar/Buttons.lua": 4,
+      "Character/CharacterCore.lua": 2,
+      "Map/MinimapTracking.lua": 2,
+      "UI/Portraits.lua": 1,
+      "Units/DruidMana.lua": 2
     }
   }
 }

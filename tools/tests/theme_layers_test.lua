@@ -43,6 +43,8 @@ function Texture:SetTexture() self.files = (self.files or 0) + 1 end
 function Texture:SetBlendMode() end
 function Texture:GetBlendMode() return "BLEND" end
 function Texture:SetVertexColor() end
+function Texture:AddMaskTexture(mask) self.mask = mask end
+function Texture:RemoveMaskTexture(mask) if self.mask == mask then self.mask = nil end end
 
 UIParent = { name = "UIParent" }
 function UIParent:GetParent() return nil end
@@ -291,6 +293,22 @@ local plate = NewFrame(true, WorldFrame)
 local platePiece = plate:CreateTexture()
 ns.PaintCopy(platePiece, COPY)
 Check("a frame off UIParent is not watched", edges[plate], nil)
+
+-- A mask on a piece (a minimap button's ring cut off) goes on its layer too, made before or after it (#194).
+local ring = NewFrame(true, UIParent)
+local ringPiece, disc = ring:CreateTexture(), {}
+ns.PaintCopy(ringPiece, COPY)
+ns.WearMask(ringPiece, disc, true)
+Check("a mask reaches the piece's layer", ring.regions[2].mask, disc)
+ns.WearMask(ringPiece, disc, false)
+Check("a mask off leaves the layer whole", ring.regions[2].mask == nil and ringPiece.mask == nil, true)
+local ring2 = NewFrame(true, UIParent)
+local ring2Piece = ring2:CreateTexture()
+ns.WearMask(ring2Piece, disc, true)
+ns.PaintCopy(ring2Piece, COPY)
+Check("a layer made after the mask wears it", ring2.regions[2].mask, disc)
+ns.PaintCopy(ringPiece, nil)
+ns.PaintCopy(ring2Piece, nil)
 
 -- Every layer off: the next whole pass puts the job to sleep and drops the events.
 for i = 1, 50 do ns.PaintCopy(shutPieces[i], nil) end
