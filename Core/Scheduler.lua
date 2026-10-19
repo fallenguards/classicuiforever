@@ -516,6 +516,8 @@ end
 -- OnHover(host, fn, pad) -> true and the sensor when set: fn(over) as the mouse enters or leaves host (grown by pad), from a child that
 -- takes no clicks and passes its motion on to host, so host keeps its own hover. False: the client refused (poll instead).
 function Sched.OnHover(host, fn, pad)
+    -- The client refuses mouse propagation in a fight (blocked, though pcall says ok): poll instead.
+    if InCombatLockdown() then return false end
     local child = Child(host)
     if not child then return false end
     pad = pad or 0
