@@ -685,6 +685,7 @@ function ns.SkinCalendar()
     fs:SetDrawLayer("OVERLAY")
     if day then button:SetText(day) end
     MM.SquareDay()
+    MM.CutCalendarRing(button)
 end
 
 --------------------------------------------------------------------- module

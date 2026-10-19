@@ -180,6 +180,19 @@ function MM.PlaceCalendar(cluster, map, above)
     ns.SetPointOnce(button, "CENTER", box, "CENTER", 0, 0)
 end
 
+-- Hide button borders: the calendar page inside its ring, cut round (UI-Calendar-Button's gold line runs 18 out from
+-- its middle, 50 across): a share of the button's width, which differs by spot.
+local DISC_SHARE = 34 / 50
+local disc
+function MM.CutCalendarRing(button)
+    disc = disc or ns.MinimapDiscMask(button, 1)
+    local w = button:GetWidth()
+    if w and w > 0 then disc:SetSize(w * DISC_SHARE, w * DISC_SHARE) end
+    for _, tex in ipairs({ button:GetNormalTexture(), button:GetPushedTexture(), button:GetHighlightTexture() }) do
+        ns.MinimapButtonDisc(tex, disc)
+    end
+end
+
 function MM.HideCalendar()
     if home then home:Hide() end
     if GameTimeFrame then
