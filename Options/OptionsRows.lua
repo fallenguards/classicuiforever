@@ -39,6 +39,10 @@ local function TipGrayWhen(self)
         if entry[1] == key then return L["OPT_GRAY_WHEN_TIP"]:format(entry[2]) end
     end
 end
+-- Grayed while a game setting makes it moot (grayIf): grayTip says which.
+local function TipGrayIf(self)
+    if self.grayIf and self.grayIf() then return self.grayTip end
+end
 -- Grayed while another toggle does it for it (offBy, in force with its parent on).
 local function TipOffBy(self)
     if not O.OffByOn(self.offBy) then return nil end
@@ -56,7 +60,7 @@ end
 -- White title, wrapped body, and why it is grayed (another addon holds the bars, a toggle it needs is off, or one does it).
 local OPTION_TIP = { when = TipBody, text = TipLabel, r = 1, g = 1, b = 1,
     lines = { { TipBody, nil, nil, nil, true }, { TipHeld, 1, 0.82, 0, true }, { TipNeeds, 1, 0.82, 0, true },
-        { TipGrayWhen, 1, 0.82, 0, true }, { TipOffBy, 1, 0.82, 0, true } } }
+        { TipGrayWhen, 1, 0.82, 0, true }, { TipGrayIf, 1, 0.82, 0, true }, { TipOffBy, 1, 0.82, 0, true } } }
 O.OPTION_TIP = OPTION_TIP
 
 -- Not part of the classic look, so Toggle none leaves them (the minimap button leads back here), nor the radio picks,
@@ -512,12 +516,13 @@ function O.BuildRows(child, colW)
         if entry.drop and not dropped[dropGroup] then
             dropped[dropGroup] = true
             local row = entry.checks and DropCheckRow(child, dropGroup) or DropRow(child, dropGroup)
-            row.needs, row.grayWhen = entry.needs, entry.grayWhen
+            row.needs, row.grayWhen, row.grayIf, row.grayTip = entry.needs, entry.grayWhen, entry.grayIf, entry.grayTip
             Add(row, entry.parent)
             row.text:SetWidth(colW - 14 - DROP_W - row.depth * INDENT)
         elseif not entry.drop then
             local box = Checkbox(child, entry[1], entry[2], entry[3], entry.radio)
             box.needs, box.offBy, box.grayWhen = entry.needs, entry.offBy, entry.grayWhen
+            box.grayIf, box.grayTip = entry.grayIf, entry.grayTip
             if entry.search then box.keyLow = box.keyLow .. " " .. entry.search:lower() end
             Add(box, entry.parent)
             box.text:SetWidth(colW - 30 - box.depth * INDENT)

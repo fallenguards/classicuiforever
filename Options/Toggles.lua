@@ -11,6 +11,7 @@ O.TITLE = "ClassicUI Forever"
 -- Order drives the options list, /fcui help and the reload prompt (Core ToggleTree); Status reads it. Kids follow their parent.
 local SHOW_TIP = L["OPT_TIP_SHOW_HOVER_HIDE"]
 local GRYPHON_TIP = L["OPT_TIP_GRYPHON"]
+local function MinimapRotates() return ns.GetCVarBool("rotateMinimap") == true end
 ns.TOGGLES = {
     { "bronzeTheme", L["OPT_bronzeTheme"], L["OPT_bronzeTheme_TIP"], group = L["GROUP_LOOK"], search = "custom skin color dark mode" },
     { "themeBronze", L["OPT_themeBronze"], L["OPT_themeBronze_TIP"], parent = "bronzeTheme", radio = "theme" },
@@ -318,7 +319,8 @@ ns.TOGGLES = {
     { "hideMinimapZone", L["OPT_hideMinimapZone"], SHOW_TIP, parent = "minimap", radio = "minimapZoneShow", drop = true },
     { "hideMinimapHeader", L["OPT_hideMinimapHeader"], L["OPT_hideMinimapHeader_TIP"], parent = "minimap", search = "zone bar top" },
     { "hideMinimapBorder", L["OPT_hideMinimapBorder"], L["OPT_hideMinimapBorder_TIP"], parent = "minimap", search = "ring frame" },
-    { "minimapSquare", L["OPT_minimapSquare"], L["OPT_minimapSquare_TIP"], parent = "minimap", search = "square shape corners" },
+    { "minimapSquare", L["OPT_minimapSquare"], L["OPT_minimapSquare_TIP"], parent = "minimap", search = "square shape corners",
+        grayIf = MinimapRotates, grayTip = L["OPT_minimapSquare_ROTATE"] },
     { "minimapToggleButton", L["OPT_minimapToggleButton"], L["OPT_minimapToggleButton_TIP"], parent = "minimap",
         search = "close hide minimap x button toggle" },
     { "hideMinimapNorth", L["OPT_hideMinimapNorth"], L["OPT_hideMinimapNorth_TIP"], parent = "minimap", search = "north n compass letter" },

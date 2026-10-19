@@ -39,7 +39,7 @@ RULES = ["CVAR", "CVARREAD", "CVARLOGIN", "CVARREG", "REGISTRY", "HOOK", "ONUPDA
          "LOADADDON", "EDITMODE", "EDITQUERY", "SETTLE",
          "PANELMGR", "SECRET", "WALK", "REGEVENTS", "EVENTFRAME", "POINTONCE", "SETIF", "THEME", "ONCEFLAG",
          "FRAMEFIELD", "GAMEMENU", "SHAREDART", "PLATES", "FORBIDDEN", "SYSBASE", "LAYOUTFIELD", "CLIENTKEY",
-         "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS", "DRAGPOINT", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "CLIENTTEMPLATE", "COMBATMOUSE", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "TOC"]
+         "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS", "DRAGPOINT", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "TOC"]
 # A hit of these on a line the change adds fails even within the baseline, so swapping one call for another fails.
 # SINCE, DEADNS, FRAMEFIELD, CVARLOGIN and THROTTLEFRAME stay count-only, so a kept line can still be rewritten.
 LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", "EDITMODE", "PANELMGR", "SEARCHBOX", "ADDONCHAR",
@@ -50,7 +50,7 @@ LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", 
               "DRAGPOINT", "ERASPOT", "WINDOWORIGIN", "CVARREG", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST",
               "POINTEXACT",
               "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE",
-              "CLIENTTEMPLATE", "COMBATMOUSE")
+              "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH")
 
 # The files allowed to hold each pattern, each with its reason; an entry ending in / is a folder.
 ALLOWED = {
@@ -178,6 +178,7 @@ FIX = {
     "PLATESHIELD": "set it blind (SetSize, ClearAllPoints, SetPoint) and give it back with the client's own values "
                    "(EraShield in Units/NamePlates.lua)",
     "PASSWRITE": "write only on change: ns.SetScaleIf, ns.SetPointIf, ns.SetTwoPointsIf (Core/Setters.lua)",
+    "MASKPATH": "wrap it in its own parentheses, SetMaskTexture((ns.TexPath(key))), so only the first path goes",
     "COMBATMOUSE": "set it through ns.Sched.OnHover (it answers refused in a fight) or guard the call with InCombatLockdown() and list the file in ALLOWED with the guard",
     "PCALLMANY": "pcall a function of ours that walks them and returns one value (ns.EachChildProtected, "
                  "ns.EachRegionProtected in Core/Util.lua), never the getter itself",
@@ -353,6 +354,7 @@ LINE_PATTERNS = {
                              r"|(?:\bcap|EndCap)\w*\s*:\s*SetAlpha\s*\(\s*0\b"),
     "ADDONFORBID": re.compile(r"\b(?:TryRequestRecentAlliesData|BuyTrainerService|UseContainerItem|GuildSetMOTD|"
                               r"GuildRosterSetPublicNote|GuildRosterSetOfficerNote)\s*\("),
+    "MASKPATH": re.compile(r"SetMaskTexture\(\s*ns\.TexPath\("),
     "COMBATMOUSE": re.compile(r"\b(?:SetPropagateMouseMotion|SetPropagateMouseClicks|SetPropagateKeyboardInput|SetPassThroughButtons)\b"),
     "PCALLMANY": re.compile(r"\bpcall\s*\(\s*[\w.:\[\]\"]+\s*[.:]\s*(?:GetChildren|GetRegions|GetAnimations)\b"),
     # A cast bar's shield measured: a plate's is a restricted region and the read errors.
@@ -459,6 +461,7 @@ MESSAGES = {
     "PADLIST": "a pad-clicked client list sized, placed or measured in our Lua (rows it rebuilds in our name are "
                "refused by Train's pad and fail a guild note save)",
     "FADEDPIECE": "a client end cap faded or laid on the band as a handle (bars snapped to it, saved at the screen top)",
+    "MASKPATH": "ns.TexPath returns two paths (ours and the fallback); the minimap's SetMaskTexture took the second as well and drew the map green with no mask (2026-10-18)",
     "COMBATMOUSE": "the client refuses mouse and key propagation in a fight (ADDON_ACTION_BLOCKED; a pcall still says ok)",
     "PCALLMANY": "a pcall straight around GetChildren/GetRegions/GetAnimations: 22 or more results abort the beta client",
     "PLATESHIELD": "a cast bar shield measured (a plate's is restricted: Can't measure restricted regions)",

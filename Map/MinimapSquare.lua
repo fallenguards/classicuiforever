@@ -35,9 +35,10 @@ function ns.FadeSquareBorders(on)
 end
 
 -- Square minimap (our own option): the map square, its border Era's ring made square, our rim pieces along its edge.
+-- Not while Rotate Minimap is on: the game turns the map's mask with it, so a square one turns into a diamond.
 local MM = ns.MM
 function MM.Square()
-    return MM.active and ns.db.minimapSquare == true
+    return MM.active and ns.db.minimapSquare == true and not ns.GetCVarBool("rotateMinimap")
 end
 -- Other addons' minimap buttons ask the shape (the convention minimap button libraries follow); kept if one exists.
 if _G.GetMinimapShape == nil then
@@ -49,3 +50,10 @@ function MM.MapBack(wasSquare)
     MM.Reopen()
     if wasSquare and Minimap and Minimap.SetMaskTexture then Minimap:SetMaskTexture((ns.TexPath("portraitMask"))) end
 end
+
+-- Rotate Minimap turned (edit mode or a layout's apply): the map round or square again, the option grayed or not.
+ns.EventFrame("CVAR_UPDATE", function(_, _, name)
+    if name ~= "rotateMinimap" then return end
+    if MM.active and ns.db.minimapSquare then ns.Sched.NextFrame("minimap.rotate", MM.Relayout) end
+    if ns.RefreshOptionsWindow then ns.RefreshOptionsWindow() end
+end)
