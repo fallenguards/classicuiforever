@@ -138,8 +138,20 @@ function MM.TrackingFrame(backdrop, level)
     UpdateTracking()
 end
 
+-- The glass's dark disc: Era's spot under the ring; with Hide button borders, under the glass art's middle
+-- (Tracking-None fills 4 to 30 by 2 to 28 of 32, the glass 20 across at 6, 6).
+local GLASS_BG = { coords = { 0, 1, 0, 1 }, w = 25, h = 25, point = "TOPLEFT", x = 2, y = -4, alpha = 0.6 }
+local GLASS_BG_BARE = setmetatable({ x = 6 + 20 * 17 / 32 - 12.5, y = -6 - 20 * 15 / 32 + 12.5 }, { __index = GLASS_BG })
+local glassBack
+function MM.GlassDisc(tracking)
+    glassBack = tracking.Background
+    if not glassBack then return end
+    ns.Dress(glassBack, "minimapBackground", ns.db.hideButtonBorders and GLASS_BG_BARE or GLASS_BG, tracking)
+end
+
 -- Seen at once, in a fight too: a plain frame of ours.
 ns.OnToggle(function(key)
+    if key == "hideButtonBorders" and glassBack and MM.active then MM.GlassDisc(MinimapCluster.Tracking) end
     if key ~= "trackingSameSize" or not trackFrame then return end
     Shape(trackFrame)
     PlaceTracking()

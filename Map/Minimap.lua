@@ -25,7 +25,6 @@ local ZOOM = {
     { field = "ZoomIn", key = "minimapZoomIn", up = "zoomInUp", down = "zoomInDown", disabled = "zoomInDisabled" },
     { field = "ZoomOut", key = "minimapZoomOut", up = "zoomOutUp", down = "zoomOutDown", disabled = "zoomOutDisabled" },
 }
-local GLASS_BG = { coords = FULL, w = 25, h = 25, point = "TOPLEFT", x = 2, y = -4, alpha = 0.6 }
 local GLASS_RING = { own = "border", layer = "BORDER", w = 52, h = 52, point = "TOPLEFT" }
 local NO_TRACKING = { coords = FULL, w = 20, h = 20 }
 local HL_RING = { coords = FULL, fill = true, add = true, states = { "Highlight" } }
@@ -532,7 +531,7 @@ local function Layout()
         tracking:SetFrameLevel(above + 1)
         tracking:SetSize(32, 32)
         ns.SetPointOnce(tracking, "TOPLEFT", glassHome, "TOPLEFT", 0, 0)
-        ns.Dress(tracking.Background, "minimapBackground", GLASS_BG, tracking)
+        MM.GlassDisc(tracking)
         ns.MinimapButtonBorder(ns.DressNew(tracking, "trackingBorder", GLASS_RING))
         local button = tracking.Button
         if button then
