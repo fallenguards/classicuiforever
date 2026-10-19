@@ -560,10 +560,32 @@ local function SetSweeping(on)
     if on then sweepJob:Wake() else sweepJob:Sleep() end
 end
 
+-- Era's classic plates turn the moused-over name yellow (Plate name on hover). The client paints every name again as
+-- the mouse finds a unit, so ours comes a frame after; as it leaves, the color it had comes back.
+local nameOver, nameWas = nil, {}
+local function PaintNameOver(fresh)
+    local over = NP.active and ns.db.plateNameHover ~= false and glowOver or nil
+    if fresh then nameOver = nil elseif nameOver == over then return end
+    local was = nameOver and nameOver.name
+    if was then
+        local r, g, b = was:GetVertexColor()
+        if not ns.AnySecret(r, g, b) and r == 1 and g == 1 and b == 0 then was:SetVertexColor(unpack(nameWas)) end
+    end
+    nameOver = over
+    local name = over and over.name
+    if not name then return end
+    local r, g, b = name:GetVertexColor()
+    if ns.AnySecret(r, g, b) then nameOver = nil return end
+    nameWas[1], nameWas[2], nameWas[3] = r, g, b
+    name:SetVertexColor(1, 1, 0)
+end
+local function PaintNameFresh() PaintNameOver(true) end
+
 -- The client says when the mouse finds a unit, never when it leaves one: while a plate glows for it, look again.
 local function OverGlow()
     LookGlows()
     EachPlate(GlowPlate)
+    PaintNameOver()
     if not overJob then return end
     if glowOver then overJob:Wake() else overJob:Sleep() end
 end
@@ -576,6 +598,7 @@ local function SetActive(on)
     NP.active = on
     SetSweeping(on)
     if overJob and not on then overJob:Sleep() end
+    if not on then PaintNameOver() end
 end
 
 local function Relay(owed)
@@ -665,6 +688,7 @@ local function OnEvent(_, event, unit, _, _, interruptedBy)
         if unitFrame then UpdateLevel(unitFrame) end
     elseif event == "UPDATE_MOUSEOVER_UNIT" then
         OverGlow()
+        ns.Sched.NextFrame("namePlates.nameOver", PaintNameFresh)
     elseif CAST_EVENTS[event] then
         -- Cast start or stop re-lays only that plate's chain and cast bar; a channel's stop names who interrupted it.
         local unitFrame = unit and PlateFor(unit)
@@ -755,5 +779,7 @@ ns.OnToggle(function(key)
         EachPlate(CastLayout)
     elseif CC_KEYS[key] then
         PlaceAllCrowdControl()
+    elseif key == "plateNameHover" then
+        PaintNameOver()
     end
 end)

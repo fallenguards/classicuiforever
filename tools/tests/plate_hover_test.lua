@@ -43,6 +43,7 @@ local env = setmetatable({
     ns = { Path = function(frame) return frame and frame.glow end },
     PlateFor = function(token) return units[token] end,
     EachPlate = function(fn) fn(plate) end,
+    PaintNameOver = function() end,
 }, { __index = _G })
 local body = "local overJob = job\n"
     .. Cut(source, "local glowTarget, glowOver", "local function Glow(")

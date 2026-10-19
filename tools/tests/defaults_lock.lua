@@ -281,6 +281,7 @@ return {
     plateHealthTextRightSwap = false,
     plateHealthTextSplit = false,
     plateHealthTextSplitSwap = false,
+    plateNameHover = true,
     plateNameSize = 0,
     platesOneSize = false,
     prdGap = 0,

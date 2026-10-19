@@ -160,6 +160,7 @@ ns.DB_DEFAULTS = {
     classColorPlates = false,
     plateDragons = false,
     plateCastBeside = false,
+    plateNameHover = true,
     plateCCBeside = true,
     plateCCAbove = false,
     plateHealthTextRight = true,

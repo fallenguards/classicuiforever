@@ -178,6 +178,8 @@ ns.TOGGLES = {
     { "namePlates", L["OPT_namePlates"], L["OPT_namePlates_TIP"], group = L["GROUP_NAMEPLATES"] },
     { "classColorPlates", L["OPT_classColorPlates"], L["OPT_classColorPlates_TIP"], parent = "namePlates" },
     { "plateDragons", L["OPT_plateDragons"], L["OPT_plateDragons_TIP"], parent = "namePlates", search = "elite rare dragon gold silver" },
+    { "plateNameHover", L["OPT_plateNameHover"], L["OPT_plateNameHover_TIP"], parent = "namePlates",
+        search = "name yellow hover mouseover highlight" },
     { "plateCastBeside", L["OPT_plateCastBeside"], L["OPT_plateCastBeside_TIP"], parent = "namePlates",
         search = "cast bar icon spell nameplate old gap" },
     { "plateCCBeside", L["OPT_plateCCBeside"], L["OPT_plateCCBeside_TIP"], parent = "namePlates", radio = "plateCC",
