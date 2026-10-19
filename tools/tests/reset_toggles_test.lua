@@ -18,13 +18,14 @@ UIParent = { GetScale = function() return uiScale end }
 ------------------------------------------------------------------ the addon
 
 local noop = function() end
-local classicLayout, changed = true, nil
+local classicLayout, changed, printed = true, nil
 local ns = {
     ClassicLayoutActive = function() return classicLayout end,
     TogglesChanged = function(keys) changed = keys[1] end,
     L = setmetatable({}, { __index = function(_, key) return key end }),
     options = { TITLE = "ClassicUI Forever" },
     Popup = noop,
+    Print = function(msg) printed = msg end,
     TOGGLES = { { "classicBar" }, { "classicBarSize" }, { "hideCombatGlow" } },
     DB_DEFAULTS = { classicBar = true, classicBarSize = false, hideCombatGlow = false },
 }
@@ -54,11 +55,18 @@ ns.db = { classicBarSize = false }
 ns.ResetToggles()
 Check(ns.db.classicBarSize == true, "with the classic layout the bars come back classic-sized at any interface size")
 
--- Without the classic layout at the game default scale: the game-sized bar, the default.
+-- Without the classic layout at the game default scale: classic-sized all the same, and a chat line says how to undo it.
 classicLayout = false
-ns.db = { classicBarSize = true }
+uiScale = 0.71
+ns.db = { classicBarSize = false }
+printed = nil
 ns.ResetToggles()
-Check(ns.db.classicBarSize == false, "at another interface size without the classic layout the bar size is the default")
+Check(ns.db.classicBarSize == true, "Default toggles turns the classic-sized bars on at any interface size and layout")
+Check(printed ~= nil, "turning them on says in chat how to undo it")
+ns.db = { classicBarSize = true }
+printed = nil
+ns.ResetToggles()
+Check(printed == nil, "already on: no chat line")
 classicLayout = true
 
 -- One page's Reset toggles: that page's boxes alone, the bar size only when the page holds it.
