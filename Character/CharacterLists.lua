@@ -291,6 +291,17 @@ local function SkinSkillHeader(row, scale, font)
     ns.Dress(icon, nil, COLLAPSE_ICON, holder)
 end
 
+-- A sub header with a collapse button of its own (retail's currency, Forever's statistics): its faces go and the old
+-- icon stands on it.
+local function OldSubToggle(row, collapsed)
+    local toggle = row.ToggleCollapseButton
+    local icon = Own(ns.OwnTexture(row, "collapseIcon", "ARTWORK"))
+    ns.SetCollapseIcon(icon, collapsed)
+    Fade(toggle:GetNormalTexture())
+    Fade(toggle:GetPushedTexture())
+    ns.Dress(icon, nil, SUB_ICON, toggle)
+end
+
 local function SkinRepHeader(row, barKey)
     if barKey == "SkillsBar" then return SkinSkillHeader(row) end
     -- Reputation headers in their own gold, on the same scaled frame.
@@ -303,24 +314,22 @@ local function SkinRepHeader(row, barKey)
         ns.SetPointOnce(row.Name, "LEFT", row, "LEFT", 26, 0)
     end
     if row.StateIcon then Fade(row.StateIcon) end
+    local collapsed = row.IsCollapsed and row:IsCollapsed()
+    if row.ToggleCollapseButton then return OldSubToggle(row, collapsed) end
     local icon = Own(ns.OwnTexture(row, "collapseIcon", "ARTWORK"))
-    ns.SetCollapseIcon(icon, row.IsCollapsed and row:IsCollapsed())
-    -- Retail's currency sub header has a button of its own: its faces go and the old icon stands on it.
-    local toggle = row.ToggleCollapseButton
-    if toggle then
-        Fade(toggle:GetNormalTexture())
-        Fade(toggle:GetPushedTexture())
-        ns.Dress(icon, nil, SUB_ICON, toggle)
-    else
-        ns.Dress(icon, nil, COLLAPSE_ICON, row)
-    end
+    ns.SetCollapseIcon(icon, collapsed)
+    ns.Dress(icon, nil, COLLAPSE_ICON, row)
 end
 
 local function SkinListRow(row, barKey)
     if not T.active then return end
     -- A row just acquired has no data; the header methods index it.
     if row.GetElementData and row:GetElementData() == nil then return end
-    if row.Content then SkinListEntry(row, barKey) else SkinRepHeader(row, barKey) end
+    if not row.Content then return SkinRepHeader(row, barKey) end
+    SkinListEntry(row, barKey)
+    -- Forever's statistics sub header is an entry row with a collapse button.
+    local node = row.treeNode
+    if row.ToggleCollapseButton and node then OldSubToggle(row, node:IsCollapsed()) end
 end
 
 -- The shared knob reshows on every scroll, so with the sheet off it goes to alpha 0, not Hide.
