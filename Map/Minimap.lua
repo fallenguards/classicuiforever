@@ -435,11 +435,8 @@ local function Layout()
     if not cluster or not backdrop or not map then ns.MissingPiece("MinimapCluster") return end
     -- Edit mode's size scales only the map container, pulling the map off its ring:
     -- scale the whole cluster instead so every spot below stays in 1.x pixels.
-    local size = 1
-    if cluster.GetSettingValue and Enum and Enum.EditModeMinimapSetting and Enum.EditModeMinimapSetting.Size then
-        local ok, value = pcall(cluster.GetSettingValue, cluster, Enum.EditModeMinimapSetting.Size)
-        if ok and type(value) == "number" and value > 0 then size = value / 100 end
-    end
+    local size = MM.MapSize()
+    local up, plateY, coordsY = MM.HeaderOffsets()
     if cluster.MinimapContainer then ns.SetScaleIf(cluster.MinimapContainer, 1, 0) end
     ns.SetScaleIf(cluster, size, 0.001)
     -- The client scales the header again as the map grows.
@@ -453,20 +450,21 @@ local function Layout()
     end
     if cluster.MinimapContainer then
         cluster.MinimapContainer:SetSize(MAP, MAP)
-        ns.SetPointOnce(cluster.MinimapContainer, "CENTER", cluster, "TOP", 9, -92)
+        ns.SetPointOnce(cluster.MinimapContainer, "CENTER", cluster, "TOP", 9, -92 + up)
     end
     map:SetSize(MAP, MAP)
     map:ClearAllPoints()
     if cluster.MinimapContainer then
         map:SetPoint("CENTER", cluster.MinimapContainer, "CENTER", 0, 0)
     else
-        map:SetPoint("CENTER", cluster, "TOP", 9, -92)
+        map:SetPoint("CENTER", cluster, "TOP", 9, -92 + up)
     end
     if map.SetMaskTexture then map:SetMaskTexture((ns.TexPath(MM.Square() and "squareMask" or "portraitMask"))) end
     if ringSquare ~= MM.Square() then BuildRing() end
     ns.FadeSquareBorders(true)
     backdrop:SetSize(CLUSTER, CLUSTER)
-    ns.SetPointOnce(backdrop, "CENTER", cluster, "CENTER", 0, -20)
+    ns.SetPointOnce(backdrop, "CENTER", cluster, "CENTER", 0, -20 + up)
+    if ringHeader then ns.SetPointOnce(ringHeader, "TOPRIGHT", cluster, "TOPRIGHT", 0, plateY) end
     if backdrop.StaticOverlayTexture then ns.Fade(backdrop.StaticOverlayTexture) end
     ns.Dress(MinimapCompassTexture, "compassRing", COMPASS, map)
     if MinimapCompassTextureUnderlay then ns.Fade(MinimapCompassTextureUnderlay) end
@@ -478,7 +476,7 @@ local function Layout()
     local above = map:GetFrameLevel() + 5
 
     -- Zone name centred on the zone bar, whatever the calendar's spot.
-    local zone = LayHome("minimapZone", cluster, cluster:GetFrameLevel() + 2, MAP, 12, cluster, "TOP", ZONE_X, -12)
+    local zone = LayHome("minimapZone", cluster, cluster:GetFrameLevel() + 2, MAP, 12, cluster, "TOP", ZONE_X, -12 + plateY)
     if cluster.ZoneTextButton then
         cluster.ZoneTextButton:SetParent(zone)
         cluster.ZoneTextButton:SetSize(MAP, 12)
@@ -581,7 +579,7 @@ local function Layout()
     -- The game's coordinates under the map, in a home edit mode moves.
     local coords = PlayerCoords()
     if coords then
-        local coordsHome = LayHome("minimapCoords", backdrop, above, 90, 10, map, "BOTTOM", 0, -23)
+        local coordsHome = LayHome("minimapCoords", backdrop, above, 90, 10, map, "BOTTOM", 0, coordsY)
         if coords:GetParent() ~= coordsHome then coords:SetParent(coordsHome) end
         ns.SetPointOnce(coords, "CENTER", coordsHome, "CENTER", 0, 0)
         commaOn = true
@@ -613,7 +611,7 @@ local function Layout()
     end
     -- Retail's difficulty flag (Forever's minimap has none): hidden by default, as 1.x had none.
     if cluster.InstanceDifficulty then
-        ns.SetPointOnce(cluster.InstanceDifficulty, "TOPLEFT", cluster, "TOPLEFT", 22, -17)
+        ns.SetPointOnce(cluster.InstanceDifficulty, "TOPLEFT", cluster, "TOPLEFT", 22, -17 + up)
         ns.MinimapShow(cluster.InstanceDifficulty, "MinimapDifficulty", true)
     end
     -- No landing page in 1.x; faded rather than moved, still reachable from the micro menu.
@@ -727,6 +725,7 @@ local function Apply()
         hooked = true
         ns.HookMethod(MinimapCluster, "Layout", LayoutIfActive)
         ns.HookMethod(MinimapCluster, "SetRotateMinimap", LayoutIfActive)
+        ns.HookMethod(MinimapCluster, "SetHeaderUnderneath", LayoutIfActive)
         if MinimapCluster.IndicatorFrame then
             ns.HookMethod(MinimapCluster.IndicatorFrame, "Layout", LayoutIfActive)
         end

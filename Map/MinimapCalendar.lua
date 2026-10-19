@@ -122,7 +122,8 @@ local function PlaceHome(box, cluster, map, spot, diel)
     local k = box:GetScale()
     if spot == "zone" then
         -- Where 1.x had the minimap toggle, on the zone name's right end.
-        ns.SetPointOnce(box, "CENTER", cluster, "TOPRIGHT", -15 / k, -13 / k)
+        local _, plateY = MM.HeaderOffsets()
+        ns.SetPointOnce(box, "CENTER", cluster, "TOPRIGHT", -15 / k, (-13 + plateY) / k)
     else
         local angle = tonumber(ns.db.calendarAngle) or (diel and RING_ANGLE or RING_ANGLE_BARE)
         ns.RingPoint(box, angle, RING_R, box:GetEffectiveScale() / map:GetEffectiveScale())

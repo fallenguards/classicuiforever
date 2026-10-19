@@ -145,6 +145,7 @@ Units\StatusFont.lua
 Units\MirrorTimers.lua
 Units\ComboPoints.lua
 Map\Minimap.lua
+Map\MinimapEditSettings.lua
 Map\MinimapTracking.lua
 Map\MinimapDiel.lua
 Map\MinimapCalendar.lua
