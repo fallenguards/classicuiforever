@@ -20,6 +20,7 @@ local HOME_HEAD, HOME = 30, {}
 local LIST_X, LIST_TOP = PANE_X + 12, PANE_TOP + 38
 local LIST_W = PANE_W - 40
 local MATCH_DIM = 0.4
+local NOTE_GAP = 8
 local LINE_COLOR = { 0.47, 0.47, 0.47, 0.63 }
 -- The 1.x options boxes: the tooltip edge in grey over a dark fill.
 local BOX_LOOK = { bg = { 0.15, 0.15, 0.15, 0.85 }, bgFirst = true, base = { 0.6, 0.6, 0.6, 1 } }
@@ -179,6 +180,10 @@ local function Sidebar(frame, pages)
     for _, page in ipairs(pages) do
         frame.nav[page] = NavButton(box, frame, page, y, function() frame:ShowPage(page) end)
         y = y + NAV_ROW
+        if page == O.MASTER_PAGE then
+            Line(box, frame, SIDE_X + 10, y + 4, SIDE_W - 20)
+            y = y + 9
+        end
     end
     Line(box, frame, SIDE_X + 10, y + 4, SIDE_W - 20)
     y = y + 9
@@ -261,6 +266,13 @@ local function PageArea(frame, bottom)
     top:SetPoint("TOPLEFT", frame, "TOPLEFT", LIST_X, -LIST_TOP)
     top:SetSize(LIST_W, 1)
     frame.pageTop = top
+    -- A toggles page's note (O.PAGE_NOTES) over its rows, the list under it.
+    local note = box:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    note:SetPoint("TOPLEFT", top, "TOPLEFT", 4, 0)
+    note:SetPoint("TOPRIGHT", top, "TOPRIGHT", -4, 0)
+    note:SetJustifyH("LEFT")
+    note:Hide()
+    frame.pageNote = note
     local list = ns.NewFrame("ScrollFrame", nil, box)
     list:SetClipsChildren(true)
     list:EnableMouseWheel(true)
@@ -313,19 +325,22 @@ local function Blocks(built, text, page)
         end
         return block
     end
+    -- A page's top-level heading keeps the rows after it in its block, so the columns never split a heading from them.
+    local section
     for _, row in ipairs(built.rows) do
-        local shown = hit[row.key] and (searching or row.page == page)
+        local shown = hit[row.key] and (searching or row.page == page) and not (row.hideIf and row.hideIf())
         if not shown then
             row:Hide()
         elseif not row.parent then
-            -- Searching: one block per page under its title; a page: one per top-level row.
-            local block = searching and byPage[row.page]
+            -- Searching: one block per page under its title; a page: one per top-level row, or per heading's run.
+            local block = searching and byPage[row.page] or (not searching and not row.sub and section)
             if not block then
                 block = NewBlock(searching and built.heads[row.page] or nil)
                 if searching then byPage[row.page] = block end
             end
             Push(block, row)
-            AddKids(block, row.key)
+            local last = AddKids(block, row.key)
+            if not searching and (row.sub or section) then section = last end
         end
     end
     return blocks, count, matched
@@ -391,7 +406,10 @@ local function Show(frame, keepScroll)
     for name, button in pairs(frame.nav) do
         if not frame.panes[name] then button:SetPicked(name == frame.page and not searching) end
     end
-    FitList(frame, pane and pane.headH or home and HOME_HEAD or 0)
+    local note = not searching and not pane and not home and O.PAGE_NOTES[frame.page]
+    frame.pageNote:SetText(note or "")
+    frame.pageNote:SetShown(note and true or false)
+    FitList(frame, pane and pane.headH or home and HOME_HEAD or note and math.ceil(frame.pageNote:GetStringHeight()) + NOTE_GAP or 0)
     local child = pane and pane.child or frame.listChild
     if frame.list:GetScrollChild() ~= child then frame.list:SetScrollChild(child) end
     frame.listChild:SetShown(not pane)
@@ -472,6 +490,7 @@ local function Build()
         frame.panes[L[spec[1]]] = O[spec[2]](frame.pageBox, frame.pageTop, frame.list, SetRange)
     end
     frame.page = pages[1]
+    function O.ShowPage(page) frame:ShowPage(page) end
 
     function frame:ShowPage(page)
         self.page = page
@@ -482,7 +501,7 @@ local function Build()
         local keys = {}
         for _, row in ipairs(self.built.rows) do
             if row.page == self.page then
-                if row.toggle then keys[row.key] = true end
+                if row.toggle then keys[row.setting or row.key] = true end
                 for _, key in ipairs(row.keys or EMPTY) do keys[key] = true end
             end
         end
@@ -498,7 +517,7 @@ local function Build()
         for _, row in ipairs(self.built.rows) do
             -- Done by another toggle (offBy): checked and grayed, as it is in force.
             local doneBy = O.OffByOn(row.offBy)
-            row:SetChecked(doneBy or ns.db[row.key] ~= false)
+            row:SetChecked(doneBy or ns.db[row.setting or row.key] ~= false)
             -- Disabled and grayed under any parent that is off.
             local on, up = not (row.needs and ns.db[row.needs] == false), row.parent
             while up do

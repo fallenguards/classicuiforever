@@ -5,6 +5,7 @@ local L = ns.L
 -- built once with its page (its group's title) for OptionsWindow.lua to lay out.
 
 local O = ns.options
+local EMPTY = ns.EMPTY
 local ROW, INDENT = 24, 22
 local C = ns.ART.CHECK
 local BTN = "Interface\\Buttons\\UI-"
@@ -64,7 +65,7 @@ local OPTION_TIP = { when = TipBody, text = TipLabel, r = 1, g = 1, b = 1,
 O.OPTION_TIP = OPTION_TIP
 
 -- Not part of the classic look, so Toggle none leaves them (the minimap button leads back here), nor the radio picks,
--- nor a parent's boxes in a drop down (its windows, its frames): the parent off turns them off, and on again finds them.
+-- nor a parent's picked boxes (checks: its windows, its frames): the parent off turns them off, on again finds them.
 local NOT_IN_NONE = { minimapButton = true, welcomeNote = true, barsTakenNote = true, questLevels = true }
 local picks
 function O.InNone(key)
@@ -197,10 +198,11 @@ local function ButtonRow(parent, key, label, tooltip, press, isOn, check)
     return row
 end
 
--- ToggleChanged refreshes the window; a radio row only turns on.
+-- ToggleChanged refreshes the window; a radio row only turns on. setting: a row standing for a toggle of another page.
 local function BoxClick(self)
-    ns.db[self.key] = (self.radio or self:GetChecked()) and true or false
-    ns.ToggleChanged(self.key)
+    local key = self.setting or self.key
+    ns.db[key] = (self.radio or self:GetChecked()) and true or false
+    ns.ToggleChanged(key)
 end
 
 local function Checkbox(parent, key, label, tooltip, radio)
@@ -274,18 +276,6 @@ local function DropGroup(field, group)
             words[#words + 1] = item .. " " .. (entry.search or "")
             keys[#keys + 1] = entry[1]
         end
-    end
-    -- dropAlso: toggles of other pages shown here too, as themselves (a box flips that toggle); sorted in with the rest.
-    if first and first.dropAlso then
-        for _, entry in ipairs(ns.TOGGLES) do
-            for _, key in ipairs(first.dropAlso) do
-                if entry[1] == key then
-                    rows[#rows + 1] = { key = key, label = entry[2], tip = entry[3] }
-                    words[#words + 1] = entry[2]
-                end
-            end
-        end
-        table.sort(rows, function(a, b) return a.label < b.label end)
     end
     local label = first and (first.dropLabel or first[2]:match("^(.-):")) or group
     local tip = first and (first.dropTip or first[3])
@@ -468,6 +458,7 @@ local function Extras(entry, child, colW, add)
         add(O.DarknessRow(child, colW - 2 * INDENT - 14), "themeDark")
     -- The Other page's last row: the camera block after it.
     elseif key == "leaveGameWindows" then
+        add(SubHead(child, L["SUB_CAMERA"]))
         local head, camera = O.CameraRow(child, colW - 2 * INDENT - 14)
         head.text:SetWidth(colW - 30)
         add(head)
@@ -509,11 +500,49 @@ local function Extras(entry, child, colW, add)
     end
 end
 
+-- A window's box on All windows. jump: the window's own page, which holds its box too; then the row is that same setting,
+-- left to the page's row in a search, with an arrow to the page.
+local JUMP = 20
+local JUMP_LOOK = { add = true }
+local function WindowRow(child, entry, jump, colW)
+    local box = Checkbox(child, entry[1], entry[2], entry[3])
+    box.needs, box.hideIf = entry.needs or entry.parent, entry.hideIf
+    if entry.search then box.keyLow = box.keyLow .. " " .. entry.search:lower() end
+    if not jump then
+        box.text:SetWidth(colW - 30)
+        return box
+    end
+    box.setting, box.key = entry[1], "also:" .. entry[1]
+    local room = colW - 30 - JUMP
+    box.text:SetWidth(room)
+    local arrow = ns.NewFrame("Button", nil, box)
+    arrow:SetSize(JUMP, JUMP)
+    arrow:SetPoint("LEFT", box.text, "LEFT", math.min(math.ceil(box.text:GetStringWidth() or 0), room) + 2, 0)
+    ns.DressStates(arrow, "sbNextUp", "sbNextDown", "sbNextDisabled", "highlight", JUMP_LOOK)
+    arrow.label, arrow.tooltip = jump, L["OPTWIN_OPEN_PAGE"]
+    ns.AttachTip(arrow, OPTION_TIP)
+    arrow:SetScript("OnClick", function() if O.ShowPage then O.ShowPage(jump) end end)
+    return box
+end
+
+local function ByLabel(a, b) return a[2] < b[2] end
+
 -- Every row of ns.TOGGLES on child, in list order. Returns the rows and their tree: rows[i], kids[key] (rows under that
 -- key), parentOf[key], heads[page] (a page's title row for search results).
 function O.BuildRows(child, colW)
     local rows, kids, parentOf, depthOf, heads = {}, {}, {}, {}, {}
-    local page, dropped = nil, {}
+    local page, dropped, pageOf, entryOf, laid = nil, {}, {}, {}, {}
+    for _, entry in ipairs(ns.TOGGLES) do
+        page = entry.group or page
+        pageOf[entry[1]], entryOf[entry[1]] = page, entry
+    end
+    -- A windows page's own windows get their rows in its list, not where the table lists them.
+    for _, entry in ipairs(ns.TOGGLES) do
+        for _, key in ipairs(entry.windows or EMPTY) do
+            if pageOf[key] == pageOf[entry[1]] then laid[key] = true end
+        end
+    end
+    page = nil
     local function Add(row, parent)
         row.parent, row.page = parent, page
         row.depth = parent and ((depthOf[parent] or 0) + 1) or 0
@@ -525,32 +554,48 @@ function O.BuildRows(child, colW)
             table.insert(kids[parent], row)
         end
     end
+    local function Head(title, parent)
+        local head = SubHead(child, title)
+        Add(head, parent)
+        head.keyLow, head.tipLow = "", ""
+    end
     for _, entry in ipairs(ns.TOGGLES) do
         if entry.group then
             page = entry.group
             heads[page] = heads[page] or GroupHead(child, page, colW - 8)
         end
-        if entry.sub then
-            local head = SubHead(child, entry.sub)
-            Add(head, entry.parent)
-            head.keyLow, head.tipLow = "", ""
+        if not laid[entry[1]] then
+            if entry.sub then Head(entry.sub, entry.parent) end
+            local dropGroup = entry.checks or entry.radio
+            if entry.drop and not dropped[dropGroup] then
+                dropped[dropGroup] = true
+                local row = entry.checks and DropCheckRow(child, dropGroup) or DropRow(child, dropGroup, entry.dropPanel)
+                row.needs, row.grayWhen, row.grayIf, row.grayTip = entry.needs, entry.grayWhen, entry.grayIf, entry.grayTip
+                Add(row, entry.parent)
+                row.text:SetWidth(colW - 14 - DROP_W - row.depth * INDENT)
+            elseif not entry.drop then
+                local box = Checkbox(child, entry[1], entry[2], entry[3], entry.radio)
+                box.needs, box.offBy, box.grayWhen = entry.needs, entry.offBy, entry.grayWhen
+                box.grayIf, box.grayTip, box.hideIf = entry.grayIf, entry.grayTip, entry.hideIf
+                if entry.search then box.keyLow = box.keyLow .. " " .. entry.search:lower() end
+                Add(box, entry.parent)
+                box.text:SetWidth(colW - 30 - box.depth * INDENT)
+            end
+            Extras(entry, child, colW, Add)
         end
-        local dropGroup = entry.checks or entry.radio
-        if entry.drop and not dropped[dropGroup] then
-            dropped[dropGroup] = true
-            local row = entry.checks and DropCheckRow(child, dropGroup) or DropRow(child, dropGroup, entry.dropPanel)
-            row.needs, row.grayWhen, row.grayIf, row.grayTip = entry.needs, entry.grayWhen, entry.grayIf, entry.grayTip
-            Add(row, entry.parent)
-            row.text:SetWidth(colW - 14 - DROP_W - row.depth * INDENT)
-        elseif not entry.drop then
-            local box = Checkbox(child, entry[1], entry[2], entry[3], entry.radio)
-            box.needs, box.offBy, box.grayWhen = entry.needs, entry.offBy, entry.grayWhen
-            box.grayIf, box.grayTip = entry.grayIf, entry.grayTip
-            if entry.search then box.keyLow = box.keyLow .. " " .. entry.search:lower() end
-            Add(box, entry.parent)
-            box.text:SetWidth(colW - 30 - box.depth * INDENT)
+        if entry.windows then
+            local list = {}
+            for _, key in ipairs(entry.windows) do
+                if entryOf[key] then list[#list + 1] = entryOf[key] end
+            end
+            table.sort(list, ByLabel)
+            for _, window in ipairs(list) do
+                local own = pageOf[window[1]]
+                local box = WindowRow(child, window, own ~= page and own or nil, colW)
+                Add(box)
+                if box.setting then box.keyLow, box.tipLow = "", "" end
+            end
         end
-        Extras(entry, child, colW, Add)
     end
     return { rows = rows, kids = kids, parentOf = parentOf, heads = heads }
 end

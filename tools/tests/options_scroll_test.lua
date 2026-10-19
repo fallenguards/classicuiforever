@@ -44,10 +44,11 @@ local search = Stub()
 search.GetText = function() return "" end
 search.hint, search.clear = Stub(), Stub()
 local frame = { search = search, page = "Action bars", panes = {}, pageTitle = Stub(), pageButtons = {}, homeButtons = {},
-    homeHint = Stub(), nav = {}, list = list, listChild = Stub(), listBar = bar }
+    homeHint = Stub(), nav = {}, list = list, listChild = Stub(), listBar = bar, pageNote = Stub() }
 
 local env = setmetatable({
     HOME = "Home", TITLE = "ClassicUI Forever", HOME_HEAD = 0, L = setmetatable({}, { __index = function(_, k) return k end }),
+    O = { PAGE_NOTES = {} }, NOTE_GAP = 8,
     FitList = function() end,
     PlaceRows = function(f) f.listBar:SetRange(RANGE) end,
 }, { __index = _G })
