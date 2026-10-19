@@ -178,6 +178,7 @@ local function ButtonRow(parent, key, label, tooltip, press, isOn, check)
         box:SetPoint("LEFT", button, "RIGHT", 4, 0)
         ns.DressStates(box, C .. "Up", C .. "Down", nil, C .. "Highlight", OPTION_BOX)
         box.label, box.tooltip = check[2], check[3]
+        box:SetMotionScriptsWhileDisabled(true)
         ns.AttachTip(box, OPTION_TIP)
         box:SetScript("OnClick", function(self) check[4](check[1], self:GetChecked() and true or false) end)
     end
@@ -218,6 +219,8 @@ local function Checkbox(parent, key, label, tooltip, radio)
     text:SetText(label)
     box.text = text
     box.toggle = true
+    -- Grayed boxes still show their tip, which says why.
+    box:SetMotionScriptsWhileDisabled(true)
     Describe(box, key, label, tooltip)
     box:SetScript("OnClick", BoxClick)
     return box
