@@ -48,8 +48,8 @@ function ns.DialogEdge(edge)
     return info
 end
 
--- how: bronze = false stays silver, base = {r, g, b, a} border grey for BronzeBackdrop,
--- bg and border colours applied after it, bgFirst sets bg before it.
+-- how: bronze = false stays silver, base = {r, g, b, a} border grey for BronzeBackdrop, grey = {r, g, b} its border
+-- with no theme, bg and border colours applied after it, bgFirst sets bg before it.
 function ns.Backdrop(frame, info, how)
     if not frame or not frame.SetBackdrop then return false end
     how = how or EMPTY
@@ -59,7 +59,7 @@ function ns.Backdrop(frame, info, how)
     if how.bronze ~= false then
         -- No base passes nil: BronzeBackdrop then keeps the frame's recorded grey.
         local base = how.base or EMPTY
-        ns.BronzeBackdrop(frame, base[1], base[2], base[3], base[4])
+        ns.BronzeBackdrop(frame, base[1], base[2], base[3], base[4], how.grey)
     end
     if bg and not how.bgFirst then ApplyColor(frame, "SetBackdropColor", bg) end
     if how.border then ApplyColor(frame, "SetBackdropBorderColor", how.border) end

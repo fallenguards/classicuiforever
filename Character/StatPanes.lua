@@ -18,9 +18,11 @@ local BAR_W, BAR_HOLD, FADE_IN, FADE_OUT = 4, 1, 0.1, 0.4
 -- Dropdown label frame sits mid-sheet (64 tall): a 24 head with 14 out all round shows ~21, pane wide.
 local HEAD_W, HEAD_H, HEAD_OUT = PANE_W, 24, 14
 local ROWS_TOP = HEAD_H + 4
--- The 2.x rounded list edge, left silver (a grey tint read dull).
-local PANE_BOX = { bg = { 0, 0, 0, 0.55 }, border = { 1, 1, 1, 1 } }
-local LIST_BOX = { bg = { 0, 0, 0, 0.55 }, bgFirst = true }
+-- The 2.x rounded list edge in Era's stat box grey with no theme (UI-Character-StatBackground's rim, 96 96 85, over
+-- the tooltip edge's 160); a theme tints it as its other boxes.
+local ERA_STAT_RIM = { 0.6, 0.6, 0.53 }
+local PANE_BOX = { bg = { 0, 0, 0, 0.55 }, grey = ERA_STAT_RIM }
+local LIST_BOX = { bg = { 0, 0, 0, 0.55 }, bgFirst = true, grey = ERA_STAT_RIM }
 local NA = _G.NOT_APPLICABLE or "N/A"
 
 -- Not a client section (it draws them as a separate block): our page, each line with its school icon.

@@ -176,7 +176,7 @@ end
 
 -- Border tinted to the theme; a window that greys its own border passes that grey to keep the depth.
 -- Edge sheets with a theme copy (dialog border, slider track) swap instead, keeping the fill colour.
-function ns.BronzeBackdrop(frame, r, g, b, a)
+function ns.BronzeBackdrop(frame, r, g, b, a, grey)
     if not frame or not frame.SetBackdropBorderColor then return end
     -- One taken off stays off: the options window inside the game's settings had its dialog back on each repaint (#203).
     if not frame.backdropInfo then return end
@@ -186,8 +186,11 @@ function ns.BronzeBackdrop(frame, r, g, b, a)
     end
     local plain = frame.backdropInfo
     if not base.info and plain and plain.edgeFile and BronzeCopy(plain.edgeFile) then base.info = { plain = plain } end
+    if grey then base.grey = grey end
     bordered[frame] = base
     local name = ThemeName()
+    -- No theme: a box may keep its own grey, as Era's stat boxes.
+    local rim = (not name and base.grey) or base
     if base.info and frame.SetBackdrop then
         local want = name and ThemedInfo(base.info, name) or base.info.plain
         if frame.backdropInfo ~= want then
@@ -196,12 +199,12 @@ function ns.BronzeBackdrop(frame, r, g, b, a)
             if fr then frame:SetBackdropColor(fr, fg, fb, fa) end
         end
         local tint = name and THEMES[name].colorCopies and THEMES[name].tint or ONE
-        frame:SetBackdropBorderColor(tint[1] * base[1], tint[2] * base[2], tint[3] * base[3], base[4])
+        frame:SetBackdropBorderColor(tint[1] * rim[1], tint[2] * rim[2], tint[3] * rim[3], base[4])
     elseif name then
         local tint = THEMES[name].tint
         frame:SetBackdropBorderColor(tint[1] * base[1], tint[2] * base[2], tint[3] * base[3], base[4])
     else
-        frame:SetBackdropBorderColor(base[1], base[2], base[3], base[4])
+        frame:SetBackdropBorderColor(rim[1], rim[2], rim[3], base[4])
     end
 end
 
