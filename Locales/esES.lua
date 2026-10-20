@@ -512,6 +512,7 @@ L["OPTWIN_HOW_THICK_THE_SWING_BARS"] = "El grosor del borde de las barras de gol
 L["OPTWIN_NAME_TEXT_SIZE"] = "Tamaño del texto del nombre"
 L["OPTWIN_POINTS_BIGGER_OR_SMALLER_THAN"] = "Puntos más o menos que el nombre propio de las placas del juego. 0 lo deja como está."
 L["OPTWIN_SEARCH_TOGGLES"] = "Buscar opciones"
+L["OPTWIN_SEARCH_PAGE"] = "Buscar en esta página"
 L["OPTWIN_TOGGLE_NONE"] = "Desactivar todo"
 L["OPTWIN_ALL_PAGES"] = "Todas las páginas"
 L["OPTWIN_ALL_NONE_CONFIRM"] = "Esto desactiva las opciones de todas las páginas, no solo de esta."

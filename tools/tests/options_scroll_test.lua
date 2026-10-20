@@ -43,7 +43,7 @@ end
 local search = Stub()
 search.GetText = function() return "" end
 search.hint, search.clear = Stub(), Stub()
-local frame = { search = search, page = "Action bars", panes = {}, pageTitle = Stub(), pageButtons = {}, homeButtons = {},
+local frame = { search = search, pageSearch = search, page = "Action bars", panes = {}, pageTitle = Stub(), pageButtons = {}, homeButtons = {},
     homeHint = Stub(), nav = {}, list = list, listChild = Stub(), listBar = bar, pageNote = Stub() }
 
 local env = setmetatable({

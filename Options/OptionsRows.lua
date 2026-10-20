@@ -92,10 +92,10 @@ function O.DialogWindow(name, y, strata, opts)
     return frame
 end
 
--- Lowercased once for the search: the name side (label, keywords, its section's title) and the tooltip.
+-- Lowercased once for the search: the name side (label, keywords, its section's title), the label alone, the tooltip.
 local function Describe(row, key, label, tooltip)
     row.key, row.label, row.tooltip = key, label, tooltip
-    row.keyLow, row.tipLow = label:lower(), (tooltip or ""):lower()
+    row.keyLow, row.nameLow, row.tipLow = label:lower(), label:lower(), (tooltip or ""):lower()
     ns.AttachTip(row, OPTION_TIP)
 end
 O.Describe = Describe

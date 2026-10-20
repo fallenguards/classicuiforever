@@ -1,6 +1,7 @@
 -- Offline test under Lua 5.4 for the options window's column blocks (Options/OptionsWindow.lua Blocks): a page's
 -- top-level heading keeps the rows after it in its block, so the columns never split a heading from its rows; a page
--- without one splits at any top-level row; All windows' rows for other pages' windows stay out of a search.
+-- without one splits at any top-level row; All windows' rows for other pages' windows stay out of a search; a page's
+-- own search keeps to that page.
 -- Run from the addon root: lua tools/tests/options_blocks_test.lua (CI runs every tools/tests/*_test.lua).
 -- luacheck: std lua54
 -- luacheck: ignore 111 112 113 212
@@ -21,9 +22,9 @@ assert(loadfile(ROOT .. "/Options/OptionsSearch.lua"))("ClassicUIForever", ns)
 local handle = assert(io.open(ROOT .. "/Options/OptionsWindow.lua", "r"))
 local source = handle:read("a"):gsub("\r\n", "\n")
 handle:close()
-local first = source:find("local function Blocks(built, text, page)", 1, true)
+local first = source:find("local function Blocks(built, text, page, pageOnly)", 1, true)
 local last = first and source:find("\nend\n", first, true)
-assert(first and last, "Blocks(built, text, page) is in Options/OptionsWindow.lua")
+assert(first and last, "Blocks(built, text, page, pageOnly) is in Options/OptionsWindow.lua")
 local env = setmetatable({ ns = ns, EMPTY = {} }, { __index = _G })
 local Blocks = assert(load(source:sub(first, last + 4) .. "\nreturn Blocks", "Blocks", "t", env))()
 
@@ -78,6 +79,15 @@ for _, block in ipairs(blocks) do
 end
 Check(shown.x and not shown["also:x"], "a search shows the window's own row, not its All windows copy")
 Check(not shown["sub:Own"], "a search shows no headings")
+
+-- A page's own search: that page's matches only, laid as the page lays them.
+blocks = Blocks(built, "one", "A", true)
+shown = {}
+for _, block in ipairs(blocks) do
+    for _, row in ipairs(block) do shown[row.key] = true end
+    Check(not block.head, "a page's own search puts no page titles over its rows")
+end
+Check(shown.a1 and not shown.b1, "a page's own search shows that page's rows only")
 
 if failed > 0 then
     print("options blocks: " .. failed .. " failures")

@@ -47,9 +47,10 @@ function ns.OptionMatchLevel(box, words)
 end
 
 -- Keys a search shows: each match and the boxes above it (its parents, and a box it needs with that one's parents), so
--- a match that is off can be switched on where it stands; never its section's other rows. No search: all.
-function ns.OptionSearchHits(boxes, matched, parentOf, searching)
-    local hit = {}
+-- a match that is off can be switched on where it stands; a match by its own name brings its options under it too, one
+-- by keywords never its section's other rows. No search: all.
+function ns.OptionSearchHits(boxes, matched, parentOf, searching, words)
+    local hit, named = {}, {}
     local function Up(key)
         while key and not hit[key] do
             hit[key] = true
@@ -61,6 +62,14 @@ function ns.OptionSearchHits(boxes, matched, parentOf, searching)
             hit[box.key] = true
             Up(parentOf[box.key])
             Up(box.needs)
+            if searching and box.nameLow and LooseIn(box.nameLow, words) then named[box.key] = true end
+        end
+    end
+    if next(named) then
+        for _, box in ipairs(boxes) do
+            local up = parentOf[box.key]
+            while up and not named[up] do up = parentOf[up] end
+            if up then hit[box.key] = true end
         end
     end
     return hit

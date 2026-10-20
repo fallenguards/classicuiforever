@@ -19,8 +19,9 @@ local HOME_HEAD, HOME = 30, {}
 -- The list inside the page box: under its title row, clear of the scroll bar.
 local LIST_X, LIST_TOP = PANE_X + 12, PANE_TOP + 38
 local LIST_W = PANE_W - 40
-local MATCH_DIM = 0.4
 local NOTE_GAP = 8
+-- A toggles page's foot: its Toggle none and Default toggles, the list ending above them; its own search at the top.
+local PAGE_FOOT, PAGE_FOOT_Y, PAGE_SEARCH_W = 32, 9, 190
 local LINE_COLOR = { 0.47, 0.47, 0.47, 0.63 }
 -- The 1.x options boxes: the tooltip edge in grey over a dark fill.
 local BOX_LOOK = { bg = { 0.15, 0.15, 0.15, 0.85 }, bgFirst = true, base = { 0.6, 0.6, 0.6, 1 } }
@@ -209,11 +210,11 @@ local function Sidebar(frame, pages)
     return y + 6
 end
 
--- The list's top under a reading page's header (headH), down to the box's foot.
-local function FitList(frame, headH)
+-- The list's top under a reading page's header (headH), down to the box's foot, less a toggles page's buttons (foot).
+local function FitList(frame, headH, foot)
     local list = frame.list
     ns.SetPointOnce(list, "TOPLEFT", frame, "TOPLEFT", LIST_X, -(LIST_TOP + headH))
-    list:SetSize(LIST_W, frame.listBottom - LIST_TOP - headH)
+    list:SetSize(LIST_W, frame.listBottom - LIST_TOP - headH - (foot or 0))
 end
 
 -- The window's foot (bottom): the page box and its list down to it.
@@ -235,7 +236,7 @@ local function PageArea(frame, bottom)
     title:SetPoint("TOPLEFT", box, "TOPLEFT", 14, -12)
     frame.pageTitle = title
     local reset = ns.PanelButton(box, L["OPTWIN_RESET_TOGGLES"], 110)
-    reset:SetPoint("TOPRIGHT", box, "TOPRIGHT", -12, -7)
+    reset:SetPoint("BOTTOMRIGHT", box, "BOTTOMRIGHT", -12, PAGE_FOOT_Y)
     reset:SetScript("OnClick", function()
         local data = { keys = frame:PageKeys(), numbers = NumberRows(frame.built.rows, frame.page) }
         StaticPopup_Show("FCUI_PAGE_RESET", frame.page, nil, data)
@@ -246,6 +247,10 @@ local function PageArea(frame, bottom)
     none:SetScript("OnClick", function() StaticPopup_Show("FCUI_PAGE_NONE", frame.page, nil, { keys = frame:PageKeys() }) end)
     Tip(none, L["OPTWIN_TOGGLE_NONE"], L["OPTWIN_PAGE_NONE_TIP"])
     frame.pageButtons = { none, reset }
+    -- This page's own search, where its buttons stood: only its rows (the sidebar's searches every page).
+    local find = ns.SearchBox(box, PAGE_SEARCH_W, L["OPTWIN_SEARCH_PAGE"])
+    find:SetPoint("TOPRIGHT", box, "TOPRIGHT", -16, -10)
+    frame.pageSearch = find
     -- The game's settings' home page (its ClassicUI Forever entry): every page's buttons in the header, the search
     -- under it, a line while it is empty.
     frame.homeButtons = {}
@@ -289,8 +294,8 @@ end
 
 -- Word starts in name, keywords or page title first, tooltip only when nothing matched those. A page shows its rows, each
 -- top-level row and its own with them a block for the columns; searching shows every page's matches with the boxes above
--- them, each page under its title, matches lit and the boxes above dimmed.
-local function Blocks(built, text, page)
+-- them, each page under its title, matches lit; pageOnly: a page's own search, its matches laid as the page lays them.
+local function Blocks(built, text, page, pageOnly)
     local words = {}
     for word in text:gmatch("%S+") do words[#words + 1] = word:gsub("%p", "%%%0") end
     local level, best = {}, 0
@@ -301,7 +306,8 @@ local function Blocks(built, text, page)
     local matched = {}
     for _, row in ipairs(built.rows) do matched[row] = best > 0 and level[row] == best end
     local searching = text ~= ""
-    local hit = ns.OptionSearchHits(built.rows, matched, built.parentOf, searching)
+    local hit = ns.OptionSearchHits(built.rows, matched, built.parentOf, searching, words)
+    local across = searching and not pageOnly
     local blocks, byPage, count = {}, {}, 0
     local function NewBlock(head)
         local block = { head = head, rows = head and 1 or 0 }
@@ -318,7 +324,7 @@ local function Blocks(built, text, page)
     local function AddKids(block, key)
         for _, other in ipairs(built.kids[key] or EMPTY) do
             if hit[other.key] then
-                if other.sub and not searching then block = NewBlock() end
+                if other.sub and not across then block = NewBlock() end
                 Push(block, other)
                 block = AddKids(block, other.key)
             end
@@ -328,29 +334,33 @@ local function Blocks(built, text, page)
     -- A page's top-level heading keeps the rows after it in its block, so the columns never split a heading from them.
     local section
     for _, row in ipairs(built.rows) do
-        local shown = hit[row.key] and (searching or row.page == page) and not (row.hideIf and row.hideIf())
+        local shown = hit[row.key] and (across or row.page == page) and not (row.hideIf and row.hideIf())
         if not shown then
             row:Hide()
         elseif not row.parent then
             -- Searching: one block per page under its title; a page: one per top-level row, or per heading's run.
-            local block = searching and byPage[row.page] or (not searching and not row.sub and section)
+            local block = across and byPage[row.page] or (not across and not row.sub and section)
             if not block then
-                block = NewBlock(searching and built.heads[row.page] or nil)
-                if searching then byPage[row.page] = block end
+                block = NewBlock(across and built.heads[row.page] or nil)
+                if across then byPage[row.page] = block end
             end
             Push(block, row)
             local last = AddKids(block, row.key)
-            if not searching and (row.sub or section) then section = last end
+            if not across and (row.sub or section) then section = last end
         end
     end
     return blocks, count, matched
 end
 
+local function Clean(box) return ((box:GetText() or ""):lower():gsub("^%s+", ""):gsub("%s+$", "")) end
+
 local function PlaceRows(frame)
     if not frame.built then return end
     local built = frame.built
-    local text = (frame.search:GetText() or ""):lower():gsub("^%s+", ""):gsub("%s+$", "")
-    local blocks, count, matched = Blocks(built, text, frame.page)
+    local text, own = Clean(frame.search), Clean(frame.pageSearch)
+    local pageOnly = text == "" and own ~= ""
+    if pageOnly then text = own end
+    local blocks, count, matched = Blocks(built, text, frame.page, pageOnly)
     for _, head in pairs(built.heads) do head:Hide() end
     -- Column-major, whole blocks in order: split where the taller column is shortest.
     local split, shortest, before = #blocks, math.huge, 0
@@ -365,10 +375,7 @@ local function PlaceRows(frame)
     local function Put(at, region, x)
         ns.SetPointOnce(region, "TOPLEFT", child, "TOPLEFT", column * colW + x, -at * ROW)
         region:Show()
-        if region.keyLow then
-            ns.SetAlphaIf(region, (text == "" or matched[region]) and 1 or MATCH_DIM)
-            O.ShowMatch(region, text ~= "" and matched[region] == true)
-        end
+        if region.keyLow then O.ShowMatch(region, text ~= "" and matched[region] == true) end
     end
     for i, block in ipairs(blocks) do
         if column < COLUMNS - 1 and i == split + 1 and row > 0 then column, row = column + 1, 0 end
@@ -395,7 +402,12 @@ local function Show(frame, keepScroll)
     frame.search.hint:SetShown(not searching)
     frame.search.clear:SetShown(searching)
     frame.pageTitle:SetText(searching and (_G.SEARCH or L["OPTWIN_SEARCH_TOGGLES"]) or home and TITLE or frame.page)
-    for _, button in ipairs(frame.pageButtons) do button:SetShown(not searching and not pane and not home) end
+    local toggles = not searching and not pane and not home
+    for _, button in ipairs(frame.pageButtons) do button:SetShown(toggles) end
+    local own = frame.pageSearch:GetText() or ""
+    frame.pageSearch:SetShown(toggles)
+    frame.pageSearch.hint:SetShown(own == "")
+    frame.pageSearch.clear:SetShown(own ~= "")
     for _, button in ipairs(frame.homeButtons) do button:SetShown(home) end
     frame.homeHint:SetShown(home and not searching)
     for name, other in pairs(frame.panes) do
@@ -409,7 +421,8 @@ local function Show(frame, keepScroll)
     local note = not searching and not pane and not home and O.PAGE_NOTES[frame.page]
     frame.pageNote:SetText(note or "")
     frame.pageNote:SetShown(note and true or false)
-    FitList(frame, pane and pane.headH or home and HOME_HEAD or note and math.ceil(frame.pageNote:GetStringHeight()) + NOTE_GAP or 0)
+    FitList(frame, pane and pane.headH or home and HOME_HEAD or note and math.ceil(frame.pageNote:GetStringHeight()) + NOTE_GAP or 0,
+        toggles and PAGE_FOOT or 0)
     local child = pane and pane.child or frame.listChild
     if frame.list:GetScrollChild() ~= child then frame.list:SetScrollChild(child) end
     frame.listChild:SetShown(not pane)
@@ -494,6 +507,8 @@ local function Build()
 
     function frame:ShowPage(page)
         self.page = page
+        -- A page's own search is that page's: a new page starts whole.
+        if self.pageSearch:GetText() ~= "" then self.pageSearch:SetText("") end
         if self.search:GetText() ~= "" then self.search:SetText("") else Show(self) end
     end
     -- This page's toggles, drop groups' items included.
@@ -509,6 +524,7 @@ local function Build()
     end
     function frame:Lay() Show(self) end
     frame.search:SetScript("OnTextChanged", function() Show(frame) end)
+    frame.pageSearch:SetScript("OnTextChanged", function() Show(frame) end)
 
     function frame:Refresh(keepScroll)
         -- The one box mirroring a game setting: read fresh.

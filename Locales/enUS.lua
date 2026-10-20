@@ -522,6 +522,7 @@ L["OPTWIN_HOW_THICK_THE_SWING_BARS"] = "How thick the swing bars' border is. 2 i
 L["OPTWIN_NAME_TEXT_SIZE"] = "Name text size"
 L["OPTWIN_POINTS_BIGGER_OR_SMALLER_THAN"] = "Points bigger or smaller than the game's own nameplate name. 0 keeps it as is."
 L["OPTWIN_SEARCH_TOGGLES"] = "Search toggles"
+L["OPTWIN_SEARCH_PAGE"] = "Search this page"
 L["OPTWIN_TOGGLE_NONE"] = "Toggle none"
 L["OPTWIN_ALL_PAGES"] = "All pages"
 L["OPTWIN_ALL_NONE_CONFIRM"] = "This turns off the toggles on every page, not only this one."

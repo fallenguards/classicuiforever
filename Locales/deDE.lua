@@ -512,6 +512,7 @@ L["OPTWIN_HOW_THICK_THE_SWING_BARS"] = "Wie dick der Rahmen der Schlagleisten is
 L["OPTWIN_NAME_TEXT_SIZE"] = "Größe des Namenstexts"
 L["OPTWIN_POINTS_BIGGER_OR_SMALLER_THAN"] = "Punkte größer oder kleiner als der eigene Plakettenname des Spiels. 0 lässt ihn, wie er ist."
 L["OPTWIN_SEARCH_TOGGLES"] = "Optionen durchsuchen"
+L["OPTWIN_SEARCH_PAGE"] = "Diese Seite durchsuchen"
 L["OPTWIN_TOGGLE_NONE"] = "Alle aus"
 L["OPTWIN_ALL_PAGES"] = "Alle Seiten"
 L["OPTWIN_ALL_NONE_CONFIRM"] = "Das schaltet die Optionen auf allen Seiten aus, nicht nur auf dieser."

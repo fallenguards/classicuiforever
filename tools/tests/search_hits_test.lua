@@ -1,6 +1,6 @@
 -- Offline tests for Options/OptionsSearch.lua under Lua 5.4: a search shows each match and the boxes above it (parents,
--- and a box it needs), never the rest of its section (a search for "dark" listed the whole theme section), so a match
--- that is off can be switched on where it shows.
+-- and a box it needs), so a match that is off can be switched on where it shows; a match by its own name brings its
+-- options too ("one bar" left out Modern page arrows), a keyword match never ("dark" listed the whole theme section).
 -- Run from the addon root: lua tools/tests/search_hits_test.lua (CI runs every tools/tests/*_test.lua).
 -- luacheck: std lua54
 
@@ -12,27 +12,28 @@ assert(loadfile(ROOT .. "/Options/OptionsSearch.lua"))("ClassicUIForever", ns)
 
 ------------------------------------------------------------------ the rows of the screenshot
 
--- key, parent, name side, needs
+-- key, parent, name side, needs, label
 local ROWS = {
-    { "bronzeTheme", nil, "custom theme custom skin color dark mode look" },
-    { "themeBronze", "bronzeTheme", "bronze look" },
-    { "themeCustom", "bronzeTheme", "custom color rgb hex color look" },
-    { "themeColor", "themeCustom", "color rgb hex color theme look" },
-    { "themeDark", "bronzeTheme", "dark look" },
-    { "themeDarkness", "themeDark", "dark black grey gray shade slider theme look" },
-    { "themeTextured", "bronzeTheme", "textured color texture textured flat solid plain stone grain look" },
-    { "texturedWindows", "themeTextured", "other windows look" },
-    { "themeIgnoreElite", "bronzeTheme", "ignore theme for elite frames look" },
-    { "classicBar", nil, "classic bar action bars" },
-    { "shadedBars", "classicBar", "shaded xp and reputation bars darker action bars" },
-    { "panels", nil, "panels look" },
-    { "classicTracking", "classicBar", "classic tracking button" },
-    { "trackingSameSize", "classicBar", "same size as tracking", "classicTracking" },
+    { "bronzeTheme", nil, "custom theme custom skin color dark mode look", nil, "custom theme" },
+    { "themeBronze", "bronzeTheme", "bronze look", nil, "bronze" },
+    { "themeCustom", "bronzeTheme", "custom color rgb hex color look", nil, "custom color" },
+    { "themeColor", "themeCustom", "color rgb hex color theme look", nil, "color" },
+    { "themeDark", "bronzeTheme", "dark look", nil, "dark" },
+    { "themeDarkness", "themeDark", "dark black grey gray shade slider theme look", nil, "darkness" },
+    { "themeTextured", "bronzeTheme", "textured color texture textured flat solid plain stone grain look", nil,
+        "textured color" },
+    { "texturedWindows", "themeTextured", "other windows look", nil, "other windows" },
+    { "themeIgnoreElite", "bronzeTheme", "ignore theme for elite frames look", nil, "ignore theme for elite frames" },
+    { "classicBar", nil, "classic bar action bars", nil, "classic bar" },
+    { "shadedBars", "classicBar", "shaded xp and reputation bars darker action bars", nil, "shaded xp and reputation bars" },
+    { "panels", nil, "panels look", nil, "panels" },
+    { "classicTracking", "classicBar", "classic tracking button", nil, "classic tracking button" },
+    { "trackingSameSize", "classicBar", "same size as tracking", "classicTracking", "same size as tracking" },
 }
 
 local boxes, kids, parentOf = {}, {}, {}
 for _, r in ipairs(ROWS) do
-    local box = { key = r[1], keyLow = r[3], tipLow = "", needs = r[4] }
+    local box = { key = r[1], keyLow = r[3], tipLow = "", needs = r[4], nameLow = r[5] }
     boxes[#boxes + 1] = box
     parentOf[r[1]] = r[2]
     if r[2] then
@@ -50,7 +51,7 @@ local function Search(text)
         if level[box] > best then best = level[box] end
     end
     for _, box in ipairs(boxes) do matched[box] = best > 0 and level[box] == best end
-    local hit = ns.OptionSearchHits(boxes, matched, parentOf, text ~= "")
+    local hit = ns.OptionSearchHits(boxes, matched, parentOf, text ~= "", words)
     local shown = {}
     for _, box in ipairs(boxes) do
         if hit[box.key] then shown[#shown + 1] = box.key end
@@ -72,6 +73,9 @@ Check("the matches and the boxes above them, no other rows of their sections", S
     "bronzeTheme themeDark themeDarkness classicBar shadedBars")
 Check("a nested match brings every box above it", Search("other windows"), "bronzeTheme themeTextured texturedWindows")
 Check("a match brings the box it needs", Search("same size"), "classicBar classicTracking trackingSameSize")
+Check("a match by its name brings its options", Search("textured"), "bronzeTheme themeTextured texturedWindows")
+Check("a section's name brings the section", Search("custom theme"),
+    "bronzeTheme themeBronze themeCustom themeColor themeDark themeDarkness themeTextured texturedWindows themeIgnoreElite")
 Check("no search shows everything", Search(""), table.concat((function()
     local all = {}
     for _, r in ipairs(ROWS) do all[#all + 1] = r[1] end

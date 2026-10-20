@@ -512,6 +512,7 @@ L["OPTWIN_HOW_THICK_THE_SWING_BARS"] = "Quanto è spesso il bordo delle barre de
 L["OPTWIN_NAME_TEXT_SIZE"] = "Dimensione del testo del nome"
 L["OPTWIN_POINTS_BIGGER_OR_SMALLER_THAN"] = "Punti in più o in meno rispetto al nome delle targhette del gioco. 0 lo lascia com'è."
 L["OPTWIN_SEARCH_TOGGLES"] = "Cerca opzioni"
+L["OPTWIN_SEARCH_PAGE"] = "Cerca in questa pagina"
 L["OPTWIN_TOGGLE_NONE"] = "Disattiva tutto"
 L["OPTWIN_ALL_PAGES"] = "Tutte le pagine"
 L["OPTWIN_ALL_NONE_CONFIRM"] = "Questo disattiva le opzioni di tutte le pagine, non solo di questa."
