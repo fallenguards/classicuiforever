@@ -39,7 +39,7 @@ RULES = ["CVAR", "CVARREAD", "CVARLOGIN", "CVARREG", "REGISTRY", "HOOK", "ONUPDA
          "LOADADDON", "EDITMODE", "EDITQUERY", "SETTLE",
          "PANELMGR", "SECRET", "WALK", "REGEVENTS", "EVENTFRAME", "POINTONCE", "SETIF", "THEME", "ONCEFLAG",
          "FRAMEFIELD", "GAMEMENU", "SHAREDART", "PLATES", "FORBIDDEN", "SYSBASE", "LAYOUTFIELD", "CLIENTKEY",
-         "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS", "DRAGPOINT", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "TOC"]
+         "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS", "DRAGPOINT", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "LOADORDER", "TOC"]
 # A hit of these on a line the change adds fails even within the baseline, so swapping one call for another fails.
 # SINCE, DEADNS, FRAMEFIELD, CVARLOGIN and THROTTLEFRAME stay count-only, so a kept line can still be rewritten.
 LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", "EDITMODE", "PANELMGR", "SEARCHBOX", "ADDONCHAR",
@@ -258,6 +258,8 @@ FIX = {
     "FORBIDDEN": "use ns.IsForbidden(object) (Core/Util.lua)",
     "DEADNS": "delete it, or add it to DEV_NAMES (ClassicUIForeverDev reads it) or KEPT_API (planned shared API) "
               "in tools/check.py",
+    "LOADORDER": "read it inside a function (at first use, or when shown), or define it in a file the .toc loads "
+                 "earlier",
     "UNDEFNS": "define it, or call the helper that exists (grep '^function ns.' Core/); a field set some other way "
                "goes in NS_DYNAMIC in tools/check.py",
     "REGISTRY": "use our own signal (ns.SignalSheetLaid pattern) or our own event frame (ns.RegisterEvents)",
@@ -1755,6 +1757,51 @@ def undefns_hits(corpus_lex):
     return hits
 
 
+def loadorder_hits(corpus_lex, funcs, toc_text):
+    """ns fields read while a file loads (outside any function) that only a later file, or a later line, defines: nil
+    then, and the rest of the file never runs (ns.options in Bar/BandShape.lua, 2026-10-20)."""
+    order = {}
+    for i, (_, entry) in enumerate(toc_entries(toc_text or "")):
+        order.setdefault(entry, i)
+    tops = {}
+    for path, lx in corpus_lex.items():
+        if path not in order:
+            continue
+        inside = set()
+        for start, end, _, _ in funcs[path]:
+            inside.update(range(start + 1, end + 1))
+        rows = []
+        for no, line in enumerate(lx.blank, 1):
+            if no in inside:
+                continue
+            m = re.search(r"\bfunction\b", line)
+            rows.append((no, line, line[:m.start()] if m else line))
+        tops[path] = rows
+    first = {}
+    for path, rows in tops.items():
+        for no, line, _ in rows:
+            names = {m.group(1) or m.group(2) for m in NS_DEF_ANY.finditer(line)}
+            m = NS_DEF_LIST.match(line)
+            if m:
+                names.update(NS_REF.findall(m.group(1)))
+            for name in names:
+                at = (order[path], no)
+                if name not in first or at < first[name]:
+                    first[name] = at
+    hits = {}
+    for path, rows in tops.items():
+        for no, line, text in rows:
+            listed = NS_DEF_LIST.match(line)
+            for m in NS_REF.finditer(text):
+                if re.match(r"\s*=(?!=)", text[m.end():]) or (listed and m.end() <= listed.end(1)):
+                    continue
+                name = m.group(1)
+                if name in first and first[name] > (order[path], no):
+                    hits.setdefault(path, []).append(
+                        ("LOADORDER", no, "ns.%s is read as the file loads, before any file defines it" % name))
+    return hits
+
+
 def toc_entries(text):
     directive = re.compile(r"\s+\[[^\]]*\]\s*$")
     for no, raw in enumerate(text.replace("\r\n", "\n").split("\n"), 1):
@@ -1921,7 +1968,7 @@ def toc_hits(tracked, toc_text):
 
 # ---------------------------------------------------------------------- driver
 
-def analyse(corpus):
+def analyse(corpus, toc_text=None):
     """Every hit for every file: {path: [(rule, line, message)]}."""
     lexed = {p: lex(t) for p, t in corpus.items()}
     funcs = {p: functions(lx) for p, lx in lexed.items()}
@@ -1942,6 +1989,8 @@ def analyse(corpus):
     for p, items in deadns_hits(lexed).items():
         hits[p].extend(items)
     for p, items in undefns_hits(lexed).items():
+        hits[p].extend(items)
+    for p, items in loadorder_hits(lexed, funcs, toc_text).items():
         hits[p].extend(items)
     return hits
 
@@ -2155,7 +2204,7 @@ def run(argv):
         tracked = [p for p in tracked if os.path.isfile(os.path.join(root, p))]
         tracked += [t for t in targets if t not in tracked]
 
-    hits = analyse(corpus)
+    hits = analyse(corpus, toc_text)
     counts = counts_of(hits)
 
     if mode == "update-baseline":

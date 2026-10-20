@@ -198,6 +198,7 @@ Existing violations are recorded per rule and per file in `tools/check-baseline.
 | DUP | 6 or more code lines (4 of them doing something) repeated elsewhere | move it to the shared layer |
 | DUPFN | a local function, or a module-table function outside Core/, Art/ and UI/, whose body (3 lines or more) matches any function in another file, `ns.` ones included (reported instead of DUP) | one `ns.` copy in the shared layer, or call the twin |
 | DEADNS | count-only: an `ns.` field defined but never read, unless listed in `DEV_NAMES` or `KEPT_API` | delete it, or list it there with its reason |
+| LOADORDER | an `ns.` field read outside any function (as the file loads) that only a file later in the .toc, or a later line, defines: it is nil then and the rest of the file never runs (`ns.options.TITLE` in Bar/BandShape.lua, 2026-10-20) | read it inside a function, at first use or when shown, or define it earlier |
 | TOC | an addon `.lua` missing from the .toc (untracked new files too), or a .toc entry that is not a file | fix the .toc |
 | EOL | a tracked file staged with CRLF line endings (its commit rewrites every line) | `git add --renormalize PATH`; `.gitattributes` keeps `* text=auto eol=lf` |
 | BASELINE | `--staged` only: a renamed file whose baseline entries still name the old path | `--carry-renames`, then stage the baseline |
