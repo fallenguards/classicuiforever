@@ -349,9 +349,9 @@ function B.LayoutPageArrows(bar)
     local pageX = CurrentPlan().base + (PAGE_X - ART_W / 2)
     local midY = (PAGE_UP_Y + PAGE_DOWN_Y) / 2
     pn:SetScale(BandNow())
-    -- Over the band's buttons but in their layer: a window or the full map that covers the bars covers these too.
+    -- Over the band's buttons and gryphons, in their layer: a window or the full map over the bars covers these too.
     ns.SetStrataIf(pn, "MEDIUM")
-    ns.SetLevelIf(pn, B.ButtonLevel() + PAGE_OVER_BUTTONS)
+    ns.SetLevelIf(pn, math.max(B.ButtonLevel(), B.CapLevel()) + PAGE_OVER_BUTTONS)
     -- Hide Bar Scrolling: the client hides them for it.
     pn:SetShown(BarSetting(bar, "HideBarScrolling") ~= 1)
     if B.ModernPages() then

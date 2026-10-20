@@ -82,10 +82,12 @@ function B.BuildArt()
     end
 end
 
+-- Gryphons over bars: their layer above every button slot (pet and stance slots stand near 73).
+function B.CapLevel() return ns.db.gryphonsOverBars and B.ButtonLevel() + 40 or CAP_LEVEL end
+
 function B.PaintArt()
     local art = B.art
-    -- Gryphons over bars: their layer above every button slot (pet and stance slots stand near 73).
-    ns.SetLevelIf(art.capLayer, ns.db.gryphonsOverBars and B.ButtonLevel() + 40 or CAP_LEVEL)
+    ns.SetLevelIf(art.capLayer, B.CapLevel())
     local segments = Segments()
     -- Hide Bar Art on Action Bar 1 drops its runs and the gryphons like the client's art; the micro menu's and the bags'
     -- runs go by their own Hide Bar Art. Buttons and the xp bar stay.
