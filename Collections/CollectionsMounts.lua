@@ -1,17 +1,28 @@
 local _, ns = ...
 
--- The Collections window's Mounts page: every mount this character may see, by ID (the game's journal keeps its own
--- filters and search); the picked one's creature in the model box, Mount or Dismount at its foot.
+-- The Collections window's Mounts page: the mounts the game's journal lists through its own filters (in the Filter
+-- menu); the picked one's creature in the model box, Mount or Dismount at its foot.
 
 local CW = ns.collections
 local MJ = C_MountJournal
 local IsSecret = ns.IsSecret
 
 local MOUNT_ICON = "Interface\\Icons\\Ability_Mount_RidingHorse"
+-- The game's mount types, by its menu's names.
+local TYPES = { { "Ground", "MOUNT_JOURNAL_FILTER_GROUND" }, { "Flying", "MOUNT_JOURNAL_FILTER_FLYING" },
+    { "Aquatic", "MOUNT_JOURNAL_FILTER_AQUATIC" }, { "Dragonriding", "MOUNT_JOURNAL_FILTER_DRAGONRIDING" },
+    { "RideAlong", "MOUNT_JOURNAL_FILTER_RIDEALONG" } }
+local searched = false
 
 local function List()
+    -- The game's own search would narrow its list past ours: cleared once.
+    if not searched and MJ.SetSearch then
+        searched = true
+        MJ.SetSearch("")
+    end
     local out = {}
-    for _, id in ipairs(MJ.GetMountIDs() or ns.EMPTY) do
+    for i = 1, MJ.GetNumDisplayedMounts() or 0 do
+        local id = MJ.GetDisplayedMountID(i)
         local name, spellID, icon, isActive, isUsable, _, _, _, _, hidden, collected = MJ.GetMountInfoByID(id)
         if type(name) == "string" and not IsSecret(name) and not hidden then
             out[#out + 1] = { id = id, name = name, icon = icon, spellID = spellID, active = isActive == true,
@@ -49,6 +60,33 @@ local function Pickup(entry)
     if C_Spell and C_Spell.PickupSpell and entry.spellID then C_Spell.PickupSpell(entry.spellID) end
 end
 
+local function CollectedRow(label, filter, after)
+    if not filter then return nil end
+    return CW.FilterCheck(label, function() return MJ.GetCollectedFilterSetting(filter) end,
+        function(on) MJ.SetCollectedFilterSetting(filter, on) end, after)
+end
+
+local function TypeName(i)
+    for _, row in ipairs(TYPES) do
+        local value = Enum.MountType and Enum.MountType[row[1]]
+        if value and value + 1 == i and MJ.IsValidTypeFilter(i) then return CW.GameName(row[2]) end
+    end
+end
+
+local function SourceName(i) return MJ.IsValidSourceFilter(i) and CW.GameName("BATTLE_PET_SOURCE_" .. i) or nil end
+
+local function FilterEntries(after)
+    return CW.Rows(
+        CollectedRow(CW.Text("COLLECTED", "COLL_COLLECTED"), _G.LE_MOUNT_JOURNAL_FILTER_COLLECTED, after),
+        CollectedRow(CW.Text("NOT_COLLECTED", "COLL_NOT_COLLECTED"), _G.LE_MOUNT_JOURNAL_FILTER_NOT_COLLECTED, after),
+        CollectedRow(CW.GameName("MOUNT_JOURNAL_FILTER_UNUSABLE"), _G.LE_MOUNT_JOURNAL_FILTER_UNUSABLE, after),
+        { divider = true },
+        CW.FilterSub(CW.GameName("MOUNT_JOURNAL_FILTER_TYPE"), MJ.SetAllTypeFilters,
+            Enum.MountTypeMeta and Enum.MountTypeMeta.NumValues, TypeName, MJ.IsTypeChecked, MJ.SetTypeFilter, after),
+        CW.FilterSub(CW.Text("SOURCES", "COLL_SOURCES"), MJ.SetAllSourceFilters, C_PetJournal.GetNumPetSources(), SourceName,
+            MJ.IsSourceChecked, MJ.SetSourceFilter, after))
+end
+
 local function Tip(entry)
     if GameTooltip.SetMountBySpellID and entry.spellID then
         GameTooltip:SetMountBySpellID(entry.spellID)
@@ -59,6 +97,8 @@ end
 
 CW.AddPage({
     key = "mounts", tab = 1, icon = MOUNT_ICON, tip = { "MOUNTS", "COLL_MOUNTS" },
-    events = { "NEW_MOUNT_ADDED", "MOUNT_JOURNAL_USABILITY_CHANGED", "COMPANION_UPDATE", "PLAYER_MOUNT_DISPLAY_CHANGED" },
-    List = List, Show = Show, Action = Action, Act = Act, Pickup = Pickup, Tip = Tip,
+    events = { "NEW_MOUNT_ADDED", "MOUNT_JOURNAL_USABILITY_CHANGED", "COMPANION_UPDATE", "PLAYER_MOUNT_DISPLAY_CHANGED",
+        "MOUNT_JOURNAL_SEARCH_UPDATED" },
+    List = List, Show = Show, Action = Action, Act = Act, Pickup = Pickup, Tip = Tip, Shown = CW.AllShown,
+    FilterEntries = FilterEntries,
 })

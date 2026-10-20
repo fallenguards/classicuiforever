@@ -111,11 +111,14 @@ end
 
 local PREV_UP, PREV_DOWN = ART.PAGE_PREV .. "Up", ART.PAGE_PREV .. "Down"
 local NEXT_UP, NEXT_DOWN = ART.PAGE_NEXT .. "Up", ART.PAGE_NEXT .. "Down"
+-- The arrows are file paths, never texture keys: set as files unless told raw.
+local FILE_FACE = { set = "file" }
 
 -- Open shows the back arrow, shut the forward one; dressed only on a change (.open on our own button).
 function ns.PanelToggleFace(button, open, how)
     if not button or button.open == open then return end
     button.open = open
+    how = how or FILE_FACE
     if open then
         DressStates(button, PREV_UP, PREV_DOWN, nil, nil, how)
     else

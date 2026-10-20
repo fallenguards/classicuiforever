@@ -32,6 +32,14 @@ local function MakeEdges()
     ns.OnToggle(QueuePlace)
 end
 
+-- A pad takes clicks only where its button does: a book tab's art reaches past its drawn tab. ratio: button to UIParent.
+local function CopyHitInsets(pad, button, ratio)
+    local l, r, t, b = button:GetHitRectInsets()
+    l, r, t, b = l * ratio, r * ratio, t * ratio, b * ratio
+    local pl, pr, pt, pb = pad:GetHitRectInsets()
+    if math.abs(pl - l) + math.abs(pr - r) + math.abs(pt - t) + math.abs(pb - b) > 0.5 then pad:SetHitRectInsets(l, r, t, b) end
+end
+
 -- target: the button pressed instead of the zone name, a macro text, or a function giving the macro text now (nil: no pad).
 -- when(): whether the pad is wanted now. editMode: wanted only while edit mode is open (else never then).
 MapPad = function(button, strata, after, target, when, editMode)
@@ -142,6 +150,7 @@ MapPad = function(button, strata, after, target, when, editMode)
             mapPad:SetFrameLevel(button:GetFrameLevel() + 5)
             mapPad:Show()
         end
+        CopyHitInsets(mapPad, button, ratio)
     end
     places[#places + 1] = Place
     MakeEdges()

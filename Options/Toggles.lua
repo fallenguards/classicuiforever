@@ -15,8 +15,8 @@ O.PAGE_NOTES = { [L["GROUP_ALL_WINDOWS"]] = L["OPTWIN_ALL_WINDOWS_NOTE"] }
 local SHOW_TIP = L["OPT_TIP_SHOW_HOVER_HIDE"]
 local GRYPHON_TIP = L["OPT_TIP_GRYPHON"]
 local function MinimapRotates() return ns.GetCVarBool("rotateMinimap") == true end
--- A list window left out while our own window of it takes its place (Forever): its box would do nothing.
-local function OursOn(key) return function() return ns.OnForever() and ns.db[key] ~= false end end
+-- A list window left out while our own window of it takes its place: its box would do nothing.
+local function OursOn(key) return function() return ns.db[key] ~= false end end
 -- Every window, one list sorted by name; a window whose box is on a page of its own shows here too, as the same setting.
 local ALL_WINDOWS = { "characterSheet", "spellBook", "talents", "professionsBook", "tradeSkill", "questLog", "worldMap",
     "bags", "collectionsWindow", "legacyWindow", "panelAchievements", "panelJournal", "panelCalendar", "panelMacros",
@@ -486,6 +486,19 @@ if not ns.ENGLISH_CLIENT then
     for _, row in ipairs(ENGLISH_ROWS) do ns.TOGGLES[#ns.TOGGLES + 1] = row end
 end
 
+-- Our collections window, after Talents on retail and after Legacy on Forever.
+-- With the preview's reset button: shown, on hover or hidden.
+local COLLECTIONS_ROWS = {
+    { "collectionsWindow", L["OPT_collectionsWindow"], L["OPT_collectionsWindow_TIP"],
+        search = "mounts pets toys heirlooms appearances wardrobe transmog journal" },
+    { "showCollReset", L["OPT_showCollReset"], L["OPT_collReset_TIP"], parent = "collectionsWindow", radio = "collResetShow",
+        drop = true, search = "reset button preview model turn zoom" },
+    { "hoverCollReset", L["OPT_hoverCollReset"], L["OPT_collReset_TIP"], parent = "collectionsWindow", radio = "collResetShow",
+        drop = true },
+    { "hideCollReset", L["OPT_hideCollReset"], L["OPT_collReset_TIP"], parent = "collectionsWindow", radio = "collResetShow",
+        drop = true },
+}
+
 -- Forever's Legacy system, after Talents; retail has none.
 local FOREVER_ROWS = {
     -- The key ring there: the round reagent bag beside it, or shown only on hover.
@@ -507,8 +520,6 @@ local FOREVER_ROWS = {
         { "legacyWindow", L["OPT_legacyWindow"], L["OPT_legacyWindow_TIP"], search = "legacy points perks tree challenges rewards track" },
         { "legacyThreePane", L["OPT_legacyThreePane"], L["OPT_legacyThreePane_TIP"], parent = "legacyWindow",
             search = "legacy three trees side by side triple pane tripane all trees" },
-        { "collectionsWindow", L["OPT_collectionsWindow"], L["OPT_collectionsWindow_TIP"],
-            search = "mounts pets toys heirlooms appearances wardrobe transmog journal" },
     },
     communitiesNoGuildTab = {
         { "groupFinder", L["OPT_groupFinder"], L["OPT_groupFinder_TIP"] },
@@ -518,6 +529,7 @@ local FOREVER_ROWS = {
 -- Retail's adventure guide and housing buttons, in the micro lists after Collections; Forever holds both off itself.
 -- Its difficulty flag after the coordinates; Forever's minimap has none.
 local RETAIL_ROWS = {
+    talents = COLLECTIONS_ROWS,
     -- No key ring: the reagent bag in its slot with the key's art or a bag's, before Full slot; or off the row.
     eraBagSize = {
         { "reagentBagKeyArt", L["OPT_reagentBagKeyArt"], L["OPT_reagentBagKeyArt_TIP"], needs = "classicBar",
@@ -552,6 +564,7 @@ local RETAIL_ROWS = {
             drop = true },
     },
 }
+for _, row in ipairs(COLLECTIONS_ROWS) do table.insert(FOREVER_ROWS.talents, row) end
 do
     local extra = ns.OnForever() and FOREVER_ROWS or RETAIL_ROWS
     for i = #ns.TOGGLES, 1, -1 do

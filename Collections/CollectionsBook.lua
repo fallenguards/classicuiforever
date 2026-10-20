@@ -13,6 +13,10 @@ local NARROW = { first = 66, step = 80, drawn = 74, overlap = -48 }
 local TAB_Y, ART_LEFT, ART_RIGHT = 61, 12, 350
 
 local B = {}
+local FOREVER = ns.OnForever()
+-- The professions window this page turns with: Forever's holds the book as a page, retail's book is a window of its own.
+local function ProfWindow() return FOREVER and _G.ProfessionsFrame or _G.ProfessionsBookFrame end
+local PROF_CLOSE = FOREVER and "ProfessionsFrameCloseButton" or "ProfessionsBookFrameCloseButton"
 
 local function PetTitle()
     return ns.SpellBookPetTitle and ns.SpellBookPetTitle() or nil
@@ -76,6 +80,11 @@ local function BuildTabs(frame)
         if i < 4 then tab:Show() end
         tabs[i] = tab
     end
+    -- Retail's book opens only for the player's press: the tab's secure pad presses the game's button, then this shuts.
+    if not FOREVER then
+        ns.MapPad(tabs[2], "HIGH", function() B.frame:Hide() end, "/click ProfessionMicroButton",
+            function() return B.frame:IsVisible() end)
+    end
     tabs[1]:SetText(SPELLBOOK or "Spellbook")
     tabs[2]:SetText(TRADE_SKILLS or "Professions")
     tabs[3]:SetText(L["SKILL_COLLECTIONS"])
@@ -91,7 +100,7 @@ local function OthersShut()
     local book = _G.ForeverClassicUISpellBook
     if book and book:IsShown() and book:GetAlpha() > 0 then ns.HideSpellBook() end
     if InCombatLockdown() then return end
-    local prof = _G.ProfessionsFrame
+    local prof = ProfWindow()
     if prof and prof:IsShown() then ns.HidePanel(prof) end
 end
 
@@ -103,7 +112,7 @@ local function WatchOthers()
             if shown and B.frame:IsShown() then B.frame:Hide() end
         end)
     end
-    local prof = _G.ProfessionsFrame
+    local prof = ProfWindow()
     if prof and not B.profWatched then
         B.profWatched = true
         ns.Sched.AfterShow(prof, "collections.book", function()
@@ -117,8 +126,8 @@ function CW.BookCloserLines()
     local lines = ""
     local book = _G.ForeverClassicUISpellBook
     if book and book:IsShown() then lines = "/click ForeverClassicUISpellBookLayerOff\n" end
-    local prof = _G.ProfessionsFrame
-    if prof and prof:IsShown() and _G.ProfessionsFrameCloseButton then lines = lines .. "/click ProfessionsFrameCloseButton\n" end
+    local prof = ProfWindow()
+    if prof and prof:IsShown() and _G[PROF_CLOSE] then lines = lines .. "/click " .. PROF_CLOSE .. "\n" end
     return lines ~= "" and lines or nil
 end
 

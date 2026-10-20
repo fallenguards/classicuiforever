@@ -255,7 +255,10 @@ Spells\BookPages.lua
 Collections\CollectionsMounts.lua
 Collections\CollectionsPets.lua
 Collections\CollectionsToys.lua
+Collections\CollectionsHeirlooms.lua
 Collections\CollectionsAppearances.lua
+Collections\CollectionsCampsites.lua
+Collections\CollectionsTeam.lua
 Options\Toggles.lua
 Options\Layout.lua
 Options\LayoutCopy.lua

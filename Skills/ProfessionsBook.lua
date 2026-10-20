@@ -76,6 +76,19 @@ end
 local FOREVER = ns.OnForever()
 -- The x the client gives a primary card's buttons from its left: Forever's from the foot, retail's from our 170's right.
 local CLIENT_BUTTON_X = FOREVER and 15 or 21
+-- Forever's fill hangs a primary card's pair from its foot at 10 and 60; retail's from its top right, the top one first,
+-- so a smaller button slid right and the page's spots missed it: hung as Forever's.
+local PAIR_LOW, PAIR_HIGH = 10, 60
+local function FromFoot(button, card)
+    local point, rel = button:GetPoint(1)
+    return point == "BOTTOMLEFT" and rel == card
+end
+local function HangPair(card)
+    local first, second = card.SpellButton1, card.SpellButton2
+    if FOREVER or not (first and second) then return end
+    if not FromFoot(first, card) then ns.SetPointOnce(first, "BOTTOMLEFT", card, "BOTTOMLEFT", CLIENT_BUTTON_X, PAIR_LOW) end
+    if not FromFoot(second, card) then ns.SetPointOnce(second, "BOTTOMLEFT", card, "BOTTOMLEFT", CLIENT_BUTTON_X, PAIR_HIGH) end
+end
 
 -- What the client draws on a card, faded (see FadeCard); both clients' names.
 local CARD_ART = { "Background", "ProfessionName", "professionName", "specialization", "missingHeader", "missingText", "Rank",
@@ -438,6 +451,7 @@ function T.PlaceCards()
             card:SetSize(170, PRIMARY_H)
             ns.SetPointOnce(card, "TOPLEFT", content, "TOPLEFT", spec.rowX + spec.spellX - CLIENT_BUTTON_X, y - (spec.cardDrop or 5))
             FadeCard(card)
+            HangPair(card)
             DressSpellButton(card.SpellButton1)
             DressSpellButton(card.SpellButton2)
             SizeSpell(card.SpellButton1, spec)
@@ -586,6 +600,7 @@ function T.TightenSpells()
     for i = 1, 2 do
         local card = Card(content, "PrimaryProfession" .. i)
         local first, second = card and card.SpellButton1, card and card.SpellButton2
+        if card then HangPair(card) end
         if spec.centerSpells and rows[i] then
             CenterSpells(rows[i], spec, first, second)
         elseif first and second and first:IsShown() and second:IsShown() then

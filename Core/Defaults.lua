@@ -74,6 +74,7 @@ ns.DB_DEFAULTS = {
     talentsSqueeze = false,
     legacyWindow = true,
     collectionsWindow = true,
+    showCollReset = true, hoverCollReset = false, hideCollReset = false,
     legacyThreePane = false,
     professionTabs = false,
     professionTabsHover = true,

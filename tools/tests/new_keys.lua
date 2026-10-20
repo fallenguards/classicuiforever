@@ -219,5 +219,8 @@ return {
         .. "(Bar/Band.lua KeepReagentSlot) turns it off where Full slot was picked",
     reagentBagSquished = "same for everyone: opt-in, off by default",
     reagentBagHidden = "same for everyone: opt-in, off by default",
+    showCollReset = "same for everyone: on by default, the preview's reset button as it came",
+    hoverCollReset = "same for everyone: opt-in, off by default",
+    hideCollReset = "same for everyone: opt-in, off by default",
     levelUpBanner = "off for everyone, a restyle: the game's level-up banners go, as 1.x had none; checked brings them back",
 }

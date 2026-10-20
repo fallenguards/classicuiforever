@@ -218,7 +218,8 @@ local Picker = {
 }
 
 CW.AddPage({
-    key = "appearances", tab = 4, icon = APPEARANCES_ICON, tip = { "WARDROBE", "COLL_APPEARANCES" },
+    -- After Heirlooms on retail, as the game's window has them.
+    key = "appearances", tab = ns.OnForever() and 4 or 5, pan = true, icon = APPEARANCES_ICON, tip = { "WARDROBE", "COLL_APPEARANCES" },
     events = { "TRANSMOG_COLLECTION_UPDATED", "TRANSMOG_COLLECTION_SOURCE_ADDED", "TRANSMOG_COLLECTION_SOURCE_REMOVED" },
     List = List, Fill = Fill, Show = Show, Action = Action, Tip = Tip, Shown = Shown, FilterEntries = FilterEntries,
     Picker = Picker,

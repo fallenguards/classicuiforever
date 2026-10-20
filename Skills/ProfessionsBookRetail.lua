@@ -40,6 +40,7 @@ local function Pass()
             state.placed = T.PlaceCards() or state.placed
             state.dirty = false
         end
+        if state.placed then T.TightenSpells() end
         -- The tabs' pads are secure: made and placed out of combat.
         state.sizeButton(true)
         T.BookTabs()
