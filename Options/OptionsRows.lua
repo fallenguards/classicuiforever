@@ -437,7 +437,8 @@ local function SubHead(parent, title)
 end
 
 -- One bar's pairings under it, each the same setting as its own row elsewhere: key, the pairing it needs.
-local ONE_BAR_PAIRS = { { "hideLatencyBar" }, { "keyRingWithBags" }, { "hideMicroArt" }, { "hideBagsArt" },
+local ONE_BAR_PAIRS = { { "hideLatencyBar" }, { "keyRingWithBags" }, { "keyRingArtHidden" }, { "hideMicroArt" },
+    { "hideBagsArt" },
     { "bagsTight", "hideBagsArt" } }
 
 -- A box for a toggle laid in its own place too (also:key): the same setting; a search finds that row, not this one.

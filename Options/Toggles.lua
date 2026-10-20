@@ -432,6 +432,8 @@ ns.TOGGLES = {
     { "hideKeyRing", L["OPT_hideKeyRing"], L["OPT_hideKeyRing_TIP"], needs = "classicBar" },
     { "keyRingWithBags", L["OPT_keyRingWithBags"], L["OPT_keyRingWithBags_TIP"], needs = "classicBar",
         search = "key ring keys keyring bags lump together" },
+    { "keyRingArtHidden", L["OPT_keyRingArtHidden"], L["OPT_keyRingArtHidden_TIP"], needs = "classicBar",
+        search = "key ring keys keyring art frame" },
     { "eraBagSize", L["OPT_eraBagSize"], L["OPT_eraBagSize_TIP"], needs = "classicBar", search = "bags big large 37" },
     { "reagentBagSlot", L["OPT_reagentBagSlot"], L["OPT_reagentBagSlot_TIP"], needs = "classicBar", radio = "reagentBag",
         drop = true, dropTip = L["OPT_reagentBag_TIP"] },
