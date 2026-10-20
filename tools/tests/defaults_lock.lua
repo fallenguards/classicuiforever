@@ -120,6 +120,8 @@ return {
     hideCombatGlow = false,
     hideGryphonLeft = false,
     hideGryphonRight = false,
+    hideItemQuality = false,
+    hideJunkCoin = false,
     hideKeyRing = false,
     hideKeyText = false,
     hideLastNames = false,

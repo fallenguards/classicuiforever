@@ -296,10 +296,15 @@ local function EmptyLook(button)
     if button.icon then button.icon:SetAlpha(button.hasItem and 1 or 0) end
 end
 
--- Plain quest items: the client only sets the quest border's file and shows it, so a faded one stays faded.
+-- A slot's marks, each off by its option (quest border, quality border, a vendor's junk coin); the game only shows them.
+local function Mark(region, off)
+    if region then ns.SetAlphaIf(region, off and 0 or 1) end
+end
 function ns.QuestItemLook(button)
-    local quest = button.IconQuestTexture
-    if quest then ns.SetAlphaIf(quest, ns.db and ns.db.plainQuestItems == true and 0 or 1) end
+    local db = ns.db or {}
+    Mark(button.IconQuestTexture, db.plainQuestItems == true)
+    Mark(button.IconBorder, db.hideItemQuality == true)
+    Mark(button.JunkIcon, db.hideJunkCoin == true)
 end
 
 local function SlotArt(button)
@@ -314,8 +319,7 @@ local function SlotArt(button)
     ns.Dress(button:GetNormalTexture(), ns.ART.QUICKSLOT, QUICK_RING_64, button)
 end
 
--- The sheet has a socket in every grid place: a short last row gets one patch of
--- plain leather over the empty ones, short of the bars above and beside.
+-- A socket in every grid place: a short last row gets one leather patch over the empty ones, short of the bars.
 local BLANK_L, BLANK_R, BLANK_T, BLANK_B = 110 / 256, 158 / 256, 126 / 512, 160 / 512
 local BLANK_H = 37
 
@@ -331,8 +335,7 @@ local function Blank(frame, i)
     return p.blanks[i]
 end
 
--- Bags fill from the bottom right, leftward then up (1.x); the combined bag reads
--- like a page, gaps at the bottom right. Anchors are written only when they differ.
+-- Bags fill from the bottom right, leftward then up (1.x); the combined bag reads like a page, gaps at the bottom right.
 local function Place(region, index, dx, dy, frame, columns, rows, count, combined, backpackExtra)
     local column, row
     if combined then
@@ -460,8 +463,7 @@ local function GamepadBarOff()
     return bar
 end
 
--- The sort button near the client's 28 x 26, its foot clear of the top row (51 down); the fixed-size hover glow (24 x 23)
--- cut to match.
+-- The sort button near the client's 28 x 26, its foot clear of the top row (51 down); its hover glow (24 x 23) to match.
 local SORT_W, SORT_H, SORT_GLOW_W, SORT_GLOW_H = 24, 22, 21, 20
 local function PlaceSearch(frame)
     if BagItemSearchBox and BagItemSearchBox:GetParent() == frame then
@@ -756,8 +758,9 @@ end
 local RESKIN = { hideLockedSlots = true, reagentBagCombined = true, reagentBagTint = true, reagentSlotsFirst = true,
     reagentSlotsLast = true, oneBagSplitNone = true, oneBagSplitType = true, oneBagSplitBag = true, oneBagKeyring = true,
     oneBagBagSlots = true }
+local MARKS = { plainQuestItems = true, hideItemQuality = true, hideJunkCoin = true }
 ns.OnToggle(function(key)
-    if (key ~= "plainQuestItems" and not RESKIN[key]) or not active then return end
+    if (not MARKS[key] and not RESKIN[key]) or not active then return end
     for _, frame in ipairs(Frames()) do
         if frame:IsShown() and frame.EnumerateValidItems then
             if RESKIN[key] then

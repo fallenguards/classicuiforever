@@ -400,6 +400,10 @@ ns.TOGGLES = {
 
     { "bags", L["OPT_bags"], L["OPT_bags_TIP"], group = L["GROUP_BAGS"], needs = "panels" },
     { "plainQuestItems", L["OPT_plainQuestItems"], L["OPT_plainQuestItems_TIP"], parent = "bags", search = "quest border glow" },
+    { "hideItemQuality", L["OPT_hideItemQuality"], L["OPT_hideItemQuality_TIP"], parent = "bags",
+        search = "quality border rarity color colour green blue purple item frame" },
+    { "hideJunkCoin", L["OPT_hideJunkCoin"], L["OPT_hideJunkCoin_TIP"], parent = "bags",
+        search = "junk trash vendor gray grey coin sell indicator" },
     { "hideLockedSlots", L["OPT_hideLockedSlots"], L["OPT_hideLockedSlots_TIP"], parent = "bags", search = "authenticator 2fa padlock backpack" },
     { "oneBag", L["OPT_oneBag"], L["OPT_oneBag_TIP"] },
     { "reagentBagCombined", L["OPT_reagentBagCombined"], L["OPT_reagentBagCombined_TIP"], parent = "oneBag",
