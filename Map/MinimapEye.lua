@@ -24,6 +24,7 @@ local lookUntil = 0
 local over, face  -- our look over the game's eye, and its Era eye
 local frame = 0
 local snapped = false   -- the eye's points ours (on the rim) until edit mode's go back
+local rimX, rimY        -- its offsets there
 
 -- Era's LFG-Eye sheet frame n (0 to 28) on tex, cropped as c crops its first frame. The group finder's portrait too.
 function ns.EraEyeFrame(tex, n, c)
@@ -38,6 +39,11 @@ local function Turn()
     local still = ns.EditMode.state or (eye and eye.Eye and eye.Eye.IsStaticMode and eye.Eye:IsStaticMode())
     frame = still and 0 or (frame + 1) % FRAMES
     ns.EraEyeFrame(face, frame, ns.ERA_EYE.coords)
+end
+
+-- Edit mode drags the eye by its selection box: the eye itself never reads as dragged.
+local function Dragged(eye)
+    return eye.Selection ~= nil and eye.Selection:IsDragging() or false
 end
 
 local function EyeMoved(eye)
@@ -69,9 +75,10 @@ local function EditModeCenter(eye)
 end
 
 -- The rim's angle: toward edit mode's place, or at its default Era's spot (or the angle an older version kept for our
--- icon there).
+-- icon there, until the eye is placed in edit mode: then its reset is Era's spot).
 local function SnapAngle(eye)
     if not EyeMoved(eye) then return ns.db.lfgButtonAngle or ERA_ANGLE end
+    ns.db.lfgButtonAngle = nil
     local x, y = EditModeCenter(eye)
     local mx, my = Minimap:GetCenter()
     local mk = ns.WindowRatio(Minimap)
@@ -123,8 +130,7 @@ local function PlaceEye()
     if eye.Selection and eye.Selection.SetFrameStrata and eye.Selection:GetFrameStrata() ~= "HIGH" then
         eye.Selection:SetFrameStrata("HIGH")
     end
-    local dragging = eye.IsDragging and eye:IsDragging()
-    if dragging or InCombatLockdown() then return end
+    if Dragged(eye) or InCombatLockdown() then return end
     if eye:GetParent() ~= UIParent then eye:SetParent(UIParent) end
     Decide(eye)
     if ns.db.eyeSnapMinimap == false then
@@ -135,6 +141,7 @@ local function PlaceEye()
             local k = eye:GetEffectiveScale() / Minimap:GetEffectiveScale()
             ns.RingPoint(eye, angle, Minimap:GetWidth() / 2 + RIM_OUT, k)
             snapped = true
+            rimX, rimY = select(4, eye:GetPoint(1))
         end
     end
     -- Our icon rides the eye: its spot and size follow.
@@ -217,6 +224,11 @@ local function AnchorSig(eye)
     return info.offsetX or 0, info.offsetY or 0
 end
 
+-- The game lays the eye again at its own spot, with no event (a minimap scale change, the micro menu's layout, a queue).
+local function OffRim(eye)
+    return snapped and ns.IsAt(eye, "CENTER", Minimap, "CENTER", rimX, rimY, 0.01) ~= true
+end
+
 -- No events for moves, resets or size changes in edit mode: poll there. The settings dialog shows only in edit mode.
 local function EyeTick(job, now)
     local editing = ns.EditMode.state
@@ -224,11 +236,11 @@ local function EyeTick(job, now)
     local eye = QueueStatusButton
     if MM.active and eye then
         local moved, scale = EyeMoved(eye), eye:GetEffectiveScale()
-        local dragging = eye.IsDragging and eye:IsDragging() or false
+        local dragging = Dragged(eye)
         local ax, ay = AnchorSig(eye)
         local icon = ns.GroupFinderIcon()
         if moved ~= job.moved or scale ~= job.scale or dragging ~= job.dragging or ax ~= job.ax or ay ~= job.ay
-            or icon ~= job.icon then
+            or icon ~= job.icon or (not dragging and OffRim(eye)) then
             job.moved, job.scale, job.dragging, job.ax, job.ay, job.icon = moved, scale, dragging, ax, ay, icon
             PlaceEye()
         end
@@ -259,6 +271,8 @@ function MM.WatchEye()
     events:SetScript("OnEvent", EyeEvent)
     ns.RegisterEvents(events, EYE_EVENTS)
     ns.OnEditMode(EditEdge)
+    -- Its move wakes the watch, which puts it back on the rim.
+    if QueueStatusButton then ns.Sched.OnMove(QueueStatusButton, EyeEvent) end
     SetEyeWatch(true)
 end
 
