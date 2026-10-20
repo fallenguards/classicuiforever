@@ -3,6 +3,18 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN44_1_TITLE"] = "Temas en un color"
+L["WN44_1_TEXT"] = "Los temas ahora dibujan todo en un solo color uniforme por defecto, como un modo oscuro. Para devolver las texturas a las partes que elijas, activa Color con textura en las opciones (/fcui), en Aspecto; Con tema elige qué partes toman el tema. El pergamino también toma el tema, con texto claro sobre una página oscura. Si ya usabas un tema, tu aspecto se conserva."
+L["WN44_2_TITLE"] = "Monedas clásicas"
+L["WN44_2_TEXT"] = "El oro, la plata y el cobre muestran las monedas redondas de Era en tus bolsas, en los vendedores, en el correo, las misiones y las descripciones. Desmarca Monedas clásicas en las opciones (/fcui), en Aspecto, para las modernas."
+L["WN44_3_TITLE"] = "Una barra"
+L["WN44_3_TEXT"] = "Una barra ahora también oculta la barra de latencia y pone el llavero con las bolsas mediante sus propias opciones, así que ambos pueden volver. Flechas de página modernas muestra las flechas pequeñas de página del juego sobre el grifo izquierdo; está desactivada por defecto, actívala en las opciones, en Una barra."
+L["WN44_4_TITLE"] = "Bolsas"
+L["WN44_4_TEXT"] = "Ocultar bordes de calidad y Ocultar moneda de chatarra quitan a tus objetos los bordes de color de su calidad y la moneda de oro del vendedor. Ambas están desactivadas por defecto; actívalas en las opciones, en Bolsas."
+L["WN44_5_TITLE"] = "Minimapa"
+L["WN44_5_TEXT"] = "Ocultar bordes de botones tiene un desplegable Botones para elegir qué botones pierden su anillo, el botón de minimapa de cada accesorio puede tener su propia elección, y el ojo del buscador de grupos se queda en el borde del minimapa."
+L["WN44_6_TITLE"] = "Correcciones"
+L["WN44_6_TEXT"] = "Una placa de nombre en la que haces clic mantiene su nombre amarillo mientras el ratón sigue encima. Una opción oculta el encabezado Todos los objetivos del seguimiento, las opciones tienen una página Todas las ventanas, y lo elegido en los desplegables de estadísticas sigue a los perfiles."
 L["WN43_1_TITLE"] = "Minimapa cuadrado"
 L["WN43_1_TEXT"] = "Minimapa cuadrado hace el mapa cuadrado, con el metal del borde redondo, y los botones del borde siguen el canto. Está desactivado por defecto, actívalo en las opciones (/fcui), en Minimapa. Mientras Rotar minimapa del juego esté activado, el mapa sigue redondo."
 L["WN43_2_TITLE"] = "Minimapa"

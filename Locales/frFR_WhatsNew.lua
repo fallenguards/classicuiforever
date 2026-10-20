@@ -3,6 +3,18 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN44_1_TITLE"] = "Thèmes d'une seule couleur"
+L["WN44_1_TEXT"] = "Les thèmes dessinent désormais tout d'une seule couleur unie par défaut, comme un mode sombre. Pour rendre les textures aux parties choisies, activez Couleur texturée dans les options (/fcui), sous Apparence. Avec thème choisit quelles parties prennent le thème. Le parchemin prend aussi le thème, avec un texte clair sur une page sombre. Si vous utilisiez déjà un thème, votre apparence est conservée."
+L["WN44_2_TITLE"] = "Pièces classiques"
+L["WN44_2_TEXT"] = "L'or, l'argent et le cuivre montrent les pièces rondes de Classic Era dans vos sacs, chez les marchands, dans le courrier, les quêtes et les infobulles. Décochez Pièces classiques dans les options (/fcui), sous Apparence, pour les modernes."
+L["WN44_3_TITLE"] = "Une seule barre"
+L["WN44_3_TEXT"] = "Une seule barre masque aussi la barre de latence et place le trousseau avec les sacs par leurs propres options, qui les rétablissent. Flèches de page modernes montre les petites flèches de page du jeu sur le griffon gauche. Elle est désactivée par défaut, activez-la dans les options, sous Une seule barre."
+L["WN44_4_TITLE"] = "Sacs"
+L["WN44_4_TEXT"] = "Masquer les bordures de qualité et Masquer la pièce de camelote retirent de vos objets les bordures colorées de qualité et la pièce d'or du marchand. Les deux sont désactivées par défaut, activez-les dans les options, sous Sacs."
+L["WN44_5_TITLE"] = "Minicarte"
+L["WN44_5_TEXT"] = "Masquer les bordures des boutons a une liste Boutons pour choisir quels boutons perdent leur anneau, le bouton de minicarte de chaque addon peut avoir son propre choix, et l'œil de la recherche de groupe reste sur le bord de la minicarte."
+L["WN44_6_TITLE"] = "Corrections"
+L["WN44_6_TEXT"] = "Une barre d'info cliquée garde son nom jaune tant que la souris reste dessus. Une option masque l'en-tête Tous les objectifs du suivi, les options ont une page Toutes les fenêtres, et les choix des listes de statistiques suivent les profils."
 L["WN43_1_TITLE"] = "Minicarte carrée"
 L["WN43_1_TEXT"] = "Minicarte carrée rend la carte carrée, dans le métal de la bordure ronde, les boutons de la bordure suivant son bord. Elle est désactivée par défaut, activez-la dans les options (/fcui), sous Minicarte. Tant que Rotation de la minicarte du jeu est activée, la carte reste ronde."
 L["WN43_2_TITLE"] = "Minicarte"

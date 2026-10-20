@@ -3,6 +3,18 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN44_1_TITLE"] = "Themen in einer Farbe"
+L["WN44_1_TEXT"] = "Themen zeichnen jetzt standardmäßig alles in einer gleichmäßigen Farbe, wie ein Dunkelmodus. Um Texturen für gewählte Teile zurückzuholen, schalte Mit Textur in den Optionen (/fcui) unter Aussehen ein; Mit Thema wählt, welche Teile das Thema überhaupt annehmen. Auch Pergament nimmt das Thema an, mit hellem Text auf dunkler Seite. Wer schon ein Thema nutzte, behält sein Aussehen."
+L["WN44_2_TITLE"] = "Klassische Münzen"
+L["WN44_2_TEXT"] = "Gold, Silber und Kupfer zeigen die runden Münzen von Era in Taschen, bei Händlern, in Post, Quests und Tooltips. Entferne den Haken bei Klassische Münzen in den Optionen (/fcui) unter Aussehen für die modernen."
+L["WN44_3_TITLE"] = "Eine Leiste"
+L["WN44_3_TEXT"] = "Eine Leiste blendet jetzt auch die Latenzleiste aus und stellt den Schlüsselbund zu den Taschen, über deren eigene Optionen, also kann beides zurückkommen. Moderne Seitenpfeile zeigt die kleinen Seitenpfeile des Spiels auf dem linken Greif; es ist standardmäßig aus, schalte es in den Optionen unter Eine Leiste ein."
+L["WN44_4_TITLE"] = "Taschen"
+L["WN44_4_TEXT"] = "Qualitätsrahmen ausblenden und Schrottmünze ausblenden nehmen deinen Gegenständen die farbigen Qualitätsrahmen und die goldene Münze beim Händler. Beide sind standardmäßig aus, schalte sie in den Optionen unter Taschen ein."
+L["WN44_5_TITLE"] = "Minikarte"
+L["WN44_5_TEXT"] = "Tastenrahmen ausblenden hat ein Auswahlmenü Tasten, um zu wählen, welche Tasten ihren Ring verlieren, die Minikartentaste jedes Addons kann eine eigene Wahl haben, und das Auge der Gruppensuche bleibt am Rand der Minikarte."
+L["WN44_6_TITLE"] = "Behoben"
+L["WN44_6_TEXT"] = "Ein angeklicktes Namensschild behält seinen gelben Namen, solange die Maus darauf ist. Eine Option blendet die Überschrift Alle Ziele der Questverfolgung aus, die Optionen haben eine Seite Alle Fenster, und die Werte der Statusauswahl folgen den Profilen."
 L["WN43_1_TITLE"] = "Eckige Minikarte"
 L["WN43_1_TEXT"] = "Eckige Minikarte macht die Karte eckig, im Metall des runden Rands, die Tasten am Rand folgen der Kante. Sie ist standardmäßig aus, schalte sie in den Optionen (/fcui) unter Minikarte ein. Solange Minikarte drehen im Spiel an ist, bleibt die Karte rund."
 L["WN43_2_TITLE"] = "Minikarte"

@@ -3,6 +3,18 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN44_1_TITLE"] = "Temi in un colore"
+L["WN44_1_TEXT"] = "I temi ora disegnano tutto in un unico colore uniforme in modo predefinito, come una modalità scura. Per riportare le trame sulle parti scelte, attiva Colore con trama nelle opzioni (/fcui), in Aspetto. Con tema sceglie quali parti prendono il tema. Anche la pergamena prende il tema, con testo chiaro su pagina scura. Se usavi già un tema, il tuo aspetto resta."
+L["WN44_2_TITLE"] = "Monete classiche"
+L["WN44_2_TEXT"] = "Oro, argento e rame mostrano le monete rotonde di Era nelle borse, dai mercanti, nella posta, nelle missioni e nei suggerimenti. Togli la spunta a Monete classiche nelle opzioni (/fcui), in Aspetto, per quelle moderne."
+L["WN44_3_TITLE"] = "Una barra"
+L["WN44_3_TEXT"] = "Una barra ora nasconde anche la barra della latenza e mette il portachiavi con le borse tramite le loro opzioni, quindi entrambi possono tornare. Frecce di pagina moderne mostra le piccole frecce di pagina del gioco sul grifone sinistro; è disattivata in modo predefinito, attivala nelle opzioni, in Una barra."
+L["WN44_4_TITLE"] = "Borse"
+L["WN44_4_TEXT"] = "Nascondi bordi di qualità e Nascondi moneta della robaccia tolgono agli oggetti i bordi colorati della qualità e la moneta d'oro del mercante. Entrambe sono disattivate in modo predefinito; attivale nelle opzioni, in Borse."
+L["WN44_5_TITLE"] = "Minimappa"
+L["WN44_5_TEXT"] = "Nascondi bordi dei pulsanti ha un menu Pulsanti per scegliere quali pulsanti perdono l'anello, il pulsante della minimappa di ogni addon può avere la sua scelta, e l'occhio della ricerca gruppi resta sul bordo della minimappa."
+L["WN44_6_TITLE"] = "Correzioni"
+L["WN44_6_TEXT"] = "Una targhetta cliccata mantiene il nome giallo finché il mouse resta sopra. Un'opzione nasconde l'intestazione Tutti gli obiettivi del tracciamento, le opzioni hanno una pagina Tutte le finestre, e le scelte dei menu delle statistiche seguono i profili."
 L["WN43_1_TITLE"] = "Minimappa quadrata"
 L["WN43_1_TEXT"] = "Minimappa quadrata rende la mappa quadrata, nel metallo del bordo rotondo, con i pulsanti del bordo lungo il suo lato. È disattivata di base, attivala nelle opzioni (/fcui), sotto Minimappa. Finché Ruota minimappa del gioco è attivo, la mappa resta rotonda."
 L["WN43_2_TITLE"] = "Minimappa"

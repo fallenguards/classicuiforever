@@ -2,6 +2,32 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.34.0] - 2026-10-20
+
+### Added
+- Classic coins, under Look in the options (/fcui), on by default: gold, silver and copper in Era's round coins in bags, the bank, vendors, mail, trade, quests, the trainer and tooltips. Turned off, the game's modern coins come back.
+- Themed parts under the theme: one row each for parchment pages, unit frames, the minimap, action bars, bags, tooltips and menus, chat and other windows, all checked by default. An unchecked part keeps the classic look under any theme.
+- Hide button borders picks which buttons lose their rings: tracking, mail, the clock, the calendar, day and night, the zoom buttons, our options button and micro icons, and other addons' buttons.
+- Modern page arrows, under One bar: the game's small page arrows and page number on the left gryphon (#207).
+- Hide quality borders and Hide junk coin, under Bags, both off by default: items without their quality border, and gray items without the gold coin a vendor puts on them.
+- Each addon's minimap button can override the Addon buttons pick, from a list with a search (#194).
+- An option hides the quest tracker's All Objectives header (#209).
+- An All windows page in the options lists every window we restyle, sorted by name (#204).
+
+### Changed
+- Themes draw in one even color by default, as a dark mode does. Textured color brings the textures back for the parts picked: bar art, the character sheet, the spellbook and other windows. A theme worn before keeps its textured look; Flat color and Hide inner borders are gone.
+- Parchment takes the theme, with light text on a dark page: the quest log, the spellbook, the professions book, quest giver and gossip windows, books and letters, opened mail, the map's quest details and the reputation box. The world map's header and foot take it too.
+- One bar also hides the latency bar and puts the key ring with the bags, through their own options, which bring them back. Main bar alone is gone; a band that had it keeps its look (#207).
+- Stat pane picks are kept by profile, as other settings are.
+- The group finder eye's Default position is Era's spot once the eye has been placed in Edit Mode.
+- Spellbook page arrows take the theme's color, a live one lighter than a spent one, and the backpack's picture keeps its colors in a themed ring.
+
+### Fixed
+- A clicked nameplate keeps its yellow name while the mouse stays on it (#206).
+- The group finder eye stays on the minimap's rim when the game moves it, and drags smoothly in Edit Mode (#208).
+- Under a theme: text on dark pages is readable (gossip options, unlearned professions), the professions book draws without dark boxes or a second fill color on its bars, a portrait ring's shadow stays Era's size, the bag portrait has no square corners, the latency bar keeps its colors, and Textured color no longer lets orange tabs or red stitching through.
+- With Hide button borders under the Dark theme, the calendar's ring comes off too.
+
 ## [0.33.0] - 2026-10-19
 
 ### Added

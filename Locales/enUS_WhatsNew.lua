@@ -2,6 +2,18 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN44_1_TITLE"] = "Themes in one color"
+L["WN44_1_TEXT"] = "Themes now draw everything in one even color by default, as a dark mode does. To bring textures back for the parts you pick, turn on Textured color in the options (/fcui), under Look; the Themed drop down picks which parts take the theme at all. Parchment takes the theme too, with light text on a dark page. If you used a theme before, your look is kept."
+L["WN44_2_TITLE"] = "Classic coins"
+L["WN44_2_TEXT"] = "Gold, silver and copper show Era's round coins in your bags, at vendors, in mail, quests and tooltips. Uncheck Classic coins in the options (/fcui), under Look, for the modern ones."
+L["WN44_3_TITLE"] = "One bar"
+L["WN44_3_TEXT"] = "One bar now hides the latency bar and puts the key ring with the bags through their own options, so either can come back. Modern page arrows shows the game's small page arrows on the left gryphon; it is off by default, so turn it on in the options, under One bar."
+L["WN44_4_TITLE"] = "Bags"
+L["WN44_4_TEXT"] = "Hide quality borders and Hide junk coin take the colored quality borders and a vendor's gold coin off your items. Both are off by default, so turn them on in the options, under Bags."
+L["WN44_5_TITLE"] = "Minimap"
+L["WN44_5_TEXT"] = "Hide button borders has a Buttons drop down to pick which buttons lose their rings, each addon's minimap button can have its own pick, and the group finder eye stays on the minimap's rim."
+L["WN44_6_TITLE"] = "Fixes"
+L["WN44_6_TEXT"] = "A clicked nameplate keeps its yellow name while the mouse is on it. An option hides the tracker's All Objectives header, the options have an All windows page, and stat pane picks follow profiles."
 L["WN43_1_TITLE"] = "Square minimap"
 L["WN43_1_TEXT"] = "Square minimap makes the map square, in the round border's metal, with the buttons on its rim along the edge. It is off by default, so turn it on in the options (/fcui), under Minimap. While the game's Rotate Minimap is on, the map stays round."
 L["WN43_2_TITLE"] = "Minimap"
