@@ -188,7 +188,7 @@ function ns.RingLook(frame, face, name, offMap)
     ns.RoundIcon(icon)
     face(icon)
     local ring = ns.DressNew(frame, "trackingBorder", RING)
-    if not offMap then ns.MinimapButtonBorder(ring) end
+    if not offMap then ns.MinimapButtonBorder(ring, "hideBorderIcons") end
     return icon
 end
 ns.RING_HIGHLIGHT = HL_RING

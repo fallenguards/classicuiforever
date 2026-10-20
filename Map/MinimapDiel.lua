@@ -27,7 +27,7 @@ function MM.EraDiel(diel, home)
         ns.SetFile(tod, TOD_FILE)
         tod:SetSize(TOD_SIZE, TOD_SIZE)
         tod:SetPoint("CENTER", home, "CENTER", 0, 0)
-        ns.MinimapButtonDisc(tod, ns.MinimapDiscMask(home, TOD_DISC))
+        ns.MinimapButtonDisc(tod, ns.MinimapDiscMask(home, TOD_DISC), "hideBorderDayNight")
         MM.tod = tod
         MM.todWatch = ns.EventFrame(DIEL_EVENTS, TimeOfDay)
     elseif not MM.todWatching then

@@ -121,7 +121,7 @@ function MM.TrackingFrame(backdrop, level)
         frame:SetScript("OnDragStop", function() drag:Sleep() end)
         if ns.PlaceSavedWindows then ns.PlaceSavedWindows() end
         frame.border = ns.DressNew(frame, "trackingBorder", TRACK_BORDER)
-        ns.MinimapButtonBorder(frame.border)
+        ns.MinimapButtonBorder(frame.border, "hideBorderTracking")
         frame.icon = frame:CreateTexture(nil, "BORDER")
         Shape(frame)
         frame:SetScript("OnMouseUp", TrackingMouseUp)
@@ -146,12 +146,14 @@ local glassBack
 function MM.GlassDisc(tracking)
     glassBack = tracking.Background
     if not glassBack then return end
-    ns.Dress(glassBack, "minimapBackground", ns.db.hideButtonBorders and GLASS_BG_BARE or GLASS_BG, tracking)
+    ns.Dress(glassBack, "minimapBackground", ns.MinimapBorderOff("hideBorderTracking") and GLASS_BG_BARE or GLASS_BG, tracking)
 end
 
 -- Seen at once, in a fight too: a plain frame of ours.
 ns.OnToggle(function(key)
-    if key == "hideButtonBorders" and glassBack and MM.active then MM.GlassDisc(MinimapCluster.Tracking) end
+    if (key == "hideButtonBorders" or key == "hideBorderTracking") and glassBack and MM.active then
+        MM.GlassDisc(MinimapCluster.Tracking)
+    end
     if key ~= "trackingSameSize" or not trackFrame then return end
     Shape(trackFrame)
     PlaceTracking()

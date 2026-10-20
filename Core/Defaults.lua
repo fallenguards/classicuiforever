@@ -292,6 +292,8 @@ ns.DB_DEFAULTS = {
     showMinimapCalendar = true, hoverMinimapCalendar = false, hideMinimapCalendar = false,
     showMinimapCoords = true, hoverMinimapCoords = false, hideMinimapCoords = false,
     hideMinimapBorder = false, hideMinimapHeader = false, hideButtonBorders = false,
+    hideBorderTracking = true, hideBorderMail = true, hideBorderClock = true, hideBorderCalendar = true,
+    hideBorderDayNight = true, hideBorderZoom = true, hideBorderIcons = true, hideBorderAddons = true,
     minimapShiftDrag = true,
     minimapSquare = false,
     minimapToggleButton = false,

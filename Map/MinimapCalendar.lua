@@ -192,7 +192,7 @@ function MM.CutCalendarRing(button)
     local w = button:GetWidth()
     if w and w > 0 then disc:SetSize(w * DISC_SHARE, w * DISC_SHARE) end
     for _, tex in ipairs({ button:GetNormalTexture(), button:GetPushedTexture(), button:GetHighlightTexture() }) do
-        ns.MinimapButtonDisc(tex, disc)
+        ns.MinimapButtonDisc(tex, disc, "hideBorderCalendar")
     end
 end
 

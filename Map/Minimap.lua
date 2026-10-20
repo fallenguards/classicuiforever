@@ -72,7 +72,7 @@ local function TintRing(region)
         end
         if ns.Once(region, "themeRing") then ns.BronzeTint(region, RING_SHARE) end
         -- Hide button borders is our minimap's: the game's map keeps its rings.
-        if MM.active then ns.MinimapButtonBorder(region) end
+        if MM.active then ns.MinimapButtonBorder(region, "hideBorderAddons") end
     end
 end
 function ns.ThemeAddonRing(button)
@@ -99,19 +99,26 @@ local function ThemeRingsOnGameMap()
     end
     if Minimap then ns.EachChild(Minimap, RingOfChild) end
 end
--- Hide button borders: every ring round a minimap button (ours, the client's, other addons'), kept here to apply at once.
-local buttonBorders = setmetatable({}, { __mode = "k" })
-function ns.MinimapButtonBorder(tex)
+-- Hide button borders: every ring round a minimap button (ours, the client's, other addons'), by its row under Buttons
+-- (part), kept here to apply at once.
+local BORDER_PARTS = { hideBorderTracking = true, hideBorderMail = true, hideBorderClock = true, hideBorderCalendar = true,
+    hideBorderDayNight = true, hideBorderZoom = true, hideBorderIcons = true, hideBorderAddons = true }
+function ns.MinimapBorderOff(part)
+    return ns.db.hideButtonBorders == true and ns.db[part] ~= false
+end
+local buttonBorders = setmetatable({}, { __mode = "k" })   -- texture -> part
+function ns.MinimapButtonBorder(tex, part)
     if not tex then return end
-    buttonBorders[tex] = true
-    ns.SetAlphaIf(tex, ns.db.hideButtonBorders and 0 or 1)
+    buttonBorders[tex] = part
+    ns.SetAlphaIf(tex, ns.MinimapBorderOff(part) and 0 or 1)
 end
 -- Rings drawn into a button's own art (day and night, zoom): cut to the disc inside them by a round mask instead.
 local DISC_MASK = "Interface\\CharacterFrame\\TempPortraitAlphaMask"
 local discs = setmetatable({}, { __mode = "k" })     -- texture -> its mask
+local discPart = setmetatable({}, { __mode = "k" })  -- texture -> part
 local cut = setmetatable({}, { __mode = "k" })       -- texture -> true while masked
 local function CutDisc(tex)
-    local on = MM.active and ns.db.hideButtonBorders == true
+    local on = MM.active and ns.MinimapBorderOff(discPart[tex])
     if (cut[tex] or false) == on then return end
     cut[tex] = on or nil
     ns.WearMask(tex, discs[tex], on)
@@ -124,13 +131,13 @@ function ns.MinimapDiscMask(owner, d)
     mask:SetPoint("CENTER", owner, "CENTER", 0, 0)
     return mask
 end
-function ns.MinimapButtonDisc(tex, mask)
+function ns.MinimapButtonDisc(tex, mask, part)
     if not (tex and mask) then return end
-    discs[tex] = mask
+    discs[tex], discPart[tex] = mask, part
     CutDisc(tex)
 end
 local function ButtonBordersApply()
-    for tex in pairs(buttonBorders) do ns.SetAlphaIf(tex, ns.db.hideButtonBorders and 0 or 1) end
+    for tex, part in pairs(buttonBorders) do ns.SetAlphaIf(tex, ns.MinimapBorderOff(part) and 0 or 1) end
     for tex in pairs(discs) do CutDisc(tex) end
 end
 
@@ -444,7 +451,7 @@ local function Layout()
             discMasks[button] = disc
             for _, tex in ipairs({ button:GetNormalTexture(), button:GetPushedTexture(), disabled,
                 button:GetHighlightTexture() }) do
-                ns.MinimapButtonDisc(tex, disc)
+                ns.MinimapButtonDisc(tex, disc, "hideBorderZoom")
             end
             button:SetHitRectInsets(4, 4, 2, 6)
             ns.SetPointOnce(button, "CENTER", zoomHome, "CENTER", 0, 0)
@@ -464,7 +471,7 @@ local function Layout()
         tracking:SetSize(32, 32)
         ns.SetPointOnce(tracking, "TOPLEFT", glassHome, "TOPLEFT", 0, 0)
         MM.GlassDisc(tracking)
-        ns.MinimapButtonBorder(ns.DressNew(tracking, "trackingBorder", GLASS_RING))
+        ns.MinimapButtonBorder(ns.DressNew(tracking, "trackingBorder", GLASS_RING), "hideBorderTracking")
         local button = tracking.Button
         if button then
             button:SetSize(32, 32)
@@ -486,7 +493,7 @@ local function Layout()
         if indicator.MailFrame then
             indicator.MailFrame:SetSize(33, 33)
             ns.SetPointOnce(indicator.MailFrame, "TOPLEFT", mailHome, "TOPLEFT", 0, 0)
-            ns.MinimapButtonBorder(ns.DressNew(indicator.MailFrame, "trackingBorder", MAIL_RING))
+            ns.MinimapButtonBorder(ns.DressNew(indicator.MailFrame, "trackingBorder", MAIL_RING), "hideBorderMail")
             if MiniMapMailIcon then
                 MiniMapMailIcon:SetTexture("Interface\\Icons\\INV_Letter_15")
                 MiniMapMailIcon:SetSize(18, 18)
@@ -535,7 +542,7 @@ local function Layout()
         clock:SetSize(60, 28)
         ns.SetPointOnce(clock, "CENTER", clockHome, "CENTER", 0, 0)
         ns.FadeTextures(clock, 0, nil, clock.fcui and clock.fcui.bg)
-        ns.MinimapButtonBorder(ns.DressNew(clock, "clockBackground", CLOCK_PLATE, TimeManagerClockButton))
+        ns.MinimapButtonBorder(ns.DressNew(clock, "clockBackground", CLOCK_PLATE, TimeManagerClockButton), "hideBorderClock")
         if TimeManagerClockTicker then ns.SetPointOnce(TimeManagerClockTicker, "CENTER", TimeManagerClockButton, "CENTER", 3, 1) end
     end
 
@@ -727,7 +734,7 @@ local RELAY_KEYS = { hideMinimapBorder = true, hideMinimapHeader = true, hideMin
     minimapToggleButton = true }
 ns.OnToggle(function(key)
     if RELAY_KEYS[key] then LayoutIfActive() return end
-    if key == "hideButtonBorders" then ButtonBordersApply() return end
+    if key == "hideButtonBorders" or BORDER_PARTS[key] then ButtonBordersApply() return end
     for _, id in ipairs(SHOW_IDS) do
         if key == "show" .. id or key == "hover" .. id or key == "hide" .. id then LayoutIfActive() return end
     end
