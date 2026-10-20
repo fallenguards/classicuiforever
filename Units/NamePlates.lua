@@ -95,7 +95,7 @@ local PLATE_EVENTS = { "NAME_PLATE_UNIT_ADDED", "NAME_PLATE_UNIT_REMOVED",
     "PLAYER_FOCUS_CHANGED", "DISPLAY_SIZE_CHANGED", "UI_SCALE_CHANGED", "CVAR_UPDATE",
     "UNIT_SPELLCAST_START", "UNIT_SPELLCAST_STOP", "UNIT_SPELLCAST_CHANNEL_START",
     "UNIT_SPELLCAST_CHANNEL_STOP", "UNIT_SPELLCAST_INTERRUPTED", "UNIT_SPELLCAST_NOT_INTERRUPTIBLE",
-    "UNIT_SPELLCAST_INTERRUPTIBLE", "UPDATE_MOUSEOVER_UNIT" }
+    "UNIT_SPELLCAST_INTERRUPTIBLE", "UPDATE_MOUSEOVER_UNIT", "GLOBAL_MOUSE_UP" }
 local CAST_EVENTS = { UNIT_SPELLCAST_START = true, UNIT_SPELLCAST_STOP = true, UNIT_SPELLCAST_CHANNEL_START = true,
     UNIT_SPELLCAST_CHANNEL_STOP = true, UNIT_SPELLCAST_INTERRUPTED = true, UNIT_SPELLCAST_NOT_INTERRUPTIBLE = true,
     UNIT_SPELLCAST_INTERRUPTIBLE = true }
@@ -563,8 +563,14 @@ end
 -- Era's classic plates turn the moused-over name yellow (Plate name on hover). The client paints every name again as
 -- the mouse finds a unit, so ours comes a frame after; as it leaves, the color it had comes back.
 local nameOver, nameWas = nil, {}
+local function Yellow(name)
+    local r, g, b = name:GetVertexColor()
+    return ns.AnySecret(r, g, b) or (r == 1 and g == 1 and b == 0)
+end
 local function PaintNameOver(fresh)
     local over = NP.active and ns.db.plateNameHover ~= false and glowOver or nil
+    -- Painted again under the mouse (a click targets it): its new color is the one to give back.
+    if over and over == nameOver and over.name and not Yellow(over.name) then fresh = true end
     if fresh then nameOver = nil elseif nameOver == over then return end
     local was = nameOver and nameOver.name
     if was then
@@ -580,6 +586,8 @@ local function PaintNameOver(fresh)
     name:SetVertexColor(1, 1, 0)
 end
 local function PaintNameFresh() PaintNameOver(true) end
+-- Read by the dev addon's namehover probe: the plate painted yellow, and the one the mouse is over.
+function NP.NameOverState() return nameOver, glowOver end
 
 -- The client says when the mouse finds a unit, never when it leaves one: while a plate glows for it, look again.
 local function OverGlow()
@@ -589,8 +597,12 @@ local function OverGlow()
     if not overJob then return end
     if glowOver then overJob:Wake() else overJob:Sleep() end
 end
+-- A press hides the mouseover unit until its release, with no event either way (namehover probe, #206): held, the
+-- glow and the yellow name stay; the release looks again.
 local function OverLeft()
-    if PlateFor("mouseover") ~= glowOver then OverGlow() end
+    local over = PlateFor("mouseover")
+    if not over and IsMouseButtonDown() then return end
+    if over ~= glowOver then OverGlow() else PaintNameOver() end
 end
 
 -- Sole writer of NP.active.
@@ -689,6 +701,8 @@ local function OnEvent(_, event, unit, _, _, interruptedBy)
     elseif event == "UPDATE_MOUSEOVER_UNIT" then
         OverGlow()
         ns.Sched.NextFrame("namePlates.nameOver", PaintNameFresh)
+    elseif event == "GLOBAL_MOUSE_UP" then
+        OverGlow()
     elseif CAST_EVENTS[event] then
         -- Cast start or stop re-lays only that plate's chain and cast bar; a channel's stop names who interrupted it.
         local unitFrame = unit and PlateFor(unit)
@@ -708,6 +722,7 @@ local function OnEvent(_, event, unit, _, _, interruptedBy)
             plateScale = nil
         end
         QueueRelay()
+        if event == "PLAYER_TARGET_CHANGED" then ns.Sched.NextFrame("namePlates.nameKept", PaintNameOver) end
     end
 end
 

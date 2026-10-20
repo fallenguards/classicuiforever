@@ -36,6 +36,7 @@ local env = setmetatable({
     NP = { active = true },
     CAST_EVENTS = {},
     QueueRelay = function(unitFrame) if unitFrame == nil then relays = relays + 1 end end,
+    ns = { Sched = { NextFrame = function() end } },
 }, { __index = _G })
 local run, err = load(chunk, "plate events", "t", env)
 Check(run ~= nil, "the handler loads (" .. tostring(err) .. ")")
