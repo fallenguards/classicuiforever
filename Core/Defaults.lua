@@ -52,6 +52,7 @@ ns.DB_DEFAULTS = {
     platesOneSize = false,
     texturedBars = true,
     modernPageArrows = false,
+    eraCoins = true,
     themePartParchment = true, themePartUnits = true, themePartMinimap = true, themePartBars = true, themePartBags = true,
     themePartTooltips = true, themePartChat = true, themePartWindows = true,
     texturedCharacter = true,

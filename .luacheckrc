@@ -25,7 +25,7 @@ globals = { "ToggleGuildFrame",
 read_globals = {
     "GetMaterialTextColors", "GossipFrame", "QuestFrame", "QuestFrame_GetMaterial", "QuestFrameGreetingPanel",
     "QuestInfoRewardsFrame", "QuestTextContrast", "ItemTextFrame", "MailTextFontNormal", "OpenMailBodyText", "OpenMailFrame",
-    "OpenMailScrollChildFrame",
+    "OpenMailScrollChildFrame", "TooltipDataProcessor",
     "GetCategoryList", "GetCategoryInfo", "GetCategoryNumAchievements", "GetAchievementInfo", "GetAchievementLink",
     "GetAchievementNumCriteria", "GetAchievementCriteriaInfo", "FormatShortDate", "C_MajorFactions", "RenownRewardUtil", "C_MountJournal", "C_PetJournal", "C_ToyBox", "PlayerHasToy", "C_TransmogCollection", "CAMERA_TRANSITION_TYPE_IMMEDIATE", "CAMERA_MODIFICATION_TYPE_DISCARD",
     "GREEN_FONT_COLOR_CODE", "RED_FONT_COLOR_CODE", "FONT_COLOR_CODE_CLOSE",

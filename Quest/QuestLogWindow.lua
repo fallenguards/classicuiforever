@@ -778,7 +778,7 @@ local function LevelsChanged()
 end
 ns.OnToggle(function(key)
     if key == "questLevels" then LevelsChanged() end
-    if ns.ThemeKey(key) and frame and frame:IsShown() then UpdateDetail() end
+    if (ns.ThemeKey(key) or key == "eraCoins") and frame and frame:IsShown() then UpdateDetail() end
 end)
 ns.EventFrame("CVAR_UPDATE", function(_, _, name)
     if name ~= "showQuestLevel" then return end

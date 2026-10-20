@@ -97,6 +97,7 @@ ns.TOGGLES = {
         search = "elite rare dragon gold silver nameplate" },
     { "windowLocksAlways", L["OPT_windowLocksAlways"], L["OPT_windowLocksAlways_TIP"], search = "lock move drag title" },
     { "classicFonts", L["OPT_classicFonts"], L["OPT_classicFonts_TIP"], search = "font text size outline shadow nameplate" },
+    { "eraCoins", L["OPT_eraCoins"], L["OPT_eraCoins_TIP"], search = "gold silver copper coins money currency icons era vanilla" },
 
     { "classicBar", L["OPT_classicBar"], L["OPT_classicBar_TIP"], group = L["GROUP_ACTION_BARS"] },
     { "classicBarSize", L["OPT_classicBarSize"], L["OPT_classicBarSize_TIP"], parent = "classicBar", search = "scale size 1.25 small big large buttons 36 45 game era forever" },

@@ -254,13 +254,7 @@ local function CreateRow(parent, index)
     return ns.SkillListRow(parent, index, Row_OnClick)
 end
 
--- Coin text with icons; the old global is gone from this client.
-local function Coins(amount)
-    if C_CurrencyInfo and C_CurrencyInfo.GetCoinTextureString then return C_CurrencyInfo.GetCoinTextureString(amount) end
-    if GetCoinTextureString then return GetCoinTextureString(amount) end
-    if GetMoneyString then return GetMoneyString(amount) end
-    return tostring(amount)
-end
+local function Coins(amount) return ns.CoinText(amount) end
 
 local WHITE, RED = "|cffffffff", "|cffff2020"
 

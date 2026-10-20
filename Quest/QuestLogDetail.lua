@@ -81,10 +81,7 @@ function QL.ResetDetail()
     detailUsed, rewardsUsed = 0, 0
 end
 
-local function Coins(copper)
-    if C_CurrencyInfo and C_CurrencyInfo.GetCoinTextureString then return C_CurrencyInfo.GetCoinTextureString(copper) end
-    return GetCoinTextureString and GetCoinTextureString(copper) or tostring(copper)
-end
+local function Coins(copper) return ns.CoinText(copper) end
 
 -- Rewards under `last`, two per row, coins after the header (money alone still gets one).
 local function RewardGrid(questID, last, kind, count, header, coins)

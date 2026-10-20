@@ -81,6 +81,7 @@ return {
     englishWindows = false,
     equipmentQuickButton = false,
     eraBagSize = true,
+    eraCoins = true,
     eyeSnapMinimap = true,
     focusBuffsOnTop = false,
     fullPlates = true,
