@@ -29,19 +29,6 @@ function B.NoPages(bar) return OneBar() or B.BarSetting(bar, "HideBarScrolling")
 -- Bags off the band with their art hidden: the buttons side by side (its option), not a socket apart over nothing.
 function B.BagsTight() return ns.db ~= nil and ns.db.hideBagsArt == true and ns.db.bagsTight == true end
 
--- One bar turned on: its look by default, each changeable after in its own place: no bar art under the bags, the micro
--- menu or the key ring, the bags close together, no latency bar, the key ring with the bags.
-local ONE_BAR_LOOK = { "hideBagsArt", "hideMicroArt", "keyRingArtHidden", "bagsTight", "hideLatencyBar", "keyRingWithBags" }
-ns.OnToggle(function(key)
-    local db = ns.db
-    if key ~= "oneBar" or not db or db.oneBar ~= true then return end
-    local set = false
-    for _, k in ipairs(ONE_BAR_LOOK) do
-        if db[k] ~= true then db[k], set = true, true end
-    end
-    if set then ns.TogglesChanged(ONE_BAR_LOOK) end
-end)
-
 -- dbVersion 19: a save with One bar on keeps its band as it was (latency bar, key ring and page arrows on it).
 function ns.KeepOneBarLook()
     local function Keep(t)
@@ -69,6 +56,74 @@ function ns.OneBarAloneGone()
         if type(shot) == "table" then Move(shot) end
     end
     ns.db.dbVersion = 22
+end
+
+-- Turned on with One bar from 0.31.0 to 0.34.0 and left on when it was turned off: the art, and the pieces with it.
+local ONE_BAR_ART = { "hideBagsArt", "hideMicroArt", "keyRingArtHidden" }
+local ONE_BAR_LEFT = { "hideBagsArt", "hideMicroArt", "keyRingArtHidden", "bagsTight", "hideLatencyBar", "keyRingWithBags" }
+
+-- t: the account's full values or a profile's differences. Any art still hidden counts: a save had the micro and bag art
+-- hidden with the key ring's shown again.
+local function LeftOn(t)
+    if t.oneBar == true then return false end
+    for _, k in ipairs(ONE_BAR_ART) do
+        if t[k] == true then return true end
+    end
+    return false
+end
+
+local function EachProfile(fn)
+    for _, shot in pairs(type(ns.db.profiles) == "table" and ns.db.profiles or {}) do
+        if type(shot) == "table" then fn(shot) end
+    end
+end
+
+-- dbVersion 23: a save left so is told at each login until the player picks (ns.AnnounceOneBarArt); nothing changes unasked.
+function ns.NoteOneBarArt()
+    local db = ns.db
+    local left = LeftOn(db)
+    EachProfile(function(shot) left = left or LeftOn(shot) end)
+    if left then db.oneBarArtNote = true end
+    db.dbVersion = 23
+end
+
+-- Show them: every piece still on goes off in the settings in use (those applied) and in every profile left so.
+local function ShowArt()
+    local db = ns.db
+    db.oneBarArtNote = nil
+    EachProfile(function(shot)
+        if LeftOn(shot) then
+            for _, k in ipairs(ONE_BAR_LEFT) do shot[k] = nil end
+        end
+    end)
+    if not LeftOn(db) then return end
+    local changed = {}
+    for _, k in ipairs(ONE_BAR_LEFT) do
+        if db[k] == true then
+            db[k] = false
+            changed[#changed + 1] = k
+        end
+    end
+    ns.TogglesChanged(changed)
+end
+
+-- The title comes at show: Options loads after this file.
+ns.Popup("FCUI_ONE_BAR_ART", {
+    text = ns.L["ONE_BAR_ART_ASK"],
+    button1 = ns.L["ONE_BAR_ART_SHOW"],
+    button2 = ns.L["OPTWIN_KEEP_MINE"],
+    OnAccept = ShowArt,
+    OnCancel = function(_, _, reason)
+        if reason == "clicked" then ns.db.oneBarArtNote = nil end
+    end,
+})
+
+function ns.ShowOneBarArt() StaticPopup_Show("FCUI_ONE_BAR_ART", ns.options.TITLE) end
+
+-- Every login until they pick; the Addon messages row hushes it.
+function ns.AnnounceOneBarArt()
+    if not ns.db or not ns.db.oneBarArtNote or ns.db.addonMessages == false then return end
+    ns.Print(string.format(ns.L["ONE_BAR_ART_CHAT"], ns.ChatLink("onebar", ns.L["WELCOME_HERE"])))
 end
 
 -- The micro menu moves by our handle, not the client's edit mode piece (re-laid constantly while edit mode is open);

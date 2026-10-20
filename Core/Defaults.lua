@@ -2,7 +2,7 @@ local _, ns = ...
 local L = ns.L
 
 ns.DB_DEFAULTS = {
-    dbVersion = 22,
+    dbVersion = 23,
     classicBar = true,
     oneBar = false,
     classicBarSize = false,

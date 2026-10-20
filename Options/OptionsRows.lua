@@ -23,7 +23,10 @@ local RAW_ADD = { set = "raw", add = true }
 
 local function TipLabel(self) return self.label end
 local function TipBody(self) return self.tooltip end
-local function TipHeld(self) return self.key and ns.BarRowHeld(self.key) and L["BARS_TAKEN_TIP"] or nil end
+local function TipHeld(self)
+    local key = self.setting or self.key
+    return key and ns.BarRowHeld(key) and L["BARS_TAKEN_TIP"] or nil
+end
 -- Grayed for a toggle on another page (needs): which one turns it back on.
 local function TipNeeds(self)
     local need = self.needs
@@ -433,6 +436,24 @@ local function SubHead(parent, title)
     return row
 end
 
+-- One bar's pairings under it, each the same setting as its own row elsewhere: key, the pairing it needs.
+local ONE_BAR_PAIRS = { { "hideLatencyBar" }, { "keyRingWithBags" }, { "hideMicroArt" }, { "hideBagsArt" },
+    { "bagsTight", "hideBagsArt" } }
+
+-- A box for a toggle laid in its own place too (also:key): the same setting; a search finds that row, not this one.
+local function AlsoRow(child, key, colW, add, parent)
+    for _, entry in ipairs(ns.TOGGLES) do
+        if entry[1] == key then
+            local box = Checkbox(child, key, entry[2], entry[3])
+            box.setting, box.key = key, "also:" .. key
+            add(box, parent)
+            box.keyLow, box.tipLow = "", ""
+            box.text:SetWidth(colW - 30 - box.depth * INDENT)
+            return box
+        end
+    end
+end
+
 -- Rows that are not toggles hang under their toggle; colW: a column's width, for the labels.
 local function Extras(entry, child, colW, add)
     local function Step(parent, key, label, tip, low, high, apply, words)
@@ -456,6 +477,13 @@ local function Extras(entry, child, colW, add)
             ns.KEY_TEXT_MIN or 8, ns.KEY_TEXT_MAX or 20, ns.SetKeyTextSize, "keybind font hotkey")
     elseif key == "themeDark" then
         add(O.DarknessRow(child, colW - 2 * INDENT - 14), "themeDark")
+    -- One bar's last row: the pieces that go well with it, after it.
+    elseif key == "modernPageArrows" then
+        add(SubHead(child, L["SUB_ONE_BAR_PAIRS"]), "oneBar")
+        for _, pair in ipairs(ONE_BAR_PAIRS) do
+            local box = AlsoRow(child, pair[1], colW, add, pair[2] and "also:" .. pair[2] or "oneBar")
+            if box then box.needs = pair[2] end
+        end
     -- The Other page's last row: the camera block after it.
     elseif key == "leaveGameWindows" then
         add(SubHead(child, L["SUB_CAMERA"]))

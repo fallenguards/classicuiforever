@@ -117,6 +117,8 @@ local function OnItemRef(link)
         ns.ShowBarsNote()
     elseif target == "look" then
         ns.ShowBarsLook()
+    elseif target == "onebar" then
+        ns.ShowOneBarArt()
     elseif target == "curseforge" then
         CopyCurseForge()
     elseif target == "barsnote" then
@@ -615,6 +617,7 @@ function ns.FirstRun()
         ns.SafeCall(ns.AnnounceWhatsNew)
         ns.SafeCall(ns.AnnounceBarsNote)
         ns.SafeCall(ns.AnnounceBarsLook)
+        ns.SafeCall(ns.AnnounceOneBarArt)
         ns.CheckLayoutPosition()
         return
     end

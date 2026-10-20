@@ -540,7 +540,7 @@ local function Build()
                 if ns.db[up] == false then on = false break end
                 up = parentOf[up]
             end
-            if on and (ns.BarRowHeld(row.key) or doneBy or (row.grayWhen and ns.db[row.grayWhen] == true)
+            if on and (ns.BarRowHeld(row.setting or row.key) or doneBy or (row.grayWhen and ns.db[row.grayWhen] == true)
                 or (row.grayIf and row.grayIf())) then on = false end
             row:SetEnabled(on)
             -- A button row's label keeps the button's own fonts.
