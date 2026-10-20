@@ -298,7 +298,7 @@ USE_PATTERNS = {
     "SECRET": re.compile(r"\b(?:issecretvalue|canaccessvalue|issecrettable|canaccesstable)\b"),
     "EDITQUERY": re.compile(r"\b(?:IsInDefaultPosition|IsEditModeActive|GetActiveLayoutInfo)\b"),
     "REGISTRY": re.compile(
-        r"\b(?:EventRegistry|CVarCallbackRegistry)\b(?:\s*[.:]\s*[A-Za-z_]\w*)?"
+        r"\b(?:EventRegistry|CVarCallbackRegistry|TooltipDataProcessor)\b(?:\s*[.:]\s*[A-Za-z_]\w*)?"
         r"|\b(?:RegisterCallback|RegisterCallbackWithHandle|UnregisterCallback|TriggerEvent)\b"),
     "LOADADDON": re.compile(r"\b(?:UIParent)?LoadAddOn\b"),
     "FRAMEWALK": re.compile(r"(?<![\w.:])EnumerateFrames\b|_G\.EnumerateFrames\b"),
@@ -316,6 +316,9 @@ REGISTRY_SITES = {
     # The game's menu show signal names every menu frame, submenus too, before it draws; its listeners run in
     # protected calls, as Menu.ModifyMenu's do (#199, 2026-10-17).
     "UI/ClientMenus.lua": re.compile(r'\bEventRegistry\s*:\s*(?:Register|Unregister)Callback\s*\(\s*"MenuProxy\.OnShow"'),
+    # The game's tooltip post-call for addons, run through a forbidden delegate with securecallfunction as
+    # Menu.ModifyMenu's are: Classic coins rewrites a finished tooltip's text coins (2026-10-20).
+    "Windows/EraCoins.lua": re.compile(r"\bTooltipDataProcessor\s*\.\s*AddTooltipPostCall\s*\("),
 }
 # A client object calling a registry method: Upper.chain:Method
 CLIENT_METHOD_OWNER = re.compile(r"[A-Z]\w*(?:\s*\.\s*\w+)*\s*:\s*$")
