@@ -764,11 +764,7 @@ local function Restore()
                 for _, tex in pairs(bar.fcui) do tex:Hide() end
             end
         end
-        -- The client's fill back on its own draw step; ours re-pins if turned on again.
-        local fill = health and health.fcui and health.fcui.fill
-        local tex = fill and fill.fcuiPinnedTo
-        if tex and fill.fcuiLayer then tex:SetDrawLayer(fill.fcuiLayer, fill.fcuiSub) end
-        if fill then fill.fcuiPinnedTo = nil end
+        NP.UnpinFill(health)
     end
     ns.needsReload = true
 end

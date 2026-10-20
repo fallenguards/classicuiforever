@@ -11,28 +11,33 @@ local ENEMY_CLASS_CVAR = "nameplateShowClassColor"
 local STYLE_CVAR = "nameplateStyle"
 local SIMPLIFIED_CVAR = "nameplateSimplifiedTypes"
 
--- Colour on our own fill pinned over the client's: its repaint can land after ours in the same frame.
+-- Colour on our own fill pinned over the client's: its repaint can land after ours in the same frame. The client's
+-- faded under it: a layer it set again tied with ours, and its own colour (retail's lilac friends) flashed through.
+local pins = setmetatable({}, { __mode = "k" })   -- our fill -> { tex = the client's fill, layer, sub }
 local function Paint(health, r, g, b)
     local tex = health.barTexture or (health.GetStatusBarTexture and health:GetStatusBarTexture())
     if not tex then return end
     local fill = ns.OwnTexture(health, "fill", "ARTWORK", 0)
-    if fill.fcuiPinnedTo ~= tex then
-        fill.fcuiPinnedTo = tex
-        Dress(fill, "barFill", BAR_FILL)
+    local pin = pins[fill]
+    if not pin or pin.tex ~= tex then
         -- Ours takes the client fill's draw step and it drops one: one above would tie with the heal absorb. Saved for restore.
-        if not fill.fcuiLayer then
+        if not pin then
             local layer, sub = tex:GetDrawLayer()
             if ns.AnySecret(layer, sub) then layer, sub = nil, nil end
-            fill.fcuiLayer, fill.fcuiSub = layer or "ARTWORK", sub or 0
+            pin = { layer = layer or "ARTWORK", sub = sub or 0 }
+            pins[fill] = pin
         end
-        tex:SetDrawLayer(fill.fcuiLayer, math.max(fill.fcuiSub - 1, -8))
-        fill:SetDrawLayer(fill.fcuiLayer, fill.fcuiSub)
+        pin.tex = tex
+        Dress(fill, "barFill", BAR_FILL)
+        tex:SetDrawLayer(pin.layer, math.max(pin.sub - 1, -8))
+        fill:SetDrawLayer(pin.layer, pin.sub)
         fill:ClearAllPoints()
         fill:SetPoint("TOPLEFT", tex, "TOPLEFT", 0, 0)
         fill:SetPoint("BOTTOMRIGHT", tex, "BOTTOMRIGHT", 0, 0)
     end
     ns.SetVertexColorIf(fill, r, g, b)
     ns.SetShownIf(fill, true)
+    ns.SetAlphaIf(tex, 0)
 end
 
 -- Whether a plate wears our fill.
@@ -45,7 +50,20 @@ end
 -- Show the client's own fill again.
 function NP.Unpaint(health)
     local fill = health and health.fcui and health.fcui.fill
-    if fill then fill:Hide() end
+    if not fill then return end
+    fill:Hide()
+    local pin = pins[fill]
+    if pin and pin.tex then ns.SetAlphaIf(pin.tex, 1) end
+end
+
+-- The client's fill as it was, its draw step and its alpha; ours re-pins if turned on again.
+function NP.UnpinFill(health)
+    local fill = health and health.fcui and health.fcui.fill
+    local pin = fill and pins[fill]
+    if not (pin and pin.tex) then return end
+    pin.tex:SetDrawLayer(pin.layer, pin.sub)
+    ns.SetAlphaIf(pin.tex, 1)
+    pin.tex = nil
 end
 
 -- Class colour, or nothing while the class is secret (dungeons).
@@ -56,10 +74,12 @@ local function ClassRGB(unit)
     if color then return color.r, color.g, color.b end
 end
 
--- Our colour for a player plate, or nothing to keep the client's. isPlayer: UnitIsPlayer's answer when already asked.
+-- Our colour for a player plate, nothing to keep the client's, or KEEP while an answer is secret (the plate stays as it
+-- was: dropping ours then flashed the client's colour). isPlayer: UnitIsPlayer's answer when already asked.
+local KEEP = "keep"
 local function WantedColor(unit, isPlayer)
     if not IsSecret(isPlayer) and isPlayer == nil then isPlayer = UnitIsPlayer and UnitIsPlayer(unit) end
-    if IsSecret(isPlayer) then return end
+    if IsSecret(isPlayer) then return KEEP end
     if not isPlayer then return end
     -- A corpse's fill may be hidden rather than shrunk; ours, pinned to it, would stick at its last width.
     local isDead = _G["UnitIsDead"]
@@ -69,7 +89,7 @@ local function WantedColor(unit, isPlayer)
     if ns.db.classColorPlates then return ClassRGB(unit) end
     -- 1.x friendly players were plain blue (the client's pale blue looks lilac on the old fill); secret: client's colour.
     local friendly = UnitIsFriend and UnitIsFriend("player", unit)
-    if IsSecret(friendly) then return end
+    if IsSecret(friendly) then return KEEP end
     if not friendly then return end
     -- Attackable friend (duel): enemy colour, the class colour if the game's enemy class colours are on, else red.
     local foe = UnitCanAttack("player", unit)
@@ -96,6 +116,7 @@ function NP.ClassColor(unitFrame, isPlayer)
     local unit = unitFrame.unit or (unitFrame.displayedUnit)
     local r, g, b
     if unit then r, g, b = WantedColor(unit, isPlayer) end
+    if r == KEEP then return end
     if r then Paint(health, r, g, b) else NP.Unpaint(health) end
 end
 
