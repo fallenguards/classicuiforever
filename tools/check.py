@@ -39,7 +39,7 @@ RULES = ["CVAR", "CVARREAD", "CVARLOGIN", "CVARREG", "REGISTRY", "HOOK", "ONUPDA
          "LOADADDON", "EDITMODE", "EDITQUERY", "SETTLE",
          "PANELMGR", "SECRET", "WALK", "REGEVENTS", "EVENTFRAME", "POINTONCE", "SETIF", "THEME", "ONCEFLAG",
          "FRAMEFIELD", "GAMEMENU", "SHAREDART", "PLATES", "FORBIDDEN", "SYSBASE", "LAYOUTFIELD", "CLIENTKEY",
-         "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS", "DRAGPOINT", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "TOC"]
+         "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS", "DRAGPOINT", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "TOC"]
 # A hit of these on a line the change adds fails even within the baseline, so swapping one call for another fails.
 # SINCE, DEADNS, FRAMEFIELD, CVARLOGIN and THROTTLEFRAME stay count-only, so a kept line can still be rewritten.
 LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", "EDITMODE", "PANELMGR", "SEARCHBOX", "ADDONCHAR",
@@ -50,7 +50,7 @@ LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", 
               "DRAGPOINT", "ERASPOT", "WINDOWORIGIN", "CVARREG", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST",
               "POINTEXACT",
               "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE",
-              "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG")
+              "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK")
 
 # The files allowed to hold each pattern, each with its reason; an entry ending in / is a folder.
 ALLOWED = {
@@ -182,6 +182,8 @@ FIX = {
     "MASKPATH": "wrap it in its own parentheses, SetMaskTexture((ns.TexPath(key))), so only the first path goes",
     "MASKWEAR": "mask through ns.WearMask(tex, mask, on) (Art/ThemeLayers.lua), which masks the theme's layers of it too",
     "EDITDRAG": "read the edit mode system's selection box, system.Selection:IsDragging() (Dragged in Map/MinimapEye.lua)",
+    "PAGEINK": "color it through ns.PageInk(r, g, b) at paint time and repaint on ns.ThemeKey toggles (MISSING_INK in "
+               "Skills/ProfessionsBook.lua)",
     "COMBATMOUSE": "set it through ns.Sched.OnHover (it answers refused in a fight) or guard the call with InCombatLockdown() and list the file in ALLOWED with the guard",
     "PCALLMANY": "pcall a function of ours that walks them and returns one value (ns.EachChildProtected, "
                  "ns.EachRegionProtected in Core/Util.lua), never the getter itself",
@@ -469,6 +471,7 @@ MESSAGES = {
     "MASKPATH": "ns.TexPath returns two paths (ours and the fallback); the minimap's SetMaskTexture took the second as well and drew the map green with no mask (2026-10-18)",
     "MASKWEAR": "a Dark or Custom theme draws a piece again as its own color layer; the day and night's ring cut by a mask on the piece showed on the layer (#194)",
     "EDITDRAG": "IsDragging on a frame edit mode moves reads false: its selection box takes the drag (the queue eye snapped back to the rim mid-drag)",
+    "PAGEINK": "dark text set by number in a file whose pages a theme darkens: unreadable on the dark page (the professions book's unlearned rows)",
     "COMBATMOUSE": "the client refuses mouse and key propagation in a fight (ADDON_ACTION_BLOCKED; a pcall still says ok)",
     "PCALLMANY": "a pcall straight around GetChildren/GetRegions/GetAnimations: 22 or more results abort the beta client",
     "PLATESHIELD": "a cast bar shield measured (a plate's is restricted: Can't measure restricted regions)",
@@ -925,6 +928,23 @@ def template_names(lx):
             for name in literal.group(1).split(","):
                 if name.strip():
                     yield no, name.strip()
+
+
+# Dark text (every channel under PAGE_DARK_TEXT) set as numbers, in a file that darkens a page or inks its text.
+PAGE_FILE_RX = re.compile(r"\bns\.(?:PageInk|InkPage|InkChrome|PageDark)\b")
+PAGE_TEXT_RX = re.compile(r":SetTextColor\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*[,)]")
+PAGE_DARK_TEXT = 0.3
+
+
+def page_ink_hits(lx):
+    if not any(PAGE_FILE_RX.search(line) for line in lx.keep):
+        return set()
+    found = set()
+    for no, line in enumerate(lx.blank, 1):
+        for m in PAGE_TEXT_RX.finditer(line):
+            if all(float(v) < PAGE_DARK_TEXT for v in m.groups()):
+                found.add(("PAGEINK", no))
+    return found
 
 
 def client_template_hits(lx):
@@ -1498,6 +1518,7 @@ def pattern_hits(path, lx, funcs):
     found |= cvar_login_hits(lx, funcs)
     found |= held_cvar_hits(lx, funcs)
     found |= client_template_hits(lx)
+    found |= page_ink_hits(lx)
     if not allowed("THROTTLEFRAME", path):
         found |= throttle_frame_hits(lx)
     if not allowed("SEARCHBOX", path):
