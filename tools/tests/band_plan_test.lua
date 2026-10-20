@@ -2,7 +2,7 @@
 -- Run from the addon root: lua tools/tests/band_plan_test.lua (CI runs every tools/tests/*_test.lua).
 -- The latency and key ring section may drop its own left post only right after a real post (the micro row's, the
 -- bags' end); what follows the page number slot starts at its post, not past the dark stone beside the box.
--- A client with no key ring seats its reagent bag in the key slot: the section draws that slot, clear of the latency window.
+-- A client with no key ring has its reagent bag as the key ring piece: the section draws its slot as the key ring's.
 -- luacheck: std lua54
 -- luacheck: ignore 111 112 113 121 122 212
 
@@ -37,8 +37,6 @@ B.BagExtraCells = function() return B.ReagentSlot() and 1 or 0 end
 
 -- Section starts that leave out its own left post (B.TailSpan: latency after a post 7, key ring alone after one 23).
 local POSTLESS = { [7] = true, [23] = true }
--- The slim reagent bag as Bar/BandBags.lua seats it: 18 wide, 5 left of the last of five bags.
-local SLIM_W, SLIM_GAP, TUBE_W = 18, 5, 7
 
 local failures, cases = 0, 0
 for _, micro in ipairs({ true, false }) do
@@ -91,18 +89,14 @@ for _, keyRing in ipairs({ true, false }) do
                 tostring(plan.tailStart), tostring(plan.tailU0)))
         end
     end
-    local slim = not keyRing and not reagent
-    if slim and bags and plan.tailStart and plan.bagsStart == plan.tailStart + plan.tailU1 - plan.tailU0 then
-        local bag = B.Bag()
-        local right = plan.bagsEnd + bag.x - (5 * bag.size - 4 * bag.gap) - SLIM_GAP
-        local window = plan.tailStart + B.TAIL_WINDOW - plan.tailU0
-        local covered = not hideLatency and right - SLIM_W < window + TUBE_W
-        if not plan.tailSlot or plan.tailU1 ~= 38 or covered then
-            failures = failures + 1
-            print(string.format("FAIL slim reagent bag with no key slot: micro=%s noPages=%s hideLatency=%s eraBags=%s"
-                .. " tailU1=%s slim %s..%s window %s", tostring(micro), tostring(noPages), tostring(hideLatency),
-                tostring(eraBags), tostring(plan.tailU1), tostring(right - SLIM_W), tostring(right), tostring(window)))
-        end
+    -- The key slot is drawn exactly while the key ring piece stands on the band: Forever's key ring, or with none the
+    -- reagent bag out of a full slot.
+    local piece = keyRing or not reagent
+    if plan.tailStart and (plan.tailSlot and true or false) ~= (piece and not hideKey) then
+        failures = failures + 1
+        print(string.format("FAIL key slot drawn %s with the piece %s: micro=%s bags=%s keyRing=%s reagentSlot=%s hideKey=%s",
+            tostring(plan.tailSlot), tostring(piece and not hideKey), tostring(micro), tostring(bags), tostring(keyRing),
+            tostring(reagent), tostring(hideKey)))
     end
 end end end end end end end end end
 

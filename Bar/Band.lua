@@ -51,7 +51,7 @@ B.TAIL_WINDOW, B.TAIL_SLOT = 7, 30   -- window's left column, key slot's centre
 function B.TailParts()
     local db = ns.db
     local latency = not (db and (db.hideLatencyBar == true or ns.ValidPlace(db.latencyPos)))
-    local key = KeyRingButton ~= nil and not (db and (db.hideKeyRing == true or ns.ValidPlace(db.keyRingPos)
+    local key = B.KeyButton() ~= nil and not (db and (db.hideKeyRing == true or ns.ValidPlace(db.keyRingPos)
         or B.KeyRingWithBags()))
     return latency, key
 end
@@ -64,16 +64,38 @@ function B.KeyRingWithBags()
     return db.keyRingWithBags == true
         or (db.keyRingSnap == true and db.keyRingFlat == true and B.BagsColumn() ~= nil)
 end
--- A client with no key ring: the reagent bag without a socket of its own ends the bag row in the key slot.
+-- A client with no key ring (retail): the reagent bag off the row (Hidden), or in the key slot as the key ring piece, in the
+-- key's art or a bag's squeezed in (As squished bag art).
+function B.ReagentHidden()
+    return KeyRingButton == nil and CharacterReagentBag0Slot ~= nil and ns.db ~= nil and ns.db.reagentBagHidden == true
+        and not B.ReagentSlot()
+end
 function B.SlimReagent()
-    return KeyRingButton == nil and CharacterReagentBag0Slot ~= nil and not B.ReagentSlot()
+    return KeyRingButton == nil and CharacterReagentBag0Slot ~= nil and not B.ReagentSlot() and not B.ReagentHidden()
+end
+function B.ReagentSquished() return B.SlimReagent() and ns.db.reagentBagSquished == true end
+-- The key ring piece's button (BandSection.lua): Forever's key ring, or retail's reagent bag in the key slot.
+function B.KeyButton()
+    if KeyRingButton then return KeyRingButton end
+    if B.SlimReagent() then return CharacterReagentBag0Slot end
+end
+
+-- dbVersion 24: retail's own picks, As key art by default; a Full slot pick stays the one on.
+function ns.KeepReagentSlot()
+    local function Keep(t)
+        if t.reagentBagSlot == true then t.reagentBagKeyArt = false end
+    end
+    Keep(ns.db)
+    for _, shot in pairs(type(ns.db.profiles) == "table" and ns.db.profiles or {}) do
+        if type(shot) == "table" then Keep(shot) end
+    end
+    ns.db.dbVersion = 24
 end
 -- The section's u span on its sheet, or nil with both halves hidden: after a post (the micro row's, the bags' end) that post
 -- opens it, before the bags the client's bag post closes it, elsewhere it keeps its own posts. slot: the key slot is in it.
 function B.TailSpan(afterPost, beforeBags)
     local latency, key = B.TailParts()
-    -- The slim reagent bag rides the bag row: its slot stands only against the bags.
-    local slot = key or (beforeBags and B.SlimReagent()) or false
+    local slot = key or false
     if not (latency or slot) then return nil end
     local u0 = latency and (afterPost and 7 or 0) or (afterPost and 23 or 14)
     local u1 = slot and (beforeBags and 38 or 45) or (beforeBags and 14 or 23)

@@ -437,10 +437,6 @@ ns.TOGGLES = {
     { "eraBagSize", L["OPT_eraBagSize"], L["OPT_eraBagSize_TIP"], needs = "classicBar", search = "bags big large 37" },
     { "reagentBagSlot", L["OPT_reagentBagSlot"], L["OPT_reagentBagSlot_TIP"], needs = "classicBar", radio = "reagentBag",
         drop = true, dropTip = L["OPT_reagentBag_TIP"] },
-    { "reagentBagRound", L["OPT_reagentBagRound"], L["OPT_reagentBagRound_TIP"], needs = "classicBar", radio = "reagentBag",
-        drop = true },
-    { "reagentBagHover", L["OPT_reagentBagHover"], L["OPT_reagentBagHover_TIP"], needs = "classicBar", radio = "reagentBag",
-        drop = true },
     { "hideBagsArt", L["OPT_hideBagsArt"], L["OPT_hideBagsArt_TIP"], needs = "classicBar" },
     { "keyRingArtWithBags", L["OPT_keyRingArtWithBags"], L["OPT_keyRingArtWithBags_TIP"], parent = "hideBagsArt",
         search = "key ring keys keyring art frame" },
@@ -492,6 +488,13 @@ end
 
 -- Forever's Legacy system, after Talents; retail has none.
 local FOREVER_ROWS = {
+    -- The key ring there: the round reagent bag beside it, or shown only on hover.
+    reagentBagSlot = {
+        { "reagentBagRound", L["OPT_reagentBagRound"], L["OPT_reagentBagRound_TIP"], needs = "classicBar",
+            radio = "reagentBag", drop = true },
+        { "reagentBagHover", L["OPT_reagentBagHover"], L["OPT_reagentBagHover_TIP"], needs = "classicBar",
+            radio = "reagentBag", drop = true },
+    },
     talents = {
         { "talentsThreePane", L["OPT_talentsThreePane"], L["OPT_talentsThreePane_TIP"], parent = "talents",
             search = "three trees side by side triple pane all trees" },
@@ -515,6 +518,17 @@ local FOREVER_ROWS = {
 -- Retail's adventure guide and housing buttons, in the micro lists after Collections; Forever holds both off itself.
 -- Its difficulty flag after the coordinates; Forever's minimap has none.
 local RETAIL_ROWS = {
+    -- No key ring: the reagent bag in its slot with the key's art or a bag's, before Full slot; or off the row.
+    eraBagSize = {
+        { "reagentBagKeyArt", L["OPT_reagentBagKeyArt"], L["OPT_reagentBagKeyArt_TIP"], needs = "classicBar",
+            radio = "reagentBag", drop = true, dropTip = L["OPT_reagentBag_TIP"] },
+        { "reagentBagSquished", L["OPT_reagentBagSquished"], L["OPT_reagentBagSquished_TIP"], needs = "classicBar",
+            radio = "reagentBag", drop = true },
+    },
+    reagentBagSlot = {
+        { "reagentBagHidden", L["OPT_reagentBagHidden"], L["OPT_reagentBagHidden_TIP"], needs = "classicBar",
+            radio = "reagentBag", drop = true },
+    },
     hideMinimapCoords = {
         { "showMinimapDifficulty", L["OPT_showMinimapDifficulty"], SHOW_TIP, parent = "minimap", radio = "minimapDifficultyShow",
             drop = true, search = "dungeon raid heroic skull banner" },

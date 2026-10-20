@@ -215,5 +215,9 @@ return {
     plateHealthTextLeft = "same for everyone: off; both left, the value at the edge",
     plateHealthTextLeftSwap = "same for everyone: off; both left, the percent at the edge",
     minimapShiftDrag = "same for everyone: on, as before (Shift to drag our minimap buttons); off lets a plain drag move them (#180)",
+    reagentBagKeyArt = "kept as before: retail's reagent bag in the key slot, as the round picks seated it; dbVersion 24 "
+        .. "(Bar/Band.lua KeepReagentSlot) turns it off where Full slot was picked",
+    reagentBagSquished = "same for everyone: opt-in, off by default",
+    reagentBagHidden = "same for everyone: opt-in, off by default",
     levelUpBanner = "off for everyone, a restyle: the game's level-up banners go, as 1.x had none; checked brings them back",
 }

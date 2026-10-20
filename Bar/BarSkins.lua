@@ -567,13 +567,14 @@ local function ApplyBagArt(button)
             ns.BronzeTint(button.IconBorder)
             ns.BronzeRim(button)
             button.IconBorder:SetTexCoord(0, 1, 0, 1)
-            button.IconBorder:SetSize(size, size)
+            button.IconBorder:SetSize(state.width or size, size)
             button.IconBorder:SetPoint("CENTER", button, "CENTER", 0, 0)
         end
         button.IconBorder:SetDrawLayer("OVERLAY")
     end
     if button.icon and not state.backpack then
-        button.icon:SetTexCoord(0, 1, 0, 1)
+        local crop = state.width and (1 - state.width / size) / 2 or 0
+        button.icon:SetTexCoord(crop, 1 - crop, 0, 1)
     end
     -- An empty bag slot (the four and the reagent bag) shows the old dim bag.
     if state.bagSlot and button.icon and button.GetID then
@@ -688,7 +689,8 @@ local function IsBagSlot(button)
     return bagSlot
 end
 
-function ns.SkinBagButton(button, size, isBackpack, round)
+-- width: narrower than size (retail's reagent bag in the key slot).
+function ns.SkinBagButton(button, size, isBackpack, round, width)
     local state = bags[button]
     if not state then
         state = { backpack = isBackpack }
@@ -696,7 +698,7 @@ function ns.SkinBagButton(button, size, isBackpack, round)
         HookBag(button)
     end
     state.bagSlot = IsBagSlot(button)
-    state.size = size
+    state.size, state.width = size, width
     state.round = round and true or false
     local fresh = not state.active
     state.active = true

@@ -56,13 +56,15 @@ local function Buttons(band)
             buttons[n] = button
         end
     end
-    if CharacterReagentBag0Slot and not B.ReagentHoverWanted() then
+    local key = B.KeyButton()
+    if CharacterReagentBag0Slot and key ~= CharacterReagentBag0Slot and not B.ReagentHoverWanted()
+        and not B.ReagentHidden() then
         n = n + 1
         buttons[n] = CharacterReagentBag0Slot
     end
-    if KeyRingButton and (not band or B.KeyRingRides()) then
+    if key and (not band or B.KeyRingRides()) then
         n = n + 1
-        buttons[n] = KeyRingButton
+        buttons[n] = key
     end
     for i = n + 1, #buttons do buttons[i] = nil end
     return n
@@ -78,10 +80,11 @@ local lastTick
 local keyWithArrow = false
 
 local function Paint()
+    local key = B.KeyButton()
     for i = 1, #buttons do
         local button = buttons[i]
         local alpha = lit[button] and rowAlpha or 0
-        if keyWithArrow and button == KeyRingButton then alpha = arrowAlpha end
+        if keyWithArrow and button == key then alpha = arrowAlpha end
         SetFrameAlphaIf(button, alpha)
     end
     local art = B.art
@@ -319,7 +322,7 @@ Apply = function(atOnce)
     local n = Buttons(band)
     for i = 1, n do
         local button = buttons[i]
-        local folds = fold and button ~= MainMenuBarBackpackButton and button ~= KeyRingButton and button ~= reagent
+        local folds = fold and button ~= MainMenuBarBackpackButton and button ~= B.KeyButton() and button ~= reagent
         local shown = band and button ~= reagent and (mode ~= "hidden" and not folds) or nil
         if shown ~= nil then SetShownIf(button, shown) end
         local lights = seen and not folds

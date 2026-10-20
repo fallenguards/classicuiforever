@@ -8,7 +8,7 @@ local B = ns.band
 local BAND_H, CORNER_X = B.BAND_H, B.CORNER_X
 local BAG_BUTTONS, PIECES = B.BAG_BUTTONS, B.PIECES
 -- Buttons sit centred on the sheet's sockets (B.Bag: size, gap, backpack corner).
-local KEYRING_W, KEYRING_H, KEYRING_GAP = 18, 39, -5
+local KEYRING_W, KEYRING_H = 18, 39
 local TIGHT_GAP = 2   -- bags close together: a hair apart, as the game's own row
 B.KEYRING_W, B.KEYRING_H = KEYRING_W, KEYRING_H
 -- Round reagent bag (reagentBagSlot off): a small button at the top corner between key ring and last bag. On, it takes a
@@ -134,6 +134,7 @@ local function ReagentSeen(reagent, seen)
     ns.FadeTo(reagent, seen and 1 or 0, true, true)
     if reagent:IsMouseEnabled() ~= seen then reagent:EnableMouse(seen) end
 end
+B.ReagentSeen = ReagentSeen
 
 -- Reagent bag on hover: the round button shows while the mouse is over the row (its own spot included, so its
 -- click still works unseen). Enter and leave hooks on the row's buttons, set once; leave is judged a frame later.
@@ -147,7 +148,7 @@ local function RowButtons()
 end
 -- The band's own piece: off the band (classic bar off, or another addon's bars) the row's pick hands it back.
 local function HoverWanted()
-    return B.active and ns.db ~= nil and ns.db.reagentBagHover == true and not B.ReagentSlot()
+    return B.active and ns.db ~= nil and ns.db.reagentBagHover == true and KeyRingButton ~= nil and not B.ReagentSlot()
 end
 -- now: a lay (any option turned) lands at once; only the mouse coming and going fades.
 local function HoverCheck(now)
@@ -298,9 +299,6 @@ function B.LayoutBags()
     local square = B.ReagentSlot()
     local rowW = folded and size or size + 4 * (size - gap)
     if square then rowW = rowW + size - gap end
-    -- The key slot's tenant: never the key ring (its own piece, BandSection.lua).
-    local slim = B.SlimReagent() and CharacterReagentBag0Slot or nil
-    if slim then rowW = rowW + KEYRING_W - KEYRING_GAP end
     -- The piece's box: a column swaps its sides, as the client's does.
     local boxW, boxH = rowW, KEYRING_H
     if vertical then boxW, boxH = KEYRING_H, rowW end
@@ -359,16 +357,13 @@ function B.LayoutBags()
         local reagent = CharacterReagentBag0Slot
         Seat(reagent, buttonScale, size, size, level)
         Chain(reagent, prev, grow, gap)
+        ns.UnskinKeyRing(reagent)
         ns.SkinBagButton(reagent, size, false, false)
         ReagentSeen(reagent, true)
         prev = reagent
     end
-    if slim then
-        Seat(slim, buttonScale, KEYRING_W, KEYRING_H, level)
-        Chain(slim, prev, grow, KEYRING_GAP)
-        ns.SkinKeyRing(slim)
-    end
-    B.LayFoldArrow(arrowed and (slim or prev) or nil, grow, size, level, buttonScale)
+    if B.ReagentHidden() then ReagentSeen(CharacterReagentBag0Slot, false) end
+    B.LayFoldArrow(arrowed and prev or nil, grow, size, level, buttonScale)
     if not square and KeyRingButton and CharacterReagentBag0Slot then
         -- Both (Forever): the reagent bag is the small round one, centred level with the bags between key ring and last bag.
         local reagent = CharacterReagentBag0Slot

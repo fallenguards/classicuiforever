@@ -298,7 +298,7 @@ local function Place(el, plan, level)
     end
     local snapped = not Hidden(el) and Snapped(el)
     local x, w = OnBand(el, plan)
-    if (not pos and not x and not snapped) or (el == KEYRING and not KeyRingButton) then
+    if (not pos and not x and not snapped) or (el == KEYRING and not B.KeyButton()) then
         if el.home then el.home:Hide() end
         return false
     end
@@ -355,13 +355,16 @@ local function Place(el, plan, level)
         -- On the band the band's own tube shows (BandLatency).
         B.PlaceTube(home.tube, home, pos and (B.TAIL_WINDOW - left) or nil)
     else
-        local keyRing = KeyRingButton
+        local keyRing = B.KeyButton()
+        -- Retail's reagent bag squeezed in as a bag: a bag's height, its frame.
+        local squished = keyRing ~= KeyRingButton and B.ReagentSquished()
+        local tall = squished and B.Bag().size or B.KEYRING_H
         -- The key's middle on the upright cut, turned with the home.
         local px, py = B.TAIL_SLOT - left + 0.5, bare and cross / 2 or KEY_Y
         if turn then
-            Seat(keyRing, scale, B.KEYRING_H, B.KEYRING_W, level)
+            Seat(keyRing, scale, tall, B.KEYRING_W, level)
         else
-            Seat(keyRing, scale, B.KEYRING_W, B.KEYRING_H, level)
+            Seat(keyRing, scale, B.KEYRING_W, tall, level)
         end
         if turn == "cw" then
             keyRing:SetPoint("CENTER", home, "TOPLEFT", py, -px)
@@ -370,7 +373,13 @@ local function Place(el, plan, level)
         else
             keyRing:SetPoint("CENTER", home, "BOTTOMLEFT", px, py)
         end
-        ns.SkinKeyRing(keyRing, turn)
+        if squished then
+            ns.UnskinKeyRing(keyRing)
+            ns.SkinBagButton(keyRing, tall, false, false, B.KEYRING_W)
+        else
+            ns.UnskinBagButton(keyRing)
+            ns.SkinKeyRing(keyRing, turn)
+        end
         -- Its edit mode box on the key itself, not the cut's full height.
         local handle = home.handle
         if handle and not ns.IsAt(handle, "TOPLEFT", keyRing, "TOPLEFT", 0, 0) then
@@ -398,6 +407,9 @@ function B.LaySection(level)
     Place(LATENCY, plan, level)
     local placed = Place(KEYRING, plan, level)
     KeyRingShown(not Hidden(KEYRING) and placed)
+    -- Retail's reagent bag as the piece: faded, never hidden (the game shows and hides it with the bags).
+    local key = B.KeyButton()
+    if key and key ~= KeyRingButton then B.ReagentSeen(key, not Hidden(KEYRING) and placed) end
 end
 
 -- Our edit mode boxes (micro menu, latency bar, key ring) up while edit mode is open, their dialogs shut after or once a
