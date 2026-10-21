@@ -23,12 +23,13 @@ function Region:Hide() self.shown = false end
 function Region:SetFormattedText(format, ...) self.text = string.format(format, ...) end
 function Region:SetText(text) self.text = text end
 
-Enum = { PowerType = { Mana = 0 } }
+Enum = { PowerType = { Mana = 0, Rage = 1, Energy = 3, LunarPower = 8 } }
 PlayerFrame = New()
 function UnitClass() return "Druid", "DRUID" end
 function UnitPower() return 400 end
 function UnitPowerMax() return 1000 end
-function UnitPowerType() return 1 end
+local power = 1
+function UnitPowerType() return power end
 function UnitPowerPercent() return 40 end
 function BreakUpLargeNumbers(value) return tostring(value) end
 unpack = table.unpack
@@ -87,6 +88,14 @@ Check(Look("0", "NONE", true) == "left 40% right 400", "status text off, on hove
 ns.db.hoverBothNumbers = false
 Check(Look("0", "NONE", true) == "center 400 / 1000", "status text off, on hover, both numbers off: " .. Texts())
 Check(Look("0", "PERCENT", true) == "center 40%", "status text off, on hover, percent picked: " .. Texts())
+
+-- Retail's moonkin on Astral Power: the same bar (the game's own is faded, Units/PlayerFrame.lua) (#212).
+power = 8
+events()
+Check(bar.shown, "moonkin's Astral Power: the bar")
+power = 0
+events()
+Check(not bar.shown, "caster form on mana: no bar")
 
 if failed > 0 then
     print(failed .. " check(s) failed")

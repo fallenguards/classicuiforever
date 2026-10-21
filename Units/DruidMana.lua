@@ -1,7 +1,7 @@
 local _, ns = ...
 
--- A druid's mana in bear and cat form, as Wrath shows it (PlayerFrameAlternateManaBar): a small bar under the power bar
--- in the group tab's frame, hanging below the player frame. The game's own alternate bar shows mana in moonkin form only.
+-- A druid's mana in any form not on mana, as Wrath shows it (PlayerFrameAlternateManaBar): a small bar under the power
+-- bar in the group tab's frame, hanging below the player frame. Retail's moonkin too, the game's own bar faded (#212).
 
 local UF = ns.UF
 local IsSecret = ns.IsSecret
@@ -122,7 +122,8 @@ end
 -- Druids only, with the classic player frame and the option on; called by the unit frame module and the switch.
 function ns.DruidManaSync()
     local player = UF.frames.player
-    local on = UF.active and player ~= nil and select(2, UnitClass("player")) == "DRUID" and ns.db.druidMana ~= false
+    local druid = select(2, UnitClass("player")) == "DRUID"
+    local on = UF.active and player ~= nil and druid and ns.db.druidMana ~= false
     if on and not bar then Build(player.power) end
     if on and not driver then driver = ns.EventFrame(EVENTS, Update) end
     if driver then
@@ -133,6 +134,8 @@ function ns.DruidManaSync()
         end
     end
     live = on
+    -- Retail's own moonkin mana bar, under ours while ours shows it (#212).
+    if druid and _G.AlternatePowerBar then ns.SetAlphaIf(_G.AlternatePowerBar, on and 0 or 1) end
     if bar then Update() end
 end
 
