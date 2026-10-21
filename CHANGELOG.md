@@ -2,6 +2,12 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.35.1] - 2026-10-21
+
+### Fixed
+- Where the game's new social system is off, as on build 70532, the social window's Raid tab was faded out and the small tab under Recent Allies read "Raid". The game's tabs are now found by their id, so the Raid tab is back in the row and the small tab says Quick Join again (#216).
+- The social window's drag strip is its title bar only, so the status drop-down under the title takes clicks again (#217).
+
 ## [0.35.0] - 2026-10-21
 
 ### Added

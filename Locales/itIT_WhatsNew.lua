@@ -3,6 +3,8 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN46_1_TITLE"] = "Finestra sociale"
+L["WN46_1_TEXT"] = "La scheda Incursione è tornata nella fila di schede della finestra sociale sui client in cui il nuovo sistema sociale del gioco è disattivato, e la piccola scheda sotto Alleati recenti dice di nuovo Partecipazione rapida invece di Incursione. La finestra ora si trascina solo dalla sua barra del titolo, così il pulsante di stato sotto il titolo accetta di nuovo i clic."
 L["WN45_1_TITLE"] = "Collezioni su Retail"
 L["WN45_1_TEXT"] = "La finestra classica delle collezioni c'è anche su Retail: cavalcature, mascotte con la tua squadra da combattimento accanto, giocattoli e cimeli come pagine di libro, accampamenti e aspetti, ogni pagina con i filtri del gioco. Trascina un'anteprima per girarla, la rotellina su una creatura la avvicina, trascina un aspetto col tasto destro per spostarlo; il pulsante accanto alle frecce la rimette a posto. Finestra delle collezioni è attiva per impostazione predefinita, nelle opzioni (/fcui) sotto Personaggio, incantesimi, talenti."
 L["WN45_2_TITLE"] = "Una ricerca in ogni pagina"

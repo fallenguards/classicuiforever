@@ -3,6 +3,8 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN46_1_TITLE"] = "Fenêtre sociale"
+L["WN46_1_TEXT"] = "L'onglet Raid est de retour dans la rangée d'onglets de la fenêtre sociale sur les clients où le nouveau système social du jeu est désactivé, et le petit onglet sous Alliés récents indique à nouveau Rejoindre rapidement au lieu de Raid. La fenêtre ne se déplace plus que par sa barre de titre, si bien que le bouton de statut sous le titre accepte de nouveau les clics."
 L["WN45_1_TITLE"] = "Collections sur Retail"
 L["WN45_1_TEXT"] = "La fenêtre classique des collections est aussi sur Retail : montures, mascottes avec votre équipe de combat à côté, jouets et héritages en pages de livre, campements et apparences, chaque page avec les filtres du jeu. Faites glisser un aperçu pour le tourner, la molette sur une créature la rapproche, un glisser du bouton droit déplace une apparence ; le bouton à côté des flèches le remet en place. Fenêtre des collections est activée par défaut, dans les options (/fcui) sous Personnage, sorts, talents."
 L["WN45_2_TITLE"] = "Une recherche sur chaque page"

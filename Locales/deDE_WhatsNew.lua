@@ -3,6 +3,8 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN46_1_TITLE"] = "Kontaktefenster"
+L["WN46_1_TEXT"] = "Der Schlachtzug-Reiter ist zurück in der Reiterzeile des Kontaktefensters, wo das neue Kontaktesystem des Spiels aus ist, und der kleine Reiter unter Kürzlich Verbündete heißt wieder Schnellbeitritt statt Schlachtzug. Das Fenster lässt sich jetzt nur noch an seiner Titelleiste ziehen, sodass der Statusknopf unter dem Titel wieder Klicks annimmt."
 L["WN45_1_TITLE"] = "Sammlungen auf Retail"
 L["WN45_1_TEXT"] = "Das klassische Sammlungsfenster gibt es jetzt auch auf Retail: Reittiere, Haustiere mit deinem Kampfteam daneben, Spielzeuge und Erbstücke als Buchseiten, Lagerplätze und Vorlagen, jede Seite mit den Filtern des Spiels. Ziehe eine Vorschau, um sie zu drehen, scrolle über einer Kreatur zum Zoomen, ziehe eine Vorlage mit der rechten Maustaste, um sie zu verschieben; der Knopf neben den Pfeilen setzt sie zurück. Sammlungsfenster ist standardmäßig an, in den Optionen (/fcui) unter Charakter, Zauber, Talente."
 L["WN45_2_TITLE"] = "Eine Suche auf jeder Seite"

@@ -2,6 +2,8 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN46_1_TITLE"] = "Social window fixes"
+L["WN46_1_TEXT"] = "The social window's Raid tab is back in its foot row on clients that have the game's new social system off, and the small tab under Recent Allies says Quick Join again instead of Raid. The window now drags by its title bar only, so the status button under the title takes clicks."
 L["WN45_1_TITLE"] = "Collections on retail"
 L["WN45_1_TEXT"] = "The classic Collections window is on retail too: mounts, pets with your battle team beside them, toys and heirlooms as book pages, campsites and appearances, each page with the game's own filters. Drag a preview to turn it, scroll over a creature to zoom, right-drag an appearance to move it; the reset button beside the arrows puts it back. Collections window is on by default, in the options (/fcui) under Character, spells, talents."
 L["WN45_2_TITLE"] = "A search on every page"

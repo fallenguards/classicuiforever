@@ -3,6 +3,8 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN46_1_TITLE"] = "Ventana social"
+L["WN46_1_TEXT"] = "La pestaña Banda vuelve a la fila de pestañas de la ventana social en los clientes que tienen desactivado el nuevo sistema social del juego, y la pestaña pequeña bajo Aliados recientes vuelve a decir Unión rápida en vez de Banda. La ventana ahora solo se arrastra por su barra de título, así que el botón de estado bajo el título vuelve a aceptar clics."
 L["WN45_1_TITLE"] = "Colecciones en Retail"
 L["WN45_1_TEXT"] = "La ventana clásica de colecciones también está en Retail: monturas, mascotas con tu equipo de combate al lado, juguetes y reliquias como páginas de libro, campamentos y apariencias, cada página con los filtros del juego. Arrastra una vista previa para girarla, usa la rueda sobre una criatura para acercarla, arrastra una apariencia con el botón derecho para moverla; el botón junto a las flechas la restablece. Ventana de colecciones está activada por defecto, en las opciones (/fcui) bajo Personaje, hechizos, talentos."
 L["WN45_2_TITLE"] = "Una búsqueda en cada página"
