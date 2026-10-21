@@ -84,6 +84,7 @@ local ns = {
     },
 }
 assert(loadfile(ROOT .. "/Bar/BarSkins.lua"))("ClassicUIForever", ns)
+assert(loadfile(ROOT .. "/Bar/MicroFlash.lua"))("ClassicUIForever", ns)
 
 local character = MicroButton("CharacterMicroButton", true)
 local finder = MicroButton("LFDMicroButton")

@@ -127,6 +127,7 @@ local function ApplyMicroArt(button)
         -- The client tints the guild sheet with the tabard colour; the 1.x sheet is drawn untinted.
         ns.EachState(button, STATES, WhiteTex)
         ns.FadeKeys(button, EMBLEMS, 0, CHANGED)
+        ns.ClassicMicroFlash(button)
         if button.Background then button.Background:Hide() end
         if button.PushedBackground then button.PushedBackground:Hide() end
         MenuDim(button, state, MenuOpen())
@@ -261,6 +262,7 @@ function ns.UnskinMicroButton(button)
         LoadMicroButtonTextures(button, button.textureName, ClientTint(button))
     end
     ns.FadeKeys(button, EMBLEMS, 1, CHANGED)
+    if state.art then ns.ClientMicroFlash(button) end
     if button.PortraitMask then button.PortraitMask:Show() end
     if button.Shadow then button.Shadow:Show() end
     if button.Portrait then

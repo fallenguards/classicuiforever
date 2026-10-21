@@ -101,6 +101,7 @@ UI\Escape.lua
 UI\LevelBanner.lua
 UI\SecurePad.lua
 Bar\BarSkins.lua
+Bar\MicroFlash.lua
 Bar\Band.lua
 Bar\BandShape.lua
 Bar\BandBare.lua
