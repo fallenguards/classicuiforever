@@ -117,7 +117,8 @@ local WINDOWS = {
     { "BankFrame", key = "panelBank", after = function(frame) if ns.SkinBank then ns.SkinBank(frame) end end },
     { "LootFrame", toggle = "lootWindow", backing = false, after = A.LootFrame },
     -- Social window's lift, so the two read as one window when they swap.
-    { "LFGWhoListFrame", key = "panelGroupFinder", addon = "Blizzard_GroupFinder_VanillaStyle", lift = 5 },
+    -- The finder's Who page: plain while our classic finder holds the window (its Who page is the game's, #210).
+    { "LFGWhoListFrame", key = "panelGroupFinder", addon = "Blizzard_GroupFinder_VanillaStyle", lift = 5, off = "groupFinder" },
     { "InspectFrame", key = "panelInspect", addon = "Blizzard_InspectUI", lift = 5, tabLift = 3, after = A.InspectFrame },
     { "MacroFrame", key = "panelMacros", addon = "Blizzard_MacroUI", topTabs = true, lift = 4, scrollBars = false,
         after = A.MacroFrame },
@@ -164,6 +165,7 @@ local done = {}   -- WINDOWS index -> dressed (for good)
 -- A window with its own row (the map, loot) by that row alone (#184); every other by Window frames and its box there.
 function P.Dressing(key) return P.active and ns.db[key] ~= false end
 local function Wanted(entry)
+    if entry.off and ns.ModuleInForce(entry.off) then return false end
     local toggle = entry.toggle
     if type(toggle) == "table" then
         for _, key in ipairs(toggle) do

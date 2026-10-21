@@ -15,6 +15,9 @@ local QUIET = { changed = true, mouseOff = true }
 local BAR_TEXTURES = { "SelectedTexture", "HighlightTexture" }
 local active = false
 local dressed = false
+-- The window as the game made it (its size, its close button's point), read before our first change: given back on its
+-- own Who page.
+local game = {}
 
 -- Era's window, laid from its dump (frame units, top left): drawn size, sheets, and every piece's spot.
 local ERA_W, ERA_H = 354, 440
@@ -306,6 +309,7 @@ local function DressParent(parent, first)
     end
     PointIf(eyeFrame, "TOPLEFT", Origin(), "TOPLEFT", 0, 0)
     ns.SetLevelIf(eyeFrame, parent:GetFrameLevel())
+    ns.SetShownIf(eyeFrame, true)
 end
 
 -- The category bars are made as the page first shows, for the wider window: cut to this one each time. Forever builds
@@ -461,10 +465,33 @@ local function FitSize(parent, width, height)
     end
 end
 
+-- The game's own Who page, our who list off (#210): the window as the game draws it there; the next pass on another
+-- page dresses it again.
+local function StandDown(parent)
+    if game.w then FitSize(parent, game.w, game.h) end
+    local close = _G["LFGParentFrameCloseButton"]
+    if close and game.close and game.close[1] then PointIf(close, unpack(game.close)) end
+    local portrait = _G["LFGParentFramePortrait"]
+    if portrait then ns.SetAlphaIf(portrait, 1) end
+    if eyeHost then ns.SetShownIf(eyeHost, false) end
+    -- Our art's frame takes the mouse across the window: off, or it took the list's clicks.
+    if origin then ns.SetShownIf(origin, false) end
+end
+
 local watcher
 local function Fit()
     local parent = _G["LFGParentFrame"]
     if not active or not parent then return end
+    if not game.w then
+        game.w, game.h = parent:GetSize()
+        local close = _G["LFGParentFrameCloseButton"]
+        game.close = close and { close:GetPoint(1) }
+    end
+    if S.FinderOnOwnWho() then
+        StandDown(parent)
+        return
+    end
+    ns.SetShownIf(Origin(), true)
     local width, height = Size()
     FitSize(parent, width, height)
     local first = not dressed
@@ -476,7 +503,8 @@ local function Fit()
         S.BuildFinderSideTabs(parent, Origin())
         WatchList(_G["LFGBrowseFrame"])
     end
-    ns.FadeKeys(parent, CLIENT_TABS, 0, QUIET)
+    -- Lent over our Who tab while our who list is off (Social/FinderTabs.lua).
+    if not S.FinderWhoOwn() then ns.FadeKeys(parent, CLIENT_TABS, 0, QUIET) end
     S.SyncFinderSideTabs(parent)
     FitCategories()
     DressRows(_G["LFGBrowseFrame"])
@@ -548,6 +576,8 @@ local function AttachFit()
     for _, name in ipairs(PAGES) do
         if _G[name] then ns.Sched.AfterShow(_G[name], "finder.pageFit", FitShown) end
     end
+    -- Its own Who page too: the window stands down before it draws.
+    if _G["LFGWhoListFrame"] then ns.Sched.AfterShow(_G["LFGWhoListFrame"], "finder.pageFit", FitShown) end
     ns.Sched.OnVisible(parent, "finder.shutFit", FinderShown)
     ns.Sched.AfterShow(parent, "finder.fightSpot", FinderOnSocialSpot)
 end

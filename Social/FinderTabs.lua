@@ -8,8 +8,9 @@ local S = ns.social
 -- Plain setters: the arrows never swap to bronze copies.
 local RAW = { set = "raw" }
 local TOGGLE_TIP = { text = function() return _G.LOOKING_FOR_GROUP or _G.GROUP_FINDER or "Group Finder" end }
--- The client's side tab per page, by our tab's index.
-local CATCH_KEYS = { "ListingTab", "BrowsingTab" }
+-- The client's side tab per page, by our tab's index; its own Who page's only while our who list is off (#210: ours then
+-- shut the finder for a list that never came).
+local CATCH_KEYS = { "ListingTab", "BrowsingTab", "WhoListingTab" }
 -- The client's own who page, which a click on its micro button can reopen.
 local WHO_PAGE = 3
 
@@ -34,12 +35,20 @@ local function NewFinderTab(parent, i, prev, entry, anchor)
 end
 
 local whoTabs, whoToggle = {}, nil
+
+-- Our who list off: the finder's own Who page stands for it.
+function S.FinderWhoOwn() return not (ns.ModuleInForce and ns.ModuleInForce("whoList")) end
+-- On it now: the window is the game's there (Social/GroupFinder.lua stands down), its own tabs at home.
+function S.FinderOnOwnWho()
+    local finder = _G["LFGParentFrame"]
+    return finder ~= nil and finder:IsShown() and S.FinderWhoOwn() and finder.selectedTab == WHO_PAGE
+end
 local finderTabs = {}
 
 ---------------------------------------------------------------- the client's tabs over ours
 
--- index -> our tab the client's lies over, and whether ours is lit for it.
-local lent, lit = {}, {}
+-- index -> our tab the client's lies over, and whether ours is lit for it; the client tab's own parent and point.
+local lent, lit, home = {}, {}, {}
 
 local function Catcher(index)
     local finder = _G["LFGParentFrame"]
@@ -50,6 +59,7 @@ end
 local function Lend(index, host)
     local catcher = Catcher(index)
     if not catcher or lent[index] == host then return end
+    if not home[index] then home[index] = { parent = catcher:GetParent(), point = { catcher:GetPoint(1) } } end
     if lent[index] and lit[index] then lent[index]:UnlockHighlight() end
     lent[index], lit[index] = host, false
     catcher:SetParent(host)
@@ -66,13 +76,19 @@ local function GiveBack(index, finder)
     if not catcher or not mine then return end
     if lit[index] then mine:UnlockHighlight() end
     lent[index], lit[index] = nil, false
-    catcher:SetParent(finder)
+    local was = home[index]
+    catcher:SetParent(was and was.parent or finder)
     catcher:ClearAllPoints()
-    -- Off the finder's edge, not the first tab, which may still be lent out.
-    local below = index == 1 and 0 or (Catcher(1):GetHeight() + 2) * (index - 1)
-    catcher:SetPoint("TOPLEFT", finder, "TOPRIGHT", 0, -60 - below)
+    if was and was.point[1] then
+        catcher:SetPoint(unpack(was.point))
+    else
+        -- Off the finder's edge, not the first tab, which may still be lent out.
+        local below = index == 1 and 0 or (Catcher(1):GetHeight() + 2) * (index - 1)
+        catcher:SetPoint("TOPLEFT", finder, "TOPRIGHT", 0, -60 - below)
+    end
     catcher:SetFrameLevel(finder:GetFrameLevel() + 1)
     catcher:SetAlpha(1)
+    if not catcher:IsMouseEnabled() then catcher:EnableMouse(true) end
 end
 
 local RunCatchers
@@ -98,11 +114,19 @@ local function SyncCatchers()
     end
     local up = finder:IsShown()
     local micro = MicroHost(finder, up)
+    local own = S.FinderOnOwnWho()
+    for _, side in ipairs(finderTabs) do ns.SetShownIf(side, not own) end
     for index = 1, #CATCH_KEYS do
-        local who = whoTabs[index]
-        local onWho = who and who:IsVisible() and (not up or who:IsMouseOver())
-        local host = onWho and who or finderTabs[index]
-        if index == 1 and micro then host = micro end
+        local host
+        if index == WHO_PAGE then
+            host = S.FinderWhoOwn() and finderTabs[index] or nil
+        else
+            local who = whoTabs[index]
+            local onWho = who and who:IsVisible() and (not up or who:IsMouseOver())
+            host = onWho and who or finderTabs[index]
+            if index == 1 and micro then host = micro end
+        end
+        if own then host = nil end
         if host then Lend(index, host) else GiveBack(index, finder) end
         local catcher, mine = Catcher(index), lent[index]
         if catcher and mine then
@@ -231,6 +255,8 @@ function S.BuildFinderSideTabs(parent, anchor)
             if entry.who then
                 PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB)
                 self:SetChecked(parent.selectedTab == WHO_PAGE)
+                -- The client's own Who tab over this one turns the page.
+                if S.FinderWhoOwn() then return end
                 -- Back to the Who tab in this window's place: this one goes first (in a fight too, unless it is locked).
                 if ns.HidePanel(parent) then ns.OpenWhoList() end
                 return
