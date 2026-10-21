@@ -409,7 +409,6 @@ return {
     trackingSameSize = false,
     tradeSkill = true,
     tradeSkillDual = false,
-    tradeSkillFull = false,
     tradeSkillSearch = true,
     trainer = true,
     unitFrameFocus = true,

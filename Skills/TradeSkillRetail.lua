@@ -1,8 +1,8 @@
 local _, ns = ...
 if ns.OnForever() then return end
 
--- Retail's crafting window: the old trade skill window (Skills/TradeSkill.lua) as its Recipes page, the game's own page
--- behind the size button and for what 1.x never had (the other tabs, runeforging, an NPC's crafts).
+-- Retail's crafting window: the old trade skill window (Skills/TradeSkill.lua) as its Recipes page; the game's own page
+-- for what 1.x never had (the other tabs, runeforging, an NPC's crafts, a recipe opened there till the window shuts).
 -- Watched from our child under the window, never hooked; nothing of the game's page is called.
 
 local L = ns.L
@@ -10,14 +10,12 @@ local R = ns.tradeReagents
 
 local GAME_W, GAME_H = 942, 658
 local PARK_X = 6000
--- This window's border is not lifted (its tab row): our page hangs this far past its foot instead, the window that much shorter.
-local FOOT_DROP = 10
+-- Our page hangs this far past the window's foot: its border wears the tab row's lift (5, Windows/Panels.lua), 5 less
+-- than Forever's window (1 past its page), so its foot line stands where Forever's does, under the page's buttons.
+local FOOT_DROP = 4
 local DROP_ARROW = "Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-"
 local DROP_HOW = { set = "file", highlightSet = "raw", add = true }
-local state = { ours = false }
-local sizer
-
-local function Full() return ns.db.tradeSkillFull == true end
+local state = { ours = false, game = false }
 
 -- The game's page width for its tab, as it last set it.
 local function GameWidth(frame)
@@ -27,7 +25,7 @@ end
 
 -- Ours stands for the Recipes tab of a profession the player crafts from.
 local function Wanted(page)
-    if not ns.TradeSkillActive() or Full() or not page:IsShown() then return false end
+    if not ns.TradeSkillActive() or state.game or not page:IsShown() then return false end
     return not (C_TradeSkillUI.IsRuneforging() or C_TradeSkillUI.IsNPCCrafting())
 end
 
@@ -52,37 +50,18 @@ local function Fit(frame)
     end
 end
 
-local function PickFull(full)
-    if Full() == full then return end
-    ns.db.tradeSkillFull = full
-    PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
-end
-
--- Ours beside the X, over the game's own (faded): our window or the game's page. On the game's page it stands left of the
--- game's, which keeps its own small view.
-local function SizeButton(frame, page)
-    local own = frame.MaximizeMinimize
-    if not sizer then
-        local ok, button = pcall(ns.NewFrame, "Frame", nil, frame, "MaximizeMinimizeButtonFrameTemplate")
-        if not ok or not button then return end
-        sizer = button
-        button:SetOnMaximizedCallback(function() PickFull(true) end)
-        button:SetOnMinimizedCallback(function() PickFull(false) end)
-    end
-    local shown = ns.TradeSkillActive() and page:IsShown() and (state.ours or Full())
-    ns.SetShownIf(sizer, shown)
-    if not shown then
-        if own then ns.SetAlphaIf(own, 1) end
-        return
-    end
-    local close = frame.CloseButton
-    if state.side ~= state.ours then
-        state.side = state.ours
-        ns.panels.MaxMinBeside(sizer, state.ours and close or own or close, state.ours and 8 or 2)
-    end
-    if close then ns.SetLevelIf(sizer, close:GetFrameLevel() + 2) end
-    if state.ours then sizer:SetMaximizedLook() else sizer:SetMinimizedLook() end
-    if own then ns.SetAlphaIf(own, state.ours and 0 or 1) end
+-- The game lays this window for its own 658 tall page, raised by its fit to stay on screen; ours is shorter and stands on
+-- the row's line as the game's other windows do (profwin read -55 against the line's -116). Out of a fight, by snippet.
+local function OnLine(frame)
+    if ns.MoverHolds(frame) or (ns.WindowMoving and ns.WindowMoving(frame)) then return end
+    if ns.Safe(frame:GetNumPoints()) ~= 1 then return end
+    local point, rel, relPoint, x, y = frame:GetPoint(1)
+    x, y = ns.Safe(x), ns.Safe(y)
+    if point ~= "TOPLEFT" or relPoint ~= "TOPLEFT" or not (x and y) then return end
+    if rel and rel ~= UIParent and rel ~= ns.windowParts.eraHost then return end
+    local _, top = ns.GameRow()
+    local want = top / (ns.WindowRatio(frame) or 1)
+    if math.abs(y - want) > 0.5 then ns.windowParts.TopLeft(frame, x, want) end
 end
 
 -- Every frame the window shows. In a fight a protected window keeps the page it has.
@@ -97,22 +76,28 @@ local function Tick()
         state.ours = ours
         Park(frame, page, ours)
     end
-    if state.ours and not locked then Fit(frame) end
+    if state.ours and not locked then
+        Fit(frame)
+        OnLine(frame)
+    end
     ns.SetShownIf(panel, state.ours)
-    SizeButton(frame, page)
+    -- The game's size button belongs to its own page: on ours it is gone, not faded (faded, it still took the click).
+    local own = frame.MaximizeMinimize
+    if own and not locked then ns.SetShownIf(own, not state.ours) end
 end
 
 ns.EventFrame({ "ADDON_LOADED", "PLAYER_ENTERING_WORLD" }, function(self)
     if not ProfessionsFrame then return end
     self:UnregisterAllEvents()
     ns.Sched.Attach(ProfessionsFrame, { name = "tradeskill.retail", every = 0, fn = Tick })
+    ns.Sched.OnVisible(ProfessionsFrame, "tradeskill.game", function(shown) if not shown then state.game = false end end)
 end)
 
 ------------------------------------------------------------------ the page's retail pieces
 
--- A recipe in the game's own page: the game opens it there on its own answer to this ask.
+-- A recipe in the game's own page, till the window shuts: the game opens it there on its own answer to this ask.
 local function OpenInGame(recipeID)
-    PickFull(true)
+    state.game = true
     C_TradeSkillUI.OpenRecipe(recipeID)
 end
 

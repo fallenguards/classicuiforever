@@ -775,8 +775,9 @@ local function CreateBook()
     -- like the classic quest log.
     ns.SetSlotWidth(f, ns.SIDE_TAB_SLOT)
     -- Its professions tab is the game's window, closed by the book's key in a fight too: a fight begun with it open
-    -- homed the book beside it, where its casting layer then held it.
-    ns.SetSlotShares(f, { ProfessionsFrame = true })
+    -- homed the book beside it, where its casting layer then held it. Forever's only: retail's is the crafting window,
+    -- which the book stands beside.
+    if ns.OnForever() then ns.SetSlotShares(f, { ProfessionsFrame = true }) end
     -- Era's spellbook's pushable (0): the quest log and social window replace it, as there.
     if not Hosted() then ns.RegisterClassicWindow(f, 0) end
     ns.db.spellBookPos = nil
