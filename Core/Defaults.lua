@@ -2,7 +2,7 @@ local _, ns = ...
 local L = ns.L
 
 ns.DB_DEFAULTS = {
-    dbVersion = 24,
+    dbVersion = 25,
     classicBar = true,
     oneBar = false,
     classicBarSize = false,
@@ -317,7 +317,7 @@ ns.DB_DEFAULTS = {
     hideMapQuestButton = false,
     lootWindow = true,
     gameMenu = true,
-    lootRoll = false,
+    lootRoll = true,
     settingsPanel = true,
     panels = true,
     classicChat = true,

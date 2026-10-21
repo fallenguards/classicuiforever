@@ -304,3 +304,12 @@ function ns.DressLootRoll(frame, bop)
     if active then Dress(frame, "preview") end
     return active
 end
+
+-- dbVersion 25: on by default for new installs; a save from before keeps it off as it was (a profile's too).
+function ns.KeepLootRollOff()
+    if ns.db.lootRoll == nil then ns.db.lootRoll = false end
+    for _, shot in pairs(type(ns.db.profiles) == "table" and ns.db.profiles or {}) do
+        if type(shot) == "table" and shot.lootRoll == nil then shot.lootRoll = false end
+    end
+    ns.db.dbVersion = 25
+end
