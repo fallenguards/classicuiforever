@@ -2,6 +2,20 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN45_1_TITLE"] = "Collections on retail"
+L["WN45_1_TEXT"] = "The classic Collections window is on retail too: mounts, pets with your battle team beside them, toys and heirlooms as book pages, campsites and appearances, each page with the game's own filters. Drag a preview to turn it, scroll over a creature to zoom, right-drag an appearance to move it; the reset button beside the arrows puts it back. Collections window is on by default, in the options (/fcui) under Character, spells, talents."
+L["WN45_2_TITLE"] = "A search on every page"
+L["WN45_2_TEXT"] = "Each options page has its own search box at the top right, which looks through that page only; the search at the top left still covers every page. Toggle none and Default toggles moved to the bottom right. Classic style windows is gone from All windows: every window is its own box now, and no row grays out because of another."
+L["WN45_3_TITLE"] = "Statistics search"
+L["WN45_3_TEXT"] = "A search box on the character window's Stats tab finds statistics by name or category. Off by default; turn it on in the options (/fcui), under Character, spells, talents."
+L["WN45_4_TITLE"] = "Interface size"
+L["WN45_4_TEXT"] = "The classic layout sets the game's UI Scale to Classic Era's size, 90% on most screens. Toggle none in the options sidebar now offers to put your old size back, with a check box in its confirm, and Default toggles offers Era's size while you are at another. Both confirms say to save a profile first to come back to your settings, and the FAQ page explains the size."
+L["WN45_5_TITLE"] = "Who list off"
+L["WN45_5_TEXT"] = "With Who list off, the Who tab on the social window and the Who side tab on the group finder open Forever's own Who list, a page of the finder; Listing and Browse go back to the classic pages. Hide Who tab takes the tab off the social window's foot. Off by default; turn it on in the options (/fcui), under Social."
+L["WN45_6_TITLE"] = "Bags and bars"
+L["WN45_6_TEXT"] = "Hide key ring art takes the key ring's art off the band. Off by default; turn it on in the options (/fcui), under Bags. On retail the reagent bag has its own picks under Bags: as key art, as squished bag art, a full slot or hidden. One bar turns nothing else on and lists its pairings under it, and the modern page arrows sit above the gryphon with Gryphons over bars."
+L["WN45_7_TITLE"] = "Fixes"
+L["WN45_7_TEXT"] = "On retail a moonkin druid saw two mana bars; only ours shows now, under Astral Power. The spellbook's Professions page slides back when another window closes, and on retail the crafting window opens beside the spellbook, not over it, with its border under the Create row; its expand button is gone, as the game's page is reached from the recipe. The group finder eye stays on the minimap's rim through Edit Mode, and on retail Shift-drag slides it round the rim. The micro menu's Edit Mode box no longer flashes in the corner, a micro button's alert pulses the 1.x glow, friendly nameplates no longer flash purple on retail, a Collections preview opens framed, Toggle none unchecks the windows under a parent, Loot rolls is on by default for new installs, and the options search keeps the rows above a match bright."
 L["WN44_1_TITLE"] = "Themes in one color"
 L["WN44_1_TEXT"] = "Themes now draw everything in one even color by default, as a dark mode does. To bring textures back for the parts you pick, turn on Textured color in the options (/fcui), under Look; the Themed drop down picks which parts take the theme at all. Parchment takes the theme too, with light text on a dark page. If you used a theme before, your look is kept."
 L["WN44_2_TITLE"] = "Classic coins"

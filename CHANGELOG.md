@@ -2,6 +2,39 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.35.0] - 2026-10-21
+
+### Added
+- The classic Collections window on retail, with the game's own filters on every page: mounts, pets with the battle team beside them, toys and heirlooms as book pages, campsites and appearances. Drag a preview to turn it, scroll over a creature to zoom, right-drag an appearance to move it; a reset button beside the turn arrows puts the preview back (Preview reset button under Collections: shown, on hover or hidden). The Professions tab opens the professions book.
+- Each options page has a search of its own at the top right, for that page's options only. Toggle none and Default toggles moved to the bottom right.
+- Statistics search, under Character, spells, talents, off by default: a search box on the Stats tab that finds statistics by name or category (#211).
+- Hide Who tab, under Social, off by default: no Who tab at the foot of the social window. The group finder keeps its Who side tab, and /who still opens the list.
+- Hide key ring art, under Bags, off by default, as the key ring's Edit Mode box has it.
+- On retail the reagent bag has its own picks under Bags: as key art, as squished bag art, a full slot, or hidden.
+- Toggle none can put the interface size back. With Classic Era's size set by the classic layout, its confirm has a box, checked, that restores the size from before, and a chat line links to where the game's UI Scale lives. Default toggles offers Era's size the same way while the interface is at another size. The FAQ answers why the interface got bigger and how to get the old size back (#181).
+- With One bar on, a save left with its art hidden gets a chat line offering to show it again.
+
+### Changed
+- Classic style windows is gone from the All windows page. Every window is its own box, and no row grays out because of another. A save that had the switch off gets each window as its own box is checked.
+- With Who list off, the social window's Who tab and the group finder's Who side tab open Forever's own Who list, the game's page in the finder; Listing and Browse there go back to the classic pages (#210).
+- One bar turns nothing else on; the options it pairs with are listed under it.
+- Toggle none unchecks the windows under a parent too, and its confirm says to save a profile first to come back to the current settings. Loot rolls is on by default for new installs (#210).
+- The Adventure Guide and Sockets rows are left out on Forever, and a window's arrow on All windows names the page its box is also on (#210).
+- Modern page arrows sit above the gryphon with Gryphons over bars on.
+- On retail the spellbook button stays pressed on the Professions and Collections pages and a press there closes the page; the talents button stays up while the spellbook shows.
+
+### Removed
+- The expand button on retail's classic crafting window, which switched every crafting window to the game's page until pressed again. "More in the game window" opens a recipe there for that window only; turn Profession windows off to keep the game's.
+
+### Fixed
+- On retail, a druid in Moonkin Form showed two mana bars, ours drawn over the game's. Only ours shows, under Astral Power, as in Bear and Cat Form (#212).
+- The spellbook's Professions page slides back when another window closes, on both clients. On retail the crafting window opens beside the spellbook on the window line instead of over it, and its bottom border runs under the Create row.
+- The group finder eye stays on the minimap's rim through Edit Mode. On retail, where Edit Mode has no box for it, Shift-drag the eye or its icon to slide it round the rim; a Shift-drag used to leave it pressed off center and send it to another spot on the next login.
+- The micro menu's Edit Mode box no longer flashes in the screen's corner when another box is clicked, and a micro button's alert pulse flashes the 1.x glow instead of a modern icon over it.
+- Friendly players' nameplates no longer flash purple on retail.
+- A Collections preview opens framed without a reset, and reset recenters an appearance moved by a drag.
+- The options search shows a match's own options under it and keeps the rows above a match at full color.
+
 ## [0.34.0] - 2026-10-20
 
 ### Added
