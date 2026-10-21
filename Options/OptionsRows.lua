@@ -541,7 +541,7 @@ local function WindowRow(child, entry, jump, colW)
     arrow:SetSize(JUMP, JUMP)
     arrow:SetPoint("LEFT", box.text, "LEFT", math.min(math.ceil(box.text:GetStringWidth() or 0), room) + 2, 0)
     ns.DressStates(arrow, "sbNextUp", "sbNextDown", "sbNextDisabled", "highlight", JUMP_LOOK)
-    arrow.label, arrow.tooltip = jump, L["OPTWIN_OPEN_PAGE"]
+    arrow.label, arrow.tooltip = jump, L["OPTWIN_OPEN_PAGE"]:format(jump)
     ns.AttachTip(arrow, OPTION_TIP)
     arrow:SetScript("OnClick", function() if O.ShowPage then O.ShowPage(jump) end end)
     return box
