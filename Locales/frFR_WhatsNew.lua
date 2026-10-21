@@ -3,6 +3,16 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN47_1_TITLE"] = "Guilde et communautés"
+L["WN47_1_TEXT"] = "La fenêtre Guilde et communautés est maintenant une page sociale : elle porte les onglets Amis, Qui, Guilde et Raid dans ses deux modes, et son petit mode a la taille de la fenêtre sociale, avec l'anneau et le portrait."
+L["WN47_2_TITLE"] = "Profils en texte"
+L["WN47_2_TEXT"] = "Exporter et Importer sur la page des profils : un profil en une ligne de texte à copier vers un autre compte ou un ami, et de retour dans un nouveau profil."
+L["WN47_3_TITLE"] = "Largeur du menu"
+L["WN47_3_TEXT"] = "La fenêtre de réglage du micro-menu a un curseur Largeur du menu à côté de Taille : la rangée s'élargit ou se rétrécit, les boutons gardant leur taille. Au-delà de 100 %, Taille élargit maintenant le décor avec la rangée."
+L["WN47_4_TITLE"] = "Fenêtre sociale"
+L["WN47_4_TEXT"] = "La fenêtre sociale reste en place après une recherche Qui, le bouton de statut sous le titre accepte les clics, les boutons du micro-menu masqués n'ouvrent plus leur fenêtre depuis une place vide."
+L["WN47_5_TITLE"] = "Carte en combat"
+L["WN47_5_TEXT"] = "La carte du monde n'est protégée en combat que pendant que la carte classique de cet addon la dispose, donc les addons de carte fonctionnent en combat avec la carte classique désactivée."
 L["WN46_1_TITLE"] = "Fenêtre sociale"
 L["WN46_1_TEXT"] = "L'onglet Raid est de retour dans la rangée d'onglets de la fenêtre sociale sur les clients où le nouveau système social du jeu est désactivé, et le petit onglet sous Alliés récents indique à nouveau Rejoindre rapidement au lieu de Raid. La fenêtre ne se déplace plus que par sa barre de titre, si bien que le bouton de statut sous le titre accepte de nouveau les clics."
 L["WN45_1_TITLE"] = "Collections sur Retail"

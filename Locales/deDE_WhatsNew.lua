@@ -3,6 +3,16 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN47_1_TITLE"] = "Gilde und Gemeinschaften"
+L["WN47_1_TEXT"] = "Das Fenster Gilde und Gemeinschaften ist jetzt eine Seite des Kontaktefensters: es trägt in beiden Modi die Reiter Freunde, Wer, Gilde und Schlachtzug, und der kleine Modus hat die Größe des Kontaktefensters, mit Ring und Porträt."
+L["WN47_2_TITLE"] = "Profile als Text"
+L["WN47_2_TEXT"] = "Exportieren und Importieren auf der Profilseite: ein Profil als eine Textzeile zum Kopieren auf einen anderen Account oder an einen Freund, und zurück in ein neues Profil."
+L["WN47_3_TITLE"] = "Menübreite"
+L["WN47_3_TEXT"] = "Der Bearbeitungsdialog des Mikromenüs hat neben Größe einen Regler Menübreite: die Reihe wird breiter oder schmaler, die Knöpfe behalten ihre Größe. Größe über 100 % verbreitert jetzt die Kunst mit der Reihe."
+L["WN47_4_TITLE"] = "Kontaktefenster"
+L["WN47_4_TEXT"] = "Das Kontaktefenster bleibt nach einer Wer-Suche an seinem Platz, der Statusknopf unter dem Titel nimmt Klicks an, ausgeblendete Mikroknöpfe öffnen ihre Fenster nicht mehr aus einem leeren Sitz."
+L["WN47_5_TITLE"] = "Karte im Kampf"
+L["WN47_5_TEXT"] = "Die Weltkarte ist im Kampf nur geschützt, solange die klassische Karte dieses Addons sie anordnet, sodass Kartenaddons im Kampf funktionieren, wenn die klassische Karte aus ist."
 L["WN46_1_TITLE"] = "Kontaktefenster"
 L["WN46_1_TEXT"] = "Der Schlachtzug-Reiter ist zurück in der Reiterzeile des Kontaktefensters, wo das neue Kontaktesystem des Spiels aus ist, und der kleine Reiter unter Kürzlich Verbündete heißt wieder Schnellbeitritt statt Schlachtzug. Das Fenster lässt sich jetzt nur noch an seiner Titelleiste ziehen, sodass der Statusknopf unter dem Titel wieder Klicks annimmt."
 L["WN45_1_TITLE"] = "Sammlungen auf Retail"

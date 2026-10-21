@@ -3,6 +3,16 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN47_1_TITLE"] = "Gilda e comunità"
+L["WN47_1_TEXT"] = "La finestra Gilda e comunità è ora una pagina sociale: porta le schede Amici, Chi, Gilda e Incursione in entrambe le modalità, e la modalità piccola ha la dimensione della finestra sociale, con l'anello e il ritratto."
+L["WN47_2_TITLE"] = "Profili come testo"
+L["WN47_2_TEXT"] = "Esporta e Importa nella pagina dei profili: un profilo come una riga di testo da copiare su un altro account o a un amico, e di nuovo in un nuovo profilo."
+L["WN47_3_TITLE"] = "Larghezza del menu"
+L["WN47_3_TEXT"] = "La finestra di modifica del micromenu ha un cursore Larghezza del menu accanto a Dimensione: la fila si allarga o si restringe e i pulsanti mantengono la loro dimensione. Dimensione oltre il 100% ora allarga la grafica con la fila."
+L["WN47_4_TITLE"] = "Finestra sociale"
+L["WN47_4_TEXT"] = "La finestra sociale resta al suo posto dopo una ricerca Chi, il pulsante di stato sotto il titolo accetta i clic, i pulsanti del micromenu nascosti non aprono più le loro finestre da un posto vuoto."
+L["WN47_5_TITLE"] = "Mappa in combattimento"
+L["WN47_5_TEXT"] = "La mappa del mondo è protetta in combattimento solo mentre la mappa classica di questo addon la dispone, così gli addon per la mappa funzionano in combattimento con la mappa classica disattivata."
 L["WN46_1_TITLE"] = "Finestra sociale"
 L["WN46_1_TEXT"] = "La scheda Incursione è tornata nella fila di schede della finestra sociale sui client in cui il nuovo sistema sociale del gioco è disattivato, e la piccola scheda sotto Alleati recenti dice di nuovo Partecipazione rapida invece di Incursione. La finestra ora si trascina solo dalla sua barra del titolo, così il pulsante di stato sotto il titolo accetta di nuovo i clic."
 L["WN45_1_TITLE"] = "Collezioni su Retail"

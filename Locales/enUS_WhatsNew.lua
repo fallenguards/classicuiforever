@@ -2,6 +2,16 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN47_1_TITLE"] = "Guild & Communities page"
+L["WN47_1_TEXT"] = "The Guild & Communities window is a social page now: it carries the Friends, Who, Guild and Raid tabs in both its modes, and its small mode is the social window's size, with the ring and portrait."
+L["WN47_2_TITLE"] = "Profiles as text"
+L["WN47_2_TEXT"] = "Export and Import on the Profiles page: a profile as one line of text to copy to another account or a friend, and back into a new profile."
+L["WN47_3_TITLE"] = "Menu Width"
+L["WN47_3_TEXT"] = "The micro menu's edit dialog has a Menu Width slider beside Size: the row widens or narrows round buttons that keep their size. Size past 100% now widens the art with the row."
+L["WN47_4_TITLE"] = "Social window fixes"
+L["WN47_4_TEXT"] = "The social window stays put after a Who search, the status button under the title takes clicks, hidden micro buttons no longer open their windows from an empty seat."
+L["WN47_5_TITLE"] = "Map in combat"
+L["WN47_5_TEXT"] = "The world map is protected in a fight only while this addon's classic map lays it, so map addons work in combat with the classic map off."
 L["WN46_1_TITLE"] = "Social window fixes"
 L["WN46_1_TEXT"] = "The social window's Raid tab is back in its foot row on clients that have the game's new social system off, and the small tab under Recent Allies says Quick Join again instead of Raid. The window now drags by its title bar only, so the status button under the title takes clicks."
 L["WN45_1_TITLE"] = "Collections on retail"

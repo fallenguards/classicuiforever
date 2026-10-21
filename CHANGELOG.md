@@ -2,6 +2,28 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.36.0] - 2026-10-22
+
+### Added
+- Export and Import on the Profiles page. Export shows the profile in use as one line of text to copy; Import makes a new profile from such text, named as it was, and switches the character to it. Only known settings come in, and nothing in the text is ever run as code.
+- The Guild & Communities window is a social page: in both its modes it carries the social window's foot tabs (Friends, Who, Guild and Raid, with Communities picked), and its small mode takes the social window's size, with the ring and portrait, the drop-downs fitted beside it, a chat line that clears with an X, and its scroll bar's column inside the border.
+- A Menu Width slider beside Size in the micro menu's edit dialog: the row widens or narrows round buttons that keep their size, hidden seats' room used first and never under what the shown buttons need. Size over 100% now widens the art along with the row instead of growing the buttons out past it.
+- A Social option, "Drag social window by its title only", for a smaller drag area; off by default.
+- With EasyFind 4.0 installed, every option of this addon shows in EasyFind's search bar with its box, slider or drop-down working on the row, and Alt-click opens the options window lit on that row. This addon's pad over the chat's friends button also hides with EasyFind's Toggle Chat Frame.
+
+### Changed
+- The window lock's tooltip names the click first ("Lock the window", "Unlock the window") with the state under it; the map's too.
+- The social window's broadcast box wears the old dialog box with the theme instead of the game's border.
+- The micro menu's Reset To Default Size lights as soon as a slider moves, and Revert All puts the width back as well.
+- The social window's status drop-down and the frame beside it sit over the drag strip, so they take clicks whatever the strip's size; the strip is the full title bar again (0.35.1 had shrunk it) (#217).
+
+### Fixed
+- Inspect Talents from a player's menu showed the game's talent window. It opens our classic talents window on that player now; on this client the inspect window has no Talents button, so the menu is the way to someone's talents.
+- A micro button hidden with Keep the menu's width still showed its tooltip and opened its window from its empty seat (Spellbook, Professions, Quest Log, World Map, Guild, Help). The seat is dead now (#219).
+- After a Who search the social window jumped to the game's spot and stayed there, and on our Who and Guild tabs it had no lock or reset and would not drag. The search opens the game's finder for a moment, which pushed the window aside; it goes back to its place now, and the lock, reset and drag strip stay on every tab (#215).
+- Opening the Raid tab from the Who tab left the raid description sitting on the top edge of its box. The box goes back to where the game puts it as the Who tab closes.
+- In a fight the world map was protected whenever this addon was loaded, even with its classic map off and Leave game windows on, so another map addon's scaling and anchoring in combat was refused with errors. The map is protected only while this addon's classic map lays it (#220).
+
 ## [0.35.1] - 2026-10-21
 
 ### Fixed

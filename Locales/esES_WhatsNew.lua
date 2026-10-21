@@ -3,6 +3,16 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN47_1_TITLE"] = "Hermandad y comunidades"
+L["WN47_1_TEXT"] = "La ventana de Hermandad y comunidades es ahora una página social: lleva las pestañas Amigos, Quién, Hermandad y Banda en sus dos modos, y el modo pequeño tiene el tamaño de la ventana social, con el anillo y el retrato."
+L["WN47_2_TITLE"] = "Perfiles como texto"
+L["WN47_2_TEXT"] = "Exportar e Importar en la página de perfiles: un perfil como una línea de texto para copiarlo a otra cuenta o a un amigo, y de vuelta a un perfil nuevo."
+L["WN47_3_TITLE"] = "Anchura del menú"
+L["WN47_3_TEXT"] = "El diálogo de edición del micromenú tiene un control Anchura del menú junto a Tamaño: la fila se ensancha o estrecha y los botones conservan su tamaño. Tamaño por encima del 100 % ahora ensancha el arte con la fila."
+L["WN47_4_TITLE"] = "Ventana social"
+L["WN47_4_TEXT"] = "La ventana social se queda en su sitio tras una búsqueda de Quién, el botón de estado bajo el título acepta clics, los botones del micromenú ocultos ya no abren sus ventanas desde un hueco vacío."
+L["WN47_5_TITLE"] = "Mapa en combate"
+L["WN47_5_TEXT"] = "El mapa del mundo solo está protegido en combate mientras el mapa clásico de este addon lo coloca, así que los addons de mapa funcionan en combate con el mapa clásico desactivado."
 L["WN46_1_TITLE"] = "Ventana social"
 L["WN46_1_TEXT"] = "La pestaña Banda vuelve a la fila de pestañas de la ventana social en los clientes que tienen desactivado el nuevo sistema social del juego, y la pestaña pequeña bajo Aliados recientes vuelve a decir Unión rápida en vez de Banda. La ventana ahora solo se arrastra por su barra de título, así que el botón de estado bajo el título vuelve a aceptar clics."
 L["WN45_1_TITLE"] = "Colecciones en Retail"
