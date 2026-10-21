@@ -305,13 +305,14 @@ local MICRO_WINDOWS = {
 }
 -- The client's one window for spells and talents, where ours is not on.
 local SHARED = { SpellbookMicroButton = true, TalentMicroButton = true, PlayerSpellsMicroButton = true }
+local BOOK_BUTTONS = { SpellbookMicroButton = true, ForeverClassicUISpellbookMicroButton = true }
 -- MICRO_WINDOWS as frames, kept once made; one not made yet (load on demand, ours on first open) is looked up each pass.
 local windowFrames = {}
 for name in pairs(MICRO_WINDOWS) do windowFrames[name] = {} end
 
 local function WindowUp(name)
-    -- The book's other pages are the book (Spells/BookPages.lua).
-    if name == "SpellbookMicroButton" and ns.BookPageUp and ns.BookPageUp() then return true end
+    -- The book's other pages are the book (Spells/BookPages.lua), for the game's button and the band's own.
+    if BOOK_BUTTONS[name] and ns.BookPageUp and ns.BookPageUp() then return true end
     local names, frames = MICRO_WINDOWS[name], windowFrames[name]
     for i = 1, #names do
         local frame = frames[i]
@@ -330,9 +331,11 @@ local function WindowUp(name)
         if name == "SpellbookMicroButton" then off = not ns.ModuleInForce("spellBook") else off = not ns.TalentsActive() end
         local shared = _G["PlayerSpellsFrame"]
         if off and shared and shared:IsShown() then
-            -- Each button follows its own half, as the client's update does.
-            local half = (name == "SpellbookMicroButton" and shared.SpellBookFrame)
-                or (name == "TalentMicroButton" and shared.TalentsFrame) or nil
+            -- Each button follows its own half, as the client's update does; retail's talents button is down on any
+            -- page but the spells (that half is our book's casting layer).
+            local book = shared.SpellBookFrame
+            if name == "PlayerSpellsMicroButton" then return not (book and book:IsShown()) end
+            local half = (name == "SpellbookMicroButton" and book) or (name == "TalentMicroButton" and shared.TalentsFrame) or nil
             if not half or half:IsShown() then return true end
         end
     elseif name == "QuestLogMicroButton" and not ns.ModuleInForce("questLog") then

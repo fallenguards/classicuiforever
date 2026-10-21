@@ -10,8 +10,22 @@ local BOOK_BUTTONS = { "SpellbookMicroButton", "PlayerSpellsMicroButton" }
 local P = {}
 
 local function ProfessionsBookPage()
+    -- Retail's book is its own window, the book's page while it wears our look.
+    if not ns.OnForever() then
+        local book = _G.ProfessionsBookFrame
+        return book ~= nil and book:IsShown() and ns.ModuleInForce("professionsBook")
+    end
     local frame = _G.ProfessionsFrame
     return frame ~= nil and frame:IsShown() and frame.BookPage ~= nil and frame.BookPage:IsShown()
+end
+
+local function ProfClose() return ns.OnForever() and "ProfessionsFrameCloseButton" or "ProfessionsBookFrameCloseButton" end
+
+-- Retail's spellbook button, which cannot press the bind: with a page of the book up, its press shuts that page, as
+-- the key does. nil otherwise.
+function ns.BookPageShutMacro()
+    if ns.CollectionsBookPage and ns.CollectionsBookPage() and _G[SHUT_NAME] then return "/click " .. SHUT_NAME end
+    if ProfessionsBookPage() then return "/click " .. ProfClose() end
 end
 
 -- A page turn (a foot tab): the old page goes a frame or two before the new one shows; the button holds through it.
@@ -137,17 +151,24 @@ function ns.BookFollowsPage(page)
     ns.SetPointIf(book, "TOPLEFT", UIParent, "TOPLEFT", x / k, y / k)
 end
 
+-- The page the bind shuts: Forever's professions window on its book page; retail's book is its own window, the book's
+-- page while it wears our look (its spot kept by Skills/ProfessionsBookRetail.lua).
 local function WatchProfessions()
-    local frame = _G.ProfessionsFrame
-    if P.profWatched or not (P.header and frame and frame.BookPage) or InCombatLockdown() then return end
+    if P.profWatched or not P.header or InCombatLockdown() then return end
+    local forever = ns.OnForever()
+    local frame = forever and _G.ProfessionsFrame or _G.ProfessionsBookFrame
+    local page = frame and (forever and frame.BookPage or frame)
+    if not page or (not forever and not ns.ModuleInForce("professionsBook")) then return end
     P.profWatched = true
-    -- Its profession tabs stand past its art, as the book's side tabs; on the book's spot each frame it is up.
-    if ns.SetSlotWidth then ns.SetSlotWidth(frame, ns.SIDE_TAB_SLOT) end
-    ns.Sched.Attach(frame, { name = "bookPages.spot", every = 0, fn = ns.KeepBookPageSpot })
+    if forever then
+        -- Its profession tabs stand past its art, as the book's side tabs; on the book's spot each frame it is up.
+        if ns.SetSlotWidth then ns.SetSlotWidth(frame, ns.SIDE_TAB_SLOT) end
+        ns.Sched.Attach(frame, { name = "bookPages.spot", every = 0, fn = ns.KeepBookPageSpot })
+        ns.Sched.OnVisible(page, "bookPages.profPage", ns.BookPagesChanged)
+    end
     P.header:SetFrameRef("prof", frame)
-    P.header:SetFrameRef("profPage", frame.BookPage)
+    P.header:SetFrameRef("profPage", page)
     ns.Sched.OnVisible(frame, "bookPages.prof", ns.BookPagesChanged)
-    ns.Sched.OnVisible(frame.BookPage, "bookPages.profPage", ns.BookPagesChanged)
 end
 
 -- Out of combat, once the bind and the Collections tab's pad exist (the book's first build).
@@ -165,7 +186,7 @@ function ns.WireBookPages()
     bind:SetAttribute("type5", "macro")
     bind:SetAttribute("macrotext5", "/click " .. SHUT_NAME)
     bind:SetAttribute("type6", "macro")
-    bind:SetAttribute("macrotext6", "/click ProfessionsFrameCloseButton")
+    bind:SetAttribute("macrotext6", "/click " .. ProfClose())
     SecureHandlerWrapScript(bind, "OnClick", P.header, PRESS)
     -- The book's own foot tabs to its other pages: pads while the layer is up, the tabs themselves otherwise.
     for i, key in pairs({ [2] = "prof", [4] = "coll" }) do

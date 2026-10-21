@@ -40,6 +40,8 @@ local ns = {
     NewFrame = function() return Frame() end,
     EventFrame = function() end,
     Sched = { NextFrame = function() end, OnVisible = function() end, Attach = function() end },
+    OnForever = function() return true end,
+    ModuleInForce = function() return true end,
 }
 assert(loadfile(ROOT .. "/Spells/BookPages.lua"))("ClassicUIForever", ns)
 ns.WireBookPages()

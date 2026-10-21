@@ -1513,9 +1513,11 @@ local function CreateBook()
         ns.RefreshMicroButtons()
     end)
     if ns.MicroButtonFollows and not Hosted() then
-        for _, name in ipairs({ "SpellbookMicroButton", "PlayerSpellsMicroButton" }) do
-            ns.MicroButtonFollows(_G[name], function() return f:IsShown() or ns.BookPageUp() end, f)
-        end
+        local function Up() return f:IsShown() or ns.BookPageUp() end
+        ns.MicroButtonFollows(_G.SpellbookMicroButton, Up, f)
+        -- The spells and talents button is the book's only while the band has no spellbook button of ours; beside
+        -- ours it is the talents button.
+        ns.MicroButtonFollows(_G.PlayerSpellsMicroButton, function() return not ns.SpellbookMicroButton and Up() end, f)
     end
     -- Event names differ between clients; a missing one is skipped.
     for _, event in ipairs({ "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB", "LEARNED_SPELL_IN_SKILL_LINE", "SPELL_UPDATE_COOLDOWN", "PLAYER_REGEN_ENABLED", "PET_BAR_UPDATE", "PLAYER_ENTERING_WORLD", "SKILL_LINES_CHANGED" }) do
