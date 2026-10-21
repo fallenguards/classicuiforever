@@ -335,14 +335,22 @@ local function ApplyArtShape(bar)
 end
 B.ApplyArtShape = ApplyArtShape
 
--- The micro menu's selection box stays hidden: it moves by our handle (MicroHome). Bags and tracking bars
--- keep theirs, as pieces the player can take off the band.
+-- The micro menu's selection box stays unseen: it moves by our handle (MicroHome). Bags and tracking bars keep theirs,
+-- as pieces the player can take off the band. Faded and deaf, not only hidden: a click on any box shows every other,
+-- and it flashed in the corner till the next beat.
 local HIDDEN_BOXES = { "MicroMenuContainer" }
+local function BoxSeen(selection, seen)
+    ns.SetAlphaIf(selection, seen and 1 or 0)
+    if selection:IsMouseEnabled() ~= seen then selection:EnableMouse(seen) end
+end
 function B.HideSelections()
     for _, name in ipairs(HIDDEN_BOXES) do
         local system = _G[name]
         local selection = system and system.Selection
-        if selection and selection:IsShown() then selection:Hide() end
+        if selection then
+            BoxSeen(selection, false)
+            if selection:IsShown() then selection:Hide() end
+        end
     end
     -- Status Tracking Bar 2's tick shows the second holder even empty (as the upper strip) and its box covered
     -- bars 2/3's, which rise only for a shown bar: hidden while empty and nothing is off the band, else restored if still lit.
@@ -360,6 +368,14 @@ function B.HideSelections()
 end
 
 -- Hide Bar Art follows on every art refresh, without a full layout pass (that stuttered while toggling).
+-- The band off: the micro menu's box the game's again.
+function B.ShowHiddenBoxes()
+    for _, name in ipairs(HIDDEN_BOXES) do
+        local system = _G[name]
+        if system and system.Selection and not InCombatLockdown() then BoxSeen(system.Selection, true) end
+    end
+end
+
 function B.KeepBarShape()
     local bar = ns.GetMainBar()
     if not bar then return end

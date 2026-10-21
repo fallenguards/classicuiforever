@@ -402,6 +402,7 @@ local function Restore()
     B.bottomWant = nil
     SetLane(false)
     RestoreSelections()
+    B.ShowHiddenBoxes()
     B.RehookPieces()
     local art = B.art
     if art then
