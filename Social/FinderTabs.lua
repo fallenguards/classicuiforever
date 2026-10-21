@@ -119,7 +119,11 @@ local function SyncCatchers()
     for index = 1, #CATCH_KEYS do
         local host
         if index == WHO_PAGE then
-            host = S.FinderWhoOwn() and finderTabs[index] or nil
+            if S.FinderWhoOwn() then
+                local social = S.whoTab
+                local onSocial = social and social:IsVisible() and (not up or social:IsMouseOver())
+                host = onSocial and social or finderTabs[index]
+            end
         else
             local who = whoTabs[index]
             local onWho = who and who:IsVisible() and (not up or who:IsMouseOver())
@@ -180,7 +184,7 @@ local function WatchClicks()
         if button ~= "LeftButton" then return end
         for index = 1, #CATCH_KEYS do
             local host, catcher = lent[index], Catcher(index)
-            local opens = host and (host.onWho or host == _G["LFDMicroButton"])
+            local opens = host and (host.onWho or host == _G["LFDMicroButton"] or host == S.whoTab)
             if opens and catcher and catcher:IsVisible() and catcher:IsMouseOver() then
                 -- Next frame: the client's own mouse-up turns the page first.
                 pending = index
@@ -188,6 +192,38 @@ local function WatchClicks()
             end
         end
     end)
+end
+
+---------------------------------------------------------------- the social window's Who tab, our list off
+
+-- Reached only without the client's tab over it: in a fight before the finder's code loaded, or on its Who page already.
+function S.OpenFinderWho()
+    local finder = _G["LFGParentFrame"]
+    if finder and finder:IsShown() and finder.selectedTab == WHO_PAGE then
+        if FriendsFrame and FriendsFrame:IsShown() then ns.HidePanel(FriendsFrame) end
+    elseif InCombatLockdown() then
+        ns.SayNotInCombat()
+    end
+end
+
+-- While the social window shows it: the finder's code fetched, then the client's Who tab kept over ours.
+local socialWatch, warmed
+local function SocialWho()
+    if not warmed and not _G["LFGParentFrame"] and not InCombatLockdown() and ns.WarmGroupFinder then
+        warmed = true
+        ns.WarmGroupFinder(true)
+    end
+    SyncCatchers()
+end
+
+function S.WatchSocialWho(host, on)
+    if on and not socialWatch then
+        socialWatch = ns.NewFrame("Frame", nil, host)
+        ns.Sched.OnFrame(socialWatch, { name = "social.whoCatchers", every = 0, fn = SocialWho })
+        WatchClicks()
+        WatchMicro()
+    end
+    if socialWatch then ns.SetShownIf(socialWatch, on) end
 end
 
 ---------------------------------------------------------------- on the Who tab

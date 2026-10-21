@@ -392,6 +392,7 @@ ns.TOGGLES = {
     { "mapUnlocked", L["OPT_mapUnlocked"], L["OPT_mapUnlocked_TIP"], search = "move map lock", needs = "worldMap" },
 
     { "whoList", L["OPT_whoList"], L["OPT_whoList_TIP"], group = L["GROUP_SOCIAL"], needs = "panels" },
+    { "hideWhoTab", L["OPT_hideWhoTab"], L["OPT_hideWhoTab_TIP"], needs = "panels", search = "who tab hide remove social group finder" },
     { "guildRoster", L["OPT_guildRoster"], L["OPT_guildRoster_TIP"], needs = "panels" },
     { "communitiesButton", L["OPT_communitiesButton"], L["OPT_communitiesButton_TIP"], parent = "guildRoster",
         search = "communities tab button tabs" },

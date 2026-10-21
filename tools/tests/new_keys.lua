@@ -4,6 +4,7 @@
 -- luacheck: std lua54
 return {
     hideThreatGlow = "same for everyone: opt-in, off by default",
+    hideWhoTab = "same for everyone: opt-in, off by default",
     hideTrackerHeader = "same for everyone: opt-in, off by default",
     hideMinimapNorth = "same for everyone: opt-in, off by default",
     hideChatButtonsHover = "same for everyone: opt-in, off by default",

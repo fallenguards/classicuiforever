@@ -474,6 +474,12 @@ local function StandDown(parent)
     local portrait = _G["LFGParentFramePortrait"]
     if portrait then ns.SetAlphaIf(portrait, 1) end
     if eyeHost then ns.SetShownIf(eyeHost, false) end
+    -- Its own Who tab, faded on our pages while Hide Who tab is on.
+    local who = parent.WhoListingTab
+    if who then
+        ns.SetAlphaIf(who, 1)
+        if not who:IsMouseEnabled() then who:EnableMouse(true) end
+    end
     -- Our art's frame takes the mouse across the window: off, or it took the list's clicks.
     if origin then ns.SetShownIf(origin, false) end
 end
@@ -602,14 +608,14 @@ local function SetActive(on)
     active = on
 end
 
--- Preloads the finder's load-on-demand code (the first open was slow); the
--- Who tab calls this as its side tabs come out.
-function ns.WarmGroupFinder()
-    if not active or InCombatLockdown() then return end
+-- Preloads the finder's load-on-demand code (the first open was slow); the Who tab calls this as its side tabs come
+-- out. always: the social window's Who tab with our list off, which opens the finder's own Who page.
+function ns.WarmGroupFinder(always)
+    if not (active or always) or InCombatLockdown() then return end
     if C_AddOns and C_AddOns.IsAddOnLoaded and not C_AddOns.IsAddOnLoaded(ADDON_NAME) then
         pcall(C_AddOns.LoadAddOn, ADDON_NAME)
     end
-    ns.SafeCall(Fit)
+    if active then ns.SafeCall(Fit) end
 end
 
 local function Apply()

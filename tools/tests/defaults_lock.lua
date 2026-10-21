@@ -171,6 +171,7 @@ return {
     hideStatusSecond = false,
     hideThreatGlow = true,
     hideTrackerHeader = false,
+    hideWhoTab = false,
     housingMinimapButton = true,
     hoverAddonBag = false,
     hoverBothNumbers = true,

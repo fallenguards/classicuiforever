@@ -97,6 +97,9 @@ local function ClientWhoMouse()
     local tab = ClientWho()
     if tab then tab:EnableMouse(not clientWhoOff) end
 end
+-- Hide Who tab: no Who tab at the social window's foot (ours or the game's); the finder keeps its side tab.
+function S.WhoTabHidden() return ns.db ~= nil and ns.db.hideWhoTab == true end
+
 -- True when the tab changed hands.
 function S.ClientWhoTab(off)
     local tab = ClientWho()

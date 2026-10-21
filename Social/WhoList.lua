@@ -404,9 +404,21 @@ local function BuildTab()
     SelectOurTab(false)
     tab:SetScript("OnClick", function()
         PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB)
-        ShowWho()
+        if active then ShowWho() else S.OpenFinderWho() end
     end)
     S.HookFriendsFrame(host, SOCIAL_HOOKS)
+end
+
+-- Forever's social window has no Who tab of the game's: with our list off ours stays, opening its Who page instead.
+local function StandsIn() return not FRIEND_TAB_WHO and ns.ModuleInForce("panels") end
+
+local function StandIn()
+    if active or not StandsIn() then return end
+    BuildTab()
+    if not tab then return end
+    tab:SetShown(not S.WhoTabHidden())
+    S.WatchSocialWho(tab, true)
+    S.PlaceTabs()
 end
 
 -- The first tab says Contacts on this client; 1.x said Friends.
@@ -434,7 +446,8 @@ local function Apply()
         BuildTab()
         RenameFirstTab()
         if tab then
-            tab:Show()
+            tab:SetShown(not S.WhoTabHidden())
+            S.WatchSocialWho(tab, false)
             S.ClientWhoTab(true)
         end
         S.PlaceTabs()
@@ -446,8 +459,25 @@ local function Restore()
     SetActive(false)
     HideWho()
     S.UseOpener("whoList", false)
-    if tab then tab:Hide() end
-    if S.ClientWhoTab(false) then S.PlaceTabs() end
+    if FriendsFrame and StandsIn() then
+        ns.WhenCalm("social.whoStandIn", StandIn)
+    elseif tab then
+        tab:Hide()
+    end
+    if S.ClientWhoTab(S.WhoTabHidden()) then S.PlaceTabs() end
 end
+
+-- In a fight too: only widget calls (the game's tab takes its mouse back after it).
+ns.OnToggle(function(key)
+    if key ~= "hideWhoTab" then return end
+    local hidden = S.WhoTabHidden()
+    if active or StandsIn() then
+        if not tab then return end
+        tab:SetShown(not hidden)
+    elseif not S.ClientWhoTab(hidden) then
+        return
+    end
+    S.PlaceTabs()
+end)
 
 ns.RegisterModule("whoList", { apply = Apply, restore = Restore })
