@@ -54,10 +54,12 @@ local chunk = "local snapped, rimX, rimY, lookUntil = true, -95.2, -12.5, 0\n" .
     .. "\nreturn EyeTick, function(on) snapped = on end"
 local EyeTick, SetSnapped = assert(load(chunk, "eye", "t", env))()
 
-local job = {}
+local job, clock = {}, 0
+-- A second apart: past the 0.1 s look outside edit mode.
 local function Tick()
     placed = 0
-    EyeTick(job, 0)
+    clock = clock + 1
+    EyeTick(job, clock)
     return placed
 end
 
@@ -84,6 +86,21 @@ Check(Tick() == 0, "while edit mode drags the eye, the watch leaves it to the mo
 Check(Tick() == 0, "and on every look of the drag")
 eye.dragged = false
 Check(Tick() == 1, "dropped, it is placed on the rim toward the drop")
+
+-- Edit mode: the micro menu's anchor lays the eye at its corner with no event, frame after frame; each frame's look puts
+-- it back (a 0.1 s look let it show there, twitching).
+env.ns.EditMode.state = true
+local frameClock = clock
+for n = 1, 3 do
+    eye.points = { { "BOTTOMRIGHT", MicroMenu, "BOTTOMLEFT", -15, 12 } }
+    placed = 0
+    frameClock = frameClock + 0.016
+    EyeTick(job, frameClock)
+    Check(placed == 1, "in edit mode, frame " .. n .. " after the game lays it at the micro menu, it is back on the rim")
+    eye.points = { { "CENTER", Minimap, "CENTER", -95.2, -12.5 } }
+end
+env.ns.EditMode.state = false
+clock = frameClock + 1
 
 -- Snap to minimap off: wherever edit mode and the game put it.
 SetSnapped(false)

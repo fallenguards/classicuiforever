@@ -33,9 +33,17 @@ function face:GetPoint() return table.unpack(self.point) end
 local button = { hooks = {} }
 function button:HookScript(script, fn) self.hooks[script] = fn end
 
+-- The release watch: its handler kept, its event's registration counted.
+local watch = { events = {} }
+function watch:RegisterEvent(event) self.events[event] = true end
+function watch:UnregisterAllEvents() self.events = {} end
 local ns = {
     SetPointOnce = function(region, ...) region.point = { ... } end,
     HookScriptOnce = function(frame, script, fn) frame.hooks[script] = fn end,
+    EventFrame = function(_, fn)
+        watch.fn = fn
+        return watch
+    end,
 }
 local env = setmetatable({ ns = ns }, { __index = _G })
 assert(load(Cut("/Map/MinimapButton.lua", "-- Era's minimap button press", "local function Build(ring)"), "ring press",
@@ -51,12 +59,20 @@ button.hooks.OnMouseUp(button)
 Check(At(17, -16), "released: back on its spot")
 button.hooks.OnMouseUp(button)
 Check(At(17, -16), "an up with no press leaves it be")
+-- A drag took the mouse up (the eye stayed pressed, off centre): any release lets it go.
+button.hooks.OnMouseDown(button)
+Check(watch.events.GLOBAL_MOUSE_UP, "a press listens for the next release anywhere")
+watch.fn(watch)
+Check(At(17, -16), "a release away from the button lets the face go")
+Check(not watch.events.GLOBAL_MOUSE_UP, "and stops listening")
 ns.RingPress(button, true)
 button.hooks.OnHide(button)
 Check(At(17, -16), "hidden while held: back on its spot")
--- A pad over the button (a micro icon's) passes its press on.
+-- A pad over the button (a micro icon's) passes its press on; its drag takes the mouse up from the pad too.
+watch.events = {}
 ns.RingPress(button, true)
 Check(At(18, -17), "a pad's press moves the face")
+Check(watch.events.GLOBAL_MOUSE_UP, "a pad's press listens for the next release anywhere")
 ns.RingPress(button, false)
 Check(At(17, -16), "and its release puts it back")
 ns.RingPress({}, true)

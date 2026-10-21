@@ -107,7 +107,23 @@ local function Unsnap(eye)
         (info.offsetY or 0) / scale)
 end
 
-local function PlaceEye()
+local PlaceEye
+
+-- Retail's edit mode has no box for the eye: it moves round the rim as our minimap buttons do (Shift-drag, #180), its
+-- angle kept as Era's spot's was.
+local dragJob
+local function DragTick() MM.EyeDragTo(ns.MinimapCursorAngle()) end
+local function EyeDrag(eye)
+    if ns.OnForever() or dragJob then return end
+    dragJob = ns.Sched.OnFrame(CreateFrame("Frame", nil, eye), { name = "minimap.eyeDrag", every = 0, awake = false, fn = DragTick })
+    eye:RegisterForDrag("LeftButton")
+    eye:HookScript("OnDragStart", function()
+        if MM.active and ns.db.eyeSnapMinimap ~= false and ns.MinimapDragOK() then dragJob:Wake() end
+    end)
+    eye:HookScript("OnDragStop", function() dragJob:Sleep() end)
+end
+
+PlaceEye = function()
     local eye = QueueStatusButton
     if not eye or not Minimap then return end
     -- A ring button's look over the game's eye, which fades; its glow stays (a group found). Border and eye are the
@@ -120,6 +136,7 @@ local function PlaceEye()
         ns.RingPressable(eye, face, over)
         ns.DressStates(eye, nil, nil, nil, "zoomHighlight", ns.RING_HIGHLIGHT)
         ns.Sched.Attach(over, { name = "minimap.eyeTurn", every = FRAME_TIME, fn = Turn })
+        EyeDrag(eye)
     end
     if eye.Eye then ns.SetAlphaIf(eye.Eye, 0) end
     if not over:IsShown() then over:Show() end
@@ -148,6 +165,12 @@ local function PlaceEye()
     if ns.PlaceRingButton then ns.PlaceRingButton("minimapGroupFinder") end
 end
 MM.PlaceEye = PlaceEye
+
+-- A drag's angle, from the eye itself (queued) or our icon riding it: the eye and icon on the rim there, kept.
+function MM.EyeDragTo(angle)
+    ns.db.lfgButtonAngle = angle
+    PlaceEye()
+end
 
 -- Our minimap off: the game's own eye back, at the place edit mode gave it.
 function MM.UnplaceEye()
@@ -229,9 +252,16 @@ local function OffRim(eye)
     return snapped and ns.IsAt(eye, "CENTER", Minimap, "CENTER", rimX, rimY, 0.01) ~= true
 end
 
--- No events for moves, resets or size changes in edit mode: poll there. The settings dialog shows only in edit mode.
+-- No events for moves, resets or size changes in edit mode: poll there, every frame (the micro menu's anchor lays the eye
+-- at its corner again with no event, and a 0.1 s look showed it there); after a wake otherwise, every 0.1 s. The settings
+-- dialog shows only in edit mode.
+local LOOK_EVERY = 0.1
 local function EyeTick(job, now)
     local editing = ns.EditMode.state
+    if not editing then
+        if now < (job.nextLook or 0) then return end
+        job.nextLook = now + LOOK_EVERY
+    end
     if editing then FollowDialog() end
     local eye = QueueStatusButton
     if MM.active and eye then
@@ -263,16 +293,31 @@ function ns.EyeFollows()
     if eyeWatch and MM.active then SetEyeWatch(true) end
 end
 
+-- The game's edit mode passes lay the eye at the micro menu's corner; a look a frame later still drew it there once. A
+-- child stretched to the screen's corner resizes as the eye moves, before the draw, so the eye goes back in that pass
+-- (a child: edit mode still drags the eye).
+local function CatchMoves(eye)
+    local catch = CreateFrame("Frame", nil, eye)
+    catch:SetPoint("TOPLEFT", eye, "TOPLEFT", 0, 0)
+    catch:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, 0)
+    catch:SetScript("OnSizeChanged", function()
+        if MM.active and OffRim(eye) and not Dragged(eye) and not InCombatLockdown() then PlaceEye() end
+    end)
+end
+
 -- Created at the first Layout with an eye (after the bar's Init made the edit poll); runs with the module on or off.
 function MM.WatchEye()
     if eyeWatch then return end
-    eyeWatch = ns.Sched.Job({ name = "minimap.eye", every = 0.1, fn = EyeTick, awake = false })
+    eyeWatch = ns.Sched.Job({ name = "minimap.eye", every = 0, fn = EyeTick, awake = false })
     local events = CreateFrame("Frame")
     events:SetScript("OnEvent", EyeEvent)
     ns.RegisterEvents(events, EYE_EVENTS)
     ns.OnEditMode(EditEdge)
     -- Its move wakes the watch, which puts it back on the rim.
-    if QueueStatusButton then ns.Sched.OnMove(QueueStatusButton, EyeEvent) end
+    if QueueStatusButton then
+        ns.Sched.OnMove(QueueStatusButton, EyeEvent)
+        CatchMoves(QueueStatusButton)
+    end
     SetEyeWatch(true)
 end
 

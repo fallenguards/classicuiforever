@@ -36,6 +36,8 @@ local MICROS = {
     { toggle = "lfgMinimapButton", micro = "LFDMicroButton", face = "eye", id = "GroupFinder", angle = 137,
         name = "ForeverClassicUIGroupFinderButton", entry = "minimapGroupFinder", angleKey = "lfgButtonAngle",
         ride = function() return QueueStatusButton end,
+        -- Retail's edit mode has no box for the eye: a Shift-drag of the icon slides eye and icon round the rim.
+        dragHost = not ns.OnForever() and function(angle) ns.MM.EyeDragTo(angle) end or nil,
         label = L["OPT_hideMicroGroupFinder"], rule = "FinderPanelDisabled" },
     { toggle = "collectionsMinimapButton", micro = "CollectionsMicroButton", face = "Mounts", id = "Collections", angle = 232, free = true,
         label = L["OPT_hideMicroCollections"], rule = "CollectionsPanelDisabled" },
@@ -117,11 +119,12 @@ for _, spec in ipairs(MICROS) do
         angle = spec.angle,
         free = spec.free,
         ride = spec.ride,
+        dragHost = spec.dragHost,
         piece = true,
         show = "GroupFinderButton",
         face = function(icon) Face(spec, icon) end,
         tip = { anchor = "ANCHOR_LEFT", text = function() return TipText(spec) end, r = 1, g = 1, b = 1,
-            lines = not spec.ride and { { L["MAP_DRAG_TO_MOVE_AROUND_THE"], 0.8, 0.8, 0.8 } } or nil },
+            lines = (not spec.ride or spec.dragHost) and { { L["MAP_DRAG_TO_MOVE_AROUND_THE"], 0.8, 0.8, 0.8 } } or nil },
     })
     spec.frame = spec.name or ("ForeverClassicUIMinimap" .. spec.id .. "Button")
 end

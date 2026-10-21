@@ -165,6 +165,11 @@ local function OnDragUpdate(job)
     local cx, cy = GetCursorPosition()
     if cx == ring.dragX and cy == ring.dragY and mx == ring.dragMX and my == ring.dragMY and scale == ring.dragScale then return end
     ring.dragX, ring.dragY, ring.dragMX, ring.dragMY, ring.dragScale = cx, cy, mx, my, scale
+    -- A riding button moves only through what it rides (dragHost), never by its own angle.
+    if ring.ride then
+        if ring.dragHost then ring.dragHost(ns.MinimapCursorAngle()) end
+        return
+    end
     ns.db[ring.angleKey] = ns.MinimapCursorAngle()
     Position(ring)
 end
@@ -196,6 +201,15 @@ ns.RING_HIGHLIGHT = HL_RING
 -- Era's minimap button press (MiniMapButtonTemplate): the face 1 right and 1 down while held, back on release.
 local faceOf = setmetatable({}, { __mode = "k" })   -- a pressable button -> its face
 local heldAt = setmetatable({}, { __mode = "k" })   -- a held face -> its point before the press
+-- A drag takes the mouse up from the button and from a pad over it: any release lets every held face go.
+local releaseWatch
+local function ReleaseAll(self)
+    self:UnregisterAllEvents()
+    for face, held in pairs(heldAt) do
+        heldAt[face] = nil
+        ns.SetPointOnce(face, held[1], held[2], held[3], held[4], held[5])
+    end
+end
 function ns.RingPress(button, down)
     local face = faceOf[button]
     local held = face and heldAt[face]
@@ -204,6 +218,8 @@ function ns.RingPress(button, down)
         if not point then return end
         heldAt[face] = { point, rel, relPoint, x, y }
         ns.SetPointOnce(face, point, rel, relPoint, x + 1, y - 1)
+        releaseWatch = releaseWatch or ns.EventFrame({}, ReleaseAll)
+        releaseWatch:RegisterEvent("GLOBAL_MOUSE_UP")
     elseif not down and held then
         heldAt[face] = nil
         ns.SetPointOnce(face, held[1], held[2], held[3], held[4], held[5])
