@@ -270,15 +270,17 @@ local function IsSeatHidden(button)
     return key and db and db.hideMicroKeepWidth == true and HiddenByOption(db, key) or false
 end
 local function SeatHidden(button)
-    if IsSeatHidden(button) then
+    local hidden, was = IsSeatHidden(button), seatHidden[button] == true
+    if hidden then
         ns.SetFrameAlphaIf(button, 0)
         if button:IsMouseEnabled() then button:EnableMouse(false) end
         seatHidden[button] = true
-    elseif seatHidden[button] then
+    elseif was then
         ns.SetFrameAlphaIf(button, 1)
         button:EnableMouse(true)
         seatHidden[button] = nil
     end
+    return hidden ~= was
 end
 function ns.MicroSeatHidden(button) return seatHidden[button] == true end
 
@@ -356,7 +358,7 @@ end
 local function SeatShown(button)
     ns.HookScriptOnce(button, "OnEnter", MicroTip)
     if button == MainMenuMicroButton then ns.HookGlobal("MainMenuBarPerformanceBarFrame_OnEnter", PerfTip) end
-    SeatHidden(button)
+    return SeatHidden(button)
 end
 
 -- Buttons on the row, and with Keep button size the count their size is fitted to.
@@ -674,7 +676,7 @@ function B.LayoutMicroButtons()
     local spread, step = SpreadStep(wanted)
     local rowY = MICRO_Y
     if not out then rowY = MICRO_Y + MICRO_H * (baseScale - scale) / 2 end
-    local prev
+    local prev, seatsChanged
     for _, button in ipairs(wanted) do
         Seat(button, buttonScale, MICRO_W, MICRO_H, level)
         local parked = spread and IsSeatHidden(button)
@@ -686,9 +688,10 @@ function B.LayoutMicroButtons()
             button:SetPoint("BOTTOMLEFT", home, "BOTTOMLEFT", rowIn / scale, rowY / scale)
         end
         ns.SkinMicroButton(button)
-        SeatShown(button)
+        if SeatShown(button) then seatsChanged = true end
         if not parked then prev = button end
     end
+    if seatsChanged then ns.PlacePads() end   -- the pads over them follow (UI/SecurePad.lua)
     if not out and prev then FitRegion(prev, art) end
     if MicroMenu then
         if MicroMenu.BorderArt then MicroMenu.BorderArt:SetAlpha(0) end

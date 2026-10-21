@@ -127,9 +127,10 @@ MapPad = function(button, strata, after, target, when, editMode)
     function Place()
         if InCombatLockdown() then return end
         local left, bottom = button:GetLeft(), button:GetBottom()
-        -- Tested before the macro text: a pad not wanted builds none.
+        -- Tested before the macro text: a pad not wanted builds none. A micro button hidden in its seat (Keep the
+        -- menu's width) is faded, not hidden: its pad goes too, or it would still open the window.
         if not button:IsVisible() or ns.EditMode.Live() ~= (editMode == true) or not left or not bottom
-            or (when and not when()) then
+            or (when and not when()) or (ns.MicroSeatHidden and ns.MicroSeatHidden(button)) then
             HidePad()
             return
         end
