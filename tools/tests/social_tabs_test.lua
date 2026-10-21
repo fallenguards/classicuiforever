@@ -65,10 +65,16 @@ local function Social(clientWho)
     FriendsFrame = { GetWidth = function() return 338 end }
     for i = 1, 8 do _G["FriendsFrameTab" .. i] = nil end
     FriendsFrameTab1, FriendsFrameTab3, FriendsFrameTab4 = NewTab(), NewTab(), NewTab()
+    -- Ids as each client numbers them: retail's Who is 2, Raid 3, Quick Join 4; Forever has no Who, Raid 2, Quick Join 3.
     FriendsFrameTab1.id, FriendsFrameTab1.name = 1, "FriendsFrameTab1"
-    FriendsFrameTab3.id, FriendsFrameTab3.name = 2, "FriendsFrameTab3"
+    FriendsFrameTab3.id, FriendsFrameTab3.name = clientWho and 3 or 2, "FriendsFrameTab3"
+    FriendsFrameTab4.id, FriendsFrameTab4.name = clientWho and 4 or 3, "FriendsFrameTab4"
     FriendsFrameTab2 = clientWho and NewTab() or nil
+    if FriendsFrameTab2 then FriendsFrameTab2.id, FriendsFrameTab2.name = 2, "FriendsFrameTab2" end
     FRIEND_TAB_WHO = clientWho and 2 or nil
+    FRIEND_TAB_RAID, FRIEND_TAB_QUICK_JOIN = clientWho and 3 or 2, clientWho and 4 or 3
+    -- The raid page check reads the picked tab: the Friends page.
+    PanelTemplates_GetSelectedTab = PanelTemplates_GetSelectedTab or function() return 1 end
     local ns = Addon(not clientWho)
     ns.guild = {}
     ns.WhoPanel = function() return nil end
@@ -188,6 +194,16 @@ do
     S.PlaceTabs()
     Check(FriendsFrameTab1.fcuiPad == 38, "the option off: five-tab padding again")
     _G.ClassicUIForeverGuildTab = nil
+end
+
+-- A client tab by its id, not by a name built from it: Forever's Raid tab is FriendsFrameTab3 with id 2 and Quick Join
+-- FriendsFrameTab4 with id 3. The name lookup took the Raid tab for Quick Join and faded it (the stress test build,
+-- where the game's new social system is off, showed the Raid tab in the row for the first time).
+do
+    local S = Social(false)
+    Check(S.ClientTab(2) == FriendsFrameTab3, "the Raid tab is found by its id")
+    Check(S.ClientTab(3) == FriendsFrameTab4, "the Quick Join tab is found by its id, not the third global")
+    Check(S.ClientTab(nil) == nil and S.ClientTab(9) == nil, "no id, or none with it: nothing")
 end
 
 if failed > 0 then

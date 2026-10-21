@@ -41,6 +41,15 @@ function S.FriendsFrameTabs()
     return tabs
 end
 
+-- A client tab by its id: the globals' numbers skip (Forever's Raid tab is FriendsFrameTab3 with id 2, Quick Join
+-- FriendsFrameTab4 with id 3), so a name built from the id lands on the wrong tab.
+function S.ClientTab(id)
+    if not id then return nil end
+    for _, tab in ipairs(S.FriendsFrameTabs()) do
+        if tab:GetID() == id then return tab end
+    end
+end
+
 -- Our tab up (every client tab down) or down.
 function S.SelectFriendsTab(tab, on)
     if on then
@@ -92,7 +101,7 @@ local TIGHT_TAB_X = 0           -- first tab's left at most this far in (+ right
 local TIGHT_TAB_PAD = 24        -- least padding a tab keeps round its label
 -- Retail's client has a Who tab of its own (Forever's has none): unseen and off the row while ours stands in it.
 local clientWhoOff = false
-local function ClientWho() return FRIEND_TAB_WHO and _G["FriendsFrameTab" .. FRIEND_TAB_WHO] or nil end
+local function ClientWho() return S.ClientTab(_G.FRIEND_TAB_WHO) end
 local function ClientWhoMouse()
     local tab = ClientWho()
     if tab then tab:EnableMouse(not clientWhoOff) end
@@ -112,10 +121,7 @@ end
 
 -- Retail's Quick Join tab stood past the window's edge: off the row, its list reached from Recent Allies (below).
 local quickOff = false
-local function ClientQuick()
-    local id = _G.FRIEND_TAB_QUICK_JOIN
-    return id and _G["FriendsFrameTab" .. id] or nil
-end
+local function ClientQuick() return S.ClientTab(_G.FRIEND_TAB_QUICK_JOIN) end
 
 -- Covered while a list of ours is up.
 local function OverlayUp()
@@ -181,11 +187,7 @@ local function FirstTab()
 end
 
 -- The client's Raid tab, hidden by the switch; ours in its place presses it.
-local function ClientRaid()
-    for _, tab in ipairs(S.FriendsFrameTabs()) do
-        if tab:GetID() == _G.FRIEND_TAB_RAID then return tab end
-    end
-end
+local function ClientRaid() return S.ClientTab(_G.FRIEND_TAB_RAID) end
 
 local function RaidTab()
     local client = ClientRaid()
