@@ -67,18 +67,11 @@ local OPTION_TIP = { when = TipBody, text = TipLabel, r = 1, g = 1, b = 1,
         { TipGrayWhen, 1, 0.82, 0, true }, { TipGrayIf, 1, 0.82, 0, true }, { TipOffBy, 1, 0.82, 0, true } } }
 O.OPTION_TIP = OPTION_TIP
 
--- Not part of the classic look, so Toggle none leaves them (the minimap button leads back here), nor the radio picks,
--- nor a parent's picked boxes (checks: its windows, its frames): the parent off turns them off, on again finds them.
+-- Not part of the classic look, so Toggle none leaves them (the minimap button leads back here), nor the radio picks.
+-- A parent's picked boxes (its windows, its frames) go off with it: none is none.
 local NOT_IN_NONE = { minimapButton = true, welcomeNote = true, barsTakenNote = true, questLevels = true }
-local picks
 function O.InNone(key)
-    if not picks then
-        picks = {}
-        for _, entry in ipairs(ns.TOGGLES) do
-            if entry.checks and entry.parent then picks[entry[1]] = true end
-        end
-    end
-    return not NOT_IN_NONE[key] and not ns.TOGGLE_RADIO[key] and not picks[key]
+    return not NOT_IN_NONE[key] and not ns.TOGGLE_RADIO[key]
 end
 -- A radio pick that is a classic piece: Toggle none picks the game's own choice instead.
 O.NONE_PICKS = { "gameObjectiveTracker", "buffArrowShown" }
