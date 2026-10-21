@@ -55,8 +55,10 @@ local function Changed()
     state.dirty = true
     local frame = _G.ProfessionsBookFrame
     if not frame then return end
-    -- While it shows: the book's size and tabs follow the options.
+    -- While it shows: the book's size and tabs follow the options; on the book's spot each frame, as Forever's page.
     ns.Sched.Attach(frame, { name = "professions.retailBook", every = 0.1, fn = Pass })
+    ns.Sched.Attach(frame, { name = "bookPages.spot", every = 0, fn = ns.KeepBookPageSpot })
+    ns.SetSlotWidth(frame, ns.SIDE_TAB_SLOT)
     Pass()
 end
 

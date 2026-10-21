@@ -162,15 +162,29 @@ function ns.PlaceFightRaw()
     end
 end
 
+-- Retail's page whole on the book's corner (12, -14 off it): the game lays it at its own height. Its cards cast, so out of
+-- a fight, through the snippet.
+local PAGE_DOWN = 14
+local function StandWhole(P, page, x)
+    if InCombatLockdown() then return end
+    local _, y = ns.ClassicSlot()
+    local k = ns.WindowRatio(page) or 1
+    x, y = x / k, (y - PAGE_DOWN) / k
+    if not ns.IsAt(page, "TOPLEFT", UIParent, "TOPLEFT", x, y) then P.TopLeft(page, x, y) end
+end
+
 -- The book's page (the professions window) on the book's spot each frame it is up: the game's manager lays it in its
 -- left slot on every panel event, and a frame of that showed, over the sheet. Its first open lays the row at once.
 function ns.KeepBookPageSpot()
     local P, page = ns.windowParts, ns.BookPageWindow and ns.BookPageWindow()
     if not (page and P.Seen(page)) then return end
+    -- The row's watch, asleep while none of ours showed: a game window shut beside the page re-lays the row.
+    ns.WakeWindowWatch()
     if ns.MoverTakes(page) then return ns.BookFollowsPage(page) end
     -- Its first open: the row (which settles the sheet first), then the page, this frame.
     if not P.pageX then ns.LayWindowsNow() end
-    if P.pageX then P.StandAt(page, P.pageX) end
+    if not P.pageX then return end
+    if ns.OnForever() then P.StandAt(page, P.pageX) else StandWhole(P, page, P.pageX) end
 end
 
 -- For the dev addon's fight probe: the last fight lay's input, answer and windows.

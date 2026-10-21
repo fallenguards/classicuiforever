@@ -42,7 +42,7 @@ end
 local BESIDE_WIDTH = 352
 -- Pieces a client window hangs past its right edge.
 local SIDE_PIECES = { CharacterFrame = { "ModeTabs" } }
-local PlaceClassicWindows, StandAt, SheetSettle   -- forward declared: must stay local
+local PlaceClassicWindows, StandAt, SheetSettle, SecureTopLeft   -- forward declared: must stay local
 
 -- The gamepad's windows close only by their own hand (Core/Gamepad.lua). opener: ours, closing by Era's rule alone.
 local function HideClientPanels(opener, except)
@@ -217,9 +217,9 @@ local function ClientWindowOpened(name, panel)
     end
 end
 
--- Every frame while ours or the social window is up (ours must go the instant the client's shows).
+-- Every frame while ours, the social window or the book's page (the book shut under it) is up.
 local function AnyOursUp()
-    if FriendsFrame and FriendsFrame:IsShown() then return true end
+    if (FriendsFrame and FriendsFrame:IsShown()) or (ns.BookPageWindow and ns.BookPageWindow()) then return true end
     for panel in pairs(ns.windowRawShown) do
         if panel:IsShown() then return true end
     end
@@ -262,7 +262,7 @@ local function WatchPre(job)
     return false
 end
 
-local function WakeWindowWatch()
+function ns.WakeWindowWatch()
     if not windowJob or windowJob:IsAwake() then return end
     RecordClientWindows()
     windowJob:Wake()
@@ -273,7 +273,7 @@ function WatchClientWindows()
     windowWatch = ns.EventFrame("ADDON_LOADED", NamesStale)
     -- Otherwise every 0.25 s: walking 100+ windows every frame was the addon's second cost.
     windowJob = ns.Sched.OnFrame(windowWatch, { name = "windows.watch", every = 0.25, pre = WatchPre, fn = WindowPass })
-    if FriendsFrame then ns.Sched.Attach(FriendsFrame, { name = "windows.social", every = 0, fn = WakeWindowWatch }) end
+    if FriendsFrame then ns.Sched.Attach(FriendsFrame, { name = "windows.social", every = 0, fn = ns.WakeWindowWatch }) end
 end
 
 -- Ours that a window opened now replaces by Era's rule.
@@ -595,7 +595,7 @@ end
 
 -- For the fight lay of the game's windows our code opened (UI/WindowPanels.lua), and a pass on demand.
 ns.windowParts = { Seen = Seen, BlockSpan = BlockSpan, Locked = Locked, SheetGap = SheetGap, ERA_X = ERA_X, ERA_Y = ERA_Y,
-    StandAt = function(...) return StandAt(...) end }
+    StandAt = function(...) return StandAt(...) end, TopLeft = function(...) return SecureTopLeft(...) end }
 function ns.LayWindowsNow() PlaceClassicWindows() end
 
 -- Moves a client window's left edge to x on its manager's anchor, on screen; nil if it cannot move.
@@ -607,7 +607,7 @@ local POSITION_BODY = [[
     f:ClearAllPoints()
     f:SetPoint("TOPLEFT", self:GetParent(), "TOPLEFT", self:GetAttribute("x"), self:GetAttribute("y"))
 ]]
-local function SecureTopLeft(panel, x, y)
+SecureTopLeft = function(panel, x, y)
     if InCombatLockdown() then return false end
     positioner = positioner or CreateFrame("Frame", nil, UIParent, "SecureHandlerBaseTemplate")
     positioner:SetFrameRef("f", panel)

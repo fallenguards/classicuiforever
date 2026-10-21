@@ -115,11 +115,13 @@ function ns.BookCollectionsPad(pad)
 end
 
 -- The game's professions window as a page of the book (our book on, its book page up): in the row it is ours, on the
--- book's spot past the game's windows, not the left slot the game's manager gives it (the sheet flipped sides).
+-- book's spot past the game's windows, not the left slot the game's manager gives it (the sheet flipped sides). Retail's
+-- is its own window, which the game spaces as 575 wide.
 function ns.BookPageWindow(frame)
-    local prof = _G.ProfessionsFrame
-    if not prof or (frame and frame ~= prof) then return nil end
-    if ns.ModuleInForce("professionsBook") and ProfessionsBookPage() then return prof end
+    local forever = ns.OnForever()
+    local prof = forever and _G.ProfessionsFrame or _G.ProfessionsBookFrame
+    if not prof or (frame and frame ~= prof) or not ns.ModuleInForce("professionsBook") then return nil end
+    if (forever and ProfessionsBookPage()) or (not forever and prof:IsShown()) then return prof end
 end
 
 -- A mover holds the page on its own spot: the book stands where the page is (the page's corner 12, -14 off the book's,
