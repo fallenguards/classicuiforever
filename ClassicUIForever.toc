@@ -221,6 +221,7 @@ Character\PetView.lua
 Character\StatPanes.lua
 Character\EquipmentPane.lua
 Character\PvPDetail.lua
+Character\StatsSearch.lua
 Spells\BookLines.lua
 Spells\PetPool.lua
 Spells\BookFlyouts.lua

@@ -354,6 +354,7 @@ return {
     statPaneLeft = "section2",
     statPaneRight = "section3",
     statPanes = true,
+    statsSearch = false,
     statusBarBacking = true,
     surnamesRepaired = false,
     swingBorder = 0,

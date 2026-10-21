@@ -19,6 +19,7 @@ local function MinimapRotates() return ns.GetCVarBool("rotateMinimap") == true e
 local function OursOn(key) return function() return ns.db[key] ~= false end end
 -- Windows Forever never opens: its Adventure Guide is held off and its items have no sockets (#210).
 local NotOnForever = ns.OnForever
+local function OnRetail() return not ns.OnForever() end
 -- Every window, one list sorted by name; a window whose box is on a page of its own shows here too, as the same setting.
 local ALL_WINDOWS = { "characterSheet", "spellBook", "talents", "professionsBook", "tradeSkill", "questLog", "worldMap",
     "bags", "collectionsWindow", "legacyWindow", "panelAchievements", "panelJournal", "panelCalendar", "panelMacros",
@@ -336,6 +337,8 @@ ns.TOGGLES = {
     { "statPanes", L["OPT_statPanes"], L["OPT_statPanes_TIP"], parent = "characterSheet" },
     { "equipmentQuickButton", L["OPT_equipmentQuickButton"], L["OPT_equipmentQuickButton_TIP"], parent = "characterSheet" },
     { "weaponSkillDetail", L["OPT_weaponSkillDetail"], L["OPT_weaponSkillDetail_TIP"], parent = "characterSheet" },
+    { "statsSearch", L["OPT_statsSearch"], L["OPT_statsSearch_TIP"], parent = "characterSheet", hideIf = OnRetail,
+        search = "statistics stats search find filter" },
     { "spellBook", L["OPT_spellBook"], L["OPT_spellBook_TIP"], needs = "panels" },
     { "spellBookTopRank", L["OPT_spellBookTopRank"], L["OPT_spellBookTopRank_TIP"], parent = "spellBook" },
     { "spellBookHidePassives", L["OPT_spellBookHidePassives"], L["OPT_spellBookHidePassives_TIP"], parent = "spellBook" },
