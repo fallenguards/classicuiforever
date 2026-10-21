@@ -2,7 +2,7 @@ local _, ns = ...
 local L = ns.L
 
 ns.DB_DEFAULTS = {
-    dbVersion = 25,
+    dbVersion = 26,
     classicBar = true,
     oneBar = false,
     classicBarSize = false,
@@ -319,7 +319,6 @@ ns.DB_DEFAULTS = {
     gameMenu = true,
     lootRoll = true,
     settingsPanel = true,
-    panels = true,
     classicChat = true,
     bags = true,
     characterSheet = true,
@@ -412,7 +411,6 @@ ns.RELOAD_KEYS = {
     questMapPane = { off = L["CORE_THE_MAP_S_QUEST_LIST"] },
     -- Restore hides the title strips only; dressed windows keep the old frame. Turned on, windows built while it was
     -- off keep the plain one: a reload either way.
-    panels = { on = L["CORE_WINDOWS_ALREADY_OPENED_KEEP_THE"], off = L["CORE_WINDOWS_ALREADY_OPENED_KEEP_THE"] },
     worldMap = { on = L["CORE_THE_WORLD_MAP_KEEPS_THE"], off = L["CORE_THE_WORLD_MAP_KEEPS_THE"] },
     lootWindow = { on = L["CORE_THE_LOOT_WINDOW_KEEPS_THE"], off = L["CORE_THE_LOOT_WINDOW_KEEPS_THE"] },
     -- Its frame of the window list stays on the game's trainer window.

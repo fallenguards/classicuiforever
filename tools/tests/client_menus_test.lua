@@ -105,7 +105,9 @@ local function Made(frame, kind)
 end
 
 local tick, module
-local ns = setmetatable({ ART = {}, db = { panels = false } }, { __index = function() return function() end end })
+-- The social window in the game's own chrome (its contacts buttons stay the client's).
+local ns = setmetatable({ ART = {}, db = {}, panels = { Dressing = function() return false end } },
+    { __index = function() return function() end end })
 ns.Sched = { OnFrame = function(_, spec)
     tick = spec.fn
     return { Wake = function() end, Sleep = function() end }

@@ -410,7 +410,7 @@ local function BuildTab()
 end
 
 -- Forever's social window has no Who tab of the game's: with our list off ours stays, opening its Who page instead.
-local function StandsIn() return not FRIEND_TAB_WHO and ns.ModuleInForce("panels") end
+local function StandsIn() return not FRIEND_TAB_WHO end
 
 local function StandIn()
     if active or not StandsIn() then return end

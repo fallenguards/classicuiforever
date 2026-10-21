@@ -73,9 +73,8 @@ for _, key in ipairs(windows or {}) do
         end
     end
 end
-Check(onPage.panels == 1, "the Classic style windows switch heads the page")
 for key in pairs(onPage) do
-    local listed = key == "panels"
+    local listed = false
     for _, other in ipairs(windows or {}) do listed = listed or other == key end
     Check(listed, key .. " on All windows is in its list")
 end

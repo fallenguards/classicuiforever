@@ -248,10 +248,10 @@ local function WindowRow(key, Frame)
     ns.RegisterModule(key, { apply = apply, restore = restore })
 end
 
--- A window's box under Classic style windows: on, dressed now; off, its strip goes and the rest waits for the reload.
+-- A window's box: on, dressed now; off, its strip goes and the rest waits for the reload.
 local WINDOW_KEYS = {}
 for _, entry in ipairs(WINDOWS) do if entry.key then WINDOW_KEYS[entry.key] = true end end
--- A box turned off or on asks for the reload (Core/Defaults.lua RELOAD_KEYS), as Classic style windows does.
+-- A box turned off or on asks for the reload (Core/Defaults.lua RELOAD_KEYS): an open window keeps its frame.
 for key in pairs(WINDOW_KEYS) do
     local text = ns.L["CORE_WINDOWS_ALREADY_OPENED_KEEP_THE"]
     ns.RELOAD_KEYS[key] = { on = text, off = text }
@@ -271,6 +271,18 @@ function ns.KeepGameWindowsOff()
         if type(shot) == "table" then Keep(shot, true) end
     end
     db.dbVersion = 19
+end
+
+-- dbVersion 26: Classic style windows is gone, each window its own box, ticked as it was (the account and every profile).
+-- Only the switch's own value goes: nothing else is flipped.
+function ns.DropWindowsSwitch()
+    local db = ns.db
+    local function Drop(t) t.panels = nil end
+    Drop(db)
+    for _, shot in pairs(type(db.profiles) == "table" and db.profiles or {}) do
+        if type(shot) == "table" then Drop(shot) end
+    end
+    db.dbVersion = 26
 end
 
 -- A window option that brings a frame of this list (professions, trainer): on, dressed now.

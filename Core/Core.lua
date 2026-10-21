@@ -148,7 +148,7 @@ local function ToggleTree()
 end
 
 -- A module runs while its toggle, every parent toggle and the toggle it needs (on another page) are on (a sub-toggle
--- alone never applies; the window options need Classic style windows).
+-- alone never applies).
 local function ModuleOn(key)
     if ns.db[key] == false then return false end
     ToggleTree()
@@ -450,6 +450,7 @@ frame:SetScript("OnEvent", function(_, event, arg1)
         if saved and saved < 23 then ns.NoteOneBarArt() end
         if saved and saved < 24 then ns.KeepReagentSlot() end
         if saved and saved < 25 then ns.KeepLootRollOff() end
+        if saved and saved < 26 then ns.DropWindowsSwitch() end
         ns.CopyDefaults(ns.db, ns.DB_DEFAULTS)
         -- Nothing of ours was ever zeroed on a fresh install: the game settings it holds are the player's own.
         if not saved then ns.db.surnamesRepaired, ns.db.damageNumbersRepaired = true, true end

@@ -262,7 +262,7 @@ end
 -- Classic only while the social window wears the old chrome; client art otherwise.
 local function PaintButtons()
     local want
-    if active and ns.db and ns.db.panels ~= false then
+    if active and ns.panels and ns.panels.Dressing and ns.panels.Dressing("panelSocial") then
         want = ns.ThemeLook(true, "themePartWindows")
     elseif buttonsPainted then
         want = "client"
