@@ -3,7 +3,7 @@ local L = ns.L
 
 -- Every piece ClassicUI Forever Windows moves and sizes (UI/WindowHandles.lua), one entry each.
 
--- w, h: box before made; cut: old 384 x 512 frame's bare edges; stripRight, stripH: strip inset, height; toggle: unlock option;
+-- w, h: box before made; cut: old 384 x 512 frame's bare edges; stripRight, stripH: strip inset, height or function; toggle: unlock option;
 -- quests: the map; section: heading; piece: laid by ns.LayPiece; ringKey: minimap angle (while ringIf); fixedIf: no drag then;
 -- choice: radio list; client: game window; follows: place, unlock (while followIf, or always), followSize: size; gameEdit.
 ns.WINDOW_LIST = {
@@ -64,7 +64,9 @@ ns.WINDOW_LIST = {
     { key = "gryphonRight", label = L["UI_GRYPHON_RIGHT"], name = "ForeverClassicUIGryphonRight", w = 128, h = 128,
         piece = true, gameEdit = true, choice = "gryphonRightShow", choiceLabel = L["UI_SHOW"] },
     -- Its status row hangs 26 under the title: the drag strip is the title bar alone, or it took the status button's clicks.
-    { key = "social", label = L["UI_SOCIAL"], name = "FriendsFrame", w = 338, h = 424, client = true, stripH = 24,
+    { key = "social", label = L["UI_SOCIAL"], name = "FriendsFrame", w = 338, h = 424, client = true,
+        stripH = function() return ns.db.socialTitleDrag == true and 24 or nil end,
+        over = { "FriendsFrameStatusDropdown", "FriendsFrameBattlenetFrame" },   -- lifted over the drag strip, so they keep their clicks
         dressed = function() return ns.panels and ns.panels.Dressing("panelSocial") end },
     -- Dressed as the social window, the group finder stands in its place at its size.
     { key = "groupFinder", label = L["OPT_groupFinder"], name = "LFGParentFrame", w = 338, h = 424, client = true,

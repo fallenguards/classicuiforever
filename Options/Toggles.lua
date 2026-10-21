@@ -399,6 +399,8 @@ ns.TOGGLES = {
 
     { "whoList", L["OPT_whoList"], L["OPT_whoList_TIP"], group = L["GROUP_SOCIAL"] },
     { "hideWhoTab", L["OPT_hideWhoTab"], L["OPT_hideWhoTab_TIP"], search = "who tab hide remove social group finder" },
+    { "socialTitleDrag", L["OPT_socialTitleDrag"], L["OPT_socialTitleDrag_TIP"],
+        search = "social window drag move title bar status online away busy" },
     { "guildRoster", L["OPT_guildRoster"], L["OPT_guildRoster_TIP"] },
     { "communitiesButton", L["OPT_communitiesButton"], L["OPT_communitiesButton_TIP"], parent = "guildRoster",
         search = "communities tab button tabs" },

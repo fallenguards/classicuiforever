@@ -332,6 +332,7 @@ ns.DB_DEFAULTS = {
     communitiesNoGuildTab = true,
     whoList = true,
     hideWhoTab = false,
+    socialTitleDrag = false,
     statsSearch = false,
     groupFinder = true,
     spellBookSearch = true,

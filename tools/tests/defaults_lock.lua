@@ -342,6 +342,7 @@ return {
     showMinimapZone = true,
     showMinimapZoomIn = true,
     showMinimapZoomOut = true,
+    socialTitleDrag = false,
     spellBook = true,
     spellBookCollectionsTab = true,
     spellBookFlyouts = false,

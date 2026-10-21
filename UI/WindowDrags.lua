@@ -68,15 +68,28 @@ local function Strip(entry)
     end
     if not strip then
         strip = ns.NewFrame("Frame", nil, frame)
-        strip:SetPoint("TOPLEFT", frame, "TOPLEFT", W.STRIP_LEFT, 0)
-        strip:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT", -(entry.stripRight or W.STRIP_RIGHT), -(entry.stripH or W.STRIP_H))
         strip:EnableMouse(true)
         strip:RegisterForDrag("LeftButton")
         strip:SetScript("OnDragStart", StripDragStart)
         strip:SetScript("OnDragStop", StripDragStop)
         W.Strips[frame] = strip
     end
+    -- The height may follow an option (the social window's title-only drag).
+    local h = entry.stripH
+    if type(h) == "function" then h = h() end
+    h = h or W.STRIP_H
+    if strip.h ~= h then
+        strip.h = h
+        strip:ClearAllPoints()
+        strip:SetPoint("TOPLEFT", frame, "TOPLEFT", W.STRIP_LEFT, 0)
+        strip:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT", -(entry.stripRight or W.STRIP_RIGHT), -h)
+    end
     ns.SetLevelIf(strip, frame:GetFrameLevel() + W.STRIP_LIFT)
+    -- The client's controls in the title bar (the social window's status drop-down) keep their clicks over the strip.
+    for _, name in ipairs(entry.over or ns.EMPTY) do
+        local control = _G[name]
+        if control and not ns.IsForbidden(control) then ns.SetLevelIf(control, frame:GetFrameLevel() + W.STRIP_LIFT + 1) end
+    end
     if not strip:IsShown() then strip:Show() end
 end
 

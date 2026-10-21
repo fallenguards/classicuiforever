@@ -268,7 +268,7 @@ PlaceAll = function()
     if ns.SyncWindowLocks then ns.SyncWindowLocks() end
 end
 
-ns.OnToggle(function(key) if key == MAP_ENTRY.toggle or key == "worldMap" then PlaceAll() end end)
+ns.OnToggle(function(key) if key == MAP_ENTRY.toggle or key == "worldMap" or key == "socialTitleDrag" then PlaceAll() end end)
 
 -- Leave game windows to other addons: a size ours gave one goes back to the game's; turned off, ours place them again.
 -- A protected one (professions) waits for calm.
