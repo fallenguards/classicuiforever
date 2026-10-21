@@ -63,7 +63,8 @@ ns.WINDOW_LIST = {
         piece = true, gameEdit = true, choice = "gryphonLeftShow", choiceLabel = L["UI_SHOW"] },
     { key = "gryphonRight", label = L["UI_GRYPHON_RIGHT"], name = "ForeverClassicUIGryphonRight", w = 128, h = 128,
         piece = true, gameEdit = true, choice = "gryphonRightShow", choiceLabel = L["UI_SHOW"] },
-    { key = "social", label = L["UI_SOCIAL"], name = "FriendsFrame", w = 338, h = 424, client = true,
+    -- Its status row hangs 26 under the title: the drag strip is the title bar alone, or it took the status button's clicks.
+    { key = "social", label = L["UI_SOCIAL"], name = "FriendsFrame", w = 338, h = 424, client = true, stripH = 24,
         dressed = function() return ns.panels and ns.panels.Dressing("panelSocial") end },
     -- Dressed as the social window, the group finder stands in its place at its size.
     { key = "groupFinder", label = L["OPT_groupFinder"], name = "LFGParentFrame", w = 338, h = 424, client = true,
