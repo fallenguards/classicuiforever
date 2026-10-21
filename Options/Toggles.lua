@@ -17,6 +17,8 @@ local GRYPHON_TIP = L["OPT_TIP_GRYPHON"]
 local function MinimapRotates() return ns.GetCVarBool("rotateMinimap") == true end
 -- A list window left out while our own window of it takes its place: its box would do nothing.
 local function OursOn(key) return function() return ns.db[key] ~= false end end
+-- Windows Forever never opens: its Adventure Guide is held off and its items have no sockets (#210).
+local NotOnForever = ns.OnForever
 -- Every window, one list sorted by name; a window whose box is on a page of its own shows here too, as the same setting.
 local ALL_WINDOWS = { "characterSheet", "spellBook", "talents", "professionsBook", "tradeSkill", "questLog", "worldMap",
     "bags", "collectionsWindow", "legacyWindow", "panelAchievements", "panelJournal", "panelCalendar", "panelMacros",
@@ -43,7 +45,8 @@ ns.TOGGLES = {
     { "panelTabard", L["OPT_panelTabard"], L["OPT_panelTabard_TIP"], parent = "panels", checks = "panelWindows" },
     { "panelMerchant", L["OPT_panelMerchant"], L["OPT_panelMerchant_TIP"], parent = "panels", checks = "panelWindows" },
     { "panelAchievements", L["OPT_panelAchievements"], L["OPT_panelAchievements_TIP"], parent = "panels", checks = "panelWindows" },
-    { "panelJournal", L["OPT_panelJournal"], L["OPT_panelJournal_TIP"], parent = "panels", checks = "panelWindows" },
+    { "panelJournal", L["OPT_panelJournal"], L["OPT_panelJournal_TIP"], parent = "panels", checks = "panelWindows",
+        hideIf = NotOnForever },
     { "panelAddons", L["OPT_panelAddons"], L["OPT_panelAddons_TIP"], parent = "panels", checks = "panelWindows" },
     { "panelCalendar", L["OPT_panelCalendar"], L["OPT_panelCalendar_TIP"], parent = "panels", checks = "panelWindows" },
     { "panelChannels", L["OPT_panelChannels"], L["OPT_panelChannels_TIP"], parent = "panels", checks = "panelWindows" },
@@ -64,7 +67,8 @@ ns.TOGGLES = {
     { "panelMacros", L["OPT_panelMacros"], L["OPT_panelMacros_TIP"], parent = "panels", checks = "panelWindows" },
     { "settingsPanel", L["OPT_settingsPanel"], L["OPT_settingsPanel_TIP"], parent = "panels" },
     { "panelSocial", L["OPT_panelSocial"], L["OPT_panelSocial_TIP"], parent = "panels", checks = "panelWindows" },
-    { "panelSocketing", L["OPT_panelSocketing"], L["OPT_panelSocketing_TIP"], parent = "panels", checks = "panelWindows" },
+    { "panelSocketing", L["OPT_panelSocketing"], L["OPT_panelSocketing_TIP"], parent = "panels", checks = "panelWindows",
+        hideIf = NotOnForever },
     { "panelTrade", L["OPT_panelTrade"], L["OPT_panelTrade_TIP"], parent = "panels", checks = "panelWindows" },
 
     { "bronzeTheme", L["OPT_bronzeTheme"], L["OPT_bronzeTheme_TIP"], group = L["GROUP_LOOK"], search = "custom skin color dark mode" },
