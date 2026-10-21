@@ -34,8 +34,8 @@ function B.BuildArt()
     art:SetFrameLevel(1)
     art.pieces = {}
     -- The most runs B.Segments makes: two body sheets, bar 2's two, micro region of two, page room, the latency and key
-    -- ring section, four bag runs, a second micro region of two, the post.
-    for i = 1, 16 do
+    -- ring section, four bag runs, a second micro region of two, the post, and floor tiles past the art's room.
+    for i = 1, 22 do
         art.pieces[i] = art:CreateTexture(nil, "BACKGROUND")
     end
     art.pageEdge = art:CreateTexture(nil, "BACKGROUND", nil, 1)

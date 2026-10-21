@@ -6,6 +6,7 @@ return {
     hideThreatGlow = "same for everyone: opt-in, off by default",
     hideWhoTab = "same for everyone: opt-in, off by default",
     socialTitleDrag = "same for everyone: opt-in, off by default",
+    microWidth = "same for everyone: 1 is the row as before; Menu Width in the micro menu's edit dialog",
     statsSearch = "same for everyone: opt-in, off by default",
     hideTrackerHeader = "same for everyone: opt-in, off by default",
     hideMinimapNorth = "same for everyone: opt-in, off by default",

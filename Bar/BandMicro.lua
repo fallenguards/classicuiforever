@@ -12,7 +12,8 @@ local MICRO_Y, MICRO_W, MICRO_H, MICRO_STEP = 2, 29, 37, -3
 -- The group's rectangle starts a little before its first button.
 local MICRO_GROUP_X, MICRO_ROW_IN, MICRO_NUDGE = 548, 7, 4
 local Remember, Seat, BandNow, OneBar = B.Remember, B.Seat, B.BandNow, B.OneBar
-local MicroUserScale, CurrentPlan, DropPlace, ButtonLevel = B.MicroUserScale, B.CurrentPlan, B.DropPlace, B.ButtonLevel
+local MicroUserScale, MicroUserWidth = B.MicroUserScale, B.MicroUserWidth
+local CurrentPlan, DropPlace, ButtonLevel = B.CurrentPlan, B.DropPlace, B.ButtonLevel
 local Dress = ns.Dress
 
 local POST_SHEET = PIECES[4]
@@ -210,16 +211,16 @@ local function MicroNeed(count)
     return count * (MICRO_W + MICRO_STEP) - MICRO_STEP
 end
 
--- Row scale and region for this many buttons: fitted to the old art's room, times the player's size
--- (settable on the band too, even past the art); snapping the group back restores default size.
--- Fitted to the buttons on the row, so Era's set draws at Era's size; sizeCount (Keep button size) counts hidden ones too.
-local function MicroPlan(count, userScale, sizeCount)
+-- Row scale and region for this many buttons: fitted to the old art's room, times the player's size (past the room
+-- the floor tiles on); sizeCount (Keep button size) counts hidden ones too. width (Menu Width) widens or narrows the
+-- row round buttons of that size, never under what the seen buttons need; the width worn comes back third.
+local function MicroPlan(count, userScale, sizeCount, width, seen)
     local need = MicroNeed(count)
-    if need <= 0 then return 1, MICRO_LEAD + MICRO_END_GAP end
+    if need <= 0 then return 1, MICRO_LEAD + MICRO_END_GAP, 1 end
     local room = MICRO_REGION_MAX - MICRO_LEAD - MICRO_END_GAP
     local scale = math.min(1, room / MicroNeed(math.max(count, sizeCount or count))) * (userScale or 1)
-    local region = math.ceil(MICRO_LEAD + need * scale + MICRO_END_GAP)
-    return scale, math.min(MICRO_REGION_MAX, region)
+    local worn = math.max(width or 1, seen and MicroNeed(seen) / need or 0)
+    return scale, math.ceil(MICRO_LEAD + need * scale * worn + MICRO_END_GAP), worn
 end
 B.MicroPlan = MicroPlan
 
@@ -361,18 +362,21 @@ local function SeatShown(button)
     return SeatHidden(button)
 end
 
--- Buttons on the row, and with Keep button size the count their size is fitted to.
+-- Buttons on the row, with Keep button size the count their size is fitted to, and the count seen (Menu Width).
 -- A hidden Help button takes no seat: it came with 0.14.0, and the rows before it were fitted without it.
 function B.MicroCounts()
-    local shown, sized = 0, 0
+    local shown, sized, seen = 0, 0, 0
     for _, button in ipairs(MicroButtonList()) do
         if button:IsShown() then
             local skipped, byOption = MicroSkipped(button)
-            if not skipped then shown = shown + 1 end
+            if not skipped then
+                shown = shown + 1
+                if not IsSeatHidden(button) then seen = seen + 1 end
+            end
             if not skipped or (byOption and button:GetName() ~= "ForeverClassicUIHelpMicroButton") then sized = sized + 1 end
         end
     end
-    return shown, (ns.db and ns.db.hideMicroKeepSize == true) and sized or nil
+    return shown, (ns.db and ns.db.hideMicroKeepSize == true) and sized or nil, seen
 end
 
 local function Percent(value) return string.format("%d%%", value) end
@@ -381,6 +385,11 @@ local function RefreshMicroDialog()
     local dialog = B.art.microDialog
     if dialog and dialog:IsShown() then dialog:Refresh() end
 end
+-- The reset buttons alone: a slider under the player's hand is never refilled.
+local function RefreshMicroButtons()
+    local dialog = B.art.microDialog
+    if dialog and dialog:IsShown() then dialog:Buttons() end
+end
 
 local function SaveMicro()
     RefreshMicroDialog()
@@ -388,12 +397,31 @@ local function SaveMicro()
 end
 
 local function MicroSizeValues() return math.floor(MicroUserScale() * 100 + 0.5), 50, 200, 30 end
+local function MicroWidthValues() return math.floor(MicroUserWidth() * 100 + 0.5), 50, 200, 30 end
 
--- No dialog refresh here: that would re-fill the slider under the player's hand.
 local function OnMicroSize(value)
     ns.MicroTouched()
     ns.db.microScale = math.max(0.5, math.min(2, value / 100))
+    RefreshMicroButtons()
     ns.QueueApply()
+end
+local function OnMicroWidth(value)
+    ns.MicroTouched()
+    ns.db.microWidth = math.max(0.5, math.min(2, value / 100))
+    RefreshMicroButtons()
+    ns.QueueApply()
+end
+
+-- A labelled stepper slider row of the dialog; init and onChange as B.GuardedSlider takes them.
+local function DialogSlider(dialog, anchor, y, text, init, onChange)
+    local label = dialog:CreateFontString(nil, "ARTWORK", "GameFontHighlightMedium")
+    label:SetSize(100, 32)
+    label:SetJustifyH("LEFT")
+    label:SetPoint("TOPLEFT", anchor, "TOPLEFT", anchor == dialog and 20 or 0, y)
+    label:SetText(text)
+    local slider, formatters = B.StepperSlider(dialog, 200, label, 5, Percent)
+    if not slider then return label, nil end
+    return label, B.GuardedSlider(slider, init, onChange, { formatters = formatters, owner = dialog })
 end
 
 -- Micro group settings shaped like the client's edit mode dialog (same templates); the client has none for a piece not its own.
@@ -401,24 +429,17 @@ local function MicroDialog()
     local art = B.art
     local dialog = art.microDialog
     if dialog then return dialog end
-    dialog = B.EditDialog("ForeverClassicUIMicroDialog", 383, 226, L["BAR_MICRO_MENU"])
+    dialog = B.EditDialog("ForeverClassicUIMicroDialog", 383, 262, L["BAR_MICRO_MENU"])
     art.microDialog = dialog
 
-    local label = dialog:CreateFontString(nil, "ARTWORK", "GameFontHighlightMedium")
-    label:SetSize(100, 32)
-    label:SetJustifyH("LEFT")
-    label:SetPoint("TOPLEFT", dialog, "TOPLEFT", 20, -48)
-    label:SetText(HUD_EDIT_MODE_SETTING_MICRO_MENU_SIZE or "Size")
-
-    local slider, formatters = B.StepperSlider(dialog, 200, label, 5, Percent)
-    if slider then
-        dialog.slider = slider
-        dialog.InitSlider = B.GuardedSlider(slider, MicroSizeValues, OnMicroSize, { formatters = formatters, owner = dialog })
-    end
+    -- Size scales the group, buttons and art; Width widens or narrows the row round buttons of that size.
+    local label, initSize = DialogSlider(dialog, dialog, -48, HUD_EDIT_MODE_SETTING_MICRO_MENU_SIZE or "Size", MicroSizeValues, OnMicroSize)
+    local widthLabel, initWidth = DialogSlider(dialog, label, -36, L["BAR_MICRO_WIDTH"], MicroWidthValues, OnMicroWidth)
+    dialog.InitSlider, dialog.InitWidth = initSize, initWidth
 
     local hideArt = CreateFrame("CheckButton", nil, dialog, "UICheckButtonTemplate")
     hideArt:SetSize(30, 30)
-    hideArt:SetPoint("TOPLEFT", label, "BOTTOMLEFT", 0, -4)
+    hideArt:SetPoint("TOPLEFT", widthLabel, "BOTTOMLEFT", 0, -4)
     ns.EditModeCheck(hideArt)
     local hideLabel = hideArt:CreateFontString(nil, "ARTWORK", "GameFontHighlightMedium")
     hideLabel:SetPoint("LEFT", hideArt, "RIGHT", 4, 0)
@@ -430,10 +451,10 @@ local function MicroDialog()
     end)
     dialog.hideArt = hideArt
 
-    -- Back in its place means default size too, so the pieces fit.
+    -- Back in its place means default size and width too, so the pieces fit.
     local reset = B.EditDialogReset(dialog, function()
         ns.MicroTouched()
-        ns.db.microPos, ns.db.microScale = nil, nil
+        ns.db.microPos, ns.db.microScale, ns.db.microWidth = nil, nil, nil
         SaveMicro()
     end)
     dialog.reset = reset
@@ -444,17 +465,21 @@ local function MicroDialog()
     resize:SetText(L["BAR_RESET_TO_DEFAULT_SIZE"])
     resize:SetScript("OnClick", function()
         ns.MicroTouched()
-        ns.db.microScale = nil
+        ns.db.microScale, ns.db.microWidth = nil, nil
         SaveMicro()
     end)
     dialog.resize = resize
     ns.EditModeRed(resize)
 
+    function dialog:Buttons()
+        self.reset:SetEnabled(ns.db.microPos ~= nil)
+        self.resize:SetEnabled(math.abs(MicroUserScale() - 1) > 0.001 or math.abs(MicroUserWidth() - 1) > 0.001)
+    end
     function dialog:Refresh()
         if self.InitSlider then self.InitSlider() end
+        if self.InitWidth then self.InitWidth() end
         self.hideArt:SetChecked(ns.db.hideMicroArt == true)
-        self.reset:SetEnabled(ns.db.microPos ~= nil)
-        self.resize:SetEnabled(math.abs(MicroUserScale() - 1) > 0.001)
+        self:Buttons()
     end
     dialog:SetScript("OnShow", function(self) self:Refresh() end)
     dialog:SetScript("OnHide", function()
@@ -510,7 +535,7 @@ local function MicroHome()
         -- Dropped near its place on the bar: back onto the bar.
         if place ~= nil then
             ns.MicroTouched()
-            ns.db.microPos, ns.db.microScale = nil, nil
+            ns.db.microPos, ns.db.microScale, ns.db.microWidth = nil, nil, nil
             ns.db.bagsFirst = place
         elseif left and bottom then
             ns.MicroTouched()
@@ -529,7 +554,7 @@ local function MicroHome()
     handle:SetScript("OnMouseUp", function(_, button)
         if button == "RightButton" then
             ns.MicroTouched()
-            ns.db.microPos, ns.db.microScale = nil, nil
+            ns.db.microPos, ns.db.microScale, ns.db.microWidth = nil, nil, nil
             SaveMicro()
             return
         end
@@ -565,7 +590,13 @@ local function FitRegion(last, art)
 end
 
 -- Spread the rest evenly: the shown buttons span the width all of them would, in button units, so any size fits.
-local function SpreadStep(wanted)
+-- A width worn (Menu Width off 100%, from MicroPlan): the seen buttons span the row it gives, hidden seats parked;
+-- the width never goes under their need, so they never overlap past the 1.x step.
+local function SpreadStep(wanted, seen, worn)
+    if math.abs(worn - 1) > 0.001 then
+        if seen < 2 then return true, MICRO_STEP end
+        return true, (MicroNeed(#wanted) * worn - seen * MICRO_W) / (seen - 1)
+    end
     local db = ns.db
     if not (db.hideMicroButtons and db.hideMicroKeepWidth and db.hideMicroSpread) then return false, MICRO_STEP end
     local visible = 0
@@ -575,6 +606,31 @@ local function SpreadStep(wanted)
     if visible < 2 or visible >= #wanted then return false, MICRO_STEP end
     local span = #wanted * MICRO_W + (#wanted - 1) * MICRO_STEP
     return true, (span - visible * MICRO_W) / (visible - 1)
+end
+
+-- Off the band only, its floor: the third sheet's run it stood on, flat stone tiles past the art's room (Size over
+-- 100%), then the dark start of the fourth where the row reaches it.
+local function LayFloor(home, region, floored)
+    local third, lead = math.min(region, 256), MICRO_GROUP_X - 512
+    local extra = math.max(0, region - MICRO_REGION_MAX)
+    local runs = { { 3, lead / 256, third / 256, third - lead, 0 } }
+    for _, tile in ipairs(B.FloorTiles(third - lead, extra)) do
+        runs[#runs + 1] = { 3, tile[3], tile[4], tile[2], tile[1] }
+    end
+    local fourth = math.max(0, region - extra - 256)
+    runs[#runs + 1] = { 4, 0, fourth / 256, fourth, third - lead + extra }
+    for i = 1, math.max(#runs, #home.floor) do
+        local tex = home.floor[i] or home:CreateTexture(nil, "BACKGROUND")
+        home.floor[i] = tex
+        local run = runs[i]
+        if floored and run and run[4] > 0 then
+            local sheet = PIECES[run[1]]
+            RUN[1], RUN[2], RUN[3], RUN[4] = run[2], run[3], sheet.band[1], sheet.band[2]
+            Dress(tex, sheet.key, B.BAND_RUN, home, run[5], 0, run[4], BAND_H, RUN)
+        else
+            tex:Hide()
+        end
+    end
 end
 
 local microBusy = false
@@ -608,8 +664,8 @@ function B.LayoutMicroButtons()
     -- divided out; on it the row itself is drawn bigger or smaller.
     local out = (not B.shape.micro) or OneBar()
     local group = out and MicroUserScale() or 1
-    local _, sized = B.MicroCounts()
-    local scale, region = MicroPlan(#wanted, out and 1 or MicroUserScale(), sized)
+    local _, sized, seen = B.MicroCounts()
+    local scale, region, worn = MicroPlan(#wanted, out and 1 or MicroUserScale(), sized, MicroUserWidth(), seen)
     -- The row at its own scale: what the band's sockets were drawn around.
     local baseScale = MicroPlan(#wanted, 1, sized)
     local home = MicroHome()
@@ -648,23 +704,8 @@ function B.LayoutMicroButtons()
         end
     end
     home:Show()
-    -- Off the band only, its floor: the third sheet's run it stood on, plus the dark start of the fourth where the row reaches it.
     local floored = out and not ns.db.hideMicroArt
-    local third = math.min(region, 256)
-    local runs = {
-        { 3, (MICRO_GROUP_X - 512) / 256, third / 256, third - (MICRO_GROUP_X - 512), 0 },
-        { 4, 0, math.max(0, region - 256) / 256, math.max(0, region - 256), third - (MICRO_GROUP_X - 512) },
-    }
-    for i, tex in ipairs(home.floor) do
-        local run = runs[i]
-        if floored and run[4] > 0 then
-            local sheet = PIECES[run[1]]
-            RUN[1], RUN[2], RUN[3], RUN[4] = run[2], run[3], sheet.band[1], sheet.band[2]
-            Dress(tex, sheet.key, B.BAND_RUN, home, run[5], 0, run[4], BAND_H, RUN)
-        else
-            tex:Hide()
-        end
-    end
+    LayFloor(home, region, floored)
     for i, post in ipairs(home.posts) do
         if floored then
             Dress(post, POST_SHEET.key, i == 1 and END_POST_LEFT or END_POST_RIGHT, home)
@@ -673,7 +714,7 @@ function B.LayoutMicroButtons()
         end
     end
 
-    local spread, step = SpreadStep(wanted)
+    local spread, step = SpreadStep(wanted, seen, worn)
     local rowY = MICRO_Y
     if not out then rowY = MICRO_Y + MICRO_H * (baseScale - scale) / 2 end
     local prev, seatsChanged

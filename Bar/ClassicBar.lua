@@ -4,7 +4,7 @@ local B = ns.band
 -- The band's pass and module: what is still on the band, the layout, and the hand-back when turned off.
 
 local BUTTON_PITCH, ROW_X, ROW_Y, PET_ROW_Y = B.BUTTON_PITCH, B.ROW_X, B.ROW_Y, B.PET_ROW_Y
-local MICRO_END_GAP, MICRO_LEAD, MICRO_REGION_MAX = B.MICRO_END_GAP, B.MICRO_LEAD, B.MICRO_REGION_MAX
+local MICRO_END_GAP, MICRO_LEAD = B.MICRO_END_GAP, B.MICRO_LEAD
 local OWNED_SYSTEMS, EXTRA_BARS = B.OWNED_SYSTEMS, B.EXTRA_BARS
 local MICRO_BUTTONS, BAG_BUTTONS, CAP_KEYS = B.MICRO_BUTTONS, B.BAG_BUTTONS, B.CAP_KEYS
 local UPPER_ROW_Y = 55 -- bars 2 and 3: 3 px over the XP strip, inside the band's top
@@ -71,9 +71,9 @@ local function ReadShape()
     local bagsMoved = BagsBar and SystemMoved(BagsBar)
     if not bagsMoved and ns.db.bagsHeld then ns.db.bagsHeld = false end
     shape.bags = ((not bagsMoved) or ns.db.bagsHeld == true) and not B.BagsTurned()
-    local count, sized = B.MicroCounts()
-    local _, region = MicroPlan(count, MicroUserScale(), sized)
-    local raw = math.max(MICRO_LEAD + MICRO_END_GAP, math.min(MICRO_REGION_MAX, region))
+    local count, sized, seen = B.MicroCounts()
+    local _, region = MicroPlan(count, MicroUserScale(), sized, B.MicroUserWidth(), seen)
+    local raw = math.max(MICRO_LEAD + MICRO_END_GAP, region)
     -- A new row size is measured again (BandMicro FitRegion).
     if shape.regionRaw ~= raw then shape.regionRaw, shape.microTrim = raw, 0 end
     shape.region = math.max(MICRO_LEAD + MICRO_END_GAP, raw - (shape.microTrim or 0))

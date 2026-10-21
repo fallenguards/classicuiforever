@@ -144,6 +144,7 @@ function ns.MicroTouched()
     ns.microBefore = {
         pos = type(pos) == "table" and { point = pos.point, relPoint = pos.relPoint, x = pos.x, y = pos.y } or nil,
         scale = ns.db.microScale,
+        width = ns.db.microWidth,
         bagsFirst = ns.db.bagsFirst,
         microArt = ns.db.hideMicroArt,
         bagsArt = ns.db.hideBagsArt,
@@ -156,6 +157,11 @@ local function MicroUserScale()
     return math.max(0.5, math.min(2, value))
 end
 B.MicroUserScale = MicroUserScale
+-- Menu Width: the row's width in units of its own, the buttons at their size.
+function B.MicroUserWidth()
+    local value = tonumber(ns.db and ns.db.microWidth) or 1
+    return math.max(0.5, math.min(2, value))
+end
 
 local shape = { micro = true, bags = true, region = MICRO_REGION_MAX }
 B.shape = shape
@@ -286,12 +292,30 @@ local function EndOwner(plan)
     return "bar"
 end
 
+-- Past the art's room (Size over 100%) the micro floor goes on as tiles of the third sheet's flat stone, before the
+-- fourth sheet's end: { x, width, u0, u1 } each, the last one partial.
+local FLOOR_U0, FLOOR_UNIT = 128, 96
+function B.FloorTiles(x, extra)
+    local tiles = {}
+    while extra > 0 do
+        local w = math.min(FLOOR_UNIT, extra)
+        tiles[#tiles + 1] = { x, w, FLOOR_U0 / 256, (FLOOR_U0 + w) / 256 }
+        x, extra = x + w, extra - w
+    end
+    return tiles
+end
+
 -- The art as runs of the four sheets: { x, width, sheet, u0, u1, owner }; owner (bar, micro, bags) is whose Hide Bar Art
 -- takes the run.
 function B.Segments()
     local plan = CurrentPlan()
     local cut = plan.cut
     local list = {}
+    local function Tiles(x, extra)
+        for _, tile in ipairs(B.FloorTiles(x, extra)) do
+            list[#list + 1] = { tile[1], tile[2], 3, tile[3], tile[4], "micro" }
+        end
+    end
     -- A twelve-socket run at x from the sheets' u (bar 1's trim, or past the wall the run before it ends with).
     local function Sockets(x, u)
         if u < 256 then
@@ -324,7 +348,10 @@ function B.Segments()
         local head = math.min(third, PAGE_ROOM)
         list[#list + 1] = { half, head, 3, 0, head / 256, "bar" }
         if third > head then list[#list + 1] = { half + head, third - head, 3, head / 256, third / 256, "micro" } end
-        if region > 256 then list[#list + 1] = { half + 256, region - 256, 4, 0, (region - 256) / 256, "micro" } end
+        local extra = math.max(0, region - MICRO_REGION_MAX)
+        Tiles(half + 256, extra)
+        local fourth = region - extra - 256
+        if fourth > 0 then list[#list + 1] = { half + 256 + extra, fourth, 4, 0, fourth / 256, "micro" } end
         if plan.microPost then list[#list + 1] = { plan.microPost, POST_W, 4, POST_U / 256, (POST_U + POST_W) / 256, "micro" } end
     elseif not plan.microFirst and not plan.noPages then
         local room = plan.pageRoom or (plan.pageEdge and PAGE_POST) or PAGE_ROOM
@@ -363,8 +390,11 @@ function B.Segments()
         local u0 = MICRO_LEAD - MICRO_SECOND_LEAD
         local first = math.min(width, 256 - u0)
         list[#list + 1] = { plan.microStart, first, 3, u0 / 256, (u0 + first) / 256, "micro" }
-        if width > first then
-            list[#list + 1] = { plan.microStart + first, width - first, 4, 0, (width - first) / 256, "micro" }
+        local extra = math.max(0, width - (MICRO_REGION_MAX - u0))
+        Tiles(plan.microStart + first, extra)
+        local fourth = width - first - extra
+        if fourth > 0 then
+            list[#list + 1] = { plan.microStart + first + extra, fourth, 4, 0, fourth / 256, "micro" }
         end
     end
     if plan.tailStart then

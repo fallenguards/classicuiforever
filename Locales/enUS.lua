@@ -468,6 +468,7 @@ L["BAR_RESET_TO_DEFAULT_SIZE"] = "Reset To Default Size"
 
 -- Bar/BandMicro.lua
 L["BAR_MICRO_MENU"] = "Micro Menu"
+L["BAR_MICRO_WIDTH"] = "Menu Width"
 L["BAR_DRAG_TO_MOVE_LET_GO"] = "Drag to move. Let go near the bar to put it back."
 L["BAR_CLICK_FOR_ITS_SIZE_AND"] = "Click for its size and reset. The mouse wheel sizes it too."
 

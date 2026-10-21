@@ -224,6 +224,7 @@ return {
     microMinimapButtons = true,
     microScale = 1,
     microTips = true,
+    microWidth = 1,
     minimap = true,
     minimapButton = true,
     minimapButtonAngle = 213,

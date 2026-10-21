@@ -7,7 +7,7 @@ local L = ns.L
 
 local DEFAULT = "Default"
 local NAME_MAX = 32
-local EXTRA = { "themeColor", "themeDarkness", "barScale", "microScale", "oneBagColumns", "keyTextSize", "plateNameSize",
+local EXTRA = { "themeColor", "themeDarkness", "barScale", "microScale", "microWidth", "oneBagColumns", "keyTextSize", "plateNameSize",
     "swingColorMain", "swingColorOff", "swingColorRanged", "swingBorder", "meterBackground", "prdGap", "meterHeader", "unitNameSize", "thickEnemyColor", "meterArtPan",
     "meterPanPreview", "statPaneLeft", "statPaneRight", "minimapButtonPicks" }
 -- The game's own setting mirrored, and the English text picks (read before the profile loads): account-wide.

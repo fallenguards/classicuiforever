@@ -96,6 +96,7 @@ ns.DB_DEFAULTS = {
     bandHandedBack = false,
     -- bagsFirst is the band order.
     microScale = 1,
+    microWidth = 1,
     bagsFirst = false,
     unitFrames = true,
     castBars = true,

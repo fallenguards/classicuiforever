@@ -563,7 +563,8 @@ local function MicroFootClick(revert)
     local before = ns.microBefore
     ns.microDirty, ns.microBefore = false, nil
     if revert and before and ns.db then
-        ns.db.microPos, ns.db.microScale, ns.db.bagsFirst = before.pos, before.scale, before.bagsFirst
+        ns.db.microPos, ns.db.microScale, ns.db.microWidth = before.pos, before.scale, before.width
+        ns.db.bagsFirst = before.bagsFirst
         ns.db.hideMicroArt, ns.db.hideBagsArt = before.microArt, before.bagsArt
         ns.QueueApply()
     end

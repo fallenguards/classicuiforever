@@ -411,7 +411,7 @@ end
 local function ResetNow()
     if not ns.sessionEnding or InCombatLockdown() then return false end
     if not ns.ClassicLayoutActive() then return false end
-    ns.db.microPos, ns.db.microScale = nil, nil
+    ns.db.microPos, ns.db.microScale, ns.db.microWidth = nil, nil, nil
     ns.db.hideMicroArt, ns.db.hideBagsArt = false, false
     ns.db.barArtHidden, ns.db.barArtKeep = false, nil
     -- The band's own pieces back on it at their defaults: latency bar, key ring, the reagent bag in its full slot.
