@@ -77,6 +77,10 @@ local FAQ = {
     { "FAQ_MOVE_Q", "FAQ_MOVE_A", function() return L["UI_CLASSICUI_FOREVER_WINDOWS"] end },
     { "FAQ_MOVERS_Q", "FAQ_MOVERS_A", function() return L["OPT_leaveGameWindows"] end },
     { "FAQ_SIZE_Q", "FAQ_SIZE_A", function() return L["UI_CLASSICUI_FOREVER_WINDOWS"], L["OPT_classicBarSize"] end },
+    { "FAQ_SCALE_Q", "FAQ_SCALE_A", function() return _G.GRAPHICS_LABEL or "Graphics", _G.USE_UISCALE or "Use UI Scale" end },
+    { "FAQ_SCALEBACK_Q", "FAQ_SCALEBACK_A", function()
+        return L["OPTWIN_TOGGLE_NONE"], L["OPTWIN_NONE_SCALE"], _G.GRAPHICS_LABEL or "Graphics", _G.USE_UISCALE or "Use UI Scale"
+    end },
     { "FAQ_SETTING_Q", "FAQ_SETTING_A", function() return L["OPTWIN_SEARCH_TOGGLES"] end },
     { "FAQ_FOREVER_Q", "FAQ_FOREVER_A", on = "forever" },
     { "FAQ_OWNLOOK_Q", "FAQ_OWNLOOK_A", on = "retail" },

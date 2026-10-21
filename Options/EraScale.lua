@@ -79,12 +79,78 @@ function ns.EraScaleBeforePin()
     ns.ApplyAll()
 end
 
--- After the pins, last in the press: pins are screen-centre units, which a scale change leaves where they are.
+-- The size we wrote, still the game's setting (the player has not picked another since).
+local function ScaleOurs()
+    local ours, now = tonumber(ns.db.eraScale), tonumber(ns.GetCVar("uiScale"))
+    return ours ~= nil and now ~= nil and ns.GetCVar("useUiScale") == "1" and math.abs(now - ours) < 0.001
+end
+ns.EraScaleOurs = ScaleOurs
+
+-- After the pins, last in the press: pins are screen-centre units, which a scale change leaves where they are. The pair
+-- from before ours is kept for Toggle none (#181), unless ours already stands.
 function ns.EraScaleAfterPin()
     local scale = EraScale()
     if not scale then return end
     local value = string.format("%.4f", scale)
+    if not ScaleOurs() then ns.db.eraScaleWas = { ns.GetCVar("useUiScale"), ns.GetCVar("uiScale") } end
     if ns.SetCVar("useUiScale", "1") and ns.SetCVar("uiScale", value) then ns.db.eraScale = value end
+end
+
+local function SayScaleBack()
+    ns.Print(L["ERASCALE_GIVEN_BACK"]:format(ns.ChatLink("scale", L["WELCOME_HERE"])))
+end
+
+-- Toggle none's tick box (#181): the pair from before ours. Era's size set before that pair was kept: the custom size
+-- only where ns.SetCVar's record says it was on, else the game's own automatic size.
+function ns.EraScaleGiveBack()
+    if not ScaleOurs() then return end
+    local kept, general = ns.db.eraScaleWas, ns.db.cvarWas or {}
+    local use = kept and kept[1] or general.useUiScale or "0"
+    local value = kept and kept[2] or general.uiScale
+    if use == "1" and value then ns.WriteCVar("uiScale", value) end
+    ns.WriteCVar("useUiScale", use)
+    general.uiScale, general.useUiScale, ns.db.eraScale, ns.db.eraScaleWas = nil, nil, nil, nil
+    SayScaleBack()
+    -- The reload Toggle none asks for wipes chat: said again after it.
+    if ns.needsReload then ns.db.eraScaleNote = true end
+end
+
+-- Default toggles' tick box: Era's size for this screen while the interface stands at another, written on the click.
+function ns.EraScaleWanted() return SizeOff() end
+function ns.EraScalePercent()
+    local scale = EraScale()
+    return scale and math.floor(scale * 100 + 0.5)
+end
+function ns.UseEraScale() ns.EraScaleAfterPin() end
+
+function ns.AnnounceScaleBack()
+    if not (ns.db and ns.db.eraScaleNote) then return end
+    ns.db.eraScaleNote = nil
+    SayScaleBack()
+end
+
+-- The game's Graphics page at its UI Scale row, opened by the game's own event (C_SettingsUtil), not in our run.
+function ns.OpenUiScaleSettings()
+    local panel, open = _G.SettingsPanel, Settings and Settings.OpenToCategory
+    if not (panel and open) then return end
+    for _, category in ipairs(panel:GetAllCategories() or {}) do
+        if category:GetName() == _G.GRAPHICS_LABEL then
+            open(category:GetID(), _G.USE_UISCALE)
+            return
+        end
+    end
+    open()
+end
+
+-- The chat line's link after the size went back: where the size lives, and a way there.
+ns.Popup("FCUI_SCALE_HELP", {
+    text = TITLE .. "\n\n" .. L["ERASCALE_HELP"],
+    button1 = L["ERASCALE_OPEN_SETTINGS"],
+    button2 = CLOSE or OKAY,
+    OnAccept = function() ns.OpenUiScaleSettings() end,
+})
+function ns.ShowScaleHelp()
+    StaticPopup_Show("FCUI_SCALE_HELP", _G.GRAPHICS_LABEL or "Graphics", _G.USE_UISCALE or "Use UI Scale")
 end
 
 -- An install from before 0.17.0, offered Era's size once.

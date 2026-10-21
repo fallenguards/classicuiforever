@@ -270,6 +270,7 @@ Options\OptionsSearch.lua
 Options\ThemeRows.lua
 Options\CameraRow.lua
 Options\OptionsRows.lua
+Options\BoxConfirm.lua
 Options\OptionsWindow.lua
 Options\Profiles.lua
 Options\HelpPanes.lua

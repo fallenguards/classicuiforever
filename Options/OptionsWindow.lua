@@ -69,12 +69,30 @@ local function NumberRows(rows, page)
     return out
 end
 
-ns.Popup("FCUI_ALL_NONE", {
-    text = L["OPTWIN_ALL_NONE_CONFIRM"],
-    button1 = OKAY,
-    button2 = CANCEL,
-    OnAccept = function() TurnOff(nil) end,
-})
+-- Toggle none and Default toggles for every page: the interface size's box in their confirms (#181). Toggle none's
+-- while Era's size we set still stands; Default toggles' while the interface stands at another size than Era's.
+local function ScalePercent()
+    local scale = tonumber(ns.db.eraScale) or tonumber(ns.GetCVar("uiScale")) or 1
+    return math.floor(scale * 100 + 0.5)
+end
+
+local confirmNone = O.BoxConfirm("ForeverClassicUINoneConfirm", L["OPTWIN_ALL_NONE_CONFIRM"], L["OPTWIN_NONE_SCALE"],
+    function() return L["OPTWIN_NONE_SCALE_TIP"]:format(ScalePercent()) end)
+local function ConfirmNone()
+    confirmNone(ns.EraScaleOurs and ns.EraScaleOurs() or false, function(scale)
+        TurnOff(nil)
+        if scale then ns.EraScaleGiveBack() end
+    end)
+end
+
+local confirmReset = O.BoxConfirm("ForeverClassicUIResetConfirm", L["OPTWIN_ALL_RESET_CONFIRM"], L["OPTWIN_RESET_SCALE"],
+    function() return L["OPTWIN_RESET_SCALE_TIP"]:format(ns.EraScalePercent() or 90) end)
+local function ConfirmReset()
+    confirmReset(ns.EraScaleWanted and ns.EraScaleWanted() or false, function(scale)
+        Reset(nil, window and NumberRows(window.built.rows) or EMPTY)
+        if scale then ns.UseEraScale() end
+    end)
+end
 -- A page's own: data holds its keys (and number rows for the reset); the text names the page.
 ns.Popup("FCUI_PAGE_NONE", {
     text = L["OPTWIN_PAGE_NONE_CONFIRM"],
@@ -88,12 +106,6 @@ ns.Popup("FCUI_PAGE_RESET", {
     button2 = CANCEL,
     OnAccept = function(_, data) Reset(data.keys, data.numbers) end,
 })
-ns.Popup("FCUI_ALL_RESET", {
-    text = L["OPTWIN_ALL_RESET_CONFIRM"],
-    button1 = OKAY,
-    button2 = CANCEL,
-    OnAccept = function() Reset(nil, window and NumberRows(window.built.rows) or EMPTY) end,
-})
 
 local function Tip(region, label, tooltip)
     region.label, region.tooltip = label, tooltip
@@ -102,13 +114,15 @@ end
 
 -- Every page's buttons: label, tooltip, popup.
 local ALL_BUTTONS = {
-    { "OPTWIN_TOGGLE_NONE", "OPTWIN_TURNS_EVERY_PIECE_OF_THE", "FCUI_ALL_NONE" },
-    { "OPTWIN_RESET_TOGGLES", "OPTWIN_PUTS_EVERY_CHECKBOX_AND_NUMBER", "FCUI_ALL_RESET" },
+    { "OPTWIN_TOGGLE_NONE", "OPTWIN_TURNS_EVERY_PIECE_OF_THE", ConfirmNone },
+    { "OPTWIN_RESET_TOGGLES", "OPTWIN_PUTS_EVERY_CHECKBOX_AND_NUMBER", ConfirmReset },
     { "OPTWIN_RESET_WINDOWS", "OPTWIN_PUTS_EVERY_WINDOW_BACK", "FCUI_WINDOWS_RESET" },
 }
 local function AllPagesButton(parent, spec, width)
     local button = ns.PanelButton(parent, L[spec[1]], width)
-    button:SetScript("OnClick", function() StaticPopup_Show(spec[3]) end)
+    button:SetScript("OnClick", function()
+        if type(spec[3]) == "function" then spec[3]() else StaticPopup_Show(spec[3]) end
+    end)
     Tip(button, L[spec[1]], L[spec[2]])
     return button
 end
