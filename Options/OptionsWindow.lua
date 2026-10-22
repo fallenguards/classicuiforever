@@ -388,6 +388,7 @@ local function PlaceRows(frame)
     local child = frame.listChild
     local function Put(at, region, x)
         ns.SetPointOnce(region, "TOPLEFT", child, "TOPLEFT", column * colW + x, -at * ROW)
+        region.listAt = at
         region:Show()
         if region.keyLow then O.ShowMatch(region, text ~= "" and matched[region] == true) end
     end
@@ -612,6 +613,71 @@ function ns.OpenOptions()
     if inside then StandAlone(frame) end
     frame:SetShown(inside or not frame:IsShown())
 end
+
+-- One row lit on its page, scrolled to it: EasyFind's search opens here.
+function ns.OpenOptionsRow(row)
+    local frame = Window()
+    if embedded ~= nil then StandAlone(frame) end
+    frame:Show()
+    frame:ShowPage(row.page)
+    O.ShowMatch(row, true)
+    frame.listBar:SetValue(math.max(0, ((row.listAt or 1) - 1) * ROW))
+end
+
+local function Choices(row)
+    local list = {}
+    for _, choice in ipairs(row.choices) do list[#list + 1] = { value = choice.key, label = choice.label } end
+    return list
+end
+
+-- The control EasyFind draws in its result row, working through the window's own paths: a box's flip, a stepper's
+-- setter, a drop group's pick, a button's press. A drop-down of several boxes stays a plain row.
+local function Control(row)
+    local key = row.setting or row.key
+    if row.toggle then
+        local radio = row.radio
+        return { kind = radio and "radio" or "check", tooltip = row.tooltip,
+            get = function() return ns.db[key] ~= false end,
+            set = function(on) ns.db[key] = (radio or on) and true or false ns.ToggleChanged(key) end }
+    elseif row.step then
+        local step = row.step
+        return { kind = "slider", tooltip = row.tooltip, min = step.low, max = step.high, step = 1,
+            get = function() return tonumber(ns.db[key]) or step.low end,
+            set = function(value)
+                step.set(math.max(step.low, math.min(step.high, math.floor(value + 0.5))))
+                if row.Sync then row:Sync() end
+            end }
+    elseif row.choices and row.apply then
+        return { kind = "choice", tooltip = row.tooltip, choices = Choices(row),
+            get = function() return ns.db[key] end, set = function(value) row.apply(key, value) end }
+    elseif row.choices then
+        return { kind = "choice", tooltip = row.tooltip, choices = Choices(row),
+            get = function()
+                for _, choice in ipairs(row.choices) do
+                    if ns.db[choice.key] == true then return choice.key end
+                end
+            end,
+            set = function(value) ns.db[value] = true ns.ToggleChanged(value) end }
+    elseif row.button then
+        return { kind = "button", tooltip = row.tooltip, press = function() row.button:Click() end }
+    end
+end
+
+-- The window's setting rows for EasyFind's search: label, page, the words our own search knows and the control it
+-- draws in the row; headings, a windows list's copies (their words blanked) and rows hidden on this client left out.
+function ns.OptionsIndexRowsOf(rows)
+    local out = {}
+    for _, row in ipairs(rows) do
+        if row.label and row.page and row.keyLow ~= "" and not (row.hideIf and row.hideIf()) then
+            local words = {}
+            for word in row.keyLow:gmatch("%S+") do words[#words + 1] = word end
+            out[#out + 1] = { name = row.label, path = row.page, keywords = words, control = Control(row),
+                open = function() ns.OpenOptionsRow(row) end }
+        end
+    end
+    return out
+end
+function ns.OptionsIndexRows() return ns.OptionsIndexRowsOf(Window().built.rows) end
 
 -- Open on one toggle (a chat link's "here"): its label searched, so its row shows lit.
 function ns.OpenOptionsAt(key)

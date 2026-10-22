@@ -31,6 +31,7 @@ function Frame:SetAttribute(name, value) self.attrs[name] = value end
 function Frame:SetScript(name, fn) self.scripts[name] = fn end
 function Frame:HookScript(name, fn) self.hooks[name] = fn end
 function Frame:IsShown() return self.shown end
+function Frame:GetAlpha() return 1 end
 local function NewFrame() return setmetatable({ attrs = {}, scripts = {}, hooks = {}, shown = false }, Frame) end
 for _, name in ipairs({ "SetSize", "SetPoint", "EnableMouse", "RegisterForClicks" }) do Frame[name] = function() end end
 

@@ -186,8 +186,9 @@ local function Stepper(parent, key, label, tooltip, low, high, apply)
     row.minus:SetScript("OnClick", Step(-1))
     row.plus:SetScript("OnClick", Step(1))
     row:EnableMouse(true)
-    -- Its page's Reset toggles puts it back through the same setter.
+    -- Its page's Reset toggles puts it back through the same setter; EasyFind's inline slider steps through it too.
     row.reset = function() apply(ns.DB_DEFAULTS[key] or low) end
+    row.step = { low = low, high = high, set = apply }
     Describe(row, key, label, tooltip)
     return row
 end
@@ -346,7 +347,7 @@ local function DropRow(parent, group, panel)
     if panel then PanelDrop(row, rows, panel) end
     Describe(row, group, label, tip)
     row.keyLow = row.keyLow .. " " .. words
-    row.keys = keys
+    row.keys, row.choices = keys, rows
     return row
 end
 
@@ -433,6 +434,7 @@ local function ValueDropRow(parent, key, label, tooltip, choices, apply, preview
         end
     end)
     Describe(row, key, label, tooltip)
+    row.choices, row.apply = choices, apply
     return row
 end
 

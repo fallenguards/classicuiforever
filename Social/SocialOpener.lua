@@ -63,7 +63,7 @@ end
 -- The friends button by chat where its own click opens the new window, or the roster settles the page after it; a
 -- group toast on it keeps its own click (the quick join list).
 local function ToastPad(toast)
-    return Wanted() and (ns.SocialUIOn() or users.guildRoster) and not toast.displayedToast
+    return Wanted() and (ns.SocialUIOn() or users.guildRoster) and not toast.displayedToast and toast:GetAlpha() > 0
 end
 
 local function Build()
@@ -94,6 +94,9 @@ local function Build()
     ns.RegisterEvents(opener, KEY_EVENTS)
     opener:SetScript("OnEvent", UpdateKeys)
     ns.MapPad(toast, nil, nil, opener, function() return ToastPad(toast) end)
+    -- EasyFind's Toggle Chat Frame hides the pad with the chat, as the toast under it.
+    local pad = ns.PadOf(toast)
+    if pad and EasyFind and EasyFind.API and EasyFind.API.RegisterChatPiece then EasyFind.API.RegisterChatPiece(pad) end
     ns.HookMethod(toast, "ShowToast", ns.PlacePads)
     ns.HookMethod(toast, "ToastToFriendFinished", ns.PlacePads)
 end

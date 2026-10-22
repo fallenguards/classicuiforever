@@ -9,6 +9,10 @@ local Debug = ns.options.Debug
 local category
 
 local function BuildSettings()
+    -- EasyFind's search finds every row of our window, each opened on its page.
+    if EasyFind and EasyFind.API and EasyFind.API.RegisterSettingsIndex then
+        EasyFind.API.RegisterSettingsIndex(TITLE, ns.OptionsIndexRows)
+    end
     if not Settings or not Settings.RegisterAddOnCategory then return end
     -- Our own panel as canvas pages: the search and every page's buttons on our entry, each page under it as the game
     -- lists other addons' pages.

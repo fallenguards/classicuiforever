@@ -23,6 +23,7 @@ globals = { "ToggleGuildFrame",
 }
 
 read_globals = {
+    "EasyFind",
     "GetMaterialTextColors", "GossipFrame", "QuestFrame", "QuestFrame_GetMaterial", "QuestFrameGreetingPanel",
     "QuestInfoRewardsFrame", "QuestTextContrast", "ItemTextFrame", "MailTextFontNormal", "OpenMailBodyText", "OpenMailFrame",
     "OpenMailScrollChildFrame", "TooltipDataProcessor",
