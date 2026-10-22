@@ -118,7 +118,8 @@ local WINDOWS = {
     { "PetitionFrame", key = "panelCharter", lift = 5 },
     { "GuildControlUI", key = "panelGuildControl", addon = "Blizzard_GuildControlUI", portrait = false, after = A.GuildControlUI },
     { "BankFrame", key = "panelBank", after = function(frame) if ns.SkinBank then ns.SkinBank(frame) end end },
-    { "LootFrame", toggle = "lootWindow", backing = false, after = A.LootFrame },
+    -- No scroll bar skin: the classic loot window turns pages, its bar is faded away (Windows/Loot.lua).
+    { "LootFrame", toggle = "lootWindow", backing = false, scrollBars = false, after = A.LootFrame },
     -- Social window's lift, so the two read as one window when they swap.
     -- The finder's Who page: plain while our classic finder holds the window (its Who page is the game's, #210).
     { "LFGWhoListFrame", key = "panelGroupFinder", addon = "Blizzard_GroupFinder_VanillaStyle", lift = 5, off = "groupFinder" },

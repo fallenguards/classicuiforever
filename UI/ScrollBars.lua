@@ -394,15 +394,33 @@ local TRACK_SPEC = { houseX = -10.5, houseTop = 7, houseFoot = -6, upX = 0, upY 
     knobX = 1, knobReach = 7 }
 ns.TRACK_SPEC = TRACK_SPEC
 
+-- The column's holder: a child of the window itself, one level under its border (over every floor and backing),
+-- laid on the bar and shown with it. On the bar a bar standing above its window (the Communities chat's) drew the
+-- column over the edge, and a child of the bar stays in the bar's strata.
+local function ColumnHolder(bar)
+    local window = bar
+    while window:GetParent() and window:GetParent() ~= UIParent do window = window:GetParent() end
+    local holder = ns.NewFrame("Frame", nil, window)
+    holder:SetAllPoints(bar)
+    local slice = window.NineSlice
+    local under = slice and slice.GetFrameLevel and slice:GetFrameLevel()
+    holder:SetFrameLevel(type(under) == "number" and under - 1 or (window:GetFrameLevel() or 0) + 2)
+    return holder
+end
+
 function ns.ScrollTrackArt(bar, spec)
     spec = spec or TRACK_SPEC
     if not bar or bar.fcuiTrackArt or not bar.GetHeight then return end
     bar.fcuiTrackArt = true
     -- A bar with its own track (the sheet's lists) keeps it.
     if bar.fcui and bar.fcui.trackTop then return end
-    local top = ns.OwnTexture(bar, "trackTop", "BACKGROUND", 0)
-    local middle = ns.OwnTexture(bar, "trackMiddle", "BACKGROUND", 0)
-    local foot = ns.OwnTexture(bar, "trackBottom", "BACKGROUND", 1)
+    local holder = ColumnHolder(bar)
+    -- A bar faded (the loot window with nothing to scroll, the bags) fades the column with it, as a child would.
+    local function Alpha() holder:SetAlpha(bar:GetEffectiveAlpha() or 1) end
+    ns.HookMethod(bar, "SetAlpha", Alpha)
+    local top = ns.OwnTexture(holder, "trackTop", "BACKGROUND", 0)
+    local middle = ns.OwnTexture(holder, "trackMiddle", "BACKGROUND", 0)
+    local foot = ns.OwnTexture(holder, "trackBottom", "BACKGROUND", 1)
     ColumnPieces(top, middle, foot)
     top:SetPoint("TOPLEFT", bar, "TOPLEFT", spec.houseX, spec.houseTop)
     Nudge(bar.Back, "fcuiRaised", spec.upX, spec.upY)
@@ -410,7 +428,7 @@ function ns.ScrollTrackArt(bar, spec)
     Nudge(bar.Forward, "fcuiLowered", spec.downX, spec.downY)
     JoinColumn(top, middle, foot)
     -- The art's channel (columns 6-24) is see-through: the old frames had a dark inset behind it.
-    local channel = ns.OwnTexture(bar, "trackChannel", "BACKGROUND", -1)
+    local channel = ns.OwnTexture(holder, "trackChannel", "BACKGROUND", -1)
     ns.TileTex(channel, "marbleBg", nil, ns.PANE_SHADE or 0.9)
     channel:SetPoint("TOPLEFT", top, "TOPLEFT", HOUSING_CHANNEL_LEFT, -HOUSING_CHANNEL_TOP)
     channel:SetPoint("BOTTOMRIGHT", foot, "BOTTOMLEFT", HOUSING_CHANNEL_RIGHT, HOUSING_CHANNEL_TOP)
@@ -418,6 +436,7 @@ function ns.ScrollTrackArt(bar, spec)
     local function Fit()
         FitColumn(top, middle, foot, (bar:GetHeight() or 0) + spec.houseTop - spec.houseFoot)
         channel:SetShown(top:IsShown())
+        Alpha()
     end
     -- Sized via our own frame: the client resets the bar's size script, dropping any hook on it. Once more next frame:
     -- a window sized as it opens (Communities) gave the first fit the bar's old height, and the column had a hole.
@@ -430,7 +449,13 @@ function ns.ScrollTrackArt(bar, spec)
         ns.Sched.NextFrame(again, Fit)
     end
     ear:SetScript("OnSizeChanged", FitSoon)
-    ear:SetScript("OnShow", FitSoon)
+    ear:SetScript("OnShow", function()
+        holder:Show()
+        FitSoon()
+    end)
+    ear:SetScript("OnHide", function() holder:Hide() end)
+    -- Visible, not shown: a bar in a hidden list (the ignore list) is shown while its list is not.
+    holder:SetShown(bar:IsVisible())
     Fit()
     -- Arrows moved out at each end, so the knob reaches further.
     knobReach[bar] = knobReach[bar] or spec.knobReach

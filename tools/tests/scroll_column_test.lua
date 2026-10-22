@@ -29,6 +29,7 @@ function Region:Show() self.shown = true end
 function Region:Hide() self.shown = false end
 function Region:SetShown(on) self.shown = on and true or false end
 function Region:IsShown() return self.shown end
+function Region:IsVisible() return self.shown end
 function Region:GetHeight() return self.height or 0 end
 function Region:SetScript(name, fn) self.scripts[name] = fn end
 local function New() return setmetatable({ shown = true, scripts = {} }, Region) end
