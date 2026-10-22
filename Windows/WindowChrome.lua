@@ -282,7 +282,9 @@ function ns.SkinWindow(frame, opts)
     if not frame or not P.active then return end
     opts = opts or {}
     local name = frame:GetName()
-    if InCombatLockdown() and not (name and name:find("ForeverClassicUI", 1, true)) then
+    -- A protected window (the map laid by our fight watchers) waits a fight out; a plain one (the inspect window,
+    -- first loaded in a fight) is dressed where it stands.
+    if InCombatLockdown() and frame.IsProtected and frame:IsProtected() then
         SkinLater(frame, opts)
         return
     end

@@ -17,6 +17,7 @@ local inspectWatch
 -- nil for the player, or the inspected unit (its own read-only config).
 local inspectUnit
 local inspectAlone   -- from the unit menu: no inspect window to stand beside or close with
+local TakeMenuInspect
 
 -- The old backgrounds, by class and by the tree's place in the row.
 local BACKGROUNDS = {
@@ -84,6 +85,7 @@ local function Build()
     end)
     frame:SetScript("OnHide", function()
         inspectUnit, inspectAlone = nil, nil
+        frame:SetAttribute("inspecting", 0)
         if inspectWatch then inspectWatch:Hide() end
         ns.TalentWindowShown(frame, false)
         if not Hosted() then PlaySound(SOUNDKIT.IG_CHARACTER_INFO_CLOSE) end
@@ -118,6 +120,8 @@ local function Build()
         if not frame:IsShown() then return end
         ns.Sched.NextFrame("talents.refresh", RefreshIfShown)
     end)
+    -- The inspect watcher's handle on the window, now that it exists.
+    TakeMenuInspect()
     return frame
 end
 
@@ -195,18 +199,39 @@ end
 -- The inspect window is a piece the client loads when first wanted.
 ns.EventFrame("ADDON_LOADED", function(_, _, name)
     if name == "Blizzard_InspectUI" and active then TakeInspectButton(true) end
+    if name == "Blizzard_PlayerSpells" then TakeMenuInspect() end
 end)
 
--- The unit menu's Inspect Talents opens the game's spells window on the unit once its data is in (no inspect window
--- on this client has a Talents button): that window goes and ours shows the unit, on its own.
-local menuHooked
-local function TakeMenuInspect()
-    if menuHooked or not (PlayerSpellsUtil and PlayerSpellsUtil.OpenToClassTalentsTab) then return end
+-- The unit menu's Inspect Talents opens the game's spells window on the unit (no inspect window on this client has a
+-- Talents button). Its unit is set before it shows: ours shows the unit then, and a secure watcher under the game's
+-- window hides it as it shows, in a fight too (our hide would be refused there), while ours says it is inspecting.
+local WATCH = [[
+    local ours = self:GetFrameRef("ours")
+    if ours and ours:IsShown() and ours:GetAttribute("inspecting") == 1 then self:GetParent():Hide() end
+]]
+local watcher, watcherHasRef, menuHooked
+function TakeMenuInspect()
+    local spells = _G.PlayerSpellsFrame
+    if not (active and spells and spells.SetInspectUnit) or Hosted() then return end
+    if not watcher then
+        watcher = ns.NewFrame("Frame", nil, spells, "SecureHandlerShowHideTemplate")
+        watcher:SetAttribute("_onshow", WATCH)
+    end
+    -- The window's handle, given out of a fight (the watcher is protected); a fight's first inspect waits for it.
+    if frame and not watcherHasRef then
+        if InCombatLockdown() then
+            ns.WhenCalm("talents.inspectWatch", TakeMenuInspect)
+        else
+            watcher:SetFrameRef("ours", frame)
+            watcherHasRef = true
+        end
+    end
+    if menuHooked then return end
     menuHooked = true
-    ns.HookMethod(PlayerSpellsUtil, "OpenToClassTalentsTab", function(unit)
+    ns.HookMethod(spells, "SetInspectUnit", function(_, unit)
         if not unit or not active or Hosted() then return end
-        ns.HidePanel(_G.PlayerSpellsFrame)
         ShowInspect(unit)
+        frame:SetAttribute("inspecting", 1)
         inspectAlone = true
     end)
 end
