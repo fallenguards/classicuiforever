@@ -38,12 +38,15 @@ local FIGHT_LAY = [[
 
 -- Out of combat, last as the fight begins: the box, scale and spot the pass would lay, quest pane open and shut, and
 -- the widths the game gives the map either way.
+local Hang
+
 local function FightValues()
     local map = MF.Map()
     if InCombatLockdown() or not map then return end
     local lay = MF.Layout()
     local style = MF.EraStyle()
     ns.SetAttributeIf(lay, "on", style and 1 or 0)
+    Hang(style and not ns.MoverHolds(map))
     if not style then return end
     -- Left to another addon (a mover, or Leave game windows): our box only, as out of combat; no scale or spot.
     ns.SetAttributeIf(lay, "place", ns.MoverHolds(map) and 0 or 1)
@@ -68,22 +71,35 @@ local function FightValues()
 end
 
 local made = false
+local watchers = {}   -- watch -> the map frame it hangs on while our layout lays the map in fights
+local shelf           -- off the map, a hidden frame of ours
 local function Watch(parent, onHide)
     local map = MF.Map()
-    local watch = ns.NewFrame("Frame", nil, parent, "SecureHandlerShowHideTemplate")
+    local watch = ns.NewFrame("Frame", nil, shelf, "SecureHandlerShowHideTemplate")
     watch:SetFrameRef("lay", MF.Layout())
     watch:SetFrameRef("map", map)
     watch:SetFrameRef("toggle", map.SidePanelToggle)
     watch:SetAttribute("_onshow", FIGHT_LAY)
     if onHide then watch:SetAttribute("_onhide", FIGHT_LAY) end
+    watchers[watch] = parent
 end
 
--- Made once out of combat: a secure child makes the map and the toggle protected in fights (the game's keys and clicks
--- still open and size it; other addons cannot move it then). Each hangs from a frame, never a region.
+-- A secure child makes the map and the toggle protected in fights (the game's keys and clicks still open and size it),
+-- and another addon's moves and scaling are refused then (#220): on the map only while ours lays it, else on the shelf.
+Hang = function(on)
+    for watch, parent in pairs(watchers) do
+        local want = on and parent or shelf
+        if watch:GetParent() ~= want then watch:SetParent(want) end
+    end
+end
+
+-- Made once out of combat. Each hangs from a frame, never a region.
 local function MakeWatchers()
     local map = MF.Map()
     if made or InCombatLockdown() or not (map and map.SidePanelToggle) then return end
     made = true
+    shelf = ns.NewFrame("Frame", nil, UIParent)
+    shelf:Hide()
     Watch(map, false)
     Watch(map.SidePanelToggle, true)
     FightValues()
