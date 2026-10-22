@@ -115,17 +115,18 @@ local function SweepChild(child, host, mark, hide)
     end
 end
 
+-- The client puts the inset at -83 on every page but Raid (-60); our floor is drawn for -83, so it is held there while
+-- ours is up, and the page under ours gets its own back as ours goes: the client lays its page first and ours re-swept
+-- it before closing (Who tab to Raid tab), so the description sat on the inset's edge.
 function ns.SweepFriendsFrame(mark, hide)
     local host = FriendsFrame
     if not host or not host.GetChildren then return end
-    -- The client puts the inset at -83 for friends, -60 otherwise; our floor is drawn for -83,
-    -- so hold it there while ours is up (from the who tab it showed a dark band).
     local inset = _G["FriendsFrameInset"]
-    if hide and inset and not InCombatLockdown() then
+    if inset and not InCombatLockdown() then
         local _, _, _, x, y = inset:GetPoint(1)
-        if y and math.abs(y + 83) > 0.5 then
-            inset:SetPoint("TOPLEFT", host, "TOPLEFT", x or 4, -83)
-        end
+        local raid = FRIEND_TAB_RAID ~= nil and PanelTemplates_GetSelectedTab(host) == FRIEND_TAB_RAID
+        local want = (hide or not raid) and -83 or -60
+        if y and math.abs(y - want) > 0.5 then inset:SetPoint("TOPLEFT", host, "TOPLEFT", x or 4, want) end
     end
     SweepInside(host.TitleContainer, mark, hide)
     SweepInside(_G["FriendsFrameInset"], mark, hide)
