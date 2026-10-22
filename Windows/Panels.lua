@@ -91,6 +91,9 @@ local WINDOWS = {
         if ns.PlaceRecentAllyRows then ns.PlaceRecentAllyRows() end
         if ns.SocialQuickJoin then ns.SocialQuickJoin() end
         ns.KeepScrollIcon(_G["FriendsFrameIcon"])
+        -- The broadcast box in the old dialog box, with the theme, instead of its diamond border.
+        local bnet = _G.FriendsFrameBattlenetFrame
+        if bnet and bnet.BroadcastFrame then ns.OldDialogBorder(bnet.BroadcastFrame.Border, true) end
     end },
     -- The contacts tab's pop-out ignore list: no portrait, its button in the old red.
     { "FriendsFrame", key = "panelSocial", child = "IgnoreListWindow", portrait = false, lift = 5, after = function(frame)
