@@ -118,13 +118,13 @@ local function SkinHeader(button)
         glow:SetPoint("LEFT", button, "LEFT", 4, 0)
         local text = HeaderText(button)
         if text then
-            text:SetFontObject("GameFontNormal")
+            text:SetFontObject(ns.QuestListFont)
             text:ClearAllPoints()
             text:SetPoint("LEFT", button, "LEFT", 24, 0)
             text:SetPoint("RIGHT", button, "RIGHT", -4, 0)
         end
-        button:SetNormalFontObject("GameFontNormal")
-        button:SetHighlightFontObject("GameFontHighlight")
+        button:SetNormalFontObject(ns.QuestListFont)
+        button:SetHighlightFontObject(ns.QuestListFontHover)
         button:HookScript("OnLeave", GoldHeader)
     end
     local icon = button.fcui and button.fcui.collapseIcon
@@ -173,6 +173,47 @@ end
 -- Title hover: the settings list's picked gold (Era's options_list_active, 255 210 0).
 local TITLE_HOVER_R, TITLE_HOVER_G, TITLE_HOVER_B = 1, 0.82, 0
 
+-- A row the game just made was measured in its own font, before ours: what our font added, per quest.
+local grown = {}
+local function Grow(questID, add)
+    if questID and add ~= 0 then grown[questID] = (grown[questID] or 0) + add end
+end
+
+-- The list's rows, each anchored from its top: moved down by what the rows above them grew. Points and sizes only;
+-- the game's Layout() from here leaves its dirty flag ours, and every later list pass runs in our name after it.
+local stack, addOf = {}, {}
+local function Stacked(child, contents)
+    local point, rel = child:GetPoint(1)
+    if point == "TOPLEFT" and rel == contents and child:IsShown() then stack[#stack + 1] = child end
+end
+local function HigherFirst(a, b) return select(5, a:GetPoint(1)) > select(5, b:GetPoint(1)) end
+local function Restack()
+    if not next(grown) then return end
+    local contents = QuestScrollFrame.Contents
+    for button in QuestScrollFrame.titleFramePool:EnumerateActive() do
+        local add = button.questID and grown[button.questID]
+        if add then
+            button:SetHeight(button:GetHeight() + add)
+            addOf[button] = add
+        end
+    end
+    wipe(grown)
+    wipe(stack)
+    ns.EachChild(contents, Stacked, contents)
+    table.sort(stack, HigherFirst)
+    local shift = 0
+    for _, child in ipairs(stack) do
+        if shift ~= 0 then
+            local point, rel, relPoint, x, y = child:GetPoint(1)
+            child:SetPoint(point, rel, relPoint, x, y - shift)
+        end
+        shift = shift + (addOf[child] or 0)
+    end
+    wipe(addOf)
+    wipe(stack)
+    if shift ~= 0 then contents:SetHeight(contents:GetHeight() + shift) end
+end
+
 -- 1.x row highlight and check box; storyline and task icons faded.
 local function SkinTitle(button)
     if ns.Once(button, "questTitle") then
@@ -190,6 +231,12 @@ local function SkinTitle(button)
         end
         local box = button.Checkbox
         if box then ns.EachTexture(box, DressCheckRegion, box) end
+        -- The list's font at the player's size; a reused row is measured in it, a new one grows (Restack).
+        if button.Text then
+            local was = button.Text:GetHeight()
+            button.Text:SetFontObject(ns.QuestListFont)
+            Grow(button.questID, button.Text:GetHeight() - was)
+        end
         -- The client restores its own color on leave.
         button:HookScript("OnLeave", ColorTitle)
     end
@@ -205,6 +252,21 @@ local function SkinRows()
     if QuestScrollFrame.titleFramePool then
         for button in QuestScrollFrame.titleFramePool:EnumerateActive() do SkinTitle(button) end
     end
+    if QuestScrollFrame.objectiveFramePool then
+        for line in QuestScrollFrame.objectiveFramePool:EnumerateActive() do
+            if ns.Once(line, "questObjective") then
+                if line.Dash then line.Dash:SetFontObject(ns.QuestListFontSmall) end
+                if line.Text then
+                    local was = line.Text:GetStringHeight()
+                    line.Text:SetFontObject(ns.QuestListFontSmall)
+                    local now = line.Text:GetStringHeight()
+                    line:SetHeight(now)
+                    Grow(line.questID, now - was)
+                end
+            end
+        end
+    end
+    Restack()
 end
 
 ------------------------------------------------------------------ details
@@ -212,8 +274,14 @@ end
 -- Ink all quest text; buttons are skipped so reward item names keep their color.
 local InkFrame
 
+-- Inked, and in the font at the player's quest text size (the game measures the text by it on its next display).
 local function InkRegion(region)
-    if region:IsObjectType("FontString") then region:SetTextColor(ns.PageInk(INK_R, INK_G, INK_B)) end
+    if not region:IsObjectType("FontString") then return end
+    region:SetTextColor(ns.PageInk(INK_R, INK_G, INK_B))
+    local base = region:GetFontObject()
+    local name = base and base.GetName and base:GetName()
+    local sized = name and ns.QuestTextFont(name)
+    if sized and sized ~= name and sized ~= base then region:SetFontObject(sized) end
 end
 
 local function InkChild(child)

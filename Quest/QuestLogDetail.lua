@@ -41,6 +41,8 @@ local function Pool(child)
 end
 
 local function TextW() return frame.textW or TEXT_W end
+-- A window with sizedText (the combined map's pages) writes in the fonts at the player's quest text size.
+local function Font(name) return frame.sizedText and ns.QuestTextFont(name) or name end
 local function RewardScale() return math.max(0.2, (TextW() - REWARD_GAP) / 2 / REWARD_W) end
 
 local function DetailString(child, font, width, x, y, anchor, relPoint)
@@ -115,11 +117,11 @@ end
 -- Rewards under `last`, two per row, coins after the header (money alone still gets one).
 local function RewardGrid(child, questID, last, kind, count, header, coins)
     if count <= 0 and not coins then return last end
-    local label = DetailString(child, FONT_SMALL, TextW(), 0, -5, last, "BOTTOMLEFT")
+    local label = DetailString(child, Font(FONT_SMALL), TextW(), 0, -5, last, "BOTTOMLEFT")
     label:SetText(header)
     last = label
     if coins then
-        local line = DetailString(child, FONT_SMALL, TextW(), 0, 0, label, "TOPLEFT")
+        local line = DetailString(child, Font(FONT_SMALL), TextW(), 0, 0, label, "TOPLEFT")
         ns.SetPointOnce(line, "LEFT", label, "LEFT", (label:GetStringWidth() or 0) + 15, 0)
         line:SetText(coins)
     end
@@ -166,9 +168,9 @@ local function LayoutRewards(last, questID)
     end
     local title
     if apart then
-        title = DetailString(child, FONT_TITLE, TextW(), 5, -5)
+        title = DetailString(child, Font(FONT_TITLE), TextW(), 5, -5)
     else
-        title = DetailString(child, FONT_TITLE, TextW(), 0, -10, last, "BOTTOMLEFT")
+        title = DetailString(child, Font(FONT_TITLE), TextW(), 0, -10, last, "BOTTOMLEFT")
     end
     title:SetText(QUEST_REWARDS or "Rewards")
     local tail = title
@@ -177,7 +179,7 @@ local function LayoutRewards(last, questID)
         numChoices > 0 and (REWARD_ITEMS or "You will also receive:") or (REWARD_ITEMS_ONLY or "You will receive:"),
         money > 0 and Coins(money) or nil)
     if xp > 0 then
-        local line = DetailString(child, FONT_SMALL, TextW(), 0, -4, tail, "BOTTOMLEFT")
+        local line = DetailString(child, Font(FONT_SMALL), TextW(), 0, -4, tail, "BOTTOMLEFT")
         line:SetText(string.format("%s: %s", REWARD_XP or "Experience", BreakUpLargeNumbers and BreakUpLargeNumbers(xp) or xp))
         tail = line
     end
@@ -196,18 +198,19 @@ function QL.FillDetail(window, info, detailH, setHasTimer)
     C_QuestLog.SetSelectedQuest(selectedID)
     local questIndex = info.questLogIndex
     local textW = TextW()
+    local fontTitle, fontBody, fontSmall = Font(FONT_TITLE), Font(FONT_BODY), Font(FONT_SMALL)
 
     local titleText = info.title or ""
     if C_QuestLog.IsFailed and C_QuestLog.IsFailed(selectedID) then
         titleText = titleText .. " - (" .. (FAILED or "Failed") .. ")"
     end
-    local title = DetailString(child, FONT_TITLE, textW, 5, -5)
+    local title = DetailString(child, fontTitle, textW, 5, -5)
     title:SetText(titleText)
     local last = title
 
     local description, objectivesText = GetQuestLogQuestText(questIndex)
     if objectivesText and objectivesText ~= "" then
-        local objectives = DetailString(child, FONT_BODY, textW - 10, 0, -5, last, "BOTTOMLEFT")
+        local objectives = DetailString(child, fontBody, textW - 10, 0, -5, last, "BOTTOMLEFT")
         objectives:SetText(objectivesText)
         last = objectives
     end
@@ -215,7 +218,7 @@ function QL.FillDetail(window, info, detailH, setHasTimer)
     local timeLeft = GetQuestLogTimeLeft and GetQuestLogTimeLeft()
     setHasTimer(timeLeft ~= nil)
     if timeLeft then
-        local timer = DetailString(child, FONT_SMALL, textW, 0, -10, last, "BOTTOMLEFT")
+        local timer = DetailString(child, fontSmall, textW, 0, -10, last, "BOTTOMLEFT")
         timer:SetText((TIME_REMAINING or "Time Remaining:") .. " " .. SecondsToTime(timeLeft))
         last = timer
     end
@@ -224,7 +227,7 @@ function QL.FillDetail(window, info, detailH, setHasTimer)
     for i = 1, numObjectives do
         local text, kind, finished = GetQuestLogLeaderBoard(i, questIndex)
         if not text or text == "" then text = kind end
-        local line = DetailString(child, FONT_SMALL, textW, 0, i == 1 and -10 or -2, last, "BOTTOMLEFT")
+        local line = DetailString(child, fontSmall, textW, 0, i == 1 and -10 or -2, last, "BOTTOMLEFT")
         if finished then
             line:SetTextColor(Done())
             text = text .. " (" .. (COMPLETE or "Complete") .. ")"
@@ -235,16 +238,16 @@ function QL.FillDetail(window, info, detailH, setHasTimer)
 
     local required = C_QuestLog.GetRequiredMoney and C_QuestLog.GetRequiredMoney(selectedID) or 0
     if required > 0 then
-        local line = DetailString(child, FONT_SMALL, textW, 0, numObjectives > 0 and -4 or -10, last, "BOTTOMLEFT")
+        local line = DetailString(child, fontSmall, textW, 0, numObjectives > 0 and -4 or -10, last, "BOTTOMLEFT")
         line:SetText((REQUIRED_MONEY or "Required Money:") .. " " .. Coins(required))
         if required > GetMoney() then line:SetTextColor(1, 0.1, 0.1) else line:SetTextColor(Done()) end
         last = line
     end
 
     if description and description ~= "" then
-        local header = DetailString(child, FONT_TITLE, textW, 0, -10, last, "BOTTOMLEFT")
+        local header = DetailString(child, fontTitle, textW, 0, -10, last, "BOTTOMLEFT")
         header:SetText(QUEST_DESCRIPTION or "Description")
-        local body = DetailString(child, FONT_BODY, textW - 10, 0, -5, header, "BOTTOMLEFT")
+        local body = DetailString(child, fontBody, textW - 10, 0, -5, header, "BOTTOMLEFT")
         body:SetText(description)
         last = body
     end

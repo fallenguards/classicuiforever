@@ -554,6 +554,11 @@ local function Extras(entry, child, colW, add)
     elseif key == "classColorPlates" then
         Step("namePlates", "plateNameSize", L["OPTWIN_NAME_TEXT_SIZE"], L["OPTWIN_POINTS_BIGGER_OR_SMALLER_THAN"],
             ns.PLATE_NAME_MIN or -6, ns.PLATE_NAME_MAX or 6, ns.SetPlateNameSize, "font")
+    elseif key == "questMapPane" and ns.SetQuestListFontSize then
+        Step("questMapPane", "questListFontSize", L["OPT_questListFontSize"], L["OPT_questListFontSize_TIP"],
+            ns.QUEST_FONT_MIN or -3, ns.QUEST_FONT_MAX or 8, ns.SetQuestListFontSize, "font text size quest list map")
+        Step("questMapPane", "questTextFontSize", L["OPT_questTextFontSize"], L["OPT_questTextFontSize_TIP"],
+            ns.QUEST_FONT_MIN or -3, ns.QUEST_FONT_MAX or 8, ns.SetQuestTextFontSize, "font text size quest description rewards map")
     end
 end
 

@@ -235,4 +235,6 @@ return {
     questMapPanePaper = "same for everyone: opt-in, off by default",
     mapQuestCombinedPaper = "same for everyone: opt-in, off by default",
     hideMapHelpButton = "same for everyone: opt-in, off by default",
+    questListFontSize = "same for everyone: 0, the game's font size until the player steps it",
+    questTextFontSize = "same for everyone: 0, the game's font size until the player steps it",
 }

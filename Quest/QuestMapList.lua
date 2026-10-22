@@ -20,7 +20,7 @@ local PAGE_L, PAGE_T, PAGE_B = 8, 8, 8
 local TEXT_R, REWARDS_R = 20, 4
 local LIST_BAR_X, LIST_BAR_TOP, LIST_BAR_FOOT = -16, 2, 1
 local TEXT_BAR_X, REWARDS_BAR_X, PAGE_BAR_TOP, PAGE_BAR_FOOT = -13, 0, 2, 2
-local TITLE_H, HEADER_H, LINE_H, ROW_GAP = 16, 18, 13, 3
+local HEADER_EXTRA, ROW_GAP = 2, 3
 local TITLE_X, HEADER_TITLE_X, LINE_X, CHECK_SIZE = 6, 22, 14, 16
 local MAX_LINES = 8
 local WHEEL_STEP = 30
@@ -42,17 +42,17 @@ local function SetHasTimer(on) hasTimer = on end
 
 ------------------------------------------------------------------ list rows
 
-local function Line(row, i)
+local function Line(row, i, y)
     local lines = row.lines
     local fs = lines[i]
     if not fs then
-        fs = row:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+        fs = row:CreateFontString(nil, "ARTWORK")
+        fs:SetFontObject(ns.QuestListFontSmall)
         fs:SetJustifyH("LEFT")
         fs:SetWordWrap(false)
-        fs:SetPoint("TOPLEFT", row, "TOPLEFT", LINE_X, -(TITLE_H + (i - 1) * LINE_H))
-        fs:SetPoint("RIGHT", row, "RIGHT", -CHECK_SIZE - 2, 0)
         lines[i] = fs
     end
+    ns.SetTwoPointsIf(fs, "TOPLEFT", row, "TOPLEFT", LINE_X, -y, "TOPRIGHT", row, "TOPRIGHT", -CHECK_SIZE - 2, -y)
     return fs
 end
 
@@ -95,7 +95,8 @@ local function MakeRow(i)
     row.glow:SetTexture(ns.ART.PLUS_GLOW)
     row.glow:SetBlendMode("ADD")
     row.glow:SetAllPoints(row.icon)
-    row.title = row:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    row.title = row:CreateFontString(nil, "ARTWORK")
+    row.title:SetFontObject(ns.QuestListFont)
     row.title:SetJustifyH("LEFT")
     row.title:SetWordWrap(false)
     row.check = row:CreateTexture(nil, "OVERLAY")
@@ -119,9 +120,10 @@ end
 local function FillRow(row, info, y)
     row.info = info
     local r, g, b = QL.LevelColor(info)
+    local titleH, lineH = ns.QuestFontHeights()
     local height
     if info.isHeader then
-        height = HEADER_H
+        height = titleH + HEADER_EXTRA
         ns.SetCollapseIcon(row.icon, info.isCollapsed)
         row.icon:Show()
         row.glow:Show()
@@ -141,14 +143,14 @@ local function FillRow(row, info, y)
             if not text or text == "" then text = kind end
             if text and text ~= "" then
                 n = n + 1
-                local fs = Line(row, n)
+                local fs = Line(row, n, titleH + (n - 1) * lineH)
                 fs:SetText("- " .. text)
                 if finished then fs:SetTextColor(unpack(DONE)) else fs:SetTextColor(1, 1, 1) end
                 fs:Show()
             end
         end
         for i = n + 1, #row.lines do row.lines[i]:Hide() end
-        height = TITLE_H + n * LINE_H + ROW_GAP
+        height = titleH + n * lineH + ROW_GAP
         row.check:SetShown(QL.IsWatched(info.questID))
         local picked = info.questID == selectedID
         row.band:SetShown(picked)
@@ -160,7 +162,7 @@ local function FillRow(row, info, y)
         end
     end
     local x = info.isHeader and HEADER_TITLE_X or TITLE_X
-    ns.SetTwoPointsIf(row.title, "TOPLEFT", row, "TOPLEFT", x, 0, "BOTTOMRIGHT", row, "TOPRIGHT", -CHECK_SIZE - 2, -TITLE_H)
+    ns.SetTwoPointsIf(row.title, "TOPLEFT", row, "TOPLEFT", x, 0, "BOTTOMRIGHT", row, "TOPRIGHT", -CHECK_SIZE - 2, -titleH)
     ns.SetTwoPointsIf(row, "TOPLEFT", list.child, "TOPLEFT", 0, -y, "BOTTOMRIGHT", list.child, "TOPRIGHT", 0, -(y + height))
     row:Show()
     return height
@@ -293,7 +295,8 @@ function QM.Attach(hosts)
     ns.QuestPaper(list, "mapQuestCombinedPaper")
     detail = Pane(hosts.pageL, PAGE_L, TEXT_R, PAGE_T, PAGE_B, TEXT_BAR_X, PAGE_BAR_TOP, PAGE_BAR_FOOT)
     rewards = Pane(hosts.pageR, PAGE_L, REWARDS_R, PAGE_T, PAGE_B, REWARDS_BAR_X, PAGE_BAR_TOP, PAGE_BAR_FOOT)
-    window = { detailChild = detail.child, detailBar = detail.bar, rewardChild = rewards.child, rewardBar = rewards.bar }
+    window = { detailChild = detail.child, detailBar = detail.bar, rewardChild = rewards.child, rewardBar = rewards.bar,
+        sizedText = true }
     track = TrackCheck(hosts.foot)
     -- Log events while the column shows; one refill per frame however many arrive.
     hosts.list:SetScript("OnShow", function(self)
@@ -319,7 +322,8 @@ end
 
 ns.OnToggle(function(key)
     if key == "mapQuestCombinedPaper" and list then ns.QuestPaper(list, key) end
-    if (ns.ThemeKey(key) or key == "eraCoins" or key == "questLevels") and list and list:IsVisible() then Update() end
+    if (ns.ThemeKey(key) or key == "eraCoins" or key == "questLevels" or key == "questListFontSize"
+        or key == "questTextFontSize") and list and list:IsVisible() then Update() end
 end)
 
 -- For the dev addon's mapcombo probe: the panes, the rows shown, the picked quest.
