@@ -232,4 +232,6 @@ return {
     mapQuestPagesH = "same for everyone: 0, the sheets' own pages height until the player drags the divider",
     mapPlayerCoords = "mirrors the game's worldMapShowPlayerCoords: read from the game at every apply",
     mapCursorCoords = "mirrors the game's worldMapShowCursorCoords: read from the game at every apply",
+    questMapPanePaper = "same for everyone: opt-in, off by default",
+    mapQuestCombinedPaper = "same for everyone: opt-in, off by default",
 }

@@ -170,6 +170,7 @@ Units\NamePlateAuras.lua
 Quest\QuestTracker.lua
 Quest\QuestWatch.lua
 Quest\QuestLogData.lua
+Quest\QuestPaper.lua
 Quest\QuestLogShare.lua
 Quest\QuestLogWindow.lua
 Quest\QuestLogDetail.lua

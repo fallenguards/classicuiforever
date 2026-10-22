@@ -69,7 +69,10 @@ local ROCK_SPAN = 1024
 
 local active = false
 local built = false
-local floorTex, parchmentTex, headerTex
+local floorTex, paperTex, parchmentTex, headerTex
+
+-- The game's own page under the list instead of the marble, an option.
+local function PaperOn() return ns.db.questMapPanePaper == true end
 
 ------------------------------------------------------------------ list rows
 
@@ -368,8 +371,10 @@ end
 -- edge on our classic frames, whose art under the pane showed behind the column and the gear.
 function ns.QuestPaneFloor(era)
     if not floorTex then return end
-    ns.SetTwoPointsIf(floorTex, "TOPLEFT", QuestMapFrame, "TOPLEFT", QUEST_PANE_BG_LEFT, QUEST_PANE_BG_TOP, "BOTTOMRIGHT",
-        QuestMapFrame, "BOTTOMRIGHT", era and 0 or QUEST_PANE_BG_RIGHT, QUEST_PANE_BG_BOTTOM)
+    for _, tex in ipairs({ floorTex, paperTex }) do
+        ns.SetTwoPointsIf(tex, "TOPLEFT", QuestMapFrame, "TOPLEFT", QUEST_PANE_BG_LEFT, QUEST_PANE_BG_TOP, "BOTTOMRIGHT",
+            QuestMapFrame, "BOTTOMRIGHT", era and 0 or QUEST_PANE_BG_RIGHT, QUEST_PANE_BG_BOTTOM)
+    end
 end
 
 local function Build()
@@ -380,6 +385,8 @@ local function Build()
     -- Dark marble floor at the other lists' shade.
     floorTex = ns.OwnTexture(QuestMapFrame, "floor", "BACKGROUND", -3)
     ns.TileTex(floorTex, "marbleBg", nil, ns.PANE_SHADE or 0.9)
+    paperTex = ns.OwnTexture(QuestMapFrame, "paper", "BACKGROUND", -3)
+    paperTex:SetAtlas(ns.QUEST_PAGE_ATLAS)
     ns.QuestPaneFloor(false)
     if scroll then
         if scroll.Background then scroll.Background:SetAlpha(0) end
@@ -418,7 +425,10 @@ local function Apply()
     if not QuestMapFrame then ns.MissingPiece("QuestMapFrame") return end
     Build()
     if ListShadow() then ListShadow():Hide() end
-    if floorTex then floorTex:Show() end
+    if floorTex then
+        floorTex:SetShown(not PaperOn())
+        paperTex:SetShown(PaperOn())
+    end
     if parchmentTex then parchmentTex:Show() end
     if headerTex then headerTex:Show() end
     PlaceBack(true)
@@ -431,7 +441,10 @@ local function Restore()
     if not active then return end
     active = false
     if ListShadow() then ListShadow():Show() end
-    if floorTex then floorTex:Hide() end
+    if floorTex then
+        floorTex:Hide()
+        paperTex:Hide()
+    end
     if parchmentTex then parchmentTex:Hide() end
     if headerTex then headerTex:Hide() end
     PlaceBack(false)

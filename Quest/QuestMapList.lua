@@ -283,6 +283,7 @@ function QM.Attach(hosts)
     list.empty:SetPoint("RIGHT", list, "RIGHT", -10, 0)
     list.empty:SetText(QUESTLOG_NO_QUESTS_TEXT or "You have no quests.")
     list.empty:Hide()
+    ns.QuestPaper(list, "mapQuestCombinedPaper")
     detail = Pane(hosts.pageL, PAGE_L, TEXT_R, PAGE_T, PAGE_B, TEXT_BAR_X, PAGE_BAR_TOP, PAGE_BAR_FOOT)
     rewards = Pane(hosts.pageR, PAGE_L, REWARDS_R, PAGE_T, PAGE_B, REWARDS_BAR_X, PAGE_BAR_TOP, PAGE_BAR_FOOT)
     window = { detailChild = detail.child, detailBar = detail.bar, rewardChild = rewards.child, rewardBar = rewards.bar }
@@ -310,6 +311,7 @@ function QM.Take(questID)
 end
 
 ns.OnToggle(function(key)
+    if key == "mapQuestCombinedPaper" and list then ns.QuestPaper(list, key) end
     if (ns.ThemeKey(key) or key == "eraCoins" or key == "questLevels") and list and list:IsVisible() then Update() end
 end)
 
