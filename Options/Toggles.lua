@@ -549,6 +549,10 @@ local FOREVER_ROWS = {
 -- Its difficulty flag after the coordinates; Forever's minimap has none.
 local RETAIL_ROWS = {
     talents = COLLECTIONS_ROWS,
+    -- The map's tutorial button: a game rule leaves Forever none.
+    hideMapQuestButton = {
+        { "hideMapHelpButton", L["OPT_hideMapHelpButton"], L["OPT_hideMapHelpButton_TIP"], search = "help tutorial info button map" },
+    },
     -- No key ring: the reagent bag in its slot with the key's art or a bag's, before Full slot; or off the row.
     eraBagSize = {
         { "reagentBagKeyArt", L["OPT_reagentBagKeyArt"], L["OPT_reagentBagKeyArt_TIP"], needs = "classicBar",

@@ -128,6 +128,7 @@ return {
     hideLastNames = false,
     hideLatencyBar = false,
     hideLockedSlots = false,
+    hideMapHelpButton = false,
     hideMapQuestButton = false,
     hideMicroAchievements = true,
     hideMicroArt = false,

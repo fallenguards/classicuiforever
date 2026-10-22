@@ -323,6 +323,7 @@ ns.DB_DEFAULTS = {
     gameMenuMinimapButton = false, shopMinimapButton = false, housingMinimapButton = true,
     achievementsMinimapButton = true, journalMinimapButton = true,
     hideMapQuestButton = false,
+    hideMapHelpButton = false,
     lootWindow = true,
     gameMenu = true,
     lootRoll = true,

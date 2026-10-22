@@ -234,4 +234,5 @@ return {
     mapCursorCoords = "mirrors the game's worldMapShowCursorCoords: read from the game at every apply",
     questMapPanePaper = "same for everyone: opt-in, off by default",
     mapQuestCombinedPaper = "same for everyone: opt-in, off by default",
+    hideMapHelpButton = "same for everyone: opt-in, off by default",
 }
