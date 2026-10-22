@@ -385,6 +385,8 @@ ns.TOGGLES = {
         search = "navigation bar header forever game pin coordinates" },
     { "mapNavNone", L["OPT_mapNavNone"], L["OPT_mapNavNone_TIP"], parent = "worldMap", radio = "mapNavStyle", drop = true,
         search = "navigation bar header none small era" },
+    { "mapQuestCombined", L["OPT_mapQuestCombined"], L["OPT_mapQuestCombined_TIP"], parent = "worldMap",
+        needs = "mapNavClassic", search = "combined map quest log list details rewards pages wrath corner drag" },
     { "mapOptions", L["OPT_mapOptions"], L["OPT_mapOptions_TIP"], parent = "worldMap", radio = "mapOptionsShow",
         drop = true, dropTip = L["OPT_mapOptionsShow_TIP"], search = "map options filter quest objectives shown" },
     { "mapOptionsHover", L["OPT_mapOptionsHover"], L["OPT_mapOptionsHover_TIP"], parent = "worldMap",

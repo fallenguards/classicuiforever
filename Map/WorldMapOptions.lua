@@ -38,6 +38,9 @@ local function Box(parent)
     return box
 end
 
+-- The box, nil before the first classic lay (Track Quest stands left of it).
+function MO.Frame() return box end
+
 local function Points(frame)
     local points = {}
     for i = 1, frame:GetNumPoints() do points[i] = { frame:GetPoint(i) } end

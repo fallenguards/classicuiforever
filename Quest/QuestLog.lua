@@ -29,6 +29,8 @@ end
 -- After the game opened the map at a quest: hide the map, never toggle it, and show the quest in ours.
 local function QuestDetailsOpened(questID)
     if not QL.active then return end
+    -- The combined map up: picked in its own list, the map stays.
+    if ns.QuestMapList.Take(questID) then return end
     if WorldMapFrame and WorldMapFrame:IsShown() then ns.HidePanel(WorldMapFrame) end
     ns.ShowQuestLog(questID)
 end

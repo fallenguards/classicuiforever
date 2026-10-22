@@ -99,6 +99,8 @@ local function Start(entry)
 end
 
 local function DefaultSize(entry)
+    -- The map's reset takes its combined layout's share back too.
+    if entry.quests then ns.MapCombined.Reset() end
     local scales, key = W.Scales(), W.SizeKey(entry)
     if scales[key] == nil then return end
     scales[key] = nil
@@ -118,16 +120,22 @@ local function Sync(entry)
     if w then ns.SetPointIf(grip, "BOTTOMRIGHT", frame, "TOPLEFT", w + GRIP_X, GRIP_Y - h) end
 end
 
-local function MakeGrip(entry)
-    local frame = ns.WindowFrame(entry)
-    if entry.piece or grips[entry.key] or not frame then return end
-    local grip = ns.NewFrame("Button", nil, entry.quests and frame.BorderFrame or frame)
+-- The chat's size grabber as a window piece; a right click is its own click.
+function ns.GripButton(parent)
+    local grip = ns.NewFrame("Button", nil, parent)
     ns.MarkWindowPiece(grip)
     grip:SetSize(GRIP_SIZE, GRIP_SIZE)
     grip:SetNormalTexture(GRIP .. "Up")
     grip:SetPushedTexture(GRIP .. "Down")
     grip:SetHighlightTexture(GRIP .. "Highlight")
     grip:RegisterForClicks("RightButtonUp")
+    return grip
+end
+
+local function MakeGrip(entry)
+    local frame = ns.WindowFrame(entry)
+    if entry.piece or grips[entry.key] or not frame then return end
+    local grip = ns.GripButton(entry.quests and frame.BorderFrame or frame)
     grip:SetScript("OnClick", function() DefaultSize(entry) end)
     grip:SetScript("OnMouseDown", function(_, button) if button == "LeftButton" then Start(entry) end end)
     grip:SetScript("OnMouseUp", function(_, button) if button == "LeftButton" then Stop() end end)

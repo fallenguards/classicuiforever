@@ -73,6 +73,7 @@ local LAY = [[
         map:SetWidth(w)
         map:SetHeight(self:GetAttribute("h"))
     end
+    canvas:SetScale(self:GetAttribute("k") or 1)
     canvas:ClearAllPoints()
     canvas:SetPoint("TOPLEFT", "$parent", "TOPLEFT", self:GetAttribute("l"), self:GetAttribute("t"))
     canvas:SetPoint("BOTTOMRIGHT", "$parent", self:GetAttribute("rp"), self:GetAttribute("r"), self:GetAttribute("b"))
@@ -118,6 +119,9 @@ local function EraStyle()
     if style and style ~= "forever" then return style end
 end
 
+-- The combined layout (#73): Classic style with its own quest list and pages; the client's pane stays shut in it.
+local function Combined() return ns.db.mapQuestCombined == true and EraStyle() == "classic" end
+
 -- Maximized, an Era style keeps its own layout scaled up to the screen as the game's fills it (its height, 30 short of
 -- its width); the game holds it by its top over its black backdrop. Our window manager wears the scale.
 local FULL_SIDE_MARGIN = 30
@@ -157,7 +161,7 @@ local function PaneShown()
     return pane and pane:IsShown() and true or false
 end
 
-local function PaneW() return PaneShown() and QUEST_PANE_W or nil end
+local function PaneW() return PaneShown() and not Combined() and QUEST_PANE_W or nil end
 
 local function Layout()
     if layout then return layout end
@@ -191,10 +195,12 @@ local function Target(style)
     if style == "classic" then
         local LM = ns.MapLarge
         local l, t, r, b = LM.Picture()
-        local x1, y1, x2, y2 = LM.Pane(QUEST_PANE_W)
         local w, h = LM.Size(PaneW())
+        local k = 1
+        if Combined() then l, t, r, b, w, h, k = ns.MapCombined.PictureBox() end
+        local x1, y1, x2, y2 = LM.Pane(QUEST_PANE_W)
         return Details({ l = l, t = -t, rp = "TOPLEFT", r = r, b = -b, qp = "TOPLEFT", qx1 = x1, qy1 = -y1,
-            qr = "TOPLEFT", qx2 = x2, qy2 = -y2, w = w, h = h }, y2 - y1)
+            qr = "TOPLEFT", qx2 = x2, qy2 = -y2, w = w, h = h, k = k }, y2 - y1)
     end
     if style then
         return Details({ l = CANVAS_LEFT, t = -CANVAS_TOP, rp = "TOPLEFT", r = CANVAS_RIGHT, b = -CANVAS_BOTTOM,
@@ -229,7 +235,7 @@ local function PictureLaid(t)
     local map = Map()
     local canvas = map.ScrollContainer
     return canvas:GetNumPoints() == 2 and PointIs(canvas, 1, "TOPLEFT", map, "TOPLEFT", t.l, t.t)
-        and PointIs(canvas, 2, "BOTTOMRIGHT", map, t.rp, t.r, t.b)
+        and PointIs(canvas, 2, "BOTTOMRIGHT", map, t.rp, t.r, t.b) and Near(canvas:GetScale(), t.k or 1)
 end
 
 local function Laid(t)
@@ -264,6 +270,7 @@ local function Lay(t)
     lay:SetAttribute("rp", t.rp)
     lay:SetAttribute("r", t.r)
     lay:SetAttribute("b", t.b)
+    lay:SetAttribute("k", t.k or 1)
     for _, key in ipairs(PANE_KEYS) do lay:SetAttribute(key, t[key]) end
     local ok, err = pcall(lay.Execute, lay, LAY)
     if not ok then
@@ -487,6 +494,7 @@ local function DressSmall(map, close, sizer)
     end
     local x = math.min(NONE_MAP_OPTIONS_X, -ns.WindowGripRoom("map"))
     ns.MapOptions.Place(map, a, a:GetWidth() + x, NONE_MAP_OPTIONS_Y - ERA_H, 1)
+    ns.MapCombined.Lay(map, nil)
 end
 
 -- Era's large map: its sheets, header and buttons (WorldMapEraLarge.lua).
@@ -497,11 +505,13 @@ local function DressLarge(map, close, sizer)
     end
     local LM, level = ns.MapLarge, map.ScrollContainer:GetFrameLevel()
     local paneW = PaneW()
+    local shape = Combined() and ns.MapCombined.Shape() or nil
     LM.Art(map, math.max(0, level - ART_UNDER_MAP))
-    LM.Show(map, paneW, level + FOOT_LINE_OVER_MAP)
-    if close then LM.PlaceButtons(close, sizer, paneW) end
-    local rel, x, y = LM.FootSpot(paneW)
+    LM.Show(map, paneW, level + FOOT_LINE_OVER_MAP, shape)
+    if close then LM.PlaceButtons(close, sizer) end
+    local rel, x, y = LM.FootSpot()
     ns.MapOptions.Place(map, rel, x, y, LM.SCALE)
+    ns.MapCombined.Lay(map, shape and LM.CombinedBoxes(shape) or nil)
 end
 
 local function DressEra(style)
@@ -513,6 +523,8 @@ local function DressEra(style)
     if border.fcui and border.fcui.titleStrip then ns.SetShownIf(border.fcui.titleStrip, false) end
     ns.SetAlphaIf(_G["WorldMapFrameBg"], 0)
     for _, key in ipairs(EXTRAS) do HoldHidden(map[key]) end
+    -- The combined layout has its own list: the client's pane, opened by its toggle or a tracker, is put away.
+    if Combined() and map.QuestLog and map.QuestLog:IsShown() then map.QuestLog:Hide() end
     -- The quest pane toggle sits on the footer's border: over its line.
     if map.SidePanelToggle then
         ns.SetLevelIf(map.SidePanelToggle, map.ScrollContainer:GetFrameLevel() + FOOT_LINE_OVER_MAP + 1)
@@ -536,6 +548,7 @@ local function DressForever()
     end
     ns.MapLarge.Hide()
     ns.MapOptions.Release(map)
+    ns.MapCombined.Lay(map, nil)
     GameCoords()
     ShiftBars(nil)
     ns.QuestPaneFloor(false)
@@ -564,7 +577,7 @@ local QUEST_BUTTON_PARTS = { "OpenButton", "CloseButton" }
 local questButtonHidden = false
 local function QuestButton(map)
     local toggle = map.SidePanelToggle
-    local hide = ns.db.hideMapQuestButton == true
+    local hide = ns.db.hideMapQuestButton == true or Combined()
     if not toggle or hide == questButtonHidden then return end
     questButtonHidden = hide
     toggle:SetAlpha(hide and 0 or 1)
@@ -642,6 +655,7 @@ local function FadeOutside(map, style)
     end
     ns.MapLarge.Keep(keep)
     ns.MapOptions.Keep(keep, map)
+    ns.MapCombined.Keep(keep)
     ClipMouse(map)
     FadeTree(map, 0)
 end
@@ -699,11 +713,12 @@ function ns.ClassicMapArt() return art end
 
 -- For the fight layer (Map/WorldMapFight.lua): the layout header, the style worn and its box, quest pane open or shut.
 ns.MapFight = {
-    Map = Map, Layout = Layout, EraStyle = EraStyle, Target = Target, PANE_KEYS = PANE_KEYS,
+    Map = Map, Layout = Layout, EraStyle = EraStyle, Target = Target, PANE_KEYS = PANE_KEYS, Relay = Pass,
     FullScale = function(w, h) return FullScale({ w = w, h = h }) end,
     -- The style's own windowed size (the header style's), nil for the rest.
     WindowedBase = function(style) return style == "classic" and WindowedScale() or nil end,
     Size = function(style, withPane)
+        if style == "classic" and Combined() then return ns.MapLarge.CombinedSize(ns.MapCombined.Shape()) end
         if style == "classic" then return ns.MapLarge.Size(withPane and QUEST_PANE_W or nil) end
         return withPane and PaneWindowW() or ERA_W, ERA_H
     end,
@@ -721,7 +736,10 @@ end
 -- The edit mode box: the size the header style draws, the client's for its own layout.
 function ns.ClassicMapSize()
     local style = ns.ModuleInForce("worldMap") and NavStyle()
-    if style == "classic" then
+    if style == "classic" and Combined() then
+        local w, h = ns.MapLarge.CombinedSize(ns.MapCombined.Shape())
+        return w, h, 0
+    elseif style == "classic" then
         local w, h = ns.MapLarge.Size(nil)
         return w, h, ns.MapLarge.Size(QUEST_PANE_W) - w
     elseif style == "none" then
@@ -754,7 +772,7 @@ ns.EventFrame({ "PLAYER_ENTERING_WORLD", "PLAYER_REGEN_ENABLED" }, function() La
 ns.AttachWhenLoaded(Attach)
 
 local PASS_KEYS = { mapNavBar = true, mapNavClassic = true, mapNavNone = true, worldMap = true, hideMapQuestButton = true,
-    mapOptions = true, mapOptionsHover = true, mapOptionsHidden = true }
+    mapOptions = true, mapOptionsHover = true, mapOptionsHidden = true, mapQuestCombined = true }
 local STYLE_KEYS = { mapNavBar = true, mapNavClassic = true, mapNavNone = true }
 
 -- A style picked: each draws the map at its own game's size, said once a session.
@@ -762,6 +780,8 @@ ns.Popup("FCUI_MAP_STYLE_SIZE", { text = ns.L["MAP_STYLE_SIZE"], button1 = OKAY 
 local sizeSaid
 
 ns.OnToggle(function(key)
+    -- Turned on by the player: the client's pane shuts for good (its CVar too), as its toggle goes away.
+    if key == "mapQuestCombined" and ns.db[key] == true and QuestMapFrame_Close then QuestMapFrame_Close(true) end
     if PASS_KEYS[key] then
         if Map() and Map():IsShown() then Pass() else LayShut() end
     end

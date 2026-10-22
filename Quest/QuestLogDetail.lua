@@ -1,13 +1,13 @@
 local _, ns = ...
 
--- The quest log's detail pane: the selected quest's text and rewards down the parchment.
+-- The quest log's detail pane: the selected quest's text and rewards down the parchment. A window with a rewardChild
+-- (the combined map's right page) takes the rewards there from its top; its textW sets the lines' width.
 
 local QL = ns.QL
 
 local TEXT_W = 285
--- Two reward buttons plus the gap span the text width.
-local REWARD_GAP = 3
-local REWARD_SCALE = (TEXT_W - REWARD_GAP) / 2 / 147
+-- Two reward buttons plus the gap span the text width; the 1.x button is 147 wide.
+local REWARD_GAP, REWARD_W = 3, 147
 
 local function FirstFont(...)
     for i = 1, select("#", ...) do
@@ -26,24 +26,35 @@ local DONE, PALE_DONE = { 0.2, 0.2, 0.2 }, { 0.6, 0.6, 0.6 }
 local function Ink() return ns.PageInk(INK_R, INK_G, INK_B) end
 local function Done() return unpack(ns.PageDark() and PALE_DONE or DONE) end
 
--- The log window; FillDetail sets it before any piece is made.
+-- The window FillDetail last wrote.
 local frame
 
--- Pooled font strings stacked down the parchment.
-local detailStrings, detailUsed = {}, 0
-local rewardButtons, rewardsUsed = {}, 0
+-- Pooled font strings and reward buttons per child frame (a window's text child, its rewards child).
+local pools = setmetatable({}, { __mode = "k" })
+local function Pool(child)
+    local pool = pools[child]
+    if not pool then
+        pool = { strings = {}, used = 0, rewards = {}, rewardsUsed = 0 }
+        pools[child] = pool
+    end
+    return pool
+end
 
-local function DetailString(font, width, x, y, anchor, relPoint)
-    detailUsed = detailUsed + 1
-    local fs = detailStrings[detailUsed]
+local function TextW() return frame.textW or TEXT_W end
+local function RewardScale() return math.max(0.2, (TextW() - REWARD_GAP) / 2 / REWARD_W) end
+
+local function DetailString(child, font, width, x, y, anchor, relPoint)
+    local pool = Pool(child)
+    pool.used = pool.used + 1
+    local fs = pool.strings[pool.used]
     if not fs then
-        fs = frame.detailChild:CreateFontString(nil, "ARTWORK")
-        detailStrings[detailUsed] = fs
+        fs = child:CreateFontString(nil, "ARTWORK")
+        pool.strings[pool.used] = fs
     end
     fs:SetFontObject(font)
     fs:SetJustifyH("LEFT")
     fs:SetWidth(width)
-    ns.SetPointOnce(fs, "TOPLEFT", anchor or frame.detailChild, relPoint or "TOPLEFT", x or 0, y or 0)
+    ns.SetPointOnce(fs, "TOPLEFT", anchor or child, relPoint or "TOPLEFT", x or 0, y or 0)
     fs:SetTextColor(Ink())
     fs:Show()
     return fs
@@ -51,53 +62,71 @@ end
 
 local function RewardEnter(self)
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-    pcall(GameTooltip.SetQuestLogItem, GameTooltip, self.rewardType, self.index, QL.SelectedID())
+    pcall(GameTooltip.SetQuestLogItem, GameTooltip, self.rewardType, self.index, self.questID)
     GameTooltip:Show()
 end
 
 local function RewardClick(self)
     if IsModifiedClick("CHATLINK") and ChatFrameUtil and ChatFrameUtil.InsertLink then
-        local ok, link = pcall(GetQuestLogItemLink, self.rewardType, self.index, QL.SelectedID())
+        local ok, link = pcall(GetQuestLogItemLink, self.rewardType, self.index, self.questID)
         if ok and link then ChatFrameUtil.InsertLink(link) end
     end
 end
 
 -- The 1.x reward button at its native 147x41, scaled so two fit across the page.
-local function RewardButton()
-    rewardsUsed = rewardsUsed + 1
-    local button = rewardButtons[rewardsUsed]
+local function RewardButton(child)
+    local pool = Pool(child)
+    pool.rewardsUsed = pool.rewardsUsed + 1
+    local button = pool.rewards[pool.rewardsUsed]
     if not button then
-        button = ns.RewardSlot(frame.detailChild, RewardEnter, RewardClick)
-        button:SetScale(REWARD_SCALE)
-        rewardButtons[rewardsUsed] = button
+        button = ns.RewardSlot(child, RewardEnter, RewardClick)
+        pool.rewards[pool.rewardsUsed] = button
     end
+    button:SetScale(RewardScale())
     button:Show()
     return button
 end
 
-function QL.ResetDetail()
-    for i = 1, detailUsed do detailStrings[i]:Hide() end
-    for i = 1, rewardsUsed do rewardButtons[i]:Hide() end
-    detailUsed, rewardsUsed = 0, 0
+local function ResetPool(child)
+    local pool = child and pools[child]
+    if not pool then return end
+    for i = 1, pool.used do pool.strings[i]:Hide() end
+    for i = 1, pool.rewardsUsed do pool.rewards[i]:Hide() end
+    pool.used, pool.rewardsUsed = 0, 0
+end
+
+function QL.ResetDetail(window)
+    window = window or frame
+    if not window then return end
+    ResetPool(window.detailChild)
+    ResetPool(window.rewardChild)
 end
 
 local function Coins(copper) return ns.CoinText(copper) end
 
+-- The scroll child spans the pane's top to the last piece; the bar scrolls the rest.
+local function Fit(child, last, bar, paneH)
+    local top, bottom = child:GetTop(), last and last:GetBottom()
+    local height = (top and bottom) and (top - bottom + 12) or paneH
+    child:SetHeight(math.max(height, paneH))
+    bar:SetRange(math.max(0, height - paneH), 20)
+end
+
 -- Rewards under `last`, two per row, coins after the header (money alone still gets one).
-local function RewardGrid(questID, last, kind, count, header, coins)
+local function RewardGrid(child, questID, last, kind, count, header, coins)
     if count <= 0 and not coins then return last end
-    local label = DetailString(FONT_SMALL, TEXT_W, 0, -5, last, "BOTTOMLEFT")
+    local label = DetailString(child, FONT_SMALL, TextW(), 0, -5, last, "BOTTOMLEFT")
     label:SetText(header)
     last = label
     if coins then
-        local line = DetailString(FONT_SMALL, TEXT_W, 0, 0, label, "TOPLEFT")
+        local line = DetailString(child, FONT_SMALL, TextW(), 0, 0, label, "TOPLEFT")
         ns.SetPointOnce(line, "LEFT", label, "LEFT", (label:GetStringWidth() or 0) + 15, 0)
         line:SetText(coins)
     end
-    local rowAnchor = last
+    local rowAnchor, scale = last, RewardScale()
     for i = 1, count do
-        local button = RewardButton()
-        button.rewardType, button.index = kind, i
+        local button = RewardButton(child)
+        button.rewardType, button.index, button.questID = kind, i, questID
         local name, texture, count2, _, itemID
         if kind == "choice" then
             name, texture, count2, _, _, itemID = GetQuestLogChoiceInfo(i, questID)
@@ -112,37 +141,51 @@ local function RewardGrid(questID, last, kind, count, header, coins)
         button:ClearAllPoints()
         -- Offsets are in the button's scaled units.
         if i % 2 == 1 then
-            button:SetPoint("TOPLEFT", rowAnchor, "BOTTOMLEFT", 0, -4 / REWARD_SCALE)
+            button:SetPoint("TOPLEFT", rowAnchor, "BOTTOMLEFT", 0, -4 / scale)
             rowAnchor = button
             last = button
         else
-            button:SetPoint("TOPLEFT", rowAnchor, "TOPRIGHT", REWARD_GAP / REWARD_SCALE, 0)
+            button:SetPoint("TOPLEFT", rowAnchor, "TOPRIGHT", REWARD_GAP / scale, 0)
         end
     end
     return last
 end
 
--- Rewards after `last`: choices, fixed items with money, then experience.
+-- Rewards after `last` on the text's child, or from the top of the window's own rewards child: choices, fixed items
+-- with money, then experience.
 local function LayoutRewards(last, questID)
+    local apart = frame.rewardChild
+    local child = apart or frame.detailChild
     local numChoices = GetNumQuestLogChoices(questID, true) or 0
     local numRewards = GetNumQuestLogRewards(questID) or 0
     local money = GetQuestLogRewardMoney(questID) or 0
     local xp = GetQuestLogRewardXP and GetQuestLogRewardXP(questID) or 0
-    if numChoices + numRewards + money + xp <= 0 then return last end
-
-    local title = DetailString(FONT_TITLE, TEXT_W, 0, -10, last, "BOTTOMLEFT")
+    if numChoices + numRewards + money + xp <= 0 then
+        if apart then Fit(apart, nil, frame.rewardBar, frame.rewardH or 1) end
+        return last
+    end
+    local title
+    if apart then
+        title = DetailString(child, FONT_TITLE, TextW(), 5, -5)
+    else
+        title = DetailString(child, FONT_TITLE, TextW(), 0, -10, last, "BOTTOMLEFT")
+    end
     title:SetText(QUEST_REWARDS or "Rewards")
-    last = title
-    last = RewardGrid(questID, last, "choice", numChoices, REWARD_CHOICES or "Choose one of the following rewards:")
-    last = RewardGrid(questID, last, "reward", numRewards,
+    local tail = title
+    tail = RewardGrid(child, questID, tail, "choice", numChoices, REWARD_CHOICES or "Choose one of the following rewards:")
+    tail = RewardGrid(child, questID, tail, "reward", numRewards,
         numChoices > 0 and (REWARD_ITEMS or "You will also receive:") or (REWARD_ITEMS_ONLY or "You will receive:"),
         money > 0 and Coins(money) or nil)
     if xp > 0 then
-        local line = DetailString(FONT_SMALL, TEXT_W, 0, -4, last, "BOTTOMLEFT")
+        local line = DetailString(child, FONT_SMALL, TextW(), 0, -4, tail, "BOTTOMLEFT")
         line:SetText(string.format("%s: %s", REWARD_XP or "Experience", BreakUpLargeNumbers and BreakUpLargeNumbers(xp) or xp))
-        last = line
+        tail = line
     end
-    return last
+    if apart then
+        Fit(apart, tail, frame.rewardBar, frame.rewardH or 1)
+        return last
+    end
+    return tail
 end
 
 -- Writes the page for info, a quest in the log; setHasTimer is the window's timer switch, called where the timer is read.
@@ -152,18 +195,19 @@ function QL.FillDetail(window, info, detailH, setHasTimer)
     local selectedID = info.questID
     C_QuestLog.SetSelectedQuest(selectedID)
     local questIndex = info.questLogIndex
+    local textW = TextW()
 
     local titleText = info.title or ""
     if C_QuestLog.IsFailed and C_QuestLog.IsFailed(selectedID) then
         titleText = titleText .. " - (" .. (FAILED or "Failed") .. ")"
     end
-    local title = DetailString(FONT_TITLE, TEXT_W, 5, -5)
+    local title = DetailString(child, FONT_TITLE, textW, 5, -5)
     title:SetText(titleText)
     local last = title
 
     local description, objectivesText = GetQuestLogQuestText(questIndex)
     if objectivesText and objectivesText ~= "" then
-        local objectives = DetailString(FONT_BODY, TEXT_W - 10, 0, -5, last, "BOTTOMLEFT")
+        local objectives = DetailString(child, FONT_BODY, textW - 10, 0, -5, last, "BOTTOMLEFT")
         objectives:SetText(objectivesText)
         last = objectives
     end
@@ -171,7 +215,7 @@ function QL.FillDetail(window, info, detailH, setHasTimer)
     local timeLeft = GetQuestLogTimeLeft and GetQuestLogTimeLeft()
     setHasTimer(timeLeft ~= nil)
     if timeLeft then
-        local timer = DetailString(FONT_SMALL, TEXT_W, 0, -10, last, "BOTTOMLEFT")
+        local timer = DetailString(child, FONT_SMALL, textW, 0, -10, last, "BOTTOMLEFT")
         timer:SetText((TIME_REMAINING or "Time Remaining:") .. " " .. SecondsToTime(timeLeft))
         last = timer
     end
@@ -180,7 +224,7 @@ function QL.FillDetail(window, info, detailH, setHasTimer)
     for i = 1, numObjectives do
         local text, kind, finished = GetQuestLogLeaderBoard(i, questIndex)
         if not text or text == "" then text = kind end
-        local line = DetailString(FONT_SMALL, TEXT_W, 0, i == 1 and -10 or -2, last, "BOTTOMLEFT")
+        local line = DetailString(child, FONT_SMALL, textW, 0, i == 1 and -10 or -2, last, "BOTTOMLEFT")
         if finished then
             line:SetTextColor(Done())
             text = text .. " (" .. (COMPLETE or "Complete") .. ")"
@@ -191,25 +235,20 @@ function QL.FillDetail(window, info, detailH, setHasTimer)
 
     local required = C_QuestLog.GetRequiredMoney and C_QuestLog.GetRequiredMoney(selectedID) or 0
     if required > 0 then
-        local line = DetailString(FONT_SMALL, TEXT_W, 0, numObjectives > 0 and -4 or -10, last, "BOTTOMLEFT")
+        local line = DetailString(child, FONT_SMALL, textW, 0, numObjectives > 0 and -4 or -10, last, "BOTTOMLEFT")
         line:SetText((REQUIRED_MONEY or "Required Money:") .. " " .. Coins(required))
         if required > GetMoney() then line:SetTextColor(1, 0.1, 0.1) else line:SetTextColor(Done()) end
         last = line
     end
 
     if description and description ~= "" then
-        local header = DetailString(FONT_TITLE, TEXT_W, 0, -10, last, "BOTTOMLEFT")
+        local header = DetailString(child, FONT_TITLE, textW, 0, -10, last, "BOTTOMLEFT")
         header:SetText(QUEST_DESCRIPTION or "Description")
-        local body = DetailString(FONT_BODY, TEXT_W - 10, 0, -5, header, "BOTTOMLEFT")
+        local body = DetailString(child, FONT_BODY, textW - 10, 0, -5, header, "BOTTOMLEFT")
         body:SetText(description)
         last = body
     end
 
     last = LayoutRewards(last, selectedID)
-
-    -- Scroll child spans the pane top to the last piece.
-    local top, bottom = child:GetTop(), last:GetBottom()
-    local height = (top and bottom) and (top - bottom + 12) or detailH
-    child:SetHeight(math.max(height, detailH))
-    frame.detailBar:SetRange(math.max(0, height - detailH), 20)
+    Fit(child, last, frame.detailBar, detailH)
 end
