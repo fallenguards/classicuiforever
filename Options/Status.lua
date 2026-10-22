@@ -12,8 +12,6 @@ local INTERNAL = {
     bandHandedBack = true, barSizeOffer = true, classicLookOffer = true, eraScaleOffer = true, barsLookNote = true, microHideMerged = true,
 }
 
--- Deliberately silver, not bronzed.
-local TEXT_BOX = { bronze = false, bg = { 0, 0, 0, 0.7 }, border = { 0.6, 0.6, 0.6 } }
 local HEADER = { width = 300 }
 
 local function Version()
@@ -153,31 +151,7 @@ local function Build()
     how:SetJustifyH("LEFT")
     how:SetText(L["OPTWIN_REPORTING_A_BUG_TAKE_A"])
 
-    local box = ns.NewFrame("Frame", nil, frame, "BackdropTemplate")
-    ns.Backdrop(box, ns.BACKDROP.TIP14, TEXT_BOX)
-    box:SetPoint("TOPLEFT", how, "BOTTOMLEFT", -4, -8)
-    box:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -20, 52)
-
-    local scroll = ns.NewFrame("ScrollFrame", nil, box)
-    scroll:SetPoint("TOPLEFT", box, "TOPLEFT", 8, -8)
-    scroll:SetPoint("BOTTOMRIGHT", box, "BOTTOMRIGHT", -8, 8)
-    scroll:EnableMouseWheel(true)
-    local edit = ns.NewFrame("EditBox", nil, scroll)
-    edit:SetMultiLine(true)
-    edit:SetAutoFocus(false)
-    edit:SetFontObject(GameFontHighlightSmall)
-    edit:SetWidth(500)
-    scroll:SetScrollChild(edit)
-    scroll:SetScript("OnMouseWheel", function(self, delta)
-        local most = math.max(0, edit:GetHeight() - self:GetHeight())
-        self:SetVerticalScroll(math.min(most, math.max(0, self:GetVerticalScroll() - delta * 28)))
-    end)
-    -- Read-only: typed text is reverted.
-    edit:SetScript("OnTextChanged", function(self, user)
-        if user and frame.text then self:SetText(frame.text) self:HighlightText() end
-    end)
-    edit:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
-    edit:SetScript("OnEditFocusLost", function(self) self:HighlightText(0, 0) end)
+    local edit, scroll = O.TextBox(frame, how, 500)
     frame.edit = edit
 
     local select = ns.PanelButton(frame, L["OPTWIN_SELECT_ALL"], 100)

@@ -25,6 +25,7 @@ local function Keys()
     for i = 1, #EXTRA do keys[#keys + 1] = EXTRA[i] end
     return keys
 end
+ns.ProfileKeys = Keys
 
 -- A table setting (the addon buttons' picks) goes in and out as a copy, so no two profiles share one; empty is none.
 local function Copy(v)

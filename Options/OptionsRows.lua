@@ -77,6 +77,38 @@ end
 O.NONE_PICKS = { "gameObjectiveTracker", "buffArrowShown" }
 
 -- Our standalone dialog shell, hidden: strata nil is DIALOG; opts.toplevel. Welcome and Status share it.
+-- Deliberately silver, not bronzed.
+local TEXT_BOX = { bronze = false, bg = { 0, 0, 0, 0.7 }, border = { 0.6, 0.6, 0.6 } }
+
+-- A scrolling text box from under how (a line of text) to the window's foot; its edit box is read-only while
+-- frame.text is set (typed text reverted), open otherwise.
+function O.TextBox(frame, how, width)
+    local box = ns.NewFrame("Frame", nil, frame, "BackdropTemplate")
+    ns.Backdrop(box, ns.BACKDROP.TIP14, TEXT_BOX)
+    box:SetPoint("TOPLEFT", how, "BOTTOMLEFT", -4, -8)
+    box:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -20, 52)
+    local scroll = ns.NewFrame("ScrollFrame", nil, box)
+    scroll:SetPoint("TOPLEFT", box, "TOPLEFT", 8, -8)
+    scroll:SetPoint("BOTTOMRIGHT", box, "BOTTOMRIGHT", -8, 8)
+    scroll:EnableMouseWheel(true)
+    local edit = ns.NewFrame("EditBox", nil, scroll)
+    edit:SetMultiLine(true)
+    edit:SetAutoFocus(false)
+    edit:SetFontObject(GameFontHighlightSmall)
+    edit:SetWidth(width)
+    scroll:SetScrollChild(edit)
+    scroll:SetScript("OnMouseWheel", function(self, delta)
+        local most = math.max(0, edit:GetHeight() - self:GetHeight())
+        self:SetVerticalScroll(math.min(most, math.max(0, self:GetVerticalScroll() - delta * 28)))
+    end)
+    edit:SetScript("OnTextChanged", function(self, user)
+        if user and frame.text then self:SetText(frame.text) self:HighlightText() end
+    end)
+    edit:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
+    edit:SetScript("OnEditFocusLost", function(self) self:HighlightText(0, 0) end)
+    return edit, scroll
+end
+
 function O.DialogWindow(name, y, strata, opts)
     local frame = CreateFrame("Frame", name, UIParent, "BackdropTemplate")
     ns.Backdrop(frame, ns.BACKDROP.DIALOG)

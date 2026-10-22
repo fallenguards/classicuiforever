@@ -80,6 +80,21 @@ local BUTTONS = {
         function() StaticPopup_Show("FCUI_PROFILE_DELETE", ns.ProfileName(), nil, ns.ProfileName()) end, true },
 }
 
+-- A second row: the profile in use as text, and a profile from such text (Options/ProfileText.lua).
+local TEXT_BUTTONS = {
+    { L["OPTWIN_EXPORT"], L["OPTWIN_EXPORT_TIP"], function() O.ShowProfileText("export") end },
+    { L["OPTWIN_IMPORT"], L["OPTWIN_IMPORT_TIP"], function() O.ShowProfileText("import") end },
+}
+
+local function PageButton(pane, top, spec, x, y)
+    local button = ns.PanelButton(pane, spec[1], 80)
+    button:SetPoint("TOPLEFT", top, "TOPLEFT", x, y)
+    button:SetScript("OnClick", spec[3])
+    button.label, button.tooltip = spec[1], spec[2]
+    ns.AttachTip(button, O.OPTION_TIP)
+    return button
+end
+
 local function ClassicLayout()
     if ns.ClassicLayoutActive() then
         StaticPopup_Show("FCUI_LAYOUT_RESET")
@@ -94,7 +109,7 @@ function O.ProfilesPane(frame, top, list, setRange)
     local pane = ns.NewFrame("Frame", nil, frame)
     pane:SetAllPoints(frame)
     pane:Hide()
-    pane.headH = 52
+    pane.headH = 78
     local caption = pane:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     caption:SetPoint("TOPLEFT", top, "TOPLEFT", 2, 0)
     local child = ns.NewFrame("Frame", nil, list)
@@ -104,14 +119,11 @@ function O.ProfilesPane(frame, top, list, setRange)
     local rows, named = {}, {}
     local x = 0
     for _, spec in ipairs(BUTTONS) do
-        local button = ns.PanelButton(pane, spec[1], 80)
-        button:SetPoint("TOPLEFT", top, "TOPLEFT", x, -20)
-        button:SetScript("OnClick", spec[3])
-        button.label, button.tooltip = spec[1], spec[2]
-        ns.AttachTip(button, O.OPTION_TIP)
+        local button = PageButton(pane, top, spec, x, -20)
         if spec[4] then named[#named + 1] = button end
         x = x + 84
     end
+    for i, spec in ipairs(TEXT_BUTTONS) do PageButton(pane, top, spec, (i - 1) * 84, -46) end
     -- Not a profile's: the edit mode layout the bars stand in, at the row's end.
     local layout = ns.PanelButton(pane, L["OPTWIN_CLASSIC_LAYOUT"], 130)
     layout:SetPoint("TOPLEFT", top, "TOPLEFT", x + 16, -20)

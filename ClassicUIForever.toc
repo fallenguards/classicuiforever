@@ -20,6 +20,7 @@ Locales\enUS_Legacy.lua
 Locales\enUS_Windows.lua
 Locales\enUS_Collections.lua
 Locales\enUS_Minimap.lua
+Locales\enUS_Profiles.lua
 Locales\deDE.lua
 Locales\deDE_WhatsNew.lua
 Locales\deDE_Help.lua
@@ -52,6 +53,7 @@ Core\Core.lua
 Core\Defaults.lua
 Core\Settings.lua
 Core\Profiles.lua
+Core\ProfileText.lua
 Core\Scheduler.lua
 Core\Util.lua
 Core\Gamepad.lua
@@ -274,6 +276,7 @@ Options\OptionsRows.lua
 Options\BoxConfirm.lua
 Options\OptionsWindow.lua
 Options\Profiles.lua
+Options\ProfileText.lua
 Options\HelpPanes.lua
 Options\GameMenu.lua
 Options\SettingsPanel.lua
