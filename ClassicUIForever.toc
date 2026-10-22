@@ -21,6 +21,7 @@ Locales\enUS_Windows.lua
 Locales\enUS_Collections.lua
 Locales\enUS_Minimap.lua
 Locales\enUS_Profiles.lua
+Locales\enUS_Map.lua
 Locales\deDE.lua
 Locales\deDE_WhatsNew.lua
 Locales\deDE_Help.lua

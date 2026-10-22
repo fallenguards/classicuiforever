@@ -363,6 +363,8 @@ local function KeyEffects(key)
     if key == "oneBag" then ns.SetCVarOrHold("combinedBags", ns.db.oneBag == true and "1" or "0") end
     if key == "questLevels" then ns.SetCVarOrHold("showQuestLevel", ns.db.questLevels == true and "1" or "0") end
     if key == "plainNumbers" then ns.SetCVarOrHold("breakUpLargeNumbers", ns.db.plainNumbers == true and "0" or "1") end
+    local coordCVar = ns.COORD_CVARS and ns.COORD_CVARS[key]
+    if coordCVar then ns.SetCVarOrHold(coordCVar, ns.db[key] == true and "1" or "0") end
 end
 
 -- Keys changed at once (a toggle, a profile switch): their own effects, one pass, the watchers, the save.

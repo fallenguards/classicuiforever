@@ -230,4 +230,6 @@ return {
     mapQuestShare = "same for everyone: 0, the sheets' own share of the map until the player drags its corner",
     mapQuestListW = "same for everyone: 0, the sheets' own list width until the player drags the divider",
     mapQuestPagesH = "same for everyone: 0, the sheets' own pages height until the player drags the divider",
+    mapPlayerCoords = "mirrors the game's worldMapShowPlayerCoords: read from the game at every apply",
+    mapCursorCoords = "mirrors the game's worldMapShowCursorCoords: read from the game at every apply",
 }

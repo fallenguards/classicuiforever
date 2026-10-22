@@ -41,6 +41,24 @@ end
 -- The box, nil before the first classic lay (Track Quest stands left of it).
 function MO.Frame() return box end
 
+-- The map's coordinates are the game's own settings (retail keeps them off): two rows of ours mirror its CVars, read
+-- at every apply and as the game's settings change; a click writes them (Core/Core.lua).
+local COORD_CVARS = { mapPlayerCoords = "worldMapShowPlayerCoords", mapCursorCoords = "worldMapShowCursorCoords" }
+ns.COORD_CVARS = COORD_CVARS
+local function ReadMapCoords()
+    if not ns.db then return end
+    for key, cvar in pairs(COORD_CVARS) do
+        local value = ns.GetCVar(cvar)
+        if value ~= nil then ns.db[key] = tostring(value) == "1" end
+    end
+end
+ns.RegisterModule("mapCoords", { apply = ReadMapCoords, restore = ReadMapCoords })
+ns.EventFrame("CVAR_UPDATE", function(_, _, name)
+    if name ~= COORD_CVARS.mapPlayerCoords and name ~= COORD_CVARS.mapCursorCoords then return end
+    ReadMapCoords()
+    if ns.RefreshOptionsWindow then ns.RefreshOptionsWindow() end
+end)
+
 -- The map's filter and pin buttons: Forever hangs them on the map by name, retail keeps them only in its overlay
 -- list, told apart by a method of their mixin. Found once per map.
 local OVERLAY_SIGN = { WorldMapTrackingOptionsButton = { "WorldMapTrackingOptionsButtonMixin", "BuildFilterTable" },

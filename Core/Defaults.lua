@@ -266,6 +266,8 @@ ns.DB_DEFAULTS = {
     mapQuestShare = 0,
     mapQuestListW = 0,
     mapQuestPagesH = 0,
+    mapPlayerCoords = true,
+    mapCursorCoords = true,
     mapOptions = true,
     mapOptionsHover = false,
     mapOptionsHidden = false,
@@ -355,7 +357,7 @@ ns.DB_DEFAULTS = {
 ns.MODULE_ORDER = {
     "bronzeTheme", "hideMicroButtons", "showBags", "classicBar", "buttons", "castAnim", "pageArrows", "unitFrames", "buffArrow",
     "castBars", "swingTimers", "resourceDisplay", "classicStatusFont", "plainNumbers", "mirrorTimers", "comboPoints", "minimap", "minimapButton", "microMinimapButtons", "minimapCollector", "namePlates", "classColorPlates",
-    "fullPlates", "classicFonts", "questTracker", "hideObjectiveTracker", "hideTrackerHeader", "questWatch", "questLog", "questLogDual", "questLevels", "questMapPane", "panels", "worldMap", "lootWindow", "classicChat", "lootRoll",
+    "fullPlates", "classicFonts", "questTracker", "hideObjectiveTracker", "hideTrackerHeader", "questWatch", "questLog", "questLogDual", "questLevels", "questMapPane", "panels", "worldMap", "mapCoords", "lootWindow", "classicChat", "lootRoll",
     "guildRoster", "whoList", "groupFinder", "hideLastNames", "mapFade", "oneBag", "bags", "characterSheet", "statPanes",
     "spellBook", "spellBookTopRank", "spellBookHidePassives", "spellBookFlyouts", "spellBookSearch", "professionsBook", "tradeSkillSearch", "tradeSkill", "tradeSkillDual",
     "trainer", "talents", "legacyWindow", "collectionsWindow", "options", "gameMenu", "tooltips", "clientMenus", "settingsPanel", "damageMeter", "gameArt",
