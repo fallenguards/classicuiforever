@@ -209,6 +209,7 @@ return {
     levelUpBanner = false,
     lfgMinimapButton = true,
     lootRoll = true,
+    lootToast = false,
     lootWindow = true,
     mapCursorCoords = true,
     mapFade = false,

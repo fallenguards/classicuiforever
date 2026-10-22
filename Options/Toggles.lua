@@ -483,6 +483,7 @@ ns.TOGGLES = {
 
     { "gameDamageNumbers", L["OPT_gameDamageNumbers"], L["OPT_gameDamageNumbers_TIP"], group = L["GROUP_OTHER"], sub = L["SUB_COMBAT"] },
     { "damageMeter", L["OPT_damageMeter"], L["OPT_damageMeter_TIP"], search = "dps meter recount details" },
+    { "lootToast", L["OPT_lootToast"], L["OPT_lootToast_TIP"], search = "loot toast popup you received alert won drop" },
     { "levelUpBanner", L["OPT_levelUpBanner"], L["OPT_levelUpBanner_TIP"], search = "level up ding banner toast popup reached",
         sub = L["SUB_MESSAGES"] },
     { "addonMessages", L["OPT_addonMessages"], L["OPT_addonMessages_TIP"], search = "chat login lines quiet" },

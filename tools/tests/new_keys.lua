@@ -226,6 +226,7 @@ return {
     hoverCollReset = "same for everyone: opt-in, off by default",
     hideCollReset = "same for everyone: opt-in, off by default",
     levelUpBanner = "off for everyone, a restyle: the game's level-up banners go, as 1.x had none; checked brings them back",
+    lootToast = "off for everyone, a restyle: the game's loot toasts go, as 1.x had none; checked brings them back",
     mapQuestCombined = "same for everyone: opt-in, off by default",
     mapQuestShare = "same for everyone: 0, the sheets' own share of the map until the player drags its corner",
     mapQuestListW = "same for everyone: 0, the sheets' own list width until the player drags the divider",

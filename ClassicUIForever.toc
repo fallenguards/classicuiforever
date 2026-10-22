@@ -102,6 +102,7 @@ UI\CheckList.lua
 UI\ClientMenus.lua
 UI\Escape.lua
 UI\LevelBanner.lua
+UI\LootToast.lua
 UI\SecurePad.lua
 Bar\BarSkins.lua
 Bar\MicroFlash.lua
