@@ -29,7 +29,7 @@ local TRACK_ALONE_X = -140  -- its box's right from the foot's, with no Map Opti
 local DONE = { 0.6, 0.6, 0.6 }
 
 local LOG_EVENTS = { "QUEST_LOG_UPDATE", "QUEST_WATCH_LIST_CHANGED", "UNIT_QUEST_LOG_CHANGED", "GROUP_ROSTER_UPDATE",
-    "PLAYER_MONEY" }
+    "PLAYER_MONEY", "GET_ITEM_INFO_RECEIVED" }
 
 local list, detail, rewards, track, window
 local rows = {}
@@ -274,7 +274,14 @@ function QM.LayFoot()
     end
 end
 
-local function OnEvent() ns.Sched.Soon("questMap.update", Update) end
+-- A reward item's data arriving late redraws the pages alone.
+local function OnEvent(_, event)
+    if event == "GET_ITEM_INFO_RECEIVED" then
+        if selectedID then ns.Sched.Soon("questMap.detail", UpdateDetail) end
+        return
+    end
+    ns.Sched.Soon("questMap.update", Update)
+end
 
 function QM.Attach(hosts)
     list = Pane(hosts.list, LIST_L, LIST_R, LIST_T, LIST_B, LIST_BAR_X, LIST_BAR_TOP, LIST_BAR_FOOT)

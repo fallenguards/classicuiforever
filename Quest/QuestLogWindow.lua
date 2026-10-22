@@ -76,7 +76,7 @@ local ALL_TAB = {
 
 -- Log, watch, roster and money changes refill the window.
 local LOG_EVENTS = { "QUEST_LOG_UPDATE", "QUEST_WATCH_LIST_CHANGED", "UNIT_QUEST_LOG_CHANGED", "GROUP_ROSTER_UPDATE",
-    "PLAYER_MONEY" }
+    "PLAYER_MONEY", "GET_ITEM_INFO_RECEIVED" }
 -- Party changes refill the rows; a quest giver's window closes the log.
 local PARTY_EVENTS = { "PARTY_MEMBER_ENABLE", "PARTY_MEMBER_DISABLE" }
 local GIVER_EVENTS = { "QUEST_DETAIL", "QUEST_PROGRESS", "QUEST_COMPLETE", "QUEST_GREETING", "GOSSIP_SHOW" }
@@ -625,8 +625,9 @@ local function OnLogEvent(self, event, unit)
         end
         return
     end
-    -- One rebuild per frame, however many events arrive.
-    if self:IsShown() then ns.Sched.Soon("questlog.update", UpdateAll) end
+    if not self:IsShown() then return end
+    -- A reward item's data arriving late redraws the page alone; one rebuild per frame, however many events arrive.
+    if event == "GET_ITEM_INFO_RECEIVED" then ns.Sched.Soon("questlog.detail", UpdateDetail) else ns.Sched.Soon("questlog.update", UpdateAll) end
 end
 
 local function LogShown()
