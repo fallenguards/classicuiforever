@@ -522,7 +522,7 @@ local function DressEra(style)
     ns.SetAlphaIf(border.InsetBorderTop, 0)
     if border.fcui and border.fcui.titleStrip then ns.SetShownIf(border.fcui.titleStrip, false) end
     ns.SetAlphaIf(_G["WorldMapFrameBg"], 0)
-    for _, key in ipairs(EXTRAS) do HoldHidden(map[key]) end
+    for _, key in ipairs(EXTRAS) do HoldHidden(ns.MapOverlay(map, key)) end
     -- The combined layout has its own list: the client's pane, opened by its toggle or a tracker, is put away.
     if Combined() and map.QuestLog and map.QuestLog:IsShown() then map.QuestLog:Hide() end
     -- The quest pane toggle sits on the footer's border: over its line.

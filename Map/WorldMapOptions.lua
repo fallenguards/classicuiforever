@@ -41,6 +41,30 @@ end
 -- The box, nil before the first classic lay (Track Quest stands left of it).
 function MO.Frame() return box end
 
+-- The map's filter and pin buttons: Forever hangs them on the map by name, retail keeps them only in its overlay
+-- list, told apart by a method of their mixin. Found once per map.
+local OVERLAY_SIGN = { WorldMapTrackingOptionsButton = { "WorldMapTrackingOptionsButtonMixin", "BuildFilterTable" },
+    WorldMapTrackingPinButton = { "WorldMapTrackingPinButtonMixin", "OnClick" } }
+local overlays = setmetatable({}, { __mode = "k" })
+function ns.MapOverlay(map, key)
+    local found = map[key]
+    if found then return found end
+    local cache = overlays[map]
+    if cache and cache[key] ~= nil then return cache[key] or nil end
+    cache = cache or {}
+    overlays[map] = cache
+    local sign = OVERLAY_SIGN[key]
+    local mixin = sign and _G[sign[1]]
+    for _, frame in ipairs(mixin and map.overlayFrames or ns.EMPTY) do
+        if frame[sign[2]] == mixin[sign[2]] then
+            found = frame
+            break
+        end
+    end
+    cache[key] = found or false
+    return found
+end
+
 local function Points(frame)
     local points = {}
     for i = 1, frame:GetNumPoints() do points[i] = { frame:GetPoint(i) } end
@@ -51,6 +75,9 @@ end
 local function Take(track, scale)
     if not took[track] then
         took[track] = { points = Points(track), w = track:GetWidth(), h = track:GetHeight() }
+        -- Retail's button carries a filter counter, its banner, a corner shadow and a ring too: all unseen.
+        ns.FadeTextures(track)
+        if track.FilterCounter then track.FilterCounter:SetAlpha(0) end
     end
     ns.SetSizeIf(track, BOX_W * scale, BOX_H * scale)
     ns.SetPointIf(track, "TOPLEFT", box, "TOPLEFT", 0, 0)
@@ -61,7 +88,7 @@ end
 
 -- spot: the frame, x and y the box's bottom right sits at from its top left, and the scale the box is drawn at.
 function MO.Place(map, rel, x, y, scale)
-    local track = map.WorldMapTrackingOptionsButton
+    local track = ns.MapOverlay(map, "WorldMapTrackingOptionsButton")
     if not track then return end
     local b = Box(map.BorderFrame)
     ns.SetScaleIf(b, scale)
@@ -90,7 +117,7 @@ end
 -- The game's button back as the game laid it (the game's own layout, or the classic map off).
 function MO.Release(map)
     if box then box:Hide() end
-    local track = map and map.WorldMapTrackingOptionsButton
+    local track = map and ns.MapOverlay(map, "WorldMapTrackingOptionsButton")
     local was = track and took[track]
     if hidden then
         hidden = false
@@ -102,6 +129,8 @@ function MO.Release(map)
     for _, p in ipairs(was.points) do track:SetPoint(unpack(p)) end
     track:SetSize(was.w, was.h)
     track:SetAlpha(1)
+    ns.FadeTextures(track, 1)
+    if track.FilterCounter then track.FilterCounter:SetAlpha(1) end
     if track.Icon then track.Icon:SetAlpha(1) end
     local hl = track:GetHighlightTexture()
     if hl then hl:SetAlpha(1) end
@@ -110,6 +139,6 @@ end
 -- Ours and the button laid on it, kept when a fight's fade walks the map.
 function MO.Keep(into, map)
     if box then into[box] = true end
-    local track = map.WorldMapTrackingOptionsButton
+    local track = ns.MapOverlay(map, "WorldMapTrackingOptionsButton")
     if track and took[track] then into[track] = true end
 end
