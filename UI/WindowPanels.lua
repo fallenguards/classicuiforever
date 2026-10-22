@@ -78,7 +78,12 @@ function ns.NoteWindowOpened(frame)
     opened = opened + 1
     openedAt[frame] = opened
 end
-function ns.NoteWindowClosed(frame) openedAt[frame] = nil end
+-- A game window gone may have pushed a placed one of ours aside while covering its place (the who results' finder):
+-- ours goes back next frame (UI/WindowHandles.lua Apply waits on a cover).
+function ns.NoteWindowClosed(frame)
+    openedAt[frame] = nil
+    if ns.windowEdit then ns.Sched.NextFrame("windowPlaces", ns.windowEdit.PlaceAll) end
+end
 function ns.FightLaid(frame) return laidSet[frame] == true end
 
 -- A game side window the lay moves: seen, not locked, not placed by the player or a mover, standing in the row.

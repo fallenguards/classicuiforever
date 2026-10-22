@@ -98,8 +98,9 @@ end
 
 local function SweepChild(child, host, mark, hide)
     local name = (child.GetName and child:GetName()) or ""
-    -- Border, portrait, title bar and inset are the window; inside the last two is swept above.
-    local keep = name:find("ClassicUIForever", 1, true) or name:find("FriendsFrameTab", 1, true)
+    -- Border, portrait, title bar and inset are the window; inside the last two is swept above. Our unnamed window edit
+    -- pieces (lock, reset, drag strip, grip) stay: swept, the Who tab had no lock and no drag.
+    local keep = ns.IsWindowPiece(child) or name:find("ClassicUIForever", 1, true) or name:find("FriendsFrameTab", 1, true)
         or child == host.CloseButton or child == host.PortraitContainer
         or child == host.NineSlice or child == host.TitleContainer or child == _G["FriendsFrameInset"]
     if not keep then

@@ -34,6 +34,11 @@ local RESET_ARROW_X = 0
 local RESET_ARROW_Y = 1
 
 -- The title names what the click does, the line what the window does now.
+-- Our window edit pieces (lock, reset, zone, strip, grip): the social sweep leaves them be (UI/FriendsWindow.lua).
+local pieces = setmetatable({}, { __mode = "k" })
+function ns.MarkWindowPiece(frame) pieces[frame] = true end
+function ns.IsWindowPiece(frame) return pieces[frame] == true end
+
 local function LockTip(entry)
     local map = entry.quests
     return { text = function()
@@ -154,6 +159,7 @@ local function MakeLock(entry)
     if entry.piece or locks[entry.key] or not frame then return end
     local parent = entry.quests and frame.BorderFrame or frame
     local lock = ns.NewFrame("Button", nil, parent)
+    ns.MarkWindowPiece(lock)
     -- Over the drag strip, which reaches under it.
     lock:SetFrameLevel(frame:GetFrameLevel() + LIFT)
     lock:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight", "ADD")
@@ -161,6 +167,7 @@ local function MakeLock(entry)
     ns.AttachTip(lock, LockTip(entry))
     -- The lock's size and red face, with a turning arrow: back where it was.
     local reset = ns.NewFrame("Button", nil, parent)
+    ns.MarkWindowPiece(reset)
     reset:SetFrameLevel(frame:GetFrameLevel() + LIFT)
     fits[entry.key] = ResetFace(reset)
     reset:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight", "ADD")
@@ -172,6 +179,7 @@ local function MakeLock(entry)
     reset:Hide()
     resets[entry.key] = reset
     local zone = ns.NewFrame("Frame", nil, parent)
+    ns.MarkWindowPiece(zone)
     zone:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, 0)
     zone:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT", 0, -LOCK_ZONE_H)
     locks[entry.key], zones[entry.key] = lock, zone

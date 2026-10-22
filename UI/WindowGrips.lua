@@ -122,6 +122,7 @@ local function MakeGrip(entry)
     local frame = ns.WindowFrame(entry)
     if entry.piece or grips[entry.key] or not frame then return end
     local grip = ns.NewFrame("Button", nil, entry.quests and frame.BorderFrame or frame)
+    ns.MarkWindowPiece(grip)
     grip:SetSize(GRIP_SIZE, GRIP_SIZE)
     grip:SetNormalTexture(GRIP .. "Up")
     grip:SetPushedTexture(GRIP .. "Down")

@@ -172,7 +172,11 @@ local function CloseClientWhoWindow()
     -- Only when ours is up to replace it.
     if not (FriendsFrame and FriendsFrame:IsVisible()) then return end
     -- Never turned from here: that marked the finder's page ours, refusing its opens in a fight.
-    if who and who:IsShown() and parent and parent:IsShown() then ns.HidePanel(parent) end
+    if who and who:IsShown() and parent and parent:IsShown() then
+        ns.HidePanel(parent)
+        -- Its opening re-laid the social window at the game's spot: ours goes back now, not with the window watch.
+        if ns.windowEdit then ns.windowEdit.PlaceAll() end
+    end
 end
 
 -- The client's panels in the window, hidden while the who list is up.

@@ -68,6 +68,7 @@ local function Strip(entry)
     end
     if not strip then
         strip = ns.NewFrame("Frame", nil, frame)
+        ns.MarkWindowPiece(strip)
         strip:EnableMouse(true)
         strip:RegisterForDrag("LeftButton")
         strip:SetScript("OnDragStart", StripDragStart)
