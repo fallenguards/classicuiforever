@@ -16,6 +16,7 @@ local function Hosted() return ns.padSession == true end
 local inspectWatch
 -- nil for the player, or the inspected unit (its own read-only config).
 local inspectUnit
+local inspectAlone   -- from the unit menu: no inspect window to stand beside or close with
 
 -- The old backgrounds, by class and by the tree's place in the row.
 local BACKGROUNDS = {
@@ -82,7 +83,7 @@ local function Build()
         Refresh()
     end)
     frame:SetScript("OnHide", function()
-        inspectUnit = nil
+        inspectUnit, inspectAlone = nil, nil
         if inspectWatch then inspectWatch:Hide() end
         ns.TalentWindowShown(frame, false)
         if not Hosted() then PlaySound(SOUNDKIT.IG_CHARACTER_INFO_CLOSE) end
@@ -90,12 +91,12 @@ local function Build()
     -- Inspect talents sit beside the inspect window and close with it: the client
     -- drops the data then.
     frame.fcuiKeep = function()
-        return inspectUnit and _G["InspectFrame"] or nil
+        return inspectUnit and not inspectAlone and _G["InspectFrame"] or nil
     end
     inspectWatch = ns.NewFrame("Frame", nil, frame)
     inspectWatch:Hide()
     ns.Sched.OnFrame(inspectWatch, { name = "talents.inspect", every = 0.2, fn = function()
-        if not inspectUnit then return end
+        if not inspectUnit or inspectAlone then return end
         local inspect = _G["InspectFrame"]
         if not (inspect and inspect:IsShown()) then frame:Hide() end
     end })
@@ -196,6 +197,20 @@ ns.EventFrame("ADDON_LOADED", function(_, _, name)
     if name == "Blizzard_InspectUI" and active then TakeInspectButton(true) end
 end)
 
+-- The unit menu's Inspect Talents opens the game's spells window on the unit once its data is in (no inspect window
+-- on this client has a Talents button): that window goes and ours shows the unit, on its own.
+local menuHooked
+local function TakeMenuInspect()
+    if menuHooked or not (PlayerSpellsUtil and PlayerSpellsUtil.OpenToClassTalentsTab) then return end
+    menuHooked = true
+    ns.HookMethod(PlayerSpellsUtil, "OpenToClassTalentsTab", function(unit)
+        if not unit or not active or Hosted() then return end
+        ns.HidePanel(_G.PlayerSpellsFrame)
+        ShowInspect(unit)
+        inspectAlone = true
+    end)
+end
+
 -- Talents micro button and key open this window while on. Both client buttons:
 -- this client shows TalentMicroButton; taking only PlayerSpellsMicroButton
 -- (never shown) left the visible one opening the client's window.
@@ -220,6 +235,7 @@ local function Apply()
     end
     TakeButton(true)
     TakeInspectButton(true)
+    TakeMenuInspect()
     key:Set(true)
     if ns.MapPad and _G.TalentMicroButton then ns.MapPad(_G.TalentMicroButton, nil, nil, CloserMacro, function() return active end) end
 end
