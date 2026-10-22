@@ -35,8 +35,9 @@ local function SkinLootElement(element)
     end
 end
 
--- One walk over the rows per look; each visitor also measures the pitch.
+-- One walk over the rows per look; each visitor also measures the pitch and counts the rows seen and still filled.
 local walkPitch
+local walked, filledSeen = 0, 0
 
 -- Real row height as drawn; LOOT_ROW until a row exists.
 local function Measure(element)
@@ -54,6 +55,8 @@ local function SyncBox(element)
         local text = element.Text:GetText()
         if not IsSecret(text) and (text or "") == "" then filled = false end
     end
+    walked = walked + 1
+    if filled and element:IsShown() then filledSeen = filledSeen + 1 end
     nameBox:SetShown(filled and true or false)
 end
 
@@ -70,7 +73,7 @@ local function LookRow(element)
 end
 
 local function Walk(box, visit)
-    walkPitch = nil
+    walkPitch, walked, filledSeen = nil, 0, 0
     if box.ForEachFrame then box:ForEachFrame(visit) end
     return walkPitch or LOOT_ROW
 end
@@ -111,8 +114,9 @@ end
 local page = 0
 
 -- Whole pages as in 1.x: the list can't scroll past its end, so the last page shrinks to what is left and scrolls
--- to the end, its rows at the top (a full last page repeated rows from the page before).
-local function UpdateLootPages(frame, visit)
+-- to the end, its rows at the top (a full last page repeated rows from the page before). cleared: a slot was just
+-- looted; a page with nothing left on it turns to the next, as Era's.
+local function UpdateLootPages(frame, visit, cleared)
     -- The client sizes the window as it opens and in edit mode; the old size goes back after its pass.
     ns.SetSizeIf(frame, LOOT_W, LOOT_H)
     local box = frame.ScrollBox
@@ -125,6 +129,7 @@ local function UpdateLootPages(frame, visit)
     ns.SetShownIf(pager, paged)
     local rows = LootRows(pitch, paged)
     local last = paged and math.ceil(total / rows) - 1 or 0
+    if cleared and walked > 0 and filledSeen == 0 and page < last then page = page + 1 end
     page = math.max(0, math.min(page, last))
     local shown = paged and math.min(rows, total - page * rows) or rows
     KeepFoot(box, frame, LOOT_H - LOOT_TOP - shown * pitch)
@@ -210,9 +215,14 @@ local function LootPager(frame)
     -- Slot change: look next frame, after the client redraws the row.
     local slots = ns.NewFrame("Frame", nil, pager)
     ns.RegisterEvents(slots, LOOT_EVENTS)
-    local function Redraw() if frame:IsShown() then UpdateLootPages(frame) end end
+    local cleared = false
+    local function Redraw()
+        if frame:IsShown() then UpdateLootPages(frame, nil, cleared) end
+        cleared = false
+    end
     slots:SetScript("OnEvent", function(_, event)
         if event == "LOOT_OPENED" then page = 0 end
+        if event == "LOOT_SLOT_CLEARED" then cleared = true end
         ns.Sched.NextFrame("loot.update", Redraw)
     end)
     UpdateLootPages(frame)
