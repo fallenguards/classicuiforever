@@ -256,9 +256,10 @@ end
 -- Plain top left stays where the client puts it, in line with the bottom left.
 function P.Reborder(frame, plain, lift)
     if not P.active or InCombatLockdown() then return false end
-    local lines = NineSlice(frame, plain and "plain" or "portrait", lift, true)
-    if not lines then return false end
+    -- The window's own lift unless one is passed: a re-dress kept the default and raised the foot (Communities).
     local opts = P.windowOpts[frame]
+    local lines = NineSlice(frame, plain and "plain" or "portrait", lift or (opts and opts.lift), true)
+    if not lines then return false end
     PlaceTitle(frame, plain, lines.left + 1, opts and opts.titleSpan)
     if opts then PlaceBacking(frame, opts, lines) end
     return true

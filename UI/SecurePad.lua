@@ -40,9 +40,22 @@ local function CopyHitInsets(pad, button, ratio)
     if math.abs(pl - l) + math.abs(pr - r) + math.abs(pt - t) + math.abs(pb - b) > 0.5 then pad:SetHitRectInsets(l, r, t, b) end
 end
 
+-- No art: the button under the pad shows the press and glow. A ring button's face presses too (Map/MinimapButton.lua).
+local function PressLook(mapPad, button, after, target)
+    mapPad:SetScript("OnMouseDown", function()
+        button:SetButtonState("PUSHED")
+        if ns.RingPress then ns.RingPress(button, true) end
+    end)
+    mapPad:SetScript("OnMouseUp", function()
+        if ns.RingPress then ns.RingPress(button, false) end
+        if after or target or not (WorldMapFrame and WorldMapFrame:IsShown()) then button:SetButtonState("NORMAL") end
+    end)
+end
+
 -- target: the button pressed instead of the zone name, a macro text, or a function giving the macro text now (nil: no pad).
 -- when(): whether the pad is wanted now. editMode: wanted only while edit mode is open (else never then).
-MapPad = function(button, strata, after, target, when, editMode)
+-- before(): ours right before the press (a window shown for the client button the macro clicks).
+MapPad = function(button, strata, after, target, when, editMode, before)
     local zone = target or (MinimapCluster and MinimapCluster.ZoneTextButton)
     local macroFn = type(target) == "function" and target
     if not button or mapPads[button] or not zone then return end
@@ -70,17 +83,9 @@ MapPad = function(button, strata, after, target, when, editMode)
     mapPad:RegisterForClicks("AnyUp", "AnyDown")
     mapPad:SetFrameStrata(strata or "MEDIUM")
     mapPad:Hide()
-    -- No art: the button under it shows the press and glow.
-    -- A ring button's face presses too (Map/MinimapButton.lua).
-    mapPad:SetScript("OnMouseDown", function()
-        button:SetButtonState("PUSHED")
-        if ns.RingPress then ns.RingPress(button, true) end
-    end)
-    mapPad:SetScript("OnMouseUp", function()
-        if ns.RingPress then ns.RingPress(button, false) end
-        if after or target or not (WorldMapFrame and WorldMapFrame:IsShown()) then button:SetButtonState("NORMAL") end
-    end)
+    PressLook(mapPad, button, after, target)
     local Place
+    if before then mapPad:SetScript("PreClick", function(_, _, down) if not down then before() end end) end
     mapPad:SetScript("PostClick", function(_, _, down)
         if down then return end
         if after then after() end

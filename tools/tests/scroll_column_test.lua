@@ -36,6 +36,8 @@ local function New() return setmetatable({ shown = true, scripts = {} }, Region)
 local owned = {}
 local ns = setmetatable({}, { __index = function() return function() end end })
 ns.KEYS = {}
+-- The next-frame refit runs at once here.
+ns.Sched = { NextFrame = function(_, fn) fn() end }
 ns.OwnTexture = function(_, key) owned[key] = New() return owned[key] end
 assert(loadfile(ROOT .. "/UI/ScrollBars.lua"))("ClassicUIForever", ns)
 

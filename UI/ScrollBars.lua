@@ -342,6 +342,7 @@ end
 local TRACK_FOOT = 108
 -- The column's see-through channel: from its left edge to its right, in from its ends.
 local HOUSING_CHANNEL_LEFT, HOUSING_CHANNEL_RIGHT, HOUSING_CHANNEL_TOP = 6, 25, 4
+local fits = 0   -- a name per bar for its next-frame fit
 
 local function ColumnPiece(tex)
     ns.SetTex(tex, "charScrollBar")
@@ -418,11 +419,18 @@ function ns.ScrollTrackArt(bar, spec)
         FitColumn(top, middle, foot, (bar:GetHeight() or 0) + spec.houseTop - spec.houseFoot)
         channel:SetShown(top:IsShown())
     end
-    -- Sized via our own frame: the client resets the bar's size script, dropping any hook on it.
+    -- Sized via our own frame: the client resets the bar's size script, dropping any hook on it. Once more next frame:
+    -- a window sized as it opens (Communities) gave the first fit the bar's old height, and the column had a hole.
     local ear = ns.NewFrame("Frame", nil, bar)
     ear:SetAllPoints(bar)
-    ear:SetScript("OnSizeChanged", Fit)
-    ear:SetScript("OnShow", Fit)
+    fits = fits + 1
+    local again = "scroll.fit" .. fits
+    local function FitSoon()
+        Fit()
+        ns.Sched.NextFrame(again, Fit)
+    end
+    ear:SetScript("OnSizeChanged", FitSoon)
+    ear:SetScript("OnShow", FitSoon)
     Fit()
     -- Arrows moved out at each end, so the knob reaches further.
     knobReach[bar] = knobReach[bar] or spec.knobReach

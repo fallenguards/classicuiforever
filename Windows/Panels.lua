@@ -127,7 +127,8 @@ local WINDOWS = {
         after = A.MacroFrame },
     { "ClassTrainerFrame", toggle = "trainer", addon = "Blizzard_TrainerUI" },
     { "AuctionHouseFrame", key = "panelAuction", addon = "Blizzard_AuctionHouseUI", lift = 9 },
-    { "CommunitiesFrame", key = "panelCommunities", addon = "Blizzard_Communities", after = A.CommunitiesFrame },
+    -- The social window's lift: its foot tabs hang on this window too (Social/CommunitiesTabs.lua).
+    { "CommunitiesFrame", key = "panelCommunities", addon = "Blizzard_Communities", lift = 5, after = A.CommunitiesFrame },
     -- Half lift: the Mount button sits on the foot. The tabs' tops on the metal line, as the vendor's.
     { "CollectionsJournal", key = "panelCollections", addon = "Blizzard_Collections", lift = 5, tabLift = MERCHANT_TAB_LIFT,
         after = A.CollectionsJournal },

@@ -203,7 +203,7 @@ local function RaidTab()
 end
 
 -- The first tab's left and every tab's padding, so the shown tabs end inside the window.
-local function RowFit(order)
+local function RowFit(order, host)
     local labels, shown = 0, 0
     for _, entry in ipairs(order) do
         local text = entry:IsShown() and (entry.Text or entry:GetFontString())
@@ -212,7 +212,7 @@ local function RowFit(order)
             shown = shown + 1
         end
     end
-    local room = FriendsFrame:GetWidth()
+    local room = host:GetWidth()
     local pad = S.fourTabs and FOUR_TAB_PAD or SOCIAL_TAB_PAD
     if shown == 0 or not room or room <= 0 then return SOCIAL_TAB_X, pad end
     local over = SOCIAL_TAB_X + labels + shown * pad + (shown - 1) * TAB_GAP - room
@@ -240,7 +240,14 @@ function S.PlaceTabs()
     for i = 2, #blizzard do
         if blizzard[i] ~= clientWho and blizzard[i] ~= clientQuick then order[#order + 1] = blizzard[i] end
     end
-    local x, pad = RowFit(order)
+    S.LayTabRow(FriendsFrame, order)
+    NewSocialUI()
+end
+
+-- The row of tabs under host's foot, fitted to its width (the social window's, and the Communities window's in its
+-- small mode).
+function S.LayTabRow(host, order)
+    local x, pad = RowFit(order, host)
     for _, entry in ipairs(order) do
         if entry.fcuiPad ~= pad then
             entry.fcuiPad = pad
@@ -255,12 +262,11 @@ function S.PlaceTabs()
                 entry:SetPoint("LEFT", previous, "RIGHT", TAB_GAP, 0)
                 entry:SetPoint("BOTTOM", previous, "BOTTOM", 0, 0)
             else
-                entry:SetPoint("TOPLEFT", FriendsFrame, "BOTTOMLEFT", x, SOCIAL_TAB_Y)
+                entry:SetPoint("TOPLEFT", host, "BOTTOMLEFT", x, SOCIAL_TAB_Y)
             end
             previous = entry
         end
     end
-    NewSocialUI()
 end
 
 -------------------------------------------------------- client panels
@@ -665,7 +671,7 @@ end
 -- Our Friends and Raid tabs press the client's hidden ones, so the page changes in its own pass, as before the switch.
 -- Off the raid page the raid frame is parked first: the raid parent's first tab takes it back and presses the client's
 -- Friends tab (ClaimRaidFrame); the switch left nothing else to hide it.
-local function StandInMacro(client)
+function S.StandInMacro(client)
     local text = "/click " .. client:GetName()
     if client == _G.FriendsFrameTab1 and _G.RaidParentFrameTab1 and _G.RaidFrame and _G.RaidFrame:GetParent() == FriendsFrame then
         text = "/click RaidParentFrameTab1\n" .. text
@@ -681,7 +687,7 @@ end
 
 StandInPad = function(tab, client)
     if not client:GetName() then return end
-    ns.MapPad(tab, "HIGH", AfterPress, function() return StandInMacro(client) end, PadWanted)
+    ns.MapPad(tab, "HIGH", AfterPress, function() return S.StandInMacro(client) end, PadWanted)
 end
 
 NewSocialUI = function()

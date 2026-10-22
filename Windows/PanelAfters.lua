@@ -533,7 +533,8 @@ TintInner = function(frame, depth, skip)
     ns.EachChild(frame, TintInnerChild, depth, skip)
 end
 
--- The client re-lays its bronze border on each open and size toggle: ours again the frame after.
+-- The client re-lays its bronze border on each open and size toggle: ours again the frame after, with the ring corner
+-- in its small mode too (a social page there, Social/CommunitiesTabs.lua).
 local function WatchBorder(frame, sizer)
     local edge = frame.NineSlice and frame.NineSlice.TopEdge
     if not edge then return end
@@ -544,7 +545,7 @@ local function WatchBorder(frame, sizer)
         local now = edge:GetTexture()
         local relaid = ours ~= nil and not IsSecret(now) and now ~= ours
         if not fresh and mini == plain and not relaid then return end
-        if P.Reborder(frame, mini) then
+        if P.Reborder(frame, false) then
             fresh, plain = false, mini
             now = edge:GetTexture()
             ours = not IsSecret(now) and now or nil
@@ -561,6 +562,15 @@ function A.CommunitiesFrame(frame)
     PlateTabs(frame, COMMUNITY_TABS)
     for _, key in ipairs(FINDERS) do PlateTabs(frame[key], FINDER_TABS) end
     TintInner(frame, 6, frame.GuildMemberDetailFrame)
+    ns.SkinDropdown(frame.CommunitiesListDropdown)
+    ns.SkinDropdown(frame.StreamDropdown)
+    -- The chat line gets the X our search boxes have, shown while it holds text.
+    local line = frame.ChatEditBox
+    if line and ns.Once(line, "clear") then
+        local clear = ns.SearchClear(line)
+        ns.HookScriptOnce(line, "OnTextChanged", function(self) clear:SetShown((self:GetText() or "") ~= "") end)
+    end
+    if ns.CommunitiesFootTabs then ns.CommunitiesFootTabs(frame) end
 end
 
 ----------------------------------------------------------- spells window

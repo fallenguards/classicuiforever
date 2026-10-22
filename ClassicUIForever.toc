@@ -194,6 +194,7 @@ Social\GuildRoster.lua
 Social\GuildMemberCard.lua
 Social\GuildNoteBridge.lua
 Social\GuildOpeners.lua
+Social\CommunitiesTabs.lua
 Social\WhoFilters.lua
 Social\WhoList.lua
 Social\FinderTabs.lua
