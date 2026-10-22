@@ -33,9 +33,13 @@ local RESET_ARROW_HEIGHT = 12
 local RESET_ARROW_X = 0
 local RESET_ARROW_Y = 1
 
+-- The title names what the click does, the line what the window does now.
 local function LockTip(entry)
     local map = entry.quests
-    return { text = map and L["UI_MAP_LOCK"] or L["UI_WINDOW_LOCK"], r = 1, g = 1, b = 1, lines = { { function()
+    return { text = function()
+        if map then return W.IsFree(entry) and L["UI_LOCK_MAP"] or L["UI_UNLOCK_MAP"] end
+        return W.IsFree(entry) and L["UI_LOCK_WINDOW"] or L["UI_UNLOCK_WINDOW"]
+    end, r = 1, g = 1, b = 1, lines = { { function()
         if map then return W.IsFree(entry) and L["UI_UNLOCKED_DRAG_THE_MAP_BY"] or L["UI_LOCKED_CLICK_TO_DRAG_THE"] end
         return W.IsFree(entry) and L["UI_UNLOCKED_DRAG_THE_WINDOW_BY"] or L["UI_LOCKED_CLICK_TO_DRAG_THE_WINDOW"]
     end, nil, nil, nil, true } } }

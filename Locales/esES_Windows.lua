@@ -3,10 +3,10 @@ if ns.LOCALE ~= "esES" then return end
 local L = ns.L
 
 -- Our window mover and its edit mode window (UI/), the one bag's reagent slots and the bag bar pick, beside Locales/esES.lua.
-L["UI_UNLOCKED_DRAG_THE_MAP_BY"] = "Desbloqueado: arrastra el mapa por su barra de título fuera de combate. Haz clic para bloquearlo."
-L["UI_LOCKED_CLICK_TO_DRAG_THE"] = "Bloqueado. Haz clic para arrastrar el mapa a cualquier sitio por su barra de título fuera de combate."
-L["UI_UNLOCKED_DRAG_THE_WINDOW_BY"] = "Desbloqueada: arrastra la ventana por su barra de título fuera de combate. Haz clic para bloquearla."
-L["UI_LOCKED_CLICK_TO_DRAG_THE_WINDOW"] = "Bloqueada. Haz clic para arrastrar la ventana a cualquier sitio por su barra de título fuera de combate."
+L["UI_UNLOCKED_DRAG_THE_MAP_BY"] = "Ahora se arrastra a cualquier sitio por su barra de título, fuera de combate. Bloqueado, se queda en su sitio."
+L["UI_LOCKED_CLICK_TO_DRAG_THE"] = "Ahora se queda en su sitio. Desbloqueado, se arrastra a cualquier sitio por su barra de título, fuera de combate."
+L["UI_UNLOCKED_DRAG_THE_WINDOW_BY"] = "Ahora se arrastra a cualquier sitio por su barra de título, fuera de combate. Bloqueada, se queda en su sitio."
+L["UI_LOCKED_CLICK_TO_DRAG_THE_WINDOW"] = "Ahora se queda en su sitio. Desbloqueada, se arrastra a cualquier sitio por su barra de título, fuera de combate."
 L["UI_WITH_QUEST_LOG"] = "Con el registro de misiones"
 L["UI_MAP_ONLY"] = "Solo el mapa"
 L["UI_CLASSICUI_FOREVER_WINDOWS"] = "Ventanas de ClassicUI Forever"

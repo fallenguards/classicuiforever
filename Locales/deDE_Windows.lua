@@ -3,10 +3,10 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Our window mover and its edit mode window (UI/), the one bag's reagent slots and the bag bar pick, beside Locales/deDE.lua.
-L["UI_UNLOCKED_DRAG_THE_MAP_BY"] = "Entsperrt: Zieh die Karte außerhalb des Kampfes an ihrer Titelleiste. Klicken zum Sperren."
-L["UI_LOCKED_CLICK_TO_DRAG_THE"] = "Gesperrt. Klicken, um die Karte außerhalb des Kampfes an ihrer Titelleiste überallhin zu ziehen."
-L["UI_UNLOCKED_DRAG_THE_WINDOW_BY"] = "Entsperrt: Zieh das Fenster außerhalb des Kampfes an seiner Titelleiste. Klicken zum Sperren."
-L["UI_LOCKED_CLICK_TO_DRAG_THE_WINDOW"] = "Gesperrt. Klicken, um das Fenster außerhalb des Kampfes an seiner Titelleiste überallhin zu ziehen."
+L["UI_UNLOCKED_DRAG_THE_MAP_BY"] = "Sie lässt sich jetzt außerhalb des Kampfes an ihrer Titelleiste überallhin ziehen. Gesperrt bleibt sie, wo sie ist."
+L["UI_LOCKED_CLICK_TO_DRAG_THE"] = "Sie bleibt jetzt, wo sie ist. Entsperrt lässt sie sich außerhalb des Kampfes an ihrer Titelleiste überallhin ziehen."
+L["UI_UNLOCKED_DRAG_THE_WINDOW_BY"] = "Es lässt sich jetzt außerhalb des Kampfes an seiner Titelleiste überallhin ziehen. Gesperrt bleibt es, wo es ist."
+L["UI_LOCKED_CLICK_TO_DRAG_THE_WINDOW"] = "Es bleibt jetzt, wo es ist. Entsperrt lässt es sich außerhalb des Kampfes an seiner Titelleiste überallhin ziehen."
 L["UI_WITH_QUEST_LOG"] = "Mit Questlog"
 L["UI_MAP_ONLY"] = "Nur Karte"
 L["UI_CLASSICUI_FOREVER_WINDOWS"] = "ClassicUI Forever Fenster"

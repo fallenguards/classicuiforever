@@ -3,10 +3,10 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Our window mover and its edit mode window (UI/), the one bag's reagent slots and the bag bar pick, beside Locales/frFR.lua.
-L["UI_UNLOCKED_DRAG_THE_MAP_BY"] = "Déverrouillée : faites glisser la carte par sa barre de titre, hors combat. Cliquez pour la verrouiller."
-L["UI_LOCKED_CLICK_TO_DRAG_THE"] = "Verrouillée. Cliquez pour faire glisser la carte n'importe où par sa barre de titre, hors combat."
-L["UI_UNLOCKED_DRAG_THE_WINDOW_BY"] = "Déverrouillée : faites glisser la fenêtre par sa barre de titre, hors combat. Cliquez pour la verrouiller."
-L["UI_LOCKED_CLICK_TO_DRAG_THE_WINDOW"] = "Verrouillée. Cliquez pour faire glisser la fenêtre n'importe où par sa barre de titre, hors combat."
+L["UI_UNLOCKED_DRAG_THE_MAP_BY"] = "Elle se déplace maintenant n'importe où par sa barre de titre, hors combat. Verrouillée, elle reste en place."
+L["UI_LOCKED_CLICK_TO_DRAG_THE"] = "Elle reste en place maintenant. Déverrouillée, elle se déplace n'importe où par sa barre de titre, hors combat."
+L["UI_UNLOCKED_DRAG_THE_WINDOW_BY"] = "Elle se déplace maintenant n'importe où par sa barre de titre, hors combat. Verrouillée, elle reste en place."
+L["UI_LOCKED_CLICK_TO_DRAG_THE_WINDOW"] = "Elle reste en place maintenant. Déverrouillée, elle se déplace n'importe où par sa barre de titre, hors combat."
 L["UI_WITH_QUEST_LOG"] = "Avec le journal de quêtes"
 L["UI_MAP_ONLY"] = "Carte seule"
 L["UI_CLASSICUI_FOREVER_WINDOWS"] = "Fenêtres ClassicUI Forever"
