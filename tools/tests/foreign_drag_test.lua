@@ -62,6 +62,7 @@ local ns = {
     MoverHolds = function() return false end,
     NewFrame = function() return {} end,
     SetLevelIf = function() end,
+    EventFrame = function() return {} end,
 }
 assert(loadfile(ROOT .. "/UI/WindowDrags.lua"))("ClassicUIForever", ns)
 

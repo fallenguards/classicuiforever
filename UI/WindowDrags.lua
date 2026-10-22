@@ -57,6 +57,16 @@ local function StripDragStop(self)
     ns.Sched.LetGo(frame, false)
 end
 
+-- A fight starting mid drag: the window stops where it is while it can still be told to (the fight's first event
+-- runs before the lockdown); told at the release instead, a protected window (the map in fights) refuses and keeps
+-- following the cursor till the fight ends.
+ns.EventFrame("PLAYER_REGEN_DISABLED", function()
+    for frame in pairs(W.Moving) do
+        local strip = W.Strips[frame]
+        if ourDrag[frame] and strip then StripDragStop(strip) end
+    end
+end)
+
 -- The title strip that drags an unlocked window; nothing on a locked one.
 local function Strip(entry)
     local frame = ns.WindowFrame(entry)
