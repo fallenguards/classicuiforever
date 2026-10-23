@@ -90,3 +90,5 @@ L["OPT_showAddonBag_TIP"] = "Always shown, or only while the mouse is over the m
 L["OPT_hoverAddonBag"] = "Show: on hover"
 L["OPT_hoverAddonBag_TIP"] = "Always shown, or only while the mouse is over the minimap."
 L["MAP_EYE_REAL_SIZE"] = "Size on the minimap: %s"
+L["OPT_zoneTerritory"] = "Territory in zone names"
+L["OPT_zoneTerritory_TIP"] = "Shows a zone's territory, such as Alliance Territory, outside the capitals too, as 1.x did."

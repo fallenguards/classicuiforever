@@ -91,3 +91,5 @@ L["OPT_showAddonBag_TIP"] = "Siempre visible, o solo mientras el ratón está so
 L["OPT_hoverAddonBag"] = "Mostrar: al pasar el ratón"
 L["OPT_hoverAddonBag_TIP"] = "Siempre visible, o solo mientras el ratón está sobre el minimapa."
 L["MAP_EYE_REAL_SIZE"] = "Tamaño en el minimapa: %s"
+L["OPT_zoneTerritory"] = "Territorio en nombres de zona"
+L["OPT_zoneTerritory_TIP"] = "Muestra el territorio de una zona, como Territorio de la Alianza, también fuera de las capitales, como en 1.x."

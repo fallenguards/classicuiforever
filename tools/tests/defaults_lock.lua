@@ -444,4 +444,5 @@ return {
     worldMap = true,
     worldMapMinimapButton = false,
     xpTipRested = false,
+    zoneTerritory = true,
 }

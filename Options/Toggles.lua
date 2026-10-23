@@ -521,6 +521,11 @@ local COLLECTIONS_ROWS = {
 
 -- Forever's Legacy system, after Talents; retail has none.
 local FOREVER_ROWS = {
+    -- Era's territory line outside the capitals (#55): Forever's zone query has none there.
+    levelUpBanner = {
+        { "zoneTerritory", L["OPT_zoneTerritory"], L["OPT_zoneTerritory_TIP"],
+            search = "alliance horde contested territory zone text pvp faction capital" },
+    },
     -- The key ring there: the round reagent bag beside it, or shown only on hover.
     reagentBagSlot = {
         { "reagentBagRound", L["OPT_reagentBagRound"], L["OPT_reagentBagRound_TIP"], needs = "classicBar",

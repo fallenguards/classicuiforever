@@ -91,3 +91,5 @@ L["OPT_showAddonBag_TIP"] = "Toujours affiché, ou seulement quand la souris sur
 L["OPT_hoverAddonBag"] = "Affichage : au survol"
 L["OPT_hoverAddonBag_TIP"] = "Toujours affiché, ou seulement quand la souris survole la minicarte."
 L["MAP_EYE_REAL_SIZE"] = "Taille sur la minicarte : %s"
+L["OPT_zoneTerritory"] = "Territoire dans les noms de zone"
+L["OPT_zoneTerritory_TIP"] = "Affiche le territoire d'une zone, comme Territoire de l'Alliance, aussi hors des capitales, comme en 1.x."

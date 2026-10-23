@@ -164,6 +164,7 @@ Map\MinimapCollector.lua
 Map\MinimapButtonPicks.lua
 Map\MinimapSquare.lua
 Map\MinimapToggle.lua
+Map\ZoneTerritory.lua
 UI\ClassicFonts.lua
 Units\NamePlates.lua
 Units\NamePlateOptions.lua
