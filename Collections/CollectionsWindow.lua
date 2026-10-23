@@ -27,6 +27,8 @@ local TURN_SPEED = math.pi
 local CREATURE_ROOM, CREATURE_FACING = 1.3, math.pi / 5
 -- The wheel over a creature moves the camera this far a notch, between these.
 local ROOM_STEP, ROOM_MIN, ROOM_MAX = 0.15, 0.6, 4
+-- A look on the character zooms as Era's dressing room: portrait zoom 0 to its player maximum, 0.15 a notch.
+local ZOOM_STEP, ZOOM_MAX = 0.15, 0.8
 local ADD_HL = { add = true }
 
 -- Window state in one table (upvalue room): frame, box, search, filter pick, page, the current page and its lists.
@@ -198,6 +200,8 @@ local function DrawBox()
         -- A model keeps its place and camera through a clear: a right drag or a creature's pulled-back camera stayed.
         box.model:SetPosition(0, 0, 0)
         box.model:SetCamDistanceScale(1)
+        W.zoom = 0
+        box.model:SetPortraitZoom(0)
         box.bigIcon:Hide()
         box.picture:Hide()
     end
@@ -390,12 +394,16 @@ local function BuildBox(frame)
     box.model:SetPoint("BOTTOMRIGHT", box, "BOTTOMRIGHT", -4, 4)
     box.model:Hide()
     box.model:SetScript("OnModelLoaded", function(self) if W.creature then FrameCreature(self) end end)
-    -- The wheel over a creature zooms it, not the page.
+    -- The wheel over the model zooms it, not the page.
     box.model:EnableMouseWheel(true)
     box.model:SetScript("OnMouseWheel", function(self, delta)
-        if not W.creature then return end
-        W.room = math.max(ROOM_MIN, math.min(ROOM_MAX, (W.room or CREATURE_ROOM) - delta * ROOM_STEP))
-        self:SetCamDistanceScale(W.room)
+        if W.creature then
+            W.room = math.max(ROOM_MIN, math.min(ROOM_MAX, (W.room or CREATURE_ROOM) - delta * ROOM_STEP))
+            self:SetCamDistanceScale(W.room)
+        else
+            W.zoom = math.max(0, math.min(ZOOM_MAX, (W.zoom or 0) + delta * ZOOM_STEP))
+            self:SetPortraitZoom(W.zoom)
+        end
     end)
     local over = ns.NewFrame("Frame", nil, box)
     over:SetAllPoints(box)
