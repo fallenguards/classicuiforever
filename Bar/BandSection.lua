@@ -9,7 +9,7 @@ local B = ns.band
 local BAND_H, BAND_RUN = B.BAND_H, B.BAND_RUN
 local Seat, CurrentPlan = B.Seat, B.CurrentPlan
 local SHEET = B.PIECES[5]
-local KEY_Y = 21
+local KEY_Y = 20.5   -- Era's key ring: 1 above the band's foot
 local KEY_PAD, TIGHT_GAP = 0, 0   -- the bare key ring: its home the key itself, touching the bags (its art has its own rim)
 local RUN = {}
 
@@ -316,7 +316,7 @@ local function Place(el, plan, level)
         if bare then
             cross = B.KEYRING_H + 2 * KEY_PAD
             long = B.KEYRING_W + 2 * KEY_PAD
-            left = B.TAIL_SLOT - long / 2 + 0.5
+            left = B.TAIL_SLOT - long / 2
         end
         local frame, point, relPoint, rowScale, dx
         if snapped then
@@ -360,7 +360,7 @@ local function Place(el, plan, level)
         local squished = keyRing ~= KeyRingButton and B.ReagentSquished()
         local tall = squished and B.Bag().size or B.KEYRING_H
         -- The key's middle on the upright cut, turned with the home.
-        local px, py = B.TAIL_SLOT - left + 0.5, bare and cross / 2 or KEY_Y
+        local px, py = B.TAIL_SLOT - left, bare and cross / 2 or KEY_Y
         if turn then
             Seat(keyRing, scale, tall, B.KEYRING_W, level)
         else

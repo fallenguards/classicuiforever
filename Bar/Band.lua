@@ -46,7 +46,7 @@ function B.BagPart()
 end
 -- Latency and key ring section, cut from the 1.x key ring sheet (Era's, the fifth piece): left post, the window the latency
 -- tube shows through, shared post, key slot, post.
-B.TAIL_WINDOW, B.TAIL_SLOT = 7, 30   -- window's left column, key slot's centre
+B.TAIL_WINDOW, B.TAIL_SLOT = 7, 31   -- window's left column, key slot's middle (Era's key ring, eram bar)
 -- Which halves stand on the band: not hidden, not moved off it (BandSection.lua).
 function B.TailParts()
     local db = ns.db
@@ -153,7 +153,8 @@ B.BAG_BUTTONS = { "MainMenuBarBackpackButton", "CharacterBag0Slot", "CharacterBa
 B.PIECES = {
     { x = 0, key = "barBody", band = { 0.83203125, 1.0 }, strip = { 0.79296875, 0.83203125 } },
     { x = 256, key = "barBody", band = { 0.58203125, 0.75 }, strip = { 0.54296875, 0.58203125 } },
-    { x = 512, key = "barKeyring", band = { 0.6640625, 1.0 }, strip = { 0.29296875, 0.33203125 }, stripKey = "barBody" },
+    -- Era's own third sheet (ours, byte for byte): Forever's repaint lost its floor's fade and rim at the right end.
+    { x = 512, key = "barKeyringClassic", band = { 0.6640625, 1.0 }, strip = { 0.29296875, 0.33203125 }, stripKey = "barBody" },
     { x = 768, key = "barKeyring", band = { 0.1640625, 0.5 }, strip = { 0.04296875, 0.08203125 }, stripKey = "barBody" },
     -- Not a run of the band's width: the latency and key ring section only.
     { key = "barKeyringClassic", band = { 0.1640625, 0.5 } },

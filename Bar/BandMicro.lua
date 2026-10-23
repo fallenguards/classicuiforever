@@ -211,7 +211,7 @@ end
 B.MicroButtonList = MicroButtonList
 ns.MicroButtonList = MicroButtonList
 
--- The band was drawn for ten micro buttons, later clients have 13-14. All stay: the row starts at x 556
+-- The band was drawn for ten micro buttons, later clients have 13-14. All stay: the row starts at Era's x 552 (measured)
 -- with the 1.x overlap, scaled as a whole to end before the latency and key ring section.
 local function MicroNeed(count)
     return count * (MICRO_W + MICRO_STEP) - MICRO_STEP
@@ -582,7 +582,8 @@ end
 local TRIM_MAX = 80
 local function FitRegion(last, art)
     local plan, shape = CurrentPlan(), B.shape
-    if not plan.microFirst or not plan.microEnd then return end
+    -- Era's whole third sheet ends at the sheet, not the row.
+    if not plan.microFirst or not plan.microEnd or plan.wholeSheet then return end
     local right, left = last:GetRight(), art:GetLeft()
     if ns.AnySecret(right, left) or not right or not left then return end
     local rowEnd = right * last:GetEffectiveScale() / art:GetEffectiveScale() - left
@@ -614,25 +615,18 @@ local function SpreadStep(wanted, seen, worn)
     return true, (span - visible * MICRO_W) / (visible - 1)
 end
 
--- Off the band only, its floor: the third sheet's run it stood on, flat stone tiles past the art's room (Size over
--- 100%), then the dark start of the fourth where the row reaches it.
+-- Off the band only, its floor: the third sheet's run it stood on, ending on Era's fade and rim (B.MicroRuns).
 local function LayFloor(home, region, floored)
-    local third, lead = math.min(region, 256), MICRO_GROUP_X - 512
-    local extra = math.max(0, region - MICRO_REGION_MAX)
-    local runs = { { 3, lead / 256, third / 256, third - lead, 0 } }
-    for _, tile in ipairs(B.FloorTiles(third - lead, extra)) do
-        runs[#runs + 1] = { 3, tile[3], tile[4], tile[2], tile[1] }
-    end
-    local fourth = math.max(0, region - extra - 256)
-    runs[#runs + 1] = { 4, 0, fourth / 256, fourth, third - lead + extra }
+    local lead = MICRO_GROUP_X - 512
+    local runs = B.MicroRuns(0, region - lead, lead)
+    local sheet = PIECES[3]
     for i = 1, math.max(#runs, #home.floor) do
         local tex = home.floor[i] or home:CreateTexture(nil, "BACKGROUND")
         home.floor[i] = tex
         local run = runs[i]
-        if floored and run and run[4] > 0 then
-            local sheet = PIECES[run[1]]
-            RUN[1], RUN[2], RUN[3], RUN[4] = run[2], run[3], sheet.band[1], sheet.band[2]
-            Dress(tex, sheet.key, B.BAND_RUN, home, run[5], 0, run[4], BAND_H, RUN)
+        if floored and run and run[2] > 0 then
+            RUN[1], RUN[2], RUN[3], RUN[4] = run[3], run[4], sheet.band[1], sheet.band[2]
+            Dress(tex, sheet.key, B.BAND_RUN, home, run[1], 0, run[2], BAND_H, RUN)
         else
             tex:Hide()
         end

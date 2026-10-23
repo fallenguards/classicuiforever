@@ -9,7 +9,8 @@ local ART_W, PAGE_ROOM, PAGE_POST = B.ART_W, B.PAGE_ROOM, B.PAGE_POST
 local MICRO_LEAD, MICRO_REGION_MAX, MICRO_END_GAP = B.MICRO_LEAD, B.MICRO_REGION_MAX, B.MICRO_END_GAP
 local POST_U, POST_W = B.POST_U, B.POST_W
 local ROW_X, ROW_Y = B.ROW_X, B.ROW_Y
-local MICRO_X = 555
+-- Era's row start, measured (eram bar: Character at 552 of its 1024 bar); the band lays its row 4 short of this.
+local MICRO_X = 556
 -- Bar 1 alone: the page room runs 1 px on into dark stone, under the right gryphon's inner edge, which then covers the
 -- page number post's dim outer column and meets its bright border.
 local ALONE_DARK = 1
@@ -223,9 +224,18 @@ local function BandPlan(microOn, bagsOn, bagsFirst, region, bar2W, bar2Left)
         end
         plan.microEnd = x
         local before = x
-        -- The row ends on a post (the bag sheet's) and the section starts past it, as 1.x drew them.
-        x = Tail(plan, x + POST_W, true, bagsOn)
-        if plan.tailStart then plan.microPost = before else x = before end
+        if not plan.noPages and region - MICRO_END_GAP <= 256 and B.TailSpan(false, bagsOn) then
+            -- Era's art (eram bar): the third sheet to its end, the section from there with its own post; its window,
+            -- key ring and bags then stand at Era's 773, 790 and 813.
+            plan.wholeSheet = true
+            x = plan.microStart + 256
+            plan.microEnd = x
+            x = Tail(plan, x, false, bagsOn)
+        else
+            -- The row ends on a post (the bag sheet's) and the section starts past it.
+            x = Tail(plan, x + POST_W, true, bagsOn)
+            if plan.tailStart then plan.microPost = before else x = before end
+        end
         -- Last on the band, the section's own post ends it; a micro region standing last leaves room for the end post.
         plan.ownEnd = plan.tailStart ~= nil and not bagsOn
         if bagsOn then
@@ -292,9 +302,8 @@ local function EndOwner(plan)
     return "bar"
 end
 
--- Past the art's room (Size over 100%) the micro floor goes on as tiles of the third sheet's flat stone, before the
--- fourth sheet's end: { x, width, u0, u1 } each, the last one partial.
-local FLOOR_U0, FLOOR_UNIT = 128, 96
+-- Stone tiles of the third sheet's flat floor, short of its fade: { x, width, u0, u1 } each, the last one partial.
+local FLOOR_U0, FLOOR_UNIT = 128, 80
 function B.FloorTiles(x, extra)
     local tiles = {}
     while extra > 0 do
@@ -305,15 +314,30 @@ function B.FloorTiles(x, extra)
     return tiles
 end
 
+-- Era's third sheet ends its floor in a fade to black and a 3 px rim (u 208 on, eram bar): a micro floor of any width
+-- ends on that end, its floor from u0 before it and tiles where it runs longer. { x, width, u0, u1 } each.
+local MICRO_END_U = 208
+function B.MicroRuns(x, width, u0)
+    local runs = {}
+    local endW = math.min(width, 256 - MICRO_END_U)
+    local floorW = width - endW
+    local direct = math.max(0, math.min(floorW, MICRO_END_U - u0))
+    if direct > 0 then runs[1] = { x, direct, u0 / 256, (u0 + direct) / 256 } end
+    for _, tile in ipairs(B.FloorTiles(x + direct, floorW - direct)) do runs[#runs + 1] = tile end
+    runs[#runs + 1] = { x + floorW, endW, (256 - endW) / 256, 1 }
+    return runs
+end
+
 -- The art as runs of the four sheets: { x, width, sheet, u0, u1, owner }; owner (bar, micro, bags) is whose Hide Bar Art
 -- takes the run.
 function B.Segments()
     local plan = CurrentPlan()
     local cut = plan.cut
     local list = {}
-    local function Tiles(x, extra)
-        for _, tile in ipairs(B.FloorTiles(x, extra)) do
-            list[#list + 1] = { tile[1], tile[2], 3, tile[3], tile[4], "micro" }
+    local function Micro(x, width, u0)
+        if width <= 0 then return end
+        for _, run in ipairs(B.MicroRuns(x, width, u0)) do
+            list[#list + 1] = { run[1], run[2], 3, run[3], run[4], "micro" }
         end
     end
     -- A twelve-socket run at x from the sheets' u (bar 1's trim, or past the wall the run before it ends with).
@@ -343,15 +367,10 @@ function B.Segments()
     local headless = plan.microFirst and plan.noPages
     if plan.microFirst and not headless then
         local region = plan.microEnd - plan.microStart
-        local third = math.min(region, 256)
         -- Its head through the page number post is bar 1's.
-        local head = math.min(third, PAGE_ROOM)
+        local head = math.min(region, PAGE_ROOM)
         list[#list + 1] = { half, head, 3, 0, head / 256, "bar" }
-        if third > head then list[#list + 1] = { half + head, third - head, 3, head / 256, third / 256, "micro" } end
-        local extra = math.max(0, region - MICRO_REGION_MAX)
-        Tiles(half + 256, extra)
-        local fourth = region - extra - 256
-        if fourth > 0 then list[#list + 1] = { half + 256 + extra, fourth, 4, 0, fourth / 256, "micro" } end
+        Micro(half + head, region - head, head)
         if plan.microPost then list[#list + 1] = { plan.microPost, POST_W, 4, POST_U / 256, (POST_U + POST_W) / 256, "micro" } end
     elseif not plan.microFirst and not plan.noPages then
         local room = plan.pageRoom or (plan.pageEdge and PAGE_POST) or PAGE_ROOM
@@ -385,17 +404,8 @@ function B.Segments()
         end
     end
     if plan.microStart and (not plan.microFirst or headless) then
-        -- Standing second: the third sheet from past its page-arrow head, plus the dark start of the fourth if it runs long.
-        local width = plan.microEnd - plan.microStart
-        local u0 = MICRO_LEAD - MICRO_SECOND_LEAD
-        local first = math.min(width, 256 - u0)
-        list[#list + 1] = { plan.microStart, first, 3, u0 / 256, (u0 + first) / 256, "micro" }
-        local extra = math.max(0, width - (MICRO_REGION_MAX - u0))
-        Tiles(plan.microStart + first, extra)
-        local fourth = width - first - extra
-        if fourth > 0 then
-            list[#list + 1] = { plan.microStart + first + extra, fourth, 4, 0, fourth / 256, "micro" }
-        end
+        -- Standing second: the third sheet from past its page-arrow head.
+        Micro(plan.microStart, plan.microEnd - plan.microStart, MICRO_LEAD - MICRO_SECOND_LEAD)
     end
     if plan.tailStart then
         list[#list + 1] = { plan.tailStart, plan.tailU1 - plan.tailU0, 5, plan.tailU0 / 256, plan.tailU1 / 256, "bar" }

@@ -118,5 +118,54 @@ if not B.KeyRingWithBags() then
     print("FAIL a shown key ring with the option on stays off the bags moved off the band")
 end
 
+-- A row that fits the third sheet (eight buttons: region 257 less the trim) draws Era's art (eram bar): the sheet to its
+-- end at 768, the section from there with its own post, the bags after it at 806 (their first slot at Era's 813).
+KeyRingButton = keyRingStub
+ns.db.hideLatencyBar, ns.db.hideKeyRing, ns.db.reagentBagSlot, ns.db.eraBagSize, ns.db.keyRingWithBags = false, false, false, true, false
+B.shape.noPages = false
+for _, region in ipairs({ 248, 257 }) do
+    local plan = B.BandPlan(true, true, false, region)
+    cases = cases + 1
+    if not (plan.wholeSheet and plan.microEnd == 768 and plan.tailStart == 768 and plan.tailU0 == 0 and plan.microPost == nil
+        and plan.bagsStart == 806) then
+        failures = failures + 1
+        print(string.format("FAIL region %d: Era's whole third sheet (microEnd=%s tailStart=%s tailU0=%s microPost=%s bagsStart=%s)",
+            region, tostring(plan.microEnd), tostring(plan.tailStart), tostring(plan.tailU0), tostring(plan.microPost),
+            tostring(plan.bagsStart)))
+    end
+end
+-- Past the sheet (more buttons): the row ends on its post and the section starts past it, as before.
+local long = B.BandPlan(true, true, false, 300)
+cases = cases + 1
+if long.wholeSheet or long.microPost == nil or long.tailStart ~= long.microPost + B.POST_W then
+    failures = failures + 1
+    print("FAIL a row past the third sheet keeps its post before the section")
+end
+
+-- Any micro floor ends on Era's third sheet's last 48 columns (its fade to black and rim) and fills its width exactly;
+-- the whole sheet is drawn unbroken.
+for _, case in ipairs({ { 211, 45 }, { 100, 45 }, { 300, 45 }, { 420, 37 }, { 30, 45 } }) do
+    local width, u0 = case[1], case[2]
+    local runs = B.MicroRuns(512, width, u0)
+    cases = cases + 1
+    local x, ok = 512, true
+    for _, run in ipairs(runs) do
+        if run[1] ~= x or run[2] <= 0 or math.abs((run[4] - run[3]) * 256 - run[2]) > 1e-9 then ok = false end
+        x = x + run[2]
+    end
+    local last = runs[#runs]
+    local endW = math.min(width, 48)
+    if not ok or x ~= 512 + width or last[4] ~= 1 or math.abs(last[3] * 256 - (256 - endW)) > 1e-9 then
+        failures = failures + 1
+        print(string.format("FAIL micro floor width %d from u %d: %d runs, ends at %d", width, u0, #runs, x))
+    end
+end
+local whole = B.MicroRuns(557, 211, 45)
+cases = cases + 1
+if not (#whole == 2 and whole[1][4] == whole[2][3]) then
+    failures = failures + 1
+    print("FAIL the whole third sheet breaks before its end")
+end
+
 print(string.format("band plan: %d cases, %d failures", cases, failures))
 if failures > 0 then os.exit(1) end
