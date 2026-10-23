@@ -339,6 +339,10 @@ local function PlaceTracker(system)
     return true
 end
 
+-- Era's Classic preset unit frames (Blizzard_EditMode/Classic EDIT_MODE_CLASSIC_SYSTEM_MAP), TOPLEFT on UIParent at
+-- 100%; the mainline file's Classic preset (player 4, -4) is the game's own, not Era's.
+local ERA_FRAME_SPOTS = { PlayerFrame = { -1, 0 }, TargetFrame = { 232, 0 }, FocusFrame = { 174, -178 } }
+
 -- Era's own Classic preset: buffs and debuffs (Forever's sit 68 further left); durability in its right-side container,
 -- 5 in from the side bars and 192 down. Forever's container sits 260 down, and at the screen edge once the bars are pinned.
 local ERA_AURAS = Enum.EditModeAuraFrameSystemIndices and {
@@ -543,12 +547,12 @@ local function DressLayoutData(layout, counts, pins, fresh)
             info.offsetX, info.offsetY = METER_X, METER_Y
             system.isInDefaultPosition = false
         end
-        -- Player top left, target beside it; Forever's presets put both in the bottom corners.
+        -- Player, target and focus at Era's Classic preset spots (ERA_FRAME_SPOTS).
         if system.system == Enum.EditModeSystem.UnitFrame and type(system.anchorInfo) == "table" and Enum.EditModeUnitFrameSystemIndices then
             local spots = {
-                [Enum.EditModeUnitFrameSystemIndices.Player] = { 4, -4 },
-                [Enum.EditModeUnitFrameSystemIndices.Target] = { 250, -2 },
-                [Enum.EditModeUnitFrameSystemIndices.Focus] = { 250, -165 },
+                [Enum.EditModeUnitFrameSystemIndices.Player] = ERA_FRAME_SPOTS.PlayerFrame,
+                [Enum.EditModeUnitFrameSystemIndices.Target] = ERA_FRAME_SPOTS.TargetFrame,
+                [Enum.EditModeUnitFrameSystemIndices.Focus] = ERA_FRAME_SPOTS.FocusFrame,
             }
             local spot = spots[system.systemIndex]
             if spot then
@@ -735,11 +739,12 @@ function ns.SelectClassicLayoutIfPending()
     StaticPopup_Show("FCUI_LAYOUT_PICK")
 end
 
--- Player top left, target beside, focus under it (1.x had none), the meter under the party frames, the chat over the
--- band, written as edit mode records a drag. Reset job only, so a frame moved on purpose stays.
--- Target y is -4 here, -2 in the layout data; both kept on purpose.
+-- Unit frames at Era's spots, the meter under the party frames, the chat over the band, written as edit mode records a
+-- drag. Reset job only, so a frame moved on purpose stays.
 local function FrameSpots()
-    return { { "PlayerFrame", "TOPLEFT", 4, -4 }, { "TargetFrame", "TOPLEFT", 250, -4 }, { "FocusFrame", "TOPLEFT", 250, -165 },
+    local era = ERA_FRAME_SPOTS
+    return { { "PlayerFrame", "TOPLEFT", unpack(era.PlayerFrame) }, { "TargetFrame", "TOPLEFT", unpack(era.TargetFrame) },
+        { "FocusFrame", "TOPLEFT", unpack(era.FocusFrame) },
         { "DamageMeter", "TOPLEFT", METER_X, METER_Y }, { "ChatFrame1", "BOTTOMLEFT", CHAT_X, ChatY() } }
 end
 function ns.ApplyClassicFrameSpots()
