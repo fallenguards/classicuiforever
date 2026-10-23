@@ -166,19 +166,19 @@ function ns.BronzeRim(button, icon, outset, share)
     ns.BronzeKeep(rim)
 end
 
--- The backdrop with its edge file swapped for the theme's copy, made once per frame and theme.
-local function ThemedInfo(info, name)
-    local themed = info[name]
+-- The backdrop with its edge file on the themed sheet (the old art where the client's is new), made once per frame.
+local function ThemedInfo(info)
+    local themed = info.themed
     if themed then return themed end
     themed = {}
     for k, v in pairs(info.plain) do themed[k] = v end
     themed.edgeFile = BronzeCopy(info.plain.edgeFile)
-    info[name] = themed
+    info.themed = themed
     return themed
 end
 
--- Border tinted to the theme; a window that greys its own border passes that grey to keep the depth.
--- Edge sheets with a theme copy (dialog border, slider track) swap instead, keeping the fill colour.
+-- Border tinted to the theme; a window that greys its own border passes that grey to keep the depth. Edge sheets the
+-- theme has (dialog border, slider track) swap to it, keeping the fill colour.
 function ns.BronzeBackdrop(frame, r, g, b, a, grey)
     if not frame or not frame.SetBackdropBorderColor then return end
     -- One taken off stays off: the options window inside the game's settings had its dialog back on each repaint (#203).
@@ -195,20 +195,15 @@ function ns.BronzeBackdrop(frame, r, g, b, a, grey)
     -- No theme: a box may keep its own grey, as Era's stat boxes.
     local rim = (not name and base.grey) or base
     if base.info and frame.SetBackdrop then
-        local want = name and ThemedInfo(base.info, name) or base.info.plain
+        local want = name and ThemedInfo(base.info) or base.info.plain
         if frame.backdropInfo ~= want then
             local fr, fg, fb, fa = frame:GetBackdropColor()
             frame:SetBackdrop(want)
             if fr then frame:SetBackdropColor(fr, fg, fb, fa) end
         end
-        local tint = name and THEMES[name].colorCopies and THEMES[name].tint or ONE
-        frame:SetBackdropBorderColor(tint[1] * rim[1], tint[2] * rim[2], tint[3] * rim[3], base[4])
-    elseif name then
-        local tint = THEMES[name].tint
-        frame:SetBackdropBorderColor(tint[1] * base[1], tint[2] * base[2], tint[3] * base[3], base[4])
-    else
-        frame:SetBackdropBorderColor(rim[1], rim[2], rim[3], base[4])
     end
+    local tint = name and THEMES[name].tint or ONE
+    frame:SetBackdropBorderColor(tint[1] * rim[1], tint[2] * rim[2], tint[3] * rim[3], base[4])
 end
 
 -- Client trim bronze where 1.x was silver (input boxes, macro text, slider arrows, guild detail border): drained to
@@ -320,9 +315,10 @@ function ns.RepaintBronze()
     for texture, what in pairs(swapped) do
         if what:find("[\\/]") then
             local args = swapArgs[texture]
-            local want = ns.ThemeFor(texture) and ns.BronzeCopy(what) or what
+            -- Most themed sheets are the file itself: the layers, not a new path, tell the theme on.
+            local copy = ns.ThemeFor(texture) and ns.BronzeCopy(what) or nil
+            local want = copy or what
             if args then SetWithFallback(texture, want, what, unpack(args)) else SetWithFallback(texture, want, what) end
-            local copy = want ~= what and want or nil
             if args then ns.PaintCopy(texture, copy, unpack(args)) else ns.PaintCopy(texture, copy) end
         else
             local primary, fallback = ns.TexPath(what, texture)

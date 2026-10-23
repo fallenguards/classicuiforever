@@ -328,7 +328,7 @@ Test("Dress tint share (textured), vertex after tint, hide, alpha", function()
     ns.db.bronzeTheme = false
 end)
 
-Test("Themes: dark tint, a copy folder per theme, the look rule", function()
+Test("Themes: dark tint, one themed sheet for every theme, the look rule", function()
     ns.db.bronzeTheme, ns.db.themeDark = true, true
     local frame = CreateFrame("Frame")
     local tex = frame:CreateTexture()
@@ -336,7 +336,7 @@ Test("Themes: dark tint, a copy folder per theme, the look rule", function()
     Check(Near(tex._vertex[1], 0.38) and Near(tex._vertex[3], 0.40), "dark tint")
     local BORDER = "Interface/DialogFrame/UI-DialogBox-Border"
     local copy = ns.BronzeCopy(BORDER)
-    Check(copy ~= nil and copy:find("custom", 1, true) ~= nil, "dark shows the tinted copies: " .. tostring(copy))
+    Check(copy ~= nil and copy:find("theme-base", 1, true) ~= nil, "dark shows the old sheet: " .. tostring(copy))
     Check(Near(ns.DarkGrey(0), 0.75) and Near(ns.DarkGrey(50), 0.38) and Near(ns.DarkGrey(100), 0), "darkness range")
     ns.db.themeDarkness = 100
     ns.ThemeName()
@@ -345,8 +345,7 @@ Test("Themes: dark tint, a copy folder per theme, the look rule", function()
     ns.db.themeDarkness = nil
     Check(ns.ThemeLook(true) == "themed" and ns.ThemeLook() == "themed", "dark keeps the 1.x shapes everywhere")
     ns.db.themeDark = false
-    copy = ns.BronzeCopy(BORDER)
-    Check(copy ~= nil and copy:find("bronze", 1, true) ~= nil, "bronze copy: " .. tostring(copy))
+    Check(ns.BronzeCopy(BORDER) == copy, "bronze shows the same sheet: " .. tostring(ns.BronzeCopy(BORDER)))
     Check(ns.ThemeLook(true) == "client", "bronze tooltips and menus are the client's")
     ns.db.bronzeTheme = false
     Check(ns.ThemeLook(true) == "classic" and ns.ThemeName() == nil, "off")

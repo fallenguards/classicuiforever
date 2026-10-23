@@ -10,6 +10,7 @@ local THEMES = B.THEMES
 local weak = { __mode = "k" }
 local layers = setmetatable({}, weak)   -- copy piece -> { tex, parch, on, metal, parched, copy, wrap, drawLayer, sub }
 local own = setmetatable({}, weak)       -- our layer textures
+local inked = setmetatable({}, weak)     -- piece -> true (inked one color) or "gray" (Textured color's gray under layers)
 -- A piece's frame -> { layer -> piece }: the layers hang on that frame and go with it, so an unseen frame's are left alone.
 local frames = setmetatable({}, weak)
 local job
@@ -163,9 +164,24 @@ end
 -- frame still wears the theme, its parchment laid over it as drawn.
 local function ParchOn() return ns.ThemePartOn("themePartParchment") end
 
--- The metal-only copy of a theme copy, whatever theme folder the copy is in.
-local function MetalPath(copyPath)
-    return (copyPath:gsub("\\[^\\]+\\([^\\]+)$", "\\custom-metal\\%1"))
+-- A layer's own mask (field: metalMask or parchMask, worn: its flag), over the piece's box: the sheet's metal, parchment
+-- or picture share, so the layer draws the sheet itself. nil path: taken off (a lifted sheet's metal is a file).
+local function MaskOn(layer, field, worn, tex, piece, path)
+    local mask = layer[field]
+    if not path then
+        if layer[worn] then tex:RemoveMaskTexture(mask) end
+        layer[worn] = nil
+        return
+    end
+    if not mask then
+        mask = piece:GetParent():CreateMaskTexture()
+        mask:SetAllPoints(piece)
+        layer[field] = mask
+    end
+    local wrap = layer.wrap
+    mask:SetTexture(path, wrap[1], wrap[2])
+    if not layer[worn] then tex:AddMaskTexture(mask) end
+    layer[worn] = true
 end
 
 -- A layer wears the piece's masks, the client's too: the bag portrait's round one cut the icon's square rim.
@@ -218,6 +234,56 @@ local function Crop(layer, ulx, uly, llx, lly, urx, ury, lrx, lry)
     return not secret
 end
 
+-- Pieces a mask could not follow (a turned crop, or a mirrored one placed as drawn), read by the dev addon.
+local unfitted = setmetatable({}, weak)
+ns.themeUnfitted = unfitted
+
+-- A mask lays its whole image over its own box and ignores a crop (/fcuidev maskmap): its box is the whole sheet's,
+-- placed so the part the piece shows lies under the piece, which alone draws. Along a tiled axis it spans the piece (a
+-- strip's metal runs along it). True when a box moved.
+local function FitMask(mask, piece, c, w, h, across, down)
+    local l, r, t, b = c[1], c[5], c[2], c[4]
+    if c[3] ~= l or c[7] ~= r or c[6] ~= t or c[8] ~= b then
+        unfitted[piece] = "turned"
+        return false
+    end
+    if l > r or t > b then
+        unfitted[piece] = "mirrored"
+        l, r, t, b = math.min(l, r), math.max(l, r), math.min(t, b), math.max(t, b)
+    end
+    if across then l, r = 0, 1 end
+    if down then t, b = 0, 1 end
+    if r - l <= 0 or b - t <= 0 then return false end
+    local fullW, fullH = w / (r - l), h / (b - t)
+    mask:ClearAllPoints()
+    mask:SetPoint("TOPLEFT", piece, "TOPLEFT", -l * fullW, t * fullH)
+    mask:SetPoint("BOTTOMRIGHT", piece, "BOTTOMRIGHT", (1 - r) * fullW, -(1 - b) * fullH)
+    return true
+end
+
+-- The layer's masks fitted again when the piece's crop, size or tiling changed since they last were.
+local function FitMasks(piece, layer)
+    local c = layer.crop
+    if not (c and (layer.metalWorn or layer.parchWorn)) then return false end
+    local w, h = piece:GetSize()
+    local across, down = false, false
+    if piece.GetHorizTile then across, down = piece:GetHorizTile(), piece:GetVertTile() end
+    if ns.AnySecret(w, h, across, down) or not (w and h) or w <= 0 or h <= 0 then return false end
+    local f = layer.fit
+    if f and f[1] == w and f[2] == h and f[3] == across and f[4] == down and f[5] == c[1] and f[6] == c[2]
+        and f[7] == c[4] and f[8] == c[5] and f[9] == c[3] and f[10] == c[6] then
+        return false
+    end
+    f = f or {}
+    layer.fit = f
+    f[1], f[2], f[3], f[4], f[5], f[6], f[7], f[8], f[9], f[10] = w, h, across, down, c[1], c[2], c[4], c[5], c[3], c[6]
+    unfitted[piece] = nil
+    local moved = false
+    if layer.metalWorn and FitMask(layer.metalMask, piece, c, w, h, across, down) then moved = true end
+    if layer.parchWorn and FitMask(layer.parchMask, piece, c, w, h, across, down) then moved = true end
+    return moved
+end
+
 -- The lowest sublevel above the piece's that another of its parent's regions holds in its draw layer (an action
 -- button's icon over its slot art); nil when none.
 local ceiling, ceilingPiece, ceilingLayer, ceilingSub
@@ -246,6 +312,34 @@ local function MakeRoom(piece, drawLayer, sub)
     return sub
 end
 
+-- The metal layer in the theme's tint times the piece's own colour (the guild button's tabard), untinted where the
+-- game greys the piece: as the old copies, being the piece's own texture, showed both.
+local NO_TINT = { 1, 1, 1 }
+local function MetalColor(layer, theme)
+    local c = layer.color
+    local t = c and c[4] and NO_TINT or theme.tint
+    local r, g, b = 1, 1, 1
+    if c then r, g, b = c[1], c[2], c[3] end
+    layer.tex:SetVertexColor(t[1] * r, t[2] * g, t[3] * b)
+end
+
+-- The piece's colour and greying onto its metal layer when they changed; Textured color's own gray is not the game's.
+local function PieceColor(piece, layer)
+    if not (layer.tex and layer.metal) then return false end
+    local r, g, b = piece:GetVertexColor()
+    local grey = piece:IsDesaturated()
+    if ns.AnySecret(r, g, b, grey) then return false end
+    grey = grey and inked[piece] ~= "gray" or false
+    local c = layer.color
+    if c and c[1] == r and c[2] == g and c[3] == b and c[4] == grey then return false end
+    c = c or {}
+    layer.color = c
+    c[1], c[2], c[3], c[4] = r, g, b, grey
+    local theme = Theme()
+    if theme then MetalColor(layer, theme) end
+    return true
+end
+
 -- seen: the piece's frame is known to be visible (the pass asks each frame once). True when a layer had to change.
 local function Follow(piece, layer, seen)
     local shown = piece:IsShown() and (seen or piece:IsVisible())
@@ -255,6 +349,8 @@ local function Follow(piece, layer, seen)
     if FollowOne(layer.parch, layer.parched, shown, alpha) then moved = true end
     if not shown then return moved end
     if Crop(layer, piece:GetTexCoord()) then moved = true end
+    if FitMasks(piece, layer) then moved = true end
+    if PieceColor(piece, layer) then moved = true end
     local drawLayer, sub = piece:GetDrawLayer()
     if ns.AnySecret(drawLayer, sub) then return moved end
     if drawLayer ~= layer.drawLayer or sub ~= layer.sub then sub = MakeRoom(piece, drawLayer, sub) end
@@ -347,23 +443,23 @@ end
 -- off, or a painted picture).
 local function Tint(layer, theme)
     local t = theme.tint
-    if layer.tex then layer.tex:SetVertexColor(t[1], t[2], t[3]) end
+    if layer.tex then MetalColor(layer, theme) end
     if not layer.parch then return end
     local tinted = layer.overTinted == true
     layer.parch:SetDesaturated(tinted)
     if tinted then layer.parch:SetVertexColor(t[1], t[2], t[3]) else layer.parch:SetVertexColor(1, 1, 1) end
 end
 
--- What a sheet wears over it: its parchment (tinted while parchment's row is on) or its painted picture (as drawn).
-local function OverCopy(copy)
-    local parch = ns.ParchCopy(copy)
+-- What a sheet wears over it, by mask: its parchment (tinted while parchment's row is on) or its painted picture (as
+-- drawn).
+local function OverMask(copy)
+    local parch = ns.ParchMask(copy)
     if parch then return parch, ParchOn() end
-    return ns.PictureCopy(copy), false
+    return ns.PictureMask(copy), false
 end
 
 -- The one color look: a chrome sheet's piece (frames, floors, parchment pages) desaturated whole in the theme's color,
 -- its layers off, as a dark mode does; buttons and icons keep their colors under the metal layer.
-local inked = setmetatable({}, weak)
 local WHITE = { 1, 1, 1 }
 -- A live button's art (a page arrow that can be pressed): inked LIVE_LIFT of the way from the theme's color to white, so
 -- it stands apart from its spent state.
@@ -433,16 +529,16 @@ end
 
 local function Shape(piece, layer)
     local theme = ns.ThemeFor(piece)
-    local parch, tinted
-    if theme then parch, tinted = OverCopy(layer.copy) end
+    local over, tinted
+    if theme then over, tinted = OverMask(layer.copy) end
     layer.overTinted = tinted
     if theme and Inks(piece, layer.copy) then
         Ink(piece, theme, layer.copy)
         -- The sheet one color; what keeps its own look over it (parchment with its row off, a picture), the layer alone.
-        if not parch or tinted then return end
+        if not over or tinted then return end
         layer.metal, layer.parched = nil, true
     else
-        layer.metal, layer.parched = theme and theme.colorCopies or nil, parch and true or nil
+        layer.metal, layer.parched = theme and true or nil, over and true or nil
         if layer.metal and ns.ChromeArt(layer.copy) then Gray(piece) else Uninked(piece) end
         if not (layer.metal or layer.parched) then
             Hide(layer)
@@ -452,25 +548,30 @@ local function Shape(piece, layer)
     local wrap = layer.wrap
     if layer.metal then
         layer.tex = layer.tex or NewTex(piece)
-        layer.tex:SetTexture(MetalPath(layer.copy), unpack(wrap, 1, 3))
+        -- The sheet itself grey under its metal mask; a lifted sheet's metal file is grey already, unmasked.
+        local file = ns.MetalFile(layer.copy)
+        layer.tex:SetTexture(file or layer.copy, unpack(wrap, 1, 3))
+        layer.tex:SetDesaturated(not file)
         layer.tex:SetBlendMode(piece:GetBlendMode())
+        MaskOn(layer, "metalMask", "metalWorn", layer.tex, piece, not file and ns.MetalMask(layer.copy) or nil)
         Tiles(layer.tex, piece)
     end
-    if parch then
+    if over then
         layer.parch = layer.parch or NewTex(piece)
-        layer.parch:SetTexture(parch, unpack(wrap, 1, 3))
+        layer.parch:SetTexture(layer.copy, unpack(wrap, 1, 3))
+        MaskOn(layer, "parchMask", "parchWorn", layer.parch, piece, over)
         Tiles(layer.parch, piece)
     end
-    layer.on, layer.drawLayer, layer.crop = true, nil, nil
+    layer.on, layer.drawLayer, layer.crop, layer.fit = true, nil, nil, nil
     Tint(layer, theme)
 end
 
--- copyPath: the theme copy the piece now shows (extra args as its SetTexture had), or nil for none.
+-- copyPath: the themed sheet the piece now shows (extra args as its SetTexture had), or nil for none.
 function ns.PaintCopy(piece, copyPath, ...)
     if not (piece and piece.GetParent) then return end
     local layer = layers[piece]
     local theme = copyPath and ns.ThemeFor(piece)
-    if not (theme and (theme.colorCopies or ns.FlatOn(piece) or ns.ParchCopy(copyPath) or ns.PictureCopy(copyPath))) then
+    if not theme then
         Hide(layer)
         Uninked(piece)
         return
@@ -484,11 +585,9 @@ function ns.PaintCopy(piece, copyPath, ...)
     local a, b, c = ...
     -- The same art again (a client reset put back, once a second on the game menu button): the layers hold it.
     if layer.on and layer.copy == copyPath and wrap[1] == a and wrap[2] == b and wrap[3] == c
-        and layer.metal == (theme.colorCopies or nil) and not Inks(piece, copyPath) then
-        if layer.metal then
-            layer.tex:SetBlendMode(piece:GetBlendMode())
-            Tiles(layer.tex, piece)
-        end
+        and layer.metal == true and not Inks(piece, copyPath) then
+        layer.tex:SetBlendMode(piece:GetBlendMode())
+        Tiles(layer.tex, piece)
         if layer.parched then Tiles(layer.parch, piece) end
         Kick(piece, layer)
         return

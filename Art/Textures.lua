@@ -10,7 +10,8 @@ ns.texStatus = {}
 -- texture -> the TEX key it shows
 B.artKey = setmetatable({}, { __mode = "k" })
 
--- A key's client path, our copy's path and whether a theme copy exists (our copy's path, else false), made on first use.
+-- A key's client path, our copy's path and whether the theme has its sheet (our copy's path, else false), made on
+-- first use.
 local builtinOf, bundledOf, bronzeOf = {}, {}, {}
 local function Resolve(key)
     local spec, BUNDLED = ns.TEX[key], B.BUNDLED
@@ -28,7 +29,7 @@ local function Resolve(key)
         bundled = BUNDLED .. (copy ~= "" and copy or file:match("[^\\]+$"))
     end
     builtinOf[key], bundledOf[key] = builtin, bundled
-    -- METAL keys never swap, even if the sheet has a copy: the tint handles them.
+    -- METAL keys never swap, even if the theme has the sheet: the tint handles them.
     bronzeOf[key] = not B.METAL[key] and BronzeCopy(bundled) and bundled or false
 end
 
@@ -69,7 +70,7 @@ function ns.SetTex(texture, key, ...)
         ns.texStatus[key] = "ok"
     end
     B.artKey[texture] = key
-    -- Sheets with a bronze copy swap with the theme.
+    -- Themed sheets swap with the theme (the old art where the client's is new) and wear its layers.
     local swapped = B.swapped
     if ns.TEX[key] and select(3, TexPaths(key)) then
         swapped[texture] = key
@@ -102,7 +103,7 @@ function ns.ThemeAs(texture, piece)
     ns.PaintCopy(texture, key and swap ~= nil and ns.ThemeFor(texture) and (ns.TexPath(key, texture)) or nil)
 end
 
--- By file; swaps to its bronze copy with the theme.
+-- By file; a themed sheet swaps with the theme and wears its layers.
 function ns.SetFile(texture, path, ...)
     if not texture or not path then return end
     B.artKey[texture] = nil

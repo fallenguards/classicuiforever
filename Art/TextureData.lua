@@ -314,14 +314,14 @@ for key, file in pairs({
     ns.TEX[key] = file
 end
 
--- Custom themes ("bronze" in names is the theme on): the colour METAL keys tint to and the folder of copies recoloured
--- on the grey metal only (bronze_variants.py; ThemeArt.lua lists them, loads first). client: tooltips and menus keep
--- Forever's own art. Keys with a copy swap to it with the theme.
+-- Custom themes ("bronze" in names is the theme on): the colour METAL keys tint to and a themed sheet's metal takes, its
+-- own art desaturated over it under a mask (Art/ThemeLayers.lua; bronze_variants.py cuts the masks, ThemeArt.lua lists
+-- the sheets and loads first). client: tooltips and menus keep Forever's own art.
 local THEMES = {
-    bronze = { tint = { 0.9, 0.62, 0.32 }, dir = BUNDLED .. "bronze\\", client = true, copies = {} },
-    -- Grey copies coloured in game (colorCopies): dark's grey by its slider, custom's picked colour; also the tint.
-    dark = { tint = { 0.38, 0.38, 0.40 }, dir = BUNDLED .. "custom\\", copies = {}, colorCopies = true },
-    custom = { tint = { 0.9, 0.62, 0.32 }, dir = BUNDLED .. "custom\\", copies = {}, colorCopies = true },
+    bronze = { tint = { 0.9, 0.62, 0.32 }, client = true },
+    -- Coloured in game: dark's grey by its slider, custom's picked colour.
+    dark = { tint = { 0.38, 0.38, 0.40 } },
+    custom = { tint = { 0.9, 0.62, 0.32 } },
 }
 B.THEMES = THEMES
 -- Toggles that change the theme.
@@ -363,25 +363,24 @@ function ns.ThemeName()
     return "bronze"
 end
 
-local ART = "\n" .. (ns.THEME_ART or "")
-local ART_LOWER = ART:lower()
-local function Lookup(path, dir, list, lower)
+local MASKS = BUNDLED .. "theme-mask\\"
+local function Lookup(path, dir, list, lower, suffix)
     local base = path:match("([^\\/]+)$")
     if not base then return false end
     local key = "\n" .. base:gsub("%.[%a]+$", ""):lower() .. "\n"
-    local at = (lower or ART_LOWER):find(key, 1, true)
-    return at and (dir .. (list or ART):sub(at + 1, at + #key - 2) .. ".tga") or false
+    local at = lower:find(key, 1, true)
+    return at and (dir .. list:sub(at + 1, at + #key - 2) .. (suffix or "") .. ".tga") or false
 end
 
--- A lookup in one of Art/ThemeArt.lua's lists: path -> its file in dir (dir "": true), or false; memoized.
-local function ListLookup(list, dir)
+-- A lookup in one of Art/ThemeArt.lua's lists: path -> its file in dir with suffix (dir "": true), or false; memoized.
+local function ListLookup(list, dir, suffix)
     list = "\n" .. (list or "")
     local lower, memo = list:lower(), {}
     return function(path)
         if type(path) ~= "string" then return false end
         local known = memo[path]
         if known == nil then
-            known = Lookup(path, dir, list, lower)
+            known = Lookup(path, dir, list, lower, suffix)
             if known and dir == "" then known = true end
             memo[path] = known
         end
@@ -390,26 +389,49 @@ local function ListLookup(list, dir)
 end
 -- A chrome sheet (frames, floors, parchment pages), which the one color look draws whole.
 ns.ChromeArt = ListLookup(ns.CHROME_ART, "")
--- A sheet's parchment alone, which Textured color tints over it; false for none.
-ns.ParchCopy = ListLookup(ns.PARCH_ART, BUNDLED .. "custom-parch\\")
+-- A sheet's parchment mask, which Textured color tints over it; false for none.
+ns.ParchMask = ListLookup(ns.PARCH_ART, MASKS, "_parch")
 -- Parchment all over (the spellbook's empty slot), which any theme draws whole.
 ns.ParchWhole = ListLookup(ns.PARCH_WHOLE, "")
--- A sheet's picture alone (Era's backpack in its ring), laid over it as drawn under any theme; false for none.
-ns.PictureCopy = ListLookup(ns.PICTURE_ART, BUNDLED .. "custom-picture\\")
+-- A sheet's picture mask (Era's backpack in its ring), laid over it as drawn under any theme; false for none.
+ns.PictureMask = ListLookup(ns.PICTURE_ART, MASKS, "_picture")
+-- A sheet whose metal layer is its own file (lifted in boxes, which no desaturate gives); false for a masked one.
+ns.MetalFile = ListLookup(ns.METAL_FILE, MASKS, "_metal")
 
--- A file's copy in the theme on (bronze while off, for callers asking whether one exists), memoized per theme.
+-- A themed sheet's file under media/, the same for every theme (its own art for most, the old one where the theme
+-- swaps the client's), or nil for art the theme leaves; memoized.
+local sheets, sheetOf = nil, {}
 local function BronzeCopy(path)
     if type(path) ~= "string" then return nil end
-    local theme = THEMES[ns.ThemeName() or "bronze"]
-    local memo = theme.copies
-    local copy = memo[path]
-    if copy == nil then
-        copy = Lookup(path, theme.dir)
-        memo[path] = copy
+    local known = sheetOf[path]
+    if known == nil then
+        if not sheets then
+            sheets = {}
+            for file in (ns.THEME_ART or ""):gmatch("[^\n]+") do
+                local name = file:match("([^\\]+)%.%w+$")
+                if name then sheets[name:lower()] = BUNDLED .. file end
+            end
+        end
+        local base = path:match("([^\\/]+)$")
+        known = base and sheets[(base:gsub("%.%w+$", "")):lower()] or false
+        sheetOf[path] = known
     end
-    return copy or nil
+    return known or nil
 end
 ns.BronzeCopy = BronzeCopy
+
+-- A themed sheet's metal mask beside it under media/theme-mask/; nil for a lifted sheet (ns.MetalFile).
+local maskOf = {}
+function ns.MetalMask(sheet)
+    if type(sheet) ~= "string" or ns.MetalFile(sheet) then return nil end
+    local mask = maskOf[sheet]
+    if mask == nil then
+        local name = sheet:match("([^\\/]+)%.%w+$")
+        mask = name and (MASKS .. name .. ".tga") or false
+        maskOf[sheet] = mask
+    end
+    return mask or nil
+end
 
 -- Metal art tinted bronze with the theme (borders, portrait and minimap rings, window frames).
 -- Stone backings are tinted where drawn; parchment and icons are left alone.

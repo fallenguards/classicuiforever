@@ -34,7 +34,9 @@ function Texture:GetAlpha() asks = asks + 1 return self.alpha end
 function Texture:SetAlpha(alpha) self.alpha = alpha end
 function Texture:SetShown(shown) self.shown = shown end
 function Texture:Hide() self.shown = false end
-function Texture:GetTexCoord() return 0, 0, 0, 1, 1, 0, 1, self.crop end
+-- A rectangle crop: the sheet's top down to self.crop.
+function Texture:GetTexCoord() return 0, 0, 0, self.crop, 1, 0, 1, self.crop end
+function Texture:GetSize() return self.w or 100, self.h or 40 end
 function Texture:SetTexCoord(_, _, _, _, _, _, _, crop) self.crop, self.crops = crop, self.crops + 1 end
 function Texture:GetDrawLayer() return self.layer, self.sub end
 function Texture:SetDrawLayer(layer, sub) self.layer, self.sub = layer, sub end
@@ -44,15 +46,39 @@ function Texture:SetBlendMode(mode) self.blend = mode end
 function Texture:GetBlendMode() return self.blend or "BLEND" end
 function Texture:SetVertexColor(r, g, b) self.rgb = { r, g, b } end
 function Texture:SetDesaturated(on) self.desat = on end
-function Texture:AddMaskTexture(mask) self.mask = mask end
+function Texture:IsDesaturated() return self.desat or false end
+function Texture:GetVertexColor()
+    local rgb = self.rgb or { 1, 1, 1 }
+    return rgb[1], rgb[2], rgb[3]
+end
+function Texture:AddMaskTexture(mask)
+    self.masks = self.masks or {}
+    self.masks[#self.masks + 1] = mask
+end
 function Texture:SetColorTexture(r, g, b) self.solid = { r, g, b } end
-function Texture:GetHorizTile() return true end
-function Texture:GetVertTile() return true end
+function Texture:GetHorizTile() return self.tileH or false end
+function Texture:GetVertTile() return self.tileV or false end
 function Texture:SetHorizTile() end
 function Texture:SetVertTile() end
-function Texture:RemoveMaskTexture(mask) if self.mask == mask then self.mask = nil end end
-function Texture:GetNumMaskTextures() return self.mask and 1 or 0 end
-function Texture:GetMaskTexture() return self.mask end
+function Texture:RemoveMaskTexture(mask)
+    for i, worn in ipairs(self.masks or {}) do
+        if worn == mask then table.remove(self.masks, i) return end
+    end
+end
+function Texture:GetNumMaskTextures() return self.masks and #self.masks or 0 end
+function Texture:GetMaskTexture(i) return self.masks[i] end
+-- Whether tex wears mask; the mask a layer of ours cut from a sheet's file.
+local function Wears(tex, mask)
+    for _, worn in ipairs(tex.masks or {}) do
+        if worn == mask then return true end
+    end
+    return false
+end
+local function OwnMask(tex)
+    for _, worn in ipairs(tex.masks or {}) do
+        if worn.ours then return worn end
+    end
+end
 
 UIParent = { name = "UIParent" }
 function UIParent:GetParent() return nil end
@@ -66,6 +92,20 @@ local function NewFrame(visible, parent)
         return self.visible
     end
     function frame:GetParent() return self.parent end
+    function frame:CreateMaskTexture()
+        local mask = { ours = true }
+        function mask:SetAllPoints() end
+        function mask:SetTexture(file) self.file = file end
+        function mask:SetTexCoord() self.cropped = true end
+        function mask:ClearAllPoints() self.points = {} end
+        function mask:SetPoint(point, _, _, x, y)
+            self.points = self.points or {}
+            self.points[point] = { x, y }
+        end
+        function mask:SetHorizTile() end
+        function mask:SetVertTile() end
+        return mask
+    end
     function frame:CreateTexture()
         local tex = NewTexture(self)
         self.regions[#self.regions + 1] = tex
@@ -91,12 +131,14 @@ local job = {
     Burst = function() bursts = bursts + 1 end,
 }
 local ns = {
-    bronze = { THEMES = { test = { colorCopies = true, tint = { 1, 1, 1 } } }, THEME_KEYS = {}, artKey = {}, tinted = {} },
+    bronze = { THEMES = { test = { tint = { 1, 1, 1 } } }, THEME_KEYS = {}, artKey = {}, tinted = {} },
     ThemeName = function() return "test" end,
     FlatOn = function() return false end,
-    ParchCopy = function() return false end,
+    ParchMask = function() return false end,
+    MetalFile = function() return false end,
+    MetalMask = function(path) return path .. "mask" end,
     ParchWhole = function() return false end,
-    PictureCopy = function() return false end,
+    PictureMask = function() return false end,
     ChromeArt = function() return false end,
     IsSecret = function() return false end,
     AnySecret = function() return false end,
@@ -313,21 +355,21 @@ local ring = NewFrame(true, UIParent)
 local ringPiece, disc = ring:CreateTexture(), {}
 ns.PaintCopy(ringPiece, COPY)
 ns.WearMask(ringPiece, disc, true)
-Check("a mask reaches the piece's layer", ring.regions[2].mask, disc)
+Check("a mask reaches the piece's layer", Wears(ring.regions[2], disc), true)
 ns.WearMask(ringPiece, disc, false)
-Check("a mask off leaves the layer whole", ring.regions[2].mask == nil and ringPiece.mask == nil, true)
+Check("a mask off leaves the layer whole", not Wears(ring.regions[2], disc) and not Wears(ringPiece, disc), true)
 local ring2 = NewFrame(true, UIParent)
 local ring2Piece = ring2:CreateTexture()
 ns.WearMask(ring2Piece, disc, true)
 ns.PaintCopy(ring2Piece, COPY)
-Check("a layer made after the mask wears it", ring2.regions[2].mask, disc)
+Check("a layer made after the mask wears it", Wears(ring2.regions[2], disc), true)
 -- The client's own mask on a piece (the bag portrait's round one) is worn by its layer too.
 local portraitHost = NewFrame(true, UIParent)
 local portraitPiece = portraitHost:CreateTexture()
 local circle = {}
 portraitPiece:AddMaskTexture(circle)
 ns.PaintCopy(portraitPiece, COPY)
-Check("a layer wears the client's mask on its piece", portraitHost.regions[2].mask, circle)
+Check("a layer wears the client's mask on its piece", Wears(portraitHost.regions[2], circle), true)
 ns.PaintCopy(portraitPiece, nil)
 ns.PaintCopy(ringPiece, nil)
 ns.PaintCopy(ring2Piece, nil)
@@ -397,12 +439,13 @@ ns.ParchWhole = function() return false end
 ns.InkChrome(slotPiece, "slot")
 -- Textured color: a sheet with parchment gets its parchment layer over the metal one, in the theme colour; the one
 -- color look inks it instead, with no layer.
-ns.ParchCopy = function(path) return path == COPY and "parch" or false end
+ns.ParchMask = function(path) return path == COPY and "parch" or false end
 local pageHost = NewFrame(true, UIParent)
 local pagePiece = pageHost:CreateTexture()
 ns.PaintCopy(pagePiece, COPY)
 local parch = pageHost.regions[3]
-Check("a textured page draws its parchment layer", parch ~= nil and parch.shown and parch.file == "parch", true)
+Check("a textured page draws its parchment layer", parch ~= nil and parch.shown and parch.file == COPY
+    and OwnMask(parch).file == "parch", true)
 Check("in the theme colour", parch and parch.rgb and parch.rgb[1] == 0.4, true)
 Check("its piece under the layers is gray, not its own color", pagePiece.desat == true and pagePiece.rgb[1] == 1, true)
 ns.InkChrome(pagePiece, COPY)
@@ -411,7 +454,7 @@ ns.FlatOn = function() return true end
 ns.PaintCopy(pagePiece, COPY)
 Check("the one color look inks the page, its parchment layer off", pagePiece.desat == true and not parch.shown, true)
 -- A sheet with a picture in its ring (Era's backpack): one color, the picture over it as drawn.
-ns.PictureCopy = function(path) return path == COPY .. "pic" and "picture" or false end
+ns.PictureMask = function(path) return path == COPY .. "pic" and "picture" or false end
 local wasFlat, wasChrome = ns.FlatOn, ns.ChromeArt
 ns.FlatOn = function() return true end
 ns.ChromeArt = function(path) return path == COPY or path == COPY .. "pic" end
@@ -420,10 +463,11 @@ local picPiece = picHost:CreateTexture()
 ns.PaintCopy(picPiece, COPY .. "pic")
 local picture = picHost.regions[3] or picHost.regions[2]
 Check("the backpack sheet is inked", picPiece.desat, true)
-Check("its picture over it as drawn", picture ~= nil and picture.file == "picture" and picture.shown
+Check("its picture over it as drawn", picture ~= nil and picture.file == COPY .. "pic"
+    and OwnMask(picture).file == "picture" and picture.shown
     and picture.desat == false and picture.rgb[1] == 1, true)
 ns.PaintCopy(picPiece, nil)
-ns.PictureCopy, ns.FlatOn, ns.ChromeArt = function() return false end, wasFlat, wasChrome
+ns.PictureMask, ns.FlatOn, ns.ChromeArt = function() return false end, wasFlat, wasChrome
 -- Parchment's row off: the sheet still one color, its parchment over it as drawn.
 local partOn = ns.ThemePartOn
 ns.ThemePartOn = function(where) return where ~= "themePartParchment" end
@@ -435,9 +479,58 @@ ns.ThemePartOn = partOn
 ns.FlatOn = function() return false end
 ns.PaintCopy(pagePiece, nil)
 Check("with no copy the piece is as drawn", pagePiece.desat, false)
-ns.ParchCopy = function() return false end
+ns.ParchMask = function() return false end
 ns.bronze.THEMES.test.tint = { 1, 1, 1 }
 ns.ChromeArt = function() return false end
+
+-- The metal layer is the sheet itself, grey under its metal mask, the mask cropped as the piece; a lifted sheet's metal
+-- file is drawn as is, with no mask of ours.
+local metalHost = NewFrame(true, UIParent)
+local metalPiece = metalHost:CreateTexture()
+metalPiece.crop = 0.5
+ns.PaintCopy(metalPiece, COPY)
+local metalLayer = metalHost.regions[2]
+Check("the metal layer draws the sheet itself", metalLayer.file, COPY)
+Check("grey", metalLayer.desat, true)
+Check("under the sheet's metal mask", OwnMask(metalLayer) and OwnMask(metalLayer).file, COPY .. "mask")
+-- Masks ignore a crop: the mask's box is the whole sheet's, the piece's half on top, so it reaches a piece-height below.
+local fit = OwnMask(metalLayer).points or {}
+Check("its mask box starts at the piece's top left", fit.TOPLEFT and fit.TOPLEFT[1] == 0 and fit.TOPLEFT[2] == 0, true)
+Check("and reaches the sheet's bottom, a piece-height under it", fit.BOTTOMRIGHT and fit.BOTTOMRIGHT[1] == 0
+    and fit.BOTTOMRIGHT[2] == -40, true)
+Check("no crop is set on a mask", OwnMask(metalLayer).cropped, nil)
+-- Tiled down, a strip's metal runs along it: the mask spans the piece that way.
+metalPiece.tileV = true
+ns.FollowLayers()
+pass()
+fit = OwnMask(metalLayer).points or {}
+Check("a piece tiled down: its mask spans it", fit.BOTTOMRIGHT and fit.BOTTOMRIGHT[2] == 0, true)
+metalPiece.tileV = nil
+-- The piece's own colour carries into its metal layer (times the tint), and a piece the game greys loses the tint.
+ns.bronze.THEMES.test.tint = { 0.5, 0.5, 0.5 }
+metalPiece:SetVertexColor(0, 1, 0)
+ns.FollowLayers()
+pass()
+Check("the metal layer takes the piece's colour", metalLayer.rgb[1] == 0 and metalLayer.rgb[2] == 0.5, true)
+metalPiece:SetDesaturated(true)
+ns.FollowLayers()
+pass()
+Check("a piece the game greys: its metal layer untinted", metalLayer.rgb[2] == 1 and metalLayer.rgb[1] == 0, true)
+metalPiece:SetDesaturated(false)
+metalPiece:SetVertexColor(1, 1, 1)
+ns.bronze.THEMES.test.tint = { 1, 1, 1 }
+ns.MetalFile = function(path) return path == COPY .. "lift" and "lifted" or false end
+local liftHost = NewFrame(true, UIParent)
+local liftPiece = liftHost:CreateTexture()
+ns.PaintCopy(liftPiece, COPY .. "lift")
+local lift = liftHost.regions[2]
+Check("a lifted sheet draws its metal file", lift.file, "lifted")
+Check("as is, with no mask of ours", lift.desat == false and OwnMask(lift) == nil, true)
+ns.PaintCopy(metalPiece, COPY .. "lift")
+Check("a sheet turned lifted takes its mask off", OwnMask(metalLayer) == nil and metalLayer.desat == false, true)
+ns.MetalFile = function() return false end
+ns.PaintCopy(metalPiece, nil)
+ns.PaintCopy(liftPiece, nil)
 
 -- Every layer off: the next whole pass puts the job to sleep and drops the events.
 for i = 1, 50 do ns.PaintCopy(shutPieces[i], nil) end

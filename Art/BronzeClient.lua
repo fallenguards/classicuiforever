@@ -1,12 +1,12 @@
 local _, ns = ...
 
--- Custom theme on client art (chat buttons, NPC windows, auras): the theme's copies at the same sheet
--- coords when on, the client's art back when off. The client resets art at will, so a light watch keeps it.
+-- Custom theme on client art (chat buttons, NPC windows, auras): the old sheets at the same coords under the theme's
+-- layers when on, the client's art back when off. The client resets art at will, so a light watch keeps it.
 
 local B = ns.bronze
 local BronzeCopy = ns.BronzeCopy
 
--- Atlas sheets with a copy, by file id (BronzeCopy finds the theme's).
+-- Atlas sheets the theme has, by file id (BronzeCopy finds the old sheet).
 local SHEETS = {
     [1537274] = "QuickJoin-Atlas.tga",
     [1706035] = "ChatFrame-Atlas.tga",
@@ -15,7 +15,7 @@ local SHEETS = {
     [1723832] = "UIFrame-VTile-Atlas.tga",
     [1723833] = "UIFrame-HTile-Atlas.tga",
 }
--- Plain files with a copy, by file id.
+-- Plain files the theme has, by file id.
 local FILES = {
     [130949] = "UI-ChatIcon-Chat-Up.tga",
     [130948] = "UI-ChatIcon-Chat-Down.tga",
