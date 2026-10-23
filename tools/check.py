@@ -39,7 +39,7 @@ RULES = ["CVAR", "CVARREAD", "CVARLOGIN", "CVARREG", "REGISTRY", "HOOK", "ONUPDA
          "LOADADDON", "EDITMODE", "EDITQUERY", "SETTLE",
          "PANELMGR", "SECRET", "WALK", "REGEVENTS", "EVENTFRAME", "POINTONCE", "SETIF", "THEME", "ONCEFLAG",
          "FRAMEFIELD", "GAMEMENU", "SHAREDART", "PLATES", "FORBIDDEN", "SYSBASE", "LAYOUTFIELD", "CLIENTKEY",
-         "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS", "DRAGPOINT", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "LOADORDER", "TOC"]
+         "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS", "DRAGPOINT", "STRETCHED", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "LOADORDER", "TOC"]
 # A hit of these on a line the change adds fails even within the baseline, so swapping one call for another fails.
 # SINCE, DEADNS, FRAMEFIELD, CVARLOGIN and THROTTLEFRAME stay count-only, so a kept line can still be rewritten.
 LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", "EDITMODE", "PANELMGR", "SEARCHBOX", "ADDONCHAR",
@@ -47,7 +47,7 @@ LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", 
               "CVARREAD", "THEME", "POINTONCE", "SECRET", "SETIF", "REGEVENTS", "ONCEFLAG", "TIMER", "EDITQUERY",
               "PLATES", "FORBIDDEN", "EVENTFRAME",
               "WALK", "GAMEMENU", "SHAREDART", "SYSBASE", "LAYOUTFIELD", "CLIENTKEY", "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS",
-              "DRAGPOINT", "ERASPOT", "WINDOWORIGIN", "CVARREG", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST",
+              "DRAGPOINT", "STRETCHED", "ERASPOT", "WINDOWORIGIN", "CVARREG", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST",
               "POINTEXACT",
               "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE",
               "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK")
@@ -57,6 +57,8 @@ ALLOWED = {
     "MASKWEAR": {"Art/ThemeLayers.lua": "ns.WearMask, which masks the theme's layers with the piece"},
     "COMBATMOUSE": {"Core/Scheduler.lua": "Sched.OnHover answers refused in a fight before it calls",
                     "Social/GuildNoteBridge.lua": "the sensor is built from PlacePads only, which stops in a fight"},
+    "STRETCHED": {"Core/Scheduler.lua": "the move helpers, let go in edit mode and for every drag of ours (LetGo)",
+                  "Map/MinimapEye.lua": "the eye's catch, let go through edit mode's drag of the eye (CatchMoves)"},
     "SETTLE": {"Social/SocialWindow.lua": "S.SettleFrame lives there"},
     "PLATESHIELD": {"Units/CastBars.lua": "the player's and unit frames' cast bars, whose shields measure"},
     "HOOK": {"Core/Hooks.lua": "the hook installers"},
@@ -201,6 +203,8 @@ FIX = {
                "old 384 x 512 frame in ALLOWED_SITES only if Era's UIPanelWindows gives it xoffset -16, yoffset 12",
     "DRAGPOINT": "read the frame's place (GetLeft/GetTop/GetBottom) before StopMovingOrSizing, which can leave a frame "
                  "others hang on with no anchor; ns.MakeDraggable (UI/Dialogs.lua) already does",
+    "STRETCHED": "watch the frame's moves with ns.Sched.OnMove (its helpers are let go for drags); a stretched frame of "
+                 "your own must ClearAllPoints as the drag starts and anchor again as it stops (CatchMoves, Map/MinimapEye.lua)",
     "CVAR": "our settings through ns.SetCVar and only on a player action; the player's own value or a hand-back "
             "through ns.WriteCVar (Core/Settings.lua); never at login; " + DOC + " Taint rules",
     "CVARREAD": "use ns.GetCVar / ns.GetCVarBool (Core/Util.lua)",
@@ -495,6 +499,7 @@ MESSAGES = {
                    "preview's spark answered secret: #139, 779 errors)",
     "ERASPOT": "Era's old-frame shift on a window Era leaves on 16, -116 (the social window flush on the screen edge)",
     "DRAGPOINT": "anchor read after StopMovingOrSizing (it can be gone: the saved place came out empty)",
+    "STRETCHED": "a frame anchored to another frame and to UIParent by opposite corners (that frame's drag ends with no anchor)",
     "CVAR": "CVar write or console command outside the ns.SetCVar / ns.WriteCVar wrappers",
     "CVARREAD": "raw CVar read outside the ns.GetCVar / ns.GetCVarBool wrappers",
     "CVARLOGIN": "CVar write in a module apply/init body or a login event branch",
@@ -1389,6 +1394,32 @@ def mouse_order_hits(lx):
     return found
 
 
+CORNER_POINT = re.compile(r"^\s*([A-Za-z_][\w.]*)\s*:\s*SetPoint\s*\(\s*\"(?:TOP|BOTTOM)(?:LEFT|RIGHT)\"\s*,\s*([A-Za-z_][\w.]*)\s*,")
+BRANCH_LINE = re.compile(r"^\s*(?:if\b|elseif\b|else\b|end\b)")
+
+
+def stretched_hits(lx):
+    """A frame given a corner on UIParent and another corner on a different frame within three code lines, no branch
+    between: it follows that frame, and the client ends that frame's drag (StartMoving) with no anchor on it."""
+    found = set()
+    code = [(no, line) for no, line in enumerate(lx.blank, 1) if line.strip()]
+    for i, (no, line) in enumerate(code):
+        m = CORNER_POINT.match(line)
+        if not m:
+            continue
+        for j in range(i + 1, min(i + 4, len(code))):
+            other_no, other = code[j]
+            if BRANCH_LINE.match(other):
+                break
+            n = CORNER_POINT.match(other)
+            if not n or n.group(1) != m.group(1):
+                continue
+            targets = {m.group(2), n.group(2)}
+            if "UIParent" in targets and len(targets) == 2:
+                found.add(("STRETCHED", other_no))
+    return found
+
+
 def drag_point_hits(lx, funcs):
     """GetPoint read after StopMovingOrSizing in the same function body (callbacks inside it excluded)."""
     found = set()
@@ -1511,6 +1542,8 @@ def pattern_hits(path, lx, funcs):
                 found.add(("EDITSAVE", no))
     found |= structure_hits(path, lx)
     found |= drag_point_hits(lx, funcs)
+    if not allowed("STRETCHED", path):
+        found |= stretched_hits(lx)
     found |= client_key_hits(lx, funcs)
     found |= check_label_hits(lx)
     found |= mouse_order_hits(lx)

@@ -17,6 +17,7 @@ local EYE_EVENTS = { "EDIT_MODE_LAYOUTS_UPDATED", "UI_SCALE_CHANGED", "DISPLAY_S
 local EYE_LOOK = 0.3   -- polling after each wake, for a client move that lands a few frames late
 -- Era's eye on the rim (degrees), and the rim's reach past the map's edge (a ring button's).
 local ERA_ANGLE, RIM_OUT = 137, 5
+local EXTRA_H = 108   -- our rows under edit mode's dialog for the eye, before the size line
 
 local eyeWatch
 local extra       -- our rows under edit mode's dialog for the eye
@@ -54,6 +55,19 @@ end
 local function Anchor(eye)
     local info = eye.systemInfo and eye.systemInfo.anchorInfo
     if type(info) == "table" and info.point and info.relativePoint then return info end
+end
+
+-- Retail's game edit mode has no box for the eye: ours stands on this frame over it, sized there (UI/WindowList.lua).
+local sizer
+
+-- The eye's own size: edit mode's Size on Forever's box, our edit mode's on retail.
+local function OwnScale(eye)
+    if sizer then return ns.Safe(sizer:GetScale()) or 1 end
+    local setting = Enum.EditModeGroupFinderSetting and Enum.EditModeGroupFinderSetting.Size
+    if setting == nil or not eye.GetSettingValue then return 1 end
+    local ok, size = pcall(eye.GetSettingValue, eye, setting)
+    if ok and type(size) == "number" and size > 0 then return size / 100 end
+    return 1
 end
 
 -- Where edit mode has the eye: its centre in UIParent units, read on a stand-in of its size and scale.
@@ -99,6 +113,7 @@ end
 local function Unsnap(eye)
     if not snapped then return end
     snapped = false
+    ns.SetScaleIf(eye, OwnScale(eye), 0.001)
     local info = Anchor(eye)
     if not info or not EyeMoved(eye) then return end
     local scale = ns.Safe(eye:GetScale()) or 1
@@ -137,6 +152,12 @@ PlaceEye = function()
         ns.DressStates(eye, nil, nil, nil, "zoomHighlight", ns.RING_HIGHLIGHT)
         ns.Sched.Attach(over, { name = "minimap.eyeTurn", every = FRAME_TIME, fn = Turn })
         EyeDrag(eye)
+        if not ns.OnForever() then
+            sizer = ns.NewFrame("Frame", "ForeverClassicUIEyeSize", Minimap)
+            sizer:SetSize(SIZE, SIZE)
+            sizer:SetPoint("CENTER", eye, "CENTER", 0, 0)
+            ns.PlaceSavedWindows()
+        end
     end
     if eye.Eye then ns.SetAlphaIf(eye.Eye, 0) end
     if not over:IsShown() then over:Show() end
@@ -150,11 +171,14 @@ PlaceEye = function()
     if Dragged(eye) or InCombatLockdown() then return end
     if eye:GetParent() ~= UIParent then eye:SetParent(UIParent) end
     Decide(eye)
-    if ns.db.eyeSnapMinimap == false then
+    -- Snap off: Forever's edit mode place once the eye is placed there, else Era's spot; retail's own spot.
+    if ns.db.eyeSnapMinimap == false and (EyeMoved(eye) or not ns.OnForever()) then
         Unsnap(eye)
     else
         local angle = SnapAngle(eye)
         if angle then
+            -- The minimap's size, as its ring buttons have it, times the eye's own (#208).
+            ns.SetScaleIf(eye, OwnScale(eye) * Minimap:GetEffectiveScale() / UIParent:GetEffectiveScale(), 0.001)
             local k = eye:GetEffectiveScale() / Minimap:GetEffectiveScale()
             ns.RingPoint(eye, angle, Minimap:GetWidth() / 2 + RIM_OUT, k)
             snapped = true
@@ -171,6 +195,9 @@ function MM.EyeDragTo(angle)
     ns.db.lfgButtonAngle = angle
     PlaceEye()
 end
+
+-- Our edit mode's box for the eye (retail): only while the eye stands on our minimap's rim.
+function ns.EyeOnRing() return MM.active and ns.db.eyeSnapMinimap ~= false end
 
 -- Our minimap off: the game's own eye back, at the place edit mode gave it.
 function MM.UnplaceEye()
@@ -190,7 +217,7 @@ local function Extra()
     extra = CreateFrame("Frame", "ForeverClassicUIEyeExtra", UIParent)
     extra:SetFrameStrata("DIALOG")
     extra:SetFrameLevel(200)
-    extra:SetHeight(108)
+    extra:SetHeight(EXTRA_H)
     extra:Hide()
     B.PanelBorder(extra)
     extra.snap = B.DialogCheck(extra, extra, "TOPLEFT", 22, -14, L["MAP_EYE_SNAP"], function(self)
@@ -202,6 +229,11 @@ local function Extra()
         ns.ToggleChanged("lfgMinimapButton")
     end)
     extra.resize = B.DialogFoot(extra, L["MAP_EYE_OPTIONS_APPLY"], L["MAP_DEFAULT_SIZE"], DefaultSizeClick)
+    -- On the rim the game's Size is the eye's own, over the minimap's: the two together here (#208).
+    extra.real = extra:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+    extra.real:SetPoint("TOPLEFT", extra.idle, "BOTTOMLEFT", 4, -6)
+    extra.real:SetPoint("RIGHT", extra, "RIGHT", -22, 0)
+    extra.real:SetJustifyH("LEFT")
     return extra
 end
 
@@ -223,9 +255,19 @@ local function FollowDialog()
         extra.resize:ClearAllPoints()
         extra.resize:SetPoint("LEFT", revert, "RIGHT", 6, 0)
         extra.resize:SetPoint("RIGHT", dialog.Buttons, "RIGHT", 0, 0)
-        extra.resize:SetEnabled(not ns.Near(eye:GetScale(), 1, 0.001))
+        extra.resize:SetEnabled(not ns.Near(OwnScale(eye), 1, 0.001))
     end
     extra.resize:SetShown(revert ~= nil)
+    extra.real:SetShown(snapped)
+    if snapped then
+        local real = OwnScale(eye) * Minimap:GetEffectiveScale() / UIParent:GetEffectiveScale()
+        extra.real:SetText(string.format(L["MAP_EYE_REAL_SIZE"], string.format("%d%%", math.floor(real * 100 + 0.5))))
+    end
+    local h = EXTRA_H + (snapped and extra.real:GetStringHeight() + 6 or 0)
+    if extra.h ~= h then
+        extra:SetHeight(h)
+        extra.h = h
+    end
     extra:Show()
 end
 
@@ -247,9 +289,28 @@ local function AnchorSig(eye)
     return info.offsetX or 0, info.offsetY or 0
 end
 
+-- The catch (CatchMoves) on the eye, or let go: hung on through the game's StartMoving, the eye loses its rect (unseen)
+-- and the drop leaves it no anchor (STRETCHED).
+local catch, catchOn
+local function PinCatch(eye, on)
+    if not catch or on == catchOn then return end
+    catchOn = on
+    if on then
+        catch:SetPoint("TOPLEFT", eye, "TOPLEFT", 0, 0)
+        catch:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, 0)
+    else
+        catch:ClearAllPoints()
+    end
+end
+
 -- The game lays the eye again at its own spot, with no event (a minimap scale change, the micro menu's layout, a queue).
 local function OffRim(eye)
     return snapped and ns.IsAt(eye, "CENTER", Minimap, "CENTER", rimX, rimY, 0.01) ~= true
+end
+
+-- Edit mode holds the eye selected from the press that starts its drag until another system or the exit.
+local function Held(eye)
+    return ns.EditMode.state and eye.isSelected == true
 end
 
 -- No events for moves, resets or size changes in edit mode: poll there, every frame (the micro menu's anchor lays the eye
@@ -264,14 +325,16 @@ local function EyeTick(job, now)
     end
     if editing then FollowDialog() end
     local eye = QueueStatusButton
+    if eye then PinCatch(eye, not Held(eye)) end
     if MM.active and eye then
-        local moved, scale = EyeMoved(eye), eye:GetEffectiveScale()
+        local moved, scale, mapScale = EyeMoved(eye), eye:GetEffectiveScale(), Minimap:GetEffectiveScale() * OwnScale(eye)
         local dragging = Dragged(eye)
         local ax, ay = AnchorSig(eye)
         local icon = ns.GroupFinderIcon()
-        if moved ~= job.moved or scale ~= job.scale or dragging ~= job.dragging or ax ~= job.ax or ay ~= job.ay
-            or icon ~= job.icon or (not dragging and OffRim(eye)) then
-            job.moved, job.scale, job.dragging, job.ax, job.ay, job.icon = moved, scale, dragging, ax, ay, icon
+        if moved ~= job.moved or scale ~= job.scale or mapScale ~= job.mapScale or dragging ~= job.dragging
+            or ax ~= job.ax or ay ~= job.ay or icon ~= job.icon or (not dragging and OffRim(eye)) then
+            job.moved, job.scale, job.mapScale, job.dragging = moved, scale, mapScale, dragging
+            job.ax, job.ay, job.icon = ax, ay, icon
             PlaceEye()
         end
     end
@@ -293,16 +356,17 @@ function ns.EyeFollows()
     if eyeWatch and MM.active then SetEyeWatch(true) end
 end
 
--- The game's edit mode passes lay the eye at the micro menu's corner; a look a frame later still drew it there once. A
--- child stretched to the screen's corner resizes as the eye moves, before the draw, so the eye goes back in that pass
--- (a child: edit mode still drags the eye).
+-- The game's edit mode passes lay the eye at the micro menu's corner (a look a frame later drew it there once): a child
+-- stretched to the screen's corner resizes as the eye moves, before the draw. Let go on the press of edit mode's box
+-- that selects the eye, before any StartMoving; the poll hangs it on again once the eye is no longer selected.
 local function CatchMoves(eye)
-    local catch = CreateFrame("Frame", nil, eye)
-    catch:SetPoint("TOPLEFT", eye, "TOPLEFT", 0, 0)
-    catch:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, 0)
+    catch = CreateFrame("Frame", nil, eye)
+    PinCatch(eye, true)
     catch:SetScript("OnSizeChanged", function()
         if MM.active and OffRim(eye) and not Dragged(eye) and not InCombatLockdown() then PlaceEye() end
     end)
+    -- Forever's eye has an edit mode box; retail's has none.
+    if eye.Selection then ns.HookScriptOnce(eye.Selection, "OnMouseDown", function() PinCatch(eye, false) end, "eyeCatch") end
 end
 
 -- Created at the first Layout with an eye (after the bar's Init made the edit poll); runs with the module on or off.

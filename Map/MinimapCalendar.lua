@@ -39,6 +39,7 @@ end
 function ns.LayPiece(key, anyway)
     if (key == KEY or (MM.PIECE_KEYS and MM.PIECE_KEYS[key])) and MM.Relayout then MM.Relayout() end
     if ns.PlaceRingButton then ns.PlaceRingButton(key) end
+    if key == "minimapEye" and MM.PlaceEye then MM.PlaceEye() end
     if ns.LayGryphon then ns.LayGryphon(key, anyway) end
     if ns.LayQuestWatch then ns.LayQuestWatch(key) end
     if ns.LayTrackingIcon then ns.LayTrackingIcon(key) end

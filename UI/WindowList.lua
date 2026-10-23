@@ -88,10 +88,15 @@ local RING_MICROS = { { "Character", L["OPT_hideMicroCharacter"] }, { "Spellbook
     { "Collections", L["OPT_hideMicroCollections"] }, { "Help", L["OPT_hideMicroHelp"] },
     { "GameMenu", L["OPT_hideMicroGameMenu"] }, { "Shop", L["OPT_hideMicroShop"] },
     { "Housing", L["OPT_hideMicroHousing"] } }
--- Retail's alone (Map/MinimapMicro.lua makes them only there).
+-- Retail's alone (Map/MinimapMicro.lua makes them only there). The queue eye too: retail's game edit mode has no box
+-- for it (Forever's has), so ours drags it round the ring while it snaps there (Map/MinimapEye.lua).
 if not ns.OnForever() then
     RING_MICROS[#RING_MICROS + 1] = { "Achievements", L["OPT_hideMicroAchievements"] }
     RING_MICROS[#RING_MICROS + 1] = { "Journal", L["OPT_hideMicroJournal"] }
+    ns.WINDOW_LIST[#ns.WINDOW_LIST + 1] = { key = "minimapEye", label = L["OPT_hideMicroGroupFinder"],
+        name = "ForeverClassicUIEyeSize", w = 32, h = 32, section = L["UI_MINIMAP"], piece = true, ringKey = "lfgButtonAngle",
+        dressed = function() return ns.EyeOnRing ~= nil and ns.EyeOnRing() end,
+        sizeBase = function() return Minimap:GetEffectiveScale() / UIParent:GetEffectiveScale() end }
 end
 for _, micro in ipairs(RING_MICROS) do
     ns.WINDOW_LIST[#ns.WINDOW_LIST + 1] = { key = "minimap" .. micro[1], label = micro[2],

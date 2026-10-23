@@ -1,6 +1,8 @@
 -- Offline test under Lua 5.4 for the queue eye's watch (Map/MinimapEye.lua OffRim, EyeTick): the game lays its eye again
 -- at its own spot with no event (a minimap scale change, the micro menu's layout, a queue), and the watch only placed
--- it when edit mode's saved spot changed, so the eye and the group finder icon riding it stood at the game's spot.
+-- it when edit mode's saved spot changed, so the eye and the group finder icon riding it stood at the game's spot. And
+-- its catch (CatchMoves, a child stretched to the screen's corner) lets go through edit mode's drag of the eye: hung on,
+-- the drop left the eye with no anchor and the game's anchor update errored (SetPoint(nil), 2026-10-22).
 -- Run from the addon root: lua tools/tests/eye_rim_test.lua (CI runs every tools/tests/*_test.lua).
 -- luacheck: std lua54
 -- luacheck: ignore 111 112 113 121 122 212
@@ -23,7 +25,8 @@ local first = source:find("local function OffRim", 1, true)
 local last = first and source:find("-- Entry wakes the poll", first, true)
 assert(first and last, "the eye's watch is in Map/MinimapEye.lua")
 
-local Minimap, MicroMenu = { name = "Minimap" }, { name = "MicroMenu" }
+local Minimap, MicroMenu = { name = "Minimap", scale = 1 }, { name = "MicroMenu" }
+function Minimap:GetEffectiveScale() return self.scale end
 local eye = { points = {} }
 function eye:GetNumPoints() return #self.points end
 function eye:GetPoint(i) return table.unpack(self.points[i]) end
@@ -48,7 +51,9 @@ local env = setmetatable({
     Dragged = function() return eye.dragged == true end,
     AnchorSig = function() return 0, 0 end,
     PlaceEye = function() placed = placed + 1 end,
+    OwnScale = function() return eye.ownScale or 1 end,
     SetEyeWatch = function() end,
+    PinCatch = function(_, on) eye.catchOn = on end,
 }, { __index = _G })
 local chunk = "local snapped, rimX, rimY, lookUntil = true, -95.2, -12.5, 0\n" .. source:sub(first, last - 1)
     .. "\nreturn EyeTick, function(on) snapped = on end"
@@ -99,8 +104,29 @@ for n = 1, 3 do
     Check(placed == 1, "in edit mode, frame " .. n .. " after the game lays it at the micro menu, it is back on the rim")
     eye.points = { { "CENTER", Minimap, "CENTER", -95.2, -12.5 } }
 end
+-- Selected in edit mode (the press that starts a drag): the catch is off the eye; deselected, or out of edit mode, on.
+eye.isSelected = true
+EyeTick(job, frameClock + 0.016)
+Check(eye.catchOn == false, "selected in edit mode, the catch is let go")
+eye.isSelected = false
+EyeTick(job, frameClock + 0.032)
+Check(eye.catchOn == true, "deselected, the catch hangs on again")
+eye.isSelected = true
 env.ns.EditMode.state = false
 clock = frameClock + 1
+Tick()
+Check(eye.catchOn == true, "out of edit mode a stale selection flag keeps the catch on")
+eye.isSelected = nil
+
+-- The minimap's edit mode Size changes (#208): the eye is placed again, at the minimap's new scale.
+Check(Tick() == 0, "nothing changed, nothing placed")
+Minimap.scale = 1.3
+Check(Tick() == 1, "the minimap grown, the eye is placed and sized again")
+Check(Tick() == 0, "and left alone after")
+-- Its own size stepped (retail: our edit mode's box) sizes it again too.
+eye.ownScale = 1.2
+Check(Tick() == 1, "its own size changed, the eye is sized again")
+Check(Tick() == 0, "and left alone after that")
 
 -- Snap to minimap off: wherever edit mode and the game put it.
 SetSnapped(false)
@@ -127,6 +153,37 @@ moved = true
 Check(SnapAngle(eye) == 90, "placed in edit mode, the eye faces that place")
 moved = false
 Check(SnapAngle(eye) == 137 and db.lfgButtonAngle == nil, "reset after that, it is Era's spot")
+
+-- The catch hangs between the eye and the screen's corner; the press on edit mode's box that selects the eye (and starts
+-- its drag) lets it go before the game's StartMoving, so the eye keeps its rect and the drop leaves it an anchor.
+local first3 = source:find("local catch, catchOn", 1, true)
+local last3 = first3 and source:find("-- The game lays the eye again", first3, true)
+local first4 = source:find("local function CatchMoves", 1, true)
+local last4 = first4 and source:find("-- Created at the first Layout", first4, true)
+assert(first3 and last3 and first4 and last4, "the eye's catch is in Map/MinimapEye.lua")
+local catch = { points = 0 }
+function catch:SetPoint() self.points = self.points + 1 end
+function catch:ClearAllPoints() self.points = 0 end
+function catch:SetScript() end
+local hooks = {}
+local catchEnv = setmetatable({
+    CreateFrame = function() return catch end,
+    ns = { HookScriptOnce = function(_, script, fn) hooks[script] = fn end },
+}, { __index = _G })
+local CatchMoves, PinCatch = assert(load(source:sub(first3, last3 - 1) .. source:sub(first4, last4 - 1)
+    .. "\nreturn CatchMoves, PinCatch", "catch", "t", catchEnv))()
+local system = { Selection = {} }
+CatchMoves(system)
+Check(catch.points == 2 and hooks.OnMouseDown ~= nil, "the catch hangs between the eye and the screen, hooked on the box's press")
+hooks.OnMouseDown()
+Check(catch.points == 0, "the press that selects the eye lets the catch go")
+PinCatch(system, true)
+PinCatch(system, true)
+Check(catch.points == 2, "pinned once the eye is no longer selected, not twice")
+PinCatch(system, false)
+catch.points, hooks = 0, {}
+CatchMoves({})
+Check(catch.points == 2 and next(hooks) == nil, "retail's eye (no edit mode box) takes no hook")
 
 if failed > 0 then
     print(failed .. " check(s) failed")

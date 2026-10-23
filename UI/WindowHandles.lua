@@ -270,8 +270,7 @@ end
 
 ns.OnToggle(function(key) if key == MAP_ENTRY.toggle or key == "worldMap" or key == "socialTitleDrag" then PlaceAll() end end)
 
--- Leave game windows to other addons: a size ours gave one goes back to the game's; turned off, ours place them again.
--- A protected one (professions) waits for calm.
+-- Leave game windows to other addons: our sizes go back to the game's (a protected one after a fight); off, ours return.
 local function LeaveGameWindows()
     if InCombatLockdown() then ns.WhenCalm("windowsLeft", LeaveGameWindows) return end
     for frame in pairs(scaled) do
@@ -308,8 +307,7 @@ function ns.MapPlaceFor(w, h, base)
     return scale, math.max(0, math.min(left, screenW - w * scale)), math.min(screenH, math.max(top, h * scale))
 end
 
--- A game window our layout grew after the game laid it (the classic map opening at the game's height): raised as the
--- game's own fit raises a tall window, its left kept. One the player placed stays.
+-- A game window our layout grew after the game laid it: raised as the game raises a tall one, left kept; placed, it stays.
 function ns.FitGameWindow(key)
     local entry = byKey[key]
     local frame = entry and ns.WindowFrame(entry)
@@ -499,15 +497,17 @@ local function ChoiceRow(dialog)
 end
 
 local function Percent(value) return string.format("%d%%", value) end
+-- sizeBase: a size the piece wears under its own (the eye's, the minimap's); the slider shows both together.
+local function Base() return selected and selected.sizeBase and selected.sizeBase() or 1 end
 local function SizeValues()
-    local scale = selected and Scales()[SizeKey(selected)] or 1
+    local scale = (selected and Scales()[SizeKey(selected)] or 1) * Base()
     return math.floor(scale * 100 + 0.5), 50, 150, 20
 end
 
 -- No dialog refresh here: that would re-fill the slider under the player's hand.
 local function OnSize(value)
     if not selected then return end
-    local scale = math.max(0.5, math.min(1.5, value / 100))
+    local scale = math.max(0.5, math.min(1.5, value / 100 / Base()))
     Scales()[SizeKey(selected)] = math.abs(scale - 1) > 0.001 and scale or nil
     PlaceAll()
     -- A piece at its own spot keeps that spot's middle as it grows.
