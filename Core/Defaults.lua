@@ -2,7 +2,7 @@ local _, ns = ...
 local L = ns.L
 
 ns.DB_DEFAULTS = {
-    dbVersion = 26,
+    dbVersion = 27,
     classicBar = true,
     oneBar = false,
     classicBarSize = false,
@@ -89,6 +89,7 @@ ns.DB_DEFAULTS = {
     gameDamageNumbers = true,
     levelUpBanner = false,
     zoneTerritory = true,
+    sideBarsEra = true,
     lootToast = false,
     -- The layout to go back to, and a pending switch to ours.
     previousLayout = "",

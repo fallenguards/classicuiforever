@@ -339,8 +339,7 @@ local function PlaceTracker(system)
     return true
 end
 
--- Era's Classic preset unit frames (Blizzard_EditMode/Classic EDIT_MODE_CLASSIC_SYSTEM_MAP), TOPLEFT on UIParent at
--- 100%; the mainline file's Classic preset (player 4, -4) is the game's own, not Era's.
+-- Era's Classic preset unit frames (its Blizzard_EditMode/Classic file; the mainline file's preset is the game's own).
 local ERA_FRAME_SPOTS = { PlayerFrame = { -1, 0 }, TargetFrame = { 232, 0 }, FocusFrame = { 174, -178 } }
 
 -- Era's own Classic preset: buffs and debuffs (Forever's sit 68 further left); durability in its right-side container,
@@ -472,6 +471,7 @@ end
 function ns.ResetClassicLayout(reloadNow)
     if RefuseInCombat("cannot change layouts in combat") then return false end
     if not ns.ClassicLayoutActive() then return false end
+    ns.db.sideBarsEra = true
     ns.QueueLayoutJob("reset", true)
     ns.AskEraScale(function()
         if reloadNow then
@@ -673,6 +673,7 @@ ns.Popup("FCUI_LAYOUTS_FULL", {
 -- Creates or selects the classic layout; reloadNow reloads in this press.
 function ns.CreateClassicLayout(reloadNow)
     if RefuseInCombat("cannot change layouts in combat") then return end
+    ns.db.sideBarsEra = true
     local mgr = EditModeManagerFrame
     if not mgr or not mgr.GetLayouts or not EditModePresetLayoutManager or not (C_EditMode and C_EditMode.SaveLayouts) then
         ns.Print(L["CHAT_15"])
@@ -739,8 +740,7 @@ function ns.SelectClassicLayoutIfPending()
     StaticPopup_Show("FCUI_LAYOUT_PICK")
 end
 
--- Unit frames at Era's spots, the meter under the party frames, the chat over the band, written as edit mode records a
--- drag. Reset job only, so a frame moved on purpose stays.
+-- Unit frames at Era's spots, meter and chat ours, written as a drag; reset job only, so a frame moved on purpose stays.
 local function FrameSpots()
     local era = ERA_FRAME_SPOTS
     return { { "PlayerFrame", "TOPLEFT", unpack(era.PlayerFrame) }, { "TargetFrame", "TOPLEFT", unpack(era.TargetFrame) },

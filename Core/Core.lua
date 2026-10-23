@@ -453,6 +453,7 @@ frame:SetScript("OnEvent", function(_, event, arg1)
         if saved and saved < 24 then ns.KeepReagentSlot() end
         if saved and saved < 25 then ns.KeepLootRollOff() end
         if saved and saved < 26 then ns.DropWindowsSwitch() end
+        if saved and saved < 27 then ns.KeepSideBarSpot() end
         ns.CopyDefaults(ns.db, ns.DB_DEFAULTS)
         -- Nothing of ours was ever zeroed on a fresh install: the game settings it holds are the player's own.
         if not saved then ns.db.surnamesRepaired, ns.db.damageNumbersRepaired = true, true end

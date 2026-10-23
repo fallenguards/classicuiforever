@@ -415,10 +415,29 @@ function B.LayoutPetRow(lift)
     end
 end
 
--- Bars 4 and 5 down the right edge, hung from the bottom-right corner 98 up as in 1.x (column ends below the minimap).
--- Buttons hang from the corner, not the bar: edit mode re-anchors right bars whenever the room by the minimap
--- changes (entering combat too) and the column jumped. A bar placed in edit mode keeps its spot and buttons.
+-- Bars 4 and 5 down the right edge. Buttons hang from the screen, not the bar: edit mode re-anchors right bars whenever
+-- the room by the minimap changes (entering combat too) and the column jumped. A bar placed in edit mode keeps its spot.
 local SIDE_COL_H = 12 * BUTTON_PITCH
+-- Era's (its UpdateRightActionBarPositions): bar 4 on the right edge, its middle 35 under the screen's, bar 5 7 beside.
+-- sideBarsEra off: 1.12's, from the bottom right corner 98 up (an install from before keeps it till the layout button).
+local ERA_SIDE_Y, ERA_SIDE_GAP = -35, 7
+local SIDE_COL_DRAWN = SIDE_COL_H - (BUTTON_PITCH - BUTTON_SIZE)
+
+-- The column's top: the screen point it hangs from and its offset there, in the column's own units.
+local function SideTop(icon)
+    if ns.db.sideBarsEra then return "RIGHT", ERA_SIDE_Y / icon + SIDE_COL_DRAWN / 2 end
+    return "BOTTOMRIGHT", SIDE_BAR_Y + SIDE_COL_H
+end
+
+-- dbVersion 27: an install from before keeps 1.12's spot.
+function ns.KeepSideBarSpot()
+    local db = ns.db
+    if db.sideBarsEra == nil then db.sideBarsEra = false end
+    for _, shot in pairs(type(db.profiles) == "table" and db.profiles or {}) do
+        if type(shot) == "table" and shot.sideBarsEra == nil then shot.sideBarsEra = false end
+    end
+    db.dbVersion = 27
+end
 
 local function SideColumn(bar, rowIndex, x)
     if not bar then return false end
@@ -429,12 +448,13 @@ local function SideColumn(bar, rowIndex, x)
     end
     -- Frame starts at the first button and spans the buttons, so edit mode's box is the column itself.
     local icon = IconScale(bar)
+    local relPoint, top = SideTop(icon)
     if not B.GameHolds(bar) then
         Remember(bar)
         ns.SetScaleIf(bar, 1)
-        ns.SetPointOnce(bar, "TOPRIGHT", UIParent, "BOTTOMRIGHT", x * icon, (SIDE_BAR_Y + SIDE_COL_H) * icon)
+        ns.SetPointIf(bar, "TOPRIGHT", UIParent, relPoint, x * icon, top * icon)
     end
-    LayoutButtons(bar, rowIndex, "TOPLEFT", UIParent, "BOTTOMRIGHT", x - BUTTON_SIZE, SIDE_BAR_Y + SIDE_COL_H, true, nil, nil, icon)
+    LayoutButtons(bar, rowIndex, "TOPLEFT", UIParent, relPoint, x - BUTTON_SIZE, top, true, nil, nil, icon)
     return true
 end
 
@@ -445,7 +465,7 @@ function B.LayoutSideBars()
     if rightPinned and right:IsShown() then
         -- Beside the first: its width in the second's pixels, less the gap.
         local ratio = IconScale(right) / IconScale(left)
-        leftX = (SIDE_BAR_X - BUTTON_SIZE) * ratio - SIDE_BAR_GAP
+        leftX = (SIDE_BAR_X - BUTTON_SIZE) * ratio - (ns.db.sideBarsEra and ERA_SIDE_GAP or SIDE_BAR_GAP)
     end
     SideColumn(left, 8, leftX)
 end

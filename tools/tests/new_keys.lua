@@ -227,6 +227,7 @@ return {
     hideCollReset = "same for everyone: opt-in, off by default",
     levelUpBanner = "off for everyone, a restyle: the game's level-up banners go, as 1.x had none; checked brings them back",
     zoneTerritory = "on for everyone, a restyle: Era's territory line and colors outside the capitals (Forever); unchecked leaves the game's",
+    sideBarsEra = "false for upgraders (dbVersion 27, KeepSideBarSpot): bars 4 and 5 keep 1.12's bottom spot till the classic layout button; new installs Era's",
     lootToast = "off for everyone, a restyle: the game's loot toasts go, as 1.x had none; checked brings them back",
     mapQuestCombined = "same for everyone: opt-in, off by default",
     mapQuestShare = "same for everyone: 0, the sheets' own share of the map until the player drags its corner",
