@@ -21,8 +21,11 @@ local function Wanted()
     return ns.db.minimapToggleButton == true and ns.db.hideMinimapHeader ~= true
 end
 
--- Laid with the cluster, before the calendar (which steps left of it): the X 1 right and 1 up of the bar's right edge,
--- as Era's, and the map shut or open.
+-- The bar's art fills rows 2 to 24 of its 32 and the X's red box the middle of its 32: 3.5 up centers them.
+local TOGGLE_X, TOGGLE_Y = 1, 3.5
+
+-- Laid with the cluster, before the calendar (which goes to the bar's left end): the X on the bar's right edge, centred
+-- on the bar, and the map shut or open.
 function MM.LayToggle(cluster, header, level)
     local on = Wanted() and header ~= nil
     if not on then MM.closed = false end
@@ -39,7 +42,7 @@ function MM.LayToggle(cluster, header, level)
         ns.AttachTip(button, TIP)
     end
     ns.SetLevelIf(button, level)
-    ns.SetPointOnce(button, "RIGHT", header, "RIGHT", 1, 1)
+    ns.SetPointOnce(button, "RIGHT", header, "RIGHT", TOGGLE_X, TOGGLE_Y)
     button:Show()
 end
 
