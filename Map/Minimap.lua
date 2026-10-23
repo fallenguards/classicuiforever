@@ -543,7 +543,8 @@ local function Layout()
         ns.SetPointOnce(clock, "CENTER", clockHome, "CENTER", 0, 0)
         ns.FadeTextures(clock, 0, nil, clock.fcui and clock.fcui.bg)
         ns.MinimapButtonBorder(ns.DressNew(clock, "clockBackground", CLOCK_PLATE, TimeManagerClockButton), "hideBorderClock")
-        if TimeManagerClockTicker then ns.SetPointOnce(TimeManagerClockTicker, "CENTER", TimeManagerClockButton, "CENTER", 3, 1) end
+        -- Era's time (Blizzard_TimeManager Classic): 1 right of the plate's middle, level.
+        if TimeManagerClockTicker then ns.SetPointOnce(TimeManagerClockTicker, "CENTER", TimeManagerClockButton, "CENTER", 1, 0) end
     end
 
     -- Queue eye on the lower left (MinimapEye.lua), instance flag on the upper left.
