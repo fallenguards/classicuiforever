@@ -111,27 +111,33 @@ end
 -- The old who-list column tab in three slices, one per column.
 local COLUMN = { layer = "BACKGROUND", set = "raw", key = COLUMN_TABS, capL = 5, capR = 4, height = 20,
     coords = { { 0, 0.078125, 0, 0.625 }, { 0.078125, 0.90625, 0, 0.625 }, { 0.90625, 0.96875, 0, 0.625 } } }
-function ns.ColumnHeader(parent, column, previous, onClick)
+-- era: Era's guild plate (GuildFrameColumnHeaderTemplate), 24 tall, each 2 over the one before, no hover light.
+local ERA_COLUMN = { layer = "BACKGROUND", set = "raw", key = COLUMN_TABS, capL = 5, capR = 4, height = 24,
+    coords = { { 0, 0.078125, 0, 0.75 }, { 0.078125, 0.90625, 0, 0.75 }, { 0.90625, 0.96875, 0, 0.75 } } }
+function ns.ColumnHeader(parent, column, previous, onClick, era)
+    local spec = era and ERA_COLUMN or COLUMN
     local button = ns.NewFrame("Button", nil, parent)
-    button:SetSize(column.w, 20)
+    button:SetSize(column.w, spec.height)
     if previous then
-        button:SetPoint("LEFT", previous, "RIGHT", 0, 0)
+        button:SetPoint("LEFT", previous, "RIGHT", era and -2 or 0, 0)
     else
         button:SetPoint("LEFT", parent, "LEFT", 0, 0)
     end
     button.key = column.key
 
-    for _, slice in ipairs({ ns.ThreeSlice(button, nil, COLUMN) }) do ns.BronzeTint(slice) end
+    for _, slice in ipairs({ ns.ThreeSlice(button, nil, spec) }) do ns.BronzeTint(slice) end
 
     local text = button:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
     text:SetPoint("LEFT", button, "LEFT", 8, 0)
     text:SetText(column.label)
     button.Text = text
 
-    local highlight = button:CreateTexture(nil, "HIGHLIGHT")
-    highlight:SetPoint("TOPLEFT", button, "TOPLEFT", 4, -2)
-    highlight:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -4, 2)
-    highlight:SetColorTexture(1, 0.82, 0, 0.12)
+    if not era then
+        local highlight = button:CreateTexture(nil, "HIGHLIGHT")
+        highlight:SetPoint("TOPLEFT", button, "TOPLEFT", 4, -2)
+        highlight:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -4, 2)
+        highlight:SetColorTexture(1, 0.82, 0, 0.12)
+    end
     button:SetScript("OnClick", onClick)
     return button
 end

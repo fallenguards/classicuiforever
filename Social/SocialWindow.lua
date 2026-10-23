@@ -18,6 +18,9 @@ local GOLD_SEL = { set = "raw", layer = "BACKGROUND", fill = true, blend = "ADD"
     coords = { 0, 0.97, 0, 1 }, show = false }
 local GOLD_HL = { set = "raw", layer = "HIGHLIGHT", fill = true, blend = "ADD", vertex = { 1, 0.82, 0, 1 },
     coords = { 0, 0.97, 0, 1 } }
+-- A panel's own bar (panel.rowBar, Era's guild one): its own colors, the whole sheet.
+local OWN_SEL = { set = "raw", layer = "BACKGROUND", fill = true, blend = "ADD", show = false }
+local OWN_HL = { set = "raw", layer = "HIGHLIGHT", fill = true, blend = "ADD" }
 
 ---------------------------------------------------------------- tabs
 
@@ -307,8 +310,8 @@ function S.HidePanels(state, panel)
     end
     local header = FriendsFrame and FriendsFrame.FriendsTabHeader
     if header then header:SetAlpha(0) end
-    ns.SweepFriendsFrame(state.swept, true)
-    ns.KeepFriendsSwept(panel, state.swept)
+    ns.SweepFriendsFrame(state.swept, true, state.insetTop)
+    ns.KeepFriendsSwept(panel, state.swept, state.insetTop)
 end
 
 function S.ShowPanels(state)
@@ -354,15 +357,15 @@ function S.RowCount(panel)
     return math.max(1, math.floor((panel.list:GetHeight() or 0) / ROW_H))
 end
 
--- A list row: gold bar on the chosen row and under the mouse, one text per column (row.Name, row.Zone, ...).
-local function ListRow(parent, index, columns, onClick, onDoubleClick)
+-- A list row: gold bar (or bar) on the chosen row and under the mouse, one text per column (row.Name, row.Zone, ...).
+local function ListRow(parent, index, columns, onClick, onDoubleClick, bar)
     local row = ns.NewFrame("Button", nil, parent)
     row:SetHeight(ROW_H)
     row:SetPoint("TOPLEFT", parent, "TOPLEFT", 0, -(index - 1) * ROW_H)
     row:SetPoint("TOPRIGHT", parent, "TOPRIGHT", 0, -(index - 1) * ROW_H)
     row:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-    row.Selected = ns.DressNew(row, ns.ART.GOLD_BAR, GOLD_SEL)
-    ns.DressNew(row, ns.ART.GOLD_BAR, GOLD_HL)
+    row.Selected = ns.DressNew(row, bar or ns.ART.GOLD_BAR, bar and OWN_SEL or GOLD_SEL)
+    ns.DressNew(row, bar or ns.ART.GOLD_BAR, bar and OWN_HL or GOLD_HL)
     for _, column in ipairs(columns) do
         local text = row:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
         text:SetPoint("LEFT", row, "LEFT", column.x, 0)
@@ -461,14 +464,14 @@ function S.ScrollRows(panel, foot, gap, onValue, columns, onClick, onDoubleClick
     -- No bar until the list outgrows its box, then the old scroll column round it.
     bar.hideWhenIdle = true
     ns.ScrollColumnOn(bar)
-    -- Era's list inset, its foot on panel.insetFoot (the Who buttons) where set.
-    ns.ListInset(panel.listBox, bar, panel.insetFoot)
+    -- Era's list inset, its foot on panel.insetFoot (the Who buttons) where set; the guild draws Era's whole tab one.
+    if not panel.ownInset then ns.ListInset(panel.listBox, bar, panel.insetFoot) end
     list:SetScript("OnMouseWheel", function(_, delta)
         bar:SetValue((bar:GetValue() or 0) - delta)
     end)
 
     panel.rows = {}
-    for i = 1, 30 do panel.rows[i] = ListRow(list, i, columns, onClick, onDoubleClick) end
+    for i = 1, 30 do panel.rows[i] = ListRow(list, i, columns, onClick, onDoubleClick, panel.rowBar) end
     return list
 end
 

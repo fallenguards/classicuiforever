@@ -115,17 +115,17 @@ local function SweepChild(child, host, mark, hide)
     end
 end
 
--- The client puts the inset at -83 on every page but Raid (-60); our floor is drawn for -83, so it is held there while
--- ours is up, and the page under ours gets its own back as ours goes: the client lays its page first and ours re-swept
+-- The client puts the inset at -83 on every page but Raid (-60); while ours is up it is held at top (Era's for that tab,
+-- else -83), and the page under ours gets its own back as ours goes: the client lays its page first and ours re-swept
 -- it before closing (Who tab to Raid tab), so the description sat on the inset's edge.
-function ns.SweepFriendsFrame(mark, hide)
+function ns.SweepFriendsFrame(mark, hide, top)
     local host = FriendsFrame
     if not host or not host.GetChildren then return end
     local inset = _G["FriendsFrameInset"]
     if inset and not InCombatLockdown() then
         local _, _, _, x, y = inset:GetPoint(1)
         local raid = FRIEND_TAB_RAID ~= nil and PanelTemplates_GetSelectedTab(host) == FRIEND_TAB_RAID
-        local want = (hide or not raid) and -83 or -60
+        local want = hide and (top or -83) or (raid and -60 or -83)
         if y and math.abs(y - want) > 0.5 then inset:SetPoint("TOPLEFT", host, "TOPLEFT", x or 4, want) end
     end
     SweepInside(host.TitleContainer, mark, hide)
@@ -136,9 +136,9 @@ function ns.SweepFriendsFrame(mark, hide)
 end
 
 -- The client raises its controls on its own schedule: re-swept by a watcher under each tab of ours, only while it shows.
-function ns.KeepFriendsSwept(panel, mark)
+function ns.KeepFriendsSwept(panel, mark, top)
     if not panel then return end
-    ns.Sched.Attach(panel, { name = "friends.sweep", every = 0.25, fn = function() ns.SweepFriendsFrame(mark, true) end })
+    ns.Sched.Attach(panel, { name = "friends.sweep", every = 0.25, fn = function() ns.SweepFriendsFrame(mark, true, top) end })
 end
 
 -- The client's opener appends to a half-typed line: empty the box, write "/w name " whole.

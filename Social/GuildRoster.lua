@@ -12,47 +12,76 @@ local CHECK_UP = ns.ART.CHECK .. "Up"
 local CHECK_MARK = ns.ART.CHECK .. "Check"
 local CHECK_HOVER = ns.ART.CHECK .. "Highlight"
 
--- 1.x column proportions.
+-- Era's guild tab (Classic FriendsFrame.xml, eram guild), from the window's top left. Plates: w, barW with the scroll
+-- bar; row texts: x from the row's left (Era's highlight, 8 in), tw wide, barX/barTw with the bar.
 local COLUMNS = {
-    { key = "name", label = NAME or "Name", x = 4, w = 88, justify = "LEFT" },
-    { key = "zone", label = ZONE or "Zone", x = 92, w = 100, justify = "LEFT" },
-    { key = "level", label = LEVEL_ABBR or "Lvl", x = 192, w = 32, justify = "LEFT" },
-    { key = "class", label = CLASS or "Class", x = 224, w = 92, justify = "LEFT" },
+    { key = "name", label = NAME or "Name", w = 83, x = 9, tw = 88, justify = "LEFT" },
+    { key = "zone", label = ZONE or "Zone", w = 120, barW = 105, x = 90, tw = 110, barTw = 95, justify = "LEFT" },
+    { key = "level", label = LEVEL_ABBR or "Lvl", w = 32, x = 204, barX = 189, tw = 20, justify = "CENTER" },
+    { key = "class", label = CLASS or "Class", w = 92, x = 236, barX = 221, tw = 87, barTw = 80, justify = "LEFT" },
 }
 -- The status view (foot arrow): rank, note, last online in the same slots.
 local STATUS_COLUMNS = {
-    { key = "name", label = NAME or "Name", x = 4, w = 88 },
-    { key = "rank", label = RANK or "Rank", x = 92, w = 76 },
-    { key = "note", label = LABEL_NOTE or "Note", x = 168, w = 76 },
-    { key = "lastOnline", label = LASTONLINE or "Last Online", x = 244, w = 72 },
+    { key = "name", label = NAME or "Name", w = 83, x = 9, tw = 75, justify = "LEFT" },
+    { key = "rank", label = RANK or "Rank", w = 75, x = 89, tw = 55, justify = "LEFT" },
+    { key = "note", label = LABEL_NOTE or "Note", w = 90, barW = 75, x = 155, tw = 85, barTw = 70, justify = "LEFT" },
+    { key = "lastOnline", label = LASTONLINE or "Last Online", w = 75, x = 250, barX = 235, tw = 80, justify = "LEFT" },
 }
 local ROW_TEXTS = { "Name", "Zone", "Level", "Class" }
 local ROSTER_EVENTS = { "GUILD_ROSTER_UPDATE", "PLAYER_GUILD_UPDATE", "GUILD_MOTD" }
--- Foot buttons (Classic Era: 123, 98, 104 wide at 3, 128, 228 from the window's left; the panel starts 8 in).
-local GUILD_INFO_BUTTON_X = -5
+local ROWS, ROW_H = 13, 16
+-- Foot buttons: 123, 98, 104 wide at 3, 128, 228, their feet 4 up.
+local GUILD_INFO_BUTTON_X = 3
 local GUILD_INFO_BUTTON_WIDTH = 123
-local GUILD_ADD_MEMBER_BUTTON_X = 120
+local GUILD_ADD_MEMBER_BUTTON_X = 128
 local GUILD_ADD_MEMBER_BUTTON_WIDTH = 98
-local GUILD_CONTROL_BUTTON_X = 220
+local GUILD_CONTROL_BUTTON_X = 228
 local GUILD_CONTROL_BUTTON_WIDTH = 104
-local GUILD_BUTTONS_Y = -7
+local GUILD_BUTTONS_Y = 4
+-- The status arrow's left, 98 under the window's middle; further in with the scroll bar.
+local STATUS_X, STATUS_BAR_X, STATUS_Y = 295, 272, -98
+local ROW_BAR = "Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar"
 local statusView = false
 
 -- The offline pill: the trainer's filter border cut in three.
 local OFFLINE_PILL = {
-    { key = PILL_BORDER, set = "raw", layer = "BACKGROUND", w = 12, h = 28, coords = { 0.90625, 1, 0, 1 }, point = "TOPRIGHT", y = 3 },
+    { key = PILL_BORDER, set = "raw", layer = "BACKGROUND", w = 12, h = 28, coords = { 0.90625, 1, 0, 1 }, point = "TOPRIGHT" },
     { key = PILL_BORDER, set = "raw", layer = "BACKGROUND", w = 186, h = 28, coords = { 0.09375, 0.90625, 0, 1 }, point = "RIGHT", relPoint = "LEFT", chain = true },
     { key = PILL_BORDER, set = "raw", layer = "BACKGROUND", w = 12, h = 28, coords = { 0, 0.09375, 0, 1 }, point = "RIGHT", relPoint = "LEFT", chain = true },
 }
-local OFFLINE_BOX = { set = "raw", layer = "ARTWORK", w = 22, h = 22, point = "RIGHT", x = -6, y = 2 }
-local OFFLINE_CHECK = { set = "raw", layer = "OVERLAY", w = 22, h = 22, point = "CENTER" }
-local OFFLINE_HOVER = { set = "raw", layer = "HIGHLIGHT", blend = "ADD", w = 22, h = 22, point = "CENTER" }
+local OFFLINE_BOX = { set = "raw", layer = "ARTWORK", w = 20, h = 20, point = "RIGHT", x = -8 }
+local OFFLINE_CHECK = { set = "raw", layer = "OVERLAY", w = 20, h = 20, point = "CENTER" }
+local OFFLINE_HOVER = { set = "raw", layer = "HIGHLIGHT", blend = "ADD", w = 20, h = 20, point = "CENTER" }
 local STATUS_ARROW = { add = true }
 local STATUS_TIP = { text = function()
     return statusView and (GUILD_STATUS or "Guild Status") or (PLAYER_STATUS or "Player Status")
 end, r = 1, g = 1, b = 1 }
 
 ---------------------------------------------------------------- the list
+
+-- The current view's columns onto the plates and row texts; Era narrows them round its scroll bar.
+local function ApplyView()
+    local panel = G.panel
+    if not panel then return end
+    local columns = statusView and STATUS_COLUMNS or COLUMNS
+    local barOn = panel.bar:IsShown()
+    panel.barOn = barOn
+    for i, header in ipairs(panel.headers) do
+        local column = columns[i]
+        header.key = column.key
+        header:SetWidth(barOn and column.barW or column.w)
+        header.Text:SetText(column.label)
+    end
+    for _, row in ipairs(panel.rows) do
+        for i, key in ipairs(ROW_TEXTS) do
+            local text, column = row[key], columns[i]
+            ns.SetPointOnce(text, "LEFT", row, "LEFT", barOn and column.barX or column.x, 0)
+            text:SetSize(barOn and column.barTw or column.tw, 14)
+            text:SetJustifyH(column.justify)
+        end
+    end
+    ns.SetPointOnce(panel.status, "LEFT", FriendsFrame, "LEFT", barOn and STATUS_BAR_X or STATUS_X, STATUS_Y)
+end
 
 local function UpdateRows()
     local panel = G.panel
@@ -65,38 +94,18 @@ local function UpdateRows()
         if not entry then
             S.HideRow(row)
         elseif statusView then
-            -- Rank, note and last online in the zone, level and class slots, uncoloured.
+            -- Rank, note and last online in the zone, level and class slots, uncolored.
             S.ShowRow(row, entry, entry.rank, entry.note, LastOnline(entry), nil, EntryKey(entry) == selected, not entry.online)
         else
-            S.ShowRow(row, entry, entry.zone, entry.level, entry.class, entry.classFile, EntryKey(entry) == selected, not entry.online)
+            -- Era's roster: the class in white, as the zone and level.
+            S.ShowRow(row, entry, entry.zone, entry.level, entry.class, nil, EntryKey(entry) == selected, not entry.online)
         end
     end
     panel.bar:SetRange(math.max(0, #roster - shown))
-    -- The arrow beside the scroll column when shown, else by the box's edge.
-    ns.SetPointOnce(panel.status, "BOTTOMRIGHT", panel.listBox, "BOTTOMRIGHT", panel.bar:IsShown() and -32 or -8, 2)
+    if panel.bar:IsShown() ~= panel.barOn then ApplyView() end
     -- The row pads follow what the rows now hold.
     G.SyncBridge()
     G.FillMemberCard()
-end
-
--- The current view's columns onto the headers and row texts.
-local function ApplyView()
-    local panel = G.panel
-    if not panel then return end
-    local columns = statusView and STATUS_COLUMNS or COLUMNS
-    for i, header in ipairs(panel.headers or {}) do
-        local column = columns[i]
-        header.key = column.key
-        header:SetWidth(column.w)
-        if header.Text then header.Text:SetText(column.label) end
-    end
-    for _, row in ipairs(panel.rows or {}) do
-        for i, key in ipairs(ROW_TEXTS) do
-            local text, column = row[key], columns[i]
-            ns.SetPointOnce(text, "LEFT", row, "LEFT", column.x, 0)
-            text:SetWidth(column.w)
-        end
-    end
 end
 
 local function UpdateButtons()
@@ -191,7 +200,7 @@ local function Header_OnClick(self)
 end
 
 -- The client's panels in the window, hidden while the roster is up.
-local hidden = { key = "fcuiGuildHidden", swept = "fcuiGuildSwept", pending = false }
+local hidden = { key = "fcuiGuildHidden", swept = "fcuiGuildSwept", pending = false, insetTop = -80 }
 S.SettleFrame(hidden)
 
 function G.HideBlizzardPanels() S.HidePanels(hidden, G.panel) end
@@ -199,11 +208,23 @@ function G.ShowBlizzardPanels() S.ShowPanels(hidden) end
 
 ---------------------------------------------------------------- the panel
 
--- The bar runs the box's full height: from its top edge down beside the counts, its column's foot on the box's foot.
-local function PlaceBar(bar, list)
+-- Era's rows on its highlight's run (8 in, 84 down), its scroll bar beside them (its FauxScrollFrame at -32, -87).
+local function PlaceList(bar, list)
+    local host = FriendsFrame
+    ns.SetPointOnce(list, "TOPLEFT", host, "TOPLEFT", 8, -84)
+    list:SetSize(298, ROWS * ROW_H)
     bar:ClearAllPoints()
-    bar:SetPoint("TOPLEFT", list, "TOPRIGHT", 6, -13)
-    bar:SetPoint("BOTTOMLEFT", G.panel.listBox, "BOTTOMRIGHT", -20, 20)
+    bar:SetPoint("TOPLEFT", host, "TOPLEFT", 312, -103)
+    bar:SetPoint("BOTTOMLEFT", host, "TOPLEFT", 312, -308)
+end
+
+-- Era's guild buttons write small (their NormalFont), the label on the middle.
+local function SmallFont(button)
+    button:SetNormalFontObject(ns.FONT_GOLD_SMALL)
+    button:SetHighlightFontObject("GameFontHighlightSmall")
+    button:SetDisabledFontObject("GameFontDisableSmall")
+    local label = button:GetFontString()
+    if label then ns.SetPointOnce(label, "CENTER", button, "CENTER", 0, 0) end
 end
 
 function G.Build()
@@ -212,18 +233,26 @@ function G.Build()
     local panel = S.NewPanel(host, "ClassicUIForeverGuildPanel")
     G.panel = panel
 
+    -- Era's inset round the whole tab (its guild page holds it at 4, -80: hidden.insetTop); plates and bar over it.
+    local inset = ns.NewFrame("Frame", nil, panel)
+    inset:SetPoint("TOPLEFT", host, "TOPLEFT", 4, -80)
+    inset:SetPoint("BOTTOMRIGHT", host, "BOTTOMRIGHT", -6, 25)
+    inset:SetFrameLevel(panel:GetFrameLevel())
+    ns.InnerBorder(inset)
+    panel.listBox, panel.ownInset, panel.rowBar = inset, true, ROW_BAR
+
     -- Show Offline Members, the old pill under the title bar; the empty box shows either way.
     local offline = ns.NewFrame("CheckButton", nil, panel)
     panel.offline = offline
     offline:SetSize(210, 23)
-    offline:SetPoint("TOPRIGHT", panel, "TOPRIGHT", 0, 30)
+    offline:SetPoint("TOPRIGHT", host, "TOPRIGHT", -10, -25)
     ns.DressPieces(offline, OFFLINE_PILL)
     local box = ns.DressNew(offline, CHECK_UP, OFFLINE_BOX)
     local check = ns.DressNew(offline, CHECK_MARK, OFFLINE_CHECK, box)
     offline:SetCheckedTexture(check)
     ns.DressNew(offline, CHECK_HOVER, OFFLINE_HOVER, box)
     local offlineText = offline:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    offlineText:SetPoint("CENTER", offline, "CENTER", -3, 2)
+    offlineText:SetPoint("RIGHT", box, "LEFT", -10, 1)
     offlineText:SetText(SHOW_OFFLINE_MEMBERS or "Show Offline Members")
     offline:SetScript("OnClick", function(self)
         if SetGuildRosterShowOffline then pcall(SetGuildRosterShowOffline, self:GetChecked() and true or false) end
@@ -233,7 +262,8 @@ function G.Build()
 
     -- The foot: the three old buttons.
     panel.add = ns.PanelButton(panel, ADDMEMBER or "Add Member", GUILD_ADD_MEMBER_BUTTON_WIDTH)
-    panel.add:SetPoint("BOTTOMLEFT", panel, "BOTTOMLEFT", GUILD_ADD_MEMBER_BUTTON_X, GUILD_BUTTONS_Y)
+    panel.add:SetPoint("BOTTOMLEFT", host, "BOTTOMLEFT", GUILD_ADD_MEMBER_BUTTON_X, GUILD_BUTTONS_Y)
+    SmallFont(panel.add)
     panel.add:SetScript("OnClick", function()
         -- The client's dialog errors unless told the guild's club.
         if StaticPopup_Show then
@@ -243,7 +273,8 @@ function G.Build()
     end)
 
     panel.control = ns.PanelButton(panel, GUILDCONTROL or "Guild Control", GUILD_CONTROL_BUTTON_WIDTH)
-    panel.control:SetPoint("BOTTOMLEFT", panel, "BOTTOMLEFT", GUILD_CONTROL_BUTTON_X, GUILD_BUTTONS_Y)
+    panel.control:SetPoint("BOTTOMLEFT", host, "BOTTOMLEFT", GUILD_CONTROL_BUTTON_X, GUILD_BUTTONS_Y)
+    SmallFont(panel.control)
     panel.control:SetScript("OnClick", function()
         -- Loaded on demand; the client's own opener loads and shows it.
         if GuildControlUI and GuildControlUI:IsShown() then
@@ -262,30 +293,29 @@ function G.Build()
     end)
 
     panel.info = ns.PanelButton(panel, GUILD_INFORMATION or "Guild Information", GUILD_INFO_BUTTON_WIDTH)
-    panel.info:SetPoint("BOTTOMLEFT", panel, "BOTTOMLEFT", GUILD_INFO_BUTTON_X, GUILD_BUTTONS_Y)
+    panel.info:SetPoint("BOTTOMLEFT", host, "BOTTOMLEFT", GUILD_INFO_BUTTON_X, GUILD_BUTTONS_Y)
+    SmallFont(panel.info)
     panel.info:SetScript("OnClick", function()
         -- The client's guild window via the kept toggle; the ghost is dropped first.
         G.DropGhost()
         if G.clientToggleGuild then G.clientToggleGuild() elseif ToggleGuildFrame then ToggleGuildFrame() end
     end)
 
-    -- The guild message over the buttons, iron bars either side.
-    panel.lowerBar = ns.StoneBar(panel)
-    panel.lowerBar:SetPoint("BOTTOM", panel.info, "TOP", 0, 1)
-    S.Span(panel.lowerBar, host)
+    -- Era's trainer bar over the message: 1 in to 75 short of the right, 89 up; its end 75 columns drawn in 70.
+    local barRun, barEnd = ns.DividerBar(inset)
+    barRun:SetPoint("BOTTOMLEFT", host, "BOTTOMLEFT", 1, 89)
+    barRun:SetPoint("BOTTOMRIGHT", host, "BOTTOMRIGHT", -75, 89)
+    barEnd:SetTexCoord(0, 75 / 256, 0.25, 0.5)
+    barEnd:SetWidth(70)
+    barEnd:SetPoint("LEFT", barRun, "RIGHT", 0, 0)
 
-    panel.motdBox = ns.SectionBox(panel)
-    panel.motdBox:SetPoint("BOTTOM", panel.lowerBar, "TOP", 0, 1)
-    S.Span(panel.motdBox, host)
-    panel.motdBox:SetHeight(74)
-
-    panel.upperBar = ns.StoneBar(panel)
-    panel.upperBar:SetPoint("BOTTOM", panel.motdBox, "TOP", 0, 1)
-    S.Span(panel.upperBar, host)
-
-    local motdLabel = panel.motdBox:CreateFontString(nil, "ARTWORK")
-    motdLabel:SetFontObject(ns.FONT_GOLD_SMALL or "GameFontNormalSmall")
-    motdLabel:SetPoint("TOPLEFT", panel.motdBox, "TOPLEFT", 8, -8)
+    -- The message: Era's label at 11, -331, the text box under it (the edit pad covers it).
+    local motdLabel = inset:CreateFontString(nil, "ARTWORK")
+    motdLabel:SetFontObject(ns.FONT_GOLD_SMALL)
+    motdLabel:SetJustifyH("LEFT")
+    motdLabel:SetHeight(11)
+    motdLabel:SetPoint("TOPLEFT", host, "TOPLEFT", 11, -331)
+    motdLabel:SetPoint("TOPRIGHT", host, "TOPLEFT", 236, -331)
     -- The client's string lost "Guild" and the colon; English gets the old words outright.
     local locale = GetLocale and GetLocale() or "enUS"
     if locale == "enUS" or locale == "enGB" then
@@ -294,31 +324,43 @@ function G.Build()
         motdLabel:SetText((GUILD_MOTD_LABEL or "Message of the Day") .. ":")
     end
 
+    panel.motdBox = ns.NewFrame("Frame", nil, inset)
+    panel.motdBox:SetPoint("TOPLEFT", motdLabel, "BOTTOMLEFT", 0, -3)
+    panel.motdBox:SetPoint("TOPRIGHT", host, "TOPLEFT", 326, -345)
+    panel.motdBox:SetHeight(45)
     panel.motd = panel.motdBox:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    panel.motd:SetPoint("TOPLEFT", motdLabel, "BOTTOMLEFT", 0, -3)
-    panel.motd:SetPoint("BOTTOMRIGHT", panel.motdBox, "BOTTOMRIGHT", -8, 6)
+    panel.motd:SetAllPoints(panel.motdBox)
     panel.motd:SetJustifyH("LEFT")
     panel.motd:SetJustifyV("TOP")
 
     G.BuildMotdPad(panel)
 
-    -- The column plates, then the list in its box; the counts are its last line.
-    local headerRow
-    headerRow, panel.headers = S.HeaderRow(panel, host, COLUMNS, Header_OnClick)
-    panel.listBox = S.ListBox(panel, host, headerRow, panel.upperBar)
+    -- Era's plates from 7, -57, over the inset's top edge.
+    local plates = ns.NewFrame("Frame", nil, panel)
+    plates:SetSize(1, 24)
+    plates:SetPoint("TOPLEFT", host, "TOPLEFT", 7, -57)
+    plates:SetFrameLevel(inset:GetFrameLevel() + 2)
+    panel.headers = {}
+    local last
+    for _, column in ipairs(COLUMNS) do
+        last = ns.ColumnHeader(plates, column, last, Header_OnClick, true)
+        panel.headers[#panel.headers + 1] = last
+    end
 
-    panel.totals = panel.listBox:CreateFontString(nil, "ARTWORK")
-    panel.totals:SetFontObject(ns.FONT_GOLD_SMALL or "GameFontNormalSmall")
-    panel.totals:SetPoint("BOTTOMLEFT", panel.listBox, "BOTTOMLEFT", 8, 6)
+    -- The counts under the rows, 98 under the window's middle, both in gold.
+    panel.totals = inset:CreateFontString(nil, "ARTWORK")
+    panel.totals:SetFontObject(ns.FONT_GOLD_SMALL)
+    panel.totals:SetHeight(16)
+    panel.totals:SetPoint("LEFT", host, "LEFT", 13, STATUS_Y)
 
-    panel.online = panel.listBox:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    panel.online:SetPoint("LEFT", panel.totals, "RIGHT", 4, 0)
-    panel.online:SetTextColor(0.1, 1, 0.1)
+    panel.online = inset:CreateFontString(nil, "ARTWORK")
+    panel.online:SetFontObject(ns.FONT_GOLD_SMALL)
+    panel.online:SetHeight(16)
+    panel.online:SetPoint("LEFT", panel.totals, "RIGHT", 3, 0)
 
-    -- The arrow at the foot turns the roster over; its tooltip says to which face.
-    panel.status = ns.NewFrame("Button", nil, panel.listBox)
-    panel.status:SetSize(28, 28)
-    panel.status:SetPoint("BOTTOMRIGHT", panel.listBox, "BOTTOMRIGHT", -8, 2)
+    -- The arrow beside the counts turns the roster over (placed with the view); its tooltip says to which face.
+    panel.status = ns.NewFrame("Button", nil, inset)
+    panel.status:SetSize(32, 32)
     ns.DressStates(panel.status, "sbNextUp", "sbNextDown", nil, "mouseHighlight", STATUS_ARROW)
     ns.AttachTip(panel.status, STATUS_TIP)
 
@@ -335,7 +377,7 @@ function G.Build()
         if GameTooltip:IsOwned(self) then self:GetScript("OnEnter")(self) end
     end)
 
-    S.ScrollRows(panel, panel.totals, 4, UpdateRows, COLUMNS, Row_OnClick, Row_OnDoubleClick, PlaceBar)
+    S.ScrollRows(panel, panel.totals, 4, UpdateRows, COLUMNS, Row_OnClick, Row_OnDoubleClick, PlaceList)
     -- After the rows: the bridge hears the mouse on them.
     G.WatchBridge(panel)
 
