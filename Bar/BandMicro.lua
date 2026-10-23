@@ -65,7 +65,7 @@ local function HelpMicroButton()
     return button
 end
 
--- 1.x had a world map button in the row; ours goes beside the quest button. Its click goes through a secure pad (UI/SecurePad.lua).
+-- 1.x had a world map button in the row, after the social one. Its click goes through a secure pad (UI/SecurePad.lua).
 local function WorldMapMicroButton()
     if ns.WorldMapMicroButton then return ns.WorldMapMicroButton end
     -- Made before the band art exists; the row layout reparents it later.
@@ -183,9 +183,15 @@ local function MicroButtonList()
     end
     local map = WorldMapMicroButton()
     if map then
+        -- Era's row (its Vanilla MicroMenuContainerOverrides): quest log, socials (the guild button here), then the map.
         local at = #found + 1
         for i, button in ipairs(found) do
-            if button == QuestLogMicroButton then at = i + 1 break end
+            if button == _G.GuildMicroButton or button == _G.SocialsMicroButton then
+                at = i + 1
+                break
+            elseif button == QuestLogMicroButton then
+                at = i + 1
+            end
         end
         table.insert(found, at, map)
     end
