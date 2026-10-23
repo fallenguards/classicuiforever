@@ -797,4 +797,3 @@ L["CHAT_19"] = "una parte di questo addon (%s) si è fermata dopo errori ripetut
 L["OPTWIN_TAB_PROFILES"] = "Profili"
 L["OPTWIN_TAB_FAQ"] = "FAQ"
 L["OPTWIN_TAB_SUPPORT"] = "Supporto"
-L["WHO_COLUMN"] = "Colonna"

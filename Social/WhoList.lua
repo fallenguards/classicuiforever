@@ -3,7 +3,6 @@ local _, ns = ...
 -- The 1.x Who tab. Takes /who results over from the client's own window while on.
 
 local S = ns.social
-local L = ns.L
 local IsSecret, Safe = ns.IsSecret, ns.Safe
 
 local active = false
@@ -208,35 +207,37 @@ end
 
 ---------------------------------------------------------------- the panel
 
-local function SortRow(label, field)
-    return { label, radio = function() return sort.field == field end,
-        pick = function() sort.field = field Refresh() end }
+-- Sorted by this field; the second column sorts as "zone" whatever it shows.
+local function SortedBy(key)
+    if key == "class" then return sort.field == "class" end
+    return sort.field == "zone" and WhoField().key == key
 end
 
-local function OrderRow(label, reverse)
-    return { label, radio = function() return sort.reverse == reverse end,
-        pick = function() sort.reverse = reverse Refresh() end }
+-- A field's row (#200): a click sorts by it, race, zone and guild shown in the second column first; clicked again,
+-- the other way. Its filters open beside it as before; the headers still sort too.
+local function FieldRow(header, label, key, filters)
+    return { label, sub = filters, radio = function() return SortedBy(key) end, pick = function()
+        if SortedBy(key) then
+            sort.reverse = not sort.reverse
+        else
+            if key ~= "class" then
+                ns.db.whoColumn = key
+                if header.Text then header.Text:SetText(WhoField().label) end
+            end
+            sort.field, sort.reverse = key == "class" and "class" or "zone", false
+        end
+        Refresh()
+    end }
 end
 
--- The game's Who filters (class, race, zone, sort), then which field the second column shows.
 local function FilterEntries(header)
-    local entries = S.WhoFilterEntries()
-    entries[#entries + 1] = { WHO_SORT_LABEL or "Sort By", sub = {
-        SortRow(NAME or "Name", "name"), SortRow(CLASS or "Class", "class"), SortRow(LEVEL or "Level", "level"),
-        { divider = true },
-        OrderRow(WHO_SORT_ASCENDING_LABEL or "Ascending", false), OrderRow(WHO_SORT_DESCENDING_LABEL or "Descending", true),
-    } }
-    local columns = {}
-    for _, field in ipairs(WHO_FIELDS) do
-        columns[#columns + 1] = { field.label, radio = function() return WhoField() == field end, pick = function()
-            ns.db.whoColumn = field.key
-            if header.Text then header.Text:SetText(field.label) end
-            sort.field, sort.reverse = "zone", false
-            Refresh()
-        end }
-    end
-    entries[#entries + 1] = { L["WHO_COLUMN"], sub = columns }
-    return entries
+    local classes, races, zones = S.WhoFilterLists()
+    return {
+        FieldRow(header, CLASS or "Class", "class", classes),
+        FieldRow(header, _G.RACE or "Race", "race", races),
+        FieldRow(header, ZONE or "Zone", "zone", zones),
+        FieldRow(header, GUILD or "Guild", "guild"),
+    }
 end
 
 -- The filter arrow on the second column's plate.

@@ -797,4 +797,3 @@ L["CHAT_19"] = "una parte de este accesorio (%s) se detuvo tras errores repetido
 L["OPTWIN_TAB_PROFILES"] = "Perfiles"
 L["OPTWIN_TAB_FAQ"] = "Preguntas"
 L["OPTWIN_TAB_SUPPORT"] = "Apoyo"
-L["WHO_COLUMN"] = "Columna"

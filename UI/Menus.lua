@@ -285,7 +285,7 @@ end
 
 -- Blizzard_Menu Vanilla's rows on the iron list. Entries, or a function giving them per open: { text, check = isOn, toggle = fn }
 -- (gold tick when on), { text, radio = isOn, pick = fn }, { text, click = fn }, { divider = true }, { text, sub = entries or
--- a function }. A pick keeps the menu open and redraws the marks; a submenu opens beside its row on hover.
+-- a function }. A pick keeps the menu open and redraws the marks; a submenu opens on hover (with a pick, a click picks).
 local CHECK_MARK, CHECK_SIZE = { 211, 1, 243, 33 }, 20      -- common-dropdown-icon-checkmark-yellow-classic-2
 local EXPAND_ARROW, EXPAND_SIZE, EXPAND_GAP = "Interface\\ChatFrame\\ChatFrameExpandArrow", 16, 4
 local SUB_GAP = 4
@@ -333,12 +333,12 @@ end
 local function RowClick(row)
     local entry = row.entry
     if not entry then return end
-    if entry.sub then
+    local act = entry.toggle or entry.pick or entry.click
+    if entry.sub and not act then
         OpenSub(row:GetParent(), row)
         return
     end
     PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
-    local act = entry.toggle or entry.pick or entry.click
     if act then act() end
     Redraw(row:GetParent().root)
 end

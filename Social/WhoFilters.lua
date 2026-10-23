@@ -119,11 +119,7 @@ local function ZoneEntries()
     return entries
 end
 
--- The filter submenus for the Who list's menu.
-function S.WhoFilterEntries()
-    return {
-        { CLASS or "Class", sub = ClassEntries },
-        { _G.RACE or "Race", sub = RaceEntries },
-        { ZONE or "Zone", sub = ZoneEntries },
-    }
+-- The filter submenus for the Who list's menu: class, race, zone.
+function S.WhoFilterLists()
+    return ClassEntries, RaceEntries, ZoneEntries
 end
