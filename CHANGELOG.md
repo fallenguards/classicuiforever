@@ -2,6 +2,41 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.37.0] - 2026-10-23
+
+### Added
+- The combined map and quest log, as the Wrath-era map: the quest list beside the map, and the picked quest's text and rewards on two pages under it. Turn on Classic combined map/quest under Map, which needs the Classic style navigation bar. Unlocked, drag the map's corner to size it and the window follows live; drag the divider to widen the list, and Reset puts both back (#73).
+- List on the game's parchment, under Map, for the map's quest list and the combined map's: the list sits on the game's own quest log page instead of dark stone. Off by default.
+- Quest list font size and Quest text font size, under Map: points added to the map's quest lists, and to the picked quest's text and rewards, in the side tab and the combined map.
+- Territory in zone names, under Other: on Forever a zone's territory, such as Alliance Territory, shows outside the capitals too, as 1.x did. On by default (#55).
+- Hide bag search box and Hide Clean Up button, under Bags, both off by default.
+- Map coordinates: player and Map coordinates: cursor, under Map. They are the game's own settings, shown here so they are easy to find.
+- On retail, Hide map help button under Map hides the game's tutorial button at the map's top left. Off by default.
+- On retail, the group finder eye moves round the minimap's rim and sizes in our Edit Mode's minimap options, and the crit and haste rows on the character's stats show the game's own tooltips (#208).
+
+### Changed
+- The game's loot toast, the "You received" box for a rare drop, a won roll or an upgrade, is hidden, as 1.x had none. Loot toast under Other brings it back.
+- The guild tab follows Classic Era's own layout: its column headers sit over the list box's top edge, a bar runs above the message of the day, and the counts, buttons and Show Offline Members box stand where Era has them. Class names show in white, as in Era.
+- The bank keeps Forever's larger grid and takes Classic Era's layout under it: Bag Slots over a row of full-size bag slots under the item columns, the purchase line with its question, and the money on a strip across the foot under a metal bar.
+- The classic layout puts the player, target and focus frames at Classic Era's own spots, and bars 4 and 5 at Era's spot on the right edge. This takes effect from the setup's layout choice or the Classic layout button; nobody is moved on their own, and installs from before keep their bars 4 and 5 where they were.
+- The micro menu has the World Map button after the social button, as in Era, and the bottom band's micro menu art is Era's own, darker toward its right end. The latency window, key ring and bags stand at Era's spots beside it.
+- The group finder eye grows and shrinks with the minimap on its rim, and its size line in Edit Mode says the size it is drawn at (#208).
+- The cast target glow on nameplates is a red classic border (#223).
+- The Who list's column menu: Class, Race, Zone and Guild sort by and show that column, and picking the shown one again flips the order. The Column and Sort By rows are gone (#200).
+
+### Fixed
+- The party frames' debuff glow sat beside the portrait. It is Era's ring round the portrait now (#225).
+- Looting the last item on a loot page left the window on the empty page. It turns to the next page, as in Era.
+- In the group finder eye's Edit Mode box, dragging the eye gave an error and sometimes hid it, it vanished off the minimap with Snap to minimap off, and Reset put it at Forever's spot instead of Era's.
+- With a picked quest list font size, hovering a header showed it at the game's size, and rows first opened could overlap.
+- A quest's page stayed incomplete when a reward item's details arrived late. It redraws as they come.
+- Inspect Talents from a player's menu in a fight showed the game's talent window beside ours. It stays hidden in a fight too.
+- A fight starting while a window was being dragged left the world map following the cursor until the fight ended. The window stops where it is.
+- On retail the classic map's filter and pin buttons were missed, and the filter button kept extra art. Both are found and dressed.
+- On retail a battle pet's target frame showed a second icon in the level spot.
+- The bank's floor showed past the window's bottom right corner.
+- Small alignment fixes on the minimap clock and the micro menu.
+
 ## [0.36.0] - 2026-10-22
 
 ### Added
