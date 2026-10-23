@@ -478,6 +478,7 @@ local function PlaceSearch(frame)
     end
     local bar = frame.IsCombinedBagContainer and frame:IsCombinedBagContainer() and GamepadBarOff()
     if bar and BagItemAutoSortButton then ns.SetLevelIf(BagItemAutoSortButton, bar:GetFrameLevel() + 5) end
+    ns.ShowBagHeader()
 end
 
 local shape = setmetatable({}, { __mode = "k" })   -- bag frame -> { extra, plusTwo, wider } as last drawn

@@ -95,6 +95,8 @@ return {
     guildMinimapButton = false,
     guildRoster = true,
     helpMinimapButton = false,
+    hideBagCleanup = false,
+    hideBagSearch = false,
     hideBagsAlways = false,
     hideBagsArt = false,
     hideBagsHover = false,

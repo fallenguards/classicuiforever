@@ -214,6 +214,7 @@ Map\WorldMapFight.lua
 Map\WorldMapMarkers.lua
 Windows\BagBand.lua
 Windows\Bags.lua
+Windows\BagHeader.lua
 Windows\BagReagent.lua
 Windows\BagSlotRow.lua
 Windows\BagSections.lua
