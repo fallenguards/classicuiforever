@@ -50,6 +50,7 @@ ns.TEX = {
     smallTargetingFrame = "TargetingFrame\\UI-SmallTargetingFrame",
     partyFrame = "TargetingFrame\\UI-PartyFrame",
     partyFlash = "TargetingFrame\\UI-PartyFrame-Flash",
+    partyStatus = "Buttons\\UI-Debuff-Overlays",
     petAttackStatus = "TargetingFrame\\UI-Player-AttackStatus",
     questBadge = "TargetingFrame\\PortraitQuestBadge",
     portraitMask = "CharacterFrame\\TempPortraitAlphaMask",

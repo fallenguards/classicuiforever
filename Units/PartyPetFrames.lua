@@ -16,6 +16,8 @@ local PARTY_ART_LAYERED = { coords = FULL, w = 128, h = 64, point = "TOPLEFT", y
 local PARTY_FLASH = { coords = FULL, w = 128, h = 64, point = "TOPLEFT", x = -3, y = -6 }
 local PARTY_FLASH_LAYERED = { coords = FULL, w = 128, h = 64, point = "TOPLEFT", x = -3, y = -6, layer = "BACKGROUND", sublevel = 0 }
 local PARTY_LEADER = { coords = FULL, w = 16, h = 16, point = "TOPLEFT", y = -8 }
+-- Era's debuff ring round the portrait (PartyFrameTemplates.xml Status); the game colors it by the debuff's type.
+local PARTY_STATUS = { coords = { 0, 0.2734375, 0, 0.5625 }, w = 36, h = 36, point = "CENTER" }
 -- Pet and party bars are 7 to 10 tall: their numbers in the small bar font (Units/StatusFont.lua).
 local SMALL_FONT = "ForeverClassicUISmallBarText"
 local SMALL_TEXTS = { { "CENTER", 0, 0 }, { "LEFT", 3, 0 }, { "RIGHT", -3, 0 }, font = SMALL_FONT }
@@ -92,6 +94,12 @@ local function DrainPartyTrim(frame, undo)
     paint(frame.VehicleTexture)
 end
 
+-- Placed for the game's own frame art, it stood above our portrait (#225).
+local function DressStatus(frame)
+    local overlay = frame.PartyMemberOverlay
+    if overlay and overlay.Status and frame.Portrait then Dress(overlay.Status, "partyStatus", PARTY_STATUS, frame.Portrait) end
+end
+
 local function SkinPartyMember(frame)
     if Busy() then return end
     UF.taken.party = true
@@ -137,6 +145,7 @@ local function SkinPartyMember(frame)
         if overlay.RoleIcon then ns.SetPointOnce(overlay.RoleIcon, "TOPLEFT", frame, "TOPLEFT", 7, -41) end
         if overlay.PVPIcon then ns.SetPointOnce(overlay.PVPIcon, "TOPLEFT", frame, "TOPLEFT", -9, -23) end
     end
+    DressStatus(frame)
     UF.DressGlow(frame.Flash, "partyFlash", PARTY_FLASH_LAYERED, frame)
 end
 
@@ -180,6 +189,7 @@ local function KeepParty()
             if frame.Portrait then ns.SetPointOnce(frame.Portrait, "TOPLEFT", frame, "TOPLEFT", 7, -14) end
             if frame.Name then ns.SetPointOnce(frame.Name, "TOPLEFT", frame, "TOPLEFT", 49, -7) end
             UF.DressGlow(frame.Flash, "partyFlash", PARTY_FLASH, frame)
+            DressStatus(frame)
             DrainPartyTrim(frame)
             if undone and not Busy() then SkinPartyMember(frame) end
         end
@@ -208,3 +218,4 @@ local function RestoreParty()
 end
 
 UF.SkinPet, UF.SkinParty, UF.SkinPartySoon, UF.KeepParty, UF.RestoreParty = SkinPet, SkinParty, SkinPartySoon, KeepParty, RestoreParty
+UF.DressPartyStatus = DressStatus
