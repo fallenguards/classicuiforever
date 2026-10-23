@@ -49,6 +49,9 @@ local REPUTATION = { coords = FULL, w = BAR_W, h = 19, point = "TOPRIGHT", x = -
 local SKULL = { coords = FULL, w = 16, h = 16, point = "CENTER", relPoint = "TOPLEFT", x = 199, y = -70 }
 local LEADER = { coords = FULL, w = 16, h = 16, point = "TOPRIGHT", x = -24, y = -14 }
 local QUEST = { coords = FULL, w = 32, h = 32, point = "TOP", x = 32, y = -16 }
+-- A battle pet's type badge where the old frame had it (Classic/TargetFrame.xml): on the portrait's right edge, 7.25
+-- right of and 26 over the level; the game's own spot covered our level.
+local PET_BADGE = { point = "CENTER", relPoint = "TOPLEFT", x = 206.25, y = -45 }
 local TOT_ART = { own = "art", layer = "ARTWORK", coords = { 0.015625, 0.7265625, 0, 0.703125 }, w = 93, h = 45, point = "TOPLEFT", show = true }
 local TEXTS = { { "CENTER", 0, 0 }, { "LEFT", 5, 0 }, { "RIGHT", -7, 0 }, { "CENTER", 0, 0 }, { "CENTER", 0, 0 } }
 local TOT_PIECES = { "FrameTexture", "HealthBar", "ManaBar" }
@@ -299,6 +302,7 @@ local function SkinTarget(frame, unit)
         ns.SetPointOnce(contextual.RaidTargetIcon, "CENTER", container.Portrait, "TOP", 2, -2)
     end
     Dress(contextual.QuestIcon, "questBadge", QUEST, frame)
+    Dress(contextual.PetBattleIcon, nil, PET_BADGE, host)
     if contextual.NumericalThreat then
         ns.SetPointOnce(contextual.NumericalThreat, "BOTTOM", frame, "TOP", -30, -26)
     end
