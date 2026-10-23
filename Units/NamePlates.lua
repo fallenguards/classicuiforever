@@ -1,7 +1,7 @@
 local _, ns = ...
 
 -- 1.x plate: 128x16 border with the level in its right slot, 103.75x10 health bar, name above, cast bar below.
--- We re-lay the client plate's pieces and fade its retail art; forbidden plates (instances) are left alone.
+-- We re-lay the client plate's pieces and fade its retail art; locked plates (friends in dungeons) stay the game's.
 
 local Dress, DressNew, FadeKeys, IsSecret = ns.Dress, ns.DressNew, ns.FadeKeys, ns.IsSecret
 
@@ -563,7 +563,7 @@ end
 
 -- Era's classic plates turn the moused-over name yellow (Plate name on hover). The client paints every name again as
 -- the mouse finds a unit, so ours comes a frame after; as it leaves, the color it had comes back.
-local nameOver, nameWas = nil, {}
+local nameOver, nameWas, nameWasFor = nil, {}, nil
 local function Yellow(name)
     local r, g, b = name:GetVertexColor()
     return ns.AnySecret(r, g, b) or (r == 1 and g == 1 and b == 0)
@@ -583,7 +583,11 @@ local function PaintNameOver(fresh)
     if not name then return end
     local r, g, b = name:GetVertexColor()
     if ns.AnySecret(r, g, b) then nameOver = nil return end
-    nameWas[1], nameWas[2], nameWas[3] = r, g, b
+    -- The game's Classic style yellows the hovered name itself: the color taken before it stays the one to give back.
+    if not (nameWasFor == over and r == 1 and g == 1 and b == 0) then
+        nameWas[1], nameWas[2], nameWas[3] = r, g, b
+        nameWasFor = over
+    end
     name:SetVertexColor(1, 1, 0)
 end
 local function PaintNameFresh() PaintNameOver(true) end
@@ -684,7 +688,6 @@ local function OnEvent(_, event, unit, _, _, interruptedBy)
         local unitFrame = PlateFor(unit)
         if unitFrame then QueueRelay(unitFrame) end
     elseif event == "NAME_PLATE_UNIT_REMOVED" then
-        -- The plate is recycled for another unit.
         local unitFrame = LivePlate(unit)
         if unitFrame then
             castCut[unitFrame] = nil
@@ -729,7 +732,6 @@ end
 
 local function Apply()
     SetActive(true)
-    NP.RestoreStyleChoice()
     if not NamePlateDriverFrame then ns.MissingPiece("NamePlateDriverFrame") return end
     if not driver then
         driver = CreateFrame("Frame")
@@ -743,7 +745,6 @@ end
 
 local function Restore()
     SetActive(false)
-    NP.RestoreStyleChoice()
     for unitFrame in pairs(skinned) do
         if unitFrame.fcui then
             -- Regions only: the table also keeps the name's sizes.

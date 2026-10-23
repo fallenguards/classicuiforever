@@ -411,6 +411,7 @@ frame:SetScript("OnEvent", function(_, event, arg1)
     if event == "PLAYER_LOGOUT" then
         if ns.RepairSurnames then pcall(ns.RepairSurnames) end
         pcall(ns.RepairDamageNumbers)
+        pcall(ns.GiveBackPlateStyle)
         pcall(ns.StoreProfile)
         -- Disabled in the addon list: the last chance to hand the UI back.
         if ns.BeingTurnedOff and ns.BeingTurnedOff() and ns.HandBack then pcall(ns.HandBack) end

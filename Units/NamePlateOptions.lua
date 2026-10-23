@@ -1,6 +1,6 @@
 local _, ns = ...
 
--- Plate colours and options: class colours, full-size plates, old nameplate style clean-up.
+-- Plate colours and options: class colours, full-size plates, the player's own plate style given back.
 
 local NP = ns.NP
 local Dress, IsSecret = ns.Dress, ns.IsSecret
@@ -120,12 +120,16 @@ function NP.ClassColor(unitFrame, isPlayer)
     if r then Paint(health, r, g, b) else NP.Unpaint(health) end
 end
 
--- An earlier build changed nameplateStyle and saved the player's value: restore it if still held.
-function NP.RestoreStyleChoice()
-    local saved = ns.db.savedNamePlateStyle
-    if saved == nil then return end
-    ns.db.savedNamePlateStyle = nil
-    ns.SetCVar(STYLE_CVAR, saved)
+-- Builds that set the game's plate style kept the player's: it goes back as the session ends. The game's Classic style
+-- does not fit the plates it locks (friends in dungeons). A CVar write runs its listeners as ours.
+function ns.GiveBackPlateStyle()
+    local db = ns.db
+    if not db then return end
+    local was = db.cvarWas and db.cvarWas[STYLE_CVAR]
+    if was == nil then was = db.savedNamePlateStyle end
+    db.savedNamePlateStyle = nil
+    if db.cvarWas then db.cvarWas[STYLE_CVAR] = nil end
+    if was ~= nil then ns.WriteCVar(STYLE_CVAR, tostring(was)) end
 end
 
 local function RestoreColor(unitFrame)
