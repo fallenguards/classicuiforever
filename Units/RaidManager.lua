@@ -1,12 +1,17 @@
 local _, ns = ...
 
 -- Raid manager panel at the left edge (1.x had none): collapsed, its backing fades and the arrow
--- sits at the top below the player frame; expanded, it is the client's.
+-- stands where the expanded one does; expanded, it is the client's.
 
 local UF = ns.UF
 local STATES = ns.KEYS.STATES
 
 local managerState
+
+-- The client's arrow spots: the back arrow 20 below the middle, the forward one at it.
+local ARROW_X, BACK_Y = -7, -20
+-- Divider lines hang on the manager, not on the part collapsing hides: they fade with the backing.
+local DIVIDER_POOLS = { "dividerHorizontalPool", "dividerVerticalPool" }
 
 -- Collapsed: the back tab turned over (flat side on the screen edge, arrow right). Expanded: the back tab as drawn.
 local TAB_FORWARD = { "gm-btnback-normal", "gm-btnback-hover", mirror = true }
@@ -130,6 +135,16 @@ local function PlainGroupBorders()
     bordersLeft = #GROUP_FRAMES + 1
 end
 
+-- Pooled: one acquired after a fade keeps the alpha it was released with, so every watch looks again.
+local function FadeDividers(manager, alpha)
+    for _, key in ipairs(DIVIDER_POOLS) do
+        local pool = manager[key]
+        if pool and pool.EnumerateActive then
+            for tex in pool:EnumerateActive() do ns.SetAlphaIf(tex, alpha) end
+        end
+    end
+end
+
 local function LayoutRaidManager()
     if not UF.active then PlainGroupBorders() end
     local manager = CompactRaidFrameManager
@@ -138,16 +153,18 @@ local function LayoutRaidManager()
     if UF.active then
         UF.taken.raidManager = true
         if manager.Background then manager.Background:SetAlpha(manager.collapsed and 0 or 1) end
+        FadeDividers(manager, manager.collapsed and 0 or 1)
         if arrow then
-            ns.SetPointOnce(arrow, "TOPRIGHT", manager, "TOPRIGHT", -7, 0)
+            ns.SetPointOnce(arrow, "RIGHT", manager, "RIGHT", ARROW_X, BACK_Y)
             MirrorTab(arrow, TAB_FORWARD)
         end
         if manager.toggleButtonBack then MirrorTab(manager.toggleButtonBack, TAB_BACK) end
     elseif UF.taken.raidManager then
         UF.taken.raidManager = nil
         if manager.Background then manager.Background:SetAlpha(1) end
+        FadeDividers(manager, 1)
         if arrow then
-            ns.SetPointOnce(arrow, "RIGHT", manager, "RIGHT", -7, 0)
+            ns.SetPointOnce(arrow, "RIGHT", manager, "RIGHT", ARROW_X, 0)
             PlainTab(arrow)
         end
         PlainTab(manager.toggleButtonBack)
@@ -160,6 +177,7 @@ local function WatchRaidManager()
     local manager = CompactRaidFrameManager
     if not manager then return end
     local state = manager.collapsed and true or false
+    if UF.active then FadeDividers(manager, state and 0 or 1) end
     if state == managerState then return end
     managerState = state
     LayoutRaidManager()
