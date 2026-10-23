@@ -56,15 +56,38 @@ local function Hastes()
     return _G.GetMeleeHaste(), ranged + (ammo or 0), _G.UnitSpellHaste("player")
 end
 
--- The client's tooltips for these name all three schools.
+-- Retail has one crit and one haste, with rating and bonus: its own line's tooltip, read off a scratch line (#208).
+local scratch
+local function RetailTip(row, set)
+    if type(set) ~= "function" then return end
+    if not scratch then
+        scratch = CreateFrame("Frame")
+        scratch.Value = scratch:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+    end
+    scratch.tooltip, scratch.tooltip2, scratch.tooltip3 = nil, nil, nil
+    set(scratch, "player")
+    scratch:Hide()
+    row.tooltip, row.tooltip2, row.tooltip3 = scratch.tooltip, scratch.tooltip2, scratch.tooltip3
+    _G.PaperDollStatTooltip(row)
+end
+
+-- Forever's tooltips for these name all three schools.
 local function HitTip(row)
     _G.CharacterHitFrame_OnEnter(row, row.fcuiMelee, row.fcuiRanged, row.fcuiSpell, _G.STAT_HIT_CHANCE)
 end
 local function CritTip(row)
-    _G.CharacterCritChanceFrame_OnEnter(row, row.fcuiMelee, row.fcuiRanged, row.fcuiSpell)
+    if ns.OnForever() then
+        _G.CharacterCritChanceFrame_OnEnter(row, row.fcuiMelee, row.fcuiRanged, row.fcuiSpell)
+    else
+        RetailTip(row, _G.PaperDollFrame_SetCritChance)
+    end
 end
 local function HasteTip(row)
-    _G.CharacterHasteFrame_OnEnter(row, row.fcuiMelee, row.fcuiRanged, row.fcuiSpell)
+    if ns.OnForever() then
+        _G.CharacterHasteFrame_OnEnter(row, row.fcuiMelee, row.fcuiRanged, row.fcuiSpell)
+    else
+        RetailTip(row, _G.PaperDollFrame_SetHaste)
+    end
 end
 
 local function School(read, index, label, format, tip)
