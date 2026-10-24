@@ -4,11 +4,13 @@ local _, ns = ...
 
 local WEAK = { __mode = "k" }
 
--- Crop the icon's own square border (it showed inside the ring); ours also get a round mask.
+-- Crop the icon's own square border (it showed inside the ring); ours also get a round mask. crop: less for an icon
+-- under the ring art (0.07 just clears an icon's 4 px frame).
 local ICON_CROP = 0.1
-function ns.RoundIcon(tex, inset)
+function ns.RoundIcon(tex, inset, crop)
     if not tex then return end
-    tex:SetTexCoord(ICON_CROP, 1 - ICON_CROP, ICON_CROP, 1 - ICON_CROP)
+    crop = crop or ICON_CROP
+    tex:SetTexCoord(crop, 1 - crop, crop, 1 - crop)
     local owner = tex:GetParent()
     if tex.fcuiMask or not (owner and owner.CreateMaskTexture and tex.AddMaskTexture) then return end
     local mask = owner:CreateMaskTexture()
@@ -21,6 +23,8 @@ end
 
 -- A portrait switches between face, ring art and icon with the tabs; only icons are cropped.
 -- Client-set sheet coords (class icons) are handled apart.
+-- Round portrait art by file id, its own black to the ring: Era's spellbook icon (the professions book's portrait).
+local ROUND_ART = { [136830] = true }
 local function IsIconTexture(tex)
     local path = tex.GetTextureFilePath and tex:GetTextureFilePath()
     -- A texture set by file id (the spec icon) reports "FileData ID n" as its path.
@@ -28,7 +32,7 @@ local function IsIconTexture(tex)
         return path:lower():find("icons", 1, true) ~= nil
     end
     local file = tex:GetTexture()
-    if type(file) == "number" then return true end
+    if type(file) == "number" then return not ROUND_ART[file] end
     if type(file) == "string" then
         local lower = file:lower()
         if lower:find("^rt") or lower:find("^portrait") then return false end

@@ -6,11 +6,11 @@ local _, ns = ...
 
 local T = ns.prof
 local ART_W, ART_H = 384, 512
--- Each window's art spot and its pieces' spots, from our window's corner. pieces() is read at first use.
--- ring: the portrait ring drawn again over the portrait (and, on the book, over its page's bands), as the art covers
--- the portrait's edge in Era; above: over the page too.
+-- Each window's art spot and its pieces' spots, from our window's corner. pieces() is read at first use. ring: the
+-- portrait ring again over the portrait (on the book, over its page's bands too); above: over the page too. fullMask:
+-- the portrait's round mask on its own box, centred on the ring's hole (the game's sits 2 up), as the spellbook's.
 local KINDS = {
-    book = { x = -12, y = 14, pieces = function() return ns.SPELLBOOK_QUARTERS end, above = true,
+    book = { x = -12, y = 14, pieces = function() return ns.SPELLBOOK_QUARTERS end, above = true, fullMask = true,
         ring = { key = "sbRing", layer = "OVERLAY", w = 96, h = 96, point = "TOPLEFT" },
         portrait = { x = -2, y = 6, size = 58 }, title = { x = 186, y = -12 }, close = { x = -11, y = -11 } },
     -- The trade skill page stands 2 in (Skills/TradeSkill.lua): its border on the book's, portrait on the same middle,
@@ -100,6 +100,7 @@ function T.EraFrame(kind)
     local fight = InCombatLockdown()
     if kind and fight and not holders[kind] then return end
     local portrait = frame.PortraitContainer and frame.PortraitContainer.portrait
+    local mask = frame.PortraitContainer and frame.PortraitContainer.CircleMask
     local title = frame.TitleContainer and frame.TitleContainer.TitleText
     local close = frame.CloseButton
     if kind == current then
@@ -115,7 +116,7 @@ function T.EraFrame(kind)
         local art = Holder(frame, kind)
         if not saved then
             saved = { portrait = portrait and Points(portrait), portraitSize = portrait and { portrait:GetSize() },
-                title = title and Points(title), close = close and Points(close) }
+                mask = mask and Points(mask), title = title and Points(title), close = close and Points(close) }
         end
         if not fight then
             -- Under every piece of the window, the chrome's textures included.
@@ -132,12 +133,19 @@ function T.EraFrame(kind)
             portrait:SetSize(spec.portrait.size, spec.portrait.size)
             ns.SetPointOnce(portrait, "TOPLEFT", frame, "TOPLEFT", spec.portrait.x, spec.portrait.y)
         end
+        if mask and spec.fullMask and portrait then
+            mask:ClearAllPoints()
+            mask:SetAllPoints(portrait)
+        elseif mask then
+            Restore(mask, saved.mask)
+        end
         if title then ns.SetPointOnce(title, "CENTER", frame, "TOPLEFT", spec.title.x, spec.title.y) end
         PlaceClose(close, spec)
     elseif current then
         if frame.NineSlice then ns.SetAlphaIf(frame.NineSlice, 1) end
         if saved then
             Restore(portrait, saved.portrait)
+            Restore(mask, saved.mask)
             if portrait and saved.portraitSize then portrait:SetSize(unpack(saved.portraitSize)) end
             Restore(title, saved.title)
             PlaceClose(close, nil)

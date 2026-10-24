@@ -798,12 +798,11 @@ local function CreateBook()
 
     ns.DressPieces(f, SB_QUARTERS)
 
-    local icon = f:CreateTexture(nil, "ARTWORK")
+    -- Under the frame art, as Era: the ring covers its edge and its black fills the whole hole.
+    local icon = f:CreateTexture(nil, "BACKGROUND", nil, -1)
     ns.SetTex(icon, "sbIcon")
     icon:SetSize(58, 58)
     icon:SetPoint("TOPLEFT", f, "TOPLEFT", 10, -8)
-    -- Square icon on this client: cut round inside the ring.
-    if ns.RoundIcon then ns.RoundIcon(icon, 2) end
 
     f.Title = f:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     f.Title:SetPoint("CENTER", f, "CENTER", 6, 230)

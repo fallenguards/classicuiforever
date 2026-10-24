@@ -663,10 +663,11 @@ local function BuildShell()
     frame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", ns.ClassicSlot())
     frame:Hide()
     ns.DressPieces(frame, ns.SPELLBOOK_QUARTERS)
-    frame.portrait = frame:CreateTexture(nil, "ARTWORK")
+    -- Under the frame art, as Era's portraits: its own frame cropped, cut round only past the ring.
+    frame.portrait = frame:CreateTexture(nil, "BACKGROUND", nil, -1)
     frame.portrait:SetSize(58, 58)
     frame.portrait:SetPoint("TOPLEFT", frame, "TOPLEFT", 10, -8)
-    if ns.RoundIcon then ns.RoundIcon(frame.portrait, 2) end
+    ns.RoundIcon(frame.portrait, 0, 0.07)
     frame.title = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     -- From the top left: a page's side panel widens the window (Collections/CollectionsTeam.lua).
     frame.title:SetPoint("CENTER", frame, "TOPLEFT", WINDOW_W / 2 + 6, -(WINDOW_H / 2 - 230))
