@@ -394,9 +394,9 @@ local TRACK_SPEC = { houseX = -10.5, houseTop = 7, houseFoot = -6, upX = 0, upY 
     knobX = 1, knobReach = 7 }
 ns.TRACK_SPEC = TRACK_SPEC
 
--- The column's holder: a child of the window itself, one level under its border (over every floor and backing),
+-- The column's holder: a child of the window itself, under its border and never over the bar (its arrows and knob),
 -- laid on the bar and shown with it. On the bar a bar standing above its window (the Communities chat's) drew the
--- column over the edge, and a child of the bar stays in the bar's strata.
+-- column over the edge; the character window's border stands at 500, over every bar inside it.
 local function ColumnHolder(bar)
     local window = bar
     while window:GetParent() and window:GetParent() ~= UIParent do window = window:GetParent() end
@@ -404,7 +404,8 @@ local function ColumnHolder(bar)
     holder:SetAllPoints(bar)
     local slice = window.NineSlice
     local under = slice and slice.GetFrameLevel and slice:GetFrameLevel()
-    holder:SetFrameLevel(type(under) == "number" and under - 1 or (window:GetFrameLevel() or 0) + 2)
+    local level = type(under) == "number" and under - 1 or (window:GetFrameLevel() or 0) + 2
+    holder:SetFrameLevel(math.min(level, bar:GetFrameLevel() or level))
     return holder
 end
 

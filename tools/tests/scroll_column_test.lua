@@ -32,6 +32,9 @@ function Region:IsShown() return self.shown end
 function Region:IsVisible() return self.shown end
 function Region:GetHeight() return self.height or 0 end
 function Region:SetScript(name, fn) self.scripts[name] = fn end
+function Region:GetParent() return self.parent end
+function Region:GetFrameLevel() return self.level end
+function Region:SetFrameLevel(level) self.level = level end
 local function New() return setmetatable({ shown = true, scripts = {} }, Region) end
 
 local owned = {}
@@ -42,9 +45,28 @@ ns.Sched = { NextFrame = function(_, fn) fn() end }
 ns.OwnTexture = function(_, key) owned[key] = New() return owned[key] end
 assert(loadfile(ROOT .. "/UI/ScrollBars.lua"))("ClassicUIForever", ns)
 
--- The bar's size watcher is our own child frame; its OnSizeChanged refits.
-local child
-ns.NewFrame = function() child = New() return child end
+-- The column's holder, then the bar's size watcher (its OnSizeChanged refits): our own frames.
+local child, made
+ns.NewFrame = function()
+    child = New()
+    made[#made + 1] = child
+    return child
+end
+
+-- The character window's border stands at 500, its stat list's bar at 12: the column under the bar, so its arrows
+-- and knob draw over it; a bar over the border (the Communities chat's) keeps the column just under the border.
+local window = New()
+window.level, window.NineSlice = 1, New()
+window.NineSlice.level = 500
+for _, case in ipairs({ { 12, 12, "a bar under the border: the column not over it" },
+    { 600, 499, "a bar over the border: the column just under the border" } }) do
+    made = {}
+    local deep = New()
+    deep.parent, deep.level, deep.height = window, case[1], 200
+    ns.ScrollTrackArt(deep)
+    Check(made[1].level == case[2], case[3] .. " (" .. tostring(made[1].level) .. ")")
+end
+made = {}
 
 -- The group finder's activity bar since 70291: 107 tall, short of the column's head and foot.
 local bar = New()
