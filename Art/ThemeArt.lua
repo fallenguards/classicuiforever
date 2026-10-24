@@ -225,6 +225,7 @@ UIFrame-VTile-Atlas
 -- The chrome sheets (frames, floors, parchment pages): the one color look draws them whole.
 ns.CHROME_ART = [[
 CharacterCreate-LabelFrame
+Common-Input-Border
 HelpFrameTab-Active
 HelpFrameTab-Inactive
 SkillFrame-BotLeft

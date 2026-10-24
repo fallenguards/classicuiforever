@@ -394,14 +394,14 @@ ns.PaintCopy(inkPiece, COPY .. "x")
 Check("out of flat color the piece is as drawn", inkPiece.desat == false and inkPiece.rgb[1] == 1, true)
 Check("out of flat color its metal layer is back", inkHost.regions[2] ~= nil and inkHost.regions[2].shown, true)
 ns.PaintCopy(inkPiece, nil)
--- A chrome sheet with no theme copy inks from ns.SetTex, and is as drawn in a textured part.
+-- A chrome sheet with no theme copy inks from ns.SetTex, and keeps its grain in the theme colour in a textured part.
 local slotPiece = NewFrame(true, UIParent):CreateTexture()
 ns.FlatOn = function() return true end
 ns.InkChrome(slotPiece, COPY)
 Check("a chrome sheet with no copy is inked", slotPiece.desat == true and slotPiece.rgb[1] == 0.4, true)
 ns.FlatOn = function() return false end
 ns.InkChrome(slotPiece, COPY)
-Check("and as drawn in a textured part", slotPiece.desat == false and slotPiece.rgb[1] == 1, true)
+Check("and tinted in a textured part", slotPiece.desat == true and slotPiece.rgb[1] == 0.4, true)
 -- Parchment all over (the empty slot) inks under any theme, textured parts too.
 ns.ParchWhole = function(path) return path == "slot" end
 ns.InkChrome(slotPiece, "slot")
@@ -447,9 +447,12 @@ local parch = pageHost.regions[3]
 Check("a textured page draws its parchment layer", parch ~= nil and parch.shown and parch.file == COPY
     and OwnMask(parch).file == "parch", true)
 Check("in the theme colour", parch and parch.rgb and parch.rgb[1] == 0.4, true)
-Check("its piece under the layers is gray, not its own color", pagePiece.desat == true and pagePiece.rgb[1] == 1, true)
+Check("its piece under the layers takes the theme colour, not gray (#224)", pagePiece.desat == true and pagePiece.rgb[1] == 0.4, true)
+ns.FollowLayers()
+pass()
+Check("its metal layer takes the theme colour once, not twice", pageHost.regions[2].rgb[1] == 0.4, true)
 ns.InkChrome(pagePiece, COPY)
-Check("the chrome pass after it (ns.SetTex's) leaves it gray", pagePiece.desat == true and pagePiece.rgb[1] == 1, true)
+Check("the chrome pass after it (ns.SetTex's) keeps it tinted", pagePiece.desat == true and pagePiece.rgb[1] == 0.4, true)
 ns.FlatOn = function() return true end
 ns.PaintCopy(pagePiece, COPY)
 Check("the one color look inks the page, its parchment layer off", pagePiece.desat == true and not parch.shown, true)

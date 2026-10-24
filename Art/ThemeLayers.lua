@@ -10,7 +10,7 @@ local THEMES = B.THEMES
 local weak = { __mode = "k" }
 local layers = setmetatable({}, weak)   -- copy piece -> { tex, parch, on, metal, parched, copy, wrap, drawLayer, sub }
 local own = setmetatable({}, weak)       -- our layer textures
-local inked = setmetatable({}, weak)     -- piece -> true (inked one color) or "gray" (Textured color's gray under layers)
+local inked = setmetatable({}, weak)     -- piece -> true (inked one color) or "grain" (Textured color's tint under layers)
 -- A piece's frame -> { layer -> piece }: the layers hang on that frame and go with it, so an unseen frame's are left alone.
 local frames = setmetatable({}, weak)
 local job
@@ -334,13 +334,13 @@ local function MetalColor(layer, theme)
     layer.tex:SetVertexColor(t[1] * r, t[2] * g, t[3] * b)
 end
 
--- The piece's colour and greying onto its metal layer when they changed; Textured color's own gray is not the game's.
+-- The piece's colour and greying onto its metal layer when they changed; Textured color's own tint is not the game's.
 local function PieceColor(piece, layer)
     if not (layer.tex and layer.metal) then return false end
     local r, g, b = piece:GetVertexColor()
     local grey = piece:IsDesaturated()
     if ns.AnySecret(r, g, b, grey) then return false end
-    grey = grey and inked[piece] ~= "gray" or false
+    if inked[piece] == "grain" then r, g, b, grey = 1, 1, 1, false end
     local c = layer.color
     if c and c[1] == r and c[2] == g and c[3] == b and c[4] == grey then return false end
     c = c or {}
@@ -508,21 +508,24 @@ local function Live(path)
     local base = type(path) == "string" and path:match("([^\\/]+)$")
     return base and LIVE[(base:lower():gsub("%.%w+$", ""))] == true or false
 end
-local function Ink(piece, theme, path)
-    Hide(layers[piece])
-    inked[piece] = true
+local function Tinted(piece, theme, path)
     -- A shading layer multiplies: in the color its white would darken its whole box.
     local t = piece:GetBlendMode() == "MOD" and WHITE or theme.tint
     local lift = Live(path) and LIVE_LIFT or 0
     piece:SetDesaturated(true)
     piece:SetVertexColor(t[1] + (1 - t[1]) * lift, t[2] + (1 - t[2]) * lift, t[3] + (1 - t[3]) * lift)
 end
--- Textured color: the piece under its metal layer in gray, so what is neither metal nor parchment (a tab's fill, the
--- book's stitched edge) keeps its grain, not its own color.
-local function Gray(piece)
-    inked[piece] = "gray"
-    piece:SetDesaturated(true)
-    piece:SetVertexColor(1, 1, 1)
+local function Ink(piece, theme, path)
+    Hide(layers[piece])
+    inked[piece] = true
+    Tinted(piece, theme, path)
+end
+-- Textured color: a chrome sheet's grain in the theme's color under its metal and parchment layers, so its stone (a
+-- bag, a tab's fill, the book's edge) takes the color too.
+local grainPath = setmetatable({}, weak)
+local function Grain(piece, theme, path)
+    inked[piece], grainPath[piece] = "grain", path
+    Tinted(piece, theme, path)
 end
 -- Out of it: as drawn, unless a tint holds the piece (its repaint colours it).
 local function Uninked(piece)
@@ -558,7 +561,13 @@ function ns.InkChrome(piece, path)
     local whole = ns.ParchWhole(path)
     chromeOf[piece] = (whole or ns.ChromeArt(path)) and path or nil
     local theme = chromeOf[piece] and not (whole and not ParchOn()) and ns.ThemeFor(piece)
-    if theme and (whole or ns.FlatOn(piece)) then Ink(piece, theme, path) else Uninked(piece) end
+    if theme and (whole or ns.FlatOn(piece)) then
+        Ink(piece, theme, path)
+    elseif theme then
+        Grain(piece, theme, path)
+    else
+        Uninked(piece)
+    end
 end
 
 local function Inks(piece, copy)
@@ -577,7 +586,7 @@ local function Shape(piece, layer)
         layer.metal, layer.parched = nil, true
     else
         layer.metal, layer.parched = theme and true or nil, over and true or nil
-        if layer.metal and ns.ChromeArt(layer.copy) then Gray(piece) else Uninked(piece) end
+        if layer.metal and ns.ChromeArt(layer.copy) then Grain(piece, theme, layer.copy) else Uninked(piece) end
         if not (layer.metal or layer.parched) then
             Hide(layer)
             return
@@ -646,7 +655,7 @@ function ns.FlatState(texture)
     local layer = layers[texture]
     if not layer then return nil end
     if not layer.on then return "copy off" end
-    return (layer.parched and "copy parchment" or "copy metal") .. (inked[texture] and " gray" or "")
+    return (layer.parched and "copy parchment" or "copy metal") .. (inked[texture] and " grain" or "")
 end
 
 -- Read by the dev addon's colour probes: how many copy layers are on, and a few seen ones as { file, r, g, b, shown }.
@@ -684,8 +693,9 @@ end
 local function Recolour()
     local theme = Theme()
     if theme then
-        for _, layer in pairs(layers) do
+        for piece, layer in pairs(layers) do
             if layer.on then Tint(layer, theme) end
+            if inked[piece] == "grain" then Tinted(piece, theme, grainPath[piece]) end
         end
     end
     ns.RepaintColours()
