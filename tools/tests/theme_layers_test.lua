@@ -532,6 +532,22 @@ ns.MetalFile = function() return false end
 ns.PaintCopy(metalPiece, nil)
 ns.PaintCopy(liftPiece, nil)
 
+-- A window not open builds no layer for its pieces; showing it builds them as it shows, before it draws.
+local lazyRoot = NewFrame(false, UIParent)
+-- The stub reads a piece's visibility off its frame's flag: the host is shut with its window.
+local lazyHost = NewFrame(false, lazyRoot)
+local lazyPieces = {}
+for i = 1, 5 do
+    lazyPieces[i] = lazyHost:CreateTexture()
+    ns.PaintCopy(lazyPieces[i], COPY)
+end
+Check("pieces in a window not open build no layer", #lazyHost.regions, 5)
+lazyRoot.visible, lazyHost.visible = true, true
+edges[lazyRoot](true)
+Check("the window showing builds its pieces' layers then", #lazyHost.regions, 10)
+Check("each with its mask", OwnMask(lazyHost.regions[6]) ~= nil, true)
+for i = 1, 5 do ns.PaintCopy(lazyPieces[i], nil) end
+
 -- Every layer off: the next whole pass puts the job to sleep and drops the events.
 for i = 1, 50 do ns.PaintCopy(shutPieces[i], nil) end
 ns.PaintCopy(openPiece, nil)

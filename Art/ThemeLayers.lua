@@ -14,6 +14,8 @@ local inked = setmetatable({}, weak)     -- piece -> true (inked one color) or "
 -- A piece's frame -> { layer -> piece }: the layers hang on that frame and go with it, so an unseen frame's are left alone.
 local frames = setmetatable({}, weak)
 local job
+-- Makes a layer's textures and masks the first time its piece shows (defined below).
+local Build
 -- No timer. A paint follows its own piece; one whole pass runs when a window shows or goes or the game restyles its
 -- bars; one window's pieces are followed every frame for BURST after it showed, was pressed or had a layer move.
 local BURST = 0.25
@@ -103,7 +105,16 @@ function Edge(frame)
     if not job:IsAwake() then return end
     Regroup()
     local root = frame and RootOf(frame)
-    if root and groups[root] then Heat(root, GetTime()) end
+    local group = root and groups[root]
+    if group then
+        Heat(root, GetTime())
+        -- Shown now: its pieces' layers are built before it draws, not a frame later.
+        for _, set in pairs(group) do
+            for layer, piece in pairs(set) do
+                if layer.on and not layer.built and ns.Safe(piece:IsVisible(), false) then Build(piece, layer) end
+            end
+        end
+    end
     Look()
 end
 ns.FollowLayers = Edge
@@ -343,6 +354,8 @@ end
 -- seen: the piece's frame is known to be visible (the pass asks each frame once). True when a layer had to change.
 local function Follow(piece, layer, seen)
     local shown = piece:IsShown() and (seen or piece:IsVisible())
+    -- Built the first time its piece shows: most themed pieces sit in windows not open (1286 of 1982 had layers made).
+    if shown and not layer.built then Build(piece, layer) end
     local alpha = shown and piece:GetAlpha() or nil
     if ns.IsSecret(alpha) then alpha = nil end
     local moved = FollowOne(layer.tex, layer.metal, shown, alpha)
@@ -450,6 +463,31 @@ local function Tint(layer, theme)
     if tinted then layer.parch:SetVertexColor(t[1], t[2], t[3]) else layer.parch:SetVertexColor(1, 1, 1) end
 end
 
+-- The layer's textures and masks, made and set the first time its piece shows, and again after a reshape: the sheet
+-- itself grey under its metal mask (a lifted sheet's metal file is grey already, unmasked), its parchment or picture
+-- over it under theirs.
+function Build(piece, layer)
+    local wrap = layer.wrap
+    if layer.metal then
+        layer.tex = layer.tex or NewTex(piece)
+        local file = ns.MetalFile(layer.copy)
+        layer.tex:SetTexture(file or layer.copy, unpack(wrap, 1, 3))
+        layer.tex:SetDesaturated(not file)
+        layer.tex:SetBlendMode(piece:GetBlendMode())
+        MaskOn(layer, "metalMask", "metalWorn", layer.tex, piece, not file and ns.MetalMask(layer.copy) or nil)
+        Tiles(layer.tex, piece)
+    end
+    if layer.parched and layer.over then
+        layer.parch = layer.parch or NewTex(piece)
+        layer.parch:SetTexture(layer.copy, unpack(wrap, 1, 3))
+        MaskOn(layer, "parchMask", "parchWorn", layer.parch, piece, layer.over)
+        Tiles(layer.parch, piece)
+    end
+    layer.built, layer.drawLayer, layer.crop, layer.fit = true, nil, nil, nil
+    local theme = ns.ThemeFor(piece)
+    if theme then Tint(layer, theme) end
+end
+
 -- What a sheet wears over it, by mask: its parchment (tinted while parchment's row is on) or its painted picture (as
 -- drawn).
 local function OverMask(copy)
@@ -545,25 +583,8 @@ local function Shape(piece, layer)
             return
         end
     end
-    local wrap = layer.wrap
-    if layer.metal then
-        layer.tex = layer.tex or NewTex(piece)
-        -- The sheet itself grey under its metal mask; a lifted sheet's metal file is grey already, unmasked.
-        local file = ns.MetalFile(layer.copy)
-        layer.tex:SetTexture(file or layer.copy, unpack(wrap, 1, 3))
-        layer.tex:SetDesaturated(not file)
-        layer.tex:SetBlendMode(piece:GetBlendMode())
-        MaskOn(layer, "metalMask", "metalWorn", layer.tex, piece, not file and ns.MetalMask(layer.copy) or nil)
-        Tiles(layer.tex, piece)
-    end
-    if over then
-        layer.parch = layer.parch or NewTex(piece)
-        layer.parch:SetTexture(layer.copy, unpack(wrap, 1, 3))
-        MaskOn(layer, "parchMask", "parchWorn", layer.parch, piece, over)
-        Tiles(layer.parch, piece)
-    end
-    layer.on, layer.drawLayer, layer.crop, layer.fit = true, nil, nil, nil
-    Tint(layer, theme)
+    layer.over, layer.on, layer.built = over, true, false
+    if ns.Safe(piece:IsVisible(), false) then Build(piece, layer) end
 end
 
 -- copyPath: the themed sheet the piece now shows (extra args as its SetTexture had), or nil for none.
@@ -586,9 +607,11 @@ function ns.PaintCopy(piece, copyPath, ...)
     -- The same art again (a client reset put back, once a second on the game menu button): the layers hold it.
     if layer.on and layer.copy == copyPath and wrap[1] == a and wrap[2] == b and wrap[3] == c
         and layer.metal == true and not Inks(piece, copyPath) then
-        layer.tex:SetBlendMode(piece:GetBlendMode())
-        Tiles(layer.tex, piece)
-        if layer.parched then Tiles(layer.parch, piece) end
+        if layer.built then
+            layer.tex:SetBlendMode(piece:GetBlendMode())
+            Tiles(layer.tex, piece)
+            if layer.parched then Tiles(layer.parch, piece) end
+        end
         Kick(piece, layer)
         return
     end
