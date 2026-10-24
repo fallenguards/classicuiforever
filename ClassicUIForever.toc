@@ -236,6 +236,7 @@ Character\StatsSearch.lua
 Spells\BookLines.lua
 Spells\PetPool.lua
 Spells\BookFlyouts.lua
+Spells\BookGrid.lua
 Spells\SpellBook.lua
 Spells\SpellsHost.lua
 Skills\SkillShell.lua

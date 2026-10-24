@@ -924,12 +924,15 @@ local function CreateBook()
     f.fcuiHoldX = function(self)
         if InCombatLockdown() and self:LayerUp() then return self.fcuiSlotX or 0 end
     end
+    -- The side bars' empty slots while the layer is up, as Era's open book; hosted, the game's window shows them.
+    local gatherGrid = not Hosted() and ns.BookGrid(clicks)
     -- Out of combat: write the attribute and show the layer now, not at the next poll.
     f.SetLayer = function(_, on)
         -- Hosted, the layer shows and hides with the game's window.
         if InCombatLockdown() or Hosted() then return end
         on = on and true or false
         if clicks.fcuiLinked then clicks:SetAttribute("unit", on and "player" or "none") end
+        if on and gatherGrid then gatherGrid() end
         clicks:SetShown(on)
     end
 
