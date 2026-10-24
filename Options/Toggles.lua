@@ -492,6 +492,8 @@ ns.TOGGLES = {
         sub = L["SUB_MESSAGES"] },
     { "hideZoneText", L["OPT_hideZoneText"], L["OPT_hideZoneText_TIP"],
         search = "zone text subzone area name popup fade screen entering territory" },
+    { "hideHelpButtons", L["OPT_hideHelpButtons"], L["OPT_hideHelpButtons_TIP"],
+        search = "help tutorial info i button map professions spellbook hints tips" },
     { "addonMessages", L["OPT_addonMessages"], L["OPT_addonMessages_TIP"], search = "chat login lines quiet" },
     { "welcomeNote", L["OPT_welcomeNote"], L["OPT_welcomeNote_TIP"], parent = "addonMessages" },
     { "barsTakenNote", L["OPT_barsTakenNote"], L["OPT_barsTakenNote_TIP"], parent = "addonMessages",
@@ -561,10 +563,6 @@ local FOREVER_ROWS = {
 -- Its difficulty flag after the coordinates; Forever's minimap has none.
 local RETAIL_ROWS = {
     talents = COLLECTIONS_ROWS,
-    -- The map's tutorial button: a game rule leaves Forever none.
-    hideMapQuestButton = {
-        { "hideMapHelpButton", L["OPT_hideMapHelpButton"], L["OPT_hideMapHelpButton_TIP"], search = "help tutorial info button map" },
-    },
     -- No key ring: the reagent bag in its slot with the key's art or a bag's, before Full slot; or off the row.
     eraBagSize = {
         { "reagentBagKeyArt", L["OPT_reagentBagKeyArt"], L["OPT_reagentBagKeyArt_TIP"], needs = "classicBar",

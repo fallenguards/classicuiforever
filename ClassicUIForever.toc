@@ -101,6 +101,7 @@ UI\Menus.lua
 UI\CheckList.lua
 UI\ClientMenus.lua
 UI\Escape.lua
+UI\HelpButtons.lua
 UI\LevelBanner.lua
 UI\LootToast.lua
 UI\SecurePad.lua

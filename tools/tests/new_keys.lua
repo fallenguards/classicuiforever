@@ -240,7 +240,7 @@ return {
     mapCursorCoords = "mirrors the game's worldMapShowCursorCoords: read from the game at every apply",
     questMapPanePaper = "same for everyone: opt-in, off by default",
     mapQuestCombinedPaper = "same for everyone: opt-in, off by default",
-    hideMapHelpButton = "same for everyone: opt-in, off by default",
+    hideHelpButtons = "same for everyone: on by default, the game's help buttons hidden on every window; replaces the map-only box, which was off by default",
     questListFontSize = "same for everyone: 0, the game's font size until the player steps it",
     questTextFontSize = "same for everyone: 0, the game's font size until the player steps it",
 }

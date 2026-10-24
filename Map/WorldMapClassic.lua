@@ -674,7 +674,6 @@ local function Pass()
     local map = Map()
     if not map then return end
     QuestButton(map)
-    ns.MapOptions.HelpButton(map)
     local style = EraStyle()
     if style then
         touched = true
@@ -773,7 +772,7 @@ ns.EventFrame({ "PLAYER_ENTERING_WORLD", "PLAYER_REGEN_ENABLED" }, function() La
 ns.AttachWhenLoaded(Attach)
 
 local PASS_KEYS = { mapNavBar = true, mapNavClassic = true, mapNavNone = true, worldMap = true, hideMapQuestButton = true,
-    mapOptions = true, mapOptionsHover = true, mapOptionsHidden = true, mapQuestCombined = true, hideMapHelpButton = true }
+    mapOptions = true, mapOptionsHover = true, mapOptionsHidden = true, mapQuestCombined = true }
 local STYLE_KEYS = { mapNavBar = true, mapNavClassic = true, mapNavNone = true }
 
 -- A style picked: each draws the map at its own game's size, said once a session.

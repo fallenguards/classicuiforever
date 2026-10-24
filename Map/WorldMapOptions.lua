@@ -41,18 +41,6 @@ end
 -- The box, nil before the first classic lay (Track Quest stands left of it).
 function MO.Frame() return box end
 
--- Hide map help button: the game's tutorial "i" at the map's top left (retail; a game rule leaves Forever none), faded
--- and deaf, as the game shows it again on every restore from maximized.
-local helpHidden = false
-function MO.HelpButton(map)
-    local button = map.BorderFrame and map.BorderFrame.Tutorial
-    local hide = ns.db.hideMapHelpButton == true
-    if not button or hide == helpHidden then return end
-    helpHidden = hide
-    button:SetAlpha(hide and 0 or 1)
-    button:EnableMouse(not hide)
-end
-
 -- The map's coordinates are the game's own settings (retail keeps them off): two rows of ours mirror its CVars, read
 -- at every apply and as the game's settings change; a click writes them (Core/Core.lua).
 local COORD_CVARS = { mapPlayerCoords = "worldMapShowPlayerCoords", mapCursorCoords = "worldMapShowCursorCoords" }
