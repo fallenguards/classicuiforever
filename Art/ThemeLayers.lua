@@ -353,7 +353,7 @@ end
 
 -- seen: the piece's frame is known to be visible (the pass asks each frame once). True when a layer had to change.
 local function Follow(piece, layer, seen)
-    local shown = piece:IsShown() and (seen or piece:IsVisible())
+    local shown = ns.Safe(piece:IsShown(), false) and (seen or ns.Safe(piece:IsVisible(), false))
     -- Built the first time its piece shows: most themed pieces sit in windows not open (1286 of 1982 had layers made).
     if shown and not layer.built then Build(piece, layer) end
     local alpha = shown and piece:GetAlpha() or nil
@@ -673,7 +673,7 @@ end
 function ns.ThemeInkShown()
     local inks, parch = 0, 0
     for piece in pairs(inked) do
-        if inked[piece] == true and piece:IsShown() and not ns.ParchWhole(chromeOf[piece]) then inks = inks + 1 end
+        if inked[piece] == true and ns.Safe(piece:IsShown(), false) and not ns.ParchWhole(chromeOf[piece]) then inks = inks + 1 end
     end
     for _, layer in pairs(layers) do
         if layer.on and layer.parched and layer.parch:IsShown() then parch = parch + 1 end
