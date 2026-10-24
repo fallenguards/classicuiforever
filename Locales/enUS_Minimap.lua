@@ -92,3 +92,5 @@ L["OPT_hoverAddonBag_TIP"] = "Always shown, or only while the mouse is over the 
 L["MAP_EYE_REAL_SIZE"] = "Size on the minimap: %s"
 L["OPT_zoneTerritory"] = "Territory in zone names"
 L["OPT_zoneTerritory_TIP"] = "Shows a zone's territory, such as Alliance Territory, outside the capitals too, as 1.x did."
+L["OPT_hideZoneText"] = "Hide zone text"
+L["OPT_hideZoneText_TIP"] = "Hides the zone and subzone names that fade in on screen as you enter an area."

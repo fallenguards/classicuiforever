@@ -93,3 +93,5 @@ L["OPT_hoverAddonBag_TIP"] = "Toujours affiché, ou seulement quand la souris su
 L["MAP_EYE_REAL_SIZE"] = "Taille sur la minicarte : %s"
 L["OPT_zoneTerritory"] = "Territoire dans les noms de zone"
 L["OPT_zoneTerritory_TIP"] = "Affiche le territoire d'une zone, comme Territoire de l'Alliance, aussi hors des capitales, comme en 1.x."
+L["OPT_hideZoneText"] = "Masquer le texte de zone"
+L["OPT_hideZoneText_TIP"] = "Masque les noms de zone et de sous-zone qui apparaissent à l'écran quand vous entrez dans une région."

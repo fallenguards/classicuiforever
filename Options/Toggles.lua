@@ -489,6 +489,8 @@ ns.TOGGLES = {
     { "lootToast", L["OPT_lootToast"], L["OPT_lootToast_TIP"], search = "loot toast popup you received alert won drop" },
     { "levelUpBanner", L["OPT_levelUpBanner"], L["OPT_levelUpBanner_TIP"], search = "level up ding banner toast popup reached",
         sub = L["SUB_MESSAGES"] },
+    { "hideZoneText", L["OPT_hideZoneText"], L["OPT_hideZoneText_TIP"],
+        search = "zone text subzone area name popup fade screen entering territory" },
     { "addonMessages", L["OPT_addonMessages"], L["OPT_addonMessages_TIP"], search = "chat login lines quiet" },
     { "welcomeNote", L["OPT_welcomeNote"], L["OPT_welcomeNote_TIP"], parent = "addonMessages" },
     { "barsTakenNote", L["OPT_barsTakenNote"], L["OPT_barsTakenNote_TIP"], parent = "addonMessages",

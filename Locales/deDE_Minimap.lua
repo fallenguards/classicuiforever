@@ -93,3 +93,5 @@ L["OPT_hoverAddonBag_TIP"] = "Immer angezeigt oder nur, solange die Maus über d
 L["MAP_EYE_REAL_SIZE"] = "Größe an der Minikarte: %s"
 L["OPT_zoneTerritory"] = "Gebiet bei Zonennamen"
 L["OPT_zoneTerritory_TIP"] = "Zeigt das Gebiet einer Zone, etwa Allianzgebiet, auch außerhalb der Hauptstädte, wie in 1.x."
+L["OPT_hideZoneText"] = "Zonentext ausblenden"
+L["OPT_hideZoneText_TIP"] = "Blendet die Zonen- und Unterzonennamen aus, die beim Betreten eines Gebiets eingeblendet werden."

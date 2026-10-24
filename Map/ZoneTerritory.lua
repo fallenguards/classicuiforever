@@ -96,3 +96,25 @@ local function Restore()
 end
 
 ns.RegisterModule("zoneTerritory", { apply = Apply, restore = Restore })
+
+-- Hide zone text: the frame that shows it stops hearing zone changes; unchecked, it hears them again.
+local ZONE_EVENTS = { "ZONE_CHANGED", "ZONE_CHANGED_INDOORS", "ZONE_CHANGED_NEW_AREA" }
+local deaf = false
+local function QuietZones(hide)
+    if hide == deaf then return end
+    deaf = hide
+    if not hide then
+        ns.RegisterEvents(ZoneTextFrame, ZONE_EVENTS)
+        return
+    end
+    for _, event in ipairs(ZONE_EVENTS) do ZoneTextFrame:UnregisterEvent(event) end
+    ZoneTextFrame:Hide()
+    SubZoneTextFrame:Hide()
+end
+
+ns.RegisterModule("hideZoneText", { apply = function() QuietZones(true) end, restore = function() QuietZones(false) end })
+
+-- In a fight too: the options pass waits one out.
+ns.OnToggle(function(key)
+    if key == "hideZoneText" then QuietZones(ns.ModuleInForce(key)) end
+end)
