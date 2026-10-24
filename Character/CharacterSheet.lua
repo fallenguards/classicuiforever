@@ -358,45 +358,47 @@ local function PetStatBoxes(pet)
     if ns.StatPanesSeen then ns.StatPanesSeen(not pet) end
 end
 
+-- The client's page tabs, each kept unseen over our drawn one: Forever's mode tab column, retail's bottom row (tab i
+-- opens the client's i-th subframe).
+local retailTabs
+local function PageTabs(frame)
+    if frame.ModeTabs and frame.ModeTabs.Tabs then return frame.ModeTabs.Tabs end
+    if not retailTabs then
+        retailTabs = {}
+        for i = 1, #(CHARACTERFRAME_SUBFRAMES or EMPTY) do retailTabs[i] = _G["CharacterFrameTab" .. i] end
+    end
+    return retailTabs
+end
+
 -- Bottom strip tabs: label width (capped), overlapping by 15, the first 14 in; Pet second, as in 1.x.
 local function LayTabs(frame, pet)
     local strip = T.general[3]
     local tabPrev
-    if frame.ModeTabs and frame.ModeTabs.Tabs then
-        T.tabs = T.tabs or {}
-        local shown = {}
-        for i, mode in ipairs(frame.ModeTabs.Tabs) do
-            local tab = T.tabs[i]
-            if not tab then
-                tab = NewTab(frame, i, mode)
-                T.tabs[i] = tab
-            end
-            tab.mode = mode
-            tab.frameName = mode.frameName
-            tab:SetLabel(Label(TAB_LABELS[mode.frameName or ""] or mode.frameName or ""))
-            tab:SetSelected(mode.frameName == frame.activeSubframe and not (i == 1 and pet))
-            tab:SetShown(mode:IsShown())
-            if mode:IsShown() then
-                tabPrev = PlaceTab(tab, tabPrev, strip)
-                shown[#shown + 1] = tab
-            end
-            local petTab = i == 1 and PlacePetTab(frame, tabPrev, strip, pet)
-            if petTab then
-                tabPrev = petTab
-                shown[#shown + 1] = petTab
-            end
+    T.tabs = T.tabs or {}
+    local shown = {}
+    for i, mode in ipairs(PageTabs(frame)) do
+        local tab = T.tabs[i]
+        if not tab then
+            tab = NewTab(frame, i, mode)
+            T.tabs[i] = tab
         end
-        CenterTabs(shown, strip, FitTabs(shown))
-        CatchTabs()
-    else
-        for i = 1, 6 do
-            local tab = _G["CharacterFrameTab" .. i]
-            if tab and tab:IsShown() then
-                ns.SkinBottomTab(tab)
-                tabPrev = PlaceTab(tab, tabPrev, strip)
-            end
+        tab.mode = mode
+        local name = mode.frameName or (CHARACTERFRAME_SUBFRAMES or EMPTY)[i] or ""
+        tab:SetLabel(Label(TAB_LABELS[name] or name))
+        tab:SetSelected(name == frame.activeSubframe and not (i == 1 and pet))
+        tab:SetShown(mode:IsShown())
+        if mode:IsShown() then
+            tabPrev = PlaceTab(tab, tabPrev, strip)
+            shown[#shown + 1] = tab
+        end
+        local petTab = i == 1 and PlacePetTab(frame, tabPrev, strip, pet)
+        if petTab then
+            tabPrev = petTab
+            shown[#shown + 1] = petTab
         end
     end
+    CenterTabs(shown, strip, FitTabs(shown))
+    CatchTabs()
 end
 
 -- Runs after the client sizes or retabs the frame. Nothing here is protected, so combat opens lay out too.
@@ -451,6 +453,9 @@ local function LayoutNow()
         Take(frame.ModeTabs, "mouse")
         Fade(frame.ModeTabs)
         frame.ModeTabs:EnableMouse(false)
+    else
+        -- Retail: its bottom tabs, live under ours.
+        for _, tab in ipairs(PageTabs(frame)) do Fade(tab) end
     end
 
     local portrait = frame.PortraitContainer and frame.PortraitContainer.portrait
