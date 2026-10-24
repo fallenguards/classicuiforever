@@ -2,7 +2,7 @@ local _, ns = ...
 local L = ns.L
 
 ns.DB_DEFAULTS = {
-    dbVersion = 27,
+    dbVersion = 28,
     classicBar = true,
     oneBar = false,
     classicBarSize = false,
@@ -350,6 +350,7 @@ ns.DB_DEFAULTS = {
     communitiesNoGuildTab = true,
     whoList = true,
     hideWhoTab = false,
+    hideFinderWho = true,
     socialTitleDrag = false,
     statsSearch = false,
     groupFinder = true,

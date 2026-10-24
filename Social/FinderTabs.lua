@@ -35,6 +35,8 @@ local function NewFinderTab(parent, i, prev, entry, anchor)
 end
 
 local whoTabs, whoToggle = {}, nil
+-- Hide Who side tab: the finder without it, so Who is only reached from the social window.
+local function FinderWhoHidden() return ns.db ~= nil and ns.db.hideFinderWho == true end
 
 -- Our who list off: the finder's own Who page stands for it.
 function S.FinderWhoOwn() return not (ns.ModuleInForce and ns.ModuleInForce("whoList")) end
@@ -300,7 +302,7 @@ function S.BuildFinderSideTabs(parent, anchor)
             -- Under the client's tab, which turns the page; only its mark is kept here.
             self:SetChecked(parent.selectedTab == entry.index)
         end)
-        side:Show()
+        side:SetShown(not (entry.who and FinderWhoHidden()))
         finderTabs[i] = side
     end
     WatchMicro()
@@ -313,4 +315,22 @@ function S.SyncFinderSideTabs(parent)
         local want = (side.index or WHO_PAGE) == parent.selectedTab
         if (side:GetChecked() and true or false) ~= want then side:SetChecked(want) end
     end
+end
+
+-- In a fight too: only a widget's shown state (the client's tab over it hides with it).
+ns.OnToggle(function(key)
+    if key ~= "hideFinderWho" then return end
+    for _, side in ipairs(finderTabs) do
+        if not side.index then side:SetShown(not FinderWhoHidden()) end
+    end
+end)
+
+-- dbVersion 28: an install from before keeps the finder's Who side tab.
+function ns.KeepFinderWho()
+    local db = ns.db
+    if db.hideFinderWho == nil then db.hideFinderWho = false end
+    for _, shot in pairs(type(db.profiles) == "table" and db.profiles or {}) do
+        if type(shot) == "table" and shot.hideFinderWho == nil then shot.hideFinderWho = false end
+    end
+    db.dbVersion = 28
 end

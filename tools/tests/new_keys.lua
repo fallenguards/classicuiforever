@@ -5,6 +5,7 @@
 return {
     hideThreatGlow = "same for everyone: opt-in, off by default",
     hideWhoTab = "same for everyone: opt-in, off by default",
+    hideFinderWho = "kept as before: dbVersion 28 (Social/FinderTabs.lua KeepFinderWho) keeps the finder's Who side tab for installs from before",
     socialTitleDrag = "same for everyone: opt-in, off by default",
     microWidth = "same for everyone: 1 is the row as before; Menu Width in the micro menu's edit dialog",
     statsSearch = "same for everyone: opt-in, off by default",
