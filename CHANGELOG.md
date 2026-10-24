@@ -2,6 +2,24 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.38.0] - 2026-10-24
+
+### Added
+- Hide zone text, under Other: hides the zone and subzone names that fade in on screen as you enter an area. Off by default (#55).
+- The mouse wheel zooms the character in the collections window's Appearances preview.
+
+### Changed
+- The download is less than half its old size and the addon uses less memory. Themes now tint and mask the game's own art instead of shipping colored copies of every sheet, and a themed piece is only made the first time it shows. The themes look the same.
+- While the spellbook is open, the side bars show their empty slots, as in Era, in a fight too.
+- On retail the character window has Era's own tabs, as on Forever: sized to their names, with the picked tab open into the page.
+- The options window's pages are grouped by kind: Look first, then the parts on screen (action bars, bags, unit frames, nameplates, chat), the minimap, map and quest pages together, then the game's windows (character, professions, social), and Other last.
+
+### Fixed
+- The character window's stats and equipment lists had lost their scroll arrows and knob behind the scroll column.
+- The spellbook's portrait left a gap in its ring. It sits under the ring as in Era, the professions book's portrait now matches it and no longer grows as it opens, and the collections window's icon is no longer zoomed past its ring.
+- The collapsed raid manager showed a stray line, and its expand arrow sat higher than when open.
+- Small alignment fixes on the minimap's close button and the calendar in the zone bar, which now sits at the bar's left end when the close button shows.
+
 ## [0.37.0] - 2026-10-23
 
 ### Added

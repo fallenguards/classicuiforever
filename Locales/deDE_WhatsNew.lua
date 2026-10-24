@@ -3,6 +3,18 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN49_1_TITLE"] = "Kleiner und leichter"
+L["WN49_1_TEXT"] = "Der Download ist weniger als halb so groß wie bisher, und das Addon braucht weniger Speicher. Themen färben jetzt die Grafik des Spiels selbst, statt Kopien davon mitzuliefern, und ein Teil im Thema entsteht erst, wenn es zum ersten Mal erscheint. Die Themen sehen aus wie bisher."
+L["WN49_2_TITLE"] = "Zonentext ausblenden"
+L["WN49_2_TEXT"] = "Blendet die Zonen- und Unterzonennamen aus, die beim Betreten eines Gebiets auf dem Bildschirm eingeblendet werden. Standardmäßig aus; schalte es in den Optionen (/fcui) unter Sonstiges ein."
+L["WN49_3_TITLE"] = "Zauberbuch und Leisten"
+L["WN49_3_TEXT"] = "Solange das Zauberbuch offen ist, zeigen die seitlichen Leisten wie in Era ihre leeren Plätze, sodass sich ein Zauber direkt auf einen davon legen lässt, auch im Kampf."
+L["WN49_4_TITLE"] = "Reiter des Charakterfensters"
+L["WN49_4_TEXT"] = "Die Reiter des Charakterfensters sind die von Era, wie auf Forever: so breit wie ihre Namen, und der gewählte Reiter geht offen in die Seite über."
+L["WN49_5_TITLE"] = "Optionsseiten"
+L["WN49_5_TEXT"] = "Die Seiten des Optionsfensters sind nach Art gruppiert: zuerst Aussehen, dann die Teile auf dem Bildschirm, die Seiten Minikarte und Karte nebeneinander, dann die Fenster des Spiels und zuletzt Sonstiges."
+L["WN49_6_TITLE"] = "Fehlerbehebungen"
+L["WN49_6_TEXT"] = "Die Statistik- und Ausrüstungslisten des Charakterfensters zeigen wieder ihre Bildlaufpfeile. Das Porträt des Zauberbuchs füllt wie in Era seinen Ring, das des Berufebuchs passt dazu und wächst beim Öffnen nicht mehr, und das Symbol des Sammlungsfensters ist nicht mehr zu nah herangezoomt. Das Mausrad zoomt die Vorschau unter Vorlagen, und die eingeklappte Schlachtzugsverwaltung zeigt keine überflüssige Linie mehr."
 L["WN48_1_TITLE"] = "Karte und Questlog vereint"
 L["WN48_1_TEXT"] = "Die Questliste neben der Karte, Text und Belohnungen der gewählten Quest auf zwei Seiten darunter, wie die Karte aus Wrath. Zieh die Ecke der Karte für die Größe und den Trenner für eine breitere Liste. Standardmäßig aus; schalte Klassische Karte und Quests vereint in den Optionen (/fcui) unter Karte ein, mit der Navigationsleiste: Classic-Stil."
 L["WN48_2_TITLE"] = "Text der Questliste"

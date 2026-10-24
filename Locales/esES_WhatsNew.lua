@@ -3,6 +3,18 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN49_1_TITLE"] = "Más pequeño y ligero"
+L["WN49_1_TEXT"] = "La descarga ocupa menos de la mitad que antes y el addon usa menos memoria. Los temas ahora colorean el arte propio del juego en vez de incluir copias de él, y una pieza con tema solo se crea la primera vez que se muestra. Los temas se ven igual."
+L["WN49_2_TITLE"] = "Ocultar texto de zona"
+L["WN49_2_TEXT"] = "Oculta los nombres de zona y subzona que aparecen en pantalla al entrar en un área. Desactivado por defecto; actívalo en las opciones (/fcui), en Otros."
+L["WN49_3_TITLE"] = "Libro de hechizos y barras"
+L["WN49_3_TEXT"] = "Mientras el libro de hechizos está abierto, las barras laterales muestran sus huecos vacíos, como en Era, así que un hechizo puede ir directamente a una de ellas, también en combate."
+L["WN49_4_TITLE"] = "Pestañas de la ventana del personaje"
+L["WN49_4_TEXT"] = "Las pestañas de la ventana del personaje son las propias de Era, como en Forever: con el tamaño de sus nombres y la pestaña elegida abierta hacia la página."
+L["WN49_5_TITLE"] = "Páginas de opciones"
+L["WN49_5_TEXT"] = "Las páginas de la ventana de opciones se agrupan por tipo: primero Aspecto, luego las partes en pantalla, las páginas del minimapa y del mapa una junto a la otra, después las ventanas del juego, y Otros al final."
+L["WN49_6_TITLE"] = "Correcciones"
+L["WN49_6_TEXT"] = "Las listas de estadísticas y de equipo de la ventana del personaje vuelven a mostrar sus flechas de desplazamiento. El retrato del libro de hechizos llena su anillo como en Era, el del libro de profesiones coincide con él y ya no crece al abrirse, y el icono de la ventana de colecciones ya no se ve demasiado ampliado. La rueda del ratón acerca y aleja la vista previa de Apariencias, y el gestor de banda plegado ya no muestra una línea de más."
 L["WN48_1_TITLE"] = "Mapa y registro de misiones juntos"
 L["WN48_1_TEXT"] = "La lista de misiones junto al mapa, con el texto y las recompensas de la misión elegida en dos páginas debajo, como el mapa de Wrath. Arrastra la esquina del mapa para darle tamaño y el divisor para ensanchar la lista. Desactivado por defecto; actívalo con Mapa y misiones clásicos combinados en las opciones (/fcui), en Mapa, con la Barra de navegación: estilo Classic."
 L["WN48_2_TITLE"] = "Texto de la lista de misiones"

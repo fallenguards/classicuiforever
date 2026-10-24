@@ -3,6 +3,18 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN49_1_TITLE"] = "Più piccolo e più leggero"
+L["WN49_1_TEXT"] = "Il download è meno della metà di prima e l'addon usa meno memoria. I temi ora colorano la grafica del gioco invece di includerne delle copie, e un elemento con tema viene creato solo la prima volta che compare. I temi hanno lo stesso aspetto."
+L["WN49_2_TITLE"] = "Nascondi testo della zona"
+L["WN49_2_TEXT"] = "Nasconde i nomi di zona e sottozona che compaiono in dissolvenza sullo schermo quando entri in un'area. Disattivato di base; attivalo nelle opzioni (/fcui), sotto Altro."
+L["WN49_3_TITLE"] = "Libro degli incantesimi e barre"
+L["WN49_3_TEXT"] = "Mentre il libro degli incantesimi è aperto, le barre laterali mostrano i loro spazi vuoti, come in Era, così un incantesimo può andare direttamente su uno di essi, anche in combattimento."
+L["WN49_4_TITLE"] = "Schede della finestra del personaggio"
+L["WN49_4_TEXT"] = "Le schede della finestra del personaggio sono quelle di Era, come su Forever: della misura dei loro nomi, con la scheda scelta aperta sulla pagina."
+L["WN49_5_TITLE"] = "Pagine delle opzioni"
+L["WN49_5_TEXT"] = "Le pagine della finestra delle opzioni sono raggruppate per tipo: prima Aspetto, poi le parti sullo schermo, le pagine Minimappa e Mappa una accanto all'altra, poi le finestre del gioco, e Altro per ultimo."
+L["WN49_6_TITLE"] = "Correzioni"
+L["WN49_6_TEXT"] = "Gli elenchi delle statistiche e dell'equipaggiamento della finestra del personaggio mostrano di nuovo le frecce di scorrimento. Il ritratto del libro degli incantesimi riempie il suo anello come in Era, quello del libro delle professioni è uguale e non si ingrandisce più all'apertura, e l'icona della finestra delle collezioni non è più troppo ingrandita. La rotella del mouse regola lo zoom dell'anteprima di Aspetti, e il gestore dell'incursione ridotto non mostra più una linea di troppo."
 L["WN48_1_TITLE"] = "Mappa e registro missioni uniti"
 L["WN48_1_TEXT"] = "L'elenco missioni accanto alla mappa, con il testo e le ricompense della missione scelta su due pagine sotto, come la mappa di Wrath. Trascina l'angolo della mappa per ridimensionarla e il divisore per allargare l'elenco. Disattivato di base; attiva Mappa e missioni classiche combinate nelle opzioni (/fcui), sotto Mappa, con la Barra di navigazione: stile Classic."
 L["WN48_2_TITLE"] = "Testo dell'elenco missioni"

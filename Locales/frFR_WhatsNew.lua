@@ -3,6 +3,18 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN49_1_TITLE"] = "Plus petit et plus léger"
+L["WN49_1_TEXT"] = "Le téléchargement fait moins de la moitié de son ancienne taille et l'addon utilise moins de mémoire. Les thèmes teintent maintenant les dessins du jeu lui-même au lieu d'en inclure des copies, et un élément teinté par le thème n'est créé que la première fois qu'il s'affiche. Les thèmes gardent le même aspect."
+L["WN49_2_TITLE"] = "Masquer le texte de zone"
+L["WN49_2_TEXT"] = "Masque les noms de zone et de sous-zone qui apparaissent en fondu à l'écran quand vous entrez dans une région. Désactivé par défaut ; activez-le dans les options (/fcui), sous Autre."
+L["WN49_3_TITLE"] = "Grimoire et barres"
+L["WN49_3_TEXT"] = "Tant que le grimoire est ouvert, les barres latérales montrent leurs emplacements vides, comme dans Era, si bien qu'un sort peut y être placé directement, même en combat."
+L["WN49_4_TITLE"] = "Onglets de la fenêtre du personnage"
+L["WN49_4_TEXT"] = "Les onglets de la fenêtre du personnage sont ceux d'Era, comme sur Forever : à la taille de leur nom, avec l'onglet choisi ouvert sur la page."
+L["WN49_5_TITLE"] = "Pages des options"
+L["WN49_5_TEXT"] = "Les pages de la fenêtre des options sont regroupées par type : Apparence d'abord, puis les éléments à l'écran, les pages Minicarte et Carte côte à côte, puis les fenêtres du jeu, et Autre en dernier."
+L["WN49_6_TITLE"] = "Corrections"
+L["WN49_6_TEXT"] = "Les listes de caractéristiques et d'équipement de la fenêtre du personnage affichent de nouveau leurs flèches de défilement. Le portrait du grimoire remplit son anneau comme dans Era, celui du livre des métiers fait de même et ne grandit plus à l'ouverture, et l'icône de la fenêtre des collections n'est plus trop zoomée. La molette règle le zoom de l'aperçu des Apparences, et le gestionnaire de raid replié n'affiche plus de ligne en trop."
 L["WN48_1_TITLE"] = "Carte et journal de quêtes réunis"
 L["WN48_1_TEXT"] = "La liste des quêtes à côté de la carte, avec le texte et les récompenses de la quête choisie sur deux pages en dessous, comme la carte de Wrath. Tirez le coin de la carte pour la redimensionner et le séparateur pour élargir la liste. Désactivé par défaut ; activez Carte et quêtes classiques combinées dans les options (/fcui), sous Carte, avec la Barre de navigation : style Classic."
 L["WN48_2_TITLE"] = "Texte de la liste des quêtes"

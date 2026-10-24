@@ -2,6 +2,18 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN49_1_TITLE"] = "Smaller and lighter"
+L["WN49_1_TEXT"] = "The download is less than half its old size and the addon uses less memory. Themes now color the game's own art instead of shipping copies of it, and a themed piece is only made the first time it shows. The themes look the same."
+L["WN49_2_TITLE"] = "Hide zone text"
+L["WN49_2_TEXT"] = "Hides the zone and subzone names that fade in on screen as you enter an area. Off by default; turn it on in the options (/fcui), under Other."
+L["WN49_3_TITLE"] = "Spellbook and bars"
+L["WN49_3_TEXT"] = "While the spellbook is open, the side bars show their empty slots, as in Era, so a spell can go straight onto one, in a fight too."
+L["WN49_4_TITLE"] = "Character window tabs"
+L["WN49_4_TEXT"] = "The character window's tabs are Era's own, as on Forever: sized to their names, with the picked tab open into the page."
+L["WN49_5_TITLE"] = "Options pages"
+L["WN49_5_TEXT"] = "The options window's pages are grouped by kind: Look first, then the parts on screen, the minimap and map pages side by side, then the game's windows, and Other last."
+L["WN49_6_TITLE"] = "Fixes"
+L["WN49_6_TEXT"] = "The character window's stats and equipment lists show their scroll arrows again. The spellbook's portrait fills its ring as in Era, the professions book's matches it and no longer grows as it opens, and the collections window's icon is no longer zoomed too far. The mouse wheel zooms the Appearances preview, and the collapsed raid manager no longer shows a stray line."
 L["WN48_1_TITLE"] = "Combined map and quest log"
 L["WN48_1_TEXT"] = "The quest list beside the map, with the picked quest's text and rewards on two pages under it, as the Wrath-era map. Drag the map's corner to size it and the divider to widen the list. Off by default; turn on Classic combined map/quest in the options (/fcui), under Map, with the Classic style navigation bar."
 L["WN48_2_TITLE"] = "Quest list text"
