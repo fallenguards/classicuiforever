@@ -278,12 +278,17 @@ function ns.DrainInput(box, drain)
     ns.EachKey(box, ns.KEYS.LMR, drain or ns.DrainBronze, ns.INPUT_GREY)
 end
 
+-- The theme's layers and masks hang in the slice too: repainted as its edges, a copy's metal went white.
+local function Edge(region, center)
+    return region ~= center and not ns.IsThemeLayer(region) and region:GetObjectType() ~= "MaskTexture"
+end
+
 local function SliceDrain(region, center, grey, drain)
-    if region ~= center then drain(region, grey) end
+    if Edge(region, center) then drain(region, grey) end
 end
 
 local function SliceTint(region, center)
-    if region ~= center and region.IsObjectType and region:IsObjectType("Texture") then ns.BronzeTint(region) end
+    if Edge(region, center) and region.IsObjectType and region:IsObjectType("Texture") then ns.BronzeTint(region) end
 end
 
 -- NineSlice edges; the Center stays as drawn.

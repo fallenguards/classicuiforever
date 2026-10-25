@@ -660,6 +660,9 @@ ns.OnToggle(function(key)
     if key == "themeTextured" or key:find("^textured") then ns.RepaintTints() end
 end)
 
+-- One of the theme's own layer textures, which walks painting a frame's regions leave alone.
+function ns.IsThemeLayer(texture) return own[texture] == true end
+
 -- Read by the dev addon's themedump probe: how the theme's layers hold a texture.
 function ns.FlatState(texture)
     if own[texture] then return "our layer" end
