@@ -3,6 +3,18 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN50_1_TITLE"] = "Colore con trama"
+L["WN50_1_TEXT"] = "Colore con trama, che mantiene la trama della grafica nel colore del tema, ora colora finestre intere, non solo il loro metallo: la pietra di borse e schede, i bordi delle caselle di ricerca e di testo, e le frecce di pagina del libro degli incantesimi, dove una freccia usabile è più chiara di una esaurita. Disattivo in modo predefinito; attivalo nelle opzioni (/fcui), in Aspetto."
+L["WN50_2_TITLE"] = "Temi sulle finestre del gioco"
+L["WN50_2_TEXT"] = "I temi colorano anche la grafica del gioco rimasta nelle finestre che l'addon ridisegna: le schede della finestra sociale, le barre di scorrimento, le caselle di ricerca, i menu a tendina come quello dello stato, il riquadro del denaro, le intestazioni di colonna dell'elenco di gilda, la casella di chat delle comunità e la scheda dell'incursione."
+L["WN50_3_TITLE"] = "Bronzo su retail"
+L["WN50_3_TEXT"] = "Il tema Bronzo ora colora anche la grafica delle finestre del gioco, argentata su retail, come fanno gli altri temi."
+L["WN50_4_TITLE"] = "Nascondi i pulsanti di aiuto"
+L["WN50_4_TEXT"] = "Nasconde i pulsanti di aiuto del gioco, la i in alto a sinistra di finestre come la mappa, le professioni e il libro degli incantesimi, e i consigli del tutorial che aprono. Attivo in modo predefinito; disattivalo nelle opzioni (/fcui), in Altro."
+L["WN50_5_TITLE"] = "Nascondi la scheda laterale Chi"
+L["WN50_5_TEXT"] = "La ricerca gruppi può togliere la sua scheda laterale Chi, così Chi si apre solo dalla finestra sociale. Attivo per le nuove installazioni; se usavi già l'addon, attivalo nelle opzioni (/fcui), in Sociale."
+L["WN50_6_TITLE"] = "Correzioni"
+L["WN50_6_TEXT"] = "L'anello del ritratto del libro degli incantesimi prende il tema Bronzo invece di restare argentato, e una freccia di pagina che può di nuovo girare non tiene più il colore esaurito finché non clicchi altrove. Le targhette mostrano il teschio per le unità amiche di livello sconosciuto, come il riquadro del bersaglio. Il bordo interno delle schede Amici e Incursione della finestra sociale prende il colore del tema, ed è corretto un errore che il tema poteva causare in combattimento."
 L["WN49_1_TITLE"] = "Più piccolo e più leggero"
 L["WN49_1_TEXT"] = "Il download è meno della metà di prima e l'addon usa meno memoria. I temi ora colorano la grafica del gioco invece di includerne delle copie, e un elemento con tema viene creato solo la prima volta che compare. I temi hanno lo stesso aspetto."
 L["WN49_2_TITLE"] = "Nascondi testo della zona"

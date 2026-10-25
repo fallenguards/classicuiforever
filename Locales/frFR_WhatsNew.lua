@@ -3,6 +3,18 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN50_1_TITLE"] = "Couleur texturée"
+L["WN50_1_TEXT"] = "Couleur texturée, qui garde la texture de l'art dans la couleur du thème, colore désormais des fenêtres entières, pas seulement leur métal : la pierre des sacs et des onglets, les bords des champs de recherche et de saisie, et les flèches de page du grimoire, une flèche utilisable plus claire qu'une flèche épuisée. Désactivé par défaut ; activez-le dans les options (/fcui), sous Apparence."
+L["WN50_2_TITLE"] = "Thèmes sur les fenêtres du jeu"
+L["WN50_2_TEXT"] = "Les thèmes colorent aussi l'art du jeu laissé dans les fenêtres que l'addon habille : les onglets de la fenêtre sociale, les barres de défilement, les champs de recherche, les listes déroulantes comme celle du statut, la boîte d'argent, les en-têtes de colonne de la liste de guilde, la boîte de discussion des communautés et l'onglet de raid."
+L["WN50_3_TITLE"] = "Bronze sur retail"
+L["WN50_3_TEXT"] = "Le thème Bronze colore désormais aussi l'art des fenêtres du jeu, argenté sur retail, comme les autres thèmes."
+L["WN50_4_TITLE"] = "Masquer les boutons d'aide"
+L["WN50_4_TEXT"] = "Masque les boutons d'aide du jeu, le i en haut à gauche de fenêtres comme la carte, les métiers et le grimoire, et les astuces de tutoriel qu'ils ouvrent. Activé par défaut ; désactivez-le dans les options (/fcui), sous Autre."
+L["WN50_5_TITLE"] = "Masquer l'onglet latéral Qui"
+L["WN50_5_TEXT"] = "La recherche de groupe peut retirer son onglet latéral Qui, Qui ne s'ouvre alors que depuis la fenêtre sociale. Activé pour les nouvelles installations ; si vous utilisiez déjà l'addon, activez-le dans les options (/fcui), sous Social."
+L["WN50_6_TITLE"] = "Corrections"
+L["WN50_6_TEXT"] = "L'anneau du portrait du grimoire prend le thème Bronze au lieu de rester argenté, et une flèche de page qui peut de nouveau tourner ne garde plus sa couleur épuisée jusqu'à un clic ailleurs. Les barres de nom montrent le crâne pour les unités amicales de niveau inconnu, comme le cadre de cible. La bordure intérieure des onglets Amis et Raid de la fenêtre sociale prend la couleur du thème, et une erreur que le thème pouvait causer en combat est corrigée."
 L["WN49_1_TITLE"] = "Plus petit et plus léger"
 L["WN49_1_TEXT"] = "Le téléchargement fait moins de la moitié de son ancienne taille et l'addon utilise moins de mémoire. Les thèmes teintent maintenant les dessins du jeu lui-même au lieu d'en inclure des copies, et un élément teinté par le thème n'est créé que la première fois qu'il s'affiche. Les thèmes gardent le même aspect."
 L["WN49_2_TITLE"] = "Masquer le texte de zone"

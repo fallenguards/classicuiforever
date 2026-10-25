@@ -3,6 +3,18 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN50_1_TITLE"] = "Mit Textur"
+L["WN50_1_TEXT"] = "Mit Textur, das die Textur der Grafik in der Farbe des Themas behält, färbt jetzt ganze Fenster, nicht nur ihr Metall: den Stein von Taschen und Reitern, die Ränder von Such- und Eingabefeldern und die Seitenpfeile des Zauberbuchs, wobei ein nutzbarer Pfeil heller ist als ein verbrauchter. Standardmäßig aus; schalte es in den Optionen (/fcui) unter Aussehen ein."
+L["WN50_2_TITLE"] = "Themen auf den Fenstern des Spiels"
+L["WN50_2_TEXT"] = "Themen färben auch die eigene Grafik des Spiels, die in den vom Addon umgestalteten Fenstern bleibt: die Reiter des Kontaktfensters, Bildlaufleisten, Suchfelder, Auswahllisten wie die Statuswahl, das Geldfeld, die Spaltenköpfe der Gildenliste, das Chatfeld der Communitys und den Schlachtzugreiter."
+L["WN50_3_TITLE"] = "Bronze auf Retail"
+L["WN50_3_TEXT"] = "Das Bronze-Thema färbt jetzt auch die eigene Fenstergrafik des Spiels, die auf Retail silbern ist, wie es die anderen Themen tun."
+L["WN50_4_TITLE"] = "Hilfeknöpfe ausblenden"
+L["WN50_4_TEXT"] = "Blendet die Hilfeknöpfe des Spiels aus, das i oben links an Fenstern wie Karte, Berufen und Zauberbuch, und die Tutorialtipps, die sie öffnen. Standardmäßig an; schalte es in den Optionen (/fcui) unter Sonstiges aus."
+L["WN50_5_TITLE"] = "Wer-Seitenreiter ausblenden"
+L["WN50_5_TEXT"] = "Die Gruppensuche kann ihren Wer-Seitenreiter weglassen, sodass Wer nur über das Kontaktfenster erreichbar ist. An für neue Installationen; wenn du das Addon schon genutzt hast, schalte es in den Optionen (/fcui) unter Kontakte ein."
+L["WN50_6_TITLE"] = "Fehlerbehebungen"
+L["WN50_6_TEXT"] = "Der Porträtring des Zauberbuchs nimmt das Bronze-Thema an, statt silbern zu bleiben, und ein Seitenpfeil, der wieder blättern kann, behält nicht mehr seine verbrauchte Farbe, bis du woanders klickst. Namensplaketten zeigen den Totenkopf für freundliche Einheiten unbekannter Stufe, wie der Zielrahmen. Der innere Rand auf den Reitern Freunde und Schlachtzug des Kontaktfensters die Farbe des Themas an, und ein Fehler, den das Thema im Kampf auslösen konnte, ist behoben."
 L["WN49_1_TITLE"] = "Kleiner und leichter"
 L["WN49_1_TEXT"] = "Der Download ist weniger als halb so groß wie bisher, und das Addon braucht weniger Speicher. Themen färben jetzt die Grafik des Spiels selbst, statt Kopien davon mitzuliefern, und ein Teil im Thema entsteht erst, wenn es zum ersten Mal erscheint. Die Themen sehen aus wie bisher."
 L["WN49_2_TITLE"] = "Zonentext ausblenden"

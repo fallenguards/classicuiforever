@@ -3,6 +3,18 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN50_1_TITLE"] = "Color con textura"
+L["WN50_1_TEXT"] = "Color con textura, que mantiene la textura del arte en el color del tema, ahora colorea ventanas enteras, no solo su metal: la piedra de bolsas y pestañas, los bordes de las cajas de búsqueda y de texto, y las flechas de página del libro de hechizos, donde una flecha usable es más clara que una agotada. Desactivado por defecto; actívalo en las opciones (/fcui), en Aspecto."
+L["WN50_2_TITLE"] = "Temas en las ventanas del juego"
+L["WN50_2_TEXT"] = "Los temas también colorean el arte propio del juego que queda en las ventanas que el addon rediseña: las pestañas de la ventana social, las barras de desplazamiento, las cajas de búsqueda, los desplegables como el de estado, la caja de dinero, las cabeceras de columna de la lista de hermandad, la caja de chat de las comunidades y la pestaña de banda."
+L["WN50_3_TITLE"] = "Bronce en retail"
+L["WN50_3_TEXT"] = "El tema Bronce ahora también colorea el arte propio de las ventanas del juego, que es plateado en retail, como hacen los demás temas."
+L["WN50_4_TITLE"] = "Ocultar botones de ayuda"
+L["WN50_4_TEXT"] = "Oculta los botones de ayuda del juego, la i arriba a la izquierda de ventanas como el mapa, las profesiones y el libro de hechizos, y los consejos de tutorial que abren. Activado por defecto; desactívalo en las opciones (/fcui), en Otros."
+L["WN50_5_TITLE"] = "Ocultar pestaña lateral Quién"
+L["WN50_5_TEXT"] = "El buscador de grupos puede quitar su pestaña lateral Quién, así Quién solo se abre desde la ventana social. Activado en instalaciones nuevas; si ya usabas el addon, actívalo en las opciones (/fcui), en Social."
+L["WN50_6_TITLE"] = "Correcciones"
+L["WN50_6_TEXT"] = "El anillo del retrato del libro de hechizos toma el tema Bronce en vez de quedarse plateado, y una flecha de página que puede volver a pasar ya no conserva su color agotado hasta que haces clic en otro sitio. Las placas de nombre muestran la calavera para unidades amistosas de nivel desconocido, como el marco de objetivo. El borde interior de las pestañas Amigos y Banda de la ventana social toma el color del tema, y se corrigió un error que el tema podía causar en combate."
 L["WN49_1_TITLE"] = "Más pequeño y ligero"
 L["WN49_1_TEXT"] = "La descarga ocupa menos de la mitad que antes y el addon usa menos memoria. Los temas ahora colorean el arte propio del juego en vez de incluir copias de él, y una pieza con tema solo se crea la primera vez que se muestra. Los temas se ven igual."
 L["WN49_2_TITLE"] = "Ocultar texto de zona"

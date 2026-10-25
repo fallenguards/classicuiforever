@@ -2,6 +2,24 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.39.0] - 2026-10-25
+
+### Added
+- Hide help buttons, under Other: hides the game's help buttons, the "i" at the top left of windows such as the map, professions and the spellbook, along with the tutorial tips they pop. On by default. It replaces Hide map help button, which only covered the map on retail.
+- On Forever, Hide Who side tab, under Social: the group finder drops its Who side tab, so Who is reached from the social window alone. On for new installs; installs from before keep the tab (#224).
+
+### Changed
+- With Textured color, whole windows take the theme's color, not only their metal: the stone of bags, tabs and the spellbook's edge, search and input box borders, and the spellbook's page arrows, a usable arrow lighter than a spent one (#224).
+- Themes color the game's own art left in the windows the addon restyles: the social window's tabs, scroll bars, search boxes, drop-downs such as the status picker, the money box, the guild roster's column headers and the stone strip over them, the communities chat box and the raid tab.
+- On retail, the Bronze theme colors the game's own art too, which is silver there, as the other themes do.
+
+### Fixed
+- The spellbook's portrait ring stayed silver with the Bronze theme.
+- A spellbook page arrow that could turn again kept its spent color until you clicked elsewhere in the book.
+- Nameplates showed no skull for friendly units of unknown level. They show it as the target frame does.
+- With Textured color, the inset border on the social window's Friends and Raid tabs kept gray metal.
+- An error the theme could raise in a fight.
+
 ## [0.38.0] - 2026-10-24
 
 ### Added

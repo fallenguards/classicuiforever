@@ -2,6 +2,18 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN50_1_TITLE"] = "Textured color"
+L["WN50_1_TEXT"] = "Textured color, which keeps the art's texture in the theme's color, now colors whole windows, not only their metal: the stone of bags and tabs, search and input box borders, and the spellbook's page arrows, where a usable arrow is lighter than a spent one. Off by default; turn it on in the options (/fcui), under Look."
+L["WN50_2_TITLE"] = "Themes on the game's windows"
+L["WN50_2_TEXT"] = "Themes also color the game's own art left in the windows the addon restyles: the social window's tabs, scroll bars, search boxes, drop-downs such as the status picker, the money box, the guild roster's column headers, the communities chat box and the raid tab."
+L["WN50_3_TITLE"] = "Bronze on retail"
+L["WN50_3_TEXT"] = "The Bronze theme now colors the game's own window art too, which is silver on retail, as the other themes do."
+L["WN50_4_TITLE"] = "Hide help buttons"
+L["WN50_4_TEXT"] = "Hides the game's help buttons, the i at the top left of windows such as the map, professions and the spellbook, and the tutorial tips they pop. On by default; turn it off in the options (/fcui), under Other."
+L["WN50_5_TITLE"] = "Hide Who side tab"
+L["WN50_5_TEXT"] = "The group finder can drop its Who side tab, so Who is reached from the social window alone. On for new installs; if you used the addon before, turn it on in the options (/fcui), under Social."
+L["WN50_6_TITLE"] = "Fixes"
+L["WN50_6_TEXT"] = "The spellbook's portrait ring takes the Bronze theme instead of staying silver, and a page arrow that can turn again no longer keeps its spent color until you click elsewhere. Nameplates show the skull for friendly units of unknown level, as the target frame does. The inset border on the social window's Friends and Raid tabs takes the theme's color, and an error the theme could raise in a fight is gone."
 L["WN49_1_TITLE"] = "Smaller and lighter"
 L["WN49_1_TEXT"] = "The download is less than half its old size and the addon uses less memory. Themes now color the game's own art instead of shipping copies of it, and a themed piece is only made the first time it shows. The themes look the same."
 L["WN49_2_TITLE"] = "Hide zone text"
