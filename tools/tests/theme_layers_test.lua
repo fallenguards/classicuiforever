@@ -92,6 +92,8 @@ local function NewFrame(visible, parent)
         return self.visible
     end
     function frame:GetParent() return self.parent end
+    function frame:IsObjectType(kind) return kind == (self.kind or "Frame") end
+    function frame:IsProtected() return false end
     function frame:CreateMaskTexture()
         local mask = { ours = true }
         function mask:SetAllPoints() end
@@ -143,6 +145,10 @@ local ns = {
     IsSecret = function() return false end,
     AnySecret = function() return false end,
     IsForbidden = function() return false end,
+    HookScriptOnce = function(frame, script, fn)
+        frame.hooks = frame.hooks or {}
+        frame.hooks[script] = frame.hooks[script] or fn
+    end,
     Safe = function(value) return value end,
     SetShownIf = function(tex, shown)
         shown = shown and true or false
@@ -456,6 +462,17 @@ Check("the chrome pass after it (ns.SetTex's) keeps it tinted", pagePiece.desat 
 ns.FlatOn = function() return true end
 ns.PaintCopy(pagePiece, COPY)
 Check("the one color look inks the page, its parchment layer off", pagePiece.desat == true and not parch.shown, true)
+-- A button's state art: its layers are looked at as it turns on or off, with no press on its window.
+ns.FlatOn = function() return false end
+local pageArrow = NewFrame(true, UIParent)
+pageArrow.kind = "Button"
+local arrowArt = pageArrow:CreateTexture()
+ns.PaintCopy(arrowArt, COPY .. "arrow")
+Check("a button with layers hears its turns", pageArrow.hooks and pageArrow.hooks.OnEnable ~= nil and pageArrow.hooks.OnDisable ~= nil, true)
+local kicksBefore = kicks
+pageArrow.hooks.OnEnable(pageArrow)
+Check("turning on wakes the pass", kicks > kicksBefore, true)
+ns.PaintCopy(arrowArt, nil)
 -- A sheet with a picture in its ring (Era's backpack): one color, the picture over it as drawn.
 ns.PictureMask = function(path) return path == COPY .. "pic" and "picture" or false end
 local wasFlat, wasChrome = ns.FlatOn, ns.ChromeArt

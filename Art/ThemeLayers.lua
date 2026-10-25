@@ -154,6 +154,14 @@ local function Listen(on)
     end
 end
 
+-- A button's state art swaps as it turns on or off, with no press on its window (a pad's click, the wheel): its
+-- layers are looked at then.
+local function StateTurned(button)
+    local set = frames[button]
+    if not set then return end
+    for layer, piece in pairs(set) do Kick(piece, layer) end
+end
+
 -- A piece's frame joins its root's group; a root gets one watcher, so its layers are looked at as it shows or goes.
 local function Index(piece, layer)
     local frame = piece:GetParent()
@@ -163,6 +171,10 @@ local function Index(piece, layer)
         frames[frame] = set
         local root = RootOf(frame)
         if root then Group(root)[frame], rootOf[frame] = set, root end
+        if frame:IsObjectType("Button") and not ns.Safe(frame:IsProtected(), true) then
+            ns.HookScriptOnce(frame, "OnEnable", StateTurned, "themeLayers")
+            ns.HookScriptOnce(frame, "OnDisable", StateTurned, "themeLayers")
+        end
     end
     set[layer] = piece
 end
