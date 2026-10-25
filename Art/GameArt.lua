@@ -1,8 +1,8 @@
 local _, ns = ...
 
--- The theme on the game's own art where our piece for it is off (its row unticked, or a game window we never dressed):
--- each piece walked whole, every texture of frame metal (by atlas, or file for the old art) tinted like ours
--- (ns.TintGameArt), back as drawn once our piece stands again; a window is walked again as it opens.
+-- The theme on the game's own art: each piece walked whole, every texture of frame metal (by atlas, or file for the
+-- old art) tinted like ours (ns.TintGameArt), dressed windows too for what our dress leaves (tabs, scroll bars, search
+-- boxes); walked again as a window opens.
 
 local held = setmetatable({}, { __mode = "k" })   -- texture -> tinted by this pass
 local want = {}                                  -- this pass's textures, refilled
@@ -32,12 +32,15 @@ local METAL = {
     "^spellbook%-item%-iconframe", "^spellbook%-rotationhelper%-iconframe", "^spellbook%-divider", "^spec%-thumbnailborder",
     "^groupfinder%-button%-cover$", "^groupfinder%-scrollline", "^common%-button%-list%-large$", "^common%-button%-list%-mid2$",
     "^professions%-recipe%-header", "^profession%-square%-frame", "^professions%-slot%-frame", "^professions%-skillbar%-frame",
-    "^tab%-divider%-top$", "^ui%-merchant%-botframe",
+    "^tab%-divider%-top$", "^ui%-merchant%-botframe", "^common%-dropdown%-textholder", "^common%-dropdown%-a%-button",
+    "^communities%-guildbanner%-border",
 }
 -- Light, not metal: a state's hover or glow over the art.
 local NOT_METAL = { "mouseover", "highlight", "glow", "hover", "mask", "shadow" }
--- The old art by file: the calendar's frame, button borders and divider, the skill line tabs.
-local METAL_FILES = { [235431] = true, [235430] = true, [235418] = true, [131074] = true, [136831] = true }
+-- The old art by file: the calendar's frame, button borders and divider, the skill line tabs; the column tabs and the
+-- rock and marble behind lists (the guild roster's header strip); the communities chat box's border.
+local METAL_FILES = { [235431] = true, [235430] = true, [235418] = true, [131074] = true, [136831] = true,
+    [131139] = true, [374155] = true, [374154] = true, [375507] = true, [375508] = true, [389190] = true }
 
 local metalAtlas = {}   -- atlas -> metal or not, worked out once
 local function IsMetal(atlas)
@@ -111,7 +114,12 @@ local ROOTS = {
     { "gameMenu", "GameMenuFrame" },
     { "settingsPanel", "SettingsPanel" },
     { false, "PlayerSpellsFrame" },
+    -- The social window's raid tab: parented to it only as the tab first opens, so walked as it shows.
+    { false, "RaidFrame" },
 }
+-- Windows walked while dressed too: our dress leaves some of the game's metal (search box, money box, tabs).
+local DRESSED_WALKED = { bags = true, groupFinder = true, characterSheet = true, gameMenu = true, settingsPanel = true,
+    questMapPane = true }
 local isRoot = setmetatable({}, { __mode = "k" })
 
 local Walk
@@ -201,7 +209,7 @@ local function Sync()
         end
     end
     for _, root in ipairs(ROOTS) do
-        if root[1] == false or not ns.ModuleInForce(root[1]) then
+        if root[1] == false or DRESSED_WALKED[root[1]] or not ns.ModuleInForce(root[1]) then
             for i = 2, #root do
                 if _G[root[i]] then Root(_G[root[i]]) end
             end
@@ -212,7 +220,7 @@ local function Sync()
     for _, entry in ipairs(P and P.WINDOWS or {}) do
         local frame = _G[entry[1]]
         if frame and entry.child then frame = frame[entry.child] end
-        if frame and not P.skinned[frame] then Root(frame) end
+        if frame then Root(frame) end
     end
     if not ns.ModuleInForce("buttons") and ns.ForEachActionButton then ns.ForEachActionButton(ButtonArt) end
     if not ns.ModuleInForce("namePlates") then ns.NP.EachPlate(PlateArt) end

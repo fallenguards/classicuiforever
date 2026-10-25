@@ -82,8 +82,11 @@ local function PaintTint(texture)
     if texture.SetDesaturated then Paint(texture, ns.ThemeFor(texture), tinted[texture], silvered[texture]) end
 end
 
--- The game's own art where our piece is off (Art/GameArt.lua): as drawn with no theme or one showing client art,
--- else tinted like our metal. Art another paint holds is left to it.
+-- Forever's own art is gold already, so a theme showing client art leaves it; retail's is silver and takes the tint.
+local function ClientGold(theme) return theme ~= nil and theme.client and ns.OnForever() end
+
+-- The game's own art (Art/GameArt.lua): as drawn with no theme or one showing Forever's gold art, else tinted like
+-- our metal. Art another paint holds is left to it.
 local gameArt = setmetatable({}, weak)   -- texture -> share, or true for full
 local function OnCopy(texture)
     return tinted[texture] or drained[texture] ~= nil or swapped[texture] or (B.clientWas and B.clientWas[texture])
@@ -91,7 +94,7 @@ end
 local function PaintGame(texture)
     if OnCopy(texture) then return end
     local theme = ns.ThemeFor(texture)
-    Paint(texture, not (theme and theme.client) and theme or nil, gameArt[texture])
+    Paint(texture, not ClientGold(theme) and theme or nil, gameArt[texture])
 end
 
 function ns.TintGameArt(texture, share)
@@ -222,7 +225,7 @@ local function PaintDrain(region, tint)
         region:SetVertexColor(t[1], t[2], t[3])
         return
     end
-    if theme and theme.client then
+    if ClientGold(theme) then
         region:SetDesaturated(false)
         if region.SetVertexColor then region:SetVertexColor(1, 1, 1) end
         return

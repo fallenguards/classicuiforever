@@ -23,6 +23,9 @@ end
 
 local function IsTexture(_, kind) return kind == "Texture" end
 local function Atlas(name) return { atlas = name, IsObjectType = IsTexture, GetAtlas = function(self) return self.atlas end } end
+local function File(id)
+    return { IsObjectType = IsTexture, GetAtlas = function() return nil end, GetTexture = function() return id end }
+end
 
 local tinted = {}
 local noop = function() end
@@ -55,6 +58,23 @@ _G.LootFrame = { regions = { cornerLeft, cornerRight, metal }, IsObjectType = fu
 apply()
 Check(tinted[metal], "the loot window's border metal is tinted")
 Check(not tinted[cornerLeft] and not tinted[cornerRight], "the flat background's corners keep the client's color")
+-- Dressed by us, the window's leftover metal still takes the theme (a search box, a tab).
+ns.panels.skinned[_G.LootFrame] = true
+tinted[metal] = nil
+apply()
+Check(tinted[metal], "a dressed window's leftover metal is tinted too")
+
+-- The guild roster's header strip: the game's column tabs and the rock behind them, by file.
+local columnTab, rock, icon = File(131139), File(374155), File(136243)
+_G.LootFrame.regions = { columnTab, rock, icon }
+apply()
+Check(tinted[columnTab] and tinted[rock], "the game's column tabs and rock strip are tinted")
+Check(not tinted[icon], "an icon by file is left as drawn")
+-- The raid tab hangs on the social window only once picked: walked on its own.
+local raidBar = Atlas("minimal-scrollbar-track-middle")
+_G.RaidFrame = { regions = { raidBar }, IsObjectType = function() return false end }
+apply()
+Check(tinted[raidBar], "the raid tab's scroll bar is tinted")
 
 if failed > 0 then
     print(failed .. " check(s) failed")
