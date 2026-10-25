@@ -222,14 +222,14 @@ local function UpdateLevel(unitFrame)
     local own = unitFrame.fcui
     local level, skull = own and own.level, own and own.skull
     if not level or not unitFrame.unit then return end
-    -- The effective level as the client's target frame reads it: -1 (a skull) from ten levels up, where UnitLevel tells it.
+    -- The target frame's rule: the effective level shown, a skull where it or UnitLevel says "??" (bosses, friends too).
     local lvl = (UnitEffectiveLevel or UnitLevel)(unitFrame.unit)
     if lvl == nil or IsSecret(lvl) then
         level:SetText("")
         skull:Hide()
         return
     end
-    if ns.SkullLevel(lvl, unitFrame.unit) then
+    if ns.SkullLevel(lvl, unitFrame.unit) or ns.SkullLevel(UnitLevel(unitFrame.unit), unitFrame.unit) then
         level:SetText("")
         skull:Show()
         return
