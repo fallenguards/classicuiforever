@@ -127,6 +127,7 @@ end
 
 function R.PickLine(professionID)
     picked = professionID
+    if R.Changed then R.Changed() end
 end
 
 -- Recipes not learned yet listed too, as the game's Show Unlearned; R.Changed is the window's refresh.

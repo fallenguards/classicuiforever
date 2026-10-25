@@ -26,6 +26,22 @@ local function SlotEntries()
     return entries
 end
 
+-- Retail: the profession's expansions, the picked one's recipes alone listed.
+local function LineEntries()
+    local R = ns.tradeReagents
+    local entries = {}
+    for _, line in ipairs(R.Lines()) do
+        local id = line.professionID
+        entries[#entries + 1] = { line.expansionName or line.professionName or "",
+            check = function()
+                local now = R.Line()
+                return now ~= nil and now.professionID == id
+            end,
+            toggle = function() R.PickLine(id) end }
+    end
+    return entries
+end
+
 -- Era's checkbox menu over the client's filters; Slots only where this profession makes gear.
 function ns.TradeSkillFilterEntries()
     local api = C_TradeSkillUI
@@ -40,6 +56,7 @@ function ns.TradeSkillFilterEntries()
     local R = ns.tradeReagents
     if not ns.OnForever() then
         entries[#entries + 1] = { _G.PROFESSION_RECIPES_SHOW_UNLEARNED or "", check = R.Unlearned, toggle = R.ToggleUnlearned }
+        if #R.Lines() > 1 then entries[#entries + 1] = { _G.EXPANSION_FILTER_TEXT or "", sub = LineEntries } end
     end
     -- Era's subclasses: each type the profession makes; ticked ones alone are listed.
     if #R.types > 0 then

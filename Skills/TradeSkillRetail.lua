@@ -13,8 +13,6 @@ local PARK_X = 6000
 -- Our page hangs this far past the window's foot: its border wears the tab row's lift (5, Windows/Panels.lua), 5 less
 -- than Forever's window (1 past its page), so its foot line stands where Forever's does, under the page's buttons.
 local FOOT_DROP = 4
-local DROP_ARROW = "Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-"
-local DROP_HOW = { set = "file", highlightSet = "raw", add = true }
 local state = { ours = false, game = false }
 
 -- The game's page width for its tab, as it last set it.
@@ -101,44 +99,12 @@ local function OpenInGame(recipeID)
     C_TradeSkillUI.OpenRecipe(recipeID)
 end
 
-local function LineEntries(refresh)
-    local entries = {}
-    for _, line in ipairs(R.Lines()) do
-        local id = line.professionID
-        entries[#entries + 1] = { line.expansionName or line.professionName or "", function()
-            R.PickLine(id)
-            refresh()
-        end, function()
-            local now = R.Line()
-            return now ~= nil and now.professionID == id
-        end }
-    end
-    return entries
-end
-
--- Called once as the page is built: the expansion drop at the rank bar's end, the best quality check and the line that
--- opens the game's page, laid per recipe through panel.LayRetail.
+-- Called once as the page is built: the best quality check and the line that opens the game's page, laid per recipe
+-- through panel.LayRetail. The expansion pick is in the Filter menu (Skills/TradeSkillExtras.lua).
 function ns.TradeSkillRetailParts(panel, refresh, selectedInfo)
-    local rank, detail = panel.rank, panel.detail
+    local detail = panel.detail
     R.Changed = refresh
     panel:SetPoint("BOTTOMRIGHT", ProfessionsFrame, "BOTTOMRIGHT", 0, -FOOT_DROP)
-    panel.rankRight = -64
-    local drop = ns.NewFrame("Button", nil, panel)
-    drop:SetSize(24, 24)
-    drop:SetPoint("LEFT", rank, "RIGHT", 5, -1)
-    ns.DressStates(drop, DROP_ARROW .. "Up", DROP_ARROW .. "Down", DROP_ARROW .. "Disabled", ns.ART.HILIGHT, DROP_HOW)
-    local lists = {}   -- base profession -> its drop list
-    drop:SetScript("OnClick", function(self)
-        local base = C_TradeSkillUI.GetBaseProfessionInfo()
-        local key = base and base.professionID or 0
-        if not lists[key] then
-            lists[key] = ns.DropList(LineEntries(refresh))
-            lists[key]:Follow(panel)
-        end
-        lists[key]:Toggle(self)
-    end)
-    ns.AttachTip(drop, { text = function() return _G.EXPANSION_FILTER_TEXT or "" end })
-
     local best = ns.SmallCheck(detail, _G.PROFESSIONS_USE_BEST_QUALITY_REAGENTS or "", 1, 0.82, 0)
     best:SetPoint("TOPRIGHT", detail, "TOPRIGHT", -14 - math.ceil(best.label:GetStringWidth() or 120), -22)
     best:SetScript("OnClick", function(self) ns.CheckSound(self) end)
@@ -156,7 +122,6 @@ function ns.TradeSkillRetailParts(panel, refresh, selectedInfo)
     end)
 
     function panel.LayRetail(info, schematic, gameOnly)
-        drop:SetShown(#R.Lines() > 1)
         best:SetShown(R.Tiered(schematic) and not gameOnly)
         -- A gathering profession's journal has nothing to make.
         local extras = (gameOnly and not info.isGatheringRecipe) or R.HasExtras(info, schematic)
