@@ -170,6 +170,7 @@ local OWN = {
 
 -- key: the old client-built list's id for the nearest section, so saved picks keep meaning.
 -- wide: side panel only (panes list TBC's lines). na: N/A where the client writes nothing.
+-- retail: a stat Forever's client has a line for but its game has none (mastery, #208).
 local sections
 
 local function Sections()
@@ -178,7 +179,7 @@ local function Sections()
     sections = {
         { key = "section1", label = _G.STAT_CATEGORY_GENERAL or "General", stats = {
             { stat = "HEALTH" }, { stat = "POWER" }, { stat = "ALTERNATEMANA" }, { own = "ITEMLEVEL" },
-            { stat = "MOVESPEED" } } },
+            { stat = "MOVESPEED" }, { stat = "MASTERY", retail = true }, { stat = "VERSATILITY", retail = true } } },
         { key = "section2", label = _G.STAT_CATEGORY_ATTRIBUTES or "Attributes", stats = {
             { stat = "STRENGTH" }, { stat = "AGILITY" }, { stat = "STAMINA" }, { stat = "INTELLECT" },
             { stat = "SPIRIT" } } },
@@ -259,6 +260,7 @@ end
 
 -- False when the client has no such line or this character has none.
 local function FillLine(row, entry, resistances)
+    if entry.retail and ns.OnForever() then return false end
     local fill = entry.own and OWN[entry.own]
     if not fill then
         local info = type(PAPERDOLL_STATINFO) == "table" and PAPERDOLL_STATINFO[entry.stat]
