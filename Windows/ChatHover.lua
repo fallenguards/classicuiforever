@@ -10,19 +10,24 @@ local PARTS = { friends = "hideChatFriends", channels = "hideChatChannels", menu
 -- A chat window's rect stretched over its tabs above, its button column left and its typing box below.
 local REACH_TOP, REACH_BOTTOM, REACH_LEFT = 32, -36, -40
 local painted = setmetatable({}, { __mode = "k" })   -- region -> faded by us
-local H = { tabs = 1, frame = 1 }
+local H = { frame = 1, tabs = {} }   -- tabs: chat window name -> its tab's last alpha
 local events, job
 
 local function ShowState(id) return ns.MM and ns.MM.ShowState(id) end
 
--- The mouse over any chat window, its tabs, its button column or its typing box, or the typing box in use.
-local function Near()
+-- The mouse over this chat window, its tabs, its button column or its typing box, or its typing box in use.
+local function NearChat(chat)
+    if chat:IsVisible() and chat:IsMouseOver(REACH_TOP, REACH_BOTTOM, REACH_LEFT, 0) then return true end
+    local box = chat.editBox
+    return box ~= nil and box:IsVisible() and (box:HasFocus() or box:IsMouseOver())
+end
+
+-- Near any chat window; docked = near one in the game's dock (they share its tab row).
+local function Near(docked)
     local list = _G.CHAT_FRAMES or ns.EMPTY
     for i = 1, #list do
         local chat = _G[list[i]]
-        if chat and chat:IsVisible() and chat:IsMouseOver(REACH_TOP, REACH_BOTTOM, REACH_LEFT, 0) then return true end
-        local box = chat and chat.editBox
-        if box and box:IsVisible() and (box:HasFocus() or box:IsMouseOver()) then return true end
+        if chat and (not docked or chat.isDocked) and NearChat(chat) then return true end
     end
     return false
 end
@@ -43,18 +48,26 @@ local function Want(id, near)
     return 1
 end
 
--- Every chat window's tab (its new message flash too) and typing box border; again only on a change unless forced.
+-- Each chat window's tab (its new message flash too) on hover of its own window, or of the dock for a docked one;
+-- the typing box borders on hover of any. Again only on a change unless forced.
 local function Lay(force)
-    local near = H.hovering and Near()
-    local tabs, frame = Want("ChatTabs", near), Want("ChatEditFrame", near)
-    if not force and tabs == H.tabs and frame == H.frame then return end
-    H.tabs, H.frame = tabs, frame
+    local frame = Want("ChatEditFrame", H.hovering and Near())
+    local boxes = force or frame ~= H.frame
+    H.frame = frame
+    local dockNear = H.hovering and Near(true)
     local list = _G.CHAT_FRAMES or ns.EMPTY
     for i = 1, #list do
         local name = list[i]
-        local tab, flash, box = _G[name .. "Tab"], _G[name .. "TabFlash"], _G[name .. "EditBox"]
-        if tab then ns.EachRegion(tab, Paint, tabs, force) end
-        if flash then ns.EachRegion(flash, Paint, tabs, force) end
+        local chat = _G[name]
+        local near = chat ~= nil and H.hovering and (chat.isDocked and dockNear or not chat.isDocked and NearChat(chat))
+        local tabs = Want("ChatTabs", near)
+        if force or tabs ~= H.tabs[name] then
+            H.tabs[name] = tabs
+            local tab, flash = _G[name .. "Tab"], _G[name .. "TabFlash"]
+            if tab then ns.EachRegion(tab, Paint, tabs, force) end
+            if flash then ns.EachRegion(flash, Paint, tabs, force) end
+        end
+        local box = boxes and _G[name .. "EditBox"]
         if box then ns.EachRegion(box, PaintTexture, frame, force) end
     end
 end
