@@ -215,7 +215,7 @@ local TITLE_STRIP = { vert = false, coords = { 0, 1, 0.2890625, 0.421875 } }
 
 local function SkinSystemTab(tab, lift)
     tab.fcuiLift = lift
-    ns.SkinBottomTab(tab)
+    ns.SkinBottomTab(tab, true)
 end
 
 -- Title between the ring (or plain corner) and the X, stone strip under it; left: just inside a plain corner's line.

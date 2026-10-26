@@ -172,6 +172,11 @@ local function PickedFace(tab) return tab.LeftActive ~= nil and tab.LeftActive:I
 local function OverBorder(tab)
     local parent = tab:GetParent()
     local slice = parent and parent.NineSlice
+    -- A tab system's tabs hang one frame further down the window (the crafting and talents windows).
+    if not slice and parent and parent.GetParent then
+        local window = parent:GetParent()
+        slice = window and window.NineSlice
+    end
     if not (slice and slice.GetFrameLevel) then return end
     local level = slice:GetFrameLevel()
     if eraRows[tab] and not PickedFace(tab) then
@@ -237,12 +242,19 @@ end
 ns.HookGlobal("PanelTemplates_SelectTab", TextAfterClient)
 ns.HookGlobal("PanelTemplates_DeselectTab", TextAfterClient)
 
--- The client disables the picked tab (no highlight), so only the inactive face glows.
-function ns.SkinBottomTab(tab)
+-- The client disables the picked tab (no highlight), so only the inactive face glows. whole: a tab system's tab, which
+-- flips its faces itself (TabSystemButtonArtMixin:SetTabSelected), never through PanelTemplates_SelectTab: each piece
+-- stays one texture, the art's rows over its whole length, so its face shows and hides whole with the client's flip.
+function ns.SkinBottomTab(tab, whole)
     if not tab or not tab.Left then return end
     ns.DressPieces(tab, BOTTOM_TAB)
     for _, piece in ipairs(BOTTOM_TAB) do
-        ns.LengthenTabPiece(tab[piece.field], piece.coords[1], piece.coords[2], piece.key == "tabInactive" and TAB_OFF_Y or TAB_PICKED_Y)
+        local more = piece.key == "tabInactive" and TAB_OFF_Y or TAB_PICKED_Y
+        if whole then
+            tab[piece.field]:SetHeight(ROWS + TAB_EXTRA + more)
+        else
+            ns.LengthenTabPiece(tab[piece.field], piece.coords[1], piece.coords[2], more)
+        end
     end
     ns.FadeKeys(tab, ns.KEYS.TAB_GLOW)
     tab.fcuiTab = true
