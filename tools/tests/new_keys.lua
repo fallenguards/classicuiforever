@@ -4,6 +4,7 @@
 -- luacheck: std lua54
 return {
     hideThreatGlow = "same for everyone: opt-in, off by default",
+    honorBadge = "same for everyone: opt-in, off by default (retail only)",
     hideWhoTab = "same for everyone: opt-in, off by default",
     hideFinderWho = "kept as before: dbVersion 28 (Social/FinderTabs.lua KeepFinderWho) keeps the finder's Who side tab for installs from before",
     socialTitleDrag = "same for everyone: opt-in, off by default",

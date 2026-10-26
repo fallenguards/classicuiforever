@@ -251,6 +251,8 @@ ns.TOGGLES = {
         search = "attack attacked red flash pulse health bar name" },
     { "damageFlash", L["OPT_damageFlash"], L["OPT_damageFlash_TIP"], parent = "unitFrames",
         search = "damage hit lost health red bar flash loss animation" },
+    { "honorBadge", L["OPT_honorBadge"], L["OPT_honorBadge_TIP"], parent = "unitFrames", hideIf = NotOnForever,
+        search = "pvp rank honor level prestige badge emblem faction crest" },
     { "threatNumber", L["OPT_threatNumber"], L["OPT_threatNumber_TIP"], parent = "unitFrames", search = "aggro threat percent focus" },
     { "threatNumberGrouped", L["OPT_threatNumberGrouped"], L["OPT_threatNumberGrouped_TIP"], parent = "threatNumber",
         search = "party raid dungeon instance solo" },

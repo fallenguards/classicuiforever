@@ -449,18 +449,69 @@ end
 local emblemArt = setmetatable({}, { __mode = "k" })
 local emblemAt = setmetatable({}, { __mode = "k" })
 
+local GetHonorRewardInfo = C_PvP and C_PvP.GetHonorRewardInfo
+local HONOR_RINGS = { Alliance = "honorsystem-portrait-alliance", Horde = "honorsystem-portrait-horde" }
+local MERCENARY_SIDE = { Alliance = "Horde", Horde = "Alliance" }
+
+-- Honor badge (retail): the ring atlas and badge file, nil with none or unreadable. The game's helper decides the
+-- showing but hands addons no art (nil fields, /fcuidev honor): looked up as the client does.
+local function HonorArt(unit)
+    local util = not ns.OnForever() and ns.db.honorBadge == true and _G.UnitFrameUtil
+    local info = util and util.GetUnitPvPIndicatorDisplayInfo and util.GetUnitPvPIndicatorDisplayInfo(unit, unit == "player")
+    if not info or ns.IsSecret(info.showPrestigePortrait) or not info.showPrestigePortrait then return nil end
+    local level, faction = UnitHonorLevel(unit), UnitFactionGroup(unit)
+    if ns.AnySecret(level, faction, info.isFreeForAll) or not GetHonorRewardInfo then return nil end
+    local reward = GetHonorRewardInfo(level)
+    local badge = reward and reward.badgeFileDataID
+    if not badge or ns.IsSecret(badge) then return nil end
+    if unit == "player" and UnitIsMercenary(unit) then faction = MERCENARY_SIDE[faction] end
+    local ring = info.isFreeForAll and "honorsystem-portrait-neutral" or HONOR_RINGS[faction]
+    if not ring then return nil end
+    return ring, badge
+end
+
+-- The game's ring and badge sizes, centered where our emblem's crest is drawn (20, 20.5 into its sheet).
+local function ShowHonor(holder, icon, ringArt, badgeArt)
+    local own = holder.fcui
+    if not ringArt then
+        if own and own.honorRing then
+            own.honorRing:Hide()
+            own.honorBadge:Hide()
+        end
+        return
+    end
+    local ring = ns.OwnTexture(holder, "honorRing", "OVERLAY", 1)
+    local badge = ns.OwnTexture(holder, "honorBadge", "OVERLAY", 2)
+    if emblemArt[ring] ~= ringArt then
+        ring:SetAtlas(ringArt)
+        ring:SetSize(50, 52)
+        emblemArt[ring] = ringArt
+    end
+    if emblemArt[badge] ~= badgeArt then
+        badge:SetTexture(badgeArt)
+        badge:SetSize(30, 30)
+        emblemArt[badge] = badgeArt
+    end
+    ns.SetPointIf(ring, "CENTER", icon, "TOPLEFT", 20, -20.5)
+    ns.SetPointIf(badge, "CENTER", ring, "CENTER", 0, 0)
+    ring:Show()
+    badge:Show()
+end
+
 function UF.OwnPvpIcon(frame, holder, unit, clientIcon, point, x, y)
     if not holder then return nil end
     local icon = ns.OwnTexture(holder, "pvpIcon", "OVERLAY")
     local art = PvpArt(unit)
     if art == false then
         icon:Hide()
+        ShowHonor(holder)
         ns.Unfade(clientIcon)
         return nil
     end
     ns.Fade(clientIcon)
     if not art then
         icon:Hide()
+        ShowHonor(holder)
         return nil
     end
     if emblemArt[icon] ~= art then
@@ -474,14 +525,19 @@ function UF.OwnPvpIcon(frame, holder, unit, clientIcon, point, x, y)
         ns.SetPointIf(icon, point, frame, point, x, y)
         emblemAt[icon] = frame
     end
-    icon:Show()
+    -- With the honor badge shown the emblem stays placed, hidden: the PvP timer hangs on it.
+    local ringArt, badgeArt = HonorArt(unit)
+    icon:SetShown(ringArt == nil)
+    ShowHonor(holder, icon, ringArt, badgeArt)
     return icon
 end
 
 function UF.HideOwnPvp(frame)
     local holder = frame and frame.fcui and frame.fcui.texts
-    local icon = holder and holder.fcui and holder.fcui.pvpIcon
-    if icon then icon:Hide() end
+    local own = holder and holder.fcui
+    if not own then return end
+    if own.pvpIcon then own.pvpIcon:Hide() end
+    ShowHonor(holder)
 end
 
 ------------------------------------------------------------------ fills

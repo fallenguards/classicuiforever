@@ -154,6 +154,7 @@ ns.DB_DEFAULTS = {
     hideThreatGlow = true,
     hideCombatGlow = false,
     damageFlash = false,
+    honorBadge = false,
     barsTakenNote = true,
     threatNumber = true,
     threatNumberGrouped = false,

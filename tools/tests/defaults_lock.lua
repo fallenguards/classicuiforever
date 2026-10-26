@@ -177,6 +177,7 @@ return {
     hideTrackerHeader = false,
     hideWhoTab = false,
     hideZoneText = false,
+    honorBadge = false,
     housingMinimapButton = true,
     hoverAddonBag = false,
     hoverBothNumbers = true,

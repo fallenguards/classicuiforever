@@ -280,6 +280,7 @@ local CLASS_HEALTH = { classColorHealth = true, classColorHealthPlayer = true, c
     classColorHealthFocus = true, classColorHealthEnemies = true }
 ns.OnToggle(function(key)
     if CLASS_HEALTH[key] and UF.active then RefillHealth() end
+    if key == "honorBadge" and UF.active then KeepFrames() end
 end)
 
 -- The name size picked in the options.
