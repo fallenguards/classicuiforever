@@ -490,6 +490,7 @@ local function Extras(entry, child, colW, add)
         row.text:SetWidth(colW - 70 - INDENT)
         if words then row.keyLow = row.keyLow .. " " .. words end
         add(row, parent)
+        return row
     end
     local function Drop(parent, key, label, tip, choices, apply, words, depth, preview)
         local row = ValueDropRow(child, key, label, tip, choices, apply, preview)
@@ -499,8 +500,9 @@ local function Extras(entry, child, colW, add)
     end
     local key = entry[1]
     if key == "oneBag" then
-        Step("oneBag", "oneBagColumns", L["OPTWIN_COLUMNS"], L["OPTWIN_HOW_MANY_SLOTS_ACROSS_THE"],
+        local columns = Step("oneBag", "oneBagColumns", L["OPTWIN_COLUMNS"], L["OPTWIN_HOW_MANY_SLOTS_ACROSS_THE"],
             ns.ONE_BAG_COLUMNS_MIN or 4, ns.ONE_BAG_COLUMNS_MAX or 16, ns.SetOneBagColumns)
+        columns.needs = "bags"
     elseif key == "hideKeyText" then
         Step("buttons", "keyTextSize", L["OPTWIN_KEY_TEXT_SIZE"], L["OPTWIN_HOW_BIG_THE_KEY_NAMES"],
             ns.KEY_TEXT_MIN or 8, ns.KEY_TEXT_MAX or 20, ns.SetKeyTextSize, "keybind font hotkey")
