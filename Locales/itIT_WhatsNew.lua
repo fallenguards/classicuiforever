@@ -3,6 +3,14 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN51_1_TITLE"] = "Maestria e Versatilità"
+L["WN51_1_TEXT"] = "Le statistiche della finestra del personaggio mostrano Maestria e Versatilità, in Generale."
+L["WN51_2_TITLE"] = "Finestra delle professioni"
+L["WN51_2_TEXT"] = "La scelta dell'espansione ora è nel menu Filtro. La finestra si apre dove stanno le altre finestre del gioco, senza spazio dopo il libro degli incantesimi, e il suo bordo inferiore passa sotto i pulsanti Crea."
+L["WN51_3_TITLE"] = "Opzioni di Una borsa"
+L["WN51_3_TEXT"] = "Le opzioni sotto Una borsa cambiano solo le finestre delle borse dell'addon, quindi sono in grigio finché Finestre delle borse è disattivato. Per usarle, attivalo nelle opzioni (/fcui), in Borse."
+L["WN51_4_TITLE"] = "Schede"
+L["WN51_4_TEXT"] = "Nelle finestre delle professioni e dei talenti, la scheda scelta mostra tutta la sua faccia e le altre schede non mostrano più una fascia nera."
 L["WN50_1_TITLE"] = "Colore con trama"
 L["WN50_1_TEXT"] = "Colore con trama, che mantiene la trama della grafica nel colore del tema, ora colora finestre intere, non solo il loro metallo: la pietra di borse e schede, i bordi delle caselle di ricerca e di testo, e le frecce di pagina del libro degli incantesimi, dove una freccia usabile è più chiara di una esaurita. Disattivo in modo predefinito; attivalo nelle opzioni (/fcui), in Aspetto."
 L["WN50_2_TITLE"] = "Temi sulle finestre del gioco"

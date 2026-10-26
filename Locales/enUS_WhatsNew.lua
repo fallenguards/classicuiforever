@@ -2,6 +2,14 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN51_1_TITLE"] = "Mastery and Versatility"
+L["WN51_1_TEXT"] = "The character window's stats show Mastery and Versatility, under General."
+L["WN51_2_TITLE"] = "Professions window"
+L["WN51_2_TEXT"] = "The expansion pick is in the Filter menu now. The window opens where the game's other windows stand, with no gap after the spellbook, and its bottom border runs under the Create buttons."
+L["WN51_3_TITLE"] = "One bag options"
+L["WN51_3_TEXT"] = "The options under One bag only change the addon's bag windows, so they gray out while Bag windows is off. To use them, turn it on in the options (/fcui), under Bags."
+L["WN51_4_TITLE"] = "Tab fixes"
+L["WN51_4_TEXT"] = "On the professions and talents windows, the picked tab shows its whole face and the other tabs no longer show a black band."
 L["WN50_1_TITLE"] = "Textured color"
 L["WN50_1_TEXT"] = "Textured color, which keeps the art's texture in the theme's color, now colors whole windows, not only their metal: the stone of bags and tabs, search and input box borders, and the spellbook's page arrows, where a usable arrow is lighter than a spent one. Off by default; turn it on in the options (/fcui), under Look."
 L["WN50_2_TITLE"] = "Themes on the game's windows"

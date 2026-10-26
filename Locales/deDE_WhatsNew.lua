@@ -3,6 +3,14 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN51_1_TITLE"] = "Meisterschaft und Vielseitigkeit"
+L["WN51_1_TEXT"] = "Die Werte im Charakterfenster zeigen Meisterschaft und Vielseitigkeit unter Allgemein."
+L["WN51_2_TITLE"] = "Berufsfenster"
+L["WN51_2_TEXT"] = "Die Wahl der Erweiterung steht jetzt im Filtermenü. Das Fenster öffnet sich dort, wo die anderen Fenster des Spiels stehen, ohne Lücke nach dem Zauberbuch, und sein unterer Rand verläuft unter den Herstellen-Knöpfen."
+L["WN51_3_TITLE"] = "Optionen von Eine Tasche"
+L["WN51_3_TEXT"] = "Die Optionen unter Eine Tasche ändern nur die Taschenfenster des Addons und sind daher ausgegraut, solange Taschenfenster aus ist. Um sie zu nutzen, schalte es in den Optionen (/fcui) unter Taschen ein."
+L["WN51_4_TITLE"] = "Reiter"
+L["WN51_4_TEXT"] = "Im Berufs- und im Talentfenster zeigt der gewählte Reiter seine ganze Fläche, und die anderen Reiter zeigen kein schwarzes Band mehr."
 L["WN50_1_TITLE"] = "Mit Textur"
 L["WN50_1_TEXT"] = "Mit Textur, das die Textur der Grafik in der Farbe des Themas behält, färbt jetzt ganze Fenster, nicht nur ihr Metall: den Stein von Taschen und Reitern, die Ränder von Such- und Eingabefeldern und die Seitenpfeile des Zauberbuchs, wobei ein nutzbarer Pfeil heller ist als ein verbrauchter. Standardmäßig aus; schalte es in den Optionen (/fcui) unter Aussehen ein."
 L["WN50_2_TITLE"] = "Themen auf den Fenstern des Spiels"

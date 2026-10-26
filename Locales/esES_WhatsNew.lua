@@ -3,6 +3,14 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN51_1_TITLE"] = "Maestría y versatilidad"
+L["WN51_1_TEXT"] = "Las estadísticas de la ventana de personaje muestran Maestría y Versatilidad, en General."
+L["WN51_2_TITLE"] = "Ventana de profesiones"
+L["WN51_2_TEXT"] = "La elección de expansión está ahora en el menú Filtro. La ventana se abre donde están las demás ventanas del juego, sin hueco tras el libro de hechizos, y su borde inferior pasa bajo los botones Crear."
+L["WN51_3_TITLE"] = "Opciones de Una bolsa"
+L["WN51_3_TEXT"] = "Las opciones bajo Una bolsa solo cambian las ventanas de bolsa del addon, así que se ven en gris mientras Ventanas de bolsa está desactivado. Para usarlas, actívalo en las opciones (/fcui), en Bolsas."
+L["WN51_4_TITLE"] = "Pestañas"
+L["WN51_4_TEXT"] = "En las ventanas de profesiones y de talentos, la pestaña elegida muestra su cara entera y las demás pestañas ya no muestran una franja negra."
 L["WN50_1_TITLE"] = "Color con textura"
 L["WN50_1_TEXT"] = "Color con textura, que mantiene la textura del arte en el color del tema, ahora colorea ventanas enteras, no solo su metal: la piedra de bolsas y pestañas, los bordes de las cajas de búsqueda y de texto, y las flechas de página del libro de hechizos, donde una flecha usable es más clara que una agotada. Desactivado por defecto; actívalo en las opciones (/fcui), en Aspecto."
 L["WN50_2_TITLE"] = "Temas en las ventanas del juego"

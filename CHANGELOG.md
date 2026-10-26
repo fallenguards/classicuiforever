@@ -2,6 +2,19 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.39.1] - 2026-10-26
+
+### Added
+- On retail, the character window's stats show Mastery and Versatility, under General.
+
+### Changed
+- On retail, the professions window's expansion pick is in its Filter menu instead of an arrow at the end of the skill bar.
+
+### Fixed
+- The options under One bag gray out while Bag windows is off, since they only change the addon's bag windows (#205).
+- On retail, the professions window opened 35 to the right of where the game's other windows stand, leaving a gap after the spellbook, and its bottom border ran over the Create All, Create and Exit buttons.
+- On retail, the picked tab on the professions and talents windows lost the lower half of its face, and the other tabs showed a black band. Their tabs also stand over the window's border, as on the addon's other windows.
+
 ## [0.39.0] - 2026-10-25
 
 ### Added

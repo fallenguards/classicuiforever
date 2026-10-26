@@ -3,6 +3,14 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN51_1_TITLE"] = "Maîtrise et Polyvalence"
+L["WN51_1_TEXT"] = "Les caractéristiques de la fenêtre du personnage montrent Maîtrise et Polyvalence, sous Général."
+L["WN51_2_TITLE"] = "Fenêtre des métiers"
+L["WN51_2_TEXT"] = "Le choix de l'extension se trouve désormais dans le menu Filtre. La fenêtre s'ouvre là où se tiennent les autres fenêtres du jeu, sans espace après le grimoire, et sa bordure du bas passe sous les boutons Créer."
+L["WN51_3_TITLE"] = "Options de Un seul sac"
+L["WN51_3_TEXT"] = "Les options sous Un seul sac ne changent que les fenêtres de sac de l'addon, elles sont donc grisées tant que Fenêtres de sac est désactivé. Pour les utiliser, activez-le dans les options (/fcui), sous Sacs."
+L["WN51_4_TITLE"] = "Onglets"
+L["WN51_4_TEXT"] = "Sur les fenêtres des métiers et des talents, l'onglet choisi montre toute sa face et les autres onglets ne montrent plus de bande noire."
 L["WN50_1_TITLE"] = "Couleur texturée"
 L["WN50_1_TEXT"] = "Couleur texturée, qui garde la texture de l'art dans la couleur du thème, colore désormais des fenêtres entières, pas seulement leur métal : la pierre des sacs et des onglets, les bords des champs de recherche et de saisie, et les flèches de page du grimoire, une flèche utilisable plus claire qu'une flèche épuisée. Désactivé par défaut ; activez-le dans les options (/fcui), sous Apparence."
 L["WN50_2_TITLE"] = "Thèmes sur les fenêtres du jeu"
