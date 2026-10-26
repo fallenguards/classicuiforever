@@ -145,7 +145,9 @@ local function Learn(left)
     local x, k = Plain(panel:GetLeft()), ns.WindowRatio(panel)
     if not (x and k) then return end
     local era = ns.GameWindowAtEra(panel) and ERA_LEFT or 0
-    shift = math.floor(x * k + era - left - (Offset(panel, "xoffset") or 0) + 0.5)
+    -- Retail's crafting window stands with its panel offset taken off (Skills/TradeSkillRetail.lua).
+    local offset = (ns.CraftingOffsetTaken and ns.CraftingOffsetTaken(panel)) and 0 or (Offset(panel, "xoffset") or 0)
+    shift = math.floor(x * k + era - left - offset + 0.5)
     shiftFrom = name
 end
 

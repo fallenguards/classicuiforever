@@ -10,10 +10,9 @@ local R = ns.tradeReagents
 
 local GAME_W, GAME_H = 942, 658
 local PARK_X = 6000
--- Our page hangs this far past the window's foot: its border wears the tab row's lift (5, Windows/Panels.lua), 5 less
--- than Forever's window (1 past its page), so its foot line stands where Forever's does, under the page's buttons.
-local FOOT_DROP = 4
 local state = { ours = false, game = false }
+-- The x ours last stood the window at, the game's panel offset (35, for its own page's art) taken off.
+local stoodX
 
 -- The game's page width for its tab, as it last set it.
 local function GameWidth(frame)
@@ -40,16 +39,18 @@ local function Park(frame, page, on)
     ns.SetAlphaIf(page, on and 0 or 1)
 end
 
+-- The window is the page's size: its border's corners hang 3 below (Forever's -8 and the tab row's lift of 5), so the
+-- metal's line stands 2 under the page's buttons.
 local function Fit(frame)
     local width, height = ns.TradeSkillWindowSize()
-    height = height - FOOT_DROP
     if math.abs(frame:GetWidth() - width) > 0.5 or math.abs(frame:GetHeight() - height) > 0.5 then
         frame:SetSize(width, height)
     end
 end
 
--- The game lays this window for its own 658 tall page, raised by its fit to stay on screen; ours is shorter and stands on
--- the row's line as the game's other windows do (profwin read -55 against the line's -116). Out of a fight, by snippet.
+-- The game lays this window for its own 658 tall page, raised by its fit to stay on screen, and 35 right of the row's
+-- start; ours is shorter and stands on the row's line and start as the game's other windows do (profwin read -55
+-- against the line's -116). The offset comes off each time the game lays it again. Out of a fight, by snippet.
 local function OnLine(frame)
     if ns.MoverHolds(frame) or (ns.WindowMoving and ns.WindowMoving(frame)) then return end
     if ns.Safe(frame:GetNumPoints()) ~= 1 then return end
@@ -57,9 +58,21 @@ local function OnLine(frame)
     x, y = ns.Safe(x), ns.Safe(y)
     if point ~= "TOPLEFT" or relPoint ~= "TOPLEFT" or not (x and y) then return end
     if rel and rel ~= UIParent and rel ~= ns.windowParts.eraHost then return end
+    local ratio = ns.WindowRatio(frame) or 1
+    local laidAgain = not ns.Near(x, stoodX, 0.5)
     local _, top = ns.GameRow()
-    local want = top / (ns.WindowRatio(frame) or 1)
-    if math.abs(y - want) > 0.5 then ns.windowParts.TopLeft(frame, x, want) end
+    local wantY = top / ratio
+    if not laidAgain and ns.Near(y, wantY, 0.5) then return end
+    if ns.FramePlaced(frame) then return end
+    local wantX = laidAgain and x - ns.GameXOffset(frame) / ratio or x
+    if ns.windowParts.TopLeft(frame, wantX, wantY) then stoodX = wantX end
+end
+
+-- The window stands where ours put it, its panel offset off: the row learns no shift from that offset (UI/GameSpot.lua).
+function ns.CraftingOffsetTaken(frame)
+    if frame ~= ProfessionsFrame or not stoodX or ns.Safe(frame:GetNumPoints()) ~= 1 then return false end
+    local _, _, _, x = frame:GetPoint(1)
+    return ns.Near(x, stoodX, 0.5)
 end
 
 -- Every frame the window shows. In a fight a protected window keeps the page it has.
@@ -88,7 +101,9 @@ ns.EventFrame({ "ADDON_LOADED", "PLAYER_ENTERING_WORLD" }, function(self)
     if not ProfessionsFrame then return end
     self:UnregisterAllEvents()
     ns.Sched.Attach(ProfessionsFrame, { name = "tradeskill.retail", every = 0, fn = Tick })
-    ns.Sched.OnVisible(ProfessionsFrame, "tradeskill.game", function(shown) if not shown then state.game = false end end)
+    ns.Sched.OnVisible(ProfessionsFrame, "tradeskill.game", function(shown)
+        if not shown then state.game, stoodX = false, nil end
+    end)
 end)
 
 ------------------------------------------------------------------ the page's retail pieces
@@ -104,7 +119,7 @@ end
 function ns.TradeSkillRetailParts(panel, refresh, selectedInfo)
     local detail = panel.detail
     R.Changed = refresh
-    panel:SetPoint("BOTTOMRIGHT", ProfessionsFrame, "BOTTOMRIGHT", 0, -FOOT_DROP)
+    panel:SetPoint("BOTTOMRIGHT", ProfessionsFrame, "BOTTOMRIGHT", 0, 0)
     local best = ns.SmallCheck(detail, _G.PROFESSIONS_USE_BEST_QUALITY_REAGENTS or "", 1, 0.82, 0)
     best:SetPoint("TOPRIGHT", detail, "TOPRIGHT", -14 - math.ceil(best.label:GetStringWidth() or 120), -22)
     best:SetScript("OnClick", function(self) ns.CheckSound(self) end)
