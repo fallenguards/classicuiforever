@@ -50,20 +50,35 @@ end
 
 -- Softer share for the slots and the band; full bronze read too strong.
 ns.BRONZE_SOFT = 0.9
+-- A pane's colour (share.pane: parchment, backgrounds), the frames' lifted toward white, as dark's grey parchment
+-- stands beside its near-black frames.
+local PANE_LIFT = 0.4
+local paneTint = {}
+local function PaneTint(t)
+    local lift = PANE_LIFT
+    paneTint[1], paneTint[2], paneTint[3] = t[1] + (1 - t[1]) * lift, t[2] + (1 - t[2]) * lift, t[3] + (1 - t[3]) * lift
+    return paneTint
+end
+
 -- Drained and tinted to the theme (share: of its colour, or by theme name; shade: times this), or as drawn without
 -- one (silver: drained grey).
 local function Paint(texture, theme, share, silver)
+    local pane = type(share) == "table" and share.pane == true
     -- The one color look: the theme's color whole, as every piece of its part (Art/ThemeLayers.lua Ink).
     if theme and ns.FlatOn(texture) then
-        local t = theme.tint
+        local t = pane and PaneTint(theme.tint) or theme.tint
         texture:SetDesaturated(true)
         texture:SetVertexColor(t[1], t[2], t[3])
         return
     end
     if theme then
-        local tint = theme.tint
+        local tint = pane and PaneTint(theme.tint) or theme.tint
         local shade = 1
-        if type(share) == "table" then shade, share = share.shade or 1, share[ThemeName()] end
+        if pane then
+            share = 1
+        elseif type(share) == "table" then
+            shade, share = share.shade or 1, share[ThemeName()]
+        end
         share = type(share) == "number" and share or 1
         texture:SetDesaturated(true)
         local max = math.max
@@ -93,8 +108,11 @@ local function OnCopy(texture)
 end
 local function PaintGame(texture)
     if OnCopy(texture) then return end
+    local share = gameArt[texture]
     local theme = ns.ThemeFor(texture)
-    Paint(texture, not ClientGold(theme) and theme or nil, gameArt[texture])
+    -- A pane (broad) is parchment too: as drawn with Parchment pages left out.
+    if type(share) == "table" and share.pane and not ns.ThemePartOn("themePartParchment") then theme = nil end
+    Paint(texture, not ClientGold(theme) and theme or nil, share)
 end
 
 function ns.TintGameArt(texture, share)

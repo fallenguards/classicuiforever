@@ -76,6 +76,95 @@ _G.RaidFrame = { regions = { raidBar }, IsObjectType = function() return false e
 apply()
 Check(tinted[raidBar], "the raid tab's scroll bar is tinted")
 
+-- Broad (Fallen's UI Color Picker): every texture of a game window takes the theme but what stays as drawn.
+local btinted, bapply = {}, nil
+local function Tex(fields)
+    local t = { layer = "ARTWORK", blend = "BLEND", w = 100, h = 50, coords = { 0, 0, 0, 1, 1, 0, 1, 1 } }
+    for k, v in pairs(fields) do t[k] = v end
+    function t:GetTexCoord() return table.unpack(self.coords) end
+    function t:GetWidth() return self.w end
+    function t:GetHeight() return self.h end
+    function t:IsObjectType(kind) return kind == "Texture" or (kind == "MaskTexture" and self.mask == true) end
+    function t:GetAtlas() return self.atlas end
+    function t:GetTexture() return self.file end
+    function t:GetDrawLayer() return self.layer end
+    function t:GetBlendMode() return self.blend end
+    function t:GetParent() return self.parent end
+    function t:GetName() return self.name end
+    function t:GetParentKey() return self.key end
+    return t
+end
+local function Frame(fields)
+    function fields:IsObjectType(kind) return kind == self.kind end
+    function fields:GetName() return self.name end
+    fields.regions, fields.children = fields.regions or {}, fields.children or {}
+    return fields
+end
+local bns = {
+    PACKAGE = { broad = true },
+    bronze = { BUNDLED = "", PlainTree = function() return false end, tinted = {}, swapped = {}, clientWas = {} },
+    NP = { EachPlate = noop },
+    Sched = { OnVisible = noop, NextFrame = noop },
+    IsSecret = function() return false end,
+    IsForbidden = function(object) return object.forbidden == true end,
+    ModuleInForce = function() return false end,
+    ThemeFor = function() return {} end,
+    EventFrame = noop,
+    OnToggle = noop,
+    TintGameArt = function(texture, share) btinted[texture] = share or true end,
+    UntintGameArt = function(texture) btinted[texture] = nil end,
+    RegisterModule = function(_, spec) bapply = spec.apply end,
+}
+function bns.EachRegion(frame, fn) for _, region in ipairs(frame.regions) do fn(region) end end
+function bns.EachChild(frame, fn, a1) for _, child in ipairs(frame.children) do fn(child, a1) end end
+_G.LootFrame, _G.RaidFrame = nil, nil
+local bar = Frame({ kind = "StatusBar" })
+local stone, border = Tex({ file = 130652 }), Tex({ atlas = "achievement-frame-border" })
+local keep = {
+    icon = Tex({ file = 136243, key = "Icon" }), glow = Tex({ atlas = "achievement-gold-glow" }),
+    light = Tex({ file = 130652, layer = "HIGHLIGHT", name = "SomeButtonHighlight" }), added = Tex({ file = 130652, blend = "ADD" }),
+    mask = Tex({ file = 130652, mask = true }), colour = Tex({}), ours = Tex({ file = "Interface\\AddOns\\x\\y" }),
+    fill = Tex({ file = 130652, parent = bar }), picture = Tex({ atlas = "talents-background-druid-feral" }),
+    raid = Tex({ file = 1396980, w = 174, h = 96, key = "bgImage" }), tutorial = Tex({ atlas = "adventureguide-tutorial-rpe" }),
+    square = Tex({ file = 136243, w = 36, h = 36 }), cropped = Tex({ file = 136243, coords = { 0.07, 0.07, 0.07, 0.93,
+        0.93, 0.07, 0.93, 0.93 } }), swords = Tex({ atlas = "pvptalents-warmode-swords" }),
+}
+-- The micro menu's character button: the player's portrait (a render target by path) in the theme with the icons.
+local micro = Frame({ kind = "Button", name = "CharacterMicroButton" })
+local portrait = Tex({ file = "RTPortrait1", name = "CharacterMicroButtonPortrait", parent = micro })
+micro.regions = { portrait }
+_G.CharacterMicroButton = micro
+local hover = Tex({ atlas = "UI-HUD-MicroMenu-Achievements-Mouseover", layer = "HIGHLIGHT" })
+function bar:GetStatusBarTexture() return keep.fill end
+local inModel = Tex({ file = 130652 })
+local parchment = Tex({ atlas = "spellbook-background-evergreen-left" })
+local page, bigArt = Tex({ file = 383588, w = 512, h = 512 }), Tex({ file = 130662, w = 195, h = 454 })
+-- A quest's campaign parchment: blank until a campaign quest opens, after the walk.
+local campaign, questBg = Tex({ key = "SealMaterialBG" }), Tex({ atlas = "questbg-light" })
+local window = Frame({ name = "AchievementFrame", regions = { stone, border, hover, parchment, page, bigArt, campaign,
+    questBg },
+    children = { bar, micro, Frame({ kind = "Model", regions = { inModel } }) } })
+for _, tex in pairs(keep) do window.regions[#window.regions + 1] = tex end
+local oursWindow = Frame({ name = "ForeverClassicUIQuestLog", regions = { Tex({ file = 130652 }) } })
+-- A forbidden frame may not be asked its name from addon code: it errors (the game's secure frames).
+local forbidden = Frame({ forbidden = true })
+function forbidden:GetName() error("forbidden frame asked its name") end
+window.children[#window.children + 1] = forbidden
+_G.UIParent = Frame({ children = { forbidden, window, oursWindow } })
+assert(loadfile(ROOT .. "/Art/GameArt.lua"))("ClassicUIForever", bns)
+bapply()
+Check(btinted[stone] == true and btinted[border] == true, "broad: a game window's frame art takes the theme whole")
+Check(type(btinted[parchment]) == "table" and type(btinted[page]) == "table" and type(btinted[bigArt]) == "table",
+    "broad: parchment and big art behind content take the lighter pane share")
+Check(type(btinted[campaign]) == "table" and type(btinted[questBg]) == "table",
+    "broad: a quest's campaign parchment is a pane, painted before it has art")
+Check(btinted[hover], "broad: a hover image on the highlight layer takes the theme with its button")
+Check(btinted[portrait], "broad: the micro menu's character button wears the theme, portrait and all")
+for what, tex in pairs(keep) do Check(not btinted[tex], "broad: " .. what .. " is left as drawn") end
+Check(not btinted[inModel], "broad: a model's insides are never walked")
+Check(not btinted[oursWindow.regions[1]], "broad: our own windows are left to the theme's own paint")
+_G.UIParent, _G.CharacterMicroButton = nil, nil
+
 if failed > 0 then
     print(failed .. " check(s) failed")
     os.exit(1)

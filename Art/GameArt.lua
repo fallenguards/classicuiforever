@@ -78,11 +78,140 @@ local function KeptDragon(atlas, region)
     return known
 end
 
+-- Broad (a package's broad flag: Fallen's UI Color Picker): frames the theme's colour, panes (parchment, backgrounds)
+-- a lighter colour so they stand apart, pictures, icons, light, masks and bar fills as drawn. A window is walked as it
+-- first exists, as it opens and as it is clicked (a new tab), never on a beat.
+local BROAD = ns.PACKAGE ~= nil and ns.PACKAGE.broad == true
+-- A pane: painted in the pane colour, the theme's lifted toward white (Art/Bronze.lua PaneTint).
+local PANE = { pane = true }
+-- Pictures and light by their own names (the Adventure Guide's raid buttons: bgImage).
+local KEEP_NAMES = { "icon", "portrait", "cooldown", "flash", "glow", "highlight", "model", "image", "splash", "preview",
+    "thumbnail", "illustration", "picture" }
+-- The curated metal list (METAL) wins over these.
+local KEEP_ATLAS = { "icon", "portrait", "mask", "glow", "highlight", "shadow", "sheen", "shine", "flash", "spark",
+    "particle", "animation", "swirl", "^talents%-background", "^talents%-node", "^spec%-", "poi", "waypoint",
+    "warmode%-swords", "splash", "preview", "thumbnail", "illustration", "tutorial", "loadingscreen", "^ui%-ej%-" }
+-- Panes by atlas, and the plain parchment by name or file (the spellbook's, the professions book's page). The quest
+-- log's campaign headers (campaign_sky) and a quest's campaign parchment (questbg-) are parchment too.
+local PANE_ATLAS = { "background", "parchment", "paper", "%-bg$", "%-bg%-", "center$", "%-fill", "^campaign", "^questbg" }
+-- A quest's campaign parchment gets its art only as a campaign quest opens, after the walks: a pane, art or not.
+local LATE_PANES = { SealMaterialBG = true }
+local PANE_FILES = { [383588] = true, [383589] = true }
+-- Bigger than this by file (both sides): art behind a window's content, a pane; borders and strips are thinner.
+local PANE_W, PANE_H = 96, 64
+
+local function Listed(list, name)
+    for i = 1, #list do
+        if name:find(list[i]) then return true end
+    end
+    return false
+end
+
+local atlasKind = {}   -- atlas -> "keep", "pane" or "frame", worked out once
+local function AtlasKind(atlas)
+    local known = atlasKind[atlas]
+    if known then return known end
+    local name = atlas:lower():gsub("^[_!]+", "")
+    if IsMetal(atlas) then
+        known = "frame"
+    elseif Listed(KEEP_ATLAS, name) then
+        known = "keep"
+    elseif Listed(PANE_ATLAS, name) then
+        known = "pane"
+    else
+        known = "frame"
+    end
+    atlasKind[atlas] = known
+    return known
+end
+
+local function NamedKeep(name)
+    if type(name) ~= "string" or ns.IsSecret(name) then return false end
+    name = name:lower()
+    for i = 1, #KEEP_NAMES do
+        if name:find(KEEP_NAMES[i], 1, true) then return true end
+    end
+    return false
+end
+
+-- A mask, light, a bar's fill, or a picture by its own name. A hover image on the highlight layer takes the theme
+-- with its button (the micro menu's); light is the added blend.
+local function Kept(region)
+    if region:IsObjectType("MaskTexture") then return true end
+    local blend = region:GetBlendMode()
+    if ns.IsSecret(blend) or blend ~= "BLEND" then return true end
+    local parent = region:GetParent()
+    if parent and parent.GetStatusBarTexture and parent:GetStatusBarTexture() == region then return true end
+    return NamedKeep(region:GetName()) or NamedKeep(region.GetParentKey and region:GetParentKey())
+end
+
+-- Frames never walked: models, cooldown sweeps, the map's canvas, ours.
+local function Skipped(frame)
+    if ns.IsForbidden(frame) or frame:IsObjectType("Model") or frame:IsObjectType("ModelScene")
+        or frame:IsObjectType("Cooldown") then return true end
+    if frame == (WorldMapFrame and WorldMapFrame.ScrollContainer) then return true end
+    local name = frame:GetName()
+    return type(name) == "string" and not ns.IsSecret(name) and (name:find("^ForeverClassicUI") ~= nil
+        or name:find("^ClassicUIForever") ~= nil)
+end
+
+-- A picture by file that reads as an icon: a button's own picture, the icon crop, or a small square.
+local ICON_KEYS = { "icon", "Icon", "IconTexture", "Texture" }
+local function IconLike(region, w, h)
+    local parent = region:GetParent()
+    if parent and parent.IsObjectType and parent:IsObjectType("Button") then
+        for i = 1, #ICON_KEYS do
+            if parent[ICON_KEYS[i]] == region then return true end
+        end
+    end
+    local left, top = region:GetTexCoord()
+    if not ns.IsSecret(left) and left > 0.04 and left < 0.15 and top > 0.04 and top < 0.15 then return true end
+    return w >= 12 and w <= 80 and math.abs(w - h) <= 1
+end
+
+local function BroadMatch(region, atlas)
+    local B = ns.bronze
+    if B.tinted[region] or B.swapped[region] or B.clientWas[region] then return end
+    -- The micro menu's character button wears the player's portrait as its icon: in the theme as the other icons are.
+    if region:GetParent() == _G.CharacterMicroButton and not region:IsObjectType("MaskTexture") then
+        want[region] = true
+        return
+    end
+    local key = region.GetParentKey and region:GetParentKey()
+    if type(key) == "string" and not ns.IsSecret(key) and LATE_PANES[key] then
+        want[region] = PANE
+        return
+    end
+    local kind
+    if atlas then
+        kind = AtlasKind(atlas)
+        if kind == "frame" and KeptDragon(atlas, region) then kind = "keep" end
+    else
+        -- A colour texture has no file; our own art goes by its path.
+        local file = region:GetTexture()
+        if ns.IsSecret(file) or type(file) ~= "number" then return end
+        local w, h = region:GetWidth(), region:GetHeight()
+        if ns.IsSecret(w) or ns.IsSecret(h) then return end
+        if METAL_FILES[file] then
+            kind = "frame"
+        elseif PANE_FILES[file] then
+            kind = "pane"
+        elseif IconLike(region, w, h) then
+            kind = "keep"
+        else
+            kind = (w > PANE_W and h > PANE_H) and "pane" or "frame"
+        end
+    end
+    if kind == "keep" or Kept(region) then return end
+    want[region] = kind == "pane" and PANE or true
+end
+
 -- A nameplate's art can come back secret: never a table key.
 local function Match(region)
     if not (region.IsObjectType and region:IsObjectType("Texture")) then return end
     local atlas = region:GetAtlas()
     if ns.IsSecret(atlas) then return end
+    if BROAD then return BroadMatch(region, atlas) end
     if atlas then
         if IsMetal(atlas) and not KeptDragon(atlas, region) then want[region] = true end
     else
@@ -124,7 +253,7 @@ local isRoot = setmetatable({}, { __mode = "k" })
 
 local Walk
 local function Child(child, depth)
-    if not isRoot[child] and not ns.bronze.PlainTree(child) then Walk(child, depth) end
+    if not isRoot[child] and not ns.bronze.PlainTree(child) and not (BROAD and Skipped(child)) then Walk(child, depth) end
 end
 Walk = function(frame, depth)
     ns.EachRegion(frame, Match)
@@ -132,9 +261,10 @@ Walk = function(frame, depth)
 end
 
 local function Tint()
-    for texture in pairs(want) do
+    for texture, kind in pairs(want) do
         held[texture] = true
-        ns.TintGameArt(texture)
+        -- A pane (broad): the lighter pane colour; anything else the theme's colour whole.
+        ns.TintGameArt(texture, kind ~= true and kind or nil)
     end
 end
 
@@ -149,6 +279,18 @@ local function Watch(frame)
         Walk(frame, 0)
         Tint()
     end)
+end
+
+-- Broad: every window of the game's as it first exists (UIParent's children), walked once, then as it opens.
+local broadRoots = setmetatable({}, { __mode = "k" })
+local function BroadRoot(frame)
+    -- Only the game's own named windows: an unnamed one's maker cannot be told, another addon's is its own.
+    if ns.IsForbidden(frame) then return end
+    local name = frame:GetName()
+    if type(name) ~= "string" or isRoot[frame] or Skipped(frame) or ns.bronze.PlainTree(frame) then return end
+    isRoot[frame], broadRoots[frame] = true, true
+    Walk(frame, 0)
+    Watch(frame)
 end
 
 local function Root(frame)
@@ -224,13 +366,42 @@ local function Sync()
     end
     if not ns.ModuleInForce("buttons") and ns.ForEachActionButton then ns.ForEachActionButton(ButtonArt) end
     if not ns.ModuleInForce("namePlates") then ns.NP.EachPlate(PlateArt) end
+    if BROAD and ns.ThemeFor() then ns.EachChild(UIParent, BroadRoot) end
     Tint()
+    -- Broad keeps what it painted: its windows are walked once, not each pass, and the paint itself follows the theme
+    -- and its parts (ns.ThemeFor); a package's other modules never come on to take a window over.
+    if BROAD then return end
     for texture in pairs(held) do
         if not want[texture] then
             held[texture] = nil
             ns.UntintGameArt(texture)
         end
     end
+end
+
+-- Broad: a click inside a walked window (a tab, a page) walks it again a frame later, its new rows in place.
+if BROAD then
+    local clicked
+    local function WalkClicked()
+        if not clicked then return end
+        wipe(want)
+        Walk(clicked, 0)
+        Tint()
+        clicked = nil
+    end
+    ns.EventFrame("GLOBAL_MOUSE_UP", function()
+        if not ns.ThemeFor() then return end
+        local foci = GetMouseFoci and GetMouseFoci()
+        local frame = foci and foci[1]
+        for _ = 1, 20 do
+            if not frame or ns.IsForbidden(frame) or watched[frame] then break end
+            frame = frame.GetParent and frame:GetParent()
+        end
+        if frame and watched[frame] then
+            clicked = frame
+            ns.Sched.NextFrame("gameArt.click", WalkClicked)
+        end
+    end)
 end
 
 -- Windows that load later, and party frames as a group forms.
