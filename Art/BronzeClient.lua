@@ -51,14 +51,14 @@ local FILES = {
     [130755] = "UI-CheckBox-Up.tga",
     [130752] = "UI-CheckBox-Down.tga",
 }
--- Atlases on a sheet too big to copy whole, packed into small copies: lower-case atlas -> copy, crop, tiled across.
--- The game menu's red buttons: per state row, the right cap then the left; the middle alone, full width to tile.
+-- Atlases on a sheet too big to copy whole, a small copy per piece: lower-case atlas -> copy, tiled across. The game
+-- menu's red buttons: each copy the extent of the game's own piece, so the crop the game gives a cap (by that extent,
+-- ThreeSliceButtonMixin.UpdateScale, after any swap of ours) lands on the copy as it would on the atlas.
 local PACKED = {}
-for row, state in ipairs({ "", "-pressed", "-disabled" }) do
-    local top, bottom = (row - 1) / 4, row / 4
-    PACKED["128-redbutton-right" .. state] = { "RedButtonCaps.tga", 0, 292 / 512, top, bottom }
-    PACKED["128-redbutton-left" .. state] = { "RedButtonCaps.tga", 296 / 512, 410 / 512, top, bottom }
-    PACKED["_128-redbutton-center" .. state] = { "RedButtonCenter.tga", 0, 1, top, bottom, true }
+for state, suffix in pairs({ [""] = "", ["-pressed"] = "-Pressed", ["-disabled"] = "-Disabled" }) do
+    PACKED["128-redbutton-left" .. state] = { "RedButtonLeft" .. suffix .. ".tga" }
+    PACKED["128-redbutton-right" .. state] = { "RedButtonRight" .. suffix .. ".tga" }
+    PACKED["_128-redbutton-center" .. state] = { "RedButtonMid" .. suffix .. ".tga", true }
 end
 local clientWas = setmetatable({}, { __mode = "k" })
 B.clientWas = clientWas
@@ -92,10 +92,10 @@ end
 
 local function SwapPacked(texture, was, atlas, packed)
     local copy = BronzeCopy(packed[1])
-    local across = packed[6] == true
+    local across = packed[2] == true
     local wrap = across and "REPEAT" or "CLAMP"
+    -- The crop is left as the game set it: it counts within the piece, as the copy is.
     if copy and texture:SetTexture(copy, wrap, "CLAMP") ~= false then
-        texture:SetTexCoord(packed[2], packed[3], packed[4], packed[5])
         if texture.SetHorizTile then texture:SetHorizTile(across) end
         Remember(texture, was, atlas, nil)
         ns.UntintGameArt(texture)

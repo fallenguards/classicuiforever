@@ -20,8 +20,15 @@ Nameplate-Border.blp
 theme-base\NumericThreatBorder.tga
 PetHappinessFaces.tga
 theme-base\QuickJoin-Atlas.tga
-theme-base\RedButtonCaps.tga
-theme-base\RedButtonCenter.tga
+theme-base\RedButtonLeft-Disabled.tga
+theme-base\RedButtonLeft-Pressed.tga
+theme-base\RedButtonLeft.tga
+theme-base\RedButtonMid-Disabled.tga
+theme-base\RedButtonMid-Pressed.tga
+theme-base\RedButtonMid.tga
+theme-base\RedButtonRight-Disabled.tga
+theme-base\RedButtonRight-Pressed.tga
+theme-base\RedButtonRight.tga
 theme-base\SkillFrame-BotLeft.tga
 theme-base\SkillFrame-BotRight.tga
 SpellBook-SkillLineTab.blp

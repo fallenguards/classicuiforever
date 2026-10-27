@@ -93,7 +93,17 @@ Check(Coords(middle) == MIDDLE, "theme turned: the middle slice keeps its crop (
 local cap = NewTex(nil, { 0, 1, 0, 1 })
 cap:SetAtlas("128-RedButton-Left")
 ns.BronzeClientTexture(cap)
-Check(cap.file == "copy\\RedButtonCaps.tga", "theme on: the cap shows the packed copy (" .. tostring(cap.file) .. ")")
+Check(cap.file == "copy\\RedButtonLeft.tga", "theme on: the cap shows its own copy (" .. tostring(cap.file) .. ")")
+Check(Coords(cap) == "0,1,0,1", "theme on: the cap's whole piece, as its atlas (" .. Coords(cap) .. ")")
+-- The game crops a narrow button's cap by its piece's extent after the swap (ThreeSliceButtonMixin.UpdateScale): the
+-- crop stays on the copy, which is that extent.
+cap:SetTexCoord(0, 0.6, 0, 1)
+ns.BronzeClientTexture(cap)
+Check(cap.file == "copy\\RedButtonLeft.tga" and Coords(cap) == "0,0.6,0,1", "the game's crop kept on the copy")
+local pressed = NewTex(nil, { 0, 1, 0, 1 })
+pressed:SetAtlas("128-RedButton-Right-Pressed")
+ns.BronzeClientTexture(pressed)
+Check(pressed.file == "copy\\RedButtonRight-Pressed.tga", "a pressed cap: its state's copy (" .. tostring(pressed.file) .. ")")
 ns.BronzeClientTexture(cap, true)
 Check(cap.atlas == "128-RedButton-Left" and Coords(cap) == "0,1,0,1", "handed back: the cap's atlas and its crop")
 
