@@ -54,6 +54,7 @@ Core\Core.lua
 Core\Defaults.lua
 Core\Settings.lua
 Core\Profiles.lua
+Core\Package.lua
 Core\ProfileText.lua
 Core\Scheduler.lua
 Core\Util.lua

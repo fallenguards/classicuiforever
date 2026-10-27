@@ -30,6 +30,7 @@ local ns = setmetatable({ L = L, ART = { CHECK = "check" }, EMPTY = {}, db = {},
     { __index = function() return function() return Stub() end end })
 ns.OnForever = function() return true end
 ns.NewFrame = function() return Stub() end
+ns.PACKAGE = false
 GameTooltip, MenuUtil, SOUNDKIT = Stub(), Stub(), {}
 assert(loadfile(ROOT .. "/Options/Toggles.lua"))("ClassicUIForever", ns)
 local O = ns.options

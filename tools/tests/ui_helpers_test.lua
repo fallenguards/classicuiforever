@@ -95,6 +95,7 @@ function Region:GetAtlas() return self._atlas end
 function Region:SetHorizTile(on) Log(self, "SetHorizTile", on) end
 function Region:SetVertTile(on) Log(self, "SetVertTile", on) end
 function Region:SetText(t) Log(self, "SetText", t) self._text = t end
+function Region:GetStringWidth() return #(self._text or "") * 6 end
 function Region:GetText() return self._text end
 function Region:SetFontObject(f) Log(self, "SetFontObject", f) self._font = f end
 function Region:CreateTexture(_, layer, _, sublevel)
@@ -794,6 +795,8 @@ Test("DialogBacking and DialogHeader", function()
     Check(plate._tex == ns.ART.DIALOG_HEADER and plate._w == 300 and plate._h == 64, "plate")
     Check(plate._points[1][1] == "TOP" and plate._points[1][2] == pane and plate._points[1][5] == 12, "plate on top")
     Check(title._parent == pane and title._font == "GameFontNormal" and title._points[1][5] == -14 and title._text == "Equipment Manager", "title")
+    local long = ns.DialogHeader(CreateFrame("Frame"), string.rep("W", 40))
+    Check(long._w * 232 / 512 >= 40 * 6 + 20 - 0.01, "a long title widens its plate past the end caps")
     local header = CreateFrame("Frame")
     header.Text = header:CreateFontString()
     header.Text:SetPoint("CENTER", header, "CENTER", 0, 0)

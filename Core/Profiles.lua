@@ -57,6 +57,7 @@ local function Fill(shot)
             changed[#changed + 1] = k
         end
     end
+    ns.PackageMask(db)
     return changed
 end
 

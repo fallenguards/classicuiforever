@@ -1,4 +1,4 @@
-local _, ns = ...
+local ADDON, ns = ...
 local L = ns.L
 
 -- The game's damage meter windows in the professions window's look: one box in the game menu's metal border, stone
@@ -65,7 +65,7 @@ local FALLBACK_MAX = 5
 -- 1.x art for its buttons: the old minus and plus for minimize; the chat's square arrow button for the type list,
 -- and the same square with the arrow taken out (ours) behind the gear and the session letter.
 local BTN = "Interface\\Buttons\\UI-"
-local MEDIA = "Interface\\AddOns\\ClassicUIForever\\media\\"
+local MEDIA = "Interface\\AddOns\\" .. ADDON .. "\\media\\"
 local ARROW = { up = "Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Up", down = "Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Down" }
 local BLANK = { up = MEDIA .. "UI-ChatIcon-Blank-Up", down = MEDIA .. "UI-ChatIcon-Blank-Down" }
 local GEAR = "Interface\\Buttons\\UI-OptionsButton"

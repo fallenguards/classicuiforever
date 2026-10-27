@@ -31,6 +31,7 @@ assert(loadfile(ROOT .. "/Core/Localization.lua"))("ClassicUIForever", ns)
 assert(loadfile(ROOT .. "/Locales/enUS.lua"))("ClassicUIForever", ns)
 assert(loadfile(ROOT .. "/Core/Settings.lua"))("ClassicUIForever", ns)
 assert(loadfile(ROOT .. "/Core/Profiles.lua"))("ClassicUIForever", ns)
+assert(loadfile(ROOT .. "/Core/Package.lua"))("ClassicUIForever", ns)
 
 ForeverClassicUICharDB = nil
 ns.LoadProfile()

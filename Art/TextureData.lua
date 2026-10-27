@@ -1,10 +1,11 @@
-local _, ns = ...
+local ADDON, ns = ...
 
 -- Art table, bronze copies and metal keys. ns.bronze is state private to the Art files.
 local B = {}
 ns.bronze = B
 
-local BUNDLED = "Interface\\AddOns\\ClassicUIForever\\media\\"
+-- From the folder's own name: a standalone package's differs.
+local BUNDLED = "Interface\\AddOns\\" .. ADDON .. "\\media\\"
 
 -- Classic art by key: "Dir\\File" (the client's Interface\\Dir\\File, our copy media\\File), "!File" (ours only),
 -- "=Dir\\File" (the client's only), "Dir\\File|Copy" (our copy under another name). Paths: ns.TexPaths (Textures.lua).

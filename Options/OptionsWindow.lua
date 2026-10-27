@@ -14,6 +14,8 @@ local SIDE_X, SIDE_W = 20, 166
 local PANE_X, PANE_TOP = 196, 34
 local PANE_W = WIDTH - PANE_X - 20
 local NAV_ROW, NAV_TOP, SEARCH_Y = 18, 64, 38
+-- The sidebar's least foot: the full list runs past it; a package's few pages would leave a strip of a window.
+local MIN_BOTTOM = 440
 -- The game's settings' home page: its search row over the list, and the page it stands for.
 local HOME_HEAD, HOME = 30, {}
 -- The list inside the page box: under its title row, clear of the scroll bar.
@@ -207,6 +209,8 @@ local function Sidebar(frame, pages)
         frame.nav[name] = NavButton(box, frame, name, y, function() frame:ShowPage(name) end)
         y = y + NAV_ROW
     end
+    -- A short page list (a standalone package's): the All pages block at the foot of a window of fair height.
+    y = math.max(y, MIN_BOTTOM - 26 * (#ALL_BUTTONS + 1))
     -- All pages: its name in the middle of the line, the line broken round it.
     y = y + 9
     local head = box:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")

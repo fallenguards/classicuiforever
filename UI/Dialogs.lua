@@ -138,6 +138,9 @@ function ns.DialogBacking(host, info, how)
     return backing
 end
 
+-- The plate's room between its end caps, of the art's width (232 of 512): the title and a gap each side fit there.
+local PLATE_INNER, TITLE_GAP = 232 / 512, 10
+
 -- how: width, own (OwnTexture key on owner), layer, sublevel,
 -- restyle (font is the title, none made), fontObject, keepTitle (keep its anchor).
 function ns.DialogHeader(host, text, how, owner, font)
@@ -165,6 +168,11 @@ function ns.DialogHeader(host, text, how, owner, font)
         title:SetPoint("TOP", plate, "TOP", 0, -14)
     end
     if text ~= nil then title:SetText(text) end
+    -- As wide as its title needs (a standalone package's longer name), never narrower than asked.
+    if text ~= nil and not how.restyle then
+        local need = (title:GetStringWidth() + 2 * TITLE_GAP) / PLATE_INNER
+        if need > plate:GetWidth() then plate:SetWidth(need) end
+    end
     return plate, title
 end
 

@@ -111,6 +111,7 @@ ALLOWED_SITES = {
         "Core/Core.lua:frame": "the addon's first frame loads before Core/Util.lua",
     },
     "EVENTFRAME": {
+        "Core/Package.lua:notice": "an inert standalone package: Core/Util.lua returned at its first line",
         "Bar/BandWatch.lua:placer": "plan 4.2: the band placer (the lane and its last word) keeps its frame and order",
         "Bar/Band.lua:hot.watch": "plan 4.2: hot.watch keeps its frame and event order",
         "Units/LastNames.lua:after": "plan 4.2: re-registered behind each new plate",
@@ -1767,7 +1768,8 @@ def deadns_hits(corpus_lex):
 
 # ns fields set by a loop or a table copy the patterns cannot see; UNDEFNS never reports them.
 # Set by the dev addon on attach: the walk helpers note each walk only then (Core/Util.lua).
-NS_DYNAMIC = frozenset(("noteWalks",))
+# PACKAGE, INERT: set by a standalone package's generated first file (tools/standalone.py).
+NS_DYNAMIC = frozenset(("noteWalks", "PACKAGE", "INERT"))
 NS_DEF_ANY = re.compile(r"\bfunction\s+ns\s*[.:]\s*(\w+)\s*\(|\bns\s*\.\s*(\w+)\s*=(?!=)")
 # ns.A, ns.B = 1, 2: every name on the left.
 NS_DEF_LIST = re.compile(r"^\s*((?:ns\s*\.\s*\w+\s*,\s*)+ns\s*\.\s*\w+)\s*=(?!=)")

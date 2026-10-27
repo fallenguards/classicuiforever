@@ -4,7 +4,8 @@ local L = ns.L
 -- Private table the Options files share.
 local O = {}
 ns.options = O
-O.TITLE = "ClassicUI Forever"
+-- A standalone package goes by its own name (Core/Package.lua).
+O.TITLE = ns.PACKAGE and ns.PACKAGE.title or "ClassicUI Forever"
 -- The master list, set apart at the top of the page list, and its note over its rows.
 O.MASTER_PAGE = L["GROUP_ALL_WINDOWS"]
 O.PAGE_NOTES = { [L["GROUP_ALL_WINDOWS"]] = L["OPTWIN_ALL_WINDOWS_NOTE"] }

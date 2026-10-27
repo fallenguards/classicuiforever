@@ -150,7 +150,7 @@ end
 -- A module runs while its toggle, every parent toggle and the toggle it needs (on another page) are on (a sub-toggle
 -- alone never applies).
 local function ModuleOn(key)
-    if ns.db[key] == false then return false end
+    if ns.db[key] == false or not ns.PackageRuns(key) then return false end
     ToggleTree()
     local need = toggleNeeds and toggleNeeds[key]
     if need and need ~= key and not ModuleOn(need) then return false end
@@ -475,6 +475,7 @@ frame:SetScript("OnEvent", function(_, event, arg1)
         end
         ns.db.capHeldLeft, ns.db.capHeldRight = nil, nil
         ns.KeepGameMicroButtons(saved)
+        ns.ApplyPackage()
         ns.LoadProfile()
         -- The old default sat on the tracking spell; a dragged angle is never exactly 160.
         if ns.db.minimapCollectorAngle == 160 then ns.db.minimapCollectorAngle = nil end
