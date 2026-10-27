@@ -3,6 +3,14 @@
 -- The same for everyone: why that is fine (opt-in and off by default, or nothing on screen).
 -- luacheck: std lua54
 return {
+    themePartCastBars = "kept as before: dbVersion 29 (Art/ThemeParts.lua SplitThemeParts) leaves it out where Unit frames was left out",
+    themePartNameplates = "kept as before: dbVersion 29 (Art/ThemeParts.lua SplitThemeParts) leaves it out where Unit frames was left out",
+    themePartMicroMenu = "kept as before: dbVersion 29 (Art/ThemeParts.lua SplitThemeParts) leaves it out where Action bars was left out",
+    themePartBagBar = "kept as before: dbVersion 29 (Art/ThemeParts.lua SplitThemeParts) leaves it out where Action bars was left out",
+    themePartBagIcons = "same for everyone: opt-in, off by default (broad mode, Fallen's UI Color Picker; bag pictures as drawn)",
+    themePartXPBars = "kept as before: dbVersion 29 (Art/ThemeParts.lua SplitThemeParts) leaves it out where Action bars was left out",
+    themePartMenus = "kept as before: dbVersion 29 (Art/ThemeParts.lua SplitThemeParts) leaves it out where Tooltips and menus was left out",
+    themePartQuestTracker = "kept as before: dbVersion 29 (Art/ThemeParts.lua SplitThemeParts) leaves it out where Other windows was left out",
     hideThreatGlow = "same for everyone: opt-in, off by default",
     themePaneShade = "same for everyone: the pane colour in broad mode (Fallen's UI Color Picker); the full addon paints no pane",
     honorBadge = "same for everyone: opt-in, off by default (retail only)",

@@ -186,3 +186,13 @@ L["PKG_OFF_FULL"] = "%s è disattivato perché ClassicUI Forever completo è att
 L["PKG_OFF_OTHER"] = "%s è disattivato perché è attivo un altro addon autonomo di ClassicUI Forever. Ne funziona uno alla volta; per più parti, usa ClassicUI Forever completo e disattiva ciò che non ti serve."
 L["OPTWIN_BACKGROUND_SHADE"] = "Tonalità dello sfondo"
 L["OPTWIN_BACKGROUND_SHADE_TIP"] = "Quanto sono scuri o chiari la pergamena e gli sfondi delle finestre accanto alle cornici: più scuri a sinistra, più chiari a destra."
+
+-- The theme's finer parts (Art/ThemeParts.lua), beside the others in Locales/itIT.lua.
+L["OPT_themePartCastBars"] = "Barre di lancio"
+L["OPT_themePartNameplates"] = "Targhette"
+L["OPT_themePartMicroMenu"] = "Micromenu"
+L["OPT_themePartBagBar"] = "Bordi delle borse"
+L["OPT_themePartBagIcons"] = "Icone delle borse"
+L["OPT_themePartXPBars"] = "Barre di esperienza e reputazione"
+L["OPT_themePartMenus"] = "Menu"
+L["OPT_themePartQuestTracker"] = "Tracciamento missioni"

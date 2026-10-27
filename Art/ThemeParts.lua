@@ -55,34 +55,78 @@ ns.BAR_ROOTS = { "ForeverClassicUIBar", "ForeverClassicUIMicroGroup", "ForeverCl
     "MultiBarBottomLeft", "MultiBarBottomRight", "MultiBarRight", "MultiBarLeft", "MultiBar5", "MultiBar6", "MultiBar7",
     "StanceBar", "PetActionBar", "PossessActionBar", "BagsBar", "MicroMenuContainer", "StatusTrackingBarManager" }
 local OTHER = "themePartWindows"
--- Every bag, every chat window with its tab and box, every nameplate.
-local FAMILIES = { { "^ContainerFrame%d", "themePartBags" }, { "^ChatFrame%d", "themePartChat" },
-    { "^NamePlate%d", "themePartUnits" } }
+-- A bag bar button's picture (Forever's backpack and key ring, the bags, the reagent bag): Bag icons, apart from its
+-- border. Art/GameArt.lua too.
+ns.BAG_ICONS = { "Bag%dSlotIconTexture$", "^MainMenuBarBackpackButtonIconTexture$", "^KeyRingButtonIconTexture$" }
+-- Every bag, chat window with its tab and box, nameplate; the micro and bag buttons the band takes onto its art.
+local FAMILIES = { { ns.BAG_ICONS[1], "themePartBagIcons" }, { ns.BAG_ICONS[2], "themePartBagIcons" },
+    { ns.BAG_ICONS[3], "themePartBagIcons" }, { "^ContainerFrame%d", "themePartBags" }, { "^ChatFrame%d", "themePartChat" },
+    { "^NamePlate%d", "themePartNameplates" }, { "MicroButton", "themePartMicroMenu" },
+    { "^CharacterBag%dSlot", "themePartBagBar" }, { "^CharacterReagentBag%dSlot", "themePartBagBar" },
+    { "^MainMenuBarBackpackButton", "themePartBagBar" }, { "^KeyRingButton", "themePartBagBar" },
+    { "^BagBarExpandToggle", "themePartBagBar" } }
+-- The band's action bars: its frames but the micro menu, bag bar and XP bars, each a part of its own.
+local OWN_PART = { BagsBar = true, MicroMenuContainer = true, StatusTrackingBarManager = true,
+    ForeverClassicUIMicroGroup = true, ForeverClassicUIBagsExtra = true }
+local ACTION_ROOTS = {}
+for _, name in ipairs(ns.BAR_ROOTS) do
+    if not OWN_PART[name] then ACTION_ROOTS[#ACTION_ROOTS + 1] = name end
+end
+-- The nearest root up a piece's frames wins: a target's cast bar before its unit frame.
 local PartOf = ns.PartFinder({
     themePartUnits = { "PlayerFrame", "TargetFrame", "FocusFrame", "PetFrame", "PartyFrame", "TargetFrameToT",
-        "FocusFrameToT", "BossTargetFrameContainer", "PlayerCastingBarFrame", "PetCastingBarFrame" },
+        "FocusFrameToT", "BossTargetFrameContainer" },
+    themePartCastBars = { "PlayerCastingBarFrame", "PetCastingBarFrame", "TargetFrameSpellBar", "FocusFrameSpellBar",
+        "OverlayPlayerCastingBarFrame" },
     themePartMinimap = { "MinimapCluster", "Minimap", "QueueStatusButton", "ForeverClassicUIMinimapBag", "GameTimeFrame",
         "TimeManagerClockButton" },
-    themePartBars = ns.BAR_ROOTS,
+    themePartBars = ACTION_ROOTS,
+    themePartMicroMenu = { "MicroMenuContainer", "ForeverClassicUIMicroGroup" },
+    themePartBagBar = { "BagsBar", "ForeverClassicUIBagsExtra" },
+    themePartXPBars = { "StatusTrackingBarManager", "MainStatusTrackingBarContainer", "SecondaryStatusTrackingBarContainer" },
     themePartBags = { "ContainerFrameCombinedBags", "BankFrame" },
     themePartTooltips = { "GameTooltip", "ItemRefTooltip", "ShoppingTooltip1", "ShoppingTooltip2", "EmbeddedItemTooltip" },
     themePartChat = { "GeneralDockManager", "ChatFrameMenuButton", "ChatFrameChannelButton", "QuickJoinToastButton" },
-}, FAMILIES, OTHER, "themePartTooltips")
+    themePartQuestTracker = { "ObjectiveTrackerFrame", "ForeverClassicUIQuestWatch" },
+}, FAMILIES, OTHER, "themePartMenus")
+-- A piece of ours in another part than where it hangs (the backpack's bag picture, Bag icons on its button).
+local pinned = setmetatable({}, weak)
+function ns.PinThemePart(region, part) pinned[region] = part end
 -- Read by the dev addon's theme probes.
-ns.ThemePartOf = PartOf
+function ns.ThemePartOf(region) return pinned[region] or PartOf(region) end
 
 -- Each part's row; a theme change repaints on it as on any theme setting.
-local PART_KEYS = { themePartParchment = true, themePartUnits = true, themePartMinimap = true, themePartBars = true,
-    themePartBags = true, themePartTooltips = true, themePartChat = true, [OTHER] = true }
+local PART_KEYS = { themePartParchment = true, themePartUnits = true, themePartCastBars = true,
+    themePartNameplates = true, themePartMinimap = true, themePartBars = true, themePartMicroMenu = true,
+    themePartBagBar = true, themePartBagIcons = true, themePartXPBars = true, themePartBags = true,
+    themePartTooltips = true, themePartMenus = true, themePartChat = true, themePartQuestTracker = true, [OTHER] = true }
 for key in pairs(PART_KEYS) do ns.bronze.THEME_KEYS[key] = true end
 function ns.IsThemePart(key) return PART_KEYS[key] == true end
+
+-- dbVersion 29: the parts split finer; each new one starts as the part it came out of.
+local SPLIT_FROM = { themePartMicroMenu = "themePartBars", themePartBagBar = "themePartBars",
+    themePartXPBars = "themePartBars", themePartCastBars = "themePartUnits", themePartNameplates = "themePartUnits",
+    themePartMenus = "themePartTooltips", themePartQuestTracker = "themePartWindows" }
+local function Split(db)
+    for new, old in pairs(SPLIT_FROM) do
+        if db[new] == nil and db[old] == false then db[new] = false end
+    end
+end
+function ns.SplitThemeParts()
+    local db = ns.db
+    Split(db)
+    for _, shot in pairs(type(db.profiles) == "table" and db.profiles or {}) do
+        if type(shot) == "table" then Split(shot) end
+    end
+    db.dbVersion = 29
+end
 
 -- where: a region, or a part's key (a module that paints no region of its own: menus, chat buttons); nil: any part.
 function ns.ThemePartOn(where)
     local db = ns.db
     if not db or where == nil then return true end
     if type(where) == "string" then return db[where] ~= false end
-    return db[PartOf(where)] ~= false
+    return db[ns.ThemePartOf(where)] ~= false
 end
 
 -- The theme on for this piece, or nil: none picked, or its part left out. No piece: the theme on at all.

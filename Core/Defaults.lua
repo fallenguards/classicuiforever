@@ -2,7 +2,7 @@ local _, ns = ...
 local L = ns.L
 
 ns.DB_DEFAULTS = {
-    dbVersion = 28,
+    dbVersion = 29,
     classicBar = true,
     oneBar = false,
     classicBarSize = false,
@@ -55,7 +55,9 @@ ns.DB_DEFAULTS = {
     modernPageArrows = false,
     eraCoins = true,
     themePartParchment = true, themePartUnits = true, themePartMinimap = true, themePartBars = true, themePartBags = true,
-    themePartTooltips = true, themePartChat = true, themePartWindows = true,
+    themePartTooltips = true, themePartChat = true, themePartWindows = true, themePartCastBars = true,
+    themePartNameplates = true, themePartMicroMenu = true, themePartBagBar = true, themePartXPBars = true,
+    themePartMenus = true, themePartQuestTracker = true, themePartBagIcons = false,
     texturedCharacter = true,
     texturedSpellbook = true,
     texturedWindows = true,

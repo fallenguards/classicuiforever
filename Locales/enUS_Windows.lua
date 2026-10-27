@@ -246,3 +246,13 @@ L["PKG_OFF_FULL"] = "%s is turned off because the full ClassicUI Forever is enab
 L["PKG_OFF_OTHER"] = "%s is turned off because another ClassicUI Forever standalone is enabled. Only one runs at a time; for more pieces, use the full ClassicUI Forever and turn off what you don't want."
 L["OPTWIN_BACKGROUND_SHADE"] = "Background shade"
 L["OPTWIN_BACKGROUND_SHADE_TIP"] = "How dark or light parchment and window backgrounds are next to the frames: darker to the left, lighter to the right."
+
+-- The theme's finer parts (Art/ThemeParts.lua), beside the others in Locales/enUS.lua.
+L["OPT_themePartCastBars"] = "Cast bars"
+L["OPT_themePartNameplates"] = "Nameplates"
+L["OPT_themePartMicroMenu"] = "Micro menu"
+L["OPT_themePartBagBar"] = "Bag borders"
+L["OPT_themePartBagIcons"] = "Bag icons"
+L["OPT_themePartXPBars"] = "XP and reputation bars"
+L["OPT_themePartMenus"] = "Menus"
+L["OPT_themePartQuestTracker"] = "Quest tracker"

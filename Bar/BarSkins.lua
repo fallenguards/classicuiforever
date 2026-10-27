@@ -566,7 +566,7 @@ local function ApplyBagArt(button)
             ns.SetAlphaIf(button.IconBorder, 1)
         else
             -- Era hides every quality border; Forever's gray one for a common bag read as a silver frame.
-            ns.SetAlphaIf(button.IconBorder, ns.ThemeLook(nil, "themePartBars") == "classic" and 0 or 1)
+            ns.SetAlphaIf(button.IconBorder, ns.ThemeLook(nil, "themePartBagBar") == "classic" and 0 or 1)
             ns.SetTex(button.IconBorder, "iconFrame")
             -- Thin frame round a bag's picture, bronze with the theme, and Forever's frame over the picture's grey bevel.
             ns.BronzeTint(button.IconBorder)

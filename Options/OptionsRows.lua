@@ -299,7 +299,7 @@ end
 local function DropGroup(field, group)
     local rows, words, keys, first = {}, {}, {}, nil
     for _, entry in ipairs(ns.TOGGLES) do
-        if entry[field] == group then
+        if entry[field] == group and not (entry.hideIf and entry.hideIf()) then
             first = first or entry
             local item = entry[2]:match(":%s*(.+)$") or entry[2]
             rows[#rows + 1] = { key = entry[1], label = (item:gsub("^%l", string.upper)), tip = entry[3] }

@@ -21,6 +21,8 @@ local function OursOn(key) return function() return ns.db[key] ~= false end end
 -- Windows Forever never opens: its Adventure Guide is held off and its items have no sockets (#210).
 local NotOnForever = ns.OnForever
 local function OnRetail() return not ns.OnForever() end
+-- Broad mode's own rows (a package's broad flag, Art/GameArt.lua).
+local function NotBroad() return not (ns.PACKAGE and ns.PACKAGE.broad) end
 -- Every window, one list sorted by name; a window whose box is on a page of its own shows here too, as the same setting.
 local ALL_WINDOWS = { "characterSheet", "spellBook", "talents", "professionsBook", "tradeSkill", "questLog", "worldMap",
     "bags", "collectionsWindow", "legacyWindow", "panelAchievements", "panelJournal", "panelCalendar", "panelMacros",
@@ -86,13 +88,22 @@ ns.TOGGLES = {
     { "texturedWindows", L["OPT_texturedWindows"], nil, parent = "themeTextured", checks = "texturedParts", drop = true },
     { "themePartParchment", L["OPT_themePartParchment"], nil, parent = "bronzeTheme", checks = "themeParts", drop = true,
         dropLabel = L["OPT_DROP_THEMED"], dropTip = L["OPT_themeParts_TIP"],
-        search = "theme parts parchment unit frames minimap bars bags tooltips menus chat windows classic" },
+        search = "theme parts parchment unit frames cast bars nameplates minimap action bars micro menu bag buttons borders icons xp experience reputation bags tooltips menus chat quest tracker windows classic" },
     { "themePartUnits", L["OPT_themePartUnits"], nil, parent = "bronzeTheme", checks = "themeParts", drop = true },
+    { "themePartCastBars", L["OPT_themePartCastBars"], nil, parent = "bronzeTheme", checks = "themeParts", drop = true },
+    { "themePartNameplates", L["OPT_themePartNameplates"], nil, parent = "bronzeTheme", checks = "themeParts", drop = true },
     { "themePartMinimap", L["OPT_themePartMinimap"], nil, parent = "bronzeTheme", checks = "themeParts", drop = true },
     { "themePartBars", L["OPT_themePartBars"], nil, parent = "bronzeTheme", checks = "themeParts", drop = true },
+    { "themePartMicroMenu", L["OPT_themePartMicroMenu"], nil, parent = "bronzeTheme", checks = "themeParts", drop = true },
+    { "themePartBagBar", L["OPT_themePartBagBar"], nil, parent = "bronzeTheme", checks = "themeParts", drop = true },
+    { "themePartBagIcons", L["OPT_themePartBagIcons"], nil, parent = "bronzeTheme", checks = "themeParts", drop = true,
+        hideIf = NotBroad },
+    { "themePartXPBars", L["OPT_themePartXPBars"], nil, parent = "bronzeTheme", checks = "themeParts", drop = true },
     { "themePartBags", L["OPT_themePartBags"], nil, parent = "bronzeTheme", checks = "themeParts", drop = true },
     { "themePartTooltips", L["OPT_themePartTooltips"], nil, parent = "bronzeTheme", checks = "themeParts", drop = true },
+    { "themePartMenus", L["OPT_themePartMenus"], nil, parent = "bronzeTheme", checks = "themeParts", drop = true },
     { "themePartChat", L["OPT_themePartChat"], nil, parent = "bronzeTheme", checks = "themeParts", drop = true },
+    { "themePartQuestTracker", L["OPT_themePartQuestTracker"], nil, parent = "bronzeTheme", checks = "themeParts", drop = true },
     { "themePartWindows", L["OPT_themePartWindows"], nil, parent = "bronzeTheme", checks = "themeParts", drop = true },
     { "themeIgnoreElite", L["OPT_themeIgnoreElite"], L["OPT_themeIgnoreElite_TIP"], parent = "bronzeTheme",
         search = "elite rare dragon gold silver unit frame" },

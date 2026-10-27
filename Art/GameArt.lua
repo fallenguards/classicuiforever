@@ -169,6 +169,31 @@ local function IconLike(region, w, h)
     return w >= 12 and w <= 80 and math.abs(w - h) <= 1
 end
 
+-- The backpack's art is one picture, its ring with the bag drawn over: hidden for our two pieces of it, the ring in
+-- Bag borders, the bag in Bag icons (media/BackpackParts: ring left, bag right, 96 square each).
+local BACKPACK = ns.bronze.BUNDLED .. "BackpackParts"
+local BACKPACK_CELLS = { { 0, 96 / 256 }, { 0.5, 224 / 256 } }
+local backpack = setmetatable({}, { __mode = "k" })   -- button -> its ring and bag
+local function SplitBackpack(region)
+    local button = region:GetParent()
+    local pieces = backpack[button]
+    if not pieces then
+        local layer, sub = region:GetDrawLayer()
+        if ns.AnySecret(layer, sub) then return end
+        pieces = {}
+        for i, cell in ipairs(BACKPACK_CELLS) do
+            pieces[i] = button:CreateTexture(nil, layer, nil, sub)
+            ns.SetFile(pieces[i], BACKPACK)
+            pieces[i]:SetTexCoord(cell[1], cell[2], 0, 96 / 128)
+            pieces[i]:SetAllPoints(button)
+        end
+        ns.PinThemePart(pieces[2], "themePartBagIcons")
+        backpack[button] = pieces
+    end
+    ns.SetAlphaIf(region, 0)
+    want[pieces[1]], want[pieces[2]] = true, true
+end
+
 local function BroadMatch(region, atlas)
     local B = ns.bronze
     if B.tinted[region] or B.swapped[region] or B.clientWas[region] then return end
@@ -177,6 +202,13 @@ local function BroadMatch(region, atlas)
         want[region] = true
         return
     end
+    -- A bag's picture: in the theme with Bag icons, never kept as a picture.
+    local name = region:GetName()
+    if type(name) == "string" and not ns.IsSecret(name) and Listed(ns.BAG_ICONS, name) then
+        want[region] = true
+        return
+    end
+    if atlas == "bag-main" then return SplitBackpack(region) end
     local key = region.GetParentKey and region:GetParentKey()
     if type(key) == "string" and not ns.IsSecret(key) and LATE_PANES[key] then
         want[region] = PANE

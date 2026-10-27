@@ -288,8 +288,8 @@ local function Apply()
         active = true
         EventRegistry:RegisterCallback("MenuProxy.OnShow", OnMenuShow, signal)
     end
-    if ns.ThemeTurned(theme, "themePartTooltips") and (ns.ThemeLook(true, "themePartTooltips") == "client") ~= clientArt then
-        clientArt = ns.ThemeLook(true, "themePartTooltips") == "client"
+    if ns.ThemeTurned(theme, "themePartMenus") and (ns.ThemeLook(true, "themePartMenus") == "client") ~= clientArt then
+        clientArt = ns.ThemeLook(true, "themePartMenus") == "client"
         if clientArt then UndressAll() else Wake() end
     end
     PaintButtons()

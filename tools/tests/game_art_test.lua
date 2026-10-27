@@ -92,6 +92,8 @@ local function Tex(fields)
     function t:GetParent() return self.parent end
     function t:GetName() return self.name end
     function t:GetParentKey() return self.key end
+    function t:SetTexCoord() end
+    function t:SetAllPoints() end
     return t
 end
 local function Frame(fields)
@@ -114,7 +116,13 @@ local bns = {
     TintGameArt = function(texture, share) btinted[texture] = share or true end,
     UntintGameArt = function(texture) btinted[texture] = nil end,
     RegisterModule = function(_, spec) bapply = spec.apply end,
+    BAG_ICONS = { "Bag%dSlotIconTexture$", "^MainMenuBarBackpackButtonIconTexture$", "^KeyRingButtonIconTexture$" },
+    AnySecret = function() return false end,
+    SetFile = noop,
+    SetAlphaIf = function(region, alpha) region.alpha = alpha end,
 }
+local pinned = {}
+function bns.PinThemePart(region, part) pinned[region] = part end
 function bns.EachRegion(frame, fn) for _, region in ipairs(frame.regions) do fn(region) end end
 function bns.EachChild(frame, fn, a1) for _, child in ipairs(frame.children) do fn(child, a1) end end
 _G.LootFrame, _G.RaidFrame = nil, nil
@@ -145,6 +153,21 @@ local window = Frame({ name = "AchievementFrame", regions = { stone, border, hov
     questBg },
     children = { bar, micro, Frame({ kind = "Model", regions = { inModel } }) } })
 for _, tex in pairs(keep) do window.regions[#window.regions + 1] = tex end
+-- The bag bar: a bag's picture by its name; the backpack's ring and bag, one picture of the game's.
+local bagIcon = Tex({ file = 136243, w = 30, h = 30, key = "icon", name = "CharacterBag0SlotIconTexture" })
+window.children[#window.children + 1] = Frame({ kind = "Button", name = "CharacterBag0Slot", regions = { bagIcon } })
+-- Forever's backpack: its frame metal and a bag icon by file, as the bags beside it.
+local foreverPack = Tex({ file = 5214261, w = 45, h = 45, key = "icon", name = "MainMenuBarBackpackButtonIconTexture" })
+window.children[#window.children + 1] = Frame({ kind = "Button", regions = { foreverPack } })
+local packNormal, packPushed = Tex({ atlas = "bag-main" }), Tex({ atlas = "bag-main" })
+local pack = Frame({ kind = "Button", name = "MainMenuBarBackpackButton", regions = { packNormal, packPushed } })
+packNormal.parent, packPushed.parent = pack, pack
+local pieces = {}
+function pack:CreateTexture()
+    pieces[#pieces + 1] = Tex({ file = "Interface\\AddOns\\x\\BackpackParts" })
+    return pieces[#pieces]
+end
+window.children[#window.children + 1] = pack
 local oursWindow = Frame({ name = "ForeverClassicUIQuestLog", regions = { Tex({ file = 130652 }) } })
 -- A forbidden frame may not be asked its name from addon code: it errors (the game's secure frames).
 local forbidden = Frame({ forbidden = true })
@@ -163,6 +186,13 @@ Check(btinted[portrait], "broad: the micro menu's character button wears the the
 for what, tex in pairs(keep) do Check(not btinted[tex], "broad: " .. what .. " is left as drawn") end
 Check(not btinted[inModel], "broad: a model's insides are never walked")
 Check(not btinted[oursWindow.regions[1]], "broad: our own windows are left to the theme's own paint")
+Check(btinted[bagIcon] == true, "broad: a bag's picture takes the theme as frame art, with Bag icons")
+Check(btinted[foreverPack] == true, "broad: Forever's backpack picture goes with the bags'")
+Check(packNormal.alpha == 0 and packPushed.alpha == 0, "broad: the backpack's one picture is hidden")
+Check(#pieces == 2 and btinted[pieces[1]] == true and btinted[pieces[2]] == true,
+    "broad: our ring and bag take its place, made once, both painted")
+Check(pinned[pieces[1]] == nil and pinned[pieces[2]] == "themePartBagIcons",
+    "broad: the ring is its button's part (Bag borders), the bag Bag icons")
 _G.UIParent, _G.CharacterMicroButton = nil, nil
 
 if failed > 0 then
