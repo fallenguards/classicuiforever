@@ -337,6 +337,7 @@ end
 
 -- Dark's slider (0-100) to its grey: light grey at 0, the first dark at 50, black at 100; blue a shade over.
 ns.DARKNESS_DEFAULT = 50
+ns.PANE_SHADE_DEFAULT = 0
 local DARK_LIGHT, DARK_MID, DARK_BLUE = 0.75, 0.38, 0.40 / 0.38
 function ns.DarkGrey(level)
     level = math.max(0, math.min(100, tonumber(level) or ns.DARKNESS_DEFAULT)) / 100

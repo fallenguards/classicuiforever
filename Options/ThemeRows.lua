@@ -56,12 +56,7 @@ function O.ColorRow(parent, key, label, tooltip)
     return row
 end
 
--- Dark's slider, light grey to black, and a button back to its first shade.
 local RESET_TIP = { text = L["OPTWIN_RESET_TO_DEFAULT"], r = 1, g = 1, b = 1 }
-local function Darkness() return tonumber(ns.db.themeDarkness) or ns.DARKNESS_DEFAULT end
-local function SetDarkness(value)
-    ns.Sched.NextFrame("options.themeDarkness", function() ns.SetThemeDarkness(value) end)
-end
 
 -- A slider row's frame: its reset button at the right (returned with its icon), the slider's room beside it
 -- (width - 34). width: the row's room in its column.
@@ -82,21 +77,40 @@ function O.SliderRow(parent, width)
     return row, reset, icon
 end
 
-function O.DarknessRow(parent, width)
+-- A slider's name on a line of its own above it (key: its search entry's).
+function O.SliderHead(parent, width, key, label, tip, words)
+    local head = ns.NewFrame("Frame", nil, parent)
+    head:SetSize(width, 24)
+    head:EnableMouse(true)
+    head.text = head:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    head.text:SetPoint("LEFT", head, "LEFT", 4, 0)
+    head.text:SetJustifyH("LEFT")
+    head.text:SetWordWrap(false)
+    head.text:SetText(label)
+    function head.SetChecked() end
+    function head.SetEnabled() end
+    O.Describe(head, key, label, tip)
+    head.keyLow = head.keyLow .. " " .. words
+    return head
+end
+
+-- A theme's 0-100 slider (spec: key, default, set, label, tip, words) and a button back to its default.
+local function ThemeSlider(parent, width, spec)
+    local function Value() return tonumber(ns.db[spec.key]) or spec.default end
     local row, reset, icon = O.SliderRow(parent, width)
     local slider = ns.band.StepperSlider(row, width - 34, row, 0)
     local Fill
     if slider then
         ns.SetPointOnce(slider, "LEFT", row, "LEFT", 2, 0)
-        Fill = ns.band.GuardedSlider(slider, function() return Darkness(), 0, 100, 20 end, function(value)
+        Fill = ns.band.GuardedSlider(slider, function() return Value(), 0, 100, 20 end, function(value)
             row.shown = math.floor(value + 0.5)
-            SetDarkness(row.shown)
+            ns.Sched.NextFrame("options." .. spec.key, function() spec.set(row.shown) end)
         end, { owner = row, enabled = function() return row.on ~= false end })
     end
     -- No refill while the player drags: only when the saved value or the enabled state moved under it.
     function row:Sync()
-        if not Fill or (self.shown == Darkness() and self.filledOn == self.on) then return end
-        self.shown, self.filledOn = Darkness(), self.on
+        if not Fill or (self.shown == Value() and self.filledOn == self.on) then return end
+        self.shown, self.filledOn = Value(), self.on
         Fill()
     end
     function row:SetChecked() self:Sync() end
@@ -107,11 +121,27 @@ function O.DarknessRow(parent, width)
         self:Sync()
     end
     reset:SetScript("OnClick", function()
-        ns.SetThemeDarkness(ns.DARKNESS_DEFAULT)
+        spec.set(spec.default)
         row.shown = nil
         row:Sync()
     end)
-    O.Describe(row, "themeDarkness", L["OPTWIN_DARKNESS"], L["OPTWIN_DARKNESS_TIP"])
-    row.keyLow = row.keyLow .. " dark black grey gray shade slider theme"
+    O.Describe(row, spec.key, spec.label, spec.tip)
+    row.keyLow = row.keyLow .. " " .. spec.words
     return row
+end
+
+-- Dark's slider, light grey to black.
+function O.DarknessRow(parent, width)
+    return ThemeSlider(parent, width, { key = "themeDarkness", default = ns.DARKNESS_DEFAULT, set = ns.SetThemeDarkness,
+        label = L["OPTWIN_DARKNESS"], tip = L["OPTWIN_DARKNESS_TIP"], words = "dark black grey gray shade slider theme" })
+end
+
+-- Background shade (broad mode): its name on a line of its own, the slider under it, as the camera's.
+function O.PaneRow(parent, width)
+    local label, tip = L["OPTWIN_BACKGROUND_SHADE"], L["OPTWIN_BACKGROUND_SHADE_TIP"]
+    local words = "pane parchment background secondary second color colour dark light shade contrast slider theme"
+    local head = O.SliderHead(parent, width, "themePaneShadeHead", label, tip, words)
+    local row = ThemeSlider(parent, width, { key = "themePaneShade", default = ns.PANE_SHADE_DEFAULT,
+        set = ns.SetThemePaneShade, label = label, tip = tip, words = words })
+    return head, row
 end

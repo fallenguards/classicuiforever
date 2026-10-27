@@ -403,6 +403,7 @@ return {
     themeIgnoreElitePlayer = true,
     themeIgnoreEliteTarget = true,
     themeIgnorePlateDragon = false,
+    themePaneShade = 0,
     themePartBags = true,
     themePartBars = true,
     themePartChat = true,

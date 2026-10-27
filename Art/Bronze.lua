@@ -55,13 +55,14 @@ end
 
 -- Softer share for the slots and the band; full bronze read too strong.
 ns.BRONZE_SOFT = 0.9
--- A pane's colour (share.pane: parchment, backgrounds), the frames' lifted toward white, as dark's grey parchment
--- stands beside its near-black frames.
-local PANE_LIFT = 0.4
+-- A pane's colour (share.pane: parchment, backgrounds) by the Background shade slider: the frames' own at its middle,
+-- toward black below it, toward white above it.
 local paneTint = {}
 local function PaneTint(t)
-    local lift = PANE_LIFT
-    paneTint[1], paneTint[2], paneTint[3] = t[1] + (1 - t[1]) * lift, t[2] + (1 - t[2]) * lift, t[3] + (1 - t[3]) * lift
+    local level = (tonumber(ns.db and ns.db.themePaneShade) or ns.PANE_SHADE_DEFAULT) / 50 - 1
+    for i = 1, 3 do
+        paneTint[i] = level < 0 and t[i] * (1 + level) or t[i] + (1 - t[i]) * level
+    end
     return paneTint
 end
 

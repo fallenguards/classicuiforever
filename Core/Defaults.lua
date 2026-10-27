@@ -47,6 +47,7 @@ ns.DB_DEFAULTS = {
     themeCustom = false,
     themeColor = "e69e52",
     themeDarkness = 50,
+    themePaneShade = 0,
     themeTextured = false,
     classicFonts = true,
     platesOneSize = false,

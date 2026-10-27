@@ -508,6 +508,13 @@ local function Extras(entry, child, colW, add)
             ns.KEY_TEXT_MIN or 8, ns.KEY_TEXT_MAX or 20, ns.SetKeyTextSize, "keybind font hotkey")
     elseif key == "themeDark" then
         add(O.DarknessRow(child, colW - 2 * INDENT - 14), "themeDark")
+        -- Broad mode's panes take their own shade under any theme.
+        if ns.PACKAGE and ns.PACKAGE.broad then
+            local head, shade = O.PaneRow(child, colW - 2 * INDENT - 14)
+            head.text:SetWidth(colW - 30)
+            add(head, "bronzeTheme")
+            add(shade, head.key)
+        end
     -- One bar's last row: the pieces that go well with it, after it.
     elseif key == "modernPageArrows" then
         add(SubHead(child, L["SUB_ONE_BAR_PAIRS"]), "oneBar")

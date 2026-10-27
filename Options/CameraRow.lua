@@ -15,21 +15,11 @@ local function Write(value)
     ns.Sched.NextFrame("options.camera", function() ns.SetCVarOrHold(CVAR, string.format("%.1f", value)) end)
 end
 local function Tenths(value) return string.format("%.1f", value) end
-local function Quiet() end
 
 -- Its name on a line of its own, the slider under it indented as the theme's darkness slider. width: the slider row's.
 function O.CameraRow(parent, width)
-    local head = ns.NewFrame("Frame", nil, parent)
-    head:SetSize(width, 24)
-    head:EnableMouse(true)
-    head.text = head:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    head.text:SetPoint("LEFT", head, "LEFT", 4, 0)
-    head.text:SetJustifyH("LEFT")
-    head.text:SetWordWrap(false)
-    head.text:SetText(L["OPTWIN_CAMERA_DISTANCE"])
-    head.SetChecked, head.SetEnabled = Quiet, Quiet
-    O.Describe(head, "cameraDistance", L["OPTWIN_CAMERA_DISTANCE"], L["OPTWIN_CAMERA_DISTANCE_TIP"])
-    head.keyLow = head.keyLow .. " camera zoom distance far out view max slider"
+    local head = O.SliderHead(parent, width, "cameraDistance", L["OPTWIN_CAMERA_DISTANCE"],
+        L["OPTWIN_CAMERA_DISTANCE_TIP"], "camera zoom distance far out view max slider")
 
     local row, reset = O.SliderRow(parent, width)
     local slider, formatters = ns.band.StepperSlider(row, width - 34 - VALUE_ROOM, row, 4, Tenths)

@@ -738,6 +738,12 @@ function ns.SetThemeColor(r, g, b)
     Retint()
 end
 
+-- Background shade (0-100): panes darker than their frames below 50, lighter above it.
+function ns.SetThemePaneShade(level)
+    ns.db.themePaneShade = math.max(0, math.min(100, math.floor((tonumber(level) or ns.PANE_SHADE_DEFAULT) + 0.5)))
+    Retint()
+end
+
 -- Dark's slider (0-100), saved and painted.
 function ns.SetThemeDarkness(level)
     ns.db.themeDarkness = math.max(0, math.min(100, math.floor((tonumber(level) or ns.DARKNESS_DEFAULT) + 0.5)))
