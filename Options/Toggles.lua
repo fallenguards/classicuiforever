@@ -322,8 +322,6 @@ ns.TOGGLES = {
     { "minimapToggleButton", L["OPT_minimapToggleButton"], L["OPT_minimapToggleButton_TIP"], parent = "minimap",
         search = "close hide minimap x button toggle" },
     { "hideMinimapNorth", L["OPT_hideMinimapNorth"], L["OPT_hideMinimapNorth_TIP"], parent = "minimap", search = "north n compass letter" },
-    { "eyeSnapMinimap", L["OPT_eyeSnapMinimap"], ns.OnForever() and L["OPT_eyeSnapMinimap_TIP"] or L["OPT_eyeSnapMinimap_RETAIL_TIP"],
-        parent = "minimap", search = "group finder lfg queue eye snap rim edit mode shift drag" },
     { "trackingSameSize", L["OPT_trackingSameSize"], L["OPT_trackingSameSize_TIP"], parent = "minimap",
         search = "tracking ring size big small uniform" },
     { "showMinimapTracking", L["OPT_showMinimapTracking"], SHOW_TIP, parent = "minimap", radio = "minimapTrackingShow", drop = true,

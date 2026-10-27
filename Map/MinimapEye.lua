@@ -196,7 +196,7 @@ function MM.EyeDragTo(angle)
     PlaceEye()
 end
 
--- Our edit mode's box for the eye (retail): only while the eye stands on our minimap's rim.
+-- The eye on our minimap's rim: our edit mode's box (retail) drags it round there, and off it holds only the snap.
 function ns.EyeOnRing() return MM.active and ns.db.eyeSnapMinimap ~= false end
 
 -- Our minimap off: the game's own eye back, at the place edit mode gave it.

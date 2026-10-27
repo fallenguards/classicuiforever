@@ -3,9 +3,9 @@ local L = ns.L
 
 -- Every piece ClassicUI Forever Windows moves and sizes (UI/WindowHandles.lua), one entry each.
 
--- w, h: box before made; cut: old 384 x 512 frame's bare edges; stripRight, stripH: strip inset, height or function; toggle: unlock option;
--- quests: the map; section: heading; piece: laid by ns.LayPiece; ringKey: minimap angle (while ringIf); fixedIf: no drag then;
--- choice: radio list; client: game window; follows: place, unlock (while followIf, or always), followSize: size; gameEdit.
+-- w, h: box before made; cut: old 384 x 512 frame's bare edges; stripRight, stripH: strip inset, height or function; toggle: unlock key;
+-- quests: the map; section: heading; piece: laid by ns.LayPiece; ringKey: minimap angle (while ringIf); fixedIf: no drag then; choice:
+-- radio list; switch: a setting's check; client: game window; follows: place, unlock (while followIf), followSize: size; gameEdit.
 ns.WINDOW_LIST = {
     -- dressed: a game window is ours while its restyle is on; off, nothing of ours goes on it (#192).
     { key = "character", label = L["UI_CHARACTER"], name = "CharacterFrame", w = 354, h = 467, cut = { 30, 45 }, client = true,
@@ -89,14 +89,16 @@ local RING_MICROS = { { "Character", L["OPT_hideMicroCharacter"] }, { "Spellbook
     { "GameMenu", L["OPT_hideMicroGameMenu"] }, { "Shop", L["OPT_hideMicroShop"] },
     { "Housing", L["OPT_hideMicroHousing"] } }
 -- Retail's alone (Map/MinimapMicro.lua makes them only there). The queue eye too: retail's game edit mode has no box
--- for it (Forever's has), so ours drags it round the ring while it snaps there (Map/MinimapEye.lua).
+-- for it (Forever's has), so ours holds its Snap to minimap and drags it round the ring; off the rim it stays put.
 if not ns.OnForever() then
     RING_MICROS[#RING_MICROS + 1] = { "Achievements", L["OPT_hideMicroAchievements"] }
     RING_MICROS[#RING_MICROS + 1] = { "Journal", L["OPT_hideMicroJournal"] }
+    local function OnRim() return ns.EyeOnRing ~= nil and ns.EyeOnRing() end
     ns.WINDOW_LIST[#ns.WINDOW_LIST + 1] = { key = "minimapEye", label = L["OPT_hideMicroGroupFinder"],
         name = "ForeverClassicUIEyeSize", w = 32, h = 32, section = L["UI_MINIMAP"], piece = true, ringKey = "lfgButtonAngle",
-        dressed = function() return ns.EyeOnRing ~= nil and ns.EyeOnRing() end,
-        sizeBase = function() return Minimap:GetEffectiveScale() / UIParent:GetEffectiveScale() end }
+        switch = "eyeSnapMinimap", switchLabel = L["MAP_EYE_SNAP"], fixedIf = function() return not OnRim() end,
+        dressed = function() return ns.MM ~= nil and ns.MM.active end,
+        sizeBase = function() return OnRim() and Minimap:GetEffectiveScale() / UIParent:GetEffectiveScale() or 1 end }
 end
 for _, micro in ipairs(RING_MICROS) do
     ns.WINDOW_LIST[#ns.WINDOW_LIST + 1] = { key = "minimap" .. micro[1], label = micro[2],

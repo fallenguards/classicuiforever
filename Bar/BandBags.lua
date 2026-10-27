@@ -465,16 +465,16 @@ function B.DialogFoot(extra, note, label, onClick)
     return resize
 end
 
--- A check row in an extra panel under edit mode's dialog (the bags', the queue eye's).
+-- A check row in an extra panel under edit mode's dialog (the bags', the queue eye's), or in our edit mode's.
 function B.DialogCheck(extra, rel, relPoint, x, y, label, onClick)
     local check = CreateFrame("CheckButton", nil, extra, "UICheckButtonTemplate")
     check:SetSize(30, 30)
     check:SetPoint("TOPLEFT", rel, relPoint, x, y)
     check:SetScript("OnClick", onClick)
     ns.EditModeCheck(check)
-    local text = check:CreateFontString(nil, "ARTWORK", "GameFontHighlightMedium")
-    text:SetPoint("LEFT", check, "RIGHT", 6, 0)
-    text:SetText(label)
+    check.label = check:CreateFontString(nil, "ARTWORK", "GameFontHighlightMedium")
+    check.label:SetPoint("LEFT", check, "RIGHT", 6, 0)
+    check.label:SetText(label)
     return check
 end
 

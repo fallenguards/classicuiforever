@@ -66,8 +66,9 @@ local function Snapshot()
     for _, entry in ipairs(WINDOWS) do
         if entry.ringKey then snap.ring[entry.key] = ns.db[entry.ringKey] or false end
     end
+    -- As saved: Revert writes it back as it was (a nil Snap to minimap is on).
     snap.set = {}
-    for _, key in ipairs(DialogKeys()) do snap.set[key] = ns.db[key] or false end
+    for _, key in ipairs(DialogKeys()) do snap.set[key] = ns.db[key] end
     return snap
 end
 
@@ -82,7 +83,7 @@ local function Dirty(snap)
     if not snap then return false end
     if (ns.db.mapUnlocked == true) ~= snap.map then return true end
     for _, key in ipairs(DialogKeys()) do
-        if (ns.db[key] or false) ~= snap.set[key] then return true end
+        if (ns.db[key] or false) ~= (snap.set[key] or false) then return true end
     end
     for _, entry in ipairs(WINDOWS) do
         if entry.ringKey and (ns.db[entry.ringKey] or false) ~= snap.ring[entry.key] then return true end
@@ -122,8 +123,8 @@ local function Restore(snap, apply)
     end
     local changed = {}
     for _, key in ipairs(DialogKeys()) do
-        if (ns.db[key] or false) ~= snap.set[key] then
-            Set(key, snap.set[key] or nil)
+        if (ns.db[key] or false) ~= (snap.set[key] or false) then
+            Set(key, snap.set[key])
             changed[#changed + 1] = key
         end
     end

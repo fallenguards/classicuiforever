@@ -89,6 +89,7 @@ local function DialogKeys()
         if entry.choice then
             for _, row in ipairs(ChoiceRows(entry.choice)) do keys[#keys + 1] = row.key end
         end
+        if entry.switch then keys[#keys + 1] = entry.switch end
     end
     return keys
 end
@@ -160,7 +161,12 @@ local PlaceAll
 
 -- A piece on the minimap ring drags round it: an angle, not a place.
 local function OnRing(entry) return entry.ringKey ~= nil and (entry.ringIf == nil or ns.db[entry.ringIf] == true) end
-local function Fixed(entry) return entry.fixedIf ~= nil and ns.db[entry.fixedIf] == true end
+-- fixedIf: a setting's key, or a function (the eye off the rim).
+local function Fixed(entry)
+    local fixed = entry.fixedIf
+    if type(fixed) == "function" then return fixed() == true end
+    return fixed ~= nil and ns.db[fixed] == true
+end
 
 -- A new size on the game's own spot (no place of ours) keeps it on screen: the offsets count in the window's scale.
 local function ScaleKept(frame, scale)
@@ -388,6 +394,7 @@ local DIALOG_H, VIEW_H, FREE_Y = 214, 34, -44
 local CONTROL_W = 200 -- floor: the size slider's width, which the choice dropdown matches (its longest row fits)
 -- The map's extra rows: its view switch over Movable anytime, Fade while moving under it.
 local MAP_ROWS = 2
+local PIECE_ROWS = { "switch", "choice", "sizeLabel" }
 
 local function Refresh()
     if not (dialog and selected and dialog:IsShown()) then return end
@@ -403,21 +410,32 @@ local function Refresh()
     -- The map's fade is the addon's own setting (the game's mapFade), the same as in the options.
     dialog.fade:SetShown(views)
     dialog.fade:SetChecked(ns.db.mapFade == true)
-    local choice = selected.choice ~= nil
+    local choice, switch = selected.choice ~= nil, selected.switch ~= nil
     dialog.choice:SetShown(choice)
     if choice then
         dialog.choice.label:SetText(selected.choiceLabel)
         dialog.choice.dropdown:GenerateMenu()
     end
+    dialog.switch:SetShown(switch)
+    if switch then
+        dialog.switch.label:SetText(selected.switchLabel)
+        dialog.switch:SetChecked(ns.db[selected.switch] ~= false)
+    end
     if selected.piece then
-        -- Rows from those shown: the choice, then size.
-        if choice then
-            ns.SetPointOnce(dialog.choice, "TOPLEFT", dialog, "TOPLEFT", 20, FREE_Y)
-            ns.SetPointOnce(dialog.sizeLabel, "TOPLEFT", dialog.choice, "BOTTOMLEFT", 0, -4)
-        else
-            ns.SetPointOnce(dialog.sizeLabel, "TOPLEFT", dialog, "TOPLEFT", 20, FREE_Y)
+        -- Rows from those shown, the first under the title: the switch, the choice, then size.
+        local above
+        for _, key in ipairs(PIECE_ROWS) do
+            local row = dialog[key]
+            if row:IsShown() then
+                if above then
+                    ns.SetPointOnce(row, "TOPLEFT", above, "BOTTOMLEFT", 0, -4)
+                else
+                    ns.SetPointOnce(row, "TOPLEFT", dialog, "TOPLEFT", 20, FREE_Y)
+                end
+                above = row
+            end
         end
-        dialog:SetHeight(choice and DIALOG_H or DIALOG_H - VIEW_H)
+        dialog:SetHeight(DIALOG_H + VIEW_H * ((choice and 1 or 0) + (switch and 1 or 0) - 1))
     else
         ns.SetPointOnce(dialog.sizeLabel, "TOPLEFT", views and dialog.fade or dialog.check, "BOTTOMLEFT", 0, -4)
     end
@@ -442,6 +460,15 @@ local function PickChoice(key)
     Set(key, true)
     ns.ToggleChanged(key)
     if selected then LayHandle(selected) end
+    Refresh()
+end
+
+-- A piece's own setting (the eye's Snap to minimap), as edit mode's own: the piece is laid again where it now stands.
+local function PickSwitch(check)
+    if not (selected and selected.switch) then return end
+    Set(selected.switch, check:GetChecked() and true or false)
+    ns.ToggleChanged(selected.switch)
+    LayHandle(selected)
     Refresh()
 end
 
@@ -542,6 +569,7 @@ local function Dialog()
     ns.AttachTip(check, FREE_TIP)
     dialog.check = check
     dialog.choice = ChoiceRow(dialog)
+    dialog.switch = B.DialogCheck(dialog, dialog, "TOPLEFT", 20, FREE_Y, "", PickSwitch)
     local fade = ns.NewFrame("CheckButton", nil, dialog, "UICheckButtonTemplate")
     fade:SetSize(30, 30)
     fade:SetPoint("TOPLEFT", check, "BOTTOMLEFT", 0, -4)
