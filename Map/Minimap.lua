@@ -344,13 +344,23 @@ end
 
 ------------------------------------------------------------------- layout
 
+-- Our pieces round the map hang in this frame at edit mode's size over the cluster, which keeps the game's scale: the
+-- game fits bars 4 and 5 under the cluster's bottom, read in its own units (#230).
+local function Box(cluster)
+    if not MM.scaled then
+        MM.scaled = CreateFrame("Frame", nil, cluster)
+        MM.scaled:SetAllPoints(cluster)
+    end
+    return MM.scaled
+end
+
 local ringBorder, ringHeader, ringSquare
 local function BuildRing()
     local cluster = MinimapCluster
     local backdrop = MinimapBackdrop
     if not cluster or not backdrop then return end
     ringSquare = MM.Square()
-    ringHeader = ns.DressNew(cluster, "minimapBorder", RING_TOP)
+    ringHeader = ns.DressNew(Box(cluster), "minimapBorder", RING_TOP)
     ringBorder = ns.DressNew(backdrop, ringSquare and "minimapBorderSquare" or "minimapBorder", RING)
     cluster.fcuiNorth = ns.DressNew(backdrop, "compassNorth", NORTH, Minimap)
 end
@@ -374,16 +384,17 @@ local function Layout()
     local backdrop = MinimapBackdrop
     local map = Minimap
     if not cluster or not backdrop or not map then ns.MissingPiece("MinimapCluster") return end
-    -- Edit mode's size scales only the map container, pulling the map off its ring:
-    -- scale the whole cluster instead so every spot below stays in 1.x pixels.
+    -- Edit mode's size on the map container, as the game sets it, and on our pieces' frame; the cluster's box grows
+    -- to match at scale 1, so every spot below stays in 1.x pixels.
     local size = MM.MapSize()
     local up, plateY, coordsY = MM.HeaderOffsets()
-    if cluster.MinimapContainer then ns.SetScaleIf(cluster.MinimapContainer, 1, 0) end
-    ns.SetScaleIf(cluster, size, 0.001)
+    local box = Box(cluster)
+    ns.SetScaleIf(box, size, 0.001)
+    if cluster.MinimapContainer then ns.SetScaleIf(cluster.MinimapContainer, size, 0.001) end
     -- The client scales the header again as the map grows.
     if cluster.BorderTop then cluster.BorderTop:SetScale(1) end
     if cluster.ZoneTextButton then cluster.ZoneTextButton:SetScale(1) end
-    cluster:SetSize(CLUSTER, CLUSTER)
+    cluster:SetSize(CLUSTER * size, CLUSTER * size)
     if cluster.BorderTop then ns.Fade(cluster.BorderTop) end
     if cluster.ZoneTextButton then
         ClientArtOff(cluster.ZoneTextButton)
@@ -417,7 +428,7 @@ local function Layout()
     local above = map:GetFrameLevel() + 5
 
     -- Zone name centred on the zone bar, whatever the calendar's spot.
-    local zone = LayHome("minimapZone", cluster, cluster:GetFrameLevel() + 2, MAP, 12, cluster, "TOP", ZONE_X, -12 + plateY)
+    local zone = LayHome("minimapZone", box, cluster:GetFrameLevel() + 2, MAP, 12, cluster, "TOP", ZONE_X, -12 + plateY)
     if cluster.ZoneTextButton then
         cluster.ZoneTextButton:SetParent(zone)
         cluster.ZoneTextButton:SetSize(MAP, 12)
@@ -485,7 +496,7 @@ local function Layout()
     local indicator = cluster.IndicatorFrame
     local mailY = MM.CalendarUnderDiel() and -70 or -37
     if indicator then
-        local mailHome = LayHome("minimapMail", cluster, above, 33, 33, map, "TOPRIGHT", 24 - 16.5, mailY - 16.5)
+        local mailHome = LayHome("minimapMail", box, above, 33, 33, map, "TOPRIGHT", 24 - 16.5, mailY - 16.5)
         indicator:SetParent(mailHome)
         indicator:SetFrameLevel(above + 1)
         indicator:SetSize(33, 33)
@@ -510,7 +521,7 @@ local function Layout()
     local diel = cluster.DielFrame
     if diel then
         local w, h = diel:GetSize()
-        local dielHome = LayHome("minimapDiel", cluster, above, w, h, map, "TOPRIGHT", 20 - w / 2, -2 - h / 2)
+        local dielHome = LayHome("minimapDiel", box, above, w, h, map, "TOPRIGHT", 20 - w / 2, -2 - h / 2)
         if diel:GetParent() ~= dielHome then diel:SetParent(dielHome) end
         ns.SetPointOnce(diel, "CENTER", dielHome, "CENTER", 0, 0)
         -- Its bronze ring follows the theme (silver off, darkened with Dark); Era's picture over it.
@@ -554,6 +565,7 @@ local function Layout()
     end
     -- Retail's difficulty flag (Forever's minimap has none): hidden by default, as 1.x had none.
     if cluster.InstanceDifficulty then
+        ns.SetScaleIf(cluster.InstanceDifficulty, size, 0.001)
         ns.SetPointOnce(cluster.InstanceDifficulty, "TOPLEFT", cluster, "TOPLEFT", 22, -17 + up)
         ns.MinimapShow(cluster.InstanceDifficulty, "MinimapDifficulty", true)
     end
@@ -699,12 +711,16 @@ local function Restore()
     MM.taken = false
     ns.FadeSquareBorders(false)
     MM.UnplaceEye()
-    HideOwn(MinimapCluster)
+    HideOwn(MM.scaled)
     HideOwn(MinimapBackdrop)
     MM.HideCalendar()
     for _, home in pairs(homes) do ns.MinimapShow(home, nil) end
     if ns.AddonRingButtonsBack then ns.AddonRingButtonsBack() end
-    if MinimapCluster and MinimapCluster.InstanceDifficulty then ns.MinimapShow(MinimapCluster.InstanceDifficulty, nil, true) end
+    local flag = MinimapCluster and MinimapCluster.InstanceDifficulty
+    if flag then
+        ns.MinimapShow(flag, nil, true)
+        ns.SetScaleIf(flag, 1)
+    end
     for tex in pairs(buttonBorders) do ns.SetAlphaIf(tex, 1) end
     -- Day/night and coordinates back in the client's frames at its spots.
     local diel = MinimapCluster and MinimapCluster.DielFrame

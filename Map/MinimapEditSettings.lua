@@ -18,7 +18,7 @@ local function Setting(read, key)
     if ok then return value end
 end
 
--- Edit mode's size, which we put on the whole cluster.
+-- Edit mode's size: the map container's scale and our pieces' frame's (Map/Minimap.lua).
 function MM.MapSize()
     local value = Setting("GetSettingValue", "Size")
     if type(value) == "number" and value > 0 then return value / 100 end

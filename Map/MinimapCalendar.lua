@@ -98,9 +98,9 @@ end
 ---------------------------------------------------------------- placing
 
 -- Named: the windows' edit mode places and sizes it by name.
-local function Home(cluster)
+local function Home()
     if home then return home end
-    home = CreateFrame("Frame", HOME, cluster)
+    home = CreateFrame("Frame", HOME, MM.scaled)
     square = CreateFrame("Frame", nil, home)
     square:SetAllPoints(home)
     square.tex = square:CreateTexture(nil, "ARTWORK")
@@ -138,7 +138,7 @@ function MM.PlaceCalendar(cluster, map, above)
     if not button then return end
     local spot = Spot()
     local diel = cluster.DielFrame
-    local box = Home(cluster)
+    local box = Home()
     WatchButton(button)
     button:SetShown(spot ~= nil)
     if spot == nil then

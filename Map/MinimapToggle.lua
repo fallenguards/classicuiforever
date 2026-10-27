@@ -35,7 +35,7 @@ function MM.LayToggle(cluster, header, level)
         return
     end
     if not button then
-        button = ns.NewFrame("Button", "ForeverClassicUIMinimapToggle", cluster)
+        button = ns.NewFrame("Button", "ForeverClassicUIMinimapToggle", MM.scaled)
         button:SetSize(32, 32)
         ns.SkinCloseButton(button, true)
         button:SetScript("OnClick", Toggle)
