@@ -3,6 +3,16 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN52_1_TITLE"] = "Distintivo d'onore"
+L["WN52_1_TEXT"] = "I riquadri del giocatore, del bersaglio e del focus possono mostrare il distintivo del livello d'onore del gioco al posto dell'emblema di fazione della 1.x. Disattivato in modo predefinito; attivalo nelle opzioni (/fcui), in Riquadri delle unità."
+L["WN52_2_TITLE"] = "Schede della chat al passaggio"
+L["WN52_2_TEXT"] = "Con le schede della chat al passaggio, compaiono solo le schede della finestra di chat sotto il mouse: quelle delle finestre agganciate insieme, o quella di una finestra staccata da sola."
+L["WN52_3_TITLE"] = "Occhio della ricerca gruppo"
+L["WN52_3_TEXT"] = "Aggancia alla minimappa per l'occhio della ricerca gruppo non è più nelle opzioni; resta nelle impostazioni dell'occhio in modalità modifica."
+L["WN52_4_TITLE"] = "Occhio della ricerca gruppo"
+L["WN52_4_TEXT"] = "Aggancia alla minimappa per l'occhio della ricerca gruppo è passato dalle opzioni al suo riquadro Ricerca gruppi in Finestre di ClassicUI Forever (modalità modifica), sotto Minimappa. Il riquadro resta finché l'occhio è fuori dal bordo, così puoi riattivarlo."
+L["WN52_5_TITLE"] = "Suggerimento di Lampo di danno"
+L["WN52_5_TEXT"] = "Il suggerimento di Lampo di danno dice che il rosso compare sulla barra della salute del riquadro del giocatore. Lampo di danno è disattivato in modo predefinito; attivalo nelle opzioni (/fcui), in Riquadri delle unità."
 L["WN51_1_TITLE"] = "Maestria e Versatilità"
 L["WN51_1_TEXT"] = "Le statistiche della finestra del personaggio mostrano Maestria e Versatilità, in Generale."
 L["WN51_2_TITLE"] = "Finestra delle professioni"

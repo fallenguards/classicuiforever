@@ -3,6 +3,16 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN52_1_TITLE"] = "Ehrenabzeichen"
+L["WN52_1_TEXT"] = "Spieler-, Ziel- und Fokusfenster können das Ehrenstufen-Abzeichen des Spiels anstelle des 1.x-Fraktionswappens zeigen. Standardmäßig aus; schalte es in den Optionen (/fcui) unter Einheitenfenster ein."
+L["WN52_2_TITLE"] = "Chat-Reiter beim Überfahren"
+L["WN52_2_TEXT"] = "Mit Chat-Reitern beim Überfahren erscheinen nur die Reiter des Chatfensters unter der Maus: die angedockten Fenster gemeinsam, ein herausgezogenes Fenster für sich."
+L["WN52_3_TITLE"] = "Gruppensuche-Auge"
+L["WN52_3_TEXT"] = "An Minikarte ausrichten für das Gruppensuche-Auge ist nicht mehr in den Optionen; es bleibt in den Einstellungen des Auges im Bearbeitungsmodus."
+L["WN52_4_TITLE"] = "Gruppensuche-Auge"
+L["WN52_4_TEXT"] = "An Minikarte ausrichten für das Gruppensuche-Auge ist aus den Optionen in sein Feld Gruppensuche in ClassicUI Forever Fenster (Bearbeitungsmodus) gewandert, unter Minikarte. Das Feld bleibt, solange das Auge nicht am Rand steht, damit du es wieder einschalten kannst."
+L["WN52_5_TITLE"] = "Tooltip von Schadensblitz"
+L["WN52_5_TEXT"] = "Der Tooltip von Schadensblitz sagt, dass das Rot auf der Gesundheitsleiste des Spielerfensters erscheint. Schadensblitz ist standardmäßig aus; schalte es in den Optionen (/fcui) unter Einheitenfenster ein."
 L["WN51_1_TITLE"] = "Meisterschaft und Vielseitigkeit"
 L["WN51_1_TEXT"] = "Die Werte im Charakterfenster zeigen Meisterschaft und Vielseitigkeit unter Allgemein."
 L["WN51_2_TITLE"] = "Berufsfenster"

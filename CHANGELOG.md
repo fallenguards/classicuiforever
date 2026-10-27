@@ -2,6 +2,18 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.40.0] - 2026-10-26
+
+### Added
+- On retail, an Honor badge option under Unit frames, off by default: the player, target and focus frames show the game's honor level badge in place of the 1.x faction emblem (#222).
+
+### Changed
+- Snap to minimap for the group finder eye is set in edit mode only, its options row gone: on retail the eye's box in ClassicUI Forever Windows has it and stays while the eye is off the rim (#205).
+- The Damage flash tooltip says it shows on the player frame's health bar (#205).
+
+### Fixed
+- With chat tabs on hover, the mouse over one chat window showed the tabs of every window; now only the tabs of the window under the mouse show, the docked windows' together (#205).
+
 ## [0.39.1] - 2026-10-26
 
 ### Added

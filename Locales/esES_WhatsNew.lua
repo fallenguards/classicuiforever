@@ -3,6 +3,16 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN52_1_TITLE"] = "Insignia de honor"
+L["WN52_1_TEXT"] = "Los marcos del jugador, del objetivo y de foco pueden mostrar la insignia de nivel de honor del juego en lugar del emblema de facción de la 1.x. Desactivado por defecto; actívalo en las opciones (/fcui), en Marcos de unidad."
+L["WN52_2_TITLE"] = "Pestañas del chat al pasar el ratón"
+L["WN52_2_TEXT"] = "Con las pestañas del chat al pasar el ratón, solo se muestran las pestañas de la ventana de chat bajo el ratón: las de las ventanas acopladas juntas, o la de una ventana que sacaste por separado."
+L["WN52_3_TITLE"] = "Ojo del buscador de grupos"
+L["WN52_3_TEXT"] = "Ajustar al minimapa del ojo del buscador de grupos ya no está en las opciones; sigue en los ajustes del ojo en el modo edición."
+L["WN52_4_TITLE"] = "Ojo del buscador de grupos"
+L["WN52_4_TEXT"] = "Ajustar al minimapa del ojo del buscador de grupos pasó de las opciones a su cuadro Buscador de grupos en Ventanas de ClassicUI Forever (modo edición), en Minimapa. El cuadro sigue ahí mientras el ojo está fuera del borde, para que puedas volver a activarlo."
+L["WN52_5_TITLE"] = "Ayuda de Destello de daño"
+L["WN52_5_TEXT"] = "La ayuda de Destello de daño dice que el rojo aparece en la barra de salud del marco del jugador. Destello de daño está desactivado por defecto; actívalo en las opciones (/fcui), en Marcos de unidad."
 L["WN51_1_TITLE"] = "Maestría y versatilidad"
 L["WN51_1_TEXT"] = "Las estadísticas de la ventana de personaje muestran Maestría y Versatilidad, en General."
 L["WN51_2_TITLE"] = "Ventana de profesiones"

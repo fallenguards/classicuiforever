@@ -3,6 +3,16 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN52_1_TITLE"] = "Insigne d'honneur"
+L["WN52_1_TEXT"] = "Les cadres du joueur, de la cible et de la focalisation peuvent afficher l'insigne de niveau d'honneur du jeu à la place de l'emblème de faction de la 1.x. Désactivé par défaut ; activez-le dans les options (/fcui), sous Cadres d'unité."
+L["WN52_2_TITLE"] = "Onglets du chat au survol"
+L["WN52_2_TEXT"] = "Avec les onglets du chat au survol, seuls les onglets de la fenêtre de chat sous la souris s'affichent : ceux des fenêtres ancrées ensemble, ou celui d'une fenêtre sortie à part."
+L["WN52_3_TITLE"] = "Œil de la recherche de groupe"
+L["WN52_3_TEXT"] = "Aimanter à la minicarte pour l'œil de la recherche de groupe n'est plus dans les options ; il reste dans les réglages de l'œil en mode Édition."
+L["WN52_4_TITLE"] = "Œil de la recherche de groupe"
+L["WN52_4_TEXT"] = "Aimanter à la minicarte pour l'œil de la recherche de groupe passe des options à son cadre Recherche de groupe dans les fenêtres ClassicUI Forever (mode Édition), sous Minicarte. Le cadre reste tant que l'œil n'est pas sur le bord, pour que vous puissiez le réactiver."
+L["WN52_5_TITLE"] = "Infobulle de Flash de dégâts"
+L["WN52_5_TEXT"] = "L'infobulle de Flash de dégâts dit que le rouge s'affiche sur la barre de vie du cadre du joueur. Flash de dégâts est désactivé par défaut ; activez-le dans les options (/fcui), sous Cadres d'unité."
 L["WN51_1_TITLE"] = "Maîtrise et Polyvalence"
 L["WN51_1_TEXT"] = "Les caractéristiques de la fenêtre du personnage montrent Maîtrise et Polyvalence, sous Général."
 L["WN51_2_TITLE"] = "Fenêtre des métiers"

@@ -2,6 +2,16 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN52_1_TITLE"] = "Honor badge"
+L["WN52_1_TEXT"] = "The player, target and focus frames can show the game's honor level badge in place of the 1.x faction emblem. Off by default; turn it on in the options (/fcui), under Unit frames."
+L["WN52_2_TITLE"] = "Chat tabs on hover"
+L["WN52_2_TEXT"] = "With chat tabs on hover, only the tabs of the chat window under the mouse show: the docked windows' tabs together, or a window you dragged out on its own."
+L["WN52_3_TITLE"] = "Group finder eye"
+L["WN52_3_TEXT"] = "Snap to minimap for the group finder eye is no longer in the options; it stays in the eye's Edit Mode settings."
+L["WN52_4_TITLE"] = "Group finder eye"
+L["WN52_4_TEXT"] = "Snap to minimap for the group finder eye moved from the options to its Group finder box in ClassicUI Forever Windows (edit mode), under Minimap. The box stays while the eye is off the rim, so you can turn it back on."
+L["WN52_5_TITLE"] = "Damage flash tooltip"
+L["WN52_5_TEXT"] = "The Damage flash tooltip says the red shows on the player frame's health bar. Damage flash is off by default; turn it on in the options (/fcui), under Unit frames."
 L["WN51_1_TITLE"] = "Mastery and Versatility"
 L["WN51_1_TEXT"] = "The character window's stats show Mastery and Versatility, under General."
 L["WN51_2_TITLE"] = "Professions window"
