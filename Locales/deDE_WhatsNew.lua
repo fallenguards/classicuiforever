@@ -3,6 +3,14 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN53_1_TITLE"] = "Feinere Designteile"
+L["WN53_1_TEXT"] = "Unter Eigenes Design ist die Liste Mit Thema in feinere Teile aufgeteilt, etwa Zauberleisten, Namensplaketten, das Mikromenü und Menüs, damit du jedes davon im klassischen Look lassen kannst. Eigenes Design ist standardmäßig aus; schalte es in den Optionen (/fcui) unter Aussehen ein."
+L["WN53_2_TITLE"] = "Rechte Aktionsleisten"
+L["WN53_2_TEXT"] = "Mit ausgeschalteter Klassischer Leiste und einer im Bearbeitungsmodus vergrößerten Minikarte schrumpfen die Aktionsleisten 4 und 5 rechts nicht mehr auf etwa zwei Drittel; sie werden nur so weit kleiner, wie der Platz unter der Minikarte es verlangt."
+L["WN53_3_TITLE"] = "Eigene Farbe"
+L["WN53_3_TEXT"] = "Ein Klick außerhalb der Farbauswahl behält die gewählte Farbe; Abbrechen oder Escape macht sie weiterhin rückgängig."
+L["WN53_4_TITLE"] = "Design-Korrekturen"
+L["WN53_4_TEXT"] = "Färbt das Design die Fenster des Spiels, blitzen sie beim Öffnen nicht mehr in ihren eigenen Farben auf, und die roten Knöpfe des Spielmenüs zeigen ihre Enden richtig. Fenster anderer Addons behalten ihren eigenen Look; um sie mitzufärben, schalte Andere Addons in der Liste Mit Thema ein, in den Optionen (/fcui) unter Aussehen."
 L["WN52_1_TITLE"] = "Ehrenabzeichen"
 L["WN52_1_TEXT"] = "Spieler-, Ziel- und Fokusfenster können das Ehrenstufen-Abzeichen des Spiels anstelle des 1.x-Fraktionswappens zeigen. Standardmäßig aus; schalte es in den Optionen (/fcui) unter Einheitenfenster ein."
 L["WN52_2_TITLE"] = "Chat-Reiter beim Überfahren"

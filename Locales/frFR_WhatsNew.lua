@@ -3,6 +3,14 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN53_1_TITLE"] = "Parties du thème plus fines"
+L["WN53_1_TEXT"] = "Sous Thème personnalisé, la liste Avec thème se divise en parties plus fines, comme les barres d'incantation, les barres de noms, le micro-menu et les menus, pour garder n'importe laquelle avec l'aspect classique. Thème personnalisé est désactivé par défaut ; activez-le dans les options (/fcui), sous Apparence."
+L["WN53_2_TITLE"] = "Barres d'action de droite"
+L["WN53_2_TEXT"] = "Avec Barre classique désactivée et la minicarte agrandie en mode Édition, les barres d'action 4 et 5 à droite ne rétrécissent plus aux deux tiers environ ; elles rétrécissent seulement autant que l'exige la place sous la minicarte."
+L["WN53_3_TITLE"] = "Couleur personnalisée"
+L["WN53_3_TEXT"] = "Un clic en dehors du sélecteur de couleur garde la couleur choisie ; Annuler ou Échap l'annule toujours."
+L["WN53_4_TITLE"] = "Corrections du thème"
+L["WN53_4_TEXT"] = "Quand le thème colore les fenêtres du jeu, elles ne clignotent plus dans leurs propres couleurs à l'ouverture, et les boutons rouges du menu du jeu affichent correctement leurs extrémités. Les cadres des autres addons gardent leur propre aspect ; pour les colorer aussi, activez Autres addons dans la liste Avec thème, dans les options (/fcui), sous Apparence."
 L["WN52_1_TITLE"] = "Insigne d'honneur"
 L["WN52_1_TEXT"] = "Les cadres du joueur, de la cible et de la focalisation peuvent afficher l'insigne de niveau d'honneur du jeu à la place de l'emblème de faction de la 1.x. Désactivé par défaut ; activez-le dans les options (/fcui), sous Cadres d'unité."
 L["WN52_2_TITLE"] = "Onglets du chat au survol"

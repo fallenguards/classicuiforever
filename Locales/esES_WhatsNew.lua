@@ -3,6 +3,14 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN53_1_TITLE"] = "Partes del tema más finas"
+L["WN53_1_TEXT"] = "En Tema personalizado, la lista Con tema se divide en partes más finas, como las barras de lanzamiento, las placas de nombre, el micromenú y los menús, para que puedas dejar cualquiera con el aspecto clásico. Tema personalizado está desactivado por defecto; actívalo en las opciones (/fcui), en Aspecto."
+L["WN53_2_TITLE"] = "Barras de acción derechas"
+L["WN53_2_TEXT"] = "Con Barra clásica desactivada y el minimapa agrandado en el modo edición, las barras de acción 4 y 5 de la derecha ya no se reducen a unos dos tercios; solo se reducen lo que pide el espacio bajo el minimapa."
+L["WN53_3_TITLE"] = "Color personalizado"
+L["WN53_3_TEXT"] = "Hacer clic fuera del selector de color conserva el color elegido; Cancelar o Escape aún lo deshacen."
+L["WN53_4_TITLE"] = "Arreglos del tema"
+L["WN53_4_TEXT"] = "Cuando el tema colorea las ventanas del juego, ya no destellan con sus propios colores al abrirse, y los botones rojos del menú del juego muestran bien sus extremos. Los marcos de otros addons conservan su propio aspecto; para colorearlos también, activa Otros addons en la lista Con tema, en las opciones (/fcui), en Aspecto."
 L["WN52_1_TITLE"] = "Insignia de honor"
 L["WN52_1_TEXT"] = "Los marcos del jugador, del objetivo y de foco pueden mostrar la insignia de nivel de honor del juego en lugar del emblema de facción de la 1.x. Desactivado por defecto; actívalo en las opciones (/fcui), en Marcos de unidad."
 L["WN52_2_TITLE"] = "Pestañas del chat al pasar el ratón"

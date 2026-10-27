@@ -3,6 +3,14 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN53_1_TITLE"] = "Parti del tema più fini"
+L["WN53_1_TEXT"] = "In Tema personalizzato, l'elenco Con tema si divide in parti più fini, come le barre di lancio, le targhette, il micromenu e i menu, così puoi lasciare ognuna con l'aspetto classico. Tema personalizzato è disattivato in modo predefinito; attivalo nelle opzioni (/fcui), in Aspetto."
+L["WN53_2_TITLE"] = "Barre delle azioni a destra"
+L["WN53_2_TEXT"] = "Con Barra classica disattivata e la minimappa ingrandita in modalità modifica, le barre delle azioni 4 e 5 a destra non si riducono più a circa due terzi; si riducono solo quanto richiede lo spazio sotto la minimappa."
+L["WN53_3_TITLE"] = "Colore personalizzato"
+L["WN53_3_TEXT"] = "Un clic fuori dal selettore di colore mantiene il colore scelto; Annulla o Esc lo annullano ancora."
+L["WN53_4_TITLE"] = "Correzioni del tema"
+L["WN53_4_TEXT"] = "Quando il tema colora le finestre del gioco, non lampeggiano più nei loro colori all'apertura, e i pulsanti rossi del menu di gioco mostrano bene le estremità. I riquadri degli altri addon mantengono il loro aspetto; per colorarli, attiva Altri addon nell'elenco Con tema, nelle opzioni (/fcui), in Aspetto."
 L["WN52_1_TITLE"] = "Distintivo d'onore"
 L["WN52_1_TEXT"] = "I riquadri del giocatore, del bersaglio e del focus possono mostrare il distintivo del livello d'onore del gioco al posto dell'emblema di fazione della 1.x. Disattivato in modo predefinito; attivalo nelle opzioni (/fcui), in Riquadri delle unità."
 L["WN52_2_TITLE"] = "Schede della chat al passaggio"

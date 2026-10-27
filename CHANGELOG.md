@@ -2,6 +2,21 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.40.1] - 2026-10-27
+
+### Added
+- With Custom theme on, the Themed list has finer parts: Cast bars and Nameplates apart from Unit frames, Micro menu, Bag borders and XP and reputation bars apart from Action bars, Menus apart from Tooltips, and Quest tracker apart from Other windows. A part you had left out keeps its new parts out too.
+- For addon authors: the addon's API can open the collections window at one entry, such as a mount, pet, toy, heirloom, appearance or campsite, and point at a collection tab by its page.
+
+### Changed
+- Custom theme leaves other addons' frames alone, even ones on the game's windows, unless the new Other addons row in the Themed list is checked. It is off by default.
+
+### Fixed
+- With Classic bar off and edit mode's Minimap Size above 100, action bars 4 and 5 on the right shrank far more than the room under the minimap called for, to about two thirds at 125%. The game now sizes them from where the minimap really ends (#230).
+- Clicking outside the color picker after choosing a Custom color keeps the new color. It threw the pick away; Cancel and Escape still undo it.
+- With Custom theme on, the game's windows no longer flash their own colors for a moment as they open.
+- With Custom theme on and Game menu and dialogs off, the game menu's red buttons no longer show misdrawn ends.
+
 ## [0.40.0] - 2026-10-26
 
 ### Added

@@ -2,6 +2,14 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN53_1_TITLE"] = "Finer theme parts"
+L["WN53_1_TEXT"] = "Under Custom theme, the Themed list splits into finer parts, such as cast bars, nameplates, the micro menu and menus, so you can keep any of them in the classic look. Custom theme is off by default; turn it on in the options (/fcui), under Look."
+L["WN53_2_TITLE"] = "Right action bars"
+L["WN53_2_TEXT"] = "With Classic bar off and the minimap made bigger in Edit Mode, action bars 4 and 5 on the right no longer shrink to about two thirds; they shrink only as much as the room under the minimap needs."
+L["WN53_3_TITLE"] = "Custom color"
+L["WN53_3_TEXT"] = "Clicking outside the color picker keeps the color you picked; Cancel or Escape still undoes it."
+L["WN53_4_TITLE"] = "Theme fixes"
+L["WN53_4_TEXT"] = "When the theme colors the game's windows, they no longer flash their own colors as they open, and the game menu's red buttons draw their ends right. Other addons' frames keep their own look; to color them too, turn on Other addons in the Themed list, in the options (/fcui) under Look."
 L["WN52_1_TITLE"] = "Honor badge"
 L["WN52_1_TEXT"] = "The player, target and focus frames can show the game's honor level badge in place of the 1.x faction emblem. Off by default; turn it on in the options (/fcui), under Unit frames."
 L["WN52_2_TITLE"] = "Chat tabs on hover"
