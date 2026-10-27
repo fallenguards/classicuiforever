@@ -39,7 +39,7 @@ RULES = ["CVAR", "CVARREAD", "CVARLOGIN", "CVARREG", "REGISTRY", "HOOK", "ONUPDA
          "LOADADDON", "EDITMODE", "EDITQUERY", "SETTLE",
          "PANELMGR", "SECRET", "WALK", "REGEVENTS", "EVENTFRAME", "POINTONCE", "SETIF", "THEME", "ONCEFLAG",
          "FRAMEFIELD", "GAMEMENU", "SHAREDART", "PLATES", "FORBIDDEN", "SYSBASE", "LAYOUTFIELD", "CLIENTKEY",
-         "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS", "DRAGPOINT", "STRETCHED", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "LOADORDER", "TOC"]
+         "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS", "DRAGPOINT", "STRETCHED", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "PVPINFOART", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "LOADORDER", "TOC"]
 # A hit of these on a line the change adds fails even within the baseline, so swapping one call for another fails.
 # SINCE, DEADNS, FRAMEFIELD, CVARLOGIN and THROTTLEFRAME stay count-only, so a kept line can still be rewritten.
 LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", "EDITMODE", "PANELMGR", "SEARCHBOX", "ADDONCHAR",
@@ -50,7 +50,7 @@ LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", 
               "DRAGPOINT", "STRETCHED", "ERASPOT", "WINDOWORIGIN", "CVARREG", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST",
               "POINTEXACT",
               "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE",
-              "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK")
+              "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "PVPINFOART")
 
 # The files allowed to hold each pattern, each with its reason; an entry ending in / is a folder.
 ALLOWED = {
@@ -183,6 +183,8 @@ FIX = {
     "PASSWRITE": "write only on change: ns.SetScaleIf, ns.SetPointIf, ns.SetTwoPointsIf (Core/Setters.lua)",
     "MASKPATH": "wrap it in its own parentheses, SetMaskTexture((ns.TexPath(key))), so only the first path goes",
     "MASKWEAR": "mask through ns.WearMask(tex, mask, on) (Art/ThemeLayers.lua), which masks the theme's layers of it too",
+    "PVPINFOART": "look the art up as the client does: the honor level's reward badge and the side's ring atlas "
+                  "(HonorArt in Units/UnitFrameCore.lua)",
     "EDITDRAG": "read the edit mode system's selection box, system.Selection:IsDragging() (Dragged in Map/MinimapEye.lua)",
     "PAGEINK": "color it through ns.PageInk(r, g, b) at paint time and repaint on ns.ThemeKey toggles (MISSING_INK in "
                "Skills/ProfessionsBook.lua)",
@@ -371,6 +373,7 @@ LINE_PATTERNS = {
     "MASKPATH": re.compile(r"SetMaskTexture\(\s*ns\.TexPath\("),
     "MASKWEAR": re.compile(r":(?:Add|Remove)MaskTexture\("),
     "EDITDRAG": re.compile(r"(?<!\.Selection):IsDragging\s*\("),
+    "PVPINFOART": re.compile(r"\.(?:prestigePortraitAtlas|prestigeBadgeFileDataID|pvpIconAtlas)\b"),
     "COMBATMOUSE": re.compile(r"\b(?:SetPropagateMouseMotion|SetPropagateMouseClicks|SetPropagateKeyboardInput|SetPassThroughButtons)\b"),
     "PCALLMANY": re.compile(r"\bpcall\s*\(\s*[\w.:\[\]\"]+\s*[.:]\s*(?:GetChildren|GetRegions|GetAnimations)\b"),
     # A cast bar's shield measured: a plate's is a restricted region and the read errors.
@@ -479,6 +482,8 @@ MESSAGES = {
     "FADEDPIECE": "a client end cap faded or laid on the band as a handle (bars snapped to it, saved at the screen top)",
     "MASKPATH": "ns.TexPath returns two paths (ours and the fallback); the minimap's SetMaskTexture took the second as well and drew the map green with no mask (2026-10-18)",
     "MASKWEAR": "a Dark or Custom theme draws a piece again as its own color layer; the day and night's ring cut by a mask on the piece showed on the layer (#194)",
+    "PVPINFOART": "an art field of UnitFrameUtil.GetUnitPvPIndicatorDisplayInfo: addons get nil there, so the Honor "
+                  "badge drew nothing (2026-10-26, /fcuidev honor)",
     "EDITDRAG": "IsDragging on a frame edit mode moves reads false: its selection box takes the drag (the queue eye snapped back to the rim mid-drag)",
     "PAGEINK": "dark text set by number in a file whose pages a theme darkens: unreadable on the dark page (the professions book's unlearned rows)",
     "COMBATMOUSE": "the client refuses mouse and key propagation in a fight (ADDON_ACTION_BLOCKED; a pcall still says ok)",
