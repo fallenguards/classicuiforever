@@ -278,7 +278,18 @@ Watch = function(window)
     if watched[window] then return end
     watched[window] = true
     ns.Sched.OnVisible(window, "bronze.client", function(shown) Opened(window, shown) end)
+    -- Painted after its show pass, before it draws: the pass alone left one frame of the game's colors on each opening.
+    ns.Sched.AfterShow(window, "bronze.client.paint", function()
+        themeOn = ns.BronzeOn()
+        if themeOn then WalkClient(window, 0) end
+    end)
 end
+-- A window its addon makes as it loads (most panels load on their first opening): watched before that opening shows it.
+ns.EventFrame({ "ADDON_LOADED", "PLAYER_LOGIN" }, function()
+    for _, name in ipairs(CLIENT_WINDOWS) do
+        if _G[name] then Watch(_G[name]) end
+    end
+end)
 
 -- Every 0.5 s: only the textures on a copy are asked (the client reset one: a list row reused on a scroll), and a
 -- window is walked only when owed. Off, asleep once every copy is handed back.

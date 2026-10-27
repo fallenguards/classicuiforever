@@ -43,6 +43,7 @@ ns.IsSecret = function() return false end
 ns.IsForbidden = function() return false end
 local walked = {}            -- window -> times its tree was walked
 local passes, edges = {}, {} -- job name -> its pass; window -> its visibility callback
+local paints = {}            -- window -> its paint ahead of the first draw
 ns.EachRegionProtected = function(frame) walked[frame] = (walked[frame] or 0) + 1 end
 ns.EachChildProtected, ns.EachChild = noop, noop
 ns.Sched = {
@@ -51,6 +52,7 @@ ns.Sched = {
         return job
     end,
     OnVisible = function(window, _, fn) edges[window] = fn end,
+    AfterShow = function(window, _, fn) paints[window] = fn end,
     AfterPerFrame = noop,
 }
 ns.OnToggle, ns.RegisterEvents, ns.UntintGameArt, ns.PaintCopy, ns.BronzeRim = noop, noop, noop, noop, noop
@@ -123,6 +125,12 @@ reset:SetTexture(130828)
 Pass(job)
 Check(reset.file == "copy\\UI-Panel-Button-Up.tga", "a reset copy is put back on the beat (" .. tostring(reset.file) .. ")")
 Check(walked[CharacterFrame] == 3, "putting a copy back walks no window")
+
+-- Painted after its show pass, ahead of its first draw: no frame of the game's own colors as it opens.
+Check(paints[CharacterFrame] ~= nil, "the window's opening is painted before it draws")
+local before = walked[CharacterFrame] or 0
+if paints[CharacterFrame] then paints[CharacterFrame]() end
+Check(walked[CharacterFrame] == before + 1, "the paint ahead of the draw walks the window once")
 
 if failures > 0 then
     print(string.format("bronze client: %d failed", failures))
