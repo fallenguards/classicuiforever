@@ -46,7 +46,9 @@ function O.ColorRow(parent, key, label, tooltip)
                 PickColor(ColorPickerFrame:GetColorRGB())
                 row:Sync()
             end,
+            -- The game's picker cancels on any click outside it: that click keeps the pick, Cancel and Escape undo it.
             cancelFunc = function()
+                if IsMouseButtonDown() and not ColorPickerFrame:IsMouseOver() then return end
                 PickColor(ns.HexColor(was))
                 row:Sync()
             end,
