@@ -294,34 +294,6 @@ local handles = {}
 -- The map's placeholder: with its quest log pane (as it opens) or the map alone; one place and size for both.
 local mapOnly = false
 
--- The map's scale of ours and, when the player placed it, its top left (UIParent units) for a box w x h, as Apply lays
--- it: read ahead of a fight, when the fight layer lays the map (Map/WorldMapFight.lua).
-function ns.MapPlaceFor(w, h, base)
-    local entry = byKey.map
-    local worn = entry and Worn(entry)
-    local scale = (worn and Scales()[SizeKey(entry)]) or base or 1
-    local left, top
-    if worn then left, top = PlaceOf(entry) end
-    if not left then return scale end
-    local screenW, screenH = UIParent:GetSize()
-    return scale, math.max(0, math.min(left, screenW - w * scale)), math.min(screenH, math.max(top, h * scale))
-end
-
--- A game window our layout grew after the game laid it: raised as the game raises a tall one, left kept; placed, it stays.
-function ns.FitGameWindow(key)
-    local entry = byKey[key]
-    local frame = entry and ns.WindowFrame(entry)
-    if not frame or PlaceOf(entry) or Full(entry, frame) or not frame:IsShown() or ns.MoverHolds(frame) then return end
-    if InCombatLockdown() and ns.WindowLocked(frame) then return end
-    local left, top, h, k = Plain(frame:GetLeft()), Plain(frame:GetTop()), Plain(frame:GetHeight()), Ratio(frame)
-    if not (left and top and h and k) then return end
-    local _, down = ns.GameHome(frame, h * k)
-    local want = UIParent:GetHeight() - down
-    if top * k >= want - 0.5 then return end
-    -- Anchors cleared first: one a drag's end left is refused a second beside it (UI/GameSpot.lua).
-    ns.SetPointOnce(frame, "TOPLEFT", UIParent, "TOPLEFT", left, -down / k)
-end
-
 -- Back where the client or our slots put it: ours on the slots, the game's at its own spot or on their next opening.
 local function Return(entry)
     local frame = ns.WindowFrame(entry)
@@ -790,7 +762,7 @@ ns.windowEdit = {
     Ratio = Ratio, PlaceAll = PlaceAll, LayHandle = LayHandle, Refresh = Refresh, IsFree = IsFree, Full = Full, Reset = Reset,
     STRIP_LEFT = STRIP_LEFT, STRIP_LIFT = STRIP_LIFT, StripOf = function(frame) return strips[frame] end,
     ShowHandle = ShowHandle, Set = Set, DialogKeys = DialogKeys, PlaceOf = PlaceOf, SetFree = SetFree, SetPlace = SetPlace, Worn = Worn,
-    Leader = Leader, SizeKey = SizeKey, DrawnSize = DrawnSize, SaveFrom = SaveFrom, HandleShown = function(key) return handles[key] ~= nil and handles[key]:IsShown() end,
+    Leader = Leader, SizeKey = SizeKey, ByKey = byKey, DrawnSize = DrawnSize, SaveFrom = SaveFrom, HandleShown = function(key) return handles[key] ~= nil and handles[key]:IsShown() end,
     HideDialog = function() if dialog then dialog:Hide() end end,
     -- The drags (UI/WindowDrags.lua): the tables they keep with us.
     Moving = moving, EntryOf = entryOf, Strips = strips, ClampWas = clampWas, STRIP_RIGHT = STRIP_RIGHT, STRIP_H = STRIP_H,

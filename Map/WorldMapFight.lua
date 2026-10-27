@@ -36,6 +36,20 @@ local FIGHT_LAY = [[
     lay:SetAttribute("busy", nil)
 ]]
 
+-- The map's scale of ours and, when the player placed it, its top left (UIParent units) for a box w x h, as our edit
+-- mode's places lay it (UI/WindowHandles.lua).
+local function MapPlace(w, h, base)
+    local W = ns.windowEdit
+    local entry = W.ByKey.map
+    local worn = entry and W.Worn(entry)
+    local scale = (worn and W.Scales()[W.SizeKey(entry)]) or base or 1
+    local left, top
+    if worn then left, top = W.PlaceOf(entry) end
+    if not left then return scale end
+    local screenW, screenH = UIParent:GetSize()
+    return scale, math.max(0, math.min(left, screenW - w * scale)), math.min(screenH, math.max(top, h * scale))
+end
+
 -- Out of combat, last as the fight begins: the box, scale and spot the pass would lay, quest pane open and shut, and
 -- the widths the game gives the map either way.
 local Hang
@@ -55,7 +69,7 @@ local function FightValues()
     local screenH = UIParent:GetHeight()
     for v = 0, 1 do
         local w, h = MF.Size(style, v == 1)
-        local k, left, top = ns.MapPlaceFor(w, h, MF.WindowedBase(style))
+        local k, left, top = MapPlace(w, h, MF.WindowedBase(style))
         if not left then
             local down
             left, down = ns.GameHome(map, h * k)

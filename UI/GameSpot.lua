@@ -198,3 +198,19 @@ function ns.GameSpot(frame)
     -- on the screen's centre, and a second anchor beside that one is refused (anchor family connection).
     ns.SetPointOnce(frame, "TOPLEFT", UIParent, "TOPLEFT", left / k, -down / k)
 end
+
+-- A game window our layout grew after the game laid it: raised as the game raises a tall one, left kept; placed, it stays.
+function ns.FitGameWindow(key)
+    local W = ns.windowEdit
+    local entry = W.ByKey[key]
+    local frame = entry and ns.WindowFrame(entry)
+    if not frame or W.PlaceOf(entry) or W.Full(entry, frame) or not frame:IsShown() or ns.MoverHolds(frame) then return end
+    if InCombatLockdown() and ns.WindowLocked(frame) then return end
+    local left, top, h, k = Plain(frame:GetLeft()), Plain(frame:GetTop()), Plain(frame:GetHeight()), ns.WindowRatio(frame)
+    if not (left and top and h and k) then return end
+    local _, down = ns.GameHome(frame, h * k)
+    local want = UIParent:GetHeight() - down
+    if top * k >= want - 0.5 then return end
+    -- Anchors cleared first: one a drag's end left is refused a second beside it.
+    ns.SetPointOnce(frame, "TOPLEFT", UIParent, "TOPLEFT", left, -down / k)
+end
