@@ -17,8 +17,8 @@ local function OwnedList()
         local info = PJ.GetPetInfoTableByPetID(petID)
         local name = info and (info.customName or info.name)
         if type(name) == "string" and not IsSecret(name) then
-            out[#out + 1] = { id = petID, petID = petID, name = name, icon = info.icon, collected = true,
-                displayID = info.displayID, source = info.sourceText }
+            out[#out + 1] = { id = petID, petID = petID, speciesID = info.speciesID, name = name, icon = info.icon,
+                collected = true, displayID = info.displayID, source = info.sourceText }
         end
     end
     table.sort(out, CW.ByCollectedName)

@@ -273,6 +273,7 @@ Collections\CollectionsHeirlooms.lua
 Collections\CollectionsAppearances.lua
 Collections\CollectionsCampsites.lua
 Collections\CollectionsTeam.lua
+Collections\CollectionsEntries.lua
 Options\Toggles.lua
 Options\Layout.lua
 Options\LayoutCopy.lua

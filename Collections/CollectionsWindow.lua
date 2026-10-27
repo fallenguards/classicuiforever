@@ -33,7 +33,7 @@ local ADD_HL = { add = true }
 
 -- Window state in one table (upvalue room): frame, box, search, filter pick, page, the current page and its lists.
 local W = { tabs = {}, cells = {}, book = {}, page = 1, picked = {}, entries = {}, shown = {} }
--- For the dev addon's probes (collzoom): the window's state, read only.
+-- The window's state, read only: the dev addon's probes (collzoom), Collections/CollectionsEntries.lua.
 function CW.State() return W end
 local active = false
 
@@ -605,6 +605,8 @@ local function BuildSearch(frame)
         local text = self:GetText() or ""
         self.hint:SetShown(text == "")
         self.clear:SetShown(text ~= "")
+        -- Only a new search turns to page 1: the box's own call as it first shows kept an entry an addon turned to.
+        if text:lower() == W.search then return end
         W.search, W.page = text:lower(), 1
         CW.Refresh()
     end)
@@ -750,5 +752,13 @@ function ns.ShowCollections(pageKey)
     return W.frame:IsShown()
 end
 function ns.CollectionsPageTab(n) return W.tabs[n] end
+
+-- The grid turned to the page holding the shown entry at index i, that entry picked (Collections/CollectionsEntries.lua).
+function CW.TurnTo(i)
+    W.page = math.ceil(i / PerPage())
+    if not W.current.book then W.picked[W.current.key] = W.shown[i].id end
+    DrawGrid()
+    DrawBox()
+end
 -- Read by the dev addon's probe: the window's state and its page turn.
 CW.Probe = { State = function() return W end, ShowPage = function(page) ShowPage(page) end }

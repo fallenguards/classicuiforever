@@ -201,6 +201,16 @@ end
 
 local Picker = {
     Get = function() return A.slot end,
+    -- From outside (an addon asking for a look): false when the list has no such category.
+    Set = function(category)
+        for _, known in ipairs(Categories()) do
+            if known == category then
+                A.slot = category
+                return true
+            end
+        end
+        return false
+    end,
     Label = function(category)
         Categories()
         return A.names[category] or ""
@@ -223,4 +233,9 @@ CW.AddPage({
     events = { "TRANSMOG_COLLECTION_UPDATED", "TRANSMOG_COLLECTION_SOURCE_ADDED", "TRANSMOG_COLLECTION_SOURCE_REMOVED" },
     List = List, Fill = Fill, Show = Show, Action = Action, Tip = Tip, Shown = Shown, FilterEntries = FilterEntries,
     Picker = Picker,
+    -- An addon asks by source: its look, in its category.
+    Want = function(sourceID)
+        local info = TC.GetSourceInfo(sourceID)
+        if info then return info.visualID, info.categoryID end
+    end,
 })

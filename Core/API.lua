@@ -15,6 +15,13 @@ local function Numbered(part, prefix)
     return n and tonumber(n)
 end
 
+-- "<kind>:<id>" (a collection entry): the kind and the number, or nil.
+local function Entry(arg)
+    if type(arg) ~= "string" then return nil end
+    local kind, id = arg:match("^(%a+):(%d+)$")
+    if kind then return kind, tonumber(id) end
+end
+
 -- Windows Open and GetFrame support: open(arg) -> shown now; frame() -> the window, nil until built; parts: name -> field;
 -- part(frame, part) for numbered parts (patterns lists them for Windows).
 local WINDOWS = {
@@ -86,15 +93,26 @@ local WINDOWS = {
         end,
     },
     collectionsWindow = {
-        -- arg: a page (mounts, pets, toys, heirlooms, appearances).
-        open = function(page) return ns.ShowCollections(page) end,
+        -- arg: a page (mounts, pets, toys, heirlooms, appearances, campsites), or an entry: mount:<mountID>,
+        -- pet:<speciesID>, toy:<itemID>, heirloom:<itemID>, appearance:<sourceID>, campsite:<id>, shown on its page and
+        -- picked (false while it is not listed: filtered or searched out).
+        open = function(arg)
+            local kind, id = Entry(arg)
+            if kind then return ns.ShowCollectionEntry(kind, id) end
+            return ns.ShowCollections(arg)
+        end,
         frame = function() return _G.ClassicUIForeverCollections end,
         parts = {},
-        -- tab:<n> the collection tabs down the right edge.
-        patterns = { "tab:<n>" },
+        -- tab:<n> or tab:<page> a collection tab down the right edge; entry:<kind>:<id> the cell drawing that entry now.
+        patterns = { "tab:<n>", "tab:<page>", "entry:<kind>:<id>" },
         part = function(_, part)
             local n = Numbered(part, "tab")
             if n then return ns.CollectionsPageTab(n) end
+            if type(part) ~= "string" then return nil end
+            local key = part:match("^tab:(%a+)$")
+            if key then return ns.CollectionsTabOf(key) end
+            local kind, id = Entry(part:match("^entry:(.+)$"))
+            if kind then return ns.CollectionEntryCell(kind, id) end
         end,
     },
     tradeSkill = {
