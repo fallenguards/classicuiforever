@@ -63,8 +63,7 @@ local function SetPlace(entry, x, y)
     Places()[leader.key] = { x - dx, y - dy }
 end
 
--- A game window wears our place, size, lock and grip while its restyle is on (UI/WindowList.lua dressed); off, it is the
--- game's and other addons' (#192), ours kept for its return. Locked, a dressed one stays where it was put.
+-- A game window wears our place, size, lock and grip while its restyle is on (dressed); off, the game's and other addons'.
 local function Worn(entry)
     if not entry.dressed then return true end
     return entry.dressed() and true or false
@@ -191,6 +190,7 @@ local function Apply(entry)
     -- Windowed, the map's header style at its own size till the player gives it one.
     if entry.quests and not (scale or held) and ns.MapWindowedScale then scale = ns.MapWindowedScale() end
     if not held and Full(entry, frame) then left, scale = nil, FullScale() end
+    if scale then scale = ns.ScreenFitScale(frame, scale, DrawnSize(entry, frame)) end
     if not (left or scale or scaled[frame]) then return end
     -- calm: its casting layer moves out of combat only.
     if InCombatLockdown() and (entry.calm or ns.WindowLocked(frame)) then

@@ -62,6 +62,16 @@ function ns.WindowRatio(frame)
     return scale / screen
 end
 
+-- A size that keeps a window inside the screen: one kept from another look or UI scale ran past it (134% on the Classic
+-- map's 768 tall sheet). w, h: its drawn size in its own units.
+function ns.ScreenFitScale(frame, scale, w, h)
+    local k, own = ns.WindowRatio(frame), Plain(frame:GetScale())
+    if not (scale and w and h and k and own and own > 0) then return scale end
+    local per = k / own
+    local screenW, screenH = UIParent:GetSize()
+    return math.min(scale, screenW / (w * per), screenH / (h * per))
+end
+
 -- A window's spot from a row start (left, top): its panel offsets (none with no frame), then raised to fit when h (its
 -- drawn height) is given, as the game's ClampUIPanelY. Left, and down from the top.
 local function Spot(frame, h, left, top)

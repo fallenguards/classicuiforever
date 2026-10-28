@@ -42,11 +42,12 @@ local function MapPlace(w, h, base)
     local W = ns.windowEdit
     local entry = W.ByKey.map
     local worn = entry and W.Worn(entry)
-    local scale = (worn and W.Scales()[W.SizeKey(entry)]) or base or 1
+    local screenW, screenH = UIParent:GetSize()
+    -- Inside the screen, as out of a fight (ns.ScreenFitScale).
+    local scale = math.min((worn and W.Scales()[W.SizeKey(entry)]) or base or 1, screenW / w, screenH / h)
     local left, top
     if worn then left, top = W.PlaceOf(entry) end
     if not left then return scale end
-    local screenW, screenH = UIParent:GetSize()
     return scale, math.max(0, math.min(left, screenW - w * scale)), math.min(screenH, math.max(top, h * scale))
 end
 
