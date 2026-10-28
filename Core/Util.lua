@@ -96,6 +96,13 @@ function ns.IsForbidden(object)
     return not object or (object.IsForbidden and object:IsForbidden())
 end
 
+-- A texture the game locks against new art from addon code (forbidden aspect SetTexture: the rotating minimap's
+-- compass in an instance, its turn would tell the facing); a set from ours then errors (#208).
+local SET_TEXTURE = Enum and Enum.ForbiddenAspect and Enum.ForbiddenAspect.SetTexture
+function ns.ArtLocked(texture)
+    return SET_TEXTURE ~= nil and texture.HasAnyForbiddenAspects ~= nil and texture:HasAnyForbiddenAspects(SET_TEXTURE) == true
+end
+
 -- One pcall per event so one this client lacks fails alone; unit1/unit2 make unit events.
 local function RegisterOne(frame, event, unit1, unit2)
     if unit2 ~= nil then return pcall(frame.RegisterUnitEvent, frame, event, unit1, unit2) end

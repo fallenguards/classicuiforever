@@ -54,7 +54,7 @@ local STATES = ns.KEYS.STATES
 -- set: "key" (default, ns.SetTex), "file" (ns.SetFile, bronze copy) or "raw".
 local function SetArt(tex, art, set)
     if set == "file" then return ns.SetFile(tex, art) ~= false end
-    if set == "raw" then return tex:SetTexture(art) ~= false end
+    if set == "raw" then return not ns.ArtLocked(tex) and tex:SetTexture(art) ~= false end
     return ns.SetTex(tex, art)
 end
 
@@ -75,6 +75,8 @@ ns.ApplyColor = ApplyColor
 -- Vertex goes after the tint, but a theme repaint resets it on tinted pieces:
 -- never pair spec.vertex with tint or a metal key.
 local function DressTex(tex, key, spec, rel, x, y, w, h, coords, skipLayer)
+    -- Locked against our art: left whole as the game drew it, crop and size included.
+    if key ~= nil and ns.ArtLocked(tex) then return false end
     local ok = true
     if key ~= nil then ok = SetArt(tex, key, spec.set) end
     local tint = spec.tint

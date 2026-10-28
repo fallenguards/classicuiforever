@@ -418,10 +418,15 @@ local function Layout()
     ns.SetPointOnce(backdrop, "CENTER", cluster, "CENTER", 0, -20 + up)
     if ringHeader then ns.SetPointOnce(ringHeader, "TOPRIGHT", cluster, "TOPRIGHT", 0, plateY) end
     if backdrop.StaticOverlayTexture then ns.Fade(backdrop.StaticOverlayTexture) end
-    ns.Dress(MinimapCompassTexture, "compassRing", COMPASS, map)
+    -- In an instance the game locks the compass against our art and its own big ring shows over our border: faded.
+    local compassLocked = MinimapCompassTexture ~= nil and ns.ArtLocked(MinimapCompassTexture)
+    if not compassLocked then ns.Dress(MinimapCompassTexture, "compassRing", COMPASS, map) end
     if MinimapCompassTextureUnderlay then ns.Fade(MinimapCompassTextureUnderlay) end
     local rotate = ns.GetCVarBool("rotateMinimap")
-    if MinimapCompassTexture then MinimapCompassTexture:SetShown(rotate and true or false) end
+    if MinimapCompassTexture then
+        MinimapCompassTexture:SetShown(rotate and true or false)
+        ns.SetAlphaIf(MinimapCompassTexture, compassLocked and 0 or 1)
+    end
     if cluster.fcuiNorth then cluster.fcuiNorth:SetShown(not rotate and ns.db.hideMinimapNorth ~= true) end
 
     -- Buttons over the map's edge must stand above it to take clicks.
@@ -740,6 +745,7 @@ local function Restore()
         end
     end
     if MinimapCluster and MinimapCluster.BorderTop then ns.Unfade(MinimapCluster.BorderTop) end
+    if MinimapCompassTexture then ns.SetAlphaIf(MinimapCompassTexture, 1) end
     if MinimapCluster then ClientArtBack(MinimapCluster) end
     ns.needsReload = true
 end
