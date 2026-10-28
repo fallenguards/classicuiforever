@@ -700,7 +700,7 @@ function ns.ThemeInkShown()
         if inked[piece] == true and ns.Safe(piece:IsShown(), false) and not ns.ParchWhole(chromeOf[piece]) then inks = inks + 1 end
     end
     for _, layer in pairs(layers) do
-        if layer.on and layer.parched and layer.parch:IsShown() then parch = parch + 1 end
+        if layer.on and layer.parched and layer.parch and layer.parch:IsShown() then parch = parch + 1 end
     end
     return inks, parch
 end

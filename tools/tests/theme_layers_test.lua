@@ -462,8 +462,13 @@ Check("the chrome pass after it (ns.SetTex's) keeps it tinted", pagePiece.desat 
 ns.FlatOn = function() return true end
 ns.PaintCopy(pagePiece, COPY)
 Check("the one color look inks the page, its parchment layer off", pagePiece.desat == true and not parch.shown, true)
--- A button's state art: its layers are looked at as it turns on or off, with no press on its window.
 ns.FlatOn = function() return false end
+-- A page in a shut window: its parchment layer waits to be drawn till it shows; the dev count passes it.
+local shutPage = NewFrame(false, UIParent):CreateTexture()
+ns.PaintCopy(shutPage, COPY)
+Check("the dev ink count passes a parchment layer not drawn yet", pcall(ns.ThemeInkShown), true)
+ns.PaintCopy(shutPage, nil)
+-- A button's state art: its layers are looked at as it turns on or off, with no press on its window.
 local pageArrow = NewFrame(true, UIParent)
 pageArrow.kind = "Button"
 local arrowArt = pageArrow:CreateTexture()
