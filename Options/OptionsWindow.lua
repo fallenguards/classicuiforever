@@ -676,7 +676,7 @@ function ns.OptionsIndexRowsOf(rows)
             local words = {}
             for word in row.keyLow:gmatch("%S+") do words[#words + 1] = word end
             out[#out + 1] = { name = row.label, path = row.page, keywords = words, control = Control(row),
-                open = function() ns.OpenOptionsRow(row) end }
+                key = row.setting or row.key, open = function() ns.OpenOptionsRow(row) end }
         end
     end
     return out

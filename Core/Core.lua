@@ -122,17 +122,23 @@ function ns.GetMainBar()
     return MainActionBar or MainMenuBar
 end
 
--- At most one deferred pass per frame; the callback is created once.
-local applyQueued = false
+-- At most one deferred pass per frame; the callback is created once. A full one asked for too wins.
+local queued, queuedFull = false, false
+local NO_KEYS = {}
 local function RunQueuedApply()
-    applyQueued = false
-    ns.ApplyAll()
+    local full = queuedFull
+    queued, queuedFull = false, false
+    if full then ns.ApplyAll() else ns.ApplyChanged(NO_KEYS) end
 end
-function ns.QueueApply()
-    if applyQueued then return end
-    applyQueued = true
+local function Queue(full)
+    if full then queuedFull = true end
+    if queued then return end
+    queued = true
     C_Timer.After(0, RunQueuedApply)
 end
+function ns.QueueApply() Queue(true) end
+-- A setting written outside the options (a slider at rest, a dialog): the modules that read it, next frame.
+function ns.QueueChanged() Queue(false) end
 
 local toggleParent, toggleOrder, toggleNeeds
 
@@ -179,28 +185,149 @@ function ns.PadSwapOwed()
     return false
 end
 
+-- Settings each module read in its last run (mod.reads, key to value; a table's entries in mod.inside, game settings in
+-- mod.cvars): a change runs only the modules that read it. During a run ns.db is a reader noting each key; writes go
+-- straight through. No record (an error) runs every pass.
+local NIL_READ = {}
+local realDb, reading, running
+local dbReader = setmetatable({}, {
+    __index = function(_, key)
+        if reading then reading.db[key] = true end
+        return realDb[key]
+    end,
+    __newindex = function(_, key, value) realDb[key] = value end,
+})
+
+-- ns.GetCVar and ns.GetCVarBool note theirs.
+function ns.NoteCVarRead(name)
+    if reading then reading.cvar[name] = true end
+end
+
+local function ReadInto(seen, fn, ...)
+    local outer = reading
+    if not outer then realDb, ns.db = ns.db, dbReader end
+    reading = seen
+    local ok = ns.SafeCall(fn, ...)
+    reading = outer
+    if outer then
+        for key in pairs(seen.db) do outer.db[key] = true end
+        for name in pairs(seen.cvar) do outer.cvar[name] = true end
+    else
+        ns.db = realDb
+    end
+    return ok
+end
+
+local function CVarNow(name)
+    local value = ns.GetCVar(name)
+    if value == nil then return NIL_READ end
+    return value
+end
+
+-- A table's entries, one level down (a window's place is a new table each save).
+local function Entries(t)
+    local copy = {}
+    for k, v in pairs(t) do copy[k] = v end
+    return copy
+end
+local function SameEntries(t, copy)
+    for k, v in pairs(t) do
+        if copy[k] ~= v then return false end
+    end
+    for k in pairs(copy) do
+        if t[k] == nil then return false end
+    end
+    return true
+end
+
+-- The values as the run left them.
+local function Note(mod, seen)
+    local reads, inside, cvars = mod.reads, mod.inside, mod.cvars
+    for key in pairs(seen.db) do
+        local value = realDb[key]
+        if value == nil then value = NIL_READ end
+        reads[key] = value
+        inside[key] = type(value) == "table" and Entries(value) or nil
+    end
+    for name in pairs(seen.cvar) do cvars[name] = CVarNow(name) end
+end
+
+local function Step(mod)
+    if Runs(mod) then mod.apply() else mod.restore() end
+end
+
+local function RunModule(mod)
+    local seen, outer = { db = {}, cvar = {} }, running
+    running = mod
+    local ok = ReadInto(seen, Step, mod)
+    running = outer
+    if not ok then
+        mod.reads = nil
+        return
+    end
+    mod.reads, mod.inside, mod.cvars = wipe(mod.reads or {}), wipe(mod.inside or {}), wipe(mod.cvars or {})
+    Note(mod, seen)
+end
+
+-- Work a module's run leaves for later (ns.Sched.Soon) counts as its run's reads.
+function ns.PassReads(fn)
+    local mod = running
+    if not mod then return fn end
+    return function(...)
+        local seen, outer = { db = {}, cvar = {} }, running
+        running = mod
+        local ok = ReadInto(seen, fn, ...)
+        running = outer
+        if not ok then mod.reads = nil elseif mod.reads then Note(mod, seen) end
+    end
+end
+
+-- named: keys a caller changed, for tables changed further down.
+local function Stale(mod, named)
+    local reads, inside = mod.reads, mod.inside
+    if not reads then return true end
+    for key, was in pairs(reads) do
+        if named[key] then return true end
+        local value = ns.db[key]
+        if value == nil then value = NIL_READ end
+        if value ~= was or (inside[key] and not SameEntries(value, inside[key])) then return true end
+    end
+    for name, was in pairs(mod.cvars) do
+        if CVarNow(name) ~= was then return true end
+    end
+    return false
+end
+
 -- Modules move and re-level protected frames: a pass asked for in combat runs when it ends. A module that touches
 -- nothing protected (inFight = true) runs now as well, so its toggle answers in a fight.
 local applyAfterCombat = false
-function ns.ApplyAll()
+local ran = {}
+local function Pass(named)
     if not ns.db or not ns.ready then return end
-    if InCombatLockdown() then
-        applyAfterCombat = true
-        for _, mod in ipairs(ns.modules) do
-            if mod.inFight then ns.SafeCall(Runs(mod) and mod.apply or mod.restore) end
-        end
-        return
-    end
-    ns.WriteHeldCVars()
+    wipe(ran)
+    local fight = InCombatLockdown()
+    if fight then applyAfterCombat = true else ns.WriteHeldCVars() end
     for _, mod in ipairs(ns.modules) do
-        if Runs(mod) then
-            ns.SafeCall(mod.apply)
-        else
-            ns.SafeCall(mod.restore)
+        if (mod.inFight or not fight) and (not named or Stale(mod, named)) then
+            RunModule(mod)
+            ran[#ran + 1] = mod
         end
     end
+    if fight then return end
     -- Restores may still set needsReload; RELOAD_KEYS has the final word.
     if ns.ReloadAfterPass then ns.ReloadAfterPass() end
+end
+
+function ns.ApplyAll() Pass(nil) end
+-- The dev addon's scope suite: what the last pass ran, and one module run alone.
+function ns.PassRan() return ran end
+ns.RunModule = RunModule
+
+-- Only the modules whose settings changed; keys may be empty (the values tell).
+function ns.ApplyChanged(keys)
+    local named = {}
+    for i = 1, #keys do named[keys[i]] = true end
+    Pass(named)
 end
 
 -- Per RELOAD_KEYS toggle: state at session start, last seen, and owed way ("on"/"off").
@@ -368,9 +495,10 @@ local function KeyEffects(key)
 end
 
 -- Keys changed at once (a toggle, a profile switch): their own effects, one pass, the watchers, the save.
-function ns.TogglesChanged(changed)
+-- full: every module runs (a profile switch).
+function ns.TogglesChanged(changed, full)
     for i = 1, #changed do KeyEffects(changed[i]) end
-    ns.ApplyAll()
+    if full then ns.ApplyAll() else ns.ApplyChanged(changed) end
     for i = 1, #changed do
         for j = 1, #toggleWatchers do ns.SafeCall(toggleWatchers[j], changed[i]) end
     end

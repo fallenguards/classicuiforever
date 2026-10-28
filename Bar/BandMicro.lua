@@ -399,7 +399,7 @@ end
 
 local function SaveMicro()
     RefreshMicroDialog()
-    ns.QueueApply()
+    ns.QueueChanged()
 end
 
 local function MicroSizeValues() return math.floor(MicroUserScale() * 100 + 0.5), 50, 200, 30 end
@@ -409,13 +409,13 @@ local function OnMicroSize(value)
     ns.MicroTouched()
     ns.db.microScale = math.max(0.5, math.min(2, value / 100))
     RefreshMicroButtons()
-    ns.QueueApply()
+    ns.QueueChanged()
 end
 local function OnMicroWidth(value)
     ns.MicroTouched()
     ns.db.microWidth = math.max(0.5, math.min(2, value / 100))
     RefreshMicroButtons()
-    ns.QueueApply()
+    ns.QueueChanged()
 end
 
 -- A labelled stepper slider row of the dialog; init and onChange as B.GuardedSlider takes them.

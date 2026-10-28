@@ -124,7 +124,7 @@ function ns.UseProfile(name)
     if not list[name] or name == ns.ProfileName() then return end
     ns.StoreProfile()
     ns.char.profile = name
-    ns.TogglesChanged(Fill(list[name]))
+    ns.TogglesChanged(Fill(list[name]), true)
 end
 
 -- copy: from the settings in use, else from the defaults. Switches to it.

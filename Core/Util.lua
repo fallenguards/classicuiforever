@@ -76,6 +76,7 @@ end
 
 function ns.GetCVar(name)
     if name == nil then return nil end
+    ns.NoteCVarRead(name)
     local get = (C_CVar and C_CVar.GetCVar) or GetCVar
     if type(get) ~= "function" then return nil end
     local ok, value = pcall(get, name)
@@ -86,6 +87,7 @@ end
 -- nil when missing or the call fails.
 function ns.GetCVarBool(name)
     if name == nil or not (C_CVar and C_CVar.GetCVarBool) then return nil end
+    ns.NoteCVarRead(name)
     local ok, value = pcall(C_CVar.GetCVarBool, name)
     if ok then return value end
     return nil

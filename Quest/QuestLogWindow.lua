@@ -442,7 +442,7 @@ end
 local function DualClick(self)
     CheckSound(self)
     ns.db.questLogDual = self:GetChecked() and true or false
-    ns.ApplyAll()
+    ns.ApplyChanged({ "questLogDual" })
     if ns.RefreshOptionsWindow then ns.RefreshOptionsWindow() end
 end
 

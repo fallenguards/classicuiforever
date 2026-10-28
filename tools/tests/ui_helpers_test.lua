@@ -189,7 +189,7 @@ UIErrorsFrame = { AddMessage = function(_, ...) errorLines[#errorLines + 1] = ta
 ------------------------------------------------------------------ the addon
 
 GetLocale = GetLocale or function() return "enUS" end
-local ns = { db = { bronzeTheme = false } }
+local ns = { db = { bronzeTheme = false }, PassReads = function(fn) return fn end }
 function ns.RegisterModule() end
 function ns.OnToggle() end
 

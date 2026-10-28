@@ -563,14 +563,14 @@ function Sched.Soon(key, fn)
         soonCount = soonCount + 1
         soonKeys[soonCount] = key
     end
-    soonFns[key] = fn
+    soonFns[key] = ns.PassReads(fn)
     ShowDriver()
 end
 
 -- NextFrame(key, fn): C_Timer.After(0), one pending per key, newest fn wins; fn may re-ask.
 local nextFns, nextWaiting, nextRunners = {}, {}, {}
 function Sched.NextFrame(key, fn)
-    nextFns[key] = fn
+    nextFns[key] = ns.PassReads(fn)
     if nextWaiting[key] then return end
     nextWaiting[key] = true
     local runner = nextRunners[key]
@@ -597,6 +597,6 @@ function Sched.AfterPerFrame(key, seconds, fn)
     end
     if stamps[seconds] == now then return false end
     stamps[seconds] = now
-    C_Timer.After(seconds, fn)
+    C_Timer.After(seconds, ns.PassReads(fn))
     return true
 end

@@ -100,7 +100,8 @@ local function Set(key, value)
     for _, entry in ipairs(WINDOWS) do covered = covered or key == entry.toggle or key == entry.ringKey end
     for _, k in ipairs(DialogKeys()) do covered = covered or k == key end
     if not covered then geterrorhandler()("windows edit mode: " .. tostring(key) .. " is outside Save and Revert") end
-    rawset(ns.db, key, value)
+    local db = ns.db
+    db[key] = value
 end
 -- A saved size by window key, for a secure re-apply (the client fits a panel to 1 as it shows it).
 function ns.WindowScale(key) return Scales()[byKey[key] and SizeKey(byKey[key]) or key] end
@@ -344,8 +345,7 @@ local function PreviewSize(entry, frame)
     return entry.w, entry.h
 end
 
--- A placeholder's rect in UIParent units: its place, else where the window is drawn now, else its spot (the map and a
--- new-style game window on the game's spot, the rest on the first slot).
+-- A placeholder's rect in UIParent units: its place, else where the window is drawn now, else its spot.
 local function HandleRect(entry)
     local frame, left, top = ns.WindowFrame(entry), PlaceOf(entry)
     local full = Full(entry, frame)

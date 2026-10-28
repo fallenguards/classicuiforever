@@ -39,7 +39,7 @@ RULES = ["CVAR", "CVARREAD", "CVARLOGIN", "CVARREG", "REGISTRY", "HOOK", "ONUPDA
          "LOADADDON", "EDITMODE", "EDITQUERY", "SETTLE",
          "PANELMGR", "SECRET", "WALK", "REGEVENTS", "EVENTFRAME", "POINTONCE", "SETIF", "THEME", "ONCEFLAG",
          "FRAMEFIELD", "GAMEMENU", "SHAREDART", "PLATES", "FORBIDDEN", "SYSBASE", "LAYOUTFIELD", "CLIENTKEY",
-         "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS", "DRAGPOINT", "STRETCHED", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "PVPINFOART", "CLUSTERSCALE", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "LOADORDER", "TOC"]
+         "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS", "DRAGPOINT", "STRETCHED", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "PVPINFOART", "CLUSTERSCALE", "DBRAW", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "LOADORDER", "TOC"]
 # A hit of these on a line the change adds fails even within the baseline, so swapping one call for another fails.
 # SINCE, DEADNS, FRAMEFIELD, CVARLOGIN and THROTTLEFRAME stay count-only, so a kept line can still be rewritten.
 LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", "EDITMODE", "PANELMGR", "SEARCHBOX", "ADDONCHAR",
@@ -50,11 +50,13 @@ LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", 
               "DRAGPOINT", "STRETCHED", "ERASPOT", "WINDOWORIGIN", "CVARREG", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST",
               "POINTEXACT",
               "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE",
-              "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "PVPINFOART", "CLUSTERSCALE")
+              "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "PVPINFOART", "CLUSTERSCALE", "DBRAW")
 
 # The files allowed to hold each pattern, each with its reason; an entry ending in / is a folder.
 ALLOWED = {
     "MASKWEAR": {"Art/ThemeLayers.lua": "ns.WearMask, which masks the theme's layers with the piece"},
+    "DBRAW": {"Core/Core.lua": "ADDON_LOADED reads the saved table before any pass",
+              "Options/Options.lua": "/fcui reset wipes the saved table, never inside a pass"},
     "COMBATMOUSE": {"Core/Scheduler.lua": "Sched.OnHover answers refused in a fight before it calls",
                     "Social/GuildNoteBridge.lua": "the sensor is built from PlacePads only, which stops in a fight"},
     "STRETCHED": {"Core/Scheduler.lua": "the move helpers, let go in edit mode and for every drag of ours (LetGo)",
@@ -142,7 +144,7 @@ ALLOWED_BODIES = {
 DEV_NAMES = frozenset((
     "walkFns", "stopped", "savedFirst", "MicroButtonList", "barMoved", "bandPasses", "stripPasses", "OnBarLaid", "OnMinimapLaid", "OnSpellBarPlaced",
     "DevLabel", "EscOursOpen", "MapMarkers", "DevNoGuild", "DevFriendRequests", "DevLockedSlots", "WindowRowState", "WindowFightState",
-    "CharacterCameraInfo", "db", "Persist", "Print", "BeginOutput", "FlushNotice", "debugSink", "debugFlushNotice",
+    "CharacterCameraInfo", "PassRan", "RunModule", "db", "Persist", "Print", "BeginOutput", "FlushNotice", "debugSink", "debugFlushNotice",
     "missing", "mirrorLoaded", "SkinBank", "ClassicLayoutActive", "GetMainBar", "BandBarsToUnpinned", "SystemMoved",
     "DressLootRoll", "ToggleSpellBook", "CombatNumbersInfo", "ClassicBarActive", "hookFns", "MODULE_ORDER", "modules",
     "BronzeOn", "DrainBronze", "UndrainBronze", "band", "Sched", "DB_DEFAULTS", "OpenGuildRoster", "sheet",
@@ -186,6 +188,8 @@ FIX = {
     "MASKWEAR": "mask through ns.WearMask(tex, mask, on) (Art/ThemeLayers.lua), which masks the theme's layers of it too",
     "PVPINFOART": "look the art up as the client does: the honor level's reward badge and the side's ring atlas "
                   "(HonorArt in Units/UnitFrameCore.lua)",
+    "DBRAW": "read and write settings by key (db.x, db[key]); a pass's reader notes each key read, and a whole-table "
+             "walk sees none of them",
     "CLUSTERSCALE": "scale the map container and our pieces' frame (MM.scaled) instead, the cluster's box grown to "
                     "match at scale 1 (Layout in Map/Minimap.lua)",
     "EDITDRAG": "read the edit mode system's selection box, system.Selection:IsDragging() (Dragged in Map/MinimapEye.lua)",
@@ -377,6 +381,7 @@ LINE_PATTERNS = {
     "MASKWEAR": re.compile(r":(?:Add|Remove)MaskTexture\("),
     "EDITDRAG": re.compile(r"(?<!\.Selection):IsDragging\s*\("),
     "PVPINFOART": re.compile(r"\.(?:prestigePortraitAtlas|prestigeBadgeFileDataID|pvpIconAtlas)\b"),
+    "DBRAW": re.compile(r"\b(?:rawget|rawset|next|pairs|wipe)\s*\(\s*(?:ns\s*\.\s*)?db\s*[,)]"),
     "CLUSTERSCALE": re.compile(r"\b(?:MinimapCluster|cluster)\s*:\s*SetScale\s*\(|SetScaleIf\s*\(\s*(?:MinimapCluster|cluster)\s*,"),
     "COMBATMOUSE": re.compile(r"\b(?:SetPropagateMouseMotion|SetPropagateMouseClicks|SetPropagateKeyboardInput|SetPassThroughButtons)\b"),
     "PCALLMANY": re.compile(r"\bpcall\s*\(\s*[\w.:\[\]\"]+\s*[.:]\s*(?:GetChildren|GetRegions|GetAnimations)\b"),
@@ -488,6 +493,8 @@ MESSAGES = {
     "MASKWEAR": "a Dark or Custom theme draws a piece again as its own color layer; the day and night's ring cut by a mask on the piece showed on the layer (#194)",
     "PVPINFOART": "an art field of UnitFrameUtil.GetUnitPvPIndicatorDisplayInfo: addons get nil there, so the Honor "
                   "badge drew nothing (2026-10-26, /fcuidev honor)",
+    "DBRAW": "the saved settings walked or written raw: during a pass ns.db is a reader (Core/Core.lua) that notes the "
+             "keys each module reads, so a whole-table walk finds nothing and a raw write never reaches the save",
     "CLUSTERSCALE": "the minimap cluster scaled: the game reads its bottom in the cluster's own units and shrank bars 4 "
                     "and 5 to fit above it (#230, /fcuidev rightbars)",
     "EDITDRAG": "IsDragging on a frame edit mode moves reads false: its selection box takes the drag (the queue eye snapped back to the rim mid-drag)",

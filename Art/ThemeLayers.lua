@@ -722,7 +722,7 @@ local movedAt = 0
 local function Settle()
     if GetTime() - movedAt < SETTLE - 0.01 then return end
     ns.RepaintBronze()
-    if ns.QueueApply then ns.QueueApply() end
+    if ns.QueueChanged then ns.QueueChanged() end
 end
 
 local function Retint()

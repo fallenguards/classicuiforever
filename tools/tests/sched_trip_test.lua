@@ -36,7 +36,7 @@ function GetTime() return clock end
 C_Timer = { After = function() end }
 
 local reported, notes = 0, {}
-local ns = { Report = function() reported = reported + 1 end }
+local ns = { Report = function() reported = reported + 1 end, PassReads = function(fn) return fn end }
 ns.NoteStopped = function(name, err) notes[#notes + 1] = { name = name, err = err } end
 assert(loadfile(ROOT .. "/Core/Scheduler.lua"))("ClassicUIForever", ns)
 local driver = frames[1]

@@ -39,7 +39,7 @@ local clock = 0
 function GetTime() return clock end
 C_Timer = { After = function() end }
 
-local ns = { Report = function(message) error(message, 0) end, SetAlphaIf = function() end }
+local ns = { Report = function(message) error(message, 0) end, SetAlphaIf = function() end, PassReads = function(fn) return fn end }
 assert(loadfile(ROOT .. "/Core/Scheduler.lua"))("ClassicUIForever", ns)
 
 local keyRing = Frame()

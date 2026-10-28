@@ -117,7 +117,7 @@ end
 
 local function Save()
     RefreshDialog()
-    ns.QueueApply()
+    ns.QueueChanged()
 end
 
 -- One of the dialog's checks, under anchor (the dialog's top for the first).

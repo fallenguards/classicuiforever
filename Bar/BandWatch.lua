@@ -566,7 +566,7 @@ local function MicroFootClick(revert)
         ns.db.microPos, ns.db.microScale, ns.db.microWidth = before.pos, before.scale, before.width
         ns.db.bagsFirst = before.bagsFirst
         ns.db.hideMicroArt, ns.db.hideBagsArt = before.microArt, before.bagsArt
-        ns.QueueApply()
+        ns.QueueChanged()
     end
 end
 
