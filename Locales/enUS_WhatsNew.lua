@@ -2,6 +2,16 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN54_1_TITLE"] = "Smoother options"
+L["WN54_1_TEXT"] = "Changing an option no longer stutters: only the parts of the interface that option touches are laid out again."
+L["WN54_2_TITLE"] = "Micro menu"
+L["WN54_2_TEXT"] = "Micro buttons you hide stay hidden, a lone button left on the row stands at its end, and the row sits centered on the bar with no gap in its floor."
+L["WN54_3_TITLE"] = "Minimap in instances"
+L["WN54_3_TEXT"] = "With Rotate Minimap on, instances no longer show a second big ring around the minimap."
+L["WN54_4_TITLE"] = "Housing button"
+L["WN54_4_TEXT"] = "The housing button on the micro menu has a 1.x frame like the others."
+L["WN54_5_TITLE"] = "Fixes"
+L["WN54_5_TEXT"] = "After a reload in a fight the game's own XP bar frame no longer shows over the 1.x one, and a window size saved in Edit Mode can no longer push a window off the screen, such as a large world map."
 L["WN53_1_TITLE"] = "Finer theme parts"
 L["WN53_1_TEXT"] = "Under Custom theme, the Themed list splits into finer parts, such as cast bars, nameplates, the micro menu and menus, so you can keep any of them in the classic look. Custom theme is off by default; turn it on in the options (/fcui), under Look."
 L["WN53_2_TITLE"] = "Right action bars"

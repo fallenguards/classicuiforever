@@ -3,6 +3,16 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN54_1_TITLE"] = "Opzioni più fluide"
+L["WN54_1_TEXT"] = "Cambiare un'opzione non scatta più: si ridispongono solo le parti dell'interfaccia toccate da quell'opzione."
+L["WN54_2_TITLE"] = "Micromenu"
+L["WN54_2_TEXT"] = "I micropulsanti che nascondi restano nascosti, un pulsante rimasto da solo sulla fila si mette in fondo, e la fila sta al centro della barra senza buchi nel suo fondo."
+L["WN54_3_TITLE"] = "Minimappa nelle istanze"
+L["WN54_3_TEXT"] = "Con Ruota minimappa attivo, le istanze non mostrano più un secondo grande anello attorno alla minimappa."
+L["WN54_4_TITLE"] = "Pulsante degli alloggi"
+L["WN54_4_TEXT"] = "Il pulsante degli alloggi nel micromenu ha una cornice 1.x come gli altri."
+L["WN54_5_TITLE"] = "Correzioni"
+L["WN54_5_TEXT"] = "Dopo un ricaricamento in combattimento, la cornice della barra dell'esperienza del gioco non compare più sopra quella 1.x, e una dimensione di finestra salvata in modalità modifica non può più spingere una finestra fuori dallo schermo, come una grande mappa del mondo."
 L["WN53_1_TITLE"] = "Parti del tema più fini"
 L["WN53_1_TEXT"] = "In Tema personalizzato, l'elenco Con tema si divide in parti più fini, come le barre di lancio, le targhette, il micromenu e i menu, così puoi lasciare ognuna con l'aspetto classico. Tema personalizzato è disattivato in modo predefinito; attivalo nelle opzioni (/fcui), in Aspetto."
 L["WN53_2_TITLE"] = "Barre delle azioni a destra"

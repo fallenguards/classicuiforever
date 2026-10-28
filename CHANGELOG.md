@@ -2,6 +2,18 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.40.2] - 2026-10-28
+
+### Changed
+- Changing an option no longer stutters: only the parts of the interface that use that option are laid out again, instead of all of them.
+- On retail, the housing button on the micro menu wears a 1.x frame like the other buttons.
+
+### Fixed
+- In instances with Rotate Minimap on, a second big ring showed around the minimap and errors came up as it was laid; the minimap now looks as it does outside (#208).
+- Micro menu with buttons hidden: hidden buttons no longer come back, such as the housing button after Escape. With Spread the rest evenly, a single button left stands at the row's end; Keep the menu's width also keeps room for buttons hidden at the row's end; the row sits centered and clear of the pillar beside it, and with Menu Width above 100% its floor shows no gap and ends on one pillar. Buttons answer clicks where they are drawn as others are hidden or shown (#213).
+- After a reload in a fight, the game's own XP bar frame no longer shows over the 1.x XP bar.
+- A window size saved in Edit Mode can no longer lay a window past the screen's edges: a large world map in the Classic map style ran off the screen.
+
 ## [0.40.1] - 2026-10-27
 
 ### Added

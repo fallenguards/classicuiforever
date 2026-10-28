@@ -3,6 +3,16 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN54_1_TITLE"] = "Opciones más fluidas"
+L["WN54_1_TEXT"] = "Cambiar una opción ya no da tirones: solo se vuelven a colocar las partes de la interfaz a las que afecta esa opción."
+L["WN54_2_TITLE"] = "Micromenú"
+L["WN54_2_TEXT"] = "Los microbotones que ocultas siguen ocultos, un botón que queda solo en la fila se coloca al final, y la fila queda centrada en la barra sin huecos en su suelo."
+L["WN54_3_TITLE"] = "Minimapa en instancias"
+L["WN54_3_TEXT"] = "Con Rotar minimapa activado, las instancias ya no muestran un segundo anillo grande alrededor del minimapa."
+L["WN54_4_TITLE"] = "Botón de vivienda"
+L["WN54_4_TEXT"] = "El botón de vivienda del micromenú tiene un marco 1.x como los demás."
+L["WN54_5_TITLE"] = "Correcciones"
+L["WN54_5_TEXT"] = "Tras recargar en combate, el marco propio del juego de la barra de experiencia ya no aparece sobre la barra 1.x, y un tamaño de ventana guardado en el modo edición ya no puede sacar una ventana de la pantalla, como un mapa del mundo grande."
 L["WN53_1_TITLE"] = "Partes del tema más finas"
 L["WN53_1_TEXT"] = "En Tema personalizado, la lista Con tema se divide en partes más finas, como las barras de lanzamiento, las placas de nombre, el micromenú y los menús, para que puedas dejar cualquiera con el aspecto clásico. Tema personalizado está desactivado por defecto; actívalo en las opciones (/fcui), en Aspecto."
 L["WN53_2_TITLE"] = "Barras de acción derechas"

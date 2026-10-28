@@ -3,6 +3,16 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN54_1_TITLE"] = "Options plus fluides"
+L["WN54_1_TEXT"] = "Changer une option ne saccade plus : seules les parties de l'interface touchées par cette option sont replacées."
+L["WN54_2_TITLE"] = "Micro-menu"
+L["WN54_2_TEXT"] = "Les micro-boutons que vous masquez restent masqués, un bouton resté seul sur la rangée se place à son extrémité, et la rangée est centrée sur la barre sans trou dans son fond."
+L["WN54_3_TITLE"] = "Minicarte en instance"
+L["WN54_3_TEXT"] = "Quand la minicarte tourne, les instances n'affichent plus un second grand anneau autour d'elle."
+L["WN54_4_TITLE"] = "Bouton du logis"
+L["WN54_4_TEXT"] = "Le bouton du logis du micro-menu a un cadre 1.x comme les autres."
+L["WN54_5_TITLE"] = "Corrections"
+L["WN54_5_TEXT"] = "Après un rechargement en combat, le cadre de la barre d'expérience du jeu ne s'affiche plus par-dessus celle de 1.x, et une taille de fenêtre enregistrée en mode Édition ne peut plus faire sortir une fenêtre de l'écran, comme une grande carte du monde."
 L["WN53_1_TITLE"] = "Parties du thème plus fines"
 L["WN53_1_TEXT"] = "Sous Thème personnalisé, la liste Avec thème se divise en parties plus fines, comme les barres d'incantation, les barres de noms, le micro-menu et les menus, pour garder n'importe laquelle avec l'aspect classique. Thème personnalisé est désactivé par défaut ; activez-le dans les options (/fcui), sous Apparence."
 L["WN53_2_TITLE"] = "Barres d'action de droite"

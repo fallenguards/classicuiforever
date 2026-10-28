@@ -3,6 +3,16 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN54_1_TITLE"] = "Flüssigere Optionen"
+L["WN54_1_TEXT"] = "Das Ändern einer Option ruckelt nicht mehr: Nur die Teile der Oberfläche, die diese Option betrifft, werden neu angeordnet."
+L["WN54_2_TITLE"] = "Mikromenü"
+L["WN54_2_TEXT"] = "Ausgeblendete Mikrotasten bleiben ausgeblendet, eine einzelne übrige Taste steht am Ende der Reihe, und die Reihe sitzt mittig auf der Leiste ohne Lücke in ihrem Boden."
+L["WN54_3_TITLE"] = "Minikarte in Instanzen"
+L["WN54_3_TEXT"] = "Mit Minikarte drehen zeigen Instanzen keinen zweiten großen Ring mehr um die Minikarte."
+L["WN54_4_TITLE"] = "Behausungstaste"
+L["WN54_4_TEXT"] = "Die Behausungstaste im Mikromenü hat jetzt einen 1.x-Rahmen wie die anderen."
+L["WN54_5_TITLE"] = "Korrekturen"
+L["WN54_5_TEXT"] = "Nach einem Neuladen im Kampf erscheint der Rahmen der Erfahrungsleiste des Spiels nicht mehr über der 1.x-Leiste, und eine im Bearbeitungsmodus gespeicherte Fenstergröße schiebt kein Fenster mehr über den Bildschirmrand hinaus, etwa eine große Weltkarte."
 L["WN53_1_TITLE"] = "Feinere Designteile"
 L["WN53_1_TEXT"] = "Unter Eigenes Design ist die Liste Mit Thema in feinere Teile aufgeteilt, etwa Zauberleisten, Namensplaketten, das Mikromenü und Menüs, damit du jedes davon im klassischen Look lassen kannst. Eigenes Design ist standardmäßig aus; schalte es in den Optionen (/fcui) unter Aussehen ein."
 L["WN53_2_TITLE"] = "Rechte Aktionsleisten"
