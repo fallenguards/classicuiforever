@@ -6,6 +6,11 @@ local _, ns = ...
 
 local held = setmetatable({}, { __mode = "k" })   -- texture -> tinted by this pass
 local want = {}                                  -- this pass's textures, refilled
+-- Each root's textures as its last walk found them: a root hidden since keeps
+-- them instead of a walk each pass (every window's tree walked on each
+-- settings change was the stutter), and its next showing walks it (Watch).
+local found = setmetatable({}, { __mode = "k" })
+local walking   -- the root's finds being filled
 local DEPTH = 10
 
 -- Frame metal by atlas (lower case, its tiling mark dropped): frames, borders, rings, tabs, slots, headers, dividers.
@@ -286,7 +291,9 @@ local isRoot = setmetatable({}, { __mode = "k" })
 -- addon: inside another addon's frame (walked only with Other addons themed), what it takes marked.
 local function MatchIn(region, addon)
     Match(region)
-    if addon and want[region] then ns.MarkAddonPiece(region) end
+    if not want[region] then return end
+    if addon then ns.MarkAddonPiece(region) end
+    if walking then walking[region] = want[region] end
 end
 local Walk
 local function Child(child, depth, addon)
@@ -308,6 +315,19 @@ local function Tint()
     end
 end
 
+-- A root's tree walked and its finds kept; hidden, its last finds stand in.
+local function WalkRoot(frame)
+    local kept = found[frame]
+    if kept and frame.IsShown and not frame:IsShown() then
+        for texture, kind in pairs(kept) do want[texture] = kind end
+        return
+    end
+    kept = {}
+    found[frame], walking = kept, kept
+    Walk(frame, 0)
+    walking = nil
+end
+
 -- A window builds rows as it opens: walked again then.
 local watched = setmetatable({}, { __mode = "k" })
 local function Watch(frame)
@@ -316,7 +336,7 @@ local function Watch(frame)
     ns.Sched.OnVisible(frame, "gameArt", function(shown)
         if not shown then return end
         wipe(want)
-        Walk(frame, 0)
+        WalkRoot(frame)
         Tint()
     end)
 end
@@ -335,7 +355,7 @@ end
 
 local function Root(frame)
     isRoot[frame] = true
-    Walk(frame, 0)
+    WalkRoot(frame)
     Watch(frame)
 end
 

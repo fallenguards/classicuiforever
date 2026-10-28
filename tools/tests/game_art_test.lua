@@ -77,6 +77,30 @@ _G.RaidFrame = { regions = { raidBar }, IsObjectType = function() return false e
 apply()
 Check(tinted[raidBar], "the raid tab's scroll bar is tinted")
 
+-- A window hidden since its last walk keeps what that walk found, without a walk each pass (every window's tree
+-- walked on each settings change was the stutter); shown again, it is walked again.
+local lootWalks = 0
+local eachRegion = ns.EachRegion
+ns.EachRegion = function(frame, fn, ...)
+    if frame == _G.LootFrame then lootWalks = lootWalks + 1 end
+    return eachRegion(frame, fn, ...)
+end
+local hiddenMetal = Atlas("UI-Frame-Metal-CornerTopRight")
+_G.LootFrame.regions = { hiddenMetal }
+_G.LootFrame.IsShown = function() return true end
+apply()
+Check(lootWalks == 1 and tinted[hiddenMetal], "a shown window is walked and its metal tinted")
+_G.LootFrame.IsShown = function() return false end
+_G.LootFrame.regions = {}
+apply()
+Check(lootWalks == 1, "hidden, it is not walked again")
+Check(tinted[hiddenMetal], "its metal stays tinted from the last walk's finds")
+_G.LootFrame.IsShown = function() return true end
+apply()
+Check(lootWalks == 2, "shown again, it is walked")
+Check(not tinted[hiddenMetal], "and what the walk no longer finds is untinted")
+ns.EachRegion = eachRegion
+
 -- Broad (Fallen's UI Color Picker): every texture of a game window takes the theme but what stays as drawn.
 local btinted, bapply = {}, nil
 local function Tex(fields)

@@ -165,6 +165,15 @@ end
 -- a pcall returning 22 or more values aborts the beta client (Lua's api check, lapi.c 577).
 local function Visit(fn, a1, a2, a3, a4, ...)
     local n = select("#", ...)
+    -- select walks the whole list each time: a long one (a list's rows) is
+    -- taken into a table once instead of n times over.
+    if n > 12 then
+        local list = { ... }
+        for i = 1, n do
+            fn(list[i], a1, a2, a3, a4)
+        end
+        return n
+    end
     for i = 1, n do
         fn((select(i, ...)), a1, a2, a3, a4)
     end
