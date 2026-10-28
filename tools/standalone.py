@@ -181,6 +181,11 @@ def build(source, out_dir, only):
     files = tree_files(source) if os.path.isdir(source) else zip_files(source)
     toc = files[SUITE + ".toc"].decode("utf-8")
     version = re.search(r"^## Version:\s*(\S+)", toc, re.M).group(1)
+    # The release build's commit beside each package zip, for the zip test's pass mark; a worktree build has none.
+    commit = None
+    if not os.path.isdir(source) and os.path.isfile(source + ".commit"):
+        with open(source + ".commit", encoding="utf-8") as handle:
+            commit = handle.read()
     made = []
     for pkg in PACKAGES:
         if only and pkg["id"] not in only:
@@ -196,6 +201,11 @@ def build(source, out_dir, only):
                     data = lua_text(rel, data.decode("utf-8"), folder).encode("utf-8")
                 out.writestr(folder + "/" + rel, data)
             out.writestr(folder + "/Package.lua", package_lua(pkg).encode("utf-8"))
+        if commit:
+            with open(path + ".commit", "w", encoding="utf-8", newline="\n") as handle:
+                handle.write(commit)
+        elif os.path.exists(path + ".commit"):
+            os.remove(path + ".commit")
         made.append(path)
     return made
 
