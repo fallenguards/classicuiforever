@@ -580,13 +580,13 @@ end
 -- The region ends MICRO_END_GAP past the row as drawn: a row drawn short of its planned end (seen in game) trims it from
 -- the next pass (B.shape.microTrim, read in ReadShape).
 local TRIM_MAX = 80
-local function FitRegion(last, art)
+local function FitRegion(last, art, trail)
     local plan, shape = CurrentPlan(), B.shape
     -- Era's whole third sheet ends at the sheet, not the row.
     if not plan.microFirst or not plan.microEnd or plan.wholeSheet then return end
     local right, left = last:GetRight(), art:GetLeft()
     if ns.AnySecret(right, left) or not right or not left then return end
-    local rowEnd = right * last:GetEffectiveScale() / art:GetEffectiveScale() - left
+    local rowEnd = right * last:GetEffectiveScale() / art:GetEffectiveScale() - left + trail
     -- Room added under bars 2 and 3 (ReadShape) is wanted, not slack.
     local trim = (shape.microTrim or 0) + plan.microEnd - (shape.microGrow or 0) - MICRO_END_GAP - rowEnd
     trim = math.floor(math.max(0, math.min(TRIM_MAX, trim)) + 0.5)
@@ -596,23 +596,25 @@ local function FitRegion(last, art)
     end
 end
 
--- Spread the rest evenly: the shown buttons span the width all of them would, in button units, so any size fits.
--- A width worn (Menu Width off 100%, from MicroPlan): the seen buttons span the row it gives, hidden seats parked;
--- the width never goes under their need, so they never overlap past the 1.x step.
+-- Spread the rest evenly: the shown buttons span the width all of them would, in button units; a lone one leads to the
+-- last seat (#213). A width worn (Menu Width off 100%, from MicroPlan): the seen buttons span the row it gives, hidden
+-- seats parked; the width never goes under their need, so they never overlap past the 1.x step.
 local function SpreadStep(wanted, seen, worn)
     if math.abs(worn - 1) > 0.001 then
-        if seen < 2 then return true, MICRO_STEP end
-        return true, (MicroNeed(#wanted) * worn - seen * MICRO_W) / (seen - 1)
+        local span = MicroNeed(#wanted) * worn
+        if seen < 2 then return true, MICRO_STEP, seen == 1 and span - MICRO_W or 0 end
+        return true, (span - seen * MICRO_W) / (seen - 1), 0
     end
     local db = ns.db
-    if not (db.hideMicroButtons and db.hideMicroKeepWidth and db.hideMicroSpread) then return false, MICRO_STEP end
+    if not (db.hideMicroButtons and db.hideMicroKeepWidth and db.hideMicroSpread) then return false, MICRO_STEP, 0 end
     local visible = 0
     for _, button in ipairs(wanted) do
         if not IsSeatHidden(button) then visible = visible + 1 end
     end
-    if visible < 2 or visible >= #wanted then return false, MICRO_STEP end
     local span = #wanted * MICRO_W + (#wanted - 1) * MICRO_STEP
-    return true, (span - visible * MICRO_W) / (visible - 1)
+    if visible == 1 and #wanted > 1 then return true, MICRO_STEP, span - MICRO_W end
+    if visible < 2 or visible >= #wanted then return false, MICRO_STEP, 0 end
+    return true, (span - visible * MICRO_W) / (visible - 1), 0
 end
 
 -- Off the band only, its floor: the third sheet's run it stood on, ending on Era's fade and rim (B.MicroRuns).
@@ -640,7 +642,7 @@ function B.LayoutMicroButtons()
     microBusy = true
     local art = B.art
     -- Every button leaves the client's menu, shown or not, so its layout never finds a lone child without a position.
-    local wanted = {}
+    local wanted, rowChanged = {}, false
     for _, button in ipairs(MicroButtonList()) do
         Remember(button)
         if button:GetParent() ~= art then button:SetParent(art) end
@@ -648,10 +650,12 @@ function B.LayoutMicroButtons()
             button:ClearAllPoints()
             button:SetAlpha(0)
             if button:IsMouseEnabled() then button:EnableMouse(false) end
+            if not offRow[button] then rowChanged = true end
             offRow[button] = true
         elseif button:IsShown() then
             -- Back from the option: seen and clickable again.
             if offRow[button] then
+                rowChanged = true
                 offRow[button] = nil
                 button:SetAlpha(1)
                 button:EnableMouse(true)
@@ -666,8 +670,6 @@ function B.LayoutMicroButtons()
     local group = out and MicroUserScale() or 1
     local _, sized, seen = B.MicroCounts()
     local scale, region, worn = MicroPlan(#wanted, out and 1 or MicroUserScale(), sized, MicroUserWidth(), seen)
-    -- The row at its own scale: what the band's sockets were drawn around.
-    local baseScale = MicroPlan(#wanted, 1, sized)
     local home = MicroHome()
     -- In hand it keeps its scale: a change mid-drag (the preview taking it off the band) threw it off the cursor, up.
     local homeScale = home.moving and home:GetScale() or (out and (group / BandNow()) or 1)
@@ -714,26 +716,28 @@ function B.LayoutMicroButtons()
         end
     end
 
-    local spread, step = SpreadStep(wanted, seen, worn)
+    local spread, step, lead = SpreadStep(wanted, seen, worn)
+    -- On the band the row stays centered on the 1.x row (a fitted or resized row grows out of it); off it the group scales.
     local rowY = MICRO_Y
-    if not out then rowY = MICRO_Y + MICRO_H * (baseScale - scale) / 2 end
-    local prev, seatsChanged
+    if not out then rowY = MICRO_Y + MICRO_H * (1 - scale) / 2 end
+    -- From the group corner by band numbers, read in the button's scale. A hidden seat gets no point, so it is never
+    -- drawn: the game's own enable and disable put its alpha back (Escape showed the hidden housing button).
+    local x, last, lastEnd, seatsChanged = rowIn / scale + lead, nil, 0, rowChanged
     for _, button in ipairs(wanted) do
         Seat(button, buttonScale, MICRO_W, MICRO_H, level)
-        local parked = spread and IsSeatHidden(button)
-        if prev and not parked then
-            button:SetPoint("BOTTOMLEFT", prev, "BOTTOMRIGHT", step, 0)
-        else
-            -- From the group corner by band numbers, read in the button's scale. On the band the row stays centred
-            -- on the sockets (hung from the floor, a resized row grew out of them); off it the whole group scales.
-            button:SetPoint("BOTTOMLEFT", home, "BOTTOMLEFT", rowIn / scale, rowY / scale)
+        local hidden = IsSeatHidden(button)
+        if not hidden then
+            button:SetPoint("BOTTOMLEFT", home, "BOTTOMLEFT", x, rowY / scale)
+            last, lastEnd = button, x + MICRO_W
         end
+        if not (spread and hidden) then x = x + MICRO_W + step end
         ns.SkinMicroButton(button)
         if SeatShown(button) then seatsChanged = true end
-        if not parked then prev = button end
     end
-    if seatsChanged then ns.PlacePads() end   -- the pads over them follow (UI/SecurePad.lua)
-    if not out and prev then FitRegion(prev, art) end
+    -- The pads follow (UI/SecurePad.lua); a button off the row has no place, so its pad goes.
+    if seatsChanged then ns.PlacePads() end
+    -- Hidden seats after the last shown button keep their room: the row ends at the last seat.
+    if not out and last then FitRegion(last, art, (x - step - lastEnd) * scale) end
     if MicroMenu then
         if MicroMenu.BorderArt then MicroMenu.BorderArt:SetAlpha(0) end
         if MicroMenu.BackgroundArt then MicroMenu.BackgroundArt:SetAlpha(0) end

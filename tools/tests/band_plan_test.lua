@@ -79,9 +79,8 @@ for _, keyRing in ipairs({ true, false }) do
             tostring(micro), tostring(bags), tostring(bagsFirst), tostring(after), tostring(plan.pageEdge)))
     end
     if plan.tailStart and POSTLESS[plan.tailU0] then
-        local afterMicroPost = plan.microPost ~= nil and plan.tailStart == plan.microPost + B.POST_W
         local afterBags = plan.bagsEnd ~= nil and plan.tailStart == plan.bagsEnd
-        if not (afterMicroPost or afterBags) then
+        if not afterBags then
             failures = failures + 1
             print(string.format("FAIL section drops its left post with no post before it: micro=%s bags=%s bagsFirst=%s"
                 .. " noPages=%s hideLatency=%s hideKey=%s tailStart=%s tailU0=%s", tostring(micro), tostring(bags),
@@ -126,36 +125,43 @@ B.shape.noPages = false
 for _, region in ipairs({ 248, 257 }) do
     local plan = B.BandPlan(true, true, false, region)
     cases = cases + 1
-    if not (plan.wholeSheet and plan.microEnd == 768 and plan.tailStart == 768 and plan.tailU0 == 0 and plan.microPost == nil
+    if not (plan.wholeSheet and plan.microEnd == 768 and plan.tailStart == 768 and plan.tailU0 == 0
         and plan.bagsStart == 806) then
         failures = failures + 1
-        print(string.format("FAIL region %d: Era's whole third sheet (microEnd=%s tailStart=%s tailU0=%s microPost=%s bagsStart=%s)",
-            region, tostring(plan.microEnd), tostring(plan.tailStart), tostring(plan.tailU0), tostring(plan.microPost),
-            tostring(plan.bagsStart)))
+        print(string.format("FAIL region %d: Era's whole third sheet (microEnd=%s tailStart=%s tailU0=%s bagsStart=%s)",
+            region, tostring(plan.microEnd), tostring(plan.tailStart), tostring(plan.tailU0), tostring(plan.bagsStart)))
     end
 end
--- Past the sheet (more buttons): the row ends on its post and the section starts past it, as before.
+-- Past the sheet (more buttons, #213): the floor still ends on the sheet's rim, so the section starts right there with its
+-- own post, as on Era's; a post of ours before it drew two pillars.
 local long = B.BandPlan(true, true, false, 300)
 cases = cases + 1
-if long.wholeSheet or long.microPost == nil or long.tailStart ~= long.microPost + B.POST_W then
+if long.wholeSheet or long.tailStart ~= long.microEnd or long.tailU0 ~= 0 then
     failures = failures + 1
-    print("FAIL a row past the third sheet keeps its post before the section")
+    print(string.format("FAIL a row past the third sheet: section at %s (floor ends %s) from u %s", tostring(long.tailStart),
+        tostring(long.microEnd), tostring(long.tailU0)))
 end
 
 -- Any micro floor ends on Era's third sheet's last 48 columns (its fade to black and rim) and fills its width exactly;
--- the whole sheet is drawn unbroken.
-for _, case in ipairs({ { 211, 45 }, { 100, 45 }, { 300, 45 }, { 420, 37 }, { 30, 45 } }) do
+-- the whole sheet is drawn unbroken. Longer: copies of the floor's strip u 136 to 176 go in at 176, so every join is the
+-- sheet's own or 176 to 136 (columns alike; 208 to 128 joined dark to light, a slit, #213), and only those stretch.
+local STRIP0, STRIP1 = 136 / 256, 176 / 256
+for _, case in ipairs({ { 211, 45 }, { 100, 45 }, { 300, 45 }, { 420, 37 }, { 30, 45 }, { 233, 45 }, { 260, 45 } }) do
     local width, u0 = case[1], case[2]
     local runs = B.MicroRuns(512, width, u0)
     cases = cases + 1
     local x, ok = 512, true
-    for _, run in ipairs(runs) do
-        if run[1] ~= x or run[2] <= 0 or math.abs((run[4] - run[3]) * 256 - run[2]) > 1e-9 then ok = false end
+    for i, run in ipairs(runs) do
+        local strip = run[3] == STRIP0 and run[4] == STRIP1
+        if run[1] ~= x or run[2] <= 0 or (not strip and math.abs((run[4] - run[3]) * 256 - run[2]) > 1e-9) then ok = false end
+        local after = runs[i + 1]
+        local longer = width > 256 - u0
+        if longer and after and after[3] ~= run[4] and not (run[4] == STRIP1 and after[3] == STRIP0) then ok = false end
         x = x + run[2]
     end
     local last = runs[#runs]
     local endW = math.min(width, 48)
-    if not ok or x ~= 512 + width or last[4] ~= 1 or math.abs(last[3] * 256 - (256 - endW)) > 1e-9 then
+    if not ok or x ~= 512 + width or last[4] ~= 1 or last[3] * 256 > 256 - endW + 1e-9 then
         failures = failures + 1
         print(string.format("FAIL micro floor width %d from u %d: %d runs, ends at %d", width, u0, #runs, x))
     end

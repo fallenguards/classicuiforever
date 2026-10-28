@@ -232,9 +232,8 @@ local function BandPlan(microOn, bagsOn, bagsFirst, region, bar2W, bar2Left)
             plan.microEnd = x
             x = Tail(plan, x, false, bagsOn)
         else
-            -- The row ends on a post (the bag sheet's) and the section starts past it.
-            x = Tail(plan, x + POST_W, true, bagsOn)
-            if plan.tailStart then plan.microPost = before else x = before end
+            -- Past the sheet the floor still ends on its rim (B.MicroRuns): the section's own post closes it, as on Era's.
+            x = Tail(plan, x, false, bagsOn)
         end
         -- Last on the band, the section's own post ends it; a micro region standing last leaves room for the end post.
         plan.ownEnd = plan.tailStart ~= nil and not bagsOn
@@ -302,28 +301,40 @@ local function EndOwner(plan)
     return "bar"
 end
 
--- Stone tiles of the third sheet's flat floor, short of its fade: { x, width, u0, u1 } each, the last one partial.
-local FLOOR_U0, FLOOR_UNIT = 128, 80
+-- The floor's strip u 136 to 176, whole copies stretched to fill: column 136 matches 176 to the stone's own grain (1.8
+-- against 0.4 to 1.8 between neighbours), so copies join each other and the sheet unseen. 128 to 208 joined dark to light.
+local TILE_U0, SEAM_U = 136, 176
 function B.FloorTiles(x, extra)
     local tiles = {}
-    while extra > 0 do
-        local w = math.min(FLOOR_UNIT, extra)
-        tiles[#tiles + 1] = { x, w, FLOOR_U0 / 256, (FLOOR_U0 + w) / 256 }
-        x, extra = x + w, extra - w
+    if extra <= 0 then return tiles end
+    local count = math.max(1, math.floor(extra / (SEAM_U - TILE_U0) + 0.5))
+    local w = math.floor(extra / count)
+    for i = 1, count do
+        local width = i < count and w or extra - w * (count - 1)
+        tiles[#tiles + 1] = { x, width, TILE_U0 / 256, SEAM_U / 256 }
+        x = x + width
     end
     return tiles
 end
 
 -- Era's third sheet ends its floor in a fade to black and a 3 px rim (u 208 on, eram bar): a micro floor of any width
--- ends on that end, its floor from u0 before it and tiles where it runs longer. { x, width, u0, u1 } each.
+-- ends on that end, its floor from u0 before it; a longer one takes the strip's copies in at u 176. { x, width, u0, u1 }.
 local MICRO_END_U = 208
 function B.MicroRuns(x, width, u0)
     local runs = {}
     local endW = math.min(width, 256 - MICRO_END_U)
     local floorW = width - endW
     local direct = math.max(0, math.min(floorW, MICRO_END_U - u0))
+    local extra = floorW - direct
+    if extra > 0 and u0 < SEAM_U then
+        runs[1] = { x, SEAM_U - u0, u0 / 256, SEAM_U / 256 }
+        local at = x + SEAM_U - u0
+        for _, tile in ipairs(B.FloorTiles(at, extra)) do runs[#runs + 1] = tile end
+        runs[#runs + 1] = { at + extra, 256 - SEAM_U, SEAM_U / 256, 1 }
+        return runs
+    end
     if direct > 0 then runs[1] = { x, direct, u0 / 256, (u0 + direct) / 256 } end
-    for _, tile in ipairs(B.FloorTiles(x + direct, floorW - direct)) do runs[#runs + 1] = tile end
+    for _, tile in ipairs(B.FloorTiles(x + direct, extra)) do runs[#runs + 1] = tile end
     runs[#runs + 1] = { x + floorW, endW, (256 - endW) / 256, 1 }
     return runs
 end
@@ -371,7 +382,6 @@ function B.Segments()
         local head = math.min(region, PAGE_ROOM)
         list[#list + 1] = { half, head, 3, 0, head / 256, "bar" }
         Micro(half + head, region - head, head)
-        if plan.microPost then list[#list + 1] = { plan.microPost, POST_W, 4, POST_U / 256, (POST_U + POST_W) / 256, "micro" } end
     elseif not plan.microFirst and not plan.noPages then
         local room = plan.pageRoom or (plan.pageEdge and PAGE_POST) or PAGE_ROOM
         list[#list + 1] = { half, room, 3, 0, room / 256, "bar" }

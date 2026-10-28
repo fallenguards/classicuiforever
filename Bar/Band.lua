@@ -19,8 +19,8 @@ B.PAGE_POST, B.PAGE_BOX_Y, B.PAGE_BOX_H = 34, 14, 15
 B.CORNER_X = -6
 -- The shop lives in the Escape menu; its button never fit the 1.x row. Help is ours (BandMicro), last as in 1.x.
 B.MICRO_SKIP = { StoreMicroButton = true, HelpMicroButton = true }
--- Gap before the latency and key ring section's first post (the 1.x button art has its own margin).
-B.MICRO_END_GAP = 1
+-- Row end to floor end, as Era's whole sheet stands: the floor ends on its rim, the first part of the section's post.
+B.MICRO_END_GAP = 5
 -- Micro region head (holds the page arrows), its max width.
 B.MICRO_LEAD, B.MICRO_REGION_MAX = 45, 330
 -- Bag part per sheet: part from u (256 - part); trim before the bag post, postTrim past the page post; one socket period
