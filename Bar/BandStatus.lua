@@ -697,6 +697,11 @@ function B.StatusBack()
     for i = 1, #list do
         if list[i].isDragging then return end
     end
+    -- The game's frame art back at full alpha as the world loads (a reload in a fight): the carried path dresses nothing.
+    for i = 1, #list do
+        local art = list[i].BarFrameTexture
+        if art then ns.SetAlphaIf(art, 0) end
+    end
     ns.stripPasses = (ns.stripPasses or 0) + 1
     if OnlyCarried(list) then
         -- Back on the spot it stood, its bars as dressed: a full lay cost each stance change a millisecond.

@@ -99,6 +99,9 @@ local status = Read("Bar/BandStatus.lua")
 local back = Body(status, "function B.StatusBack()")
 Check(back and back:find("if OnlyCarried(list) then", 1, true),
     "an XP holder only carried off goes back to its spot, its bars not dressed again (a millisecond each re-stack)")
+Check(back and back:find("if art then ns.SetAlphaIf(art, 0) end", 1, true)
+    and back:find("SetAlphaIf(art, 0)", 1, true) < back:find("if OnlyCarried(list) then", 1, true),
+    "the game's XP frame art, back as the world loads, is faded before the carried path (a reload in a fight kept it)")
 local stats = Read("Character/CharacterStats.lua")
 local queue = Body(stats, "local function QueueStats(_, event, unit)")
 Check(queue and queue:find("if not PaperDollFrame:IsVisible() then", 1, true),
