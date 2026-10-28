@@ -404,6 +404,7 @@ return {
     themeIgnoreEliteTarget = true,
     themeIgnorePlateDragon = false,
     themePaneShade = 0,
+    themePartAddons = false,
     themePartBagBar = true,
     themePartBagIcons = false,
     themePartBags = true,

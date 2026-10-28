@@ -283,13 +283,21 @@ local DRESSED_WALKED = { bags = true, groupFinder = true, characterSheet = true,
     questMapPane = true }
 local isRoot = setmetatable({}, { __mode = "k" })
 
-local Walk
-local function Child(child, depth)
-    if not isRoot[child] and not ns.bronze.PlainTree(child) and not (BROAD and Skipped(child)) then Walk(child, depth) end
+-- addon: inside another addon's frame (walked only with Other addons themed), what it takes marked.
+local function MatchIn(region, addon)
+    Match(region)
+    if addon and want[region] then ns.MarkAddonPiece(region) end
 end
-Walk = function(frame, depth)
-    ns.EachRegion(frame, Match)
-    if depth < DEPTH then ns.EachChild(frame, Child, depth + 1) end
+local Walk
+local function Child(child, depth, addon)
+    if not isRoot[child] and not ns.bronze.PlainTree(child) and not (BROAD and Skipped(child)) then
+        Walk(child, depth, addon)
+    end
+end
+Walk = function(frame, depth, addon)
+    addon = addon or ns.bronze.AddonFrame(frame)
+    ns.EachRegion(frame, MatchIn, addon)
+    if depth < DEPTH then ns.EachChild(frame, Child, depth + 1, addon) end
 end
 
 local function Tint()

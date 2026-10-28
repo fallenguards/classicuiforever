@@ -8,6 +8,7 @@ return {
     themePartMicroMenu = "kept as before: dbVersion 29 (Art/ThemeParts.lua SplitThemeParts) leaves it out where Action bars was left out",
     themePartBagBar = "kept as before: dbVersion 29 (Art/ThemeParts.lua SplitThemeParts) leaves it out where Action bars was left out",
     themePartBagIcons = "same for everyone: opt-in, off by default (broad mode, Fallen's UI Color Picker; bag pictures as drawn)",
+    themePartAddons = "same for everyone: opt-in, off by default (other addons' frames keep their own look unless checked)",
     themePartXPBars = "kept as before: dbVersion 29 (Art/ThemeParts.lua SplitThemeParts) leaves it out where Action bars was left out",
     themePartMenus = "kept as before: dbVersion 29 (Art/ThemeParts.lua SplitThemeParts) leaves it out where Tooltips and menus was left out",
     themePartQuestTracker = "kept as before: dbVersion 29 (Art/ThemeParts.lua SplitThemeParts) leaves it out where Other windows was left out",

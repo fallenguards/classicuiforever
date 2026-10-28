@@ -99,7 +99,14 @@ function ns.ThemePartOf(region) return pinned[region] or PartOf(region) end
 local PART_KEYS = { themePartParchment = true, themePartUnits = true, themePartCastBars = true,
     themePartNameplates = true, themePartMinimap = true, themePartBars = true, themePartMicroMenu = true,
     themePartBagBar = true, themePartBagIcons = true, themePartXPBars = true, themePartBags = true,
-    themePartTooltips = true, themePartMenus = true, themePartChat = true, themePartQuestTracker = true, [OTHER] = true }
+    themePartTooltips = true, themePartMenus = true, themePartChat = true, themePartQuestTracker = true, [OTHER] = true,
+    themePartAddons = true }
+
+-- Other addons: their frames on the game's windows, walked only while it is checked (off by default), each piece the
+-- walks paint marked so leaving it out hands them back.
+local addonPieces = setmetatable({}, weak)
+function ns.ThemeAddonsOn() return ns.db ~= nil and ns.db.themePartAddons == true end
+function ns.MarkAddonPiece(region) addonPieces[region] = true end
 for key in pairs(PART_KEYS) do ns.bronze.THEME_KEYS[key] = true end
 function ns.IsThemePart(key) return PART_KEYS[key] == true end
 
@@ -126,6 +133,7 @@ function ns.ThemePartOn(where)
     local db = ns.db
     if not db or where == nil then return true end
     if type(where) == "string" then return db[where] ~= false end
+    if addonPieces[where] and db.themePartAddons ~= true then return false end
     return db[ns.ThemePartOf(where)] ~= false
 end
 

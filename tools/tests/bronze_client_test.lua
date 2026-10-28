@@ -36,7 +36,7 @@ local noop = function() end
 local job = { Wake = noop, Kick = noop, Sleep = noop, Burst = noop }
 local plainTree              -- the subtree the walks leave out (the talent tree's nodes)
 local ns = { db = {}, bronze = { tinted = {}, swapped = {}, THEME_KEYS = {},
-    PlainTree = function(frame) return frame == plainTree end } }
+    PlainTree = function(frame) return frame == plainTree end, AddonFrame = function() return false end } }
 ns.BronzeCopy = function(name) return themeOn and ("copy\\" .. name) or nil end
 ns.BronzeOn = function() return themeOn end
 ns.IsSecret = function() return false end

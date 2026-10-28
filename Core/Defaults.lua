@@ -57,7 +57,7 @@ ns.DB_DEFAULTS = {
     themePartParchment = true, themePartUnits = true, themePartMinimap = true, themePartBars = true, themePartBags = true,
     themePartTooltips = true, themePartChat = true, themePartWindows = true, themePartCastBars = true,
     themePartNameplates = true, themePartMicroMenu = true, themePartBagBar = true, themePartXPBars = true,
-    themePartMenus = true, themePartQuestTracker = true, themePartBagIcons = false,
+    themePartMenus = true, themePartQuestTracker = true, themePartBagIcons = false, themePartAddons = false,
     texturedCharacter = true,
     texturedSpellbook = true,
     texturedWindows = true,

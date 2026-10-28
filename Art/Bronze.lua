@@ -22,14 +22,20 @@ function ns.BronzeOn()
     return ThemeName() ~= nil
 end
 
+-- Another addon's frame: its global name set outside the game's own code, and not ours.
+function B.AddonFrame(frame)
+    local name = frame.GetName and frame:GetName()
+    if type(name) ~= "string" or ns.IsSecret(name) or issecurevariable(name) then return false end
+    return not (name:find("^ForeverClassicUI") or name:find("^ClassicUIForever"))
+end
+
 -- A subtree none of whose art the theme copies or tints, left out of the walks over the game's windows: another
--- addon's frame (its global name set outside the game's own code; their themes are their own), and the talent tree's
--- nodes and edges, hundreds of frames.
+-- addon's frame unless Other addons is themed (EasyFind's never: its theme is its own), and the talent tree's nodes
+-- and edges, hundreds of frames.
 function B.PlainTree(frame)
     -- A forbidden frame may not even be asked its name.
     if ns.IsForbidden(frame) then return true end
-    local name = frame.GetName and frame:GetName()
-    if type(name) == "string" and not ns.IsSecret(name) and not issecurevariable(name) then return true end
+    if B.AddonFrame(frame) and (not ns.ThemeAddonsOn() or frame:GetName():find("^EasyFind")) then return true end
     local spells = _G.PlayerSpellsFrame
     local talents = spells and spells.TalentsFrame
     return talents ~= nil and frame == talents.ButtonsParent

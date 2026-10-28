@@ -31,7 +31,8 @@ local tinted = {}
 local noop = function() end
 local apply
 local ns = {
-    bronze = { BUNDLED = "", PlainTree = function() return false end },
+    bronze = { BUNDLED = "", PlainTree = function() return false end, AddonFrame = function() return false end },
+    MarkAddonPiece = function() end,
     panels = { WINDOWS = { { "LootFrame" } }, skinned = {} },
     NP = { EachPlate = noop },
     Sched = { OnVisible = noop, NextFrame = noop },
@@ -104,7 +105,8 @@ local function Frame(fields)
 end
 local bns = {
     PACKAGE = { broad = true },
-    bronze = { BUNDLED = "", PlainTree = function() return false end, tinted = {}, swapped = {}, clientWas = {} },
+    bronze = { BUNDLED = "", PlainTree = function() return false end, tinted = {}, swapped = {}, clientWas = {},
+        AddonFrame = function(frame) return frame.addon == true end },
     NP = { EachPlate = noop },
     Sched = { OnVisible = noop, NextFrame = noop },
     IsSecret = function() return false end,
@@ -121,10 +123,11 @@ local bns = {
     SetFile = noop,
     SetAlphaIf = function(region, alpha) region.alpha = alpha end,
 }
-local pinned = {}
+local pinned, marked = {}, {}
 function bns.PinThemePart(region, part) pinned[region] = part end
-function bns.EachRegion(frame, fn) for _, region in ipairs(frame.regions) do fn(region) end end
-function bns.EachChild(frame, fn, a1) for _, child in ipairs(frame.children) do fn(child, a1) end end
+function bns.MarkAddonPiece(region) marked[region] = true end
+function bns.EachRegion(frame, fn, ...) for _, region in ipairs(frame.regions) do fn(region, ...) end end
+function bns.EachChild(frame, fn, ...) for _, child in ipairs(frame.children) do fn(child, ...) end end
 _G.LootFrame, _G.RaidFrame = nil, nil
 local bar = Frame({ kind = "StatusBar" })
 local stone, border = Tex({ file = 130652 }), Tex({ atlas = "achievement-frame-border" })
@@ -168,6 +171,9 @@ function pack:CreateTexture()
     return pieces[#pieces]
 end
 window.children[#window.children + 1] = pack
+-- Another addon's frame on the window, walked as with Other addons checked: what it takes is marked as its.
+local addonMetal = Tex({ file = 130652 })
+window.children[#window.children + 1] = Frame({ kind = "Frame", addon = true, regions = { addonMetal } })
 local oursWindow = Frame({ name = "ForeverClassicUIQuestLog", regions = { Tex({ file = 130652 }) } })
 -- A forbidden frame may not be asked its name from addon code: it errors (the game's secure frames).
 local forbidden = Frame({ forbidden = true })
@@ -185,6 +191,8 @@ Check(btinted[hover], "broad: a hover image on the highlight layer takes the the
 Check(btinted[portrait], "broad: the micro menu's character button wears the theme, portrait and all")
 for what, tex in pairs(keep) do Check(not btinted[tex], "broad: " .. what .. " is left as drawn") end
 Check(not btinted[inModel], "broad: a model's insides are never walked")
+Check(btinted[addonMetal] and marked[addonMetal], "broad: another addon's piece it takes is marked as its")
+Check(not marked[stone], "broad: the game's own art is never marked as another addon's")
 Check(not btinted[oursWindow.regions[1]], "broad: our own windows are left to the theme's own paint")
 Check(btinted[bagIcon] == true, "broad: a bag's picture takes the theme as frame art, with Bag icons")
 Check(btinted[foreverPack] == true, "broad: Forever's backpack picture goes with the bags'")

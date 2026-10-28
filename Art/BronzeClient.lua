@@ -223,13 +223,15 @@ local EachRegionProtected, EachChildProtected = ns.EachRegionProtected, ns.EachC
 
 -- Whether a region is a texture we may ask, worked out once.
 local askable = setmetatable({}, { __mode = "k" })
-local function ClientRegion(region)
+local function ClientRegion(region, addon)
     local ask = askable[region]
     if ask == nil then
         ask = not Forbidden(region) and region.IsObjectType ~= nil and region:IsObjectType("Texture")
         askable[region] = ask
     end
-    if ask then pcall(BronzeClient, region) end
+    if not ask then return end
+    pcall(BronzeClient, region)
+    if addon and clientWas[region] then ns.MarkAddonPiece(region) end
 end
 
 -- One client texture to the theme (off = back to the client's), for watchers of our own.
@@ -239,14 +241,16 @@ function ns.BronzeClientTexture(texture, off)
 end
 
 local WalkClient, Watch
-local function ClientChild(child, depth)
-    WalkClient(child, depth + 1)
+local function ClientChild(child, depth, addon)
+    WalkClient(child, depth + 1, addon)
 end
 
-WalkClient = function(frame, depth)
+-- addon: inside another addon's frame (walked only with Other addons themed).
+WalkClient = function(frame, depth, addon)
     if Forbidden(frame) or depth > 5 or not frame.GetRegions or B.PlainTree(frame) then return end
-    EachRegionProtected(frame, ClientRegion)
-    EachChildProtected(frame, ClientChild, depth)
+    addon = addon or B.AddonFrame(frame)
+    EachRegionProtected(frame, ClientRegion, addon)
+    EachChildProtected(frame, ClientChild, depth, addon)
 end
 
 -- Theme last seen by the client pass; turning it on wakes the aura rims.
