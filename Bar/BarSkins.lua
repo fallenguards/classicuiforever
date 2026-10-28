@@ -15,9 +15,9 @@ local MICRO_ART = {
     QuestLogMicroButton = "Quest", GuildMicroButton = "Socials", LFDMicroButton = "LFG",
     CollectionsMicroButton = "Mounts", EJMicroButton = "EJ", HelpMicroButton = "Help",
     StoreMicroButton = "BStore", MainMenuMicroButton = "MainMenu",
-    -- The legacy adventure tree gets the old achievement sheet; housing keeps Forever's art (1.x had none). Professions
-    -- and the world map button are ours: Forever's picture redrawn at the old size, and BandMicro's.
-    LegacyMicroButton = "Achievement", ProfessionMicroButton = "Professions",
+    -- The legacy adventure tree gets the old achievement sheet. Professions, Housing and the world map button are ours:
+    -- Forever's pictures redrawn at the old size, and BandMicro's.
+    LegacyMicroButton = "Achievement", ProfessionMicroButton = "Professions", HousingMicroButton = "Housing",
     ForeverClassicUIWorldMapMicroButton = "World", ForeverClassicUIHelpMicroButton = "Help",
     ForeverClassicUISpellbookMicroButton = "Spellbook",
 }

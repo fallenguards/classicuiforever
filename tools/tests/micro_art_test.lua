@@ -39,6 +39,15 @@ for name in Read("Bar/BandMicro.lua"):gmatch('CreateFrame%("Button", "(ForeverCl
 end
 Check(count >= 3, "BandMicro.lua's own micro buttons are found (" .. count .. ")")
 
+-- Every sheet MICRO_ART names has its textures: a 1.x sheet, or one of ours made from Forever's picture (Professions,
+-- Housing). A button with none keeps the game's art and no 1.x frame round it.
+local textures = Read("Art/TextureData.lua")
+for button, sheet in (art or ""):gmatch('(%w+) = "(%w+)"') do
+    Check(sheets[sheet] or textures:find('"micro' .. sheet, 1, true) or textures:find("TEX.micro" .. sheet, 1, true),
+        button .. "'s sheet " .. sheet .. " has its textures")
+end
+Check(art and art:find('HousingMicroButton = "Housing"', 1, true), "the housing button takes its 1.x frame")
+
 if failed > 0 then
     print(failed .. " check(s) failed")
     os.exit(1)

@@ -99,6 +99,9 @@ UI-MicroButton-ej-up.blp
 UI-MicroButton-help-disabled.blp
 UI-MicroButton-help-down.blp
 UI-MicroButton-help-up.blp
+UI-MicroButton-Housing-Disabled.tga
+UI-MicroButton-Housing-Down.tga
+UI-MicroButton-Housing-Up.tga
 UI-MicroButton-lfg-disabled.blp
 UI-MicroButton-lfg-down.blp
 UI-MicroButton-lfg-up.blp

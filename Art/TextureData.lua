@@ -277,9 +277,10 @@ for _, key in ipairs({ "microSocialsUp", "microSocialsDown", "microSocialsDisabl
     B.PREFER[key] = true
 end
 
--- 1.x had no Professions button: Forever's picture shrunk into the old frame (dev/tools/professions_micro.py). Ours only.
+-- 1.x had no Professions or Housing button: Forever's pictures shrunk into the old frame (dev/tools/professions_micro.py).
 for _, state in ipairs({ "Up", "Down", "Disabled" }) do
     ns.TEX["microProfessions" .. state] = "!UI-MicroButton-Professions-" .. state .. ".tga"
+    ns.TEX["microHousing" .. state] = "!UI-MicroButton-Housing-" .. state .. ".tga"
 end
 
 -- The character button is the portrait frame sheet; no disabled version exists.
