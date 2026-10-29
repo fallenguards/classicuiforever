@@ -17,6 +17,11 @@ ns.TEX = {
     statusBar = "TargetingFrame\\UI-StatusBar",
     -- Vertical shading only: the XP fill tiles, so a horizontal gradient shows as blocks. Ours only.
     statusBarFlat = "!UI-StatusBar-Flat.tga",
+    -- Unit frame bars' other fills (Bar texture): the 1.x one smooth at 256 x 64, the raid frames' without its end
+    -- columns (dev/tools/unit_bar_fills.py makes both), a plain one.
+    barClassicHD = "!UI-UnitBar-ClassicHD.tga",
+    barRaid = "!UI-UnitBar-Raid.tga",
+    barSolid = "=Buttons\\WHITE8X8",
     repBar = "PaperDollInfoFrame\\UI-ReputationWatchBar",
     maxLevel = "MainMenuBar\\UI-MainMenuBar-MaxLevel",
     threatBorder = "TargetingFrame\\NumericThreatBorder",

@@ -497,6 +497,8 @@ L["OPTWIN_HEADER_HEIGHT"] = "Header height"
 L["OPTWIN_EXTRA_HEIGHT_OVER_THE_METER"] = "Extra height over the meter's header, in pixels."
 L["OPTWIN_ENEMY_HEALTH"] = "Enemy health"
 L["OPTWIN_THE_COLOUR_OF_AN_ENEMY"] = "The color of an enemy's thick health bar. With Class colored health on, enemy players show their class color unless Enemy players too is off."
+L["OPTWIN_BAR_TEXTURE"] = "Bar texture"
+L["OPTWIN_BAR_TEXTURE_TIP"] = "The fill of the unit frames' health and mana bars."
 L["OPTWIN_NAME_SIZE"] = "Name size"
 L["OPTWIN_TEXT_SIZE_OF_THE_PLAYER"] = "Text size of the player, target and focus names."
 L["OPTWIN_BAR_GAP"] = "Bar gap"
@@ -564,17 +566,6 @@ L["CORE_GAMEPAD_OFF_RELOAD"] = "Gamepad off: reload (/reload) to bring back the 
 L["SPELL_PAD_NO_FREE_SLOT"] = "No free gamepad bar slot on this page."
 L["SPELL_PAD_CANNOT_ADD"] = "That spell cannot go on the gamepad bar."
 L["SPELL_PAD_ADDED"] = "Added to the gamepad bar. Y moves it."
-
--- UI/Colors.lua
-L["UI_HEALTH_GREEN"] = "Health green"
-L["UI_FAILED_RED"] = "Failed red"
-L["UI_CAST_GOLD"] = "Cast gold"
-L["UI_DARK_GOLD"] = "Dark gold"
-L["UI_FOCUS_ORANGE"] = "Focus orange"
-L["UI_ENERGY_YELLOW"] = "Energy yellow"
-L["UI_MANA_BLUE"] = "Mana blue"
-L["UI_BY_REACTION"] = "By reaction"
-L["UI_BY_REACTION_TIP"] = "Yellow while the enemy is neutral, red once it is hostile or fighting you."
 
 -- Units/ResourceDisplay.lua
 L["UNIT_RESET_TO_DEFAULT_SETTINGS"] = "Reset To Default Settings"

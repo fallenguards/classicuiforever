@@ -98,13 +98,46 @@ function ns.PowerColor(unit)
     return 0, 0, 1
 end
 
--- Our StatusBar with the 1.x fill; takes no mouse.
+-- Unit frame bars' fill (Bar texture in the options): the 1.x one drawn smooth, or another bar the game draws. The
+-- client's 1.x fill showed its compression on a thick bar (vertical lines, stepped shading); any other pick is ours.
+ns.UNIT_BAR_TEXTURES = {
+    { key = "classic", label = L["UI_BAR_CLASSIC"], tex = "barClassicHD" },
+    { key = "raid", label = L["UI_BAR_RAID"], tex = "barRaid" },
+    { key = "solid", label = L["UI_BAR_SOLID"], tex = "barSolid" },
+    { key = "skills", label = L["UI_BAR_SKILLS"], tex = "skillsBar" },
+}
+local BAR_TEX = {}
+for _, pick in ipairs(ns.UNIT_BAR_TEXTURES) do BAR_TEX[pick.key] = pick.tex end
+local function UnitFill() return BAR_TEX[ns.db and ns.db.unitBarTexture] or "barClassicHD" end
+
+-- Every unit frame bar of ours and the game's heal fills laid on them, refilled as the pick changes.
+local unitBars, unitFills = setmetatable({}, { __mode = "k" }), setmetatable({}, { __mode = "k" })
+function ns.FillUnitBar(bar)
+    unitBars[bar] = true
+    ns.SetBarFill(bar, UnitFill())
+    bar:GetStatusBarTexture():SetTexCoord(0, 1, 0, 1)
+end
+function ns.FillUnitTexture(tex)
+    unitFills[tex] = true
+    tex:SetTexture((ns.TexPath(UnitFill())))
+end
+local function RefillUnitBars()
+    for bar in pairs(unitBars) do ns.FillUnitBar(bar) end
+    for tex in pairs(unitFills) do ns.FillUnitTexture(tex) end
+end
+-- Our textures on our bars: at once, in a fight too; a profile's pick through its toggle pass.
+function ns.SetUnitBarTexture(key, value)
+    ns.db[key] = value
+    RefillUnitBars()
+end
+ns.OnToggle(function(key) if key == "unitBarTexture" then RefillUnitBars() end end)
+
+-- Our StatusBar with the picked fill; takes no mouse.
 local BAR = { kind = "StatusBar", show = false }
 function ns.CreateBar(parent, key, width, height)
     local bar = ns.OwnFrame(parent, key, nil, BAR)
     bar:SetSize(width, height)
-    ns.SetBarFill(bar)
-    bar:GetStatusBarTexture():SetTexCoord(0, 1, 0, 1)
+    ns.FillUnitBar(bar)
     -- A restore hides the bar; the next apply reuses it.
     bar:Show()
     return bar

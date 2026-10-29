@@ -195,7 +195,7 @@ function UF.AttachOverlays(source, bar, mask)
             piece:ClearAllPoints()
             piece:SetAllPoints(bar)
             if mask and piece.Fill and piece.Fill.RemoveMaskTexture then pcall(piece.Fill.RemoveMaskTexture, piece.Fill, mask) end
-            if piece.Fill then piece.Fill:SetTexture((ns.TexPath("statusBar"))) end
+            if piece.Fill then ns.FillUnitTexture(piece.Fill) end
             if piece.FillMask then
                 ns.Sched.Attach(piece, { name = "uf.healFollow", every = 0, fn = function() FollowOurFill(piece, source, bar) end })
             end

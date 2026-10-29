@@ -7,8 +7,8 @@
 local ROOT = (arg and arg[0] or ""):gsub("[\\/]tools[\\/]tests[\\/][^\\/]*$", "")
 if ROOT == (arg and arg[0]) or ROOT == "" then ROOT = "." end
 
-local FILES = { "Core/Localization.lua", "Locales/enUS.lua", "Locales/enUS_WhatsNew.lua", "Locales/enUS_Help.lua", "Locales/enUS_Windows.lua", "Locales/deDE.lua",
-    "Locales/deDE_WhatsNew.lua" }
+local FILES = { "Core/Localization.lua", "Locales/enUS.lua", "Locales/enUS_WhatsNew.lua", "Locales/enUS_Help.lua", "Locales/enUS_Windows.lua", "Locales/enUS_Colors.lua",
+    "Locales/deDE.lua", "Locales/deDE_WhatsNew.lua", "Locales/deDE_Colors.lua" }
 -- One key per part, with its English text.
 local SAMPLES = {
     englishSettings = { "OPT_threatNumber", "UI_BY_REACTION" },

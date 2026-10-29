@@ -126,6 +126,7 @@ ns.DB_DEFAULTS = {
     eraBagSize = true,
     thickHealth = false, thickHealthName = true, thickHealthMana = false,
     thickHealthPlayer = true, thickHealthTarget = true, thickHealthFocus = true, thickEnemyColor = "green",
+    unitBarTexture = "classic",
     classColorNames = false,
     classColorNamesPlayer = true, classColorNamesTarget = true, classColorNamesFocus = true,
     nameBoxPlayer = false, nameBoxTarget = true, nameBoxFocus = true,

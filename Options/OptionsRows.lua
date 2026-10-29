@@ -550,6 +550,8 @@ local function Extras(entry, child, colW, add)
     elseif key == "unitFrames" and ns.SetUnitNameSize then
         Step("unitFrames", "unitNameSize", L["OPTWIN_NAME_SIZE"], L["OPTWIN_TEXT_SIZE_OF_THE_PLAYER"],
             ns.UNIT_NAME_MIN or 8, ns.UNIT_NAME_MAX or 16, ns.SetUnitNameSize, "font unit frame name text")
+        Drop("unitFrames", "unitBarTexture", L["OPTWIN_BAR_TEXTURE"], L["OPTWIN_BAR_TEXTURE_TIP"], ns.UNIT_BAR_TEXTURES,
+            ns.SetUnitBarTexture, "health mana bar texture fill style solid flat raid statusbar")
     elseif key == "resourceDisplay" and ns.SetPrdGap then
         Step("resourceDisplay", "prdGap", L["OPTWIN_BAR_GAP"], L["OPTWIN_SPACE_BETWEEN_THE_HEALTH_AND"],
             ns.PRD_GAP_MIN or 0, ns.PRD_GAP_MAX or 20, ns.SetPrdGap, "personal resource padding spacing")
