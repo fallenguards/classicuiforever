@@ -30,7 +30,7 @@ function ns.ResetToggles(keys)
     end
     -- Addon buttons' picks of their own go with Addon buttons'.
     if not keys or keys.showMinimapAddonButtons then ns.db.minimapButtonPicks = nil end
-    if keys and not keys.classicBarSize then return end
+    if (keys and not keys.classicBarSize) or not ns.PackageRuns("classicBarSize") then return end
     ns.db.classicBarSize = true
     if not small then ns.Print(L["OPTWIN_RESET_BAR_SIZE_NOTE"]:format(L["OPT_classicBarSize"], L["GROUP_ACTION_BARS"])) end
 end

@@ -29,6 +29,9 @@ local ns = {
     TOGGLES = { { "classicBar" }, { "classicBarSize" }, { "hideCombatGlow" } },
     DB_DEFAULTS = { classicBar = true, classicBarSize = false, hideCombatGlow = false },
 }
+-- The full addon runs every setting; a standalone piece only its own (Core/Package.lua).
+local pieceKeeps
+function ns.PackageRuns(key) return pieceKeeps == nil or pieceKeeps[key] == true end
 assert(loadfile(ROOT .. "/Options/EraScale.lua"))("ClassicUIForever", ns)
 
 ------------------------------------------------------------------ checks
@@ -75,6 +78,14 @@ ns.db = { classicBar = false, classicBarSize = false, hideCombatGlow = true }
 ns.ResetToggles({ hideCombatGlow = true })
 Check(ns.db.hideCombatGlow == false and ns.db.classicBar == false and ns.db.classicBarSize == false,
     "a page's reset leaves the other pages' boxes")
+
+-- A piece without the bars (Nameplates): its reset leaves the bar size alone and says nothing about it.
+pieceKeeps = { hideCombatGlow = true }
+ns.db = { classicBarSize = false, hideCombatGlow = true }
+printed = nil
+ns.ResetToggles()
+Check(ns.db.classicBarSize == false and printed == nil, "a piece without the bars: no bar size, no chat line about it")
+pieceKeeps = nil
 
 -- Settings gone (a reinstall): the classic layout at Era's size gets the 36 px bar it was laid for, once.
 local function FreshLogin(scale, layout)
