@@ -35,7 +35,7 @@ DUP_WINDOW = 6
 DUP_MIN_REAL = 4
 DUPFN_MIN = 3
 
-RULES = ["CVAR", "CVARREAD", "CVARLOGIN", "CVARREG", "REGISTRY", "HOOK", "ONUPDATE", "SINCE", "TIMER", "THROTTLEFRAME", "SEARCHBOX", "ADDONCHAR", "KEYONLY",
+RULES = ["CVAR", "CVARREAD", "CVARLOGIN", "CVARREG", "REGISTRY", "HOOK", "ONUPDATE", "SINCE", "TIMER", "THROTTLEFRAME", "SEARCHBOX", "ADDONCHAR", "ADDONSELF", "KEYONLY",
          "LOADADDON", "EDITMODE", "EDITQUERY", "SETTLE",
          "PANELMGR", "SECRET", "WALK", "REGEVENTS", "EVENTFRAME", "POINTONCE", "SETIF", "THEME", "ONCEFLAG",
          "FRAMEFIELD", "GAMEMENU", "SHAREDART", "PLATES", "FORBIDDEN", "SYSBASE", "LAYOUTFIELD", "CLIENTKEY",
@@ -43,7 +43,7 @@ RULES = ["CVAR", "CVARREAD", "CVARLOGIN", "CVARREG", "REGISTRY", "HOOK", "ONUPDA
 # A hit of these on a line the change adds fails even within the baseline, so swapping one call for another fails.
 # SINCE, DEADNS, FRAMEFIELD, CVARLOGIN and THROTTLEFRAME stay count-only, so a kept line can still be rewritten.
 LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", "EDITMODE", "PANELMGR", "SEARCHBOX", "ADDONCHAR",
-              "KEYONLY",
+              "ADDONSELF", "KEYONLY",
               "CVARREAD", "THEME", "POINTONCE", "SECRET", "SETIF", "REGEVENTS", "ONCEFLAG", "TIMER", "EDITQUERY",
               "PLATES", "FORBIDDEN", "EVENTFRAME",
               "WALK", "GAMEMENU", "SHAREDART", "SYSBASE", "LAYOUTFIELD", "CLIENTKEY", "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS",
@@ -253,6 +253,8 @@ FIX = {
     "PADART": "give a secure pad no art or text of its own: light the control under it (LockHighlight in OnEnter, "
               "UnlockHighlight in OnLeave), so a pad that outlives its window (a fight blocks its hide) draws nothing",
     "ADDONCHAR": "name the character by UnitGUID(\"player\"), as the game's AddOns list does",
+    "ADDONSELF": "name the copy that runs: the addon's own name, the first value of ... (a standalone piece runs under "
+                 "its own folder)",
     "KEYONLY": "fall back to the global name on the same line (ClassTrainerFrame.TrainButton or _G.ClassTrainerTrainButton)",
     "SEARCHBOX": "use ns.SearchBox(parent, width, hint) (UI/Controls.lua): the hint while empty, the X once typed; "
                  "show box.hint and box.clear by the text in OnTextChanged",
@@ -419,6 +421,8 @@ KEEP_PATTERNS = {
     # An addon's on/off state for a character by its name: the game keys it by GUID.
     "ADDONCHAR": re.compile(r"(?:EnableAddOn|DisableAddOn|GetAddOnEnableState)\b[^\n]*\bUnit(?:Full)?Name\s*\("
                             r"|[\"']ClassicUIForever[\"']\s*,\s*Unit(?:Full)?Name\s*\("),
+    # The full addon's folder handed to a call: a standalone piece runs under its own (a frame name's find is fine).
+    "ADDONSELF": re.compile(r"(?<!find\()[\"']ClassicUIForever[\"']\s*[,)]"),
     # Player-facing text as a literal: a set text or tooltip line, a text/title/label/tooltip field, or one of our
     # option and dialog row builders given a label (a capital letter then lower case: words, not keys or paths).
     # A literal after `or` is the English fallback for the game's own translated global (CLOSE or "Close").
@@ -556,6 +560,8 @@ MESSAGES = {
     "KEYONLY": "a trainer piece by a key retail lacks (retail's Train did nothing, #144)",
     "ADDONCHAR": "an addon turned on, off or read for a character by name (Forever's UnitName is the first name "
                  "alone: /fcui off turned off nothing)",
+    "ADDONSELF": "the full addon's folder named in a call (a standalone piece asked whether the full addon was off and "
+                 "handed back every game setting at every logout)",
     "SECRETMOUSE": "a unit frame bar's IsMouseOver() tested directly (it can answer a secret in a fight or an instance)",
     "BARCLICK": "EnableMouse on a client unit bar (clicks on too: the bar took the frame's right click, no menu, #183)",
     "AURAREAD": "a unit's auras read from our code (refused with an error whenever they are secret, 12x from the focus preview)",

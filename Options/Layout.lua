@@ -1,4 +1,4 @@
-local _, ns = ...
+local ADDON, ns = ...
 local L = ns.L
 
 -- The addon's edit mode layout: create, reset, select, hand back.
@@ -270,7 +270,7 @@ function ns.BeingTurnedOff()
     local state = C_AddOns and C_AddOns.GetAddOnEnableState
     local me = AddonCharacter()
     if not (state and me) then return false end
-    local ok, value = pcall(state, "ClassicUIForever", me)
+    local ok, value = pcall(state, ADDON, me)
     return ok and value == 0
 end
 
@@ -297,7 +297,7 @@ function ns.TurnOffCleanly()
     local disable = C_AddOns and C_AddOns.DisableAddOn
     local me = AddonCharacter()
     if not (disable and me) then return end
-    pcall(disable, "ClassicUIForever", me)
+    pcall(disable, ADDON, me)
     -- In the press: at logout the client no longer takes a layout change. Old pins first: HandBack switches layouts.
     ns.sessionEnding = true
     ns.SafeCall(ns.HandBackPlayerPins)
