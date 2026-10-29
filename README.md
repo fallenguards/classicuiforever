@@ -63,7 +63,7 @@ The addon also loads on retail, for the pieces retail has.
 
 ## Feedback
 
-This addon is a work in progress. If something looks wrong, say so; every report helps.
+Bug reports and ideas are always welcome.
 
 - Issues: https://github.com/fallenguards/classicuiforever/issues/new/choose
 - CurseForge: https://www.curseforge.com/wow/addons/classicui-forever
