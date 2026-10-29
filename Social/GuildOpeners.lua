@@ -350,6 +350,19 @@ local function BuildSecureOpener()
     UpdateGuildBinding()
 end
 
+-- The client's text is about guilds and communities; this button opens Social. From its own enter and from the pad
+-- over it, which runs the button's script but not its hooks (through ns.MicroTip); true when it took the tooltip.
+function ns.SocialTip(self)
+    if not G.active or self ~= GuildMicroButton or not GameTooltip:IsOwned(self) then return false end
+    local title = SOCIAL_BUTTON or "Social"
+    if type(MicroButtonTooltipText) == "function" then title = MicroButtonTooltipText(title, "TOGGLESOCIAL") end
+    GameTooltip:SetText(title, 1, 1, 1)
+    local desc = ns.EraText("NEWBIE_TOOLTIP_SOCIAL")
+    if desc and ns.db.microTips then GameTooltip:AddLine(desc, 1, 0.82, 0, true) end
+    GameTooltip:Show()
+    return true
+end
+
 local function HookGuildOpeners()
     local button = GuildMicroButton
     if not button or not ns.Once(button, "guildHooked") then return end
@@ -364,16 +377,7 @@ local function HookGuildOpeners()
     end)
     -- Pressed look while the social window is up.
     ns.MicroButtonFollows(button, SocialShown)
-    -- The client's text is about guilds and communities; this button is Social.
-    button:HookScript("OnEnter", function(self)
-        if not G.active or not GameTooltip:IsOwned(self) then return end
-        local title = SOCIAL_BUTTON or "Social"
-        if type(MicroButtonTooltipText) == "function" then title = MicroButtonTooltipText(title, "TOGGLESOCIAL") end
-        GameTooltip:SetText(title, 1, 1, 1)
-        local desc = ns.EraText("NEWBIE_TOOLTIP_SOCIAL")
-        if desc and ns.db.microTips then GameTooltip:AddLine(desc, 1, 0.82, 0, true) end
-        GameTooltip:Show()
-    end)
+    button:HookScript("OnEnter", ns.SocialTip)
 end
 
 ---------------------------------------------------------------- module

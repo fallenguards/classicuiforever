@@ -304,7 +304,10 @@ local MICRO_TIPS = {
 
 -- Also from the pads over the buttons that open our windows (their enter runs the button's own, not its hooks).
 local function MicroTip(button)
-    if not (ns.db and ns.db.microTips) or GameTooltip:GetOwner() ~= button then return end
+    if GameTooltip:GetOwner() ~= button then return end
+    -- The guild button while it opens Social: its own title and line (Social/GuildOpeners.lua).
+    if ns.SocialTip and ns.SocialTip(button) then return end
+    if not (ns.db and ns.db.microTips) then return end
     local name = MICRO_TIPS[button:GetName() or ""]
     if name == "NEWBIE_TOOLTIP_GUILDTAB" and not (IsInGuild and IsInGuild()) then name = "NEWBIE_TOOLTIP_LOOKINGFORGUILDTAB" end
     local text = name and ns.EraText(name)
