@@ -138,8 +138,50 @@ function ns.DialogBacking(host, info, how)
     return backing
 end
 
--- The plate's room between its end caps, of the art's width (232 of 512): the title and a gap each side fit there.
-local PLATE_INNER, TITLE_GAP = 232 / 512, 10
+-- The plate's art across its 512: clear to 118, the left cap to 152, a middle that stretches to 360, the right cap to
+-- 394. Drawn as three pieces on an unseen sizing box, so a wider plate keeps its caps at their own size (a standalone
+-- package's longer name); the clear margins still scale with the box, as the one stretched texture did.
+local ART_W, CAP_L, MID_L, MID_R, CAP_R, HOLE_L = 512, 118, 152, 360, 394, 140
+local CAP_K, PLATE_H, TITLE_GAP = 256 / 512, 64, 10
+local slices = setmetatable({}, { __mode = "k" })   -- sizing box -> its left, middle and right pieces
+
+local function LaySlices(plate)
+    local pieces = slices[plate]
+    local w = plate:GetWidth()
+    if not pieces or ns.IsSecret(w) or not w or w <= 0 then return end
+    local left, right = pieces[1], pieces[3]
+    local inset = w * CAP_L / ART_W
+    left:SetSize((MID_L - CAP_L) * CAP_K, PLATE_H)
+    right:SetSize((CAP_R - MID_R) * CAP_K, PLATE_H)
+    ns.SetPointOnce(left, "TOPLEFT", plate, "TOPLEFT", inset, 0)
+    ns.SetPointOnce(right, "TOPRIGHT", plate, "TOPRIGHT", -inset, 0)
+end
+
+local function ShowSlices(plate)
+    local pieces = slices[plate]
+    if not pieces then return end
+    local shown = plate:IsShown()
+    for i = 1, 3 do pieces[i]:SetShown(shown) end
+end
+
+-- The three pieces beside the box on its owner, in its layer; they follow its width and shown state.
+local function Slice(plate, owner, layer, sublevel)
+    local pieces = {}
+    for i, coords in ipairs({ { CAP_L, MID_L }, { MID_L, MID_R }, { MID_R, CAP_R } }) do
+        local piece = owner:CreateTexture(nil, layer, nil, sublevel)
+        ns.SetFile(piece, ART.DIALOG_HEADER)
+        piece:SetTexCoord(coords[1] / ART_W, coords[2] / ART_W, 0, 1)
+        pieces[i] = piece
+    end
+    pieces[2]:SetPoint("TOPLEFT", pieces[1], "TOPRIGHT")
+    pieces[2]:SetPoint("BOTTOMRIGHT", pieces[3], "BOTTOMLEFT")
+    slices[plate] = pieces
+    ns.HookMethod(plate, "SetWidth", LaySlices)
+    ns.HookMethod(plate, "SetSize", LaySlices)
+    ns.HookMethod(plate, "Show", ShowSlices)
+    ns.HookMethod(plate, "Hide", ShowSlices)
+    ns.HookMethod(plate, "SetShown", ShowSlices)
+end
 
 -- how: width, own (OwnTexture key on owner), layer, sublevel,
 -- restyle (font is the title, none made), fontObject, keepTitle (keep its anchor).
@@ -153,8 +195,8 @@ function ns.DialogHeader(host, text, how, owner, font)
     else
         plate = owner:CreateTexture(nil, layer, nil, sublevel)
     end
-    ns.SetFile(plate, ART.DIALOG_HEADER)
-    plate:SetSize(how.width or 256, 64)
+    if not slices[plate] then Slice(plate, owner, layer, sublevel) end
+    plate:SetSize(how.width or 256, PLATE_H)
     SetPointOnce(plate, "TOP", host, "TOP", 0, 12)
     plate:Show()
     local title
@@ -168,9 +210,11 @@ function ns.DialogHeader(host, text, how, owner, font)
         title:SetPoint("TOP", plate, "TOP", 0, -14)
     end
     if text ~= nil then title:SetText(text) end
-    -- As wide as its title needs (a standalone package's longer name), never narrower than asked.
+    -- As wide as its title needs between the caps' inner borders (a standalone package's longer name), never narrower
+    -- than asked.
     if text ~= nil and not how.restyle then
-        local need = (title:GetStringWidth() + 2 * TITLE_GAP) / PLATE_INNER
+        local seen = title:GetStringWidth() + 2 * TITLE_GAP + 2 * (HOLE_L - CAP_L) * CAP_K
+        local need = seen * ART_W / (CAP_R - CAP_L)
         if need > plate:GetWidth() then plate:SetWidth(need) end
     end
     return plate, title

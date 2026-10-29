@@ -192,6 +192,15 @@ GetLocale = GetLocale or function() return "enUS" end
 local ns = { db = { bronzeTheme = false }, PassReads = function(fn) return fn end }
 function ns.RegisterModule() end
 function ns.OnToggle() end
+-- Core/Hooks.lua's post-hook on one object's method.
+function ns.HookMethod(object, method, fn)
+    local own = object[method]
+    object[method] = function(self, ...)
+        own(self, ...)
+        fn(self, ...)
+    end
+    return true
+end
 
 local function Load(path)
     local chunk, err = loadfile(ROOT .. "/" .. path)
@@ -792,11 +801,25 @@ Test("DialogBacking and DialogHeader", function()
     Check(backing.backdropInfo == ns.BACKDROP.DIALOG, "default info")
     local pane = CreateFrame("Frame")
     local plate, title = ns.DialogHeader(pane, "Equipment Manager", { width = 300 })
-    Check(plate._tex == ns.ART.DIALOG_HEADER and plate._w == 300 and plate._h == 64, "plate")
+    Check(plate._tex == nil and plate._w == 300 and plate._h == 64, "plate: an unseen box")
     Check(plate._points[1][1] == "TOP" and plate._points[1][2] == pane and plate._points[1][5] == 12, "plate on top")
     Check(title._parent == pane and title._font == "GameFontNormal" and title._points[1][5] == -14 and title._text == "Equipment Manager", "title")
-    local long = ns.DialogHeader(CreateFrame("Frame"), string.rep("W", 40))
-    Check(long._w * 232 / 512 >= 40 * 6 + 20 - 0.01, "a long title widens its plate past the end caps")
+    local pieces = {}
+    for _, region in ipairs(pane._regions) do
+        if region._tex == ns.ART.DIALOG_HEADER then pieces[#pieces + 1] = region end
+    end
+    Check(#pieces == 3, "drawn in three pieces")
+    local left, right = pieces[1], pieces[3]
+    Check(Same(left._coords, { 118 / 512, 152 / 512, 0, 1 }) and Same(right._coords, { 360 / 512, 394 / 512, 0, 1 }), "caps cut from the art")
+    Check(left._w == 17 and right._w == 17 and left._points[1][4] == 300 * 118 / 512, "caps at their own size, in the clear margin")
+    local longPane = CreateFrame("Frame")
+    local long = ns.DialogHeader(longPane, string.rep("W", 40))
+    Check(long._w * 276 / 512 - 22 >= 40 * 6 + 20 - 0.01, "a long title widens its plate between the caps")
+    local capL
+    for _, region in ipairs(longPane._regions) do
+        if region._tex == ns.ART.DIALOG_HEADER and not capL then capL = region end
+    end
+    Check(capL._w == 17, "a wider plate keeps its caps' size")
     local header = CreateFrame("Frame")
     header.Text = header:CreateFontString()
     header.Text:SetPoint("CENTER", header, "CENTER", 0, 0)
@@ -809,7 +832,7 @@ Test("DialogBacking and DialogHeader", function()
     local panel = CreateFrame("Frame")
     local before = #panel._regions
     local p3, t3 = ns.DialogHeader(panel, nil, { own = "plate", restyle = true }, nil, nil)
-    Check(p3 and t3 == nil and #panel._regions == before + 1, "restyle with no font makes none")
+    Check(p3 and t3 == nil and #panel._regions == before + 4, "restyle with no font makes none (box and three pieces)")
 end)
 
 Test("MakeDraggable, DialogClose, SayNotInCombat", function()
