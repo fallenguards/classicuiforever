@@ -89,6 +89,8 @@ end
 local BROAD = ns.PACKAGE ~= nil and ns.PACKAGE.broad == true
 -- A pane: painted in the pane colour, the theme's lifted toward white (Art/Bronze.lua PaneTint).
 local PANE = { pane = true }
+-- A tooltip's center: shaded from the game's own tooltip dark, not the theme's color (Art/Bronze.lua Paint).
+local TIP_PANE = { pane = true, tip = true }
 -- Pictures and light by their own names (the Adventure Guide's raid buttons: bgImage).
 local KEEP_NAMES = { "icon", "portrait", "cooldown", "flash", "glow", "highlight", "model", "image", "splash", "preview",
     "thumbnail", "illustration", "picture" }
@@ -240,6 +242,10 @@ local function BroadMatch(region, atlas)
         end
     end
     if kind == "keep" or Kept(region) then return end
+    if kind == "pane" and atlas and atlas:lower():find("^tooltip%-nineslice%-center") then
+        want[region] = TIP_PANE
+        return
+    end
     want[region] = kind == "pane" and PANE or true
 end
 

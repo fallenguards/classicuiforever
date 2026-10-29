@@ -72,9 +72,21 @@ local function PaneTint(t)
     return paneTint
 end
 
+-- A tooltip's center under the theme: the game's own tooltip dark at the shade's middle, darker or lighter from there.
+local TIP_DARK = { 0.09, 0.09, 0.19 }
+if _G.TOOLTIP_DEFAULT_BACKGROUND_COLOR and _G.TOOLTIP_DEFAULT_BACKGROUND_COLOR.GetRGB then
+    TIP_DARK[1], TIP_DARK[2], TIP_DARK[3] = _G.TOOLTIP_DEFAULT_BACKGROUND_COLOR:GetRGB()
+end
+
 -- Drained and tinted to the theme (share: of its colour, or by theme name; shade: times this), or as drawn without
 -- one (silver: drained grey).
 local function Paint(texture, theme, share, silver)
+    if theme and type(share) == "table" and share.tip then
+        local t = PaneTint(TIP_DARK)
+        texture:SetDesaturated(false)
+        texture:SetVertexColor(t[1], t[2], t[3])
+        return
+    end
     local pane = type(share) == "table" and share.pane == true
     -- The one color look: the theme's color whole, as every piece of its part (Art/ThemeLayers.lua Ink).
     if theme and ns.FlatOn(texture, theme) then
