@@ -119,6 +119,22 @@ local paintedAt = setmetatable({}, weak)   -- game art -> the frame it was last 
 local function OnCopy(texture)
     return tinted[texture] or drained[texture] ~= nil or swapped[texture] or (B.clientWas and B.clientWas[texture])
 end
+-- The game colors much of its own art (a tooltip's dark center, a quality border): white is not its "as drawn".
+local gameWas = setmetatable({}, weak)     -- game art -> { desaturated, r, g, b, a } before our first themed paint
+local function Remember(texture)
+    if gameWas[texture] ~= nil then return end
+    local r, g, b, a = texture:GetVertexColor()
+    local desat = texture:IsDesaturated()
+    gameWas[texture] = not ns.AnySecret(r, g, b, a, desat) and { desat, r, g, b, a } or false
+end
+-- Ours off it: the game's own desaturation and color back. Art we never painted is left as the game keeps it.
+local function GiveBack(texture)
+    local was = gameWas[texture]
+    if was == nil then return end
+    gameWas[texture] = nil
+    texture:SetDesaturated(was and was[1] or false)
+    if was then texture:SetVertexColor(was[2], was[3], was[4], was[5]) else texture:SetVertexColor(1, 1, 1) end
+end
 local function PaintGame(texture)
     if OnCopy(texture) then return end
     paintedAt[texture] = GetTime()
@@ -126,7 +142,12 @@ local function PaintGame(texture)
     local theme = ns.ThemeFor(texture)
     -- A pane (broad) is parchment too: as drawn with Parchment pages left out.
     if type(share) == "table" and share.pane and not ns.ThemePartOn("themePartParchment") then theme = nil end
-    Paint(texture, not ClientGold(theme) and theme or nil, share)
+    if theme and not ClientGold(theme) then
+        Remember(texture)
+        Paint(texture, theme, share)
+    else
+        GiveBack(texture)
+    end
 end
 
 -- The game art's walk follows the theme's repaint in the same pass: art painted this frame as it is is left.
@@ -142,8 +163,7 @@ function ns.UntintGameArt(texture)
     if not texture or gameArt[texture] == nil then return end
     gameArt[texture] = nil
     if OnCopy(texture) then return end
-    texture:SetDesaturated(false)
-    texture:SetVertexColor(1, 1, 1)
+    GiveBack(texture)
 end
 
 function ns.GameArtTinted(texture) return gameArt[texture] ~= nil end
@@ -350,6 +370,17 @@ end
 function ns.RepaintColours()
     ns.RepaintTints()
     for frame in pairs(bordered) do ns.BronzeBackdrop(frame) end
+end
+
+-- The dev addon's tooltip probe: which of the theme's lists hold a piece.
+function ns.ThemeListsOf(region)
+    local lists = {}
+    if tinted[region] then lists[#lists + 1] = silvered[region] and "tinted(silvered)" or "tinted" end
+    if gameArt[region] ~= nil then lists[#lists + 1] = "gameArt" end
+    if drained[region] ~= nil then lists[#lists + 1] = "drained" end
+    if kept[region] then lists[#lists + 1] = "kept" end
+    if swapped[region] then lists[#lists + 1] = "swapped" end
+    return #lists > 0 and table.concat(lists, ",") or "none"
 end
 
 -- Repaint every remembered piece for the current theme.
