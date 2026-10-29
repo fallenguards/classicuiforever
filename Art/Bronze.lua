@@ -77,7 +77,7 @@ end
 local function Paint(texture, theme, share, silver)
     local pane = type(share) == "table" and share.pane == true
     -- The one color look: the theme's color whole, as every piece of its part (Art/ThemeLayers.lua Ink).
-    if theme and ns.FlatOn(texture) then
+    if theme and ns.FlatOn(texture, theme) then
         local t = pane and PaneTint(theme.tint) or theme.tint
         texture:SetDesaturated(true)
         texture:SetVertexColor(t[1], t[2], t[3])
@@ -115,11 +115,13 @@ local function ClientGold(theme) return theme ~= nil and theme.client and ns.OnF
 -- The game's own art (Art/GameArt.lua): as drawn with no theme or one showing Forever's gold art, else tinted like
 -- our metal. Art another paint holds is left to it.
 local gameArt = setmetatable({}, weak)   -- texture -> share, or true for full
+local paintedAt = setmetatable({}, weak)   -- game art -> the frame it was last painted in
 local function OnCopy(texture)
     return tinted[texture] or drained[texture] ~= nil or swapped[texture] or (B.clientWas and B.clientWas[texture])
 end
 local function PaintGame(texture)
     if OnCopy(texture) then return end
+    paintedAt[texture] = GetTime()
     local share = gameArt[texture]
     local theme = ns.ThemeFor(texture)
     -- A pane (broad) is parchment too: as drawn with Parchment pages left out.
@@ -127,9 +129,12 @@ local function PaintGame(texture)
     Paint(texture, not ClientGold(theme) and theme or nil, share)
 end
 
+-- The game art's walk follows the theme's repaint in the same pass: art painted this frame as it is is left.
 function ns.TintGameArt(texture, share)
     if not (texture and texture.SetDesaturated and texture.SetVertexColor) then return end
+    local same = gameArt[texture] == (share or true)
     gameArt[texture] = share or true
+    if same and paintedAt[texture] == GetTime() then return end
     PaintGame(texture)
 end
 
@@ -332,11 +337,13 @@ end
 
 -- The tinted, game and drained pieces with their flat layers: textures only, so a flat row answers in a fight.
 function ns.RepaintTints()
+    ns.HoldThemeName(true)
     for texture in pairs(tinted) do PaintTint(texture) end
     for texture in pairs(gameArt) do PaintGame(texture) end
     for region, tint in pairs(drained) do
         if region.SetDesaturated then PaintDrain(region, tint or nil) end
     end
+    ns.HoldThemeName(false)
 end
 
 -- The theme's colour moved (a slider or picker drag): tints and borders only, no file swaps.
@@ -346,7 +353,10 @@ function ns.RepaintColours()
 end
 
 -- Repaint every remembered piece for the current theme.
+local repaintedAt   -- the frame the last full repaint ran in
 function ns.RepaintBronze()
+    repaintedAt = GetTime()
+    ns.HoldThemeName(true)
     ns.RepaintTints()
     for region in pairs(kept) do PaintKeep(region) end
     for frame in pairs(bordered) do ns.BronzeBackdrop(frame) end
@@ -364,11 +374,14 @@ function ns.RepaintBronze()
             ns.PaintCopy(texture, ns.ThemeFor(texture) and select(3, ns.TexPaths(what)) and primary or nil)
         end
     end
+    ns.HoldThemeName(false)
 end
 
--- A part taken out of the theme or put back: its tints at once, in a fight too; file swaps with the apply pass.
+-- A part left out of the theme or put back: its tints at once, in a fight too; file swaps with the apply pass. The
+-- pass reruns the theme only when its last run read that part (a tooltip's paint waits for one to show): this repaints
+-- unless the pass just did.
 ns.OnToggle(function(key)
-    if not ns.IsThemePart(key) then return end
+    if not ns.IsThemePart(key) or repaintedAt == GetTime() then return end
     ns.RepaintTints()
     for region in pairs(kept) do PaintKeep(region) end
 end)

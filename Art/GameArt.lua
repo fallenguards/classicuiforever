@@ -308,11 +308,13 @@ Walk = function(frame, depth, addon)
 end
 
 local function Tint()
+    ns.HoldThemeName(true)
     for texture, kind in pairs(want) do
         held[texture] = true
         -- A pane (broad): the lighter pane colour; anything else the theme's colour whole.
         ns.TintGameArt(texture, kind ~= true and kind or nil)
     end
+    ns.HoldThemeName(false)
 end
 
 -- A root's tree walked and its finds kept; hidden, its last finds stand in.

@@ -14,9 +14,10 @@ local PARTS = { "texturedBars", "texturedCharacter", "texturedSpellbook", "textu
 ns.FlatPartOf = PartOf
 
 -- True while a theme is on and the piece's part is one color: every part, unless Textured color keeps it textured.
-function ns.FlatOn(piece)
+-- theme: the piece's own theme when the caller has it already.
+function ns.FlatOn(piece, theme)
     local db = ns.db
-    if not (db and ns.ThemeFor(piece)) then return false end
+    if not (db and (theme or ns.ThemeFor(piece))) then return false end
     if db.themeTextured ~= true then return true end
     return db[PartOf(piece)] == false
 end

@@ -352,7 +352,7 @@ function ns.DarkGrey(level)
 end
 
 -- nil while the custom theme is off, else the pick under it.
-function ns.ThemeName()
+local function Name()
     local db = ns.db
     if not db or db.bronzeTheme ~= true then return nil end
     if db.themeDark == true then
@@ -369,6 +369,22 @@ function ns.ThemeName()
         return "custom"
     end
     return "bronze"
+end
+
+-- A repaint asks it for every piece and its answer cannot change inside one: held for the repaint, this frame only.
+local holds, held, heldAt = 0, nil, nil
+function ns.ThemeName()
+    if holds > 0 and heldAt == GetTime() then return held end
+    holds = 0
+    return Name()
+end
+function ns.HoldThemeName(on)
+    if not on then
+        holds = math.max(0, holds - 1)
+        return
+    end
+    if holds == 0 or heldAt ~= GetTime() then holds, held, heldAt = 0, Name(), GetTime() end
+    holds = holds + 1
 end
 
 local MASKS = BUNDLED .. "theme-mask\\"

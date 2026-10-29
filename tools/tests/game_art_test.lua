@@ -42,6 +42,7 @@ local ns = {
     EventFrame = noop,
     OnToggle = noop,
     TintGameArt = function(texture) tinted[texture] = true end,
+    HoldThemeName = function() end,
     UntintGameArt = function(texture) tinted[texture] = nil end,
     RegisterModule = function(_, spec) apply = spec.apply end,
 }
@@ -140,6 +141,7 @@ local bns = {
     EventFrame = noop,
     OnToggle = noop,
     TintGameArt = function(texture, share) btinted[texture] = share or true end,
+    HoldThemeName = function() end,
     UntintGameArt = function(texture) btinted[texture] = nil end,
     RegisterModule = function(_, spec) bapply = spec.apply end,
     BAG_ICONS = { "Bag%dSlotIconTexture$", "^MainMenuBarBackpackButtonIconTexture$", "^KeyRingButtonIconTexture$" },
