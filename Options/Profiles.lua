@@ -86,9 +86,8 @@ local TEXT_BUTTONS = {
     { L["OPTWIN_IMPORT"], L["OPTWIN_IMPORT_TIP"], function() O.ShowProfileText("import") end },
 }
 
-local function PageButton(pane, top, spec, x, y)
+local function PageButton(pane, spec)
     local button = ns.PanelButton(pane, spec[1], 80)
-    button:SetPoint("TOPLEFT", top, "TOPLEFT", x, y)
     button:SetScript("OnClick", spec[3])
     button.label, button.tooltip = spec[1], spec[2]
     ns.AttachTip(button, O.OPTION_TIP)
@@ -109,7 +108,6 @@ function O.ProfilesPane(frame, top, list, setRange)
     local pane = ns.NewFrame("Frame", nil, frame)
     pane:SetAllPoints(frame)
     pane:Hide()
-    pane.headH = 78
     local caption = pane:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     caption:SetPoint("TOPLEFT", top, "TOPLEFT", 2, 0)
     local child = ns.NewFrame("Frame", nil, list)
@@ -117,19 +115,34 @@ function O.ProfilesPane(frame, top, list, setRange)
     child:Hide()
     pane.child = child
     local rows, named = {}, {}
-    local x = 0
-    for _, spec in ipairs(BUTTONS) do
-        local button = PageButton(pane, top, spec, x, -20)
-        if spec[4] then named[#named + 1] = button end
-        x = x + 84
+    -- Buttons left to right under the caption, a new line where the next runs past the page (a piece's is narrow);
+    -- the text buttons start their own line unless the first ones already wrapped.
+    local width, x, y, wrapped = list:GetWidth(), 0, -20, false
+    local function Place(button, gap)
+        if x > 0 and x + gap + button:GetWidth() > width then
+            x, y, wrapped = 0, y - 26, true
+        elseif x > 0 then
+            x = x + gap
+        end
+        button:SetPoint("TOPLEFT", top, "TOPLEFT", x, y)
+        x = x + button:GetWidth()
     end
-    for i, spec in ipairs(TEXT_BUTTONS) do PageButton(pane, top, spec, (i - 1) * 84, -46) end
-    -- Not a profile's: the edit mode layout the bars stand in, at the row's end.
-    local layout = ns.PanelButton(pane, L["OPTWIN_CLASSIC_LAYOUT"], 130)
-    layout:SetPoint("TOPLEFT", top, "TOPLEFT", x + 16, -20)
-    layout:SetScript("OnClick", ClassicLayout)
-    layout.label, layout.tooltip = L["OPTWIN_CLASSIC_LAYOUT"], L["OPTWIN_ADDS_AN_EDIT_MODE_LAYOUT"]
-    ns.AttachTip(layout, O.OPTION_TIP)
+    for _, spec in ipairs(BUTTONS) do
+        local button = PageButton(pane, spec)
+        if spec[4] then named[#named + 1] = button end
+        Place(button, 4)
+    end
+    -- Not a profile's: the edit mode layout the bars stand in, at the row's end; a piece without the bars has none.
+    if ns.PackageRuns("classicBar") then
+        local layout = ns.PanelButton(pane, L["OPTWIN_CLASSIC_LAYOUT"], 130)
+        layout:SetScript("OnClick", ClassicLayout)
+        layout.label, layout.tooltip = L["OPTWIN_CLASSIC_LAYOUT"], L["OPTWIN_ADDS_AN_EDIT_MODE_LAYOUT"]
+        ns.AttachTip(layout, O.OPTION_TIP)
+        Place(layout, 20)
+    end
+    if not wrapped then x, y = 0, y - 26 end
+    for _, spec in ipairs(TEXT_BUTTONS) do Place(PageButton(pane, spec), 4) end
+    pane.headH = 26 - y + 6
 
     local function Row(i)
         local row = rows[i]

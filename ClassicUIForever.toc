@@ -295,6 +295,7 @@ Options\OptionsWindow.lua
 Options\Profiles.lua
 Options\ProfileText.lua
 Options\HelpPanes.lua
+Options\PieceWindow.lua
 Options\GameMenu.lua
 Options\SettingsPanel.lua
 Options\Welcome.lua

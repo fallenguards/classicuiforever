@@ -27,6 +27,7 @@ local PAGE_FOOT, PAGE_FOOT_Y, PAGE_SEARCH_W = 32, 9, 190
 local LINE_COLOR = { 0.47, 0.47, 0.47, 0.63 }
 -- The 1.x options boxes: the tooltip edge in grey over a dark fill.
 local BOX_LOOK = { bg = { 0.15, 0.15, 0.15, 0.85 }, bgFirst = true, base = { 0.6, 0.6, 0.6, 1 } }
+O.LINE_COLOR, O.BOX_LOOK = LINE_COLOR, BOX_LOOK
 local TOPLEVEL = { toplevel = true }
 local HIGHLIGHT = "Interface\\QuestFrame\\UI-QuestTitleHighlight"
 -- After the toggles' pages, the reading pages: title key and builder.
@@ -454,19 +455,12 @@ end
 -- The game's settings show this window on its subcategory page (nil: our entry, the home page with the search), the
 -- contents at the host's left on the game's own panel. Its bare left strip lies over the game's list: no mouse there.
 local function Embed(frame, host, page)
-    embedded = host
-    frame.chrome = frame.chrome or { frame.fill, frame.header, frame.title, frame.close }
-    for _, region in ipairs(frame.chrome) do if region then region:Hide() end end
+    O.IntoHost(frame, host)
     frame.navBox:Hide()
     frame.pageBox:SetBackdrop(nil)
     frame:EnableMouse(false)
     frame.search:SetShown(page == nil)
     ns.SetPointOnce(frame.search, "TOPLEFT", frame.pageTop, "TOPLEFT", 4, 0)
-    frame:SetBackdrop(nil)
-    frame:RegisterForDrag()
-    frame:SetParent(host)
-    frame:SetFrameStrata(host:GetFrameStrata())
-    frame:SetFrameLevel(host:GetFrameLevel() + 1)
     -- Scaled to the room's width, the page down to its foot as the game's own pages run.
     local shift = PANE_X - SIDE_X
     local scale = math.min(1, (host:GetWidth() or WIDTH) / (WIDTH - shift))
@@ -480,34 +474,76 @@ local function Embed(frame, host, page)
 end
 
 local function StandAlone(frame)
-    embedded = nil
     frame.navBox:Show()
     ns.Backdrop(frame.pageBox, ns.BACKDROP.TIP16, BOX_LOOK)
     frame:EnableMouse(true)
     frame.search:Show()
     ns.SetPointOnce(frame.search, "TOPLEFT", frame, "TOPLEFT", SIDE_X + 8, -SEARCH_Y)
     if frame.page == HOME then frame.page = Pages()[1] end
-    for _, region in ipairs(frame.chrome or EMPTY) do if region then region:Show() end end
+    O.OutOfHost(frame)
+    SetFoot(frame, frame.standBottom)
+end
+
+-- Every row's box from the settings (this window's and a standalone piece's).
+function O.RefreshRows(built)
+    -- The one box mirroring a game setting: read fresh.
+    ns.ReadGameDamageNumbers()
+    local parentOf = built.parentOf
+    for _, row in ipairs(built.rows) do
+        -- Done by another toggle (offBy): checked and grayed, as it is in force.
+        local doneBy = O.OffByOn(row.offBy)
+        row:SetChecked(doneBy or ns.db[row.setting or row.key] ~= false)
+        -- Disabled and grayed under any parent that is off.
+        local on, up = not (row.needs and ns.db[row.needs] == false), row.parent
+        while up do
+            if ns.db[up] == false then on = false break end
+            up = parentOf[up]
+        end
+        if on and (ns.BarRowHeld(row.setting or row.key) or doneBy or (row.grayWhen and ns.db[row.grayWhen] == true)
+            or (row.grayIf and row.grayIf())) then on = false end
+        row:SetEnabled(on)
+        -- A button row's label keeps the button's own fonts.
+        if not row.button then row.text:SetFontObject(on and (row.font or "GameFontHighlight") or "GameFontDisable") end
+    end
+end
+
+-- The options dialog (this window's and a standalone piece's): its title and close, and a dark fill under the old
+-- see-through backdrop to keep the list readable; chrome: what the game's settings panel shows instead.
+function O.OptionsFrame(title)
+    -- HIGH, not DIALOG: on edit mode's strata its panel backing drew over our boxes.
+    local frame = O.DialogWindow("ForeverClassicUIOptions", 0, "HIGH", TOPLEVEL)
+    local fill = frame:CreateTexture(nil, "BACKGROUND", nil, -8)
+    fill:SetColorTexture(0.03, 0.03, 0.03, 0.45)
+    fill:SetPoint("TOPLEFT", frame, "TOPLEFT", 11, -12)
+    fill:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -12, 11)
+    frame.header, frame.title = ns.DialogHeader(frame, title)
+    frame.close = ns.DialogClose(frame, function() frame:Hide() end)
+    frame.chrome = { fill, frame.header, frame.title, frame.close }
+    return frame
+end
+
+-- Onto the game's settings panel (host) without the dialog's edge, title and close; and back on its own.
+function O.IntoHost(frame, host)
+    for _, region in ipairs(frame.chrome) do region:Hide() end
+    frame:SetBackdrop(nil)
+    frame:RegisterForDrag()
+    frame:SetParent(host)
+    frame:SetFrameStrata(host:GetFrameStrata())
+    frame:SetFrameLevel(host:GetFrameLevel() + 1)
+end
+
+function O.OutOfHost(frame)
+    for _, region in ipairs(frame.chrome) do region:Show() end
     ns.Backdrop(frame, ns.BACKDROP.DIALOG)
     frame:RegisterForDrag("LeftButton")
     frame:SetParent(UIParent)
     frame:SetFrameStrata("HIGH")
     frame:SetScale(1)
-    SetFoot(frame, frame.standBottom)
     ns.SetPointOnce(frame, "CENTER", UIParent, "CENTER", 0, 0)
 end
 
 local function Build()
-    -- HIGH, not DIALOG: on edit mode's strata its panel backing drew over our boxes.
-    local frame = O.DialogWindow("ForeverClassicUIOptions", 0, "HIGH", TOPLEVEL)
-    -- The old backdrop is see-through; a dark fill keeps the list readable.
-    local fill = frame:CreateTexture(nil, "BACKGROUND", nil, -8)
-    fill:SetColorTexture(0.03, 0.03, 0.03, 0.45)
-    fill:SetPoint("TOPLEFT", frame, "TOPLEFT", 11, -12)
-    fill:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -12, 11)
-    frame.fill = fill
-    frame.header, frame.title = ns.DialogHeader(frame, TITLE)
-    frame.close = ns.DialogClose(frame, function() frame:Hide() end)
+    local frame = O.OptionsFrame(TITLE)
 
     local pages = Pages()
     FitNames(frame, pages)
@@ -546,25 +582,7 @@ local function Build()
     frame.pageSearch:SetScript("OnTextChanged", function() Show(frame) end)
 
     function frame:Refresh(keepScroll)
-        -- The one box mirroring a game setting: read fresh.
-        ns.ReadGameDamageNumbers()
-        local parentOf = self.built.parentOf
-        for _, row in ipairs(self.built.rows) do
-            -- Done by another toggle (offBy): checked and grayed, as it is in force.
-            local doneBy = O.OffByOn(row.offBy)
-            row:SetChecked(doneBy or ns.db[row.setting or row.key] ~= false)
-            -- Disabled and grayed under any parent that is off.
-            local on, up = not (row.needs and ns.db[row.needs] == false), row.parent
-            while up do
-                if ns.db[up] == false then on = false break end
-                up = parentOf[up]
-            end
-            if on and (ns.BarRowHeld(row.setting or row.key) or doneBy or (row.grayWhen and ns.db[row.grayWhen] == true)
-                or (row.grayIf and row.grayIf())) then on = false end
-            row:SetEnabled(on)
-            -- A button row's label keeps the button's own fonts.
-            if not row.button then row.text:SetFontObject(on and (row.font or "GameFontHighlight") or "GameFontDisable") end
-        end
+        O.RefreshRows(self.built)
         Show(self, keepScroll)
     end
     frame:SetScript("OnShow", function(self) self:Refresh() end)
@@ -574,9 +592,41 @@ local function Build()
     return frame
 end
 
+-- One row lit on its page, scrolled to it (EasyFind's search opens here); one setting's row, searched by its label.
+local function ShowRow(frame, row)
+    frame:ShowPage(row.page)
+    O.ShowMatch(row, true)
+    frame.listBar:SetValue(math.max(0, ((row.listAt or 1) - 1) * ROW))
+end
+
+local function OpenAt(frame, key)
+    for _, entry in ipairs(ns.TOGGLES) do
+        if entry[1] == key then
+            frame.search:SetText(entry[2])
+            return
+        end
+    end
+end
+
+-- The window in use: this one, or a standalone piece's one page (Options/PieceWindow.lua puts its own here).
+O.Window = { Build = Build, Embed = Embed, StandAlone = StandAlone, ShowRow = ShowRow, OpenAt = OpenAt }
+
 local function Window()
-    window = window or Build()
+    window = window or O.Window.Build()
     return window
+end
+
+function O.Embedded() return embedded ~= nil end
+
+-- Out of the game's settings to stand alone, shown.
+local function ShowAlone()
+    local frame = Window()
+    if embedded ~= nil then
+        embedded = nil
+        O.Window.StandAlone(frame)
+    end
+    frame:Show()
+    return frame
 end
 
 -- The game's settings: its ClassicUI Forever entry (page nil) and a subcategory per page, each a canvas the window
@@ -587,11 +637,15 @@ function ns.OptionsCanvas(page)
     if canvases[key] then return canvases[key] end
     local canvas = CreateFrame("Frame", page == nil and "ForeverClassicUIOptionsCanvas" or nil, UIParent)
     canvas:Hide()
-    canvas:SetScript("OnShow", function(self) Embed(Window(), self, page) end)
+    canvas:SetScript("OnShow", function(self)
+        embedded = self
+        O.Window.Embed(Window(), self, page)
+    end)
     canvas:SetScript("OnHide", function(self)
         -- Another page's canvas may have taken the window first.
         if embedded ~= self then return end
-        StandAlone(window)
+        embedded = nil
+        O.Window.StandAlone(window)
         window:Hide()
     end)
     canvases[key] = canvas
@@ -610,23 +664,16 @@ function ns.RefreshOptionsWindow()
     if window and window:IsShown() then window:Refresh(true) end
 end
 
+-- Shown inside the game's settings: out to stand alone, open; else open or shut.
 function ns.OpenOptions()
-    local frame = Window()
-    -- Shown inside the game's settings: out to stand alone, open.
-    local inside = embedded ~= nil
-    if inside then StandAlone(frame) end
-    frame:SetShown(inside or not frame:IsShown())
+    if embedded == nil and window and window:IsShown() then
+        window:Hide()
+        return
+    end
+    ShowAlone()
 end
 
--- One row lit on its page, scrolled to it: EasyFind's search opens here.
-function ns.OpenOptionsRow(row)
-    local frame = Window()
-    if embedded ~= nil then StandAlone(frame) end
-    frame:Show()
-    frame:ShowPage(row.page)
-    O.ShowMatch(row, true)
-    frame.listBar:SetValue(math.max(0, ((row.listAt or 1) - 1) * ROW))
-end
+function ns.OpenOptionsRow(row) O.Window.ShowRow(ShowAlone(), row) end
 
 local function Choices(row)
     local list = {}
@@ -683,15 +730,5 @@ function ns.OptionsIndexRowsOf(rows)
 end
 function ns.OptionsIndexRows() return ns.OptionsIndexRowsOf(Window().built.rows) end
 
--- Open on one toggle (a chat link's "here"): its label searched, so its row shows lit.
-function ns.OpenOptionsAt(key)
-    local frame = Window()
-    if embedded ~= nil then StandAlone(frame) end
-    frame:Show()
-    for _, entry in ipairs(ns.TOGGLES) do
-        if entry[1] == key then
-            frame.search:SetText(entry[2])
-            return
-        end
-    end
-end
+-- Open on one toggle (a chat link's "here"), its row lit.
+function ns.OpenOptionsAt(key) O.Window.OpenAt(ShowAlone(), key) end

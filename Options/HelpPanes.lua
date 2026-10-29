@@ -37,6 +37,18 @@ local function MicroKey(binding, option)
     return function() return KeyOf(binding), L[option], L["OPT_hideMicroButtons"] end
 end
 
+-- Which copy this is: the full addon, a ClassicUI Forever piece, or the color picker.
+local function Copy()
+    if not ns.PACKAGE then return "full" end
+    return ns.PACKAGE.piece and "piece" or "picker"
+end
+
+-- A page an answer names; a piece has its one Settings tab (Options/PieceWindow.lua).
+local function Page(key)
+    if Copy() == "piece" then return L["OPTWIN_TAB_SETTINGS"] end
+    return L[key]
+end
+
 -- Our windows with a lock on the title bar.
 local LOCKED = { "characterSheet", "professionsBook", "tradeSkill", "talents", "legacyWindow", "collectionsWindow",
     "questLog", "worldMap", "spellBook", "panelSocial", "groupFinder", "panelQuest", "panelGossip", "windowLocksAlways" }
@@ -93,10 +105,10 @@ local FAQ = {
     -- The band follows Action Bar 1's own edit mode settings.
     { "FAQ_TENBUTTONS_Q", "FAQ_TENBUTTONS_A", needs = { "classicBar" }, function()
         return G("HUD_EDIT_MODE_SETTING_ACTION_BAR_NUM_ICONS"), G("HUD_EDIT_MODE_SETTING_ACTION_BAR_ICON_SIZE"),
-            L["OPT_classicBarSize"], L["GROUP_ACTION_BARS"]
+            L["OPT_classicBarSize"], Page("GROUP_ACTION_BARS")
     end },
     { "FAQ_GRYPHONS_Q", "FAQ_GRYPHONS_A", needs = { "classicBar" }, function()
-        return L["GROUP_ACTION_BARS"], Before(L["OPT_hideGryphonLeft"]), Before(L["OPT_hideGryphonRight"]),
+        return Page("GROUP_ACTION_BARS"), Before(L["OPT_hideGryphonLeft"]), Before(L["OPT_hideGryphonRight"]),
             After(L["OPT_hideGryphonLeft"])
     end },
     { "FAQ_XPBAR_Q", "FAQ_XPBAR_A", needs = { "classicBar" }, function() return L["BAR_HIDE_THIS_BAR"] end },
@@ -107,26 +119,24 @@ local FAQ = {
         function() return L["UI_CLASSICUI_FOREVER_WINDOWS"], L["OPT_classicBarSize"] end },
     { "FAQ_SCALE_Q", "FAQ_SCALE_A", needs = { "classicBar" },
         function() return _G.GRAPHICS_LABEL or "Graphics", _G.USE_UISCALE or "Use UI Scale" end },
-    { "FAQ_SCALEBACK_Q", "FAQ_SCALEBACK_A", needs = { "classicBar" }, function()
+    -- A piece has no Toggle none, and no sidebar search.
+    { "FAQ_SCALEBACK_Q", "FAQ_SCALEBACK_A", needs = { "classicBar" }, notIn = "piece", function()
         return L["OPTWIN_TOGGLE_NONE"], L["OPTWIN_NONE_SCALE"], _G.GRAPHICS_LABEL or "Graphics", _G.USE_UISCALE or "Use UI Scale"
     end },
-    { "FAQ_SETTING_Q", "FAQ_SETTING_A", function() return L["OPTWIN_SEARCH_TOGGLES"] end },
+    { "FAQ_SCALEBACK_Q", "FAQ_SCALEBACK_PIECE_A", needs = { "classicBar" }, only = "piece",
+        function() return _G.GRAPHICS_LABEL or "Graphics", _G.USE_UISCALE or "Use UI Scale" end },
+    { "FAQ_SETTING_Q", "FAQ_SETTING_A", notIn = "piece", function() return L["OPTWIN_SEARCH_TOGGLES"] end },
+    { "FAQ_SETTING_Q", "FAQ_SETTING_PIECE_A", only = "piece", function() return L["OPTWIN_TAB_SETTINGS"] end },
     { "FAQ_FOREVER_Q", "FAQ_FOREVER_A", on = "forever", notIn = "picker" },
     { "FAQ_OWNLOOK_Q", "FAQ_OWNLOOK_A", on = "retail", notIn = "picker" },
     { "FAQ_GLOW_Q", "FAQ_GLOW_A", needs = { "hideThreatGlow" },
-        function() return L["GROUP_UNIT_FRAMES"], L["OPT_hideThreatGlow"], L["OPT_hideCombatGlow"] end },
+        function() return Page("GROUP_UNIT_FRAMES"), L["OPT_hideThreatGlow"], L["OPT_hideCombatGlow"] end },
     { "FAQ_TRACKER_Q", "FAQ_TRACKER_A", needs = { "questTracker" },
-        function() return L["GROUP_QUESTS"], Before(L["OPT_questTracker"]) end },
+        function() return Page("GROUP_QUESTS"), Before(L["OPT_questTracker"]) end },
     { "FAQ_PLATES_Q", "FAQ_PLATES_A", needs = { "namePlates" },
-        function() return G("NAMEPLATE_OPTIONS_LABEL"), L["OPTWIN_NAME_TEXT_SIZE"], L["GROUP_NAMEPLATES"] end },
+        function() return G("NAMEPLATE_OPTIONS_LABEL"), L["OPTWIN_NAME_TEXT_SIZE"], Page("GROUP_NAMEPLATES") end },
     { "FAQ_OTHER_ADDON_Q", "FAQ_OTHER_ADDON_A" },
 }
-
--- Which copy this is: the full addon, a ClassicUI Forever piece, or the color picker.
-local function Copy()
-    if not ns.PACKAGE then return "full" end
-    return ns.PACKAGE.piece and "piece" or "picker"
-end
 
 local function Fits(item, copy)
     if item.on and (item.on == "forever") ~= ns.OnForever() then return false end
@@ -184,8 +194,10 @@ local function Stack(child, pieces, setRange)
     local y, first = 0, true
     for _, piece in ipairs(pieces) do
         local region = piece.region
-        if piece.beside then
-            ns.SetPointOnce(region, "LEFT", piece.beside, "RIGHT", BUTTON_GAP, 0)
+        -- Beside its button while both fit the page's width (a piece's is narrow), else under it.
+        local beside = piece.beside
+        if beside and beside:GetWidth() + BUTTON_GAP + region:GetWidth() <= child:GetWidth() then
+            ns.SetPointOnce(region, "LEFT", beside, "RIGHT", BUTTON_GAP, 0)
         elseif region:IsShown() then
             y = y + (first and 0 or piece.gap)
             first = false
