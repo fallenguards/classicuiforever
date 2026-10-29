@@ -164,11 +164,19 @@ for line, title in titles:gmatch("## Title: ([^\t\n]+)\t([^\n]+)") do
     Check(line == title:gsub("\r$", ""), "toc title " .. line .. " is the package's own")
 end
 
-local function Guard(enabled)
+-- elsewhere: enabled on other characters only (the game's AddOns list turns an addon off for this character).
+local ME = "Player-1-0000000A"
+local function Guard(enabled, elsewhere)
     if not src then return "no file" end
-    local names = { "ClassicUIForever", "ClassicUIForeverStandaloneBags", "ClassicUIForeverStandaloneChat" }
+    local names = { "ClassicUIForever", "ClassicUIForeverStandaloneBags", "ClassicUIForeverStandaloneChat",
+        "FallensUIColorPicker" }
+    UnitGUID = function(unit) return unit == "player" and ME or nil end
     C_AddOns = {
-        GetAddOnEnableState = function(which) return enabled[type(which) == "number" and names[which] or which] and 2 or 0 end,
+        GetAddOnEnableState = function(which, character)
+            which = type(which) == "number" and names[which] or which
+            if enabled[which] then return 2 end
+            return (elsewhere or {})[which] and character ~= ME and 1 or 0
+        end,
         GetNumAddOns = function() return #names end,
         GetAddOnInfo = function(i) return names[i] end,
     }
@@ -181,6 +189,10 @@ Check(Guard({ ClassicUIForeverStandaloneBags = true }) == nil, "alone, the packa
 Check(Guard({ ClassicUIForever = true, ClassicUIForeverStandaloneBags = true }) == "full", "the full addon enabled: inert")
 Check(Guard({ ClassicUIForeverStandaloneBags = true, ClassicUIForeverStandaloneChat = true }) == "other",
     "another standalone enabled: inert")
+Check(Guard({ ClassicUIForeverStandaloneBags = true }, { ClassicUIForever = true }) == nil,
+    "the full addon on for other characters only: the package runs")
+Check(Guard({ ClassicUIForeverStandaloneBags = true, FallensUIColorPicker = true }) == nil,
+    "Fallen's UI Color Picker beside it (an addon of its own): the package runs")
 
 -- Every released piece is a pick in the issue forms' Which addon?, and its Support page link picks it; the full addon's
 -- link picks the first option.

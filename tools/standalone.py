@@ -21,7 +21,6 @@ SUITE = "ClassicUIForever"
 # Which addon? picked by the link (.github/ISSUE_TEMPLATE, the dropdown id addon).
 ISSUES = "https://github.com/fallenguards/classicuiforever/issues/new/choose?addon="
 PREFIX = SUITE + "Standalone"
-THEME = ["bronzeTheme"]
 
 # id, name, pages (locale keys of options pages), roots (options rows, with every row under them), modules (modules
 # with no options row), icon, forever (Forever only), project (CurseForge id once the project exists), notes.
@@ -72,13 +71,6 @@ PACKAGES = [
          roots=["classicFonts", "windowLocksAlways"], modules=["panels", "clientMenus"],
          icon="Interface\\Icons\\INV_Misc_Book_08",
          notes="The game's own windows, game menu, settings and menus in 1.x frames."),
-    # The theme alone, under the author's own brand: its own folder and title, not a ClassicUI Forever piece's.
-    # broad: every texture of the game's windows takes the theme but what stays as drawn (Art/GameArt.lua).
-    dict(id="UIColorPicker", name="Fallen's UI Color Picker", folder="FallensUIColorPicker", pages=[], roots=THEME,
-         modules=[], title="Fallen's UI Color Picker", issues="https://github.com/fallenguards/fallens-ui-color-picker/issues",
-         broad=True, icon="Interface\\Icons\\INV_Misc_Gem_Variety_01",
-         notes="Recolor the game's whole UI: dark, a custom color or bronze, on Forever and retail. Originally "
-               "developed as part of ClassicUI Forever."),
 ]
 for pkg in PACKAGES:
     pkg.setdefault("forever", False)
@@ -121,12 +113,14 @@ def package_lua(pkg, icon=None):
         "local COPIES = {",
         copies,
         "}",
+        "-- This character, as the game's AddOns list asks: with none the game answers for every character.",
+        'local me = UnitGUID("player")',
         "local addons = C_AddOns",
-        'if addons.GetAddOnEnableState("%s") > 0 then' % SUITE,
+        'if addons.GetAddOnEnableState("%s", me) > 0 then' % SUITE,
         '    ns.INERT = "full"',
         "else",
         "    for _, name in ipairs(COPIES) do",
-        "        if name ~= ADDON and addons.GetAddOnEnableState(name) > 0 then",
+        "        if name ~= ADDON and addons.GetAddOnEnableState(name, me) > 0 then",
         '            ns.INERT = "other"',
         "            break",
         "        end",

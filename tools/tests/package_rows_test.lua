@@ -1,7 +1,8 @@
 -- Offline test under Lua 5.4: the standalone packages over the real options list (Options/Toggles.lua), the real
 -- package specs (tools/standalone.py) and Core/Package.lua, on both clients. No package keeps a row needing a setting
 -- it lacks; the classic bar's rows on other pages go with Action Bars; the look modules go with every package that
--- shows their work; chat notes keep their default; every module runs in some package or is listed as unplaced.
+-- shows their work; chat notes keep their default; every module runs in some package or is listed as unplaced or
+-- as carried by an addon of its own.
 -- Run from the addon root: lua tools/tests/package_rows_test.lua (CI runs every tools/tests/*_test.lua).
 -- luacheck: std lua54
 -- luacheck: ignore 111 112 113 121 122 212
@@ -36,6 +37,8 @@ local SHARED = {
 }
 -- Modules no package carries yet: the next wave places them.
 local UNPLACED = { hideHelpButtons = true, hideZoneText = true, lootToast = true, zoneTerritory = true }
+-- Modules an addon of their own carries: the theme is Fallen's UI Color Picker.
+local OWN_ADDON = { bronzeTheme = true }
 
 -- Any frame or region: every method answers another stub.
 local NUMBERS = { GetStringWidth = 60, GetStringHeight = 12, GetWidth = 100, GetHeight = 24 }
@@ -143,7 +146,8 @@ for _, forever in ipairs({ true, false }) do
     end
     for _, module in ipairs(modules) do
         local foreverOnly = module == "legacyWindow" and not forever
-        Check(ran[module] or UNPLACED[module] or foreverOnly, client .. ": module " .. module .. " runs in no package")
+        Check(ran[module] or UNPLACED[module] or OWN_ADDON[module] or foreverOnly,
+            client .. ": module " .. module .. " runs in no package")
     end
 end
 
