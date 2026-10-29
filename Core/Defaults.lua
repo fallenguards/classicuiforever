@@ -2,7 +2,7 @@ local _, ns = ...
 local L = ns.L
 
 ns.DB_DEFAULTS = {
-    dbVersion = 29,
+    dbVersion = 30,
     classicBar = true,
     oneBar = false,
     classicBarSize = false,
@@ -27,7 +27,7 @@ ns.DB_DEFAULTS = {
     hideMicroCollections = true,
     hideMicroHousing = true, hideMicroJournal = true,
     hideMicroGameMenu = false,
-    hideMicroShop = false,
+    hideMicroShop = true,
     oneBag = false,
     bagsAboveRow = false,
     bagWindowsFollow = false,

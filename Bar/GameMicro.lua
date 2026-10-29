@@ -60,3 +60,21 @@ function ns.KeepAchievementsButton()
     end
     db.dbVersion = 14
 end
+
+-- dbVersion 30: the shop can sit on the 1.x row, hidden by default. A classic bar never showed it, so it stays hidden
+-- there; the game's own micro menu keeps the shop as it was (the account and every profile).
+function ns.ShopOffRow()
+    local db = ns.db
+    local function Keep(t)
+        if t.classicBar == false then
+            if t.hideMicroShop == nil then t.hideMicroShop = false end
+        else
+            t.hideMicroShop = true
+        end
+    end
+    Keep(db)
+    for _, shot in pairs(type(db.profiles) == "table" and db.profiles or {}) do
+        if type(shot) == "table" then Keep(shot) end
+    end
+    db.dbVersion = 30
+end

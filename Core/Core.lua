@@ -585,6 +585,7 @@ frame:SetScript("OnEvent", function(_, event, arg1)
         if saved and saved < 27 then ns.KeepSideBarSpot() end
         if saved and saved < 28 then ns.KeepFinderWho() end
         if saved and saved < 29 then ns.SplitThemeParts() end
+        if saved and saved < 30 then ns.ShopOffRow() end
         ns.CopyDefaults(ns.db, ns.DB_DEFAULTS)
         -- Nothing of ours was ever zeroed on a fresh install: the game settings it holds are the player's own.
         if not saved then ns.db.surnamesRepaired, ns.db.damageNumbersRepaired = true, true end

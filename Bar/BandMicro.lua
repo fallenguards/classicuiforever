@@ -240,7 +240,7 @@ local MICRO_HIDE = {
     CollectionsMicroButton = "hideMicroCollections", MainMenuMicroButton = "hideMicroGameMenu",
     PlayerSpellsMicroButton = "hideMicroTalents", AchievementMicroButton = "hideMicroAchievements",
     LegacyMicroButton = "hideMicroLegacy", HousingMicroButton = "hideMicroHousing", EJMicroButton = "hideMicroJournal",
-    HelpMicroButton = "hideMicroHelp",
+    HelpMicroButton = "hideMicroHelp", StoreMicroButton = "hideMicroShop",
 }
 
 -- The collections button hidden by our option, on either bar: the spellbook's foot gives it a tab instead.
@@ -254,10 +254,11 @@ function ns.BookCollectionsTab()
     return ns.CollectionsMicroHidden() and ns.db.spellBookCollectionsTab ~= false
 end
 
--- Off the row: the shop always; the ones picked under Hide micro buttons. Second value: left off by the option.
--- Help hides by its own row even with Hide micro buttons off: it came with 0.14.0, and older installs keep it off.
+-- Off the row: the game's Help (ours stands in); the ones picked under Hide micro buttons. Second value: left off by the
+-- option. Help and the shop hide by their own rows even with Hide micro buttons off: rows stood without them before.
+local OWN_ROW = { hideMicroHelp = true, hideMicroShop = true }
 local function HiddenByOption(db, key)
-    return db[key] == true and (db.hideMicroButtons == true or key == "hideMicroHelp")
+    return db[key] == true and (db.hideMicroButtons == true or OWN_ROW[key] == true)
 end
 
 local function MicroSkipped(button)
@@ -372,7 +373,8 @@ local function SeatShown(button)
 end
 
 -- Buttons on the row, with Keep button size the count their size is fitted to, and the count seen (Menu Width).
--- A hidden Help button takes no seat: it came with 0.14.0, and the rows before it were fitted without it.
+-- A hidden Help or shop button takes no seat: the rows before them were fitted without them.
+local NO_SEAT = { ForeverClassicUIHelpMicroButton = true, StoreMicroButton = true }
 function B.MicroCounts()
     local shown, sized, seen = 0, 0, 0
     for _, button in ipairs(MicroButtonList()) do
@@ -382,7 +384,7 @@ function B.MicroCounts()
                 shown = shown + 1
                 if not IsSeatHidden(button) then seen = seen + 1 end
             end
-            if not skipped or (byOption and button:GetName() ~= "ForeverClassicUIHelpMicroButton") then sized = sized + 1 end
+            if not skipped or (byOption and not NO_SEAT[button:GetName() or ""]) then sized = sized + 1 end
         end
     end
     return shown, (ns.db and ns.db.hideMicroKeepSize == true) and sized or nil, seen

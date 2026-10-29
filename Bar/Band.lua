@@ -18,7 +18,7 @@ B.PAGE_POST, B.PAGE_BOX_Y, B.PAGE_BOX_H = 34, 14, 15
 -- One-bar mode: the micro group on the screen's floor, the bags over it.
 B.CORNER_X = -6
 -- The shop lives in the Escape menu; its button never fit the 1.x row. Help is ours (BandMicro), last as in 1.x.
-B.MICRO_SKIP = { StoreMicroButton = true, HelpMicroButton = true }
+B.MICRO_SKIP = { HelpMicroButton = true }
 -- Row end to floor end, as Era's whole sheet stands: the floor ends on its rim, the first part of the section's post.
 B.MICRO_END_GAP = 5
 -- Micro region head (holds the page arrows), its max width.
