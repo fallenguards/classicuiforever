@@ -184,6 +184,8 @@ L["OPT_hideFinderWho"] = "Masquer l'onglet latéral Qui"
 L["OPT_hideFinderWho_TIP"] = "Pas d'onglet latéral Qui sur la recherche de groupe. La fenêtre sociale garde son onglet Qui."
 L["PKG_OFF_FULL"] = "%s est désactivé, car ClassicUI Forever complet est activé et l'inclut déjà."
 L["PKG_OFF_OTHER"] = "%s est désactivé, car un autre module autonome de ClassicUI Forever est activé. Un seul fonctionne à la fois ; pour plusieurs parties, utilisez ClassicUI Forever complet et désactivez ce que vous ne voulez pas."
+L["PKG_INTRO"] = "Une partie de ClassicUI Forever, la suite d'addons complète au style classique de la 1.x. Tapez %s pour ses options."
+L["PKG_INTRO_PICKER"] = "D'abord créé pour ClassicUI Forever, la suite d'addons complète au style classique de la 1.x. Tapez %s pour ses options."
 L["OPTWIN_BACKGROUND_SHADE"] = "Teinte du fond"
 L["OPTWIN_BACKGROUND_SHADE_TIP"] = "À quel point le parchemin et les fonds des fenêtres sont sombres ou clairs à côté des cadres : plus sombres à gauche, plus clairs à droite."
 

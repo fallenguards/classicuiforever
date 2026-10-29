@@ -101,9 +101,9 @@ def package_lua(pkg):
     return "\n".join([
         "local ADDON, ns = ...",
         "-- %s, made by tools/standalone.py from the ClassicUI Forever build." % pkg["title"],
-        'ns.PACKAGE = { title = "%s", pages = %s, roots = %s, modules = %s, broad = %s,' % (
+        'ns.PACKAGE = { title = "%s", pages = %s, roots = %s, modules = %s, broad = %s, piece = %s,' % (
             pkg["title"], lua_list(pkg["pages"]), lua_list(pkg["roots"]), lua_list(pkg["modules"]),
-            "true" if pkg.get("broad") else "false"),
+            "true" if pkg.get("broad") else "false", "true" if pkg["folder"].startswith(PREFIX) else "false"),
         '    curseforge = %s, issues = "%s" }' % (
             ('"https://www.curseforge.com/projects/%s"' % pkg["project"]) if pkg["project"] else "nil", pkg["issues"]),
         "-- One copy of our code runs: the full addon or another package enabled leaves this one inert.",

@@ -690,8 +690,12 @@ end
 -- A new player gets the welcome, then the layout question as it closes; everyone else the What's New, once per list.
 function ns.FirstRun()
     if not ns.db then return end
-    -- A standalone package: no welcome or news; the layout question only with the classic bar.
+    -- A standalone package: one chat line naming the full addon, no news; the layout question only with the classic bar.
     if ns.PACKAGE then
+        if not ns.db.welcomed then
+            ns.db.welcomed = true
+            ns.Print(L[ns.PACKAGE.piece and "PKG_INTRO" or "PKG_INTRO_PICKER"]:format("/fcui"))
+        end
         if ns.PACKAGE.kept.classicBar then ns.CheckLayoutPosition() end
         return
     end

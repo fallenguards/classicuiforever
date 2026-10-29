@@ -184,6 +184,8 @@ L["OPT_hideFinderWho"] = "Ocultar pestaña lateral Quién"
 L["OPT_hideFinderWho_TIP"] = "Sin pestaña lateral Quién en el buscador de grupos. La ventana social mantiene su pestaña Quién."
 L["PKG_OFF_FULL"] = "%s está desactivado porque ClassicUI Forever completo está activado y ya lo incluye."
 L["PKG_OFF_OTHER"] = "%s está desactivado porque hay otro complemento independiente de ClassicUI Forever activado. Solo funciona uno a la vez; para más partes, usa ClassicUI Forever completo y desactiva lo que no quieras."
+L["PKG_INTRO"] = "Una parte de ClassicUI Forever, el conjunto completo de complementos clásicos de la 1.x. Escribe %s para ver sus opciones."
+L["PKG_INTRO_PICKER"] = "Hecho primero para ClassicUI Forever, el conjunto completo de complementos clásicos de la 1.x. Escribe %s para ver sus opciones."
 L["OPTWIN_BACKGROUND_SHADE"] = "Tono del fondo"
 L["OPTWIN_BACKGROUND_SHADE_TIP"] = "Lo oscuros o claros que son el pergamino y los fondos de las ventanas junto a los marcos: a la izquierda más oscuros, a la derecha más claros."
 

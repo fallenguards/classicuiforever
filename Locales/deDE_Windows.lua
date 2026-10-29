@@ -184,6 +184,8 @@ L["OPT_hideFinderWho"] = "Wer-Seitenreiter ausblenden"
 L["OPT_hideFinderWho_TIP"] = "Kein Wer-Seitenreiter an der Gruppensuche. Das Kontaktfenster behält seinen Wer-Reiter."
 L["PKG_OFF_FULL"] = "%s ist ausgeschaltet, weil das vollständige ClassicUI Forever aktiviert ist und es bereits enthält."
 L["PKG_OFF_OTHER"] = "%s ist ausgeschaltet, weil ein anderes eigenständiges Addon von ClassicUI Forever aktiviert ist. Es läuft immer nur eines; für mehr Teile nutze das vollständige ClassicUI Forever und schalte aus, was du nicht brauchst."
+L["PKG_INTRO"] = "Ein Teil von ClassicUI Forever, der vollständigen klassischen 1.x-Addon-Sammlung. Tippe %s für seine Optionen."
+L["PKG_INTRO_PICKER"] = "Zuerst für ClassicUI Forever gebaut, die vollständige klassische 1.x-Addon-Sammlung. Tippe %s für seine Optionen."
 L["OPTWIN_BACKGROUND_SHADE"] = "Hintergrundton"
 L["OPTWIN_BACKGROUND_SHADE_TIP"] = "Wie dunkel oder hell Pergament und Fensterhintergründe neben den Rahmen sind: links dunkler, rechts heller."
 

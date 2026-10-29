@@ -184,6 +184,8 @@ L["OPT_hideFinderWho"] = "Nascondi la scheda laterale Chi"
 L["OPT_hideFinderWho_TIP"] = "Nessuna scheda laterale Chi nella ricerca gruppi. La finestra social mantiene la sua scheda Chi."
 L["PKG_OFF_FULL"] = "%s è disattivato perché ClassicUI Forever completo è attivo e lo include già."
 L["PKG_OFF_OTHER"] = "%s è disattivato perché è attivo un altro addon autonomo di ClassicUI Forever. Ne funziona uno alla volta; per più parti, usa ClassicUI Forever completo e disattiva ciò che non ti serve."
+L["PKG_INTRO"] = "Una parte di ClassicUI Forever, la raccolta completa di addon classici della 1.x. Scrivi %s per le sue opzioni."
+L["PKG_INTRO_PICKER"] = "Nato per ClassicUI Forever, la raccolta completa di addon classici della 1.x. Scrivi %s per le sue opzioni."
 L["OPTWIN_BACKGROUND_SHADE"] = "Tonalità dello sfondo"
 L["OPTWIN_BACKGROUND_SHADE_TIP"] = "Quanto sono scuri o chiari la pergamena e gli sfondi delle finestre accanto alle cornici: più scuri a sinistra, più chiari a destra."
 
