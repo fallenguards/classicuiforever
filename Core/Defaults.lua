@@ -2,7 +2,7 @@ local _, ns = ...
 local L = ns.L
 
 ns.DB_DEFAULTS = {
-    dbVersion = 30,
+    dbVersion = 31,
     classicBar = true,
     oneBar = false,
     classicBarSize = false,
@@ -47,7 +47,7 @@ ns.DB_DEFAULTS = {
     themeCustom = false,
     themeColor = "e69e52",
     themeDarkness = 50,
-    themePaneShade = 0,
+    themePaneShade = 50,
     themeTextured = false,
     classicFonts = true,
     platesOneSize = false,

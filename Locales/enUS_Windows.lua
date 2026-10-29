@@ -246,6 +246,8 @@ L["PKG_OFF_FULL"] = "%s is turned off because the full ClassicUI Forever is enab
 L["PKG_OFF_OTHER"] = "%s is turned off because another ClassicUI Forever standalone is enabled. Only one runs at a time; for more pieces, use the full ClassicUI Forever and turn off what you don't want."
 L["PKG_INTRO"] = "One piece of ClassicUI Forever, the full classic 1.x addon suite. Type %s for its options."
 L["PKG_INTRO_PICKER"] = "First made for ClassicUI Forever, the full classic 1.x addon suite. Type %s for its options."
+L["LOOKPICK_OWN"] = "The game's own look"
+L["LOOKPICK_FOOT"] = "Change these and other settings with %s or from the minimap button."
 L["OPTWIN_BACKGROUND_SHADE"] = "Background shade"
 L["OPTWIN_BACKGROUND_SHADE_TIP"] = "How dark or light parchment and window backgrounds are next to the frames: darker to the left, lighter to the right."
 

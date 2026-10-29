@@ -106,7 +106,7 @@ def lua_list(items):
     return "{ " + ", ".join('"%s"' % item for item in items) + " }" if items else "{}"
 
 
-def package_lua(pkg):
+def package_lua(pkg, icon=None):
     copies = ",\n".join('    "%s"' % folder for folder in FOLDERS)
     return "\n".join([
         "local ADDON, ns = ...",
@@ -114,8 +114,9 @@ def package_lua(pkg):
         'ns.PACKAGE = { title = "%s", pages = %s, roots = %s, modules = %s, broad = %s, piece = %s,' % (
             pkg["title"], lua_list(pkg["pages"]), lua_list(pkg["roots"]), lua_list(pkg["modules"]),
             "true" if pkg.get("broad") else "false", "true" if pkg["folder"].startswith(PREFIX) else "false"),
-        '    curseforge = %s, issues = "%s" }' % (
-            ('"https://www.curseforge.com/projects/%s"' % pkg["project"]) if pkg["project"] else "nil", pkg["issues"]),
+        '    curseforge = %s, issues = "%s", icon = "%s" }' % (
+            ('"https://www.curseforge.com/projects/%s"' % pkg["project"]) if pkg["project"] else "nil", pkg["issues"],
+            (icon or pkg["icon"]).replace("\\", "\\\\")),
         "-- One copy of our code runs: the full addon or another package enabled leaves this one inert.",
         "local COPIES = {",
         copies,
@@ -235,7 +236,7 @@ def build(source, out_dir, only):
                 elif rel.endswith(".lua"):
                     data = lua_text(rel, data.decode("utf-8"), folder).encode("utf-8")
                 out.writestr(folder + "/" + rel, data)
-            out.writestr(folder + "/Package.lua", package_lua(pkg).encode("utf-8"))
+            out.writestr(folder + "/Package.lua", package_lua(pkg, icon).encode("utf-8"))
         if commit:
             with open(path + ".commit", "w", encoding="utf-8", newline="\n") as handle:
                 handle.write(commit)

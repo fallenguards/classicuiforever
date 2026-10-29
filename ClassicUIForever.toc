@@ -298,6 +298,7 @@ Options\HelpPanes.lua
 Options\GameMenu.lua
 Options\SettingsPanel.lua
 Options\Welcome.lua
+Options\LookPick.lua
 Options\Status.lua
 Options\VersionCheck.lua
 Core\API.lua

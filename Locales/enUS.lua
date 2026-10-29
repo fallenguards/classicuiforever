@@ -464,6 +464,7 @@ L["CORE_CLASSICUI_FOREVER_N_NX"] = "ClassicUI Forever\n\n%s"
 L["MAP_CLASSICUI_FOREVER"] = "ClassicUI Forever"
 L["MAP_LEFT_CLICK_OPTIONS"] = "Left-click: options"
 L["MAP_RIGHT_CLICK_WELCOME_NOTE"] = "Right-click: welcome note"
+L["MAP_RIGHT_CLICK_PICK"] = "Right-click: pick a look"
 L["MAP_DRAG_TO_MOVE_AROUND_THE"] = "Shift-drag to move around the ring"
 
 -- Map/MinimapCollector.lua

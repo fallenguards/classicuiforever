@@ -14,6 +14,12 @@ local function BuildSettings()
         EasyFind.API.RegisterSettingsIndex(TITLE, ns.OptionsIndexRows)
     end
     if not Settings or not Settings.RegisterAddOnCategory then return end
+    -- The color picker: its own settings on one page.
+    if ns.PickerCanvas and Settings.RegisterCanvasLayoutCategory then
+        category = Settings.RegisterCanvasLayoutCategory(ns.PickerCanvas(), TITLE)
+        Settings.RegisterAddOnCategory(category)
+        return
+    end
     -- Our own panel as canvas pages: the search and every page's buttons on our entry, each page under it as the game
     -- lists other addons' pages.
     if Settings.RegisterCanvasLayoutCategory and ns.OptionsCanvas then
@@ -90,8 +96,11 @@ local function SetBool(key, value)
     ns.ToggleChanged(key)
 end
 
-SLASH_FOREVERCLASSICUI1 = "/fcui"
-SLASH_FOREVERCLASSICUI2 = "/foreverclassicui"
+-- The color picker is an addon of its own: its own command, never the full addon's.
+local PICKER = ns.PACKAGE and not ns.PACKAGE.piece
+ns.SLASH = PICKER and "/fcp" or "/fcui"
+SLASH_FOREVERCLASSICUI1 = ns.SLASH
+SLASH_FOREVERCLASSICUI2 = PICKER and "/fallenscolorpicker" or "/foreverclassicui"
 SlashCmdList.FOREVERCLASSICUI = function(msg)
     msg = (msg or ""):lower()
     local cmd, arg = msg:match("^(%S+)%s*(%S*)$")

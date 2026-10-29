@@ -738,6 +738,19 @@ function ns.SetThemeColor(r, g, b)
     Retint()
 end
 
+-- dbVersion 31: the shade's default moved from 0 (black panes) to its middle. It only ever showed in the color picker's
+-- broad mode, so a saved 0 (the old default) moves with it, in the account and every profile.
+function ns.PaneShadeMiddle()
+    local function Move(t)
+        if t.themePaneShade == 0 then t.themePaneShade = ns.PANE_SHADE_DEFAULT end
+    end
+    Move(ns.db)
+    for _, shot in pairs(type(ns.db.profiles) == "table" and ns.db.profiles or {}) do
+        if type(shot) == "table" then Move(shot) end
+    end
+    ns.db.dbVersion = 31
+end
+
 -- Background shade (0-100): panes darker than their frames below 50, lighter above it.
 function ns.SetThemePaneShade(level)
     ns.db.themePaneShade = math.max(0, math.min(100, math.floor((tonumber(level) or ns.PANE_SHADE_DEFAULT) + 0.5)))

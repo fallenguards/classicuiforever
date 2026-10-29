@@ -2,6 +2,7 @@
 BackdropTemplate
 ContainerFrameItemButtonTemplate
 CooldownFrameTemplate
+DefaultPanelFlatTemplate
 DialogBorderDarkTemplate
 InputBoxTemplate
 PanelTabButtonTemplate
@@ -15,4 +16,5 @@ TooltipBackdropTemplate
 UICheckButtonTemplate
 UIPanelButtonTemplate
 UIPanelCloseButton
+UIRadioButtonTemplate
 WowStyle1DropdownTemplate

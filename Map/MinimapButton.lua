@@ -312,23 +312,35 @@ function ns.RingButton(spec)
     return Show, Hide
 end
 
+-- The color picker is a product of its own: its addon list icon, and right-click its look pick.
+local PICKER = ns.PACKAGE and not ns.PACKAGE.piece
+
 local ShowOptions, HideOptions = ns.RingButton({
     name = "ForeverClassicUIMinimapButton",
     key = "minimapOptionsButton",
     angleKey = "minimapButtonAngle",
     angle = 213,   -- clear of the tracking glass (186) under the tracking spell
     addonButton = true,
-    face = function(icon) ns.Dress(icon, "gryphonIcon", GRYPHON) end,
-    onClick = function(_, mouse)
-        if mouse == "RightButton" then
-            if ns.ShowWelcome then ns.ShowWelcome() end
+    face = function(icon)
+        if PICKER then
+            icon:SetTexture(ns.PACKAGE.icon)
+            ns.Dress(icon, nil, ICON_FACE)
         else
+            ns.Dress(icon, "gryphonIcon", GRYPHON)
+        end
+    end,
+    onClick = function(_, mouse)
+        if mouse ~= "RightButton" then
             ns.OpenOptions()
+        elseif PICKER then
+            ns.ShowLookPick()
+        elseif ns.ShowWelcome then
+            ns.ShowWelcome()
         end
     end,
     tip = { anchor = "ANCHOR_LEFT", text = L["MAP_CLASSICUI_FOREVER"], r = 1, g = 1, b = 1, lines = {
         { L["MAP_LEFT_CLICK_OPTIONS"], 0.8, 0.8, 0.8 },
-        { L["MAP_RIGHT_CLICK_WELCOME_NOTE"], 0.8, 0.8, 0.8 },
+        { L[PICKER and "MAP_RIGHT_CLICK_PICK" or "MAP_RIGHT_CLICK_WELCOME_NOTE"], 0.8, 0.8, 0.8 },
         { L["MAP_DRAG_TO_MOVE_AROUND_THE"], 0.8, 0.8, 0.8 },
     } },
 })

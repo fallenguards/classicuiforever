@@ -37,25 +37,28 @@ function O.ColorRow(parent, key, label, tooltip)
         self:EnableMouse(self.on)
         self:Sync()
     end
-    row:SetScript("OnClick", function()
-        local r, g, b = ns.HexColor(ns.db[key])
-        local was = ns.db[key]
-        ColorPickerFrame:SetupColorPickerAndShow({
-            r = r or 1, g = g or 1, b = b or 1,
-            swatchFunc = function()
-                PickColor(ColorPickerFrame:GetColorRGB())
-                row:Sync()
-            end,
-            -- The game's picker cancels on any click outside it: that click keeps the pick, Cancel and Escape undo it.
-            cancelFunc = function()
-                if IsMouseButtonDown() and not ColorPickerFrame:IsMouseOver() then return end
-                PickColor(ns.HexColor(was))
-                row:Sync()
-            end,
-        })
-    end)
+    row:SetScript("OnClick", function() O.EditThemeColor(function() row:Sync() end) end)
     O.Describe(row, key, label, tooltip)
     return row
+end
+
+-- The game's colour picker on the custom colour; changed(): after each pick or undo.
+function O.EditThemeColor(changed)
+    local was = ns.db.themeColor
+    local r, g, b = ns.HexColor(was)
+    ColorPickerFrame:SetupColorPickerAndShow({
+        r = r or 1, g = g or 1, b = b or 1,
+        swatchFunc = function()
+            PickColor(ColorPickerFrame:GetColorRGB())
+            changed()
+        end,
+        -- The game's picker cancels on any click outside it: that click keeps the pick, Cancel and Escape undo it.
+        cancelFunc = function()
+            if IsMouseButtonDown() and not ColorPickerFrame:IsMouseOver() then return end
+            PickColor(ns.HexColor(was))
+            changed()
+        end,
+    })
 end
 
 local RESET_TIP = { text = L["OPTWIN_RESET_TO_DEFAULT"], r = 1, g = 1, b = 1 }
