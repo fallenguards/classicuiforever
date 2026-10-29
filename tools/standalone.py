@@ -18,7 +18,7 @@ import zipfile
 SUITE = "ClassicUIForever"
 # Where a package's players report problems: the full addon's tracker, the code being the same, its issue form's
 # Which addon? picked by the link (.github/ISSUE_TEMPLATE, the dropdown id addon).
-ISSUES = "https://github.com/wowaddonmaker/classicuiforever/issues/new/choose?addon="
+ISSUES = "https://github.com/fallenguards/classicuiforever/issues/new/choose?addon="
 PREFIX = SUITE + "Standalone"
 THEME = ["bronzeTheme"]
 
@@ -68,7 +68,7 @@ PACKAGES = [
     # The theme alone, under the author's own brand: its own folder and title, not a ClassicUI Forever piece's.
     # broad: every texture of the game's windows takes the theme but what stays as drawn (Art/GameArt.lua).
     dict(id="UIColorPicker", name="Fallen's UI Color Picker", folder="FallensUIColorPicker", pages=[], roots=THEME,
-         modules=[], title="Fallen's UI Color Picker", issues="https://github.com/wowaddonmaker/fallens-ui-color-picker/issues",
+         modules=[], title="Fallen's UI Color Picker", issues="https://github.com/fallenguards/fallens-ui-color-picker/issues",
          broad=True, icon="Interface\\Icons\\INV_Misc_Gem_Variety_01",
          notes="Recolor the game's whole UI: dark, a custom color or bronze, on Forever and retail. Originally "
                "developed as part of ClassicUI Forever."),

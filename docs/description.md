@@ -1,6 +1,6 @@
 # ClassicUI Forever
 
-[![GitHub](https://raw.githubusercontent.com/wowaddonmaker/EasyFind/main/.github/badges/github.png)](https://github.com/wowaddonmaker/classicuiforever) [![Donate](https://raw.githubusercontent.com/wowaddonmaker/EasyFind/main/.github/badges/donate.png)](https://buymeacoffee.com/easyfind)
+[![GitHub](https://raw.githubusercontent.com/fallenguards/EasyFind/main/.github/badges/github.png)](https://github.com/fallenguards/classicuiforever) [![Donate](https://raw.githubusercontent.com/fallenguards/EasyFind/main/.github/badges/donate.png)](https://buymeacoffee.com/easyfind)
 
 **ClassicUI Forever** puts the original Classic look back on top of the modern interface in World of Warcraft: Forever. Every piece has its own toggle in case you want to keep any of the new stuff.
 
@@ -32,10 +32,10 @@ Every piece is a checkbox in the options window (`/fcui`) or in the game's Setti
 
 This addon is a work in progress. If something looks wrong, say so; every report helps.
 
-*   GitHub issues: [https://github.com/wowaddonmaker/classicuiforever/issues/new/choose](https://github.com/wowaddonmaker/classicuiforever/issues/new/choose)
+*   GitHub issues: [https://github.com/fallenguards/classicuiforever/issues/new/choose](https://github.com/fallenguards/classicuiforever/issues/new/choose)
 *   CurseForge: [https://www.curseforge.com/wow/addons/classicui-forever](https://www.curseforge.com/wow/addons/classicui-forever)
 
 # Links
 
-*   GitHub: [https://github.com/wowaddonmaker/classicuiforever](https://github.com/wowaddonmaker/classicuiforever)
-*   Changelog: [https://github.com/wowaddonmaker/classicuiforever/blob/main/CHANGELOG.md](https://github.com/wowaddonmaker/classicuiforever/blob/main/CHANGELOG.md)
+*   GitHub: [https://github.com/fallenguards/classicuiforever](https://github.com/fallenguards/classicuiforever)
+*   Changelog: [https://github.com/fallenguards/classicuiforever/blob/main/CHANGELOG.md](https://github.com/fallenguards/classicuiforever/blob/main/CHANGELOG.md)

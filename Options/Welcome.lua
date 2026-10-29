@@ -10,7 +10,7 @@ local WIDTH = 420
 local PKG = ns.PACKAGE
 local CURSEFORGE_URL = PKG and PKG.curseforge or "https://www.curseforge.com/projects/1700043"
 local GITHUB_URL = PKG and PKG.issues
-    or "https://github.com/wowaddonmaker/classicuiforever/issues/new/choose?addon=ClassicUI%20Forever%20(full%20addon)"
+    or "https://github.com/fallenguards/classicuiforever/issues/new/choose?addon=ClassicUI%20Forever%20(full%20addon)"
 
 local BODY = L["WELCOME_BODY"]
 
@@ -513,7 +513,7 @@ for _, section in ipairs(WHATSNEW) do
     if #mine > 0 then NEWS[#NEWS + 1] = mine end
 end
 local GOLD, GREY = "|cffffd100", "|cffa0a0a0"
-local CHANGELOG_URL = "https://github.com/wowaddonmaker/classicuiforever/blob/main/CHANGELOG.md"
+local CHANGELOG_URL = "https://github.com/fallenguards/classicuiforever/blob/main/CHANGELOG.md"
 -- The box fits the text up to NEWS_BODY_H; past that it stays that tall and the bar scrolls the rest.
 local NEWS_WIDTH, NEWS_BODY_H, NEWS_WHEEL = 480, 280, 28
 local NEWS_BAR_ROOM = 24
