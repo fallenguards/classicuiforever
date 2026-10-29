@@ -3,6 +3,14 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN55_1_TITLE"] = "Leistentextur"
+L["WN55_1_TEXT"] = "Unter Einheitenfenster wählst du die Leistentextur der Gesundheits- und Manaleisten: Klassisch, jetzt glatter gezeichnet, Schlachtzugsfenster, Einfarbig oder Fertigkeitsleiste."
+L["WN55_2_TITLE"] = "Shop-Taste"
+L["WN55_2_TEXT"] = "Die Shop-Taste kann in einem eigenen Rahmen im 1.x-Mikromenü stehen. Sie ist standardmäßig ausgeblendet: Um sie zu zeigen, entferne den Haken bei Shop unter Mikrotasten ausblenden auf der Seite Aktionsleisten der Optionen (/fcui)."
+L["WN55_3_TITLE"] = "Zauberbuch-Taste"
+L["WN55_3_TEXT"] = "Die Zauberbuch-Taste im Mikromenü bleibt gedrückt, solange das Zauberbuch deine Zauber zeigt."
+L["WN55_4_TITLE"] = "Fehlerbehebungen"
+L["WN55_4_TEXT"] = "Der Tooltip der Sozial-Taste sagt Sozial, und ein langer Fenstertitel behält die Enden seines Titelschilds."
 L["WN54_1_TITLE"] = "Flüssigere Optionen"
 L["WN54_1_TEXT"] = "Das Ändern einer Option ruckelt nicht mehr: Nur die Teile der Oberfläche, die diese Option betrifft, werden neu angeordnet."
 L["WN54_2_TITLE"] = "Mikromenü"

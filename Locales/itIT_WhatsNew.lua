@@ -3,6 +3,14 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN55_1_TITLE"] = "Texture delle barre"
+L["WN55_1_TEXT"] = "Una scelta di Texture delle barre in Riquadri delle unità per le barre di salute e mana: Classica, ora più liscia, Riquadri incursione, Tinta unita o Barra delle abilità."
+L["WN55_2_TITLE"] = "Pulsante del negozio"
+L["WN55_2_TEXT"] = "Il pulsante del negozio può stare nel micromenu della 1.x con una cornice sua. È nascosto per impostazione predefinita: per mostrarlo, togli la spunta a Negozio sotto Nascondi micropulsanti, nella pagina Barre delle azioni delle opzioni (/fcui)."
+L["WN55_3_TITLE"] = "Pulsante del libro degli incantesimi"
+L["WN55_3_TEXT"] = "Il pulsante del libro degli incantesimi nel micromenu resta premuto mentre il libro mostra i tuoi incantesimi."
+L["WN55_4_TITLE"] = "Correzioni"
+L["WN55_4_TEXT"] = "Il suggerimento del pulsante sociale dice Social, e un titolo di finestra lungo mantiene le estremità della sua targa."
 L["WN54_1_TITLE"] = "Opzioni più fluide"
 L["WN54_1_TEXT"] = "Cambiare un'opzione non scatta più: si ridispongono solo le parti dell'interfaccia toccate da quell'opzione."
 L["WN54_2_TITLE"] = "Micromenu"

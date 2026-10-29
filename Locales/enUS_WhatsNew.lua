@@ -2,6 +2,14 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN55_1_TITLE"] = "Bar texture"
+L["WN55_1_TEXT"] = "A Bar texture pick under Unit frames for the health and mana bars: Classic, now drawn smoother, Raid frames, Solid or Skill bar."
+L["WN55_2_TITLE"] = "Shop button"
+L["WN55_2_TEXT"] = "The shop button can stand on the 1.x micro menu in a frame of its own. It is hidden by default: to show it, uncheck Shop under Hide micro buttons on the Action bars page of the options (/fcui)."
+L["WN55_3_TITLE"] = "Spellbook button"
+L["WN55_3_TEXT"] = "The spellbook button on the micro menu stays pressed while the spellbook shows your spells."
+L["WN55_4_TITLE"] = "Fixes"
+L["WN55_4_TEXT"] = "The social button's tooltip says Social, and a long window title keeps its title plate's ends."
 L["WN54_1_TITLE"] = "Smoother options"
 L["WN54_1_TEXT"] = "Changing an option no longer stutters: only the parts of the interface that option touches are laid out again."
 L["WN54_2_TITLE"] = "Micro menu"

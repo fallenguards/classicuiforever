@@ -3,6 +3,14 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN55_1_TITLE"] = "Textura de barra"
+L["WN55_1_TEXT"] = "Una opción de Textura de barra en Marcos de unidad para las barras de salud y maná: Clásica, ahora más suave, Marcos de banda, Sólida o Barra de habilidad."
+L["WN55_2_TITLE"] = "Botón de la tienda"
+L["WN55_2_TEXT"] = "El botón de la tienda puede estar en el micromenú de la 1.x con un marco propio. Está oculto por defecto: para mostrarlo, desmarca Tienda en Ocultar microbotones, en la página Barras de acción de las opciones (/fcui)."
+L["WN55_3_TITLE"] = "Botón del libro de hechizos"
+L["WN55_3_TEXT"] = "El botón del libro de hechizos del micromenú se queda pulsado mientras el libro muestra tus hechizos."
+L["WN55_4_TITLE"] = "Correcciones"
+L["WN55_4_TEXT"] = "El consejo del botón social dice Social, y un título de ventana largo conserva los extremos de su placa de título."
 L["WN54_1_TITLE"] = "Opciones más fluidas"
 L["WN54_1_TEXT"] = "Cambiar una opción ya no da tirones: solo se vuelven a colocar las partes de la interfaz a las que afecta esa opción."
 L["WN54_2_TITLE"] = "Micromenú"

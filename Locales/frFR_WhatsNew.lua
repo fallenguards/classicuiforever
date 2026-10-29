@@ -3,6 +3,14 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN55_1_TITLE"] = "Texture des barres"
+L["WN55_1_TEXT"] = "Un choix de Texture des barres dans Cadres d'unité pour les barres de vie et de mana : Classique, désormais plus lisse, Cadres de raid, Unie ou Barre de compétence."
+L["WN55_2_TITLE"] = "Bouton de la boutique"
+L["WN55_2_TEXT"] = "Le bouton de la boutique peut se placer dans le micro-menu de la 1.x, avec son propre cadre. Il est masqué par défaut : pour l'afficher, décochez Boutique sous Masquer des micro-boutons, dans la page Barres d'action des options (/fcui)."
+L["WN55_3_TITLE"] = "Bouton du grimoire"
+L["WN55_3_TEXT"] = "Le bouton du grimoire du micro-menu reste enfoncé tant que le grimoire affiche vos sorts."
+L["WN55_4_TITLE"] = "Corrections"
+L["WN55_4_TEXT"] = "L'infobulle du bouton social indique Social, et un long titre de fenêtre garde les extrémités de sa plaque de titre."
 L["WN54_1_TITLE"] = "Options plus fluides"
 L["WN54_1_TEXT"] = "Changer une option ne saccade plus : seules les parties de l'interface touchées par cette option sont replacées."
 L["WN54_2_TITLE"] = "Micro-menu"

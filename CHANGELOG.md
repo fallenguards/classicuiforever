@@ -2,6 +2,23 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.40.3] - 2026-10-29
+
+### Added
+- A Bar texture pick under Unit frames for the health and mana bars: Classic, Raid frames, Solid or Skill bar. Classic is drawn smoother than before.
+- The shop button can stand on the 1.x micro menu in a frame of its own. It stays hidden by default: uncheck Shop under Hide micro buttons on the Action bars page to show it.
+
+### Changed
+- Bags beside the side bars is grayed out while Classic bar is off, where it had no effect.
+- The FAQ no longer asks about action bars 6 to 8, which have been the game's own since 0.14.0.
+- The Support page's GitHub link opens the issue form with ClassicUI Forever already picked, and every GitHub link points to the project's new address.
+- Groundwork for standalone pieces of ClassicUI Forever.
+
+### Fixed
+- The social button's tooltip says Social under its pad too (#205).
+- On retail, the spellbook button on the micro menu stays pressed while the spellbook shows your spells.
+- A long window title keeps its title plate's ends at their own size; the middle widens instead.
+
 ## [0.40.2] - 2026-10-28
 
 ### Changed
