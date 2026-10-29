@@ -195,7 +195,7 @@ ns.TOGGLES = {
         search = "key ring keys keyring" },
     { "oneBagBagSlots", L["OPT_oneBagBagSlots"], L["OPT_oneBagBagSlots_TIP"], parent = "oneBag", needs = "bags",
         search = "bag slots equipped bags swap backpack only" },
-    { "bagsBesideBars", L["OPT_bagsBesideBars"], L["OPT_bagsBesideBars_TIP"] },
+    { "bagsBesideBars", L["OPT_bagsBesideBars"], L["OPT_bagsBesideBars_TIP"], needs = "classicBar" },
     { "showBags", L["OPT_showBags"], L["OPT_bagsShow_TIP"], radio = "bagsShow", drop = true,
         search = "bag bar hide bags buttons backpack hover mouseover mouse over open", sub = L["SUB_BAG_BAR"] },
     { "hideBagsAlways", L["OPT_hideBagsAlways"], L["OPT_bagsShow_TIP"], radio = "bagsShow", drop = true },

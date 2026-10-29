@@ -23,6 +23,9 @@ local BOX_OWNERS = { character = { "characterSheet" }, professions = { "professi
     gryphonRight = { "classicBar" }, social = { "panelSocial" }, groupFinder = { "groupFinder" },
     questGiver = { "panelQuest" }, gossip = { "panelGossip" }, minimapOptionsButton = { "minimapButton" } }
 
+-- Settings with no row in a package that keep their default there: chat notes (another addon holds the bars) still say.
+local AT_DEFAULT = { addonMessages = true, barsTakenNote = true }
+
 local function Set(list)
     local set = {}
     for _, key in ipairs(list or ns.EMPTY) do set[key] = true end
@@ -37,6 +40,20 @@ local function PageOf()
         pageOf[entry[1]] = page
     end
     return pageOf
+end
+
+-- Kept rows that need a setting the package lacks (the classic bar's pieces on the Bags page), and rows under them, out.
+local function DropDead(pkg, kept)
+    local gone, dropped = {}, true
+    while dropped do
+        dropped = false
+        for _, entry in ipairs(ns.TOGGLES) do
+            local key, need = entry[1], entry.needs
+            if kept[key] and ((need and not kept[need] and not pkg.modules[need]) or (entry.parent and gone[entry.parent])) then
+                kept[key], gone[key], dropped = nil, true, true
+            end
+        end
+    end
 end
 
 -- The rows on the package's pages and its roots, then every row under a kept one and every row of a kept radio group.
@@ -60,6 +77,7 @@ local function KeptRows(pkg, pageOf)
             end
         end
     end
+    DropDead(pkg, kept)
     return kept
 end
 
@@ -121,7 +139,7 @@ function ns.ApplyPackage()
     local kept = KeptRows(pkg, pageOf)
     pkg.kept, pkg.off = kept, {}
     for _, entry in ipairs(ns.TOGGLES) do
-        if not kept[entry[1]] then pkg.off[entry[1]] = true end
+        if not kept[entry[1]] and not AT_DEFAULT[entry[1]] then pkg.off[entry[1]] = true end
     end
     TrimRows(kept, pageOf)
     for i = #ns.WINDOW_LIST, 1, -1 do

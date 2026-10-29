@@ -65,7 +65,8 @@ local function Answers(list)
 end
 
 local ACTION_BARS = { "classicBar", "classicBarSize", "hideGryphonLeft", "hideMicroButtons", "hideMicroGroupFinder",
-    "hideMicroLegacy", "hideProfessionsButton", "hideMicroCollections", "hideMicroAchievements", "minimapButton" }
+    "hideMicroLegacy", "hideProfessionsButton", "hideMicroCollections", "hideMicroAchievements", "minimapButton", "showBags",
+    "reagentBagSlot", "hideBagsArt", "classicFonts" }
 local loads = {}
 local function Copy(name, forever, kept, piece)
     local list = Load(forever, kept, piece)
@@ -106,11 +107,11 @@ for _, client in ipairs({ true, false }) do
     Check(bars.FAQ_RETAILBUTTONS_Q == (not client and "FAQ_RETAILBUTTONS_KEY_A" or nil),
         name .. " action bars: retail's buttons by their keys")
     for _, q in ipairs({ "FAQ_TENBUTTONS_Q", "FAQ_GRYPHONS_Q", "FAQ_XPBAR_Q", "FAQ_SCALE_Q", "FAQ_SCALEBACK_Q",
-        "FAQ_SETTING_Q", "FAQ_OTHER_ADDON_Q" }) do
+        "FAQ_SETTING_Q", "FAQ_OTHER_ADDON_Q", "FAQ_REAGENT_Q" }) do
         Check(bars[q], name .. " action bars: asks " .. q)
     end
     for _, q in ipairs({ "FAQ_GLOW_Q", "FAQ_TRACKER_Q", "FAQ_PLATES_Q", "FAQ_MOVE_Q", "FAQ_MOVERS_Q", "FAQ_SIZE_Q",
-        "FAQ_REAGENT_Q", "FAQ_QUICKJOIN_Q" }) do
+        "FAQ_QUICKJOIN_Q" }) do
         Check(not bars[q], name .. " action bars: no " .. q)
     end
 end

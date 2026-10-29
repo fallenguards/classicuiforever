@@ -25,19 +25,24 @@ THEME = ["bronzeTheme"]
 # id, name, pages (locale keys of options pages), roots (options rows, with every row under them), modules (modules
 # with no options row), icon, forever (Forever only), project (CurseForge id once the project exists), notes.
 PACKAGES = [
-    dict(id="ActionBars", name="Action Bars", pages=["GROUP_ACTION_BARS"], roots=[], modules=[],
+    # The bag bar rides the band: its rows (the Bags page's bag bar section) go with the bars. Classic fonts: the
+    # buttons' key labels and counts. Era coins: bag money, quest rewards. Each piece takes the look it shows.
+    dict(id="ActionBars", name="Action Bars", pages=["GROUP_ACTION_BARS"],
+         roots=["showBags", "bagsBesideBars", "hideKeyRing", "keyRingWithBags", "keyRingArtHidden", "eraBagSize",
+                "reagentBagSlot", "hideBagsArt", "bagsAboveRow", "classicFonts"], modules=[],
          icon="Interface\\Icons\\INV_Sword_04", notes="The 1.x gryphon bar: square buttons, micro menu, XP bar, key ring."),
-    dict(id="Bags", name="Bags", pages=["GROUP_BAGS"], roots=[], modules=[],
+    dict(id="Bags", name="Bags", pages=["GROUP_BAGS"], roots=["eraCoins"], modules=[],
          icon="Interface\\Icons\\INV_Misc_Bag_08", notes="1.x bag windows, one bag, and the bag bar."),
-    dict(id="UnitFrames", name="Unit Frames", pages=["GROUP_UNIT_FRAMES"], roots=[], modules=["buffArrow"],
+    dict(id="UnitFrames", name="Unit Frames", pages=["GROUP_UNIT_FRAMES"], roots=["classicFonts"], modules=["buffArrow"],
          icon="Interface\\Icons\\INV_Misc_Head_Human_01", notes="1.x unit frames and cast bars."),
-    dict(id="Nameplates", name="Nameplates", pages=["GROUP_NAMEPLATES"], roots=[], modules=[],
+    dict(id="Nameplates", name="Nameplates", pages=["GROUP_NAMEPLATES"], roots=["classicFonts"], modules=[],
          icon="Interface\\Icons\\Ability_Hunter_SniperShot", notes="1.x nameplates."),
     dict(id="Chat", name="Chat", pages=["GROUP_CHAT"], roots=[], modules=[],
          icon="Interface\\Icons\\INV_Misc_Note_01", notes="The 1.x chat frame look."),
-    dict(id="Maps", name="Minimap & World Map", pages=["GROUP_MINIMAP", "GROUP_MAP"], roots=[], modules=["mapCoords"],
+    dict(id="Maps", name="Minimap & World Map", pages=["GROUP_MINIMAP", "GROUP_MAP"], roots=["eraCoins"],
+         modules=["mapCoords"],
          icon="Interface\\Icons\\INV_Misc_Map_01", notes="The 1.x minimap and its ring buttons, and Era's world map."),
-    dict(id="Quests", name="Quests", pages=["GROUP_QUESTS"], roots=["panelQuest", "panelGossip"],
+    dict(id="Quests", name="Quests", pages=["GROUP_QUESTS"], roots=["panelQuest", "panelGossip", "eraCoins"],
          modules=["questListFont", "panels"], icon="Interface\\Icons\\INV_Scroll_03",
          notes="The 1.x quest log, quest tracker look and quest giver windows."),
     dict(id="CharacterSheet", wave=2, name="Character Sheet", pages=[], roots=["characterSheet"], modules=[],
