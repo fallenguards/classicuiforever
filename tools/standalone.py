@@ -12,11 +12,13 @@ import os
 import re
 import subprocess
 import sys
+import urllib.parse
 import zipfile
 
 SUITE = "ClassicUIForever"
-# Where a package's players report problems: the full addon's tracker, the code being the same.
-ISSUES = "https://github.com/wowaddonmaker/classicuiforever/issues"
+# Where a package's players report problems: the full addon's tracker, the code being the same, its issue form's
+# Which addon? picked by the link (.github/ISSUE_TEMPLATE, the dropdown id addon).
+ISSUES = "https://github.com/wowaddonmaker/classicuiforever/issues/new/choose?addon="
 PREFIX = SUITE + "Standalone"
 THEME = ["bronzeTheme"]
 
@@ -38,47 +40,49 @@ PACKAGES = [
     dict(id="Quests", name="Quests", pages=["GROUP_QUESTS"], roots=["panelQuest", "panelGossip"],
          modules=["questListFont", "panels"], icon="Interface\\Icons\\INV_Scroll_03",
          notes="The 1.x quest log, quest tracker look and quest giver windows."),
-    dict(id="CharacterSheet", name="Character Sheet", pages=[], roots=["characterSheet"], modules=[],
+    dict(id="CharacterSheet", wave=2, name="Character Sheet", pages=[], roots=["characterSheet"], modules=[],
          icon="Interface\\Icons\\INV_Chest_Plate06", notes="The 1.x character sheet and its stat panes."),
-    dict(id="Spellbook", name="Spellbook", pages=[], roots=["spellBook"], modules=[],
+    dict(id="Spellbook", wave=2, name="Spellbook", pages=[], roots=["spellBook"], modules=[],
          icon="Interface\\Icons\\INV_Misc_Book_09", notes="The 1.x spellbook."),
-    dict(id="Talents", name="Talents", pages=[], roots=["talents"], modules=[],
+    dict(id="Talents", wave=2, name="Talents", pages=[], roots=["talents"], modules=[],
          icon="Interface\\Icons\\Ability_Marksmanship", notes="The 1.x talents window."),
-    dict(id="LegacyWindow", name="Legacy Window", pages=[], roots=["legacyWindow"], modules=[], forever=True,
+    dict(id="LegacyWindow", wave=2, name="Legacy Window", pages=[], roots=["legacyWindow"], modules=[], forever=True,
          icon="Interface\\Icons\\INV_Misc_Book_11", notes="Forever's Legacy trees, challenges and rewards in the 1.x look."),
-    dict(id="Professions", name="Professions", pages=["GROUP_PROFESSIONS"], roots=[], modules=[],
+    dict(id="Professions", wave=2, name="Professions", pages=["GROUP_PROFESSIONS"], roots=[], modules=[],
          icon="Interface\\Icons\\Trade_BlackSmithing", notes="The 1.x professions book, trade skill window and trainer."),
-    dict(id="Collections", name="Collections", pages=[], roots=["collectionsWindow"], modules=[],
+    dict(id="Collections", wave=2, name="Collections", pages=[], roots=["collectionsWindow"], modules=[],
          icon="Interface\\Icons\\Ability_Mount_RidingHorse", notes="Mounts, pets, toys, heirlooms and looks in a 1.x window."),
-    dict(id="Social", name="Social", pages=["GROUP_SOCIAL"],
+    dict(id="Social", wave=2, name="Social", pages=["GROUP_SOCIAL"],
          roots=["groupFinder", "panelSocial", "panelCommunities", "panelGuildControl", "panelGroupFinder",
                         "panelChannels"],
          modules=["panels"], icon="Interface\\Icons\\INV_Misc_Note_02",
          notes="The 1.x social window, Who list, guild roster and group finder."),
     dict(id="DamageMeter", name="Damage Meter", pages=[], roots=["damageMeter"], modules=[],
          icon="Interface\\Icons\\INV_Misc_PocketWatch_01", notes="The game's damage meter in the classic look."),
-    dict(id="Tooltips", name="Tooltips", pages=[], roots=["eraCoins"], modules=["tooltips"],
+    dict(id="Tooltips", wave=2, name="Tooltips", pages=[], roots=["eraCoins"], modules=["tooltips"],
          icon="Interface\\Icons\\INV_Misc_QuestionMark", notes="1.x tooltips."),
-    dict(id="WindowsAndMenus", name="Windows and Menus", pages=["GROUP_ALL_WINDOWS"],
+    dict(id="WindowsAndMenus", wave=2, name="Windows and Menus", pages=["GROUP_ALL_WINDOWS"],
          roots=["classicFonts", "windowLocksAlways"], modules=["panels", "clientMenus"],
          icon="Interface\\Icons\\INV_Misc_Book_08",
          notes="The game's own windows, game menu, settings and menus in 1.x frames."),
     # The theme alone, under the author's own brand: its own folder and title, not a ClassicUI Forever piece's.
     # broad: every texture of the game's windows takes the theme but what stays as drawn (Art/GameArt.lua).
     dict(id="UIColorPicker", name="Fallen's UI Color Picker", folder="FallensUIColorPicker", pages=[], roots=THEME,
-         modules=[], title="Fallen's UI Color Picker", broad=True, icon="Interface\\Icons\\INV_Misc_Gem_Variety_01",
+         modules=[], title="Fallen's UI Color Picker", issues="https://github.com/wowaddonmaker/fallens-ui-color-picker/issues",
+         broad=True, icon="Interface\\Icons\\INV_Misc_Gem_Variety_01",
          notes="Recolor the game's whole UI: dark, a custom color or bronze, on Forever and retail. Originally "
                "developed as part of ClassicUI Forever."),
 ]
 for pkg in PACKAGES:
     pkg.setdefault("forever", False)
     pkg.setdefault("project", None)
-    pkg.setdefault("issues", ISSUES)
     # Every package keeps the minimap options button: players find a package there, not by its slash command.
     if "GROUP_MINIMAP" not in pkg["pages"] and "minimapButton" not in pkg["roots"]:
         pkg["roots"] = pkg["roots"] + ["minimapButton"]
     pkg.setdefault("folder", PREFIX + pkg["id"])
     pkg.setdefault("title", "ClassicUI Forever: Standalone %s" % pkg["name"])
+    pkg.setdefault("issues", ISSUES + urllib.parse.quote(pkg["title"]))
+    pkg.setdefault("wave", 1)
 # Every package's folder: the guard's list of copies of our code.
 FOLDERS = [pkg["folder"] for pkg in PACKAGES]
 

@@ -7,7 +7,25 @@ body:
       value: |
         **Please check you have this addon first.** Several addons use a similar mix of the same words, Forever ClassicUI and Classic UI for Forever among them, and reports meant for those land here by mistake.
 
-        This one is **ClassicUI Forever**: its folder is `ClassicUIForever` and its commands are under `/fcui`. If the folder or the slash command on yours reads differently, it is a different project and this tracker cannot help with it.
+        This one is **ClassicUI Forever**: its folder is `ClassicUIForever`, or `ClassicUIForeverStandalone` and the piece's name for a standalone piece, and its commands are under `/fcui`. If the folder or the slash command on yours reads differently, it is a different project and this tracker cannot help with it.
+  - type: dropdown
+    id: addon
+    attributes:
+      label: Which addon?
+      description: The full addon, or the standalone piece you have. The link in the addon's Support page picks it for you.
+      options:
+        - "ClassicUI Forever (full addon)"
+        - "ClassicUI Forever: Standalone Action Bars"
+        - "ClassicUI Forever: Standalone Bags"
+        - "ClassicUI Forever: Standalone Unit Frames"
+        - "ClassicUI Forever: Standalone Nameplates"
+        - "ClassicUI Forever: Standalone Chat"
+        - "ClassicUI Forever: Standalone Minimap & World Map"
+        - "ClassicUI Forever: Standalone Quests"
+        - "ClassicUI Forever: Standalone Damage Meter"
+      default: 0
+    validations:
+      required: true
   - type: textarea
     id: request
     attributes:

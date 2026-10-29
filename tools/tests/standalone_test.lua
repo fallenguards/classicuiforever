@@ -149,6 +149,35 @@ Check(Guard({ ClassicUIForever = true, ClassicUIForeverStandaloneBags = true }) 
 Check(Guard({ ClassicUIForeverStandaloneBags = true, ClassicUIForeverStandaloneChat = true }) == "other",
     "another standalone enabled: inert")
 
+-- Every released piece is a pick in the issue forms' Which addon?, and its Support page link picks it; the full addon's
+-- link picks the first option.
+local function Released()
+    local cmd = 'cd "%s" && %s -c "import sys; sys.path.insert(0, \'tools\'); import standalone; '
+        .. '[print(p[\'title\'] + chr(9) + p[\'issues\']) for p in standalone.PACKAGES '
+        .. 'if p[\'wave\'] == 1 and p[\'folder\'].startswith(standalone.PREFIX)]"'
+    for _, py in ipairs({ "python3", "python" }) do
+        local pipe = io.popen(string.format(cmd, ROOT, py) .. " 2>&1")
+        local text = pipe and pipe:read("a")
+        if pipe then pipe:close() end
+        if text and text:find("Standalone", 1, true) then return text end
+    end
+end
+local function Decode(s) return (s:gsub("%%(%x%x)", function(h) return string.char(tonumber(h, 16)) end)) end
+local released = Released() or ""
+Check(released ~= "", "tools/standalone.py lists the released pieces")
+for _, form in ipairs({ ".github/ISSUE_TEMPLATE/bug_report.yml", ".github/ISSUE_TEMPLATE/feature_request.yml" }) do
+    local text = Read(form)
+    local options = text:match("id: addon.-options:\n(.-)\n%s+default:") or ""
+    local first = options:match('%- "([^"]+)"')
+    Check(first == "ClassicUI Forever (full addon)", form .. ": the full addon first")
+    local welcome = Read("Options/Welcome.lua"):match("issues/new/choose%?addon=([^\"]+)\"")
+    Check(welcome and Decode(welcome) == first, "the full addon's link picks the first option")
+    for title, url in released:gmatch("([^\t\n]+)\t([^\n]+)") do
+        Check(options:find('- "' .. title .. '"', 1, true) ~= nil, form .. " lists " .. title)
+        Check(Decode(url:match("addon=(.+)$") or "") == title, title .. ": its link picks it")
+    end
+end
+
 if failed > 0 then
     print(failed .. " standalone check(s) failed")
     os.exit(1)
