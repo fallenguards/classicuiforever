@@ -3,6 +3,8 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN56_1_TITLE"] = "Schnelleres Eigenes Design"
+L["WN56_1_TEXT"] = "Ein anderer Look oder ein Teil unter Mit Thema lässt das Spiel nicht mehr stocken, und ein abgewählter Teil bekommt die Farben des Spiels zurück. Eigenes Design ist standardmäßig aus; schalte es in den Optionen (/fcui) unter Aussehen ein."
 L["WN55_1_TITLE"] = "Leistentextur"
 L["WN55_1_TEXT"] = "Unter Einheitenfenster wählst du die Leistentextur der Gesundheits- und Manaleisten: Klassisch, jetzt glatter gezeichnet, Schlachtzugsfenster, Einfarbig oder Fertigkeitsleiste."
 L["WN55_2_TITLE"] = "Shop-Taste"

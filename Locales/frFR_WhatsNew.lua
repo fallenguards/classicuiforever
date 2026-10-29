@@ -3,6 +3,8 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN56_1_TITLE"] = "Thème personnalisé plus rapide"
+L["WN56_1_TEXT"] = "Changer de style ou une partie de Avec thème ne fige plus le jeu, et une partie décochée retrouve les couleurs du jeu. Thème personnalisé est désactivé par défaut ; activez-le dans les options (/fcui), sous Apparence."
 L["WN55_1_TITLE"] = "Texture des barres"
 L["WN55_1_TEXT"] = "Un choix de Texture des barres dans Cadres d'unité pour les barres de vie et de mana : Classique, désormais plus lisse, Cadres de raid, Unie ou Barre de compétence."
 L["WN55_2_TITLE"] = "Bouton de la boutique"

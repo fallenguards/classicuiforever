@@ -2,6 +2,8 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN56_1_TITLE"] = "Faster Custom theme"
+L["WN56_1_TEXT"] = "Switching the look or a part under Themed no longer stalls the game, and an unchecked part gets the game's own colors back. Custom theme is off by default; turn it on in the options (/fcui), under Look."
 L["WN55_1_TITLE"] = "Bar texture"
 L["WN55_1_TEXT"] = "A Bar texture pick under Unit frames for the health and mana bars: Classic, now drawn smoother, Raid frames, Solid or Skill bar."
 L["WN55_2_TITLE"] = "Shop button"

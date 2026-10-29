@@ -2,6 +2,14 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.40.4] - 2026-10-29
+
+### Changed
+- Changing a Custom theme setting is much faster: switching the look or checking a part under Themed no longer stalls the game for a moment.
+
+### Fixed
+- With Custom theme on, a part unchecked under Themed gives the game's own art in it back the game's colors, instead of plain white.
+
 ## [0.40.3] - 2026-10-29
 
 ### Added

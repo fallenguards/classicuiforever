@@ -3,6 +3,8 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN56_1_TITLE"] = "Tema personalizado más rápido"
+L["WN56_1_TEXT"] = "Cambiar de aspecto o una parte de Con tema ya no detiene el juego, y una parte desmarcada recupera los colores propios del juego. Tema personalizado está desactivado por defecto; actívalo en las opciones (/fcui), en Aspecto."
 L["WN55_1_TITLE"] = "Textura de barra"
 L["WN55_1_TEXT"] = "Una opción de Textura de barra en Marcos de unidad para las barras de salud y maná: Clásica, ahora más suave, Marcos de banda, Sólida o Barra de habilidad."
 L["WN55_2_TITLE"] = "Botón de la tienda"

@@ -3,6 +3,8 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN56_1_TITLE"] = "Tema personalizzato più veloce"
+L["WN56_1_TEXT"] = "Cambiare aspetto o una parte di Con tema non blocca più il gioco, e una parte deselezionata riprende i colori del gioco. Tema personalizzato è disattivato in modo predefinito; attivalo nelle opzioni (/fcui), in Aspetto."
 L["WN55_1_TITLE"] = "Texture delle barre"
 L["WN55_1_TEXT"] = "Una scelta di Texture delle barre in Riquadri delle unità per le barre di salute e mana: Classica, ora più liscia, Riquadri incursione, Tinta unita o Barra delle abilità."
 L["WN55_2_TITLE"] = "Pulsante del negozio"
