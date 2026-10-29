@@ -29,6 +29,11 @@ local LOOKS = {
     classicFonts = { "ActionBars", "UnitFrames", "Nameplates" },   -- key labels and counts, pet bar numbers, plate names
     eraCoins = { "Bags", "Quests", "Maps" },                       -- bag money, quest rewards, the map's quest list
 }
+-- Game windows a piece opens, and settings two pieces share: kept by each package listed.
+local SHARED = {
+    panelBank = { "Bags" }, panelCalendar = { "Maps" }, panelTaxi = { "Maps" }, panelChannels = { "Chat" },
+    panelQuest = { "Quests" }, panelGossip = { "Quests" }, hideLastNames = { "UnitFrames", "Nameplates" },
+}
 -- Modules no package carries yet: the next wave places them.
 local UNPLACED = { hideHelpButtons = true, hideZoneText = true, lootToast = true, zoneTerritory = true }
 
@@ -117,9 +122,11 @@ for _, forever in ipairs({ true, false }) do
             if spec.id == "ActionBars" then
                 for _, key in ipairs(barRows) do Check(kept[key], name .. ": the classic bar's row " .. key .. " goes with the bars") end
             end
-            for look, owners in pairs(LOOKS) do
-                for _, owner in ipairs(owners) do
-                    if owner == spec.id then Check(kept[look], name .. ": keeps " .. look) end
+            for _, list in ipairs({ LOOKS, SHARED }) do
+                for key, owners in pairs(list) do
+                    for _, owner in ipairs(owners) do
+                        if owner == spec.id then Check(kept[key], name .. ": keeps " .. key) end
+                    end
                 end
             end
             Check(ns.db.addonMessages == nil and ns.db.barsTakenNote == nil, name .. ": chat notes keep their default")

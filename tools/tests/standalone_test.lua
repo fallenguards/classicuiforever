@@ -131,6 +131,39 @@ end
 local src = Generated()
 Check(src ~= nil, "tools/standalone.py writes a package's first file")
 
+-- The addon list shows each package's title as it is, Standalone said once.
+local function Titles()
+    local cmd = 'cd "%s" && %s -c "import sys; sys.path.insert(0, \'tools\'); import standalone; '
+        .. '[print(standalone.toc_text(\'## Title: x\', p, p[\'folder\']).splitlines()[0] + chr(9) + p[\'title\']) '
+        .. 'for p in standalone.PACKAGES]"'
+    for _, py in ipairs({ "python3", "python" }) do
+        local pipe = io.popen(string.format(cmd, ROOT, py) .. " 2>&1")
+        local text = pipe and pipe:read("a")
+        if pipe then pipe:close() end
+        if text and text:find("## Title", 1, true) then return text end
+    end
+end
+-- Every addon list picture (tools/standalone_icons/<Id>.png) is named after a package.
+local function StrayIcons()
+    local cmd = 'cd "%s" && %s -c "import os, sys; sys.path.insert(0, \'tools\'); import standalone; '
+        .. 'ids = {p[\'id\'] for p in standalone.PACKAGES}; '
+        .. 'print(\'icons:\', *[f for f in os.listdir(standalone.ICONS) if f[:-4] not in ids or not f.endswith(\'.png\')])"'
+    for _, py in ipairs({ "python3", "python" }) do
+        local pipe = io.popen(string.format(cmd, ROOT, py) .. " 2>&1")
+        local text = pipe and pipe:read("a")
+        if pipe then pipe:close() end
+        if text and text:find("icons:", 1, true) then return text:match("icons:(.-)%s*$") end
+    end
+end
+local stray = StrayIcons()
+Check(stray == "", "standalone_icons holds only <Id>.png pictures of packages; stray: " .. tostring(stray))
+
+local titles = Titles() or ""
+Check(titles ~= "", "tools/standalone.py writes a package's toc title")
+for line, title in titles:gmatch("## Title: ([^\t\n]+)\t([^\n]+)") do
+    Check(line == title:gsub("\r$", ""), "toc title " .. line .. " is the package's own")
+end
+
 local function Guard(enabled)
     if not src then return "no file" end
     local names = { "ClassicUIForever", "ClassicUIForeverStandaloneBags", "ClassicUIForeverStandaloneChat" }

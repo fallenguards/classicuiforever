@@ -8,6 +8,7 @@ ns.PACKAGE (Core/Package.lua keeps its rows, boxes and modules, every other sett
 or another standalone enabled leaves this copy inert, every file returning at its first line. Saved variables are
 renamed per package; one copy of our code ever runs, so no other global needs a new name.
 """
+import io
 import os
 import re
 import subprocess
@@ -26,21 +27,22 @@ THEME = ["bronzeTheme"]
 # with no options row), icon, forever (Forever only), project (CurseForge id once the project exists), notes.
 PACKAGES = [
     # The bag bar rides the band: its rows (the Bags page's bag bar section) go with the bars. Classic fonts: the
-    # buttons' key labels and counts. Era coins: bag money, quest rewards. Each piece takes the look it shows.
+    # buttons' key labels and counts. Era coins: bag money, quest rewards. Each piece takes the look it shows, and the
+    # game windows it opens (the bank with the bags, the calendar and flight map with the maps, channels with chat).
     dict(id="ActionBars", name="Action Bars", pages=["GROUP_ACTION_BARS"],
          roots=["showBags", "bagsBesideBars", "hideKeyRing", "keyRingWithBags", "keyRingArtHidden", "eraBagSize",
-                "reagentBagSlot", "hideBagsArt", "bagsAboveRow", "classicFonts"], modules=[],
+                "reagentBagSlot", "hideBagsArt", "bagsAboveRow", "classicFonts"], modules=[], project=1771847,
          icon="Interface\\Icons\\INV_Sword_04", notes="The 1.x gryphon bar: square buttons, micro menu, XP bar, key ring."),
-    dict(id="Bags", name="Bags", pages=["GROUP_BAGS"], roots=["eraCoins"], modules=[],
+    dict(id="Bags", name="Bags", pages=["GROUP_BAGS"], roots=["eraCoins", "panelBank"], modules=["panels"],
          icon="Interface\\Icons\\INV_Misc_Bag_08", notes="1.x bag windows, one bag, and the bag bar."),
-    dict(id="UnitFrames", name="Unit Frames", pages=["GROUP_UNIT_FRAMES"], roots=["classicFonts"], modules=["buffArrow"],
+    dict(id="UnitFrames", name="Unit Frames", pages=["GROUP_UNIT_FRAMES"], roots=["classicFonts", "hideLastNames"], modules=["buffArrow"],
          icon="Interface\\Icons\\INV_Misc_Head_Human_01", notes="1.x unit frames and cast bars."),
     dict(id="Nameplates", name="Nameplates", pages=["GROUP_NAMEPLATES"], roots=["classicFonts"], modules=[],
          icon="Interface\\Icons\\Ability_Hunter_SniperShot", notes="1.x nameplates."),
-    dict(id="Chat", name="Chat", pages=["GROUP_CHAT"], roots=[], modules=[],
+    dict(id="Chat", name="Chat", pages=["GROUP_CHAT"], roots=["panelChannels"], modules=["panels"],
          icon="Interface\\Icons\\INV_Misc_Note_01", notes="The 1.x chat frame look."),
-    dict(id="Maps", name="Minimap & World Map", pages=["GROUP_MINIMAP", "GROUP_MAP"], roots=["eraCoins"],
-         modules=["mapCoords"],
+    dict(id="Maps", name="Minimap & World Map", pages=["GROUP_MINIMAP", "GROUP_MAP"],
+         roots=["eraCoins", "panelCalendar", "panelTaxi"], modules=["mapCoords", "panels"],
          icon="Interface\\Icons\\INV_Misc_Map_01", notes="The 1.x minimap and its ring buttons, and Era's world map."),
     dict(id="Quests", name="Quests", pages=["GROUP_QUESTS"], roots=["panelQuest", "panelGossip", "eraCoins"],
          modules=["questListFont", "panels"], icon="Interface\\Icons\\INV_Scroll_03",
@@ -95,6 +97,9 @@ FOLDERS = [pkg["folder"] for pkg in PACKAGES]
 LIVE = re.compile(r"^(Core/Localization\.lua|Core/Package\.lua|Locales/.*)$")
 INERT_LINE = "if select(2, ...).INERT then return end "
 SAVED = (("ForeverClassicUIDB", "DB"), ("ForeverClassicUICharDB", "CharDB"))
+# Each package's CurseForge picture, its addon list icon in the zip; a package with none keeps its game icon.
+ICONS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "standalone_icons")
+ICON_FILE = "media/StandaloneIcon.tga"
 
 
 def lua_list(items):
@@ -134,18 +139,18 @@ def package_lua(pkg):
     ])
 
 
-def toc_text(text, pkg, folder):
+def toc_text(text, pkg, folder, icon=None):
     nl = "\r\n" if "\r\n" in text else "\n"
     out, listed = [], False
     for line in text.split(nl):
         head = line.split(":", 1)[0]
         piece = folder.startswith(PREFIX)
         if head == "## Title":
-            line = "## Title: " + (pkg["title"] + " (Standalone)" if piece else pkg["title"])
+            line = "## Title: " + pkg["title"]
         elif head == "## Notes":
             line = "## Notes: " + (pkg["notes"] + " Standalone edition of ClassicUI Forever." if piece else pkg["notes"])
         elif head == "## IconTexture":
-            line = "## IconTexture: " + pkg["icon"]
+            line = "## IconTexture: " + (icon or pkg["icon"])
         elif head == "## X-Curse-Project-ID":
             if not pkg["project"]:
                 continue
@@ -168,6 +173,17 @@ def lua_text(path, text, folder):
     if not LIVE.match(path):
         text = INERT_LINE + text
     return text
+
+
+def icon_tga(pkg):
+    """The package's addon list icon from its CurseForge picture (standalone_icons/<Id>.png) as a 64 x 64 texture."""
+    path = os.path.join(ICONS, pkg["id"] + ".png")
+    if not os.path.isfile(path):
+        return None
+    from PIL import Image
+    buf = io.BytesIO()
+    Image.open(path).convert("RGBA").resize((64, 64), Image.LANCZOS).save(buf, "TGA")
+    return buf.getvalue()
 
 
 def zip_files(full_zip):
@@ -207,11 +223,15 @@ def build(source, out_dir, only):
             continue
         folder = pkg["folder"]
         path = "%s/%s-%s.zip" % (out_dir, folder, version)
+        tga = icon_tga(pkg)
+        icon = "Interface\\AddOns\\%s\\%s" % (folder, ICON_FILE[:-4].replace("/", "\\")) if tga else None
         with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as out:
+            if tga:
+                out.writestr(folder + "/" + ICON_FILE, tga)
             for rel, data in sorted(files.items()):
                 if rel == SUITE + ".toc":
                     rel = folder + ".toc"
-                    data = toc_text(data.decode("utf-8"), pkg, folder).encode("utf-8")
+                    data = toc_text(data.decode("utf-8"), pkg, folder, icon).encode("utf-8")
                 elif rel.endswith(".lua"):
                     data = lua_text(rel, data.decode("utf-8"), folder).encode("utf-8")
                 out.writestr(folder + "/" + rel, data)
