@@ -304,7 +304,9 @@ local MICRO_WINDOWS = {
     ForeverClassicUISpellbookMicroButton = { "ForeverClassicUISpellBook" },
 }
 -- The client's one window for spells and talents, where ours is not on.
-local SHARED = { SpellbookMicroButton = true, TalentMicroButton = true, PlayerSpellsMicroButton = true }
+-- Retail has no spellbook button: the band's own (Bar/BandMicro.lua) takes the spells half of the client's window.
+local SHARED = { SpellbookMicroButton = true, TalentMicroButton = true, PlayerSpellsMicroButton = true,
+    ForeverClassicUISpellbookMicroButton = true }
 local BOOK_BUTTONS = { SpellbookMicroButton = true, ForeverClassicUISpellbookMicroButton = true }
 -- MICRO_WINDOWS as frames, kept once made; one not made yet (load on demand, ours on first open) is looked up each pass.
 local windowFrames = {}
@@ -328,14 +330,14 @@ local function WindowUp(name)
     if SHARED[name] then
         -- Talents by the window itself: retail's row dresses the client's, ours never opens there.
         local off
-        if name == "SpellbookMicroButton" then off = not ns.ModuleInForce("spellBook") else off = not ns.TalentsActive() end
+        if BOOK_BUTTONS[name] then off = not ns.ModuleInForce("spellBook") else off = not ns.TalentsActive() end
         local shared = _G["PlayerSpellsFrame"]
         if off and shared and shared:IsShown() then
             -- Each button follows its own half, as the client's update does; retail's talents button is down on any
             -- page but the spells (that half is our book's casting layer).
             local book = shared.SpellBookFrame
             if name == "PlayerSpellsMicroButton" then return not (book and book:IsShown()) end
-            local half = (name == "SpellbookMicroButton" and book) or (name == "TalentMicroButton" and shared.TalentsFrame) or nil
+            local half = (BOOK_BUTTONS[name] and book) or (name == "TalentMicroButton" and shared.TalentsFrame) or nil
             if not half or half:IsShown() then return true end
         end
     elseif name == "QuestLogMicroButton" and not ns.ModuleInForce("questLog") then
