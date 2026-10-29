@@ -15,6 +15,8 @@ import sys
 import zipfile
 
 SUITE = "ClassicUIForever"
+# Where a package's players report problems: the full addon's tracker, the code being the same.
+ISSUES = "https://github.com/wowaddonmaker/classicuiforever/issues"
 PREFIX = SUITE + "Standalone"
 THEME = ["bronzeTheme"]
 
@@ -31,10 +33,8 @@ PACKAGES = [
          icon="Interface\\Icons\\Ability_Hunter_SniperShot", notes="1.x nameplates."),
     dict(id="Chat", name="Chat", pages=["GROUP_CHAT"], roots=[], modules=[],
          icon="Interface\\Icons\\INV_Misc_Note_01", notes="The 1.x chat frame look."),
-    dict(id="Minimap", name="Minimap", pages=["GROUP_MINIMAP"], roots=[], modules=[],
-         icon="Interface\\Icons\\INV_Misc_Map_01", notes="The 1.x minimap and its ring buttons."),
-    dict(id="WorldMap", name="World Map", pages=["GROUP_MAP"], roots=[], modules=["mapCoords"],
-         icon="Interface\\Icons\\INV_Misc_Map02", notes="Era's world map with its quest pane."),
+    dict(id="Maps", name="Minimap & World Map", pages=["GROUP_MINIMAP", "GROUP_MAP"], roots=[], modules=["mapCoords"],
+         icon="Interface\\Icons\\INV_Misc_Map_01", notes="The 1.x minimap and its ring buttons, and Era's world map."),
     dict(id="Quests", name="Quests", pages=["GROUP_QUESTS"], roots=["panelQuest", "panelGossip"],
          modules=["questListFont", "panels"], icon="Interface\\Icons\\INV_Scroll_03",
          notes="The 1.x quest log, quest tracker look and quest giver windows."),
@@ -73,8 +73,12 @@ PACKAGES = [
 for pkg in PACKAGES:
     pkg.setdefault("forever", False)
     pkg.setdefault("project", None)
+    pkg.setdefault("issues", ISSUES)
+    # Every package keeps the minimap options button: players find a package there, not by its slash command.
+    if "GROUP_MINIMAP" not in pkg["pages"] and "minimapButton" not in pkg["roots"]:
+        pkg["roots"] = pkg["roots"] + ["minimapButton"]
     pkg.setdefault("folder", PREFIX + pkg["id"])
-    pkg.setdefault("title", "ClassicUI Forever: %s" % pkg["name"])
+    pkg.setdefault("title", "ClassicUI Forever: Standalone %s" % pkg["name"])
 # Every package's folder: the guard's list of copies of our code.
 FOLDERS = [pkg["folder"] for pkg in PACKAGES]
 
@@ -93,9 +97,11 @@ def package_lua(pkg):
     return "\n".join([
         "local ADDON, ns = ...",
         "-- %s, made by tools/standalone.py from the ClassicUI Forever build." % pkg["title"],
-        'ns.PACKAGE = { title = "%s", pages = %s, roots = %s, modules = %s, broad = %s }' % (
+        'ns.PACKAGE = { title = "%s", pages = %s, roots = %s, modules = %s, broad = %s,' % (
             pkg["title"], lua_list(pkg["pages"]), lua_list(pkg["roots"]), lua_list(pkg["modules"]),
             "true" if pkg.get("broad") else "false"),
+        '    curseforge = %s, issues = "%s" }' % (
+            ('"https://www.curseforge.com/projects/%s"' % pkg["project"]) if pkg["project"] else "nil", pkg["issues"]),
         "-- One copy of our code runs: the full addon or another package enabled leaves this one inert.",
         "local COPIES = {",
         copies,

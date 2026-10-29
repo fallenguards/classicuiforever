@@ -6,8 +6,10 @@ local L = ns.L
 local O = ns.options
 local TITLE = O.TITLE
 local WIDTH = 420
-local CURSEFORGE_URL = "https://www.curseforge.com/projects/1700043"
-local GITHUB_URL = "https://github.com/wowaddonmaker/classicuiforever/issues"
+-- A standalone package's own project and tracker (tools/standalone.py); the full addon's otherwise.
+local PKG = ns.PACKAGE
+local CURSEFORGE_URL = PKG and PKG.curseforge or "https://www.curseforge.com/projects/1700043"
+local GITHUB_URL = PKG and PKG.issues or "https://github.com/wowaddonmaker/classicuiforever/issues"
 
 local BODY = L["WELCOME_BODY"]
 

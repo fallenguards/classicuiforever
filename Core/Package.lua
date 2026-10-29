@@ -21,7 +21,7 @@ local BOX_OWNERS = { character = { "characterSheet" }, professions = { "professi
     talents = { "talents" }, legacy = { "legacyWindow" }, collections = { "collectionsWindow" }, questLog = { "questLog" },
     map = { "worldMap" }, spellBook = { "spellBook" }, questWatch = { "questWatch" }, gryphonLeft = { "classicBar" },
     gryphonRight = { "classicBar" }, social = { "panelSocial" }, groupFinder = { "groupFinder" },
-    questGiver = { "panelQuest" }, gossip = { "panelGossip" } }
+    questGiver = { "panelQuest" }, gossip = { "panelGossip" }, minimapOptionsButton = { "minimapButton" } }
 
 local function Set(list)
     local set = {}

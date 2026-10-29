@@ -1,9 +1,16 @@
 local ADDON, ns = ...
 local L = ns.L
 
+-- A standalone package goes by its own name where the addon names itself (Core/Package.lua).
+local NAME = ns.PACKAGE and ns.PACKAGE.title or "ClassicUI Forever"
+if ns.PACKAGE then
+    L["MAP_CLASSICUI_FOREVER"] = NAME
+    L["CORE_CLASSICUI_FOREVER_N_NX"] = NAME .. "\n\n%s"
+end
+
 -- Chat lines lead with the 1.x bar's gryphon (the addon list icon), cut to its body: 128 x 76 of the file at 24 x 14.
 ns.PREFIX = "|TInterface\\AddOns\\" .. ADDON .. "\\media\\UI-MainMenuBar-EndCap-Dwarf:14:24:0:0:128:128:0:128:52:128|t "
-    .. "|cffe6c56cClassicUI Forever|r: "
+    .. "|cffe6c56c" .. NAME .. "|r: "
 
 -- { key = db key, apply, restore, init, id }, walked in ns.MODULE_ORDER so bar art lays out
 -- after end caps. id defaults to key (pageArrows rides classicBar's toggle).

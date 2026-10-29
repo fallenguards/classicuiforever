@@ -100,7 +100,7 @@ local function StatusText()
     local lines = {}
     local function Add(text) lines[#lines + 1] = text end
     local version, build, _, toc = GetBuildInfo()
-    Add("ClassicUI Forever " .. Version())
+    Add(O.TITLE .. " " .. Version())
     Add(string.format("Client: %s (%s), toc %s, %s", tostring(version), tostring(build), tostring(toc), GetLocale and GetLocale() or "?"))
     local width, height = GetPhysicalScreenSize()
     local windowed = ns.GetCVar("gxMaximize")
@@ -143,7 +143,7 @@ local window
 local function Build()
     local frame = O.DialogWindow("ForeverClassicUIStatus", 60)
     frame:SetSize(560, 380)
-    ns.DialogHeader(frame, L["OPTWIN_STATUS_TITLE"], HEADER)
+    ns.DialogHeader(frame, string.format(L["OPTWIN_STATUS_TITLE"], O.TITLE), HEADER)
 
     local how = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
     how:SetPoint("TOPLEFT", frame, "TOPLEFT", 24, -32)

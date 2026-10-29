@@ -715,7 +715,7 @@ L["OPTWIN_SWITCHING_TO_LAYOUT"] = "Switching to your %s layout."
 L["OPTWIN_SETTING_UP_LAYOUT"] = "Setting up the %s layout."
 L["OPTWIN_SWITCHING_TO_LAYOUT_ERA"] = "Switching to your %s layout, at Classic Era's interface size."
 L["OPTWIN_SETTING_UP_LAYOUT_ERA"] = "Setting up the %s layout, at Classic Era's interface size."
-L["OPTWIN_STATUS_TITLE"] = "ClassicUI Forever status"
+L["OPTWIN_STATUS_TITLE"] = "%s status"
 L["CORE_NAMES_AT_MOST_N_LETTERS"] = "Names are at most %d letters."
 L["UNIT_GAME_DEFAULTS"] = "Game defaults: %s"
 
