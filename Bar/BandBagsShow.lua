@@ -1,20 +1,18 @@
 local _, ns = ...
-local L = ns.L
 local B = ns.band
 
 -- The bag bar pick (options, Bag bar): the row hidden, faded till a bag window opens or the mouse is over it, or folded to
--- the backpack alone with a small arrow beside it while the mouse is there; the band's sockets, the floor and the game's own
--- bar go with it. Alpha, mouse and show flags only, so a pick made in a fight answers in it; what shows and goes fades.
+-- the backpack, a modified click of the player's pick on it unfolding them; sockets, floor and the game's bar go with it.
+-- Alpha, mouse and show flags only, so a pick made in a fight answers in it; what shows and goes fades.
 
 local BAG_BUTTONS = B.BAG_BUTTONS
 local SetFrameAlphaIf, SetShownIf = ns.SetFrameAlphaIf, ns.SetShownIf
 local MODES = { hideBagsAlways = "hidden", hideBagsOpen = "open", hideBagsHover = "hover", bagsBackpackOnly = "backpack" }
 local revealed = false        -- a bag window open (open), or the mouse over the row (hover)
-local arrowRevealed = false   -- the mouse over the row or the arrow
+local overRow = false         -- the mouse over the row: a folded row's riding key ring shows
 local hooked = false
 local buttons = {}
 local lit = setmetatable({}, { __mode = "k" })   -- row button -> true while the row's alpha lights it
-local arrow
 
 -- Edit mode shows the row whatever the pick: its box must be there to take. Bars another addon holds are its own.
 -- With Classic bar off, Forever's own bar keeps a socket per bag (the pick grayed) and retail's own bar folds with
@@ -29,7 +27,7 @@ function B.BagsMode()
     return "shown"
 end
 
--- Backpack only, folded: the bags away, the reagent bag kept, the key ring back on hover (the arrow's own state, saved).
+-- Backpack only, folded: the bags away, the reagent bag kept, the key ring back on hover (the fold click's state, saved).
 function B.BagsFolded() return B.BagsMode() == "backpack" and not (ns.db and ns.db.bagsUnfolded == true) end
 
 -- Cells past the five sockets: the reagent slot's.
@@ -75,19 +73,19 @@ end
 
 ------------------------------------------------------------------ the fade
 
--- The row's alpha and the arrow's walk to their targets a frame at a time; a lit item button's own SetAlpha lights its
--- regions again first (unlit, the frame's alpha alone hides them).
-local rowAlpha, rowTarget, arrowAlpha, arrowTarget = 1, 1, 0, 0
+-- The row's alpha and the riding key's walk to their targets a frame at a time; a lit item button's own SetAlpha lights
+-- its regions again first (unlit, the frame's alpha alone hides them).
+local rowAlpha, rowTarget, keyAlpha, keyTarget = 1, 1, 0, 0
 local lastTick
--- Backpack only, folded: the key ring riding the row comes and goes with the arrow, on hover (#195).
-local keyWithArrow = false
+-- Backpack only, folded: the key ring riding the row comes and goes on hover (#195).
+local keyOnHover = false
 
 local function Paint()
     local key = B.KeyButton()
     for i = 1, #buttons do
         local button = buttons[i]
         local alpha = lit[button] and rowAlpha or 0
-        if keyWithArrow and button == key then alpha = arrowAlpha end
+        if keyOnHover and button == key then alpha = keyAlpha end
         SetFrameAlphaIf(button, alpha)
     end
     local art = B.art
@@ -97,7 +95,6 @@ local function Paint()
         local home = B.KeyRingHome()
         if home and B.KeyRingRides() then home:SetAlpha(rowAlpha) end
     end
-    if arrow then arrow:SetAlpha(arrowAlpha) end
 end
 
 -- The hover fade's timings (ns.FADE_IN, ns.FADE_OUT in Core/Setters.lua).
@@ -111,21 +108,21 @@ local function FadeStep()
     local now = GetTime()
     local elapsed = now - (lastTick or now)
     lastTick = now
-    rowAlpha, arrowAlpha = Toward(rowAlpha, rowTarget, elapsed), Toward(arrowAlpha, arrowTarget, elapsed)
+    rowAlpha, keyAlpha = Toward(rowAlpha, rowTarget, elapsed), Toward(keyAlpha, keyTarget, elapsed)
     Paint()
-    if rowAlpha == rowTarget and arrowAlpha == arrowTarget then fadeJob:Sleep() end
+    if rowAlpha == rowTarget and keyAlpha == keyTarget then fadeJob:Sleep() end
 end
 fadeJob = ns.Sched.Job({ name = "bags.fade", every = 0, awake = false, fn = FadeStep })
 
 -- Targets set; at once when nothing fades (the pick, a band pass), else from where the fade stands.
-local function FadeTo(row, arrowWanted, atOnce)
-    rowTarget, arrowTarget = row, arrowWanted
+local function FadeTo(row, keyWanted, atOnce)
+    rowTarget, keyTarget = row, keyWanted
     if atOnce then
-        rowAlpha, arrowAlpha = row, arrowWanted
+        rowAlpha, keyAlpha = row, keyWanted
         Paint()
         return
     end
-    if rowAlpha ~= rowTarget or arrowAlpha ~= arrowTarget then
+    if rowAlpha ~= rowTarget or keyAlpha ~= keyTarget then
         lastTick = nil
         fadeJob:Wake()
     end
@@ -143,8 +140,8 @@ local function AnyBagOpen()
     return false
 end
 
--- The row's whole box (its buttons, the band's sockets or the floor under a moved row, the arrow) is one hover zone of
--- ours: gaps and socket art count as over the row. Hover only, so a click goes through to what lies under it.
+-- The row's whole box (its buttons, the band's sockets or the floor under a moved row) is one hover zone of ours: gaps
+-- and socket art count as over the row. Hover only, so a click goes through to what lies under it.
 local zone
 local box = {}
 
@@ -158,14 +155,14 @@ local function Grow(region)
     box.r, box.t = math.max(box.r or l + w, l + w), math.max(box.t or b + h, b + h)
 end
 
--- The mouse anywhere on the row's box, or over one of its buttons or the arrow.
+-- The mouse anywhere on the row's box, or over one of its buttons.
 local function OverRow()
     if zone and zone:IsVisible() and zone:IsMouseOver() then return true end
     for i = 1, Buttons(false) do
         local button = buttons[i]
         if button:IsVisible() and button:IsMouseOver() then return true end
     end
-    return arrow ~= nil and arrow:IsVisible() and arrow:IsMouseOver()
+    return false
 end
 
 local Apply
@@ -175,17 +172,17 @@ local function Reveal(on)
     revealed = on
     Apply()
 end
-local function ArrowReveal(on)
+local function KeyReveal(on)
     on = on and true or false
-    if arrowRevealed == on then return end
-    arrowRevealed = on
+    if overRow == on then return end
+    overRow = on
     Apply()
 end
 local function BagsChanged() if B.BagsMode() == "open" then Reveal(AnyBagOpen()) end end
 local function HoverChanged()
     local over = OverRow()
     if B.BagsMode() == "hover" then Reveal(over) end
-    ArrowReveal(over)
+    KeyReveal(over)
 end
 -- Its own key: the reagent bag's hover (BandBags) queues under bags.hover on the same buttons, and the last one queued runs.
 local function HoverLeft() ns.Sched.NextFrame("bags.rowHover", HoverChanged) end
@@ -204,7 +201,6 @@ local function HoverZone(wanted, n)
     local art = B.art
     for _, tex in ipairs(art and art.bagRun or {}) do Grow(tex) end
     Grow(art and art.bagFloor)
-    Grow(arrow)
     if not box.l then
         if zone then zone:Hide() end
         return
@@ -223,10 +219,39 @@ local function HoverZone(wanted, n)
     zone:Show()
 end
 
--- Bag windows seen opening and closing; the mouse entering and leaving the row's buttons (leave judged a frame later).
+------------------------------------------------------------------ the fold click
+
+-- Backpack only: the picked click on the backpack (options, Show bags with) folds or unfolds at once, in a fight too;
+-- the band's own pass (the part's width) follows out of combat. The game acts there on plain clicks and Shift (all bags).
+local FOLD_CLICKS = {
+    bagsFoldCtrl = { "LeftButton", "ctrl" }, bagsFoldAlt = { "LeftButton", "alt" },
+    bagsFoldShift = { "LeftButton", "shift" }, bagsFoldCtrlRight = { "RightButton", "ctrl" },
+    bagsFoldAltRight = { "RightButton", "alt" }, bagsFoldShiftRight = { "RightButton", "shift" },
+}
+
+local function Held(down, mod, name) return (down and true or false) == (mod == name) end
+
+local function FoldClicked(_, button)
+    if B.BagsMode() ~= "backpack" then return end
+    for key, click in pairs(FOLD_CLICKS) do
+        if ns.db[key] == true then
+            local mod = click[2]
+            if button ~= click[1] or not (Held(IsControlKeyDown(), mod, "ctrl") and Held(IsAltKeyDown(), mod, "alt")
+                and Held(IsShiftKeyDown(), mod, "shift")) then return end
+            ns.db.bagsUnfolded = ns.db.bagsUnfolded ~= true
+            Apply()
+            ns.WhenCalm("bags.fold", function() if B.Apply then B.Apply() end end)
+            return
+        end
+    end
+end
+
+-- Bag windows seen opening and closing; the mouse entering and leaving the row's buttons (leave judged a frame later);
+-- the backpack's clicks.
 local function Hook()
     if hooked then return end
     hooked = true
+    if MainMenuBarBackpackButton then MainMenuBarBackpackButton:HookScript("OnClick", FoldClicked) end
     if ContainerFrameCombinedBags then ns.Sched.OnVisible(ContainerFrameCombinedBags, "bags.show", BagsChanged) end
     for i = 1, NUM_CONTAINER_FRAMES or 13 do
         local frame = _G["ContainerFrame" .. i]
@@ -236,77 +261,6 @@ local function Hook()
         buttons[i]:HookScript("OnEnter", HoverChanged)
         buttons[i]:HookScript("OnLeave", HoverLeft)
     end
-end
-
------------------------------------------------------------------- the fold arrow
-
--- The band's stone page arrow, small, turned along the row: just past the backpack folded, past the last bag unfolded,
--- seen only while the mouse is over the row or itself. A click folds or unfolds at once, in a fight too; the band's
--- own pass (the part's width) follows out of combat.
-local ARROW = { coords = { 0, 1, 0, 1 }, fill = true, add = true }
-local STONE = { "arrowUpUp", "arrowUpDown", "arrowUpDisabled", "arrowUpHighlight" }
-local ARROW_SHARE, ARROW_GAP = 0.8, 2
-
-local function FoldClick()
-    ns.db.bagsUnfolded = ns.db.bagsUnfolded ~= true
-    Apply()
-    ns.WhenCalm("bags.fold", function() if B.Apply then B.Apply() end end)
-end
-
-local function Turn(tex, _, angle) tex:SetRotation(angle) end
-
--- Up is the art's own way; along the row's growth folded (the bags come out that way), back unfolded.
-local function Angle(dx, dy)
-    local angle = math.atan2(-dx, dy)
-    return B.BagsFolded() and angle or angle + math.pi
-end
-
-local function Arrow()
-    if arrow then return arrow end
-    arrow = ns.NewFrame("Button", nil, UIParent)
-    ns.DressStates(arrow, STONE[1], STONE[2], STONE[3], STONE[4], ARROW)
-    arrow:SetScript("OnClick", FoldClick)
-    ns.AttachTip(arrow, { text = function() return B.BagsFolded() and L["BAGS_SHOW_BAGS"] or L["BAGS_HIDE_BAGS"] end })
-    arrow:HookScript("OnEnter", HoverChanged)
-    arrow:HookScript("OnLeave", HoverLeft)
-    arrow:SetAlpha(0)
-    return arrow
-end
-
--- Beside prev in the row's growth, a gap on, at a share of the buttons' size.
-local function Beside(a, prev, grow, size, level, scale)
-    local across = math.floor(size * ARROW_SHARE + 0.5)
-    a:SetSize(across, across)
-    ns.SetScaleIf(a, scale)
-    ns.SetLevelIf(a, level)
-    ns.SetPointIf(a, grow[1], prev, grow[2], grow[3] * ARROW_GAP, grow[4] * ARROW_GAP)
-    ns.EachState(a, ns.KEYS.STATES, Turn, Angle(grow[3], grow[4]))
-    a:Show()
-end
-
--- On the band's row past prev; nil prev takes the arrow off the row.
-function B.LayFoldArrow(prev, grow, size, level, scale)
-    if not prev then
-        if arrow then arrow:Hide() end
-        return
-    end
-    local a = Arrow()
-    if a:GetParent() ~= B.art then a:SetParent(B.art) end
-    Beside(a, prev, grow, size, level + 1, scale)
-end
-
--- The game's own bar (classic bar off), laid as the game lays it: the bags to the backpack's left.
-local LEFTWARD = { "RIGHT", "LEFT", -1, 0 }
-local function LayArrowOnGameBar()
-    local backpack = MainMenuBarBackpackButton
-    if not backpack then return end
-    local a = Arrow()
-    if a:GetParent() ~= UIParent then a:SetParent(UIParent) end
-    local reagent = CharacterReagentBag0Slot
-    local beside = (reagent and reagent:IsShown() and reagent) or (B.BagsFolded() and backpack) or _G.CharacterBag3Slot
-        or backpack
-    Beside(a, beside, LEFTWARD, backpack:GetWidth() or 30, backpack:GetFrameLevel() + 1,
-        backpack:GetEffectiveScale() / UIParent:GetEffectiveScale())
 end
 
 ------------------------------------------------------------------ the pick applied
@@ -321,7 +275,7 @@ Apply = function(atOnce)
     local fold = B.BagsFolded()
     local seen = mode == "shown" or mode == "backpack" or (mode ~= "hidden" and revealed)
     local reagent = CharacterReagentBag0Slot
-    keyWithArrow = fold
+    keyOnHover = fold
     local n = Buttons(band)
     for i = 1, n do
         local button = buttons[i]
@@ -334,14 +288,9 @@ Apply = function(atOnce)
         local mouse = lights or (mode == "hover" and not folds)
         if button:IsMouseEnabled() ~= mouse then button:EnableMouse(mouse) end
     end
-    if mode == "backpack" and not band then
-        LayArrowOnGameBar()
-    elseif arrow and mode ~= "backpack" then
-        arrow:Hide()
-    end
     HoverZone(mode == "hover" or mode == "backpack", n)
     B.ReagentHoverCheck(atOnce)
-    FadeTo(seen and 1 or 0, (mode == "backpack" and arrowRevealed) and 1 or 0, atOnce)
+    FadeTo(seen and 1 or 0, (mode == "backpack" and overRow) and 1 or 0, atOnce)
 end
 B.ApplyBagsMode = function() Apply(true) end
 
@@ -350,7 +299,7 @@ B.ApplyBagsMode = function() Apply(true) end
 ns.OnToggle(function(key)
     if not MODES[key] and key ~= "showBags" then return end
     revealed = B.BagsMode() == "open" and AnyBagOpen() or false
-    arrowRevealed = false
+    overRow = false
     Apply(true)
 end)
 

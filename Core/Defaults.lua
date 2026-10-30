@@ -10,6 +10,8 @@ ns.DB_DEFAULTS = {
     hideMicroButtons = true,
     showBags = true, hideBagsAlways = false, hideBagsOpen = false, hideBagsHover = false, bagsBackpackOnly = false,
     bagsUnfolded = false,
+    bagsFoldCtrl = true, bagsFoldAlt = false, bagsFoldShift = false,
+    bagsFoldCtrlRight = false, bagsFoldAltRight = false, bagsFoldShiftRight = false,
     hideMicroKeepSize = false,
     hideMicroKeepWidth = false,
     bandHoldsBars = false,

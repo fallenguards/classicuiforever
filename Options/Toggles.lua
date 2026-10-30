@@ -24,6 +24,7 @@ local function OnRetail() return not ns.OnForever() end
 -- Forever's own bag bar keeps a socket per bag: a fold or hide there leaves empty ones (#205).
 local function ForeverGameBags() return ns.OnForever() and ns.db.classicBar == false end
 local function RetailGameBags() return not ns.OnForever() and ns.db.classicBar == false end
+local function NoFold() return ns.db.bagsBackpackOnly ~= true end
 -- Broad mode's own rows (a package's broad flag, Art/GameArt.lua).
 local function NotBroad() return not (ns.PACKAGE and ns.PACKAGE.broad) end
 -- Every window, one list sorted by name; a window whose box is on a page of its own shows here too, as the same setting.
@@ -207,6 +208,13 @@ ns.TOGGLES = {
     { "hideBagsHover", L["OPT_hideBagsHover"], L["OPT_bagsShow_TIP"], radio = "bagsShow", drop = true },
     { "bagsBackpackOnly", L["OPT_bagsBackpackOnly"], L["OPT_bagsShow_TIP"], radio = "bagsShow", drop = true,
         pickGrayIf = RetailGameBags, pickGrayTip = L["OPT_bagsBackpackOnly_GAME"] },
+    { "bagsFoldCtrl", L["OPT_bagsFoldCtrl"], L["OPT_bagsFold_TIP"], radio = "bagsFold", drop = true, needs = "classicBar",
+        grayIf = NoFold, grayTip = L["OPT_bagsFold_OFF"], search = "fold unfold backpack only show bags click modifier" },
+    { "bagsFoldAlt", L["OPT_bagsFoldAlt"], L["OPT_bagsFold_TIP"], radio = "bagsFold", drop = true },
+    { "bagsFoldShift", L["OPT_bagsFoldShift"], L["OPT_bagsFold_TIP"], radio = "bagsFold", drop = true },
+    { "bagsFoldCtrlRight", L["OPT_bagsFoldCtrlRight"], L["OPT_bagsFold_TIP"], radio = "bagsFold", drop = true },
+    { "bagsFoldAltRight", L["OPT_bagsFoldAltRight"], L["OPT_bagsFold_TIP"], radio = "bagsFold", drop = true },
+    { "bagsFoldShiftRight", L["OPT_bagsFoldShiftRight"], L["OPT_bagsFold_TIP"], radio = "bagsFold", drop = true },
     -- The bag bar's own boxes, on the Bags page; Classic bar (Action bars) gates them.
     { "hideKeyRing", L["OPT_hideKeyRing"], L["OPT_hideKeyRing_TIP"], needs = "classicBar" },
     { "keyRingWithBags", L["OPT_keyRingWithBags"], L["OPT_keyRingWithBags_TIP"], needs = "classicBar",

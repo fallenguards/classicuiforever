@@ -293,9 +293,8 @@ function B.LayoutBags()
     local lift = (KEYRING_H - size) / 2
     local home, homePoint, homeY = art, "BOTTOMRIGHT", bag.y
     local homeX
-    -- Backpack only (BandBagsShow): the bags fold away, the backpack and the reagent bag left (#195); the arrow that
-    -- unfolds them floats beside them, no cell of its own.
-    local folded, arrowed = B.BagsFolded(), B.BagsMode() == "backpack"
+    -- Backpack only (BandBagsShow): the bags fold away, the backpack and the reagent bag left (#195).
+    local folded = B.BagsFolded()
     local square = B.ReagentSlot()
     local rowW = folded and size or size + 4 * (size - gap)
     if square then rowW = rowW + size - gap end
@@ -363,7 +362,6 @@ function B.LayoutBags()
         prev = reagent
     end
     if B.ReagentHidden() then ReagentSeen(CharacterReagentBag0Slot, false) end
-    B.LayFoldArrow(arrowed and prev or nil, grow, size, level, buttonScale)
     if not square and KeyRingButton and CharacterReagentBag0Slot then
         -- Both (Forever): the reagent bag is the small round one, centred level with the bags between key ring and last bag.
         local reagent = CharacterReagentBag0Slot

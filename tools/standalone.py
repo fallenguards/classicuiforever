@@ -30,7 +30,7 @@ PACKAGES = [
     # game windows it opens (the bank with the bags, the calendar and flight map with the maps, channels with chat).
     dict(id="ActionBars", name="Action Bars", pages=["GROUP_ACTION_BARS"],
          roots=["showBags", "bagsBesideBars", "hideKeyRing", "keyRingWithBags", "keyRingArtHidden", "eraBagSize",
-                "reagentBagSlot", "hideBagsArt", "bagsAboveRow", "classicFonts"], modules=[], project=1771847,
+                "reagentBagSlot", "hideBagsArt", "bagsAboveRow", "classicFonts", "bagsFoldCtrl"], modules=[], project=1771847,
          icon="Interface\\Icons\\INV_Sword_04", notes="The 1.x gryphon bar: square buttons, micro menu, XP bar, key ring."),
     dict(id="Bags", name="Bags", pages=["GROUP_BAGS"], roots=["eraCoins", "panelBank"], modules=["panels"],
          icon="Interface\\Icons\\INV_Misc_Bag_08", notes="1.x bag windows, one bag, and the bag bar."),
