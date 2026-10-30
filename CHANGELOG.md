@@ -2,6 +2,19 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.40.5] - 2026-10-29
+
+### Added
+- ClassicUI Forever: Standalone Nameplates, the 1.x nameplates as an addon of their own.
+
+### Changed
+- Each standalone piece has a settings window of its own: its settings on one page, with tabs for Profiles, FAQ and Support.
+
+### Fixed
+- A standalone piece no longer turns itself off while Fallen's UI Color Picker is on, or while the full addon is on for another character.
+- A standalone piece no longer puts your game settings back at every reload, so Same size near and far no longer comes undone.
+- In a standalone piece without the action bars, Default toggles no longer turns on classic-sized bars.
+
 ## [0.40.4] - 2026-10-29
 
 ### Changed
