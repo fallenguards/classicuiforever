@@ -14,12 +14,12 @@ local BOX_X, PAD, LIST_TOP, BAR_ROOM = 16, 12, 10, 28
 local TAB_TOP, TAB_H, TAB_SIDE, TAB_OVERLAP, TAB_INSET = 30, 24, 20, 16, 6
 local BOX_TOP = TAB_TOP + TAB_H - 2
 local FOOT_H, FOOT_Y = 40, 14
--- Two columns past ONE_COLUMN lines, three where two would pass MAX_LINES; past that a column scrolls under a search.
--- The Settings tab is as tall as its rows (SETTINGS_MIN at least); a reading tab takes READ_LINES, the top kept.
+-- Two columns past ONE_COLUMN lines, three where two would pass MAX_LINES; past that a column scrolls. The Settings tab
+-- is its search over its rows (SETTINGS_MIN at least); a reading tab takes READ_LINES, the window's top kept.
 local ONE_COLUMN, MAX_LINES, SETTINGS_MIN, READ_LINES = 20, 24, 3, 12
 -- A page from the full window with fewer rows than this joins the first section instead of heading its own.
 local SECTION_MIN = 3
-local SEARCH_W = 150
+local SEARCH_W, SEARCH_H = 240, 28
 local TAB_COORDS = { { 0, 0.15625 }, { 0.15625, 0.84375 }, { 0.84375, 1 } }
 local SETTINGS_TAB = L["OPTWIN_TAB_SETTINGS"]
 local TABS = { { SETTINGS_TAB }, { L["OPTWIN_TAB_PROFILES"], "ProfilesPane" }, { L["OPTWIN_TAB_FAQ"], "FaqPane" },
@@ -255,11 +255,11 @@ local function Tabs(frame, box)
     end
 end
 
--- The tabs' row with the search beside it: the window is at least this wide.
-local function TabsWidth(frame, searching)
+-- The tabs' row: the window is at least this wide.
+local function TabsWidth(frame)
     local w = TAB_INSET
     for i, tab in ipairs(frame.tabs) do w = w + tab:GetWidth() - (i > 1 and TAB_OVERLAP or 0) end
-    return w + (searching and SEARCH_W + 16 or 0) + 8
+    return w + 8
 end
 
 -- Our windows that move (band pieces are the game's edit mode's): Reset windows puts them back.
@@ -328,8 +328,8 @@ function O.PieceShape(blocks)
 end
 
 local function Measure(frame)
-    local columns, tallest, scrolls = O.PieceShape(O.PieceBlocks(frame.built, frame.sections))
-    frame.columns, frame.scrolls = columns, scrolls
+    local columns, tallest = O.PieceShape(O.PieceBlocks(frame.built, frame.sections))
+    frame.columns = columns
     frame.lines = math.max(SETTINGS_MIN, math.min(tallest, MAX_LINES))
 end
 
@@ -353,10 +353,10 @@ local function Show(frame)
     if frame.search then frame.search:SetShown(not pane) end
     -- A reading tab takes the foot's room too.
     local lines = pane and math.max(frame.lines, READ_LINES) or frame.lines
-    local boxH = LIST_TOP + lines * ROW + 8 + (pane and FOOT_H - 12 or 0)
+    local boxH = LIST_TOP + SEARCH_H + lines * ROW + 8 + (pane and FOOT_H - 12 or 0)
     frame.box:SetHeight(boxH)
     Resize(frame, BOX_TOP + boxH + (pane and 12 or FOOT_H))
-    local top = LIST_TOP + (pane and pane.headH or 0)
+    local top = LIST_TOP + (pane and pane.headH or SEARCH_H)
     ns.SetPointOnce(frame.list, "TOPLEFT", frame.box, "TOPLEFT", PAD, -top)
     frame.list:SetHeight(boxH - top - 8)
     local child = pane and pane.child or frame.child
@@ -396,24 +396,23 @@ local function Build()
     Measure(frame)
     Tabs(frame, box)
     local content = frame.columns * COL_W + (frame.columns - 1) * COL_GAP
-    local boxW = math.max(PAD + content + BAR_ROOM, TabsWidth(frame, frame.scrolls))
+    local boxW = math.max(PAD + content + BAR_ROOM, TabsWidth(frame))
     box:SetWidth(boxW)
-    frame:SetSize(boxW + 2 * BOX_X, BOX_TOP + LIST_TOP + frame.lines * ROW + 8 + FOOT_H)
+    frame:SetSize(boxW + 2 * BOX_X, BOX_TOP + LIST_TOP + SEARCH_H + frame.lines * ROW + 8 + FOOT_H)
     list:SetWidth(boxW - PAD - BAR_ROOM)
     child:SetSize(list:GetWidth(), 1)
     frame.bar = ns.ClassicScrollBar(box, list, function(value) list:SetVerticalScroll(value) end)
     frame.bar.hideWhenIdle = true
-    if frame.scrolls then
-        local search = ns.SearchBox(frame, SEARCH_W, L["OPTWIN_SEARCH_PAGE"])
-        search:SetPoint("BOTTOMRIGHT", box, "TOPRIGHT", -8, 2)
-        search:SetScript("OnTextChanged", function(self)
-            self.hint:SetShown(self:GetText() == "")
-            self.clear:SetShown(self:GetText() ~= "")
-            frame.bar:SetValue(0)
-            Lay(frame)
-        end)
-        frame.search = search
-    end
+    -- Over the rows at the box's top left, as the FAQ tab's own (its answer points here).
+    local search = ns.SearchBox(box, math.min(SEARCH_W, list:GetWidth()), L["OPTWIN_SEARCH_TOGGLES"])
+    search:SetPoint("TOPLEFT", box, "TOPLEFT", PAD + 4, -LIST_TOP)
+    search:SetScript("OnTextChanged", function(self)
+        self.hint:SetShown(self:GetText() == "")
+        self.clear:SetShown(self:GetText() ~= "")
+        frame.bar:SetValue(0)
+        Lay(frame)
+    end)
+    frame.search = search
     Foot(frame)
     Panes(frame, box)
     frame.tab = 1

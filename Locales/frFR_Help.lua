@@ -44,7 +44,6 @@ L["FAQ_MOVERS_Q"] = "Pourquoi mon addon de déplacement de fenêtres en déplace
 L["FAQ_MOVERS_A"] = "La fiche de personnage et les autres fenêtres du jeu sont celles du jeu à l'aspect 1.x, donc ces addons peuvent les déplacer ; \"%s\" dans les options les leur laisse entièrement. Notre grimoire et notre journal de quêtes sont faits par nous, car le jeu n'en a aucun comme ceux d'Era, et ces addons ne déplacent que les fenêtres de leur propre liste. Les nôtres se déplacent avec le cadenas de leur barre de titre, ou en mode édition."
 L["FAQ_SETTING_Q"] = "Puis-je changer l'apparence ou le fonctionnement de quelque chose ?"
 L["FAQ_SETTING_A"] = "Très probablement. Presque chaque élément peut être désactivé ou ajusté : tapez un mot dans le champ \"%s\" en haut à gauche de cette fenêtre. Si vous ne le trouvez pas, demandez sur GitHub ou CurseForge."
-L["FAQ_SETTING_PIECE_A"] = "Très probablement. Chaque réglage de cet élément se trouve dans l'onglet \"%s\". Si vous ne le trouvez pas, demandez sur GitHub ou CurseForge."
 L["FAQ_FOREVER_Q"] = "Puis-je garder l'apparence propre à Forever pour certaines parties ?"
 L["FAQ_FOREVER_A"] = "Oui. Chaque élément classique a son propre interrupteur dans cette fenêtre ; désactivez-le et celui de Forever revient. Certains changements demandent un rechargement, et une fenêtre vous le propose."
 L["FAQ_OTHER_ADDON_Q"] = "Pouvez-vous rendre %s compatible avec un autre addon ?"

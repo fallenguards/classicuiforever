@@ -44,7 +44,6 @@ L["FAQ_MOVERS_Q"] = "Perché il mio addon per spostare le finestre ne sposta alc
 L["FAQ_MOVERS_A"] = "La scheda del personaggio e le altre finestre del gioco sono quelle del gioco con l'aspetto della 1.x, quindi questi addon possono spostarle; \"%s\" nelle opzioni gliele lascia del tutto. Il nostro libro degli incantesimi e il registro delle missioni li facciamo noi, perché il gioco non ne ha di simili a quelli di Era, e questi addon spostano solo le finestre della loro lista. Le nostre si spostano con il lucchetto sulla barra del titolo o in modalità modifica."
 L["FAQ_SETTING_Q"] = "Posso cambiare l'aspetto o il funzionamento di qualcosa?"
 L["FAQ_SETTING_A"] = "Molto probabilmente. Quasi ogni parte si può disattivare o regolare: scrivi una parola nella casella \"%s\" in alto a sinistra di questa finestra. Se non lo trovi, chiedi su GitHub o CurseForge."
-L["FAQ_SETTING_PIECE_A"] = "Molto probabilmente. Ogni opzione di questa parte è nella scheda \"%s\". Se non la trovi, chiedi su GitHub o CurseForge."
 L["FAQ_FOREVER_Q"] = "Posso mantenere l'aspetto proprio di Forever per alcune parti?"
 L["FAQ_FOREVER_A"] = "Sì. Ogni parte classica ha il suo interruttore in questa finestra; spegnila e torna quella di Forever. Alcune modifiche richiedono un ricaricamento, e una finestra te lo chiede."
 L["FAQ_OTHER_ADDON_Q"] = "Potete far funzionare %s con un altro addon?"

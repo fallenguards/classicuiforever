@@ -44,7 +44,6 @@ L["FAQ_MOVERS_Q"] = "¿Por qué mi addon para mover ventanas mueve algunas y otr
 L["FAQ_MOVERS_A"] = "La hoja de personaje y otras ventanas del juego son las propias del juego con el aspecto de la 1.x, así que esos addons pueden moverlas; \"%s\" en las opciones se las deja por completo. Nuestro libro de hechizos y registro de misiones los hacemos nosotros, porque el juego no tiene ninguno como los de Era, y esos addons solo mueven las ventanas de su propia lista. Las nuestras se mueven con el candado de su barra de título o en el modo de edición."
 L["FAQ_SETTING_Q"] = "¿Puedo cambiar cómo se ve o funciona algo?"
 L["FAQ_SETTING_A"] = "Casi seguro. Casi todas las piezas se pueden desactivar o ajustar: escribe una palabra en el campo \"%s\" arriba a la izquierda de esta ventana. Si no lo encuentras, pregunta en GitHub o CurseForge."
-L["FAQ_SETTING_PIECE_A"] = "Casi seguro. Todos los ajustes de esta pieza están en la pestaña \"%s\". Si no lo encuentras, pregunta en GitHub o CurseForge."
 L["FAQ_FOREVER_Q"] = "¿Puedo mantener el aspecto propio de Forever en algunas partes?"
 L["FAQ_FOREVER_A"] = "Sí. Cada pieza clásica tiene su propio interruptor en esta ventana; desactívala y vuelve la de Forever. Algunos cambios necesitan recargar, y una ventana emergente te lo pide."
 L["FAQ_OTHER_ADDON_Q"] = "¿Se puede hacer que %s funcione con otro accesorio?"

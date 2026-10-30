@@ -44,7 +44,6 @@ L["FAQ_MOVERS_Q"] = "Warum kann mein Fensterverschieber manche Fenster bewegen u
 L["FAQ_MOVERS_A"] = "Das Charakterfenster und andere Spielfenster sind die des Spiels im 1.x-Aussehen, deshalb können Fensterverschieber sie bewegen; \"%s\" in den Optionen überlässt sie ganz einem solchen Addon. Unser Zauberbuch und Questlog bauen wir selbst, weil das Spiel keine wie in Era hat, und Fensterverschieber bewegen nur Fenster auf ihrer eigenen Liste. Unsere bewegst du mit dem Schloss in ihrer Titelleiste oder im Bearbeitungsmodus."
 L["FAQ_SETTING_Q"] = "Kann ich ändern, wie etwas aussieht oder funktioniert?"
 L["FAQ_SETTING_A"] = "Sehr wahrscheinlich. Fast jedes Teil lässt sich ausschalten oder anpassen: Tippe ein Wort in das Feld \"%s\" oben links in diesem Fenster. Wenn du es nicht findest, frag auf GitHub oder CurseForge."
-L["FAQ_SETTING_PIECE_A"] = "Sehr wahrscheinlich. Jeder Schalter dieses Teils steht auf dem Reiter \"%s\". Wenn du ihn nicht findest, frag auf GitHub oder CurseForge."
 L["FAQ_FOREVER_Q"] = "Kann ich für einige Teile das eigene Aussehen von Forever behalten?"
 L["FAQ_FOREVER_A"] = "Ja. Jedes klassische Teil hat seinen eigenen Schalter in diesem Fenster; schalte es aus und das von Forever kommt zurück. Manche Änderungen brauchen ein Neuladen, und ein Fenster fragt danach."
 L["FAQ_OTHER_ADDON_Q"] = "Könnt ihr %s mit einem anderen Addon zusammenarbeiten lassen?"

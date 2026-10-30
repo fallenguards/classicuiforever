@@ -119,14 +119,13 @@ local FAQ = {
         function() return L["UI_CLASSICUI_FOREVER_WINDOWS"], L["OPT_classicBarSize"] end },
     { "FAQ_SCALE_Q", "FAQ_SCALE_A", needs = { "classicBar" },
         function() return _G.GRAPHICS_LABEL or "Graphics", _G.USE_UISCALE or "Use UI Scale" end },
-    -- A piece has no Toggle none, and no sidebar search.
+    -- A piece has no Toggle none.
     { "FAQ_SCALEBACK_Q", "FAQ_SCALEBACK_A", needs = { "classicBar" }, notIn = "piece", function()
         return L["OPTWIN_TOGGLE_NONE"], L["OPTWIN_NONE_SCALE"], _G.GRAPHICS_LABEL or "Graphics", _G.USE_UISCALE or "Use UI Scale"
     end },
     { "FAQ_SCALEBACK_Q", "FAQ_SCALEBACK_PIECE_A", needs = { "classicBar" }, only = "piece",
         function() return _G.GRAPHICS_LABEL or "Graphics", _G.USE_UISCALE or "Use UI Scale" end },
-    { "FAQ_SETTING_Q", "FAQ_SETTING_A", notIn = "piece", function() return L["OPTWIN_SEARCH_TOGGLES"] end },
-    { "FAQ_SETTING_Q", "FAQ_SETTING_PIECE_A", only = "piece", function() return L["OPTWIN_TAB_SETTINGS"] end },
+    { "FAQ_SETTING_Q", "FAQ_SETTING_A", function() return L["OPTWIN_SEARCH_TOGGLES"] end },
     { "FAQ_FOREVER_Q", "FAQ_FOREVER_A", on = "forever", notIn = "picker" },
     { "FAQ_OWNLOOK_Q", "FAQ_OWNLOOK_A", on = "retail", notIn = "picker" },
     { "FAQ_GLOW_Q", "FAQ_GLOW_A", needs = { "hideThreatGlow" },
