@@ -3,6 +3,8 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN58_1_TITLE"] = "Marcadores de pueblos de Era"
+L["WN58_1_TEXT"] = "Poblado Sañadiente y Fuerte Cenarion aparecen en los mapas de continente solo cuando has explorado su zona, como en Classic Era."
 L["WN57_1_TITLE"] = "Mostrar bolsas con un clic"
 L["WN57_1_TEXT"] = "Con Barra de bolsas: solo la mochila, un Ctrl-clic en la mochila muestra las demás bolsas o las vuelve a plegar; la flecha de al lado ya no está. Mostrar bolsas con elige otro clic. Para activarlo, elige Barra de bolsas: solo la mochila en las opciones (/fcui), en Bolsas."
 L["WN57_2_TITLE"] = "Ocultar el arte del llavero"

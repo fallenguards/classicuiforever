@@ -3,6 +3,8 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN58_1_TITLE"] = "Era-Ortsmarkierungen"
+L["WN58_1_TEXT"] = "Revantusk und Burg Cenarius erscheinen auf den Kontinentkarten erst, wenn du ihre Gegend erkundet hast, wie in Classic Era."
 L["WN57_1_TITLE"] = "Taschen zeigen per Klick"
 L["WN57_1_TEXT"] = "Mit Taschenleiste: nur Rucksack zeigt ein Strg-Klick auf den Rucksack die übrigen Taschen oder klappt sie wieder ein; der Pfeil daneben ist weg. Taschen zeigen mit wählt einen anderen Klick. Zum Einschalten wähle Taschenleiste: nur Rucksack in den Optionen (/fcui) unter Taschen."
 L["WN57_2_TITLE"] = "Schlüsselbundgrafik ausblenden"

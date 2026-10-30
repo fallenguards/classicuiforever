@@ -2,6 +2,8 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN58_1_TITLE"] = "Era's town markers"
+L["WN58_1_TEXT"] = "Revantusk Village and Cenarion Hold show on the continent maps only once you have explored their area, as in Classic Era."
 L["WN57_1_TITLE"] = "Show bags with a click"
 L["WN57_1_TEXT"] = "With Bag bar on backpack only, Ctrl-click the backpack to show the other bags or fold them away again; the arrow beside it is gone. Show bags with picks another click. To turn it on, pick Bag bar: backpack only in the options (/fcui), under Bags."
 L["WN57_2_TITLE"] = "Hide key ring art"

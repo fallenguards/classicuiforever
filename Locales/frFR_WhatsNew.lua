@@ -3,6 +3,8 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN58_1_TITLE"] = "Marqueurs de villes d'Era"
+L["WN58_1_TEXT"] = "Le Village des Revantusk et le Fort cénarien n'apparaissent sur les cartes des continents qu'une fois leur zone explorée, comme dans Classic Era."
 L["WN57_1_TITLE"] = "Afficher les sacs d'un clic"
 L["WN57_1_TEXT"] = "Avec Barre des sacs : sac à dos seul, un Ctrl-clic sur le sac à dos affiche les autres sacs ou les replie à nouveau ; la flèche à côté a disparu. Afficher les sacs avec choisit un autre clic. Pour l'activer, choisissez Barre des sacs : sac à dos seul dans les options (/fcui), sous Sacs."
 L["WN57_2_TITLE"] = "Masquer les graphismes du trousseau"

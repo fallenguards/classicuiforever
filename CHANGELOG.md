@@ -2,6 +2,11 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.40.7] - 2026-10-30
+
+### Fixed
+- On Forever, the continent maps show Revantusk Village and Cenarion Hold only once you have explored their area, as Classic Era does. Every other town and city shows from the start, explored or not, as in Era (#205).
+
 ## [0.40.6] - 2026-10-30
 
 ### Changed
