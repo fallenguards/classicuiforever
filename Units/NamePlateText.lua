@@ -8,6 +8,18 @@ ns.PLATE_NAME_MIN, ns.PLATE_NAME_MAX = -6, 6
 -- Era's plate name: Friz 10 at the plate's size, no outline, no shadow (Forever's is 17.5, outlined and shadowed).
 -- Era draws it from SystemFont_NamePlate's own 9, stretched to that height: about 2% wider and softer than a true 10.
 local ERA_NAME_SIZE, ERA_NAME_FONT = 10, 9
+-- The client's flags string -> the same without its outline; a handful of strings ever.
+local unoutlined = {}
+local function Unoutlined(flags)
+    flags = flags or ""
+    local plain = unoutlined[flags]
+    if not plain then
+        plain = flags:gsub("THICKOUTLINE", ""):gsub("OUTLINE", ""):gsub("^[,%s]+", ""):gsub("[,%s]+$", "")
+            :gsub(",%s*,", ",")
+        unoutlined[flags] = plain
+    end
+    return plain
+end
 
 -- The size the client shows (Classic fonts: Era's at the plate's size) plus the player's offset in points. The client's
 -- size is read off the name itself (it scales plate fonts on its own): any other than the one we last set is its new one.
@@ -18,8 +30,7 @@ function NP.NameSize(name, own)
     local classic = ns.ClassicFonts()
     local base = classic and ERA_NAME_SIZE * NP.PlateScale() or own.nameBase
     local want = math.max(6, base + (tonumber(ns.db.plateNameSize) or 0))
-    local wantFlags = classic and (flags or ""):gsub("THICKOUTLINE", ""):gsub("OUTLINE", ""):gsub("^[,%s]+", "")
-        :gsub("[,%s]+$", ""):gsub(",%s*,", ",") or flags
+    local wantFlags = classic and Unoutlined(flags) or flags
     -- The drawn base first, then the height: a later SetFont does not undo a stretch (the client reads back the height).
     local drawn = classic and ERA_NAME_FONT or want
     if math.abs(size - want) > 0.05 or flags ~= wantFlags or own.nameFont ~= drawn then

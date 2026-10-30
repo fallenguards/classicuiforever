@@ -125,6 +125,14 @@ local function PlateFor(unitToken)
     return ok and plate and plate.UnitFrame or nil
 end
 
+-- Our own textures on a plate's bars keep their art through plate reuse: drawn on a bar's first layout and after any
+-- toggle, not on every layout (#127). The game's own pieces (fill, spark, shield) are still set each time.
+local artStamp = 0
+ns.OnToggle(function() artStamp = artStamp + 1 end)
+local healthDrawn = setmetatable({}, { __mode = "k" })
+local castDrawn = setmetatable({}, { __mode = "k" })
+local dragonDrawn = setmetatable({}, { __mode = "k" })   -- health bar -> the dragon key drawn at artStamp
+
 -- Border sheet around a bar, above its fill.
 local function Border(bar)
     return (DressNew(bar, "nameplateBorder", BORDER))
@@ -203,10 +211,10 @@ local function LookGlows()
     glowTarget, glowOver = PlateFor("target"), PlateFor("mouseover")
 end
 
-local function Glow(unitFrame, health)
+local function Glow(unitFrame, health, fresh)
     local fill = health.barTexture or health:GetStatusBarTexture()
     if not fill then return end
-    DressNew(health, "barFill", GLOW, fill):SetIgnoreParentAlpha(true)
+    if fresh then DressNew(health, "barFill", GLOW, fill):SetIgnoreParentAlpha(true) end
     LookGlows()
     GlowPlate(unitFrame)
 end
@@ -269,7 +277,10 @@ local function UpdateDragon(unitFrame, health)
     local kind = ns.db and ns.db.plateDragons == true and unitFrame.unit and UnitClassification(unitFrame.unit)
     if IsSecret(kind) then kind = nil end
     local key = kind and DRAGON_KEY[kind]
-    if key then DressNew(health, key, DRAGON, border) end
+    if key and (dragonDrawn[health] ~= key or healthDrawn[health] ~= artStamp) then
+        DressNew(health, key, DRAGON, border)
+        dragonDrawn[health] = key
+    end
     if own.dragon then ns.SetShownIf(own.dragon, key ~= nil) end
 end
 
@@ -352,12 +363,18 @@ local function LayCast(castContainer, unitFrame)
     else
         ns.SetBarColorIf(cast, 1, 0.7, 0)
     end
-    local castBorder = old and CastBorder(cast) or EraCastBorder(cast)
+    local castBorder
+    if castDrawn[cast] ~= artStamp then
+        castDrawn[cast] = artStamp
+        castBorder = old and CastBorder(cast) or EraCastBorder(cast)
+        local back = ns.OwnTexture(cast, "castBack", "BACKGROUND", -1)
+        back:SetColorTexture(0, 0, 0, 0.5)
+        back:SetAllPoints(cast)
+        back:SetShown(not old)
+    else
+        castBorder = old and cast.fcui.borderL or cast.fcui.castBorder
+    end
     FadeKeys(cast, CAST_ART)
-    local back = ns.OwnTexture(cast, "castBack", "BACKGROUND", -1)
-    back:SetColorTexture(0, 0, 0, 0.5)
-    back:SetAllPoints(cast)
-    back:SetShown(not old)
     OldSpark(cast, not old)
     EraShield(cast, not old)
     AimGlow(cast, old)
@@ -405,10 +422,11 @@ local function Layout(unitFrame)
 
     LayChain(unitFrame, castContainer, container, health)
 
+    local fresh = healthDrawn[health] ~= artStamp
     ShadedFill(health)
-    Glow(unitFrame, health)
+    Glow(unitFrame, health, fresh)
     NP.ClassColor(unitFrame)
-    local border = Border(health)
+    local border = fresh and Border(health) or health.fcui.border
     FadeKeys(health, HEALTH_ART)
     for _, key in ipairs(HEALTH_TEXTS) do
         local text = health[key]
@@ -429,11 +447,12 @@ local function Layout(unitFrame)
         skull:Hide()
         own.skull = skull
     end
-    NP.TextShadow(level)
+    if fresh then NP.TextShadow(level) end
     ns.SetPointIf(level, "CENTER", border, "RIGHT", LEVEL_X, 0)
     ns.SetPointIf(own.skull, "CENTER", border, "RIGHT", LEVEL_X, 0)
     UpdateLevel(unitFrame)
     UpdateDragon(unitFrame, health)
+    healthDrawn[health] = artStamp
 
     -- Name centred above the border, sized to its text; debuffs above it.
     local name = unitFrame.name
@@ -702,6 +721,10 @@ end
 
 local function Restore()
     SetActive(false)
+    -- Our art is hidden below: the next layout draws it again.
+    wipe(healthDrawn)
+    wipe(castDrawn)
+    wipe(dragonDrawn)
     for unitFrame in pairs(skinned) do
         if unitFrame.fcui then
             -- Regions only: the table also keeps the name's sizes.
