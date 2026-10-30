@@ -82,6 +82,8 @@ for pkg in PACKAGES:
     pkg.setdefault("title", "ClassicUI Forever: Standalone %s" % pkg["name"])
     pkg.setdefault("issues", ISSUES + urllib.parse.quote(pkg["title"]))
     pkg.setdefault("wave", 1)
+    # Each piece's own version, apart from the full addon's and from the other pieces': raise it in its entry.
+    pkg.setdefault("version", "1.0.0")
 # Every package's folder: the guard's list of copies of our code.
 FOLDERS = [pkg["folder"] for pkg in PACKAGES]
 
@@ -103,8 +105,8 @@ def package_lua(pkg, icon=None):
     return "\n".join([
         "local ADDON, ns = ...",
         "-- %s, made by tools/standalone.py from the ClassicUI Forever build." % pkg["title"],
-        'ns.PACKAGE = { title = "%s", pages = %s, roots = %s, modules = %s, broad = %s, piece = %s,' % (
-            pkg["title"], lua_list(pkg["pages"]), lua_list(pkg["roots"]), lua_list(pkg["modules"]),
+        'ns.PACKAGE = { id = "%s", title = "%s", pages = %s, roots = %s, modules = %s, broad = %s, piece = %s,' % (
+            pkg["id"], pkg["title"], lua_list(pkg["pages"]), lua_list(pkg["roots"]), lua_list(pkg["modules"]),
             "true" if pkg.get("broad") else "false", "true" if pkg["folder"].startswith(PREFIX) else "false"),
         '    curseforge = %s, issues = "%s", icon = "%s" }' % (
             ('"https://www.curseforge.com/projects/%s"' % pkg["project"]) if pkg["project"] else "nil", pkg["issues"],
@@ -142,6 +144,8 @@ def toc_text(text, pkg, folder, icon=None):
         piece = folder.startswith(PREFIX)
         if head == "## Title":
             line = "## Title: " + pkg["title"]
+        elif head == "## Version":
+            line = "## Version: " + pkg["version"]
         elif head == "## Notes":
             line = "## Notes: " + (pkg["notes"] + " Standalone edition of ClassicUI Forever." if piece else pkg["notes"])
         elif head == "## IconTexture":
@@ -205,8 +209,6 @@ def tree_files(root):
 
 def build(source, out_dir, only):
     files = tree_files(source) if os.path.isdir(source) else zip_files(source)
-    toc = files[SUITE + ".toc"].decode("utf-8")
-    version = re.search(r"^## Version:\s*(\S+)", toc, re.M).group(1)
     # The release build's commit beside each package zip, for the zip test's pass mark; a worktree build has none.
     commit = None
     if not os.path.isdir(source) and os.path.isfile(source + ".commit"):
@@ -217,7 +219,7 @@ def build(source, out_dir, only):
         if only and pkg["id"] not in only:
             continue
         folder = pkg["folder"]
-        path = "%s/%s-%s.zip" % (out_dir, folder, version)
+        path = "%s/%s-%s.zip" % (out_dir, folder, pkg["version"])
         tga = icon_tga(pkg)
         icon = "Interface\\AddOns\\%s\\%s" % (folder, ICON_FILE[:-4].replace("/", "\\")) if tga else None
         with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as out:

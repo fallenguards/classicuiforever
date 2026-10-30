@@ -5,7 +5,9 @@ local L = ns.L
 -- addon channel (guild, group); one chat line a session, never saved, so a forged version costs one line.
 -- Wire: prefix FCUIVer; hello "1\tH"; version "1\tV\t<version>".
 
-local PREFIX, PROTOCOL = "FCUIVer", "1"
+-- A standalone piece numbers its versions apart from the full addon: it compares only with the same piece.
+local PREFIX = ns.PACKAGE and ns.PACKAGE.id and ("FCUIV" .. ns.PACKAGE.id):sub(1, 16) or "FCUIVer"
+local PROTOCOL = "1"
 local HELLO, VERSION = "H", "V"
 local VERSION_PATTERN = "^%d+%.%d+%.%d+$"
 -- Answers spread out, or a whole guild replies in the same instant.

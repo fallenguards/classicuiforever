@@ -143,6 +143,31 @@ local function Titles()
         if text and text:find("## Title", 1, true) then return text end
     end
 end
+-- Each piece's own version in its toc, its id in its first file, and a version-check channel (16 characters at most)
+-- no other piece shares: the full addon's numbers and other pieces' never reach it.
+local function Versions()
+    local cmd = 'cd "%s" && %s -c "import sys; sys.path.insert(0, \'tools\'); import standalone; '
+        .. '[print(\'v\', p[\'id\'], p[\'version\'], standalone.toc_text(\'## Version: 9.9.9\', p, p[\'folder\']), '
+        .. '(\'FCUIV\' + p[\'id\'])[:16], \'id = \\"%%s\\"\' %% p[\'id\'] in standalone.package_lua(p)) '
+        .. 'for p in standalone.PACKAGES]"'
+    for _, py in ipairs({ "python3", "python" }) do
+        local pipe = io.popen(string.format(cmd, ROOT, py) .. " 2>&1")
+        local text = pipe and pipe:read("a")
+        if pipe then pipe:close() end
+        if text and text:find("^v ") then return text end
+    end
+end
+local channels = {}
+local versions = Versions() or ""
+Check(versions ~= "", "tools/standalone.py gives each piece a version")
+for id, version, line, channel, named in versions:gmatch("v (%w+) (%S+) ([^\n]-) (FCUIV%w+) (%a+)") do
+    Check(version:match("^%d+%.%d+%.%d+$") ~= nil, id .. ": a version of three numbers (" .. version .. ")")
+    Check(line == "## Version: " .. version, id .. ": its toc carries its own version, not the full addon's")
+    Check(named == "True", id .. ": its first file names its id (the version check's channel)")
+    Check(not channels[channel], id .. ": a version-check channel of its own (" .. channel .. ")")
+    channels[channel] = true
+end
+Check(not channels.FCUIVer, "no piece talks on the full addon's version-check channel")
 -- Every addon list picture (tools/standalone_icons/<Id>.png) is named after a package.
 local function StrayIcons()
     local cmd = 'cd "%s" && %s -c "import os, sys; sys.path.insert(0, \'tools\'); import standalone; '
