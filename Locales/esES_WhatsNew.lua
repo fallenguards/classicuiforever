@@ -3,6 +3,12 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN57_1_TITLE"] = "Mostrar bolsas con un clic"
+L["WN57_1_TEXT"] = "Con Barra de bolsas: solo la mochila, un Ctrl-clic en la mochila muestra las demás bolsas o las vuelve a plegar; la flecha de al lado ya no está. Mostrar bolsas con elige otro clic. Para activarlo, elige Barra de bolsas: solo la mochila en las opciones (/fcui), en Bolsas."
+L["WN57_2_TITLE"] = "Ocultar el arte del llavero"
+L["WN57_2_TEXT"] = "Ocultar el arte del llavero ahora también despeja el hueco del llavero en la barra clásica y sustituye a Ocultar también el arte del llavero, conservando tu elección. Está desactivado por defecto; actívalo en las opciones (/fcui), en Bolsas."
+L["WN57_3_TITLE"] = "Bolsas sin Barra clásica"
+L["WN57_3_TEXT"] = "Con Barra clásica desactivada, las opciones que la barra de bolsas propia del juego no puede seguir aparecen en gris, y su descripción dice por qué."
 L["WN56_1_TITLE"] = "Tema personalizado más rápido"
 L["WN56_1_TEXT"] = "Cambiar de aspecto o una parte de Con tema ya no detiene el juego, y una parte desmarcada recupera los colores propios del juego. Tema personalizado está desactivado por defecto; actívalo en las opciones (/fcui), en Aspecto."
 L["WN55_1_TITLE"] = "Textura de barra"

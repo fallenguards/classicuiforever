@@ -2,6 +2,13 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.40.6] - 2026-10-30
+
+### Changed
+- With Bag bar on backpack only, a click on the backpack shows the other bags or folds them away again, in place of the small arrow beside it. It is Ctrl-click by default; Show bags with, on the Bags page, picks Alt, Shift or a right-click instead (#205).
+- Hide key ring art also clears the key ring's own slot on the classic bar, not only its art when the key ring is moved off the bar. It takes over from the Hide key ring art too box under Hide bags bar art, which is gone; where that box was checked, Hide key ring art is checked for you (#205).
+- With Classic bar off, a Bag bar pick the game's own bag bar cannot follow is grayed, and its tooltip says why: the whole pick on Forever, where the game's bar keeps a socket for every bag, and Backpack only on retail, where the game's bar folds with its own arrow (#205).
+
 ## [0.40.5] - 2026-10-29
 
 ### Added

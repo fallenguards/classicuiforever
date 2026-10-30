@@ -2,6 +2,12 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN57_1_TITLE"] = "Show bags with a click"
+L["WN57_1_TEXT"] = "With Bag bar on backpack only, Ctrl-click the backpack to show the other bags or fold them away again; the arrow beside it is gone. Show bags with picks another click. To turn it on, pick Bag bar: backpack only in the options (/fcui), under Bags."
+L["WN57_2_TITLE"] = "Hide key ring art"
+L["WN57_2_TEXT"] = "Hide key ring art now also clears the key ring's slot on the classic bar, and it takes over from Hide key ring art too, keeping your pick. It is off by default; turn it on in the options (/fcui), under Bags."
+L["WN57_3_TITLE"] = "Bag picks with Classic bar off"
+L["WN57_3_TEXT"] = "With Classic bar off, picks the game's own bag bar cannot follow are grayed in the options, and their tooltip says why."
 L["WN56_1_TITLE"] = "Faster Custom theme"
 L["WN56_1_TEXT"] = "Switching the look or a part under Themed no longer stalls the game, and an unchecked part gets the game's own colors back. Custom theme is off by default; turn it on in the options (/fcui), under Look."
 L["WN55_1_TITLE"] = "Bar texture"

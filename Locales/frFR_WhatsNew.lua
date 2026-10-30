@@ -3,6 +3,12 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN57_1_TITLE"] = "Afficher les sacs d'un clic"
+L["WN57_1_TEXT"] = "Avec Barre des sacs : sac à dos seul, un Ctrl-clic sur le sac à dos affiche les autres sacs ou les replie à nouveau ; la flèche à côté a disparu. Afficher les sacs avec choisit un autre clic. Pour l'activer, choisissez Barre des sacs : sac à dos seul dans les options (/fcui), sous Sacs."
+L["WN57_2_TITLE"] = "Masquer les graphismes du trousseau"
+L["WN57_2_TEXT"] = "Masquer les graphismes du trousseau libère aussi l'emplacement du trousseau sur la barre classique et remplace Masquer aussi les graphismes du trousseau, en gardant votre choix. Désactivé par défaut ; activez-le dans les options (/fcui), sous Sacs."
+L["WN57_3_TITLE"] = "Sacs sans Barre classique"
+L["WN57_3_TEXT"] = "Avec Barre classique désactivée, les choix que la barre de sacs du jeu ne peut pas suivre sont grisés, et leur infobulle dit pourquoi."
 L["WN56_1_TITLE"] = "Thème personnalisé plus rapide"
 L["WN56_1_TEXT"] = "Changer de style ou une partie de Avec thème ne fige plus le jeu, et une partie décochée retrouve les couleurs du jeu. Thème personnalisé est désactivé par défaut ; activez-le dans les options (/fcui), sous Apparence."
 L["WN55_1_TITLE"] = "Texture des barres"

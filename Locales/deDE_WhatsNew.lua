@@ -3,6 +3,12 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN57_1_TITLE"] = "Taschen zeigen per Klick"
+L["WN57_1_TEXT"] = "Mit Taschenleiste: nur Rucksack zeigt ein Strg-Klick auf den Rucksack die übrigen Taschen oder klappt sie wieder ein; der Pfeil daneben ist weg. Taschen zeigen mit wählt einen anderen Klick. Zum Einschalten wähle Taschenleiste: nur Rucksack in den Optionen (/fcui) unter Taschen."
+L["WN57_2_TITLE"] = "Schlüsselbundgrafik ausblenden"
+L["WN57_2_TEXT"] = "Schlüsselbundgrafik ausblenden räumt jetzt auch den Platz des Schlüsselbunds auf der klassischen Leiste und ersetzt Auch Schlüsselbundgrafik ausblenden, deine Wahl bleibt erhalten. Es ist standardmäßig aus; schalte es in den Optionen (/fcui) unter Taschen ein."
+L["WN57_3_TITLE"] = "Taschen ohne Klassische Leiste"
+L["WN57_3_TEXT"] = "Mit ausgeschalteter Klassischer Leiste sind Optionen, denen die eigene Taschenleiste des Spiels nicht folgen kann, ausgegraut, und ihr Tooltip sagt, warum."
 L["WN56_1_TITLE"] = "Schnelleres Eigenes Design"
 L["WN56_1_TEXT"] = "Ein anderer Look oder ein Teil unter Mit Thema lässt das Spiel nicht mehr stocken, und ein abgewählter Teil bekommt die Farben des Spiels zurück. Eigenes Design ist standardmäßig aus; schalte es in den Optionen (/fcui) unter Aussehen ein."
 L["WN55_1_TITLE"] = "Leistentextur"

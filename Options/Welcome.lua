@@ -141,6 +141,11 @@ end
 -- line once per new version, and the box shows only the versions since the one they saw last. An entry marked
 -- on = "forever" or on = "retail" is that client's alone; unmarked is both.
 local WHATSNEW = {
+    { id = 57, version = "0.40.6",
+        { L["WN57_1_TITLE"], L["WN57_1_TEXT"] },
+        { L["WN57_2_TITLE"], L["WN57_2_TEXT"] },
+        { L["WN57_3_TITLE"], L["WN57_3_TEXT"] },
+    },
     { id = 56, version = "0.40.4",
         { L["WN56_1_TITLE"], L["WN56_1_TEXT"] },
     },

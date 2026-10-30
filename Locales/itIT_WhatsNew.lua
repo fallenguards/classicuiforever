@@ -3,6 +3,12 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN57_1_TITLE"] = "Mostra le borse con un clic"
+L["WN57_1_TEXT"] = "Con Barra delle borse: solo lo zaino, un Ctrl-clic sullo zaino mostra le altre borse o le ripiega di nuovo; la freccia accanto non c'è più. Mostra le borse con sceglie un altro clic. Per attivarlo, scegli Barra delle borse: solo lo zaino nelle opzioni (/fcui), in Borse."
+L["WN57_2_TITLE"] = "Nascondi la grafica del portachiavi"
+L["WN57_2_TEXT"] = "Nascondi la grafica del portachiavi ora libera anche il posto del portachiavi sulla barra classica e sostituisce Nascondi anche la grafica del portachiavi, mantenendo la tua scelta. È disattivato in modo predefinito; attivalo nelle opzioni (/fcui), in Borse."
+L["WN57_3_TITLE"] = "Borse senza Barra classica"
+L["WN57_3_TEXT"] = "Con Barra classica disattivata, le scelte che la barra delle borse del gioco non può seguire sono in grigio, e il loro suggerimento dice perché."
 L["WN56_1_TITLE"] = "Tema personalizzato più veloce"
 L["WN56_1_TEXT"] = "Cambiare aspetto o una parte di Con tema non blocca più il gioco, e una parte deselezionata riprende i colori del gioco. Tema personalizzato è disattivato in modo predefinito; attivalo nelle opzioni (/fcui), in Aspetto."
 L["WN55_1_TITLE"] = "Texture delle barre"
