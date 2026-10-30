@@ -34,7 +34,7 @@ PACKAGES = [
          icon="Interface\\Icons\\INV_Sword_04", notes="The 1.x gryphon bar: square buttons, micro menu, XP bar, key ring."),
     dict(id="Bags", name="Bags", pages=["GROUP_BAGS"], roots=["eraCoins", "panelBank"], modules=["panels"],
          icon="Interface\\Icons\\INV_Misc_Bag_08", notes="1.x bag windows, one bag, and the bag bar."),
-    dict(id="UnitFrames", name="Unit Frames", pages=["GROUP_UNIT_FRAMES"], roots=["classicFonts", "hideLastNames"], modules=["buffArrow"],
+    dict(id="UnitFrames", name="Cast Bars and Unit Frames", pages=["GROUP_UNIT_FRAMES"], roots=["classicFonts", "hideLastNames"], modules=["buffArrow"],
          icon="Interface\\Icons\\INV_Misc_Head_Human_01", notes="1.x unit frames and cast bars."),
     dict(id="Nameplates", name="Nameplates", pages=["GROUP_NAMEPLATES"], roots=["classicFonts"], modules=[],
          project=1773378, icon="Interface\\Icons\\Ability_Hunter_SniperShot", notes="1.x nameplates."),
