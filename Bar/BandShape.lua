@@ -339,8 +339,8 @@ function B.MicroRuns(x, width, u0)
     return runs
 end
 
--- The art as runs of the four sheets: { x, width, sheet, u0, u1, owner }; owner (bar, micro, bags) is whose Hide Bar Art
--- takes the run.
+-- The art as runs of the four sheets: { x, width, sheet, u0, u1, owner }; owner (bar, micro, bags, key) is whose Hide Bar
+-- Art takes the run.
 function B.Segments()
     local plan = CurrentPlan()
     local cut = plan.cut
@@ -418,7 +418,13 @@ function B.Segments()
         Micro(plan.microStart, plan.microEnd - plan.microStart, MICRO_LEAD - MICRO_SECOND_LEAD)
     end
     if plan.tailStart then
-        list[#list + 1] = { plan.tailStart, plan.tailU1 - plan.tailU0, 5, plan.tailU0 / 256, plan.tailU1 / 256, "bar" }
+        -- The key slot from past the shared post (23) is the key ring's own run, as the bags' sockets are theirs.
+        local split = (plan.tailSlot and (B.TailParts())) and 23 or plan.tailU0
+        if split > plan.tailU0 then
+            list[#list + 1] = { plan.tailStart, split - plan.tailU0, 5, plan.tailU0 / 256, split / 256, "bar" }
+        end
+        list[#list + 1] = { plan.tailStart + split - plan.tailU0, plan.tailU1 - split, 5, split / 256, plan.tailU1 / 256,
+            plan.tailSlot and "key" or "bar" }
     end
     -- Right end: with the bags off, the last run was a cut through a sheet and looked sliced; the moved groups'
     -- end post closes it, over the bag part's same pixels where present. A last piece with its own post needs none.

@@ -15,6 +15,7 @@ local CAP_LEFT, CAP_RIGHT = { coords = FULL }, { coords = { 1, 0, 0, 1 } }
 local RUN = {}   -- a run's coords, refilled per piece
 local ARTLESS = {}   -- segment owner -> its art hidden, refilled per paint
 local RIM_H = 2      -- the band's top rows: the lower border of the strip over it
+local KEY_RIM_U0, KEY_RIM_U1 = 27 / 256, 35 / 256   -- the key slot's top rows past its corners: the border alone
 local CAP_TEX = { LeftEndCap = "leftCap", RightEndCap = "rightCap" }
 local GRYPHON_NAMES = { LeftEndCap = "ForeverClassicUIGryphonLeft", RightEndCap = "ForeverClassicUIGryphonRight" }
 local GRYPHON_KEYS = { LeftEndCap = "gryphonLeft", RightEndCap = "gryphonRight" }
@@ -34,8 +35,8 @@ function B.BuildArt()
     art:SetFrameLevel(1)
     art.pieces = {}
     -- The most runs B.Segments makes: two body sheets, bar 2's two, micro region of two, page room, the latency and key
-    -- ring section, four bag runs, a second micro region of two, the post, and floor tiles past the art's room.
-    for i = 1, 22 do
+    -- ring section's two, four bag runs, a second micro region of two, the post, and floor tiles past the art's room.
+    for i = 1, 23 do
         art.pieces[i] = art:CreateTexture(nil, "BACKGROUND")
     end
     art.pageEdge = art:CreateTexture(nil, "BACKGROUND", nil, 1)
@@ -89,11 +90,12 @@ function B.PaintArt()
     local art = B.art
     ns.SetLevelIf(art.capLayer, B.CapLevel())
     local segments = Segments()
-    -- Hide Bar Art on Action Bar 1 drops its runs and the gryphons like the client's art; the micro menu's and the bags'
-    -- runs go by their own Hide Bar Art. Buttons and the xp bar stay.
+    -- Hide Bar Art on Action Bar 1 drops its runs and the gryphons like the client's art; the micro menu's, the bags' and
+    -- the key ring's runs go by their own Hide Bar Art. Buttons and the xp bar stay.
     local main = ns.GetMainBar()
     local bare = B.BarBare(main)
     ARTLESS.bar, ARTLESS.micro, ARTLESS.bags = bare, ns.db.hideMicroArt == true, ns.db.hideBagsArt == true
+    ARTLESS.key = bare or ns.db.keyRingArtHidden == true
     -- The bag sockets' runs, faded with a hidden row (BandBagsShow); a piece drawn as another run next pass is lit again.
     local bagRun = art.bagRun or {}
     art.bagRun = bagRun
@@ -110,6 +112,7 @@ function B.PaintArt()
             local v0, v1 = piece.band[1], piece.band[2]
             if rim then v1 = v0 + (v1 - v0) * RIM_H / BAND_H end
             RUN[1], RUN[2], RUN[3], RUN[4] = seg[4], seg[5], v0, v1
+            if rim and seg[6] == "key" then RUN[1], RUN[2] = KEY_RIM_U0, KEY_RIM_U1 end
             Dress(tex, piece.key, BAND_RUN, art, seg[1], rim and BAND_H - RIM_H or 0, seg[2], rim and RIM_H or BAND_H, RUN)
             local bags = seg[6] == "bags"
             if bags then bagRun[#bagRun + 1] = tex end

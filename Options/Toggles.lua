@@ -217,8 +217,6 @@ ns.TOGGLES = {
     { "reagentBagSlot", L["OPT_reagentBagSlot"], L["OPT_reagentBagSlot_TIP"], needs = "classicBar", radio = "reagentBag",
         drop = true, dropTip = L["OPT_reagentBag_TIP"] },
     { "hideBagsArt", L["OPT_hideBagsArt"], L["OPT_hideBagsArt_TIP"], needs = "classicBar" },
-    { "keyRingArtWithBags", L["OPT_keyRingArtWithBags"], L["OPT_keyRingArtWithBags_TIP"], parent = "hideBagsArt",
-        grayWhen = "keyRingArtHidden", search = "key ring keys keyring art frame" },
     { "bagsTight", L["OPT_bagsTight"], L["OPT_bagsTight_TIP"], parent = "hideBagsArt", search = "bags gap tight together spacing" },
     { "bagsAboveRow", L["OPT_bagsAboveRow"], L["OPT_bagsAboveRow_TIP"], needs = "classicBar" },
 

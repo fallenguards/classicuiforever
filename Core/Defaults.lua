@@ -2,7 +2,7 @@ local _, ns = ...
 local L = ns.L
 
 ns.DB_DEFAULTS = {
-    dbVersion = 31,
+    dbVersion = 32,
     classicBar = true,
     oneBar = false,
     classicBarSize = false,
@@ -136,7 +136,6 @@ ns.DB_DEFAULTS = {
     keyRingSnap = false,
     keyRingWithBags = false,
     keyRingArtHidden = false,
-    keyRingArtWithBags = false,
     reagentBagSlot = false,
     reagentBagRound = false,
     reagentBagHover = true,

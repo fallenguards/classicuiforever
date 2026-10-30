@@ -30,10 +30,20 @@ local function Moved(el) return ns.ValidPlace(ns.db[el.posKey]) end
 local SNAP_REACH = 24
 local function Flat(el) return el == KEYRING and ns.db.keyRingFlat == true end
 local function Snapped(el) return el == KEYRING and B.KeyRingWithBags() and B.BagsFarEnd() ~= nil end
--- The key ring off the band without its cut of art: its own Hide Bar Art, or the bags' with Hide key ring art too
--- (#195), riding the bags or not.
-local function Bare(el)
-    return el == KEYRING and (ns.db.keyRingArtHidden == true or (ns.db.hideBagsArt == true and ns.db.keyRingArtWithBags == true))
+-- The key ring off the band without its cut of art (its own Hide Bar Art), riding the bags or not.
+local function Bare(el) return el == KEYRING and ns.db.keyRingArtHidden == true end
+
+-- dbVersion 32: Hide key ring art too (with the bags' art) is one row with Hide key ring art (#205), in every profile.
+function ns.OneKeyRingArtRow()
+    local function Fold(t)
+        if t.keyRingArtWithBags == true and t.hideBagsArt == true then t.keyRingArtHidden = true end
+        t.keyRingArtWithBags = nil
+    end
+    Fold(ns.db)
+    for _, shot in pairs(type(ns.db.profiles) == "table" and ns.db.profiles or {}) do
+        if type(shot) == "table" then Fold(shot) end
+    end
+    ns.db.dbVersion = 32
 end
 
 -- Hidden, or with no place of ours this layout, the client's key ring is hidden (it lays it beside its bags at its own size:
@@ -152,7 +162,7 @@ local function Dialog()
         if not ns.db.keyRingFlat then ns.db.keyRingSnap = false end
         Save()
     end)
-    -- The key ring off the band only: its own cut of art.
+    -- Its own cut of art off the band, its slot's run on it (BandArt).
     dialog.art = DialogCheck(dialog.flat, false, HUD_EDIT_MODE_SETTING_ACTION_BAR_HIDE_BAR_ART or "Hide Bar Art",
         function(self)
             ns.db.keyRingArtHidden = self:GetChecked() and true or false
@@ -309,7 +319,7 @@ local function Place(el, plan, level)
     local turn, scale = nil, 1
     -- No art: the home is the key itself (across too, so the key centres on the bags at any size), and against the bags
     -- it stands as close as they stand to each other.
-    local bare, cross = Bare(el), BAND_H
+    local bare, cross = (pos or snapped) and Bare(el), BAND_H
     if pos or snapped then
         left = el.u0 - el.cap
         local long = el.cap + el.u1 - el.u0

@@ -520,6 +520,43 @@ function ns.ToggleChanged(key)
     ns.TogglesChanged({ key })
 end
 
+-- Each save older than its version, in order; the last writes the newest dbVersion.
+local function Migrate(saved)
+    if saved < 3 then ns.KeepOldLook() elseif saved == 3 then ns.NoteBarsLook() end
+    if saved < 6 then ns.HideThreatGlowNow() end
+    if saved < 7 then ns.MarkEraScaleOffer() end
+    if saved < 8 then ns.KeepGroupFinderEye() end
+    if saved < 9 then ns.KeepBarArt() end
+    if saved < 10 then ns.KeepLegacyIcon() end
+    if saved < 11 then ns.OneTrackerChoice() end
+    if saved < 12 then ns.FreeOptionsButton() end
+    if saved < 13 then ns.FreeAddonBag() end
+    if saved < 14 then ns.KeepAchievementsButton() end
+    if saved < 15 then ns.KeepPieceSpots() end
+    if saved < 16 then ns.OneProfTabsChoice() end
+    if saved < 17 then ns.KeepQuestLogSingle() end
+    if saved < 17 then ns.KeepMapNav() end
+    if saved < 18 then ns.EyeSnapToDecide() end
+    if saved < 19 then ns.KeepEnemyPlayerColor() end
+    if saved < 19 then ns.BuffArrowChoice() end
+    if saved < 19 then ns.KeepEliteNPCs() end
+    if saved < 19 then ns.KeepGameWindowsOff() end
+    if saved < 19 then ns.KeepOneBarLook() end
+    if saved < 20 then ns.KeepOptionsButtonPick() end
+    if saved < 21 then ns.KeepTexturedLook() end
+    if saved < 22 then ns.OneBarAloneGone() end
+    if saved < 23 then ns.NoteOneBarArt() end
+    if saved < 24 then ns.KeepReagentSlot() end
+    if saved < 25 then ns.KeepLootRollOff() end
+    if saved < 26 then ns.DropWindowsSwitch() end
+    if saved < 27 then ns.KeepSideBarSpot() end
+    if saved < 28 then ns.KeepFinderWho() end
+    if saved < 29 then ns.SplitThemeParts() end
+    if saved < 30 then ns.ShopOffRow() end
+    if saved < 31 then ns.PaneShadeMiddle() end
+    if saved < 32 then ns.OneKeyRingArtRow() end
+end
+
 -- Our first frame: db loads and the post-combat pass runs before any other frame of ours sees the event.
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("ADDON_LOADED")
@@ -561,39 +598,7 @@ frame:SetScript("OnEvent", function(_, event, arg1)
         ns.freshSettings = not saved
         local upgraded = saved and saved < 2
         local big = ns.db.defaultBarSize == true
-        if saved and saved < 3 then ns.KeepOldLook() elseif saved == 3 then ns.NoteBarsLook() end
-        -- Last, as it writes the newest dbVersion.
-        if saved and saved < 6 then ns.HideThreatGlowNow() end
-        if saved and saved < 7 then ns.MarkEraScaleOffer() end
-        if saved and saved < 8 then ns.KeepGroupFinderEye() end
-        if saved and saved < 9 then ns.KeepBarArt() end
-        if saved and saved < 10 then ns.KeepLegacyIcon() end
-        if saved and saved < 11 then ns.OneTrackerChoice() end
-        if saved and saved < 12 then ns.FreeOptionsButton() end
-        if saved and saved < 13 then ns.FreeAddonBag() end
-        if saved and saved < 14 then ns.KeepAchievementsButton() end
-        if saved and saved < 15 then ns.KeepPieceSpots() end
-        if saved and saved < 16 then ns.OneProfTabsChoice() end
-        if saved and saved < 17 then ns.KeepQuestLogSingle() end
-        if saved and saved < 17 then ns.KeepMapNav() end
-        if saved and saved < 18 then ns.EyeSnapToDecide() end
-        if saved and saved < 19 then ns.KeepEnemyPlayerColor() end
-        if saved and saved < 19 then ns.BuffArrowChoice() end
-        if saved and saved < 19 then ns.KeepEliteNPCs() end
-        if saved and saved < 19 then ns.KeepGameWindowsOff() end
-        if saved and saved < 19 then ns.KeepOneBarLook() end
-        if saved and saved < 20 then ns.KeepOptionsButtonPick() end
-        if saved and saved < 21 then ns.KeepTexturedLook() end
-        if saved and saved < 22 then ns.OneBarAloneGone() end
-        if saved and saved < 23 then ns.NoteOneBarArt() end
-        if saved and saved < 24 then ns.KeepReagentSlot() end
-        if saved and saved < 25 then ns.KeepLootRollOff() end
-        if saved and saved < 26 then ns.DropWindowsSwitch() end
-        if saved and saved < 27 then ns.KeepSideBarSpot() end
-        if saved and saved < 28 then ns.KeepFinderWho() end
-        if saved and saved < 29 then ns.SplitThemeParts() end
-        if saved and saved < 30 then ns.ShopOffRow() end
-        if saved and saved < 31 then ns.PaneShadeMiddle() end
+        if saved then Migrate(saved) end
         ns.CopyDefaults(ns.db, ns.DB_DEFAULTS)
         -- Nothing of ours was ever zeroed on a fresh install: the game settings it holds are the player's own.
         if not saved then ns.db.surnamesRepaired, ns.db.damageNumbersRepaired = true, true end
