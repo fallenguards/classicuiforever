@@ -110,8 +110,8 @@ local function PlateScale()
     return plateScale
 end
 
--- Shared with NamePlateOptions.lua; active is written only by SetActive.
-local NP = { active = false }
+-- Shared with NamePlateText.lua and NamePlateOptions.lua; active is written only by SetActive.
+local NP = { active = false, PlateScale = PlateScale }
 ns.NP = NP
 
 local skinned = setmetatable({}, { __mode = "k" })
@@ -396,42 +396,6 @@ local function CastLayout(unitFrame)
     LayCast(castContainer, unitFrame)
 end
 
-ns.PLATE_NAME_MIN, ns.PLATE_NAME_MAX = -6, 6
-
--- Era's plate name: Friz 10 at the plate's size, no outline, no shadow (Forever's is 17.5, outlined and shadowed).
--- Era draws it from SystemFont_NamePlate's own 9, stretched to that height: about 2% wider and softer than a true 10.
-local ERA_NAME_SIZE, ERA_NAME_FONT = 10, 9
-
--- The size the client shows (Classic fonts: Era's at the plate's size) plus the player's offset in points. The client's
--- size is read off the name itself (it scales plate fonts on its own): any other than the one we last set is its new one.
-local function NameSize(name, own)
-    local file, size, flags = name:GetFont()
-    if not size or ns.IsSecret(size) or ns.IsSecret(flags) then return end
-    if not own.nameSet or math.abs(own.nameSet - size) > 0.05 then own.nameBase = size end
-    local classic = ns.ClassicFonts()
-    local base = classic and ERA_NAME_SIZE * PlateScale() or own.nameBase
-    local want = math.max(6, base + (tonumber(ns.db.plateNameSize) or 0))
-    local wantFlags = classic and (flags or ""):gsub("THICKOUTLINE", ""):gsub("OUTLINE", ""):gsub("^[,%s]+", "")
-        :gsub("[,%s]+$", ""):gsub(",%s*,", ",") or flags
-    -- The drawn base first, then the height: a later SetFont does not undo a stretch (the client reads back the height).
-    local drawn = classic and ERA_NAME_FONT or want
-    if math.abs(size - want) > 0.05 or flags ~= wantFlags or own.nameFont ~= drawn then
-        -- The plate's own font for its other alphabets: a Cyrillic name keeps its letters (#188).
-        local family = ns.FontFamily(_G.SystemFont_NamePlate or GameFontNormal, drawn, wantFlags, file)
-        if family then ns.SetFontFamily(name, family) else name:SetFont(file, drawn, wantFlags) end
-        name:SetTextHeight(want)
-        own.nameFont = drawn
-    end
-    own.nameSet = want
-end
-
--- Plate text shadows: none in Era's look, a 1 px drop shadow otherwise.
-local function TextShadow(text)
-    local off = ns.ClassicFonts() and 0 or 1
-    text:SetShadowColor(0, 0, 0, 1)
-    text:SetShadowOffset(off, -off)
-end
-
 -- Runs after the client has anchored the unit frame.
 local function Layout(unitFrame)
     local container, health, castContainer = Pieces(unitFrame)
@@ -465,7 +429,7 @@ local function Layout(unitFrame)
         skull:Hide()
         own.skull = skull
     end
-    TextShadow(level)
+    NP.TextShadow(level)
     ns.SetPointIf(level, "CENTER", border, "RIGHT", LEVEL_X, 0)
     ns.SetPointIf(own.skull, "CENTER", border, "RIGHT", LEVEL_X, 0)
     UpdateLevel(unitFrame)
@@ -477,8 +441,8 @@ local function Layout(unitFrame)
         ns.SetPointIf(name, "BOTTOM", border, "TOP", 0, NAME_GAP)
         name:SetWidth(0)
         name:SetJustifyH("CENTER")
-        TextShadow(name)
-        NameSize(name, own)
+        NP.TextShadow(name)
+        NP.NameSize(name, own)
         local debuffs = ns.Path(unitFrame, "AurasFrame", "DebuffListFrame")
         if debuffs then
             ns.SetTwoPointsIf(debuffs, "LEFT", border, "LEFT", 0, 0, "BOTTOM", name, "TOP", 0, AURA_GAP)
@@ -524,29 +488,6 @@ local function PlaceAllCrowdControl()
     end)
 end
 
-local function PlateText(unitFrame)
-    local own = unitFrame.fcui
-    if not own then return end
-    if unitFrame.name then
-        TextShadow(unitFrame.name)
-        NameSize(unitFrame.name, own)
-    end
-    if own.level then TextShadow(own.level) end
-end
-
--- Name text size (options stepper); applies live.
-function ns.SetPlateNameSize(offset)
-    offset = math.max(ns.PLATE_NAME_MIN, math.min(ns.PLATE_NAME_MAX, math.floor(tonumber(offset) or 0)))
-    ns.db.plateNameSize = offset
-    if NP.active then EachPlate(PlateText) end
-    return offset
-end
-
--- Classic fonts answers on the plates at once, in a fight too.
-ns.OnToggle(function(key)
-    if key == "classicFonts" and NP.active then EachPlate(PlateText) end
-end)
-
 -- Plates re-lay after the client's handlers for what re-anchors them, this frame and the next (a plate registers its
 -- events after ours). Only player plates change colour with no event (a duel, a flag, a death): a 0.2 s sweep while one shows.
 local SWEEP = 0.2
@@ -554,6 +495,8 @@ local driver, sweepJob, overJob
 -- Plates owed a re-lay in this frame's pass and in the next frame's; all = every plate.
 local relaySoon = { plates = setmetatable({}, { __mode = "k" }) }
 local relayNext = { plates = setmetatable({}, { __mode = "k" }) }
+-- The plate laid as the target's and as the focus's: a change re-lays it and the new one, not every plate (#127).
+local held = setmetatable({}, { __mode = "v" })
 
 -- Sole writer of the sweep's awake state.
 local function SetSweeping(on)
@@ -613,6 +556,7 @@ end
 -- Sole writer of NP.active.
 local function SetActive(on)
     NP.active = on
+    held.target, held.focus = on and LivePlate("target") or nil, on and LivePlate("focus") or nil
     SetSweeping(on)
     if overJob and not on then overJob:Sleep() end
     if not on then PaintNameOver() end
@@ -678,21 +622,35 @@ local function Sweep()
     if swept == 0 then SetSweeping(false) end
 end
 
-local ALL_EVENTS = { PLAYER_TARGET_CHANGED = true, PLAYER_FOCUS_CHANGED = true, DISPLAY_SIZE_CHANGED = true,
-    UI_SCALE_CHANGED = true, CVAR_UPDATE = true }
+local ALL_EVENTS = { DISPLAY_SIZE_CHANGED = true, UI_SCALE_CHANGED = true, CVAR_UPDATE = true }
+local HELD_UNIT = { PLAYER_TARGET_CHANGED = "target", PLAYER_FOCUS_CHANGED = "focus" }
 
 local function OnEvent(_, event, unit, _, _, interruptedBy)
     if not NP.active then return end
     if event == "NAME_PLATE_UNIT_ADDED" then
         if MaybePlayer(unit) then SetSweeping(true) end
         local unitFrame = PlateFor(unit)
-        if unitFrame then QueueRelay(unitFrame) end
+        if unitFrame then
+            QueueRelay(unitFrame)
+            if PlateFor("target") == unitFrame then held.target = unitFrame end
+            if PlateFor("focus") == unitFrame then held.focus = unitFrame end
+        end
     elseif event == "NAME_PLATE_UNIT_REMOVED" then
         local unitFrame = LivePlate(unit)
         if unitFrame then
             castCut[unitFrame] = nil
             NP.Unpaint(ns.Path(unitFrame, "HealthBarsContainer", "healthBar"))
+            if held.target == unitFrame then held.target = nil end
+            if held.focus == unitFrame then held.focus = nil end
         end
+    elseif HELD_UNIT[event] then
+        -- The client re-draws only the plate that lost the unit and the one that gained it (UpdateIsTarget, UpdateIsFocus).
+        local token = HELD_UNIT[event]
+        local was, now = held[token], LivePlate(token)
+        held[token] = now
+        if was and was ~= now then QueueRelay(was) end
+        if now then QueueRelay(now) end
+        if token == "target" then ns.Sched.NextFrame("namePlates.nameKept", PaintNameOver) end
     elseif event == "UNIT_FACTION" or event == "UNIT_FLAGS" then
         local unitFrame = LivePlate(unit)
         if unitFrame then
@@ -726,7 +684,6 @@ local function OnEvent(_, event, unit, _, _, interruptedBy)
             plateScale = nil
         end
         QueueRelay()
-        if event == "PLAYER_TARGET_CHANGED" then ns.Sched.NextFrame("namePlates.nameKept", PaintNameOver) end
     end
 end
 

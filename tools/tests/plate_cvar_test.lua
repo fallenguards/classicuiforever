@@ -1,6 +1,7 @@
--- Offline test under Lua 5.4 for the nameplates' answer to a changed CVar (Units/NamePlates.lua). Every CVar written by
--- the game or any addon laid every plate out twice; now only one named for the plates does. The names below are the
--- ones the client's plate files listen to (Blizzard_NamePlates, the same on both clients); ours are read from our files.
+-- Offline test under Lua 5.4 for the nameplates' answer to a changed CVar, target and focus (Units/NamePlates.lua).
+-- Every CVar written by the game or any addon laid every plate out twice; now only one named for the plates does. The
+-- names below are the ones the client's plate files listen to (Blizzard_NamePlates, the same on both clients); ours are
+-- read from our files. A target or focus change re-lays only the plate that lost it and the one that gained it (#127).
 -- Run from the addon root: lua tools/tests/plate_cvar_test.lua (CI runs every tools/tests/*_test.lua).
 -- luacheck: std lua54
 -- luacheck: ignore 111 112 113 121 212
@@ -31,12 +32,22 @@ local last = source:find("local function Apply()", 1, true)
 Check(first and last and last > first, "the plates' event handler is in the file")
 local chunk = first and last and (source:sub(first, last - 1) .. "\nreturn OnEvent") or ""
 
-local relays = 0
+local relays, queued = 0, {}
+-- The plate shown for each unit token now.
+local plateOf = {}
 local env = setmetatable({
-    NP = { active = true },
+    NP = { active = true, Unpaint = function() end },
     CAST_EVENTS = {},
-    QueueRelay = function(unitFrame) if unitFrame == nil then relays = relays + 1 end end,
-    ns = { Sched = { NextFrame = function() end } },
+    held = {},
+    castCut = {},
+    QueueRelay = function(unitFrame)
+        if unitFrame == nil then relays = relays + 1 else queued[#queued + 1] = unitFrame end
+    end,
+    PlateFor = function(token) return plateOf[token] end,
+    LivePlate = function(token) return plateOf[token] end,
+    MaybePlayer = function() return false end,
+    SetSweeping = function() end,
+    ns = { Sched = { NextFrame = function() end }, Path = function() end },
 }, { __index = _G })
 local run, err = load(chunk, "plate events", "t", env)
 Check(run ~= nil, "the handler loads (" .. tostring(err) .. ")")
@@ -95,10 +106,38 @@ for _, name in ipairs({ "Sound_MasterVolume", "cameraDistanceMaxZoomFactor", "au
 end
 
 -- The other whole-pass events answer as before.
-for _, event in ipairs({ "PLAYER_TARGET_CHANGED", "PLAYER_FOCUS_CHANGED", "DISPLAY_SIZE_CHANGED", "UI_SCALE_CHANGED" }) do
+for _, event in ipairs({ "DISPLAY_SIZE_CHANGED", "UI_SCALE_CHANGED" }) do
     relays = 0
     OnEvent(nil, event)
     Check(relays == 1, event .. " lays the plates out again")
+end
+
+------------------------------------------------------------------ target and focus: two plates, never all
+
+local A, B, C = { "plate A" }, { "plate B" }, { "plate C" }
+local function Changed2(event, token, now)
+    relays, queued = 0, {}
+    plateOf[token] = now
+    OnEvent(nil, event)
+    return relays, queued
+end
+for _, case in ipairs({ { "PLAYER_TARGET_CHANGED", "target" }, { "PLAYER_FOCUS_CHANGED", "focus" } }) do
+    local event, token = case[1], case[2]
+    env.held[token] = A
+    local all, laid = Changed2(event, token, B)
+    Check(all == 0, event .. " lays no whole pass")
+    Check(#laid == 2 and laid[1] == A and laid[2] == B, event .. " re-lays the old and the new plate")
+    Check(env.held[token] == B, event .. " keeps the new plate")
+    all, laid = Changed2(event, token, nil)
+    Check(all == 0 and #laid == 1 and laid[1] == B, event .. " to a unit with no plate re-lays only the old one")
+    Check(env.held[token] == nil, event .. " to a unit with no plate keeps none")
+    -- The unit's plate shows up later (it came into range): that plate is the one held.
+    plateOf[token], plateOf.nameplate3 = C, C
+    OnEvent(nil, "NAME_PLATE_UNIT_ADDED", "nameplate3")
+    Check(env.held[token] == C, token .. "'s plate added later is held")
+    OnEvent(nil, "NAME_PLATE_UNIT_REMOVED", "nameplate3")
+    Check(env.held[token] == nil, token .. "'s plate removed is let go")
+    plateOf[token], plateOf.nameplate3 = nil, nil
 end
 
 -- Turned off, nothing answers.
