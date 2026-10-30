@@ -291,7 +291,8 @@ local function ToggleOn(key) return ns.db[key] == true end
 
 local function ChoiceTip(tip, choice)
     GameTooltip_SetTitle(tip, choice.label)
-    GameTooltip_AddNormalLine(tip, choice.tip, true)
+    if choice.tip then GameTooltip_AddNormalLine(tip, choice.tip, true) end
+    if choice.grayIf and choice.grayIf() then GameTooltip_AddNormalLine(tip, choice.grayTip, true) end
 end
 
 -- A drop group's rows, label and tooltip. A row's "Label: item" names the group and the item; the first entry's dropLabel
@@ -302,7 +303,8 @@ local function DropGroup(field, group)
         if entry[field] == group and not (entry.hideIf and entry.hideIf()) then
             first = first or entry
             local item = entry[2]:match(":%s*(.+)$") or entry[2]
-            rows[#rows + 1] = { key = entry[1], label = (item:gsub("^%l", string.upper)), tip = entry[3] }
+            rows[#rows + 1] = { key = entry[1], label = (item:gsub("^%l", string.upper)), tip = entry[3],
+                grayIf = entry.pickGrayIf, grayTip = entry.pickGrayTip }
             words[#words + 1] = item .. " " .. (entry.search or "")
             keys[#keys + 1] = entry[1]
         end
@@ -316,7 +318,7 @@ local function DropGroup(field, group)
 end
 
 local function ItemTip(item, choice)
-    if not (choice.tip and item and item.SetOnEnter) then return end
+    if not ((choice.tip or choice.grayIf) and item and item.SetOnEnter) then return end
     item:SetOnEnter(function(button) MenuUtil.ShowTooltipEx(button, item:GetTooltipFrame(), ChoiceTip, choice) end)
 end
 
@@ -343,7 +345,12 @@ end
 local function DropRow(parent, group, panel)
     local rows, label, tip, words, keys = DropGroup("radio", group)
     local row = DropShell(parent, label, not panel and function(root)
-        for _, choice in ipairs(rows) do ItemTip(root:CreateRadio(choice.label, ToggleOn, PickToggle, choice.key), choice) end
+        for _, choice in ipairs(rows) do
+            local item = root:CreateRadio(choice.label, ToggleOn, PickToggle, choice.key)
+            -- A pick moot in this state (pickGrayIf) stays listed, grayed, its tip saying why.
+            if choice.grayIf then item:SetEnabled(function() return not choice.grayIf() end) end
+            ItemTip(item, choice)
+        end
     end)
     if panel then PanelDrop(row, rows, panel) end
     Describe(row, group, label, tip)

@@ -17,9 +17,12 @@ local lit = setmetatable({}, { __mode = "k" })   -- row button -> true while the
 local arrow
 
 -- Edit mode shows the row whatever the pick: its box must be there to take. Bars another addon holds are its own.
+-- With Classic bar off, Forever's own bar keeps a socket per bag (the pick grayed) and retail's own bar folds with
+-- its own arrow (Backpack only grayed) (#205).
 function B.BagsMode()
     local db = ns.db
     if not db or ns.EditMode.Live() or ns.BarsTaken() then return "shown" end
+    if db.classicBar == false and (ns.OnForever() or db.bagsBackpackOnly == true) then return "shown" end
     for key, mode in pairs(MODES) do
         if db[key] == true then return mode end
     end

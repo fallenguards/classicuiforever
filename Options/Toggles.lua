@@ -21,6 +21,9 @@ local function OursOn(key) return function() return ns.db[key] ~= false end end
 -- Windows Forever never opens: its Adventure Guide is held off and its items have no sockets (#210).
 local NotOnForever = ns.OnForever
 local function OnRetail() return not ns.OnForever() end
+-- Forever's own bag bar keeps a socket per bag: a fold or hide there leaves empty ones (#205).
+local function ForeverGameBags() return ns.OnForever() and ns.db.classicBar == false end
+local function RetailGameBags() return not ns.OnForever() and ns.db.classicBar == false end
 -- Broad mode's own rows (a package's broad flag, Art/GameArt.lua).
 local function NotBroad() return not (ns.PACKAGE and ns.PACKAGE.broad) end
 -- Every window, one list sorted by name; a window whose box is on a page of its own shows here too, as the same setting.
@@ -197,11 +200,13 @@ ns.TOGGLES = {
         search = "bag slots equipped bags swap backpack only" },
     { "bagsBesideBars", L["OPT_bagsBesideBars"], L["OPT_bagsBesideBars_TIP"], needs = "classicBar" },
     { "showBags", L["OPT_showBags"], L["OPT_bagsShow_TIP"], radio = "bagsShow", drop = true,
-        search = "bag bar hide bags buttons backpack hover mouseover mouse over open", sub = L["SUB_BAG_BAR"] },
+        search = "bag bar hide bags buttons backpack hover mouseover mouse over open", sub = L["SUB_BAG_BAR"],
+        grayIf = ForeverGameBags, grayTip = L["OPT_bagsShow_FOREVER"] },
     { "hideBagsAlways", L["OPT_hideBagsAlways"], L["OPT_bagsShow_TIP"], radio = "bagsShow", drop = true },
     { "hideBagsOpen", L["OPT_hideBagsOpen"], L["OPT_bagsShow_TIP"], radio = "bagsShow", drop = true },
     { "hideBagsHover", L["OPT_hideBagsHover"], L["OPT_bagsShow_TIP"], radio = "bagsShow", drop = true },
-    { "bagsBackpackOnly", L["OPT_bagsBackpackOnly"], L["OPT_bagsShow_TIP"], radio = "bagsShow", drop = true },
+    { "bagsBackpackOnly", L["OPT_bagsBackpackOnly"], L["OPT_bagsShow_TIP"], radio = "bagsShow", drop = true,
+        pickGrayIf = RetailGameBags, pickGrayTip = L["OPT_bagsBackpackOnly_GAME"] },
     -- The bag bar's own boxes, on the Bags page; Classic bar (Action bars) gates them.
     { "hideKeyRing", L["OPT_hideKeyRing"], L["OPT_hideKeyRing_TIP"], needs = "classicBar" },
     { "keyRingWithBags", L["OPT_keyRingWithBags"], L["OPT_keyRingWithBags_TIP"], needs = "classicBar",
@@ -213,7 +218,7 @@ ns.TOGGLES = {
         drop = true, dropTip = L["OPT_reagentBag_TIP"] },
     { "hideBagsArt", L["OPT_hideBagsArt"], L["OPT_hideBagsArt_TIP"], needs = "classicBar" },
     { "keyRingArtWithBags", L["OPT_keyRingArtWithBags"], L["OPT_keyRingArtWithBags_TIP"], parent = "hideBagsArt",
-        search = "key ring keys keyring art frame" },
+        grayWhen = "keyRingArtHidden", search = "key ring keys keyring art frame" },
     { "bagsTight", L["OPT_bagsTight"], L["OPT_bagsTight_TIP"], parent = "hideBagsArt", search = "bags gap tight together spacing" },
     { "bagsAboveRow", L["OPT_bagsAboveRow"], L["OPT_bagsAboveRow_TIP"], needs = "classicBar" },
 

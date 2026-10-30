@@ -44,7 +44,9 @@ L["OPT_hideBagsHover"] = "Taschenleiste: beim Überfahren"
 L["OPT_bagsBackpackOnly"] = "Taschenleiste: nur Rucksack"
 L["BAGS_SHOW_BAGS"] = "Taschen anzeigen"
 L["BAGS_HIDE_BAGS"] = "Taschen ausblenden"
+L["OPT_bagsBackpackOnly_GAME"] = "Ausgegraut, solange Klassische Leiste aus ist: die eigene Taschenleiste des Spiels klappt mit ihrem eigenen Pfeil ein."
 L["OPT_bagsShow_TIP"] = "Die Taschentasten angezeigt, ausgeblendet, nur solange ein Taschenfenster offen ist, nur solange die Maus über ihrem Platz ist, oder hinter einem Pfeil auf den Rucksack eingeklappt. Auf der klassischen Leiste rückt die Leiste über ausgeblendeten oder eingeklappten Taschen zusammen, sonst verblassen ihre Fassungen mit ihnen."
+L["OPT_bagsShow_FOREVER"] = "Auf Forever ausgegraut, solange Klassische Leiste aus ist: die eigene Taschenleiste des Spiels behält für jede Tasche einen Sockel."
 
 -- Options/Toggles.lua: where a nameplate's crowd control icons sit
 L["OPT_plateCCBeside"] = "Kontrolleffekte: hinter der Stufe"

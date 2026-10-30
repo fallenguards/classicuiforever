@@ -44,7 +44,9 @@ L["OPT_hideBagsHover"] = "Barra de bolsas: al pasar el ratón"
 L["OPT_bagsBackpackOnly"] = "Barra de bolsas: solo la mochila"
 L["BAGS_SHOW_BAGS"] = "Mostrar las bolsas"
 L["BAGS_HIDE_BAGS"] = "Ocultar las bolsas"
+L["OPT_bagsBackpackOnly_GAME"] = "En gris mientras Barra clásica está desactivada: la barra de bolsas del propio juego se pliega con su propia flecha."
 L["OPT_bagsShow_TIP"] = "Los botones de bolsa visibles, ocultos, visibles solo mientras una ventana de bolsa está abierta, solo mientras el ratón está sobre su sitio, o plegados en la mochila tras una flecha. En la barra clásica, la barra se cierra sobre las bolsas ocultas o plegadas y si no sus huecos se desvanecen con ellas."
+L["OPT_bagsShow_FOREVER"] = "En gris en Forever mientras Barra clásica está desactivada: la barra de bolsas del propio juego mantiene un hueco para cada bolsa."
 
 -- Options/Toggles.lua: where a nameplate's crowd control icons sit
 L["OPT_plateCCBeside"] = "Control: tras el nivel"

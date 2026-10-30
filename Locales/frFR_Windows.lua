@@ -44,7 +44,9 @@ L["OPT_hideBagsHover"] = "Barre des sacs : au survol"
 L["OPT_bagsBackpackOnly"] = "Barre des sacs : sac à dos seul"
 L["BAGS_SHOW_BAGS"] = "Afficher les sacs"
 L["BAGS_HIDE_BAGS"] = "Masquer les sacs"
+L["OPT_bagsBackpackOnly_GAME"] = "Grisé tant que Barre classique est désactivée : la barre de sacs du jeu se replie avec sa propre flèche."
 L["OPT_bagsShow_TIP"] = "Les boutons de sac affichés, masqués, affichés seulement quand une fenêtre de sac est ouverte, seulement quand la souris survole leur emplacement, ou repliés sur le sac à dos derrière une flèche. Sur la barre classique, la barre se resserre sur les sacs masqués ou repliés et sinon leurs logements s'estompent avec eux."
+L["OPT_bagsShow_FOREVER"] = "Grisé sur Forever tant que Barre classique est désactivée : la barre de sacs du jeu garde un emplacement pour chaque sac."
 
 -- Options/Toggles.lua: where a nameplate's crowd control icons sit
 L["OPT_plateCCBeside"] = "Contrôle : après le niveau"
