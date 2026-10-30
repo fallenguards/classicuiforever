@@ -6,7 +6,9 @@ local _, ns = ...
 
 local GetPOITextureCoords = C_Minimap.GetPOITextureCoords
 local GetMapPosFromWorldPos = C_Map.GetMapPosFromWorldPos
+local GetMapInfoAtPosition = C_Map.GetMapInfoAtPosition
 local GetAreaInfo = C_Map.GetAreaInfo
+local GetExploredAreaIDsAtPosition = C_MapExplorationInfo.GetExploredAreaIDsAtPosition
 
 local TOWER, HOUSE = 6, 5
 local ERA_CAPITAL, ERA_TOWN = 5, 4
@@ -19,7 +21,8 @@ local CONTINENT_OF = { [1415] = 0, [1414] = 1 }
 local POI_TEMPLATE = "AreaPOIPinTemplate"
 
 local CAPITALS = { [8] = true, [16] = true, [18] = true, [29] = true, [33] = true, [38] = true }
--- POI id, continent (0 Eastern Kingdoms, 1 Kalimdor), world x, y, the area of the same name (dev/tools/map_markers.py).
+-- POI id, continent (0 Eastern Kingdoms, 1 Kalimdor), world x, y, the area of the same name (dev/tools/map_markers.py),
+-- and the area Era's row waits for: Era shows those two only once it is explored (#205, /eram towns).
 local TOWNS = {
     { 3, 0, -10564.7, -1170.7, 42 },      -- Darkshire
     { 10, 0, -9227.7, -2201.5, 69 },      -- Lakeshire
@@ -52,8 +55,8 @@ local TOWNS = {
     { 799, 1, 202.5, 1308.2, 608 },       -- Nijel's Point
     { 1469, 1, -2352.7, -1921.7, 378 },   -- Camp Taurajo
     { 1471, 1, 2286.4, -2564.7, 431 },    -- Splintertree Post
-    { 1507, 0, -573.5, -4590.5, 3317 },   -- Revantusk Village
-    { 1685, 1, -6886.1, 718.4, 3425 },    -- Cenarion Hold
+    { 1507, 0, -573.5, -4590.5, 3317, 307 },    -- Revantusk Village (The Overlook Cliffs)
+    { 1685, 1, -6886.1, 718.4, 3425, 3425 },    -- Cenarion Hold
 }
 local TOWN_IDS = {}
 for _, row in ipairs(TOWNS) do TOWN_IDS[row[1]] = row end
@@ -65,6 +68,9 @@ local M = {
     painted = setmetatable({}, { __mode = "k" }),
     gameShows = {},
     laid = {},
+    -- POI id -> its waited-for area explored; read again each time the map opens.
+    explored = {},
+    reads = 0,
 }
 
 local function On() return ns.db ~= nil and ns.db.mapMarkers ~= false end
@@ -118,6 +124,26 @@ local function Spot(row)
     return spot[1], spot[2]
 end
 
+local function Explored(row)
+    if not row[6] then return true end
+    local seen = M.explored[row[1]]
+    if seen == nil then
+        seen = false
+        local x, y = Spot(row)
+        local zone = x and GetMapInfoAtPosition(CONTINENT_MAP[row[2]], x, y)
+        local _, pos
+        if zone then _, pos = GetMapPosFromWorldPos(row[2], CreateVector2D(row[3], row[4]), zone.mapID) end
+        local areas = pos and GetExploredAreaIDsAtPosition(zone.mapID, pos)
+        if areas then
+            for _, area in ipairs(areas) do
+                if area == row[6] then seen = true end
+            end
+        end
+        M.explored[row[1]] = seen
+    end
+    return seen
+end
+
 local function TownName(marker)
     local row = TOWN_IDS[marker.poi]
     return row and GetAreaInfo(row[5])
@@ -160,11 +186,12 @@ local function Lay(map, continent, canvas, level)
     local laid, shown = M.laid, 0
     for id in pairs(M.gameShows) do if TOWN_IDS[id] then shown = shown + 1 end end
     if laid.continent == continent and laid.scale == scale and laid.w == w and laid.h == h and laid.level == level
-        and laid.shown == shown then return end
+        and laid.shown == shown and laid.reads == M.reads then return end
     laid.continent, laid.scale, laid.w, laid.h, laid.level, laid.shown = continent, scale, w, h, level, shown
+    laid.reads = M.reads
     for _, row in ipairs(TOWNS) do
         local x, y = Spot(row)
-        local wanted = row[2] == continent and x ~= nil and not M.gameShows[row[1]]
+        local wanted = row[2] == continent and x ~= nil and not M.gameShows[row[1]] and Explored(row)
         local marker = (wanted or M.markers[row[1]]) and Marker(row, canvas)
         if wanted then
             marker:SetScale(scale)
@@ -186,11 +213,18 @@ local function Pass()
 end
 
 -- For the dev self-test: the rows, a town's spot and a marker as laid.
-ns.MapMarkers = { TOWNS = TOWNS, CAPITALS = CAPITALS, Spot = Spot, markers = M.markers, painted = M.painted }
+ns.MapMarkers = { TOWNS = TOWNS, CAPITALS = CAPITALS, Spot = Spot, Explored = Explored, markers = M.markers,
+    painted = M.painted }
 
 local function Attach()
     local map = WorldMapFrame
     if not map or not map.ScrollContainer then return false end
+    ns.Sched.OnVisible(map, "map.markers.explored", function(shown)
+        if shown then
+            wipe(M.explored)
+            M.reads = M.reads + 1
+        end
+    end)
     ns.Sched.Attach(map, { name = "map.markers", every = 0, fn = Pass })
     return true
 end
