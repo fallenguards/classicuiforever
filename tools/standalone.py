@@ -37,7 +37,7 @@ PACKAGES = [
     dict(id="UnitFrames", name="Unit Frames", pages=["GROUP_UNIT_FRAMES"], roots=["classicFonts", "hideLastNames"], modules=["buffArrow"],
          icon="Interface\\Icons\\INV_Misc_Head_Human_01", notes="1.x unit frames and cast bars."),
     dict(id="Nameplates", name="Nameplates", pages=["GROUP_NAMEPLATES"], roots=["classicFonts"], modules=[],
-         icon="Interface\\Icons\\Ability_Hunter_SniperShot", notes="1.x nameplates."),
+         project=1773378, icon="Interface\\Icons\\Ability_Hunter_SniperShot", notes="1.x nameplates."),
     dict(id="Chat", name="Chat", pages=["GROUP_CHAT"], roots=["panelChannels"], modules=["panels"],
          icon="Interface\\Icons\\INV_Misc_Note_01", notes="The 1.x chat frame look."),
     dict(id="Maps", name="Minimap & World Map", pages=["GROUP_MINIMAP", "GROUP_MAP"],
