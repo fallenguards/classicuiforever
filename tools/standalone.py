@@ -63,7 +63,7 @@ PACKAGES = [
                         "panelChannels"],
          modules=["panels"], icon="Interface\\Icons\\INV_Misc_Note_02",
          notes="The 1.x social window, Who list, guild roster and group finder."),
-    dict(id="DamageMeter", name="Damage Meter", pages=[], roots=["damageMeter"], modules=[],
+    dict(id="DamageMeterSkins", name="Damage Meter Skins", pages=[], roots=["damageMeter"], modules=[],
          icon="Interface\\Icons\\INV_Misc_PocketWatch_01", notes="The game's damage meter in the classic look."),
     dict(id="Tooltips", wave=2, name="Tooltips", pages=[], roots=["eraCoins"], modules=["tooltips"],
          icon="Interface\\Icons\\INV_Misc_QuestionMark", notes="1.x tooltips."),

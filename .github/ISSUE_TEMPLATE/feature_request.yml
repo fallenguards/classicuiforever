@@ -22,7 +22,7 @@ body:
         - "ClassicUI Forever: Standalone Chat"
         - "ClassicUI Forever: Standalone Minimap & World Map"
         - "ClassicUI Forever: Standalone Quests"
-        - "ClassicUI Forever: Standalone Damage Meter"
+        - "ClassicUI Forever: Standalone Damage Meter Skins"
       default: 0
     validations:
       required: true
