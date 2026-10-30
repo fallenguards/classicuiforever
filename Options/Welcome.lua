@@ -12,7 +12,8 @@ local CURSEFORGE_URL = PKG and PKG.curseforge or "https://www.curseforge.com/pro
 local GITHUB_URL = PKG and PKG.issues
     or "https://github.com/fallenguards/classicuiforever/issues/new/choose?addon=ClassicUI%20Forever%20(full%20addon)"
 
-local BODY = L["WELCOME_BODY"]
+-- A standalone piece's own note: the full addon's names parts a piece may not have.
+local BODY = PKG and PKG.piece and L["WELCOME_BODY_PIECE"]:format(ns.SLASH) or L["WELCOME_BODY"]
 
 local OnForever = ns.OnForever
 

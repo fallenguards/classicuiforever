@@ -194,6 +194,18 @@ Check(Guard({ ClassicUIForeverStandaloneBags = true }, { ClassicUIForever = true
 Check(Guard({ ClassicUIForeverStandaloneBags = true, FallensUIColorPicker = true }) == nil,
     "Fallen's UI Color Picker beside it (an addon of its own): the package runs")
 
+-- A piece's welcome note is its own: the full addon's talked about the classic bar's professions and reagent bag.
+local welcomeFile = Read("Options/Welcome.lua")
+Check(welcomeFile:find('PKG.piece and L["WELCOME_BODY_PIECE"]', 1, true) ~= nil, "a piece shows its own welcome note")
+for _, lang in ipairs({ "enUS", "deDE", "esES", "frFR", "itIT" }) do
+    local body = Read("Locales/" .. lang .. ".lua"):match('L%["WELCOME_BODY_PIECE"%] = "(.-)"\r?\n')
+    Check(body ~= nil, lang .. ": a piece's welcome note")
+    for _, word in ipairs({ "rofession", "eagent", "Reagenz", "componentes", "composants", "reagenti", "Classic bar",
+                            "Klassische Leiste", "Barra clásica", "Barre classique", "Barra classica" }) do
+        Check(not (body or ""):find(word, 1, true), lang .. ": a piece's welcome names no part (" .. word .. ")")
+    end
+end
+
 -- Every released piece is a pick in the issue forms' Which addon?, and its Support page link picks it; the full addon's
 -- link picks the first option.
 local function Released()
