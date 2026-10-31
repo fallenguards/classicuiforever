@@ -212,6 +212,7 @@ return {
     eraCoins = "same for everyone: on by default, a new restyle (Era's coins, as the damage meter's look was)",
     hideItemQuality = "same for everyone: opt-in, off by default",
     hideJunkCoin = "same for everyone: opt-in, off by default",
+    hideSheetQuality = "same for everyone: opt-in, off by default",
     modernPageArrows = "kept as before: dbVersion 22 (Bar/BandShape.lua OneBarAloneGone) turns it on where One bar kept its page arrows; else opt-in, off (#207)",
     themePartParchment = "same for everyone: on by default, every part took the theme before",
     themePartUnits = "same for everyone: on by default, every part took the theme before",

@@ -176,6 +176,7 @@ return {
     hideMinimapZoomOut = false,
     hideObjectiveTracker = false,
     hideProfessionsButton = true,
+    hideSheetQuality = false,
     hideStanceBar = false,
     hideStatusMain = false,
     hideStatusSecond = false,

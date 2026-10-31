@@ -478,6 +478,8 @@ ns.TOGGLES = {
     { "statPanes", L["OPT_statPanes"], L["OPT_statPanes_TIP"], parent = "characterSheet" },
     { "equipmentQuickButton", L["OPT_equipmentQuickButton"], L["OPT_equipmentQuickButton_TIP"], parent = "characterSheet" },
     { "weaponSkillDetail", L["OPT_weaponSkillDetail"], L["OPT_weaponSkillDetail_TIP"], parent = "characterSheet" },
+    { "hideSheetQuality", L["OPT_hideSheetQuality"], L["OPT_hideSheetQuality_TIP"], parent = "characterSheet",
+        search = "quality border rarity color colour green blue purple item equipped gear slot" },
     { "statsSearch", L["OPT_statsSearch"], L["OPT_statsSearch_TIP"], parent = "characterSheet", hideIf = OnRetail,
         search = "statistics stats search find filter" },
     { "spellBook", L["OPT_spellBook"], L["OPT_spellBook_TIP"] },

@@ -348,6 +348,7 @@ ns.DB_DEFAULTS = {
     statPanes = true,
     weaponSkillDetail = true,
     equipmentQuickButton = false,
+    hideSheetQuality = false,
     statPaneLeft = "section2",
     statPaneRight = "section3",
     spellBook = true,

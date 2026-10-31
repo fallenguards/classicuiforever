@@ -23,10 +23,19 @@ local function Rim(slot)
     if rim then rim:Show() end
 end
 
+-- Era's sheet draws no quality border round worn items; the client's slots do, faded by the option.
+local function QualityBorder(slot)
+    local border = slot.IconBorder
+    if not border then return end
+    Take(border, "alpha")
+    ns.SetAlphaIf(border, ns.db and ns.db.hideSheetQuality == true and 0 or 1)
+end
+
 local function DressSlot(slot, name)
     Fade(_G[name .. "Frame"])
     Fade(slot.BorderFrame)
     Rim(slot)
+    QualityBorder(slot)
 end
 
 -- Each slot off the previous (nextPoint, dx, dy); the first at relPoint, x, y on the doll.
@@ -80,3 +89,14 @@ function T.LaySlots(doll)
     local ammo = _G["CharacterAmmoSlot"]
     if ammo then AmmoSlot(ammo) end
 end
+
+-- Answers in a fight too: the options pass waits one out.
+local SLOT_LISTS = { LEFT_SLOTS, RIGHT_SLOTS, WEAPON_SLOTS, { "CharacterAmmoSlot" } }
+ns.OnToggle(function(key)
+    if key ~= "hideSheetQuality" or not T.active then return end
+    for _, names in ipairs(SLOT_LISTS) do
+        for _, name in ipairs(names) do
+            if _G[name] then QualityBorder(_G[name]) end
+        end
+    end
+end)
