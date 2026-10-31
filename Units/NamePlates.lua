@@ -483,6 +483,7 @@ local function LivePlate(unit)
     local unitFrame = unit and PlateFor(unit)
     if unitFrame and not Forbidden(unitFrame) then return unitFrame end
 end
+NP.LivePlate = LivePlate
 
 -- Every plate on screen; forbidden ones only with withForbidden. Returns how many fn saw.
 local function EachPlate(fn, withForbidden)

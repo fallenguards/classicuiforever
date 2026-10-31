@@ -27,10 +27,21 @@ local function TintPlate(unitFrame)
     end
 end
 
-local function TintAll()
-    ns.NP.EachPlate(TintPlate)
+-- Plates whose auras changed this frame: the client builds a plate's aura items in its own UNIT_AURA handler, so only
+-- those have new rings (#127: every change re-tinted every plate).
+local pending = {}   -- nameplate unit -> true
+
+local function TintPending()
+    for unit in pairs(pending) do
+        pending[unit] = nil
+        local unitFrame = ns.NP.LivePlate(unit)
+        if unitFrame then TintPlate(unitFrame) end
+    end
 end
 
 ns.EventFrame(RING_EVENTS, function(_, _, unit)
-    if type(unit) == "string" and unit:find("^nameplate") then ns.Sched.NextFrame("namePlates.auraRings", TintAll) end
+    if type(unit) == "string" and unit:find("^nameplate") then
+        pending[unit] = true
+        ns.Sched.NextFrame("namePlates.auraRings", TintPending)
+    end
 end)
