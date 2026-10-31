@@ -44,12 +44,12 @@ local ROSTER_EVENTS = { GROUP_ROSTER_UPDATE = true, PARTY_MEMBER_ENABLE = true, 
     PLAYER_LEVEL_UP = true, PLAYER_LEVEL_CHANGED = true }
 local LAYOUT_EVENTS = { EDIT_MODE_LAYOUTS_UPDATED = true, PLAYER_SPECIALIZATION_CHANGED = true }
 local POWER_FREQUENT = { "UNIT_POWER_FREQUENT" }
--- The client re-lays the aura row on these: UNIT_TARGET via the ToT-constrained rows (TargetFrame.lua 222-226),
--- threat when the threat number shows or hides (its OnShow/OnHide, TargetFrame.lua 1220-1221).
-local AURA_EVENTS = { "UNIT_AURA", "UNIT_TARGET", "UNIT_THREAT_SITUATION_UPDATE", "UNIT_THREAT_LIST_UPDATE" }
+-- The client re-lays the aura row on these: UNIT_TARGET via the ToT-constrained rows (TargetFrame.lua 222-226).
+-- Threat re-lays it only as the threat number shows or hides, which WatchEdges hears (#127).
+local AURA_EVENTS = { "UNIT_AURA", "UNIT_TARGET" }
 local TARGET_EVENTS = { "PLAYER_TARGET_CHANGED", "PLAYER_FOCUS_CHANGED" }
 -- A neutral mob turning on the player goes red (enemy health color by reaction).
-local THREAT_EVENTS = { UNIT_THREAT_SITUATION_UPDATE = true, UNIT_THREAT_LIST_UPDATE = true }
+local THREAT_EVENTS = { "UNIT_THREAT_SITUATION_UPDATE", "UNIT_THREAT_LIST_UPDATE" }
 -- The pet frame's UnitFrame_Update paints its mana bar white on these (UnitFrame.lua OnEvent, the vehicle data).
 local PET_EVENTS = { "UNIT_NAME_UPDATE", "PLAYER_GAINS_VEHICLE_DATA", "PLAYER_LOSES_VEHICLE_DATA" }
 local SNAP_FRAMES = { "PlayerFrame", "TargetFrame", "FocusFrame", "PetFrame" }
@@ -334,13 +334,15 @@ local function Apply()
         local auraKick = CreateFrame("Frame")
         ns.RegisterEvents(auraKick, AURA_EVENTS, "target", "focus")
         ns.RegisterEvents(auraKick, TARGET_EVENTS)
-        auraKick:SetScript("OnEvent", function(_, event, unit)
+        auraKick:SetScript("OnEvent", function()
             if not UF.active then return end
-            if THREAT_EVENTS[event] and ns.db.thickEnemyColor == "reaction" then Recolor(unit) end
             SetAuraLive()
             KeepAuras(true)
             AuraHot()
         end)
+        ns.EventFrame(THREAT_EVENTS, function(_, _, unit)
+            if UF.active and ns.db.thickEnemyColor == "reaction" then Recolor(unit) end
+        end, "target", "focus")
         ns.EventFrame(PET_EVENTS, OnPetEvent, "pet", "player")
         auraJob = ns.Sched.Job({ name = "unitFrames.auras", every = 0.25, awake = false, fn = AuraPass })
         editJob = ns.Sched.Job({ name = "unitFrames.edit", every = 0.25, awake = false, fn = EditBeat })
