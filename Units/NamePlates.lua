@@ -508,8 +508,8 @@ local function PlaceAllCrowdControl()
 end
 
 -- Plates re-lay after the client's handlers for what re-anchors them, this frame and the next (a plate registers its
--- events after ours). Only player plates change colour with no event (a duel, a flag, a death): a 0.2 s sweep while one shows.
-local SWEEP = 0.2
+-- events after ours). Only player plates change color with no event (a duel, a flag, a death): a 1 s sweep while one shows.
+local SWEEP = 1
 local driver, sweepJob, overJob
 -- Plates owed a re-lay in this frame's pass and in the next frame's; all = every plate.
 local relaySoon = { plates = setmetatable({}, { __mode = "k" }) }
