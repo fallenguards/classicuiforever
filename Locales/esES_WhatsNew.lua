@@ -3,6 +3,8 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN59_1_TITLE"] = "Menos trabajo para el juego"
+L["WN59_1_TEXT"] = "Las placas de nombre trabajan mucho menos cuando cambias de objetivo, lanzas hechizos, ganas o pierdes auras, o estás entre otros jugadores. Los marcos de objetivo y de foco y la Lista Quién también hacen menos en segundo plano."
 L["WN58_1_TITLE"] = "Marcadores de pueblos de Era"
 L["WN58_1_TEXT"] = "Poblado Sañadiente y Fuerte Cenarion aparecen en los mapas de continente solo cuando has explorado su zona, como en Classic Era."
 L["WN57_1_TITLE"] = "Mostrar bolsas con un clic"

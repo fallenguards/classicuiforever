@@ -3,6 +3,8 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN59_1_TITLE"] = "Meno lavoro per il gioco"
+L["WN59_1_TEXT"] = "Le targhette lavorano molto meno quando cambi bersaglio, lanci incantesimi, ottieni o perdi aure, o sei tra altri giocatori. Anche i riquadri del bersaglio e del focus e l'Elenco Chi fanno meno lavoro in background."
 L["WN58_1_TITLE"] = "Segnalini dei villaggi di Era"
 L["WN58_1_TEXT"] = "Revantusk Village e Cenarion Hold compaiono sulle mappe dei continenti solo dopo che ne hai esplorato la zona, come in Classic Era."
 L["WN57_1_TITLE"] = "Mostra le borse con un clic"

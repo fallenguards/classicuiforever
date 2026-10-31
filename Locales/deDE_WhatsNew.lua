@@ -3,6 +3,8 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN59_1_TITLE"] = "Weniger Arbeit für das Spiel"
+L["WN59_1_TEXT"] = "Namensplaketten arbeiten deutlich weniger, wenn du das Ziel wechselst, zauberst, Auren bekommst oder verlierst oder zwischen anderen Spielern stehst. Auch Ziel- und Fokusfenster und die Wer-Liste tun im Hintergrund weniger."
 L["WN58_1_TITLE"] = "Era-Ortsmarkierungen"
 L["WN58_1_TEXT"] = "Revantusk und Burg Cenarius erscheinen auf den Kontinentkarten erst, wenn du ihre Gegend erkundet hast, wie in Classic Era."
 L["WN57_1_TITLE"] = "Taschen zeigen per Klick"

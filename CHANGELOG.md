@@ -2,6 +2,16 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.40.8] - 2026-10-30
+
+### Changed
+- Changing target or focus lays out only the two nameplates involved, not every plate on screen (#127).
+- The addon's own nameplate art (borders, cast bar frames, the glow) is drawn once per plate, not again on every update and every cast (#127).
+- Player nameplates check whether their color needs to change once a second instead of five times, which counts most in cities and battlegrounds (#127).
+- A buff or debuff change on one nameplate updates the rings around that plate's aura icons only, not those on every plate (#127).
+- In a fight, the target and focus frames no longer put their aura rows back in place on every threat change (#127).
+- On Forever, the Who list no longer checks every frame whether the game's own Who list has opened; it takes over as that list opens (#127).
+
 ## [0.40.7] - 2026-10-30
 
 ### Fixed

@@ -3,6 +3,8 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN59_1_TITLE"] = "Moins de travail pour le jeu"
+L["WN59_1_TEXT"] = "Les barres de nom travaillent beaucoup moins quand vous changez de cible, lancez un sort, gagnez ou perdez des auras, ou êtes entouré d'autres joueurs. Les cadres de cible et de focalisation et la Liste Qui en font aussi moins en arrière-plan."
 L["WN58_1_TITLE"] = "Marqueurs de villes d'Era"
 L["WN58_1_TEXT"] = "Le Village des Revantusk et le Fort cénarien n'apparaissent sur les cartes des continents qu'une fois leur zone explorée, comme dans Classic Era."
 L["WN57_1_TITLE"] = "Afficher les sacs d'un clic"
