@@ -10,6 +10,7 @@ local panel, tab
 local results = {}
 local sort = { field = "name", reverse = false }
 local clientWho -- LFGWhoListFrame from its first sighting: a global frame is never replaced
+local whoShown -- runs the send-away as if the client's list had just shown
 
 -- Classic Era's header widths; x is each row text's start, under its header.
 local COLUMNS = {
@@ -329,7 +330,7 @@ local function Build()
         if C_FriendList and C_FriendList.SetWhoToUi then pcall(C_FriendList.SetWhoToUi, false) end
     end)
 
-    local driver = ns.EventFrame("WHO_LIST_UPDATE", function()
+    ns.EventFrame("WHO_LIST_UPDATE", function()
         if not active then return end
         ns.OpenWhoList()
         HideBlizzardPanels()
@@ -338,22 +339,18 @@ local function Build()
         -- The client shows its list on this event too; ours goes back in front next frame.
         ns.Sched.NextFrame("who.front", FrontAgain)
     end)
-    panel.driver = driver
-    -- /who, the Who key or a finder reopened on its Who page shows the client's list: sent away the frame it shows.
-    ns.Sched.OnFrame(driver, { name = "who.driver", every = 0, fn = function()
-        if not active then return end
-        local who = clientWho
-        if not who then
-            who = _G["LFGWhoListFrame"]
-            if not who then return end
-            clientWho = who
-        end
-        if not who:IsVisible() then return end
-        ns.OpenWhoList()
-        HideBlizzardPanels()
-    end })
-    -- Shown only while the module is on (SetActive); it still hears the event.
-    if not active then driver:Hide() end
+    -- /who, the Who key or a finder reopened on its Who page shows the client's list: sent away before it draws (#127).
+    ns.AttachWhenLoaded(function()
+        local who = _G["LFGWhoListFrame"]
+        if not who then return false end
+        clientWho = who
+        whoShown = ns.Sched.AfterShow(who, "who.sendAway", function()
+            if not active then return end
+            ns.OpenWhoList()
+            HideBlizzardPanels()
+        end)
+        return true
+    end)
 end
 
 ---------------------------------------------------------------- the tabs
@@ -434,11 +431,10 @@ local function RenameFirstTab()
     ns.FitBottomTab(first)
 end
 
--- The module's switch, its only writer. The watch does nothing while off, so its frame shows only while on.
+-- The module's switch, its only writer. Turned on over the client's list: sent away as if it had just shown.
 local function SetActive(on)
     active = on
-    local driver = panel and panel.driver
-    if driver then driver:SetShown(on) end
+    if on and whoShown and clientWho and clientWho:IsVisible() then whoShown() end
 end
 
 local function Apply()
