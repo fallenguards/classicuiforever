@@ -3,6 +3,10 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN60_1_TITLE"] = "Riquadri dei boss classici"
+L["WN60_1_TEXT"] = "I riquadri dei boss negli scontri di spedizioni e incursioni indossano il vecchio riquadro col drago, con il livello nel suo anello rotondo e la barra di lancio accanto o sotto il riquadro. Per riavere quelli del gioco, togli la spunta a Boss nella lista Riquadri delle opzioni (/fcui), sotto Riquadri delle unità."
+L["WN60_2_TITLE"] = "Nascondi bordi di qualità"
+L["WN60_2_TEXT"] = "Gli oggetti che indossi nella scheda del personaggio possono apparire senza il bordo colorato della loro qualità. È disattivato in modo predefinito; attivalo nelle opzioni (/fcui), sotto Scheda del personaggio."
 L["WN59_1_TITLE"] = "Meno lavoro per il gioco"
 L["WN59_1_TEXT"] = "Le targhette lavorano molto meno quando cambi bersaglio, lanci incantesimi, ottieni o perdi aure, o sei tra altri giocatori. Anche i riquadri del bersaglio e del focus e l'Elenco Chi fanno meno lavoro in background."
 L["WN58_1_TITLE"] = "Segnalini dei villaggi di Era"

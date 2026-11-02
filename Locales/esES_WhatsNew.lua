@@ -3,6 +3,10 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN60_1_TITLE"] = "Marcos de jefe clásicos"
+L["WN60_1_TEXT"] = "Los marcos de jefe de los combates de mazmorra y banda llevan el antiguo marco de dragón, con el nivel en su anillo redondo y la barra de lanzamiento al lado o debajo del marco. Para recuperar los del juego, desmarca Jefe en la lista Marcos de las opciones (/fcui), en Marcos de unidad."
+L["WN60_2_TITLE"] = "Ocultar bordes de calidad"
+L["WN60_2_TEXT"] = "Los objetos que llevas puestos en la ficha de personaje pueden mostrarse sin el borde de color de su calidad. Está desactivado por defecto; actívalo en las opciones (/fcui), en Ficha de personaje."
 L["WN59_1_TITLE"] = "Menos trabajo para el juego"
 L["WN59_1_TEXT"] = "Las placas de nombre trabajan mucho menos cuando cambias de objetivo, lanzas hechizos, ganas o pierdes auras, o estás entre otros jugadores. Los marcos de objetivo y de foco y la Lista Quién también hacen menos en segundo plano."
 L["WN58_1_TITLE"] = "Marcadores de pueblos de Era"

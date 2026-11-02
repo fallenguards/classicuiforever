@@ -2,6 +2,12 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.41.0] - 2026-11-02
+
+### Added
+- Boss frames in the classic art: the boss frames of a dungeon or raid fight wear the old dragon frame, with the level in its round ring, the raid mark at the end of the bars and the threat percent over the name. Their cast bars sit clear of the art, beside the frame or under it as Edit Mode's Cast Bar on Side picks. On for everyone; uncheck Boss in the Frames list under Unit frames to get the game's own back.
+- Hide quality borders, under Character sheet: the items you wear show without the colored border of their quality. Off by default.
+
 ## [0.40.8] - 2026-10-30
 
 ### Changed

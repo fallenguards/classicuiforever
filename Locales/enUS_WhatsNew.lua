@@ -2,6 +2,10 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN60_1_TITLE"] = "Classic boss frames"
+L["WN60_1_TEXT"] = "The boss frames of dungeon and raid fights wear the old dragon frame, with the level in its round ring and the cast bar beside or under the frame. To get the game's own back, uncheck Boss in the Frames list in the options (/fcui), under Unit frames."
+L["WN60_2_TITLE"] = "Hide quality borders"
+L["WN60_2_TEXT"] = "Items you wear on the character sheet can show without the colored border of their quality. It is off by default; turn it on in the options (/fcui), under Character sheet."
 L["WN59_1_TITLE"] = "Less work for the game"
 L["WN59_1_TEXT"] = "Nameplates do much less work when you change target, cast, gain or lose auras, or stand among other players. The target and focus frames and the Who list do less in the background too."
 L["WN58_1_TITLE"] = "Era's town markers"

@@ -3,6 +3,10 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN60_1_TITLE"] = "Klassische Bossfenster"
+L["WN60_1_TEXT"] = "Die Bossfenster in Dungeon- und Schlachtzugskämpfen tragen den alten Drachenrahmen, mit der Stufe in ihrem runden Ring und der Zauberleiste neben oder unter dem Fenster. Um die Fenster des Spiels zurückzubekommen, entferne den Haken bei Boss in der Liste Fenster in den Optionen (/fcui) unter Einheitenfenster."
+L["WN60_2_TITLE"] = "Qualitätsrahmen ausblenden"
+L["WN60_2_TEXT"] = "Getragene Gegenstände im Charakterfenster können ohne den farbigen Rahmen ihrer Qualität erscheinen. Standardmäßig aus; schalte es in den Optionen (/fcui) unter Charakterfenster ein."
 L["WN59_1_TITLE"] = "Weniger Arbeit für das Spiel"
 L["WN59_1_TEXT"] = "Namensplaketten arbeiten deutlich weniger, wenn du das Ziel wechselst, zauberst, Auren bekommst oder verlierst oder zwischen anderen Spielern stehst. Auch Ziel- und Fokusfenster und die Wer-Liste tun im Hintergrund weniger."
 L["WN58_1_TITLE"] = "Era-Ortsmarkierungen"

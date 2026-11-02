@@ -3,6 +3,10 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN60_1_TITLE"] = "Cadres de boss classiques"
+L["WN60_1_TEXT"] = "Les cadres de boss des combats en donjon et en raid portent l'ancien cadre au dragon, avec le niveau dans son anneau rond et la barre d'incantation à côté ou sous le cadre. Pour retrouver ceux du jeu, décochez Boss dans la liste Cadres des options (/fcui), sous Cadres d'unité."
+L["WN60_2_TITLE"] = "Masquer les bordures de qualité"
+L["WN60_2_TEXT"] = "Les objets que vous portez sur la fiche de personnage peuvent s'afficher sans la bordure colorée de leur qualité. Désactivé par défaut ; activez-le dans les options (/fcui), sous Fiche de personnage."
 L["WN59_1_TITLE"] = "Moins de travail pour le jeu"
 L["WN59_1_TEXT"] = "Les barres de nom travaillent beaucoup moins quand vous changez de cible, lancez un sort, gagnez ou perdez des auras, ou êtes entouré d'autres joueurs. Les cadres de cible et de focalisation et la Liste Qui en font aussi moins en arrière-plan."
 L["WN58_1_TITLE"] = "Marqueurs de villes d'Era"
