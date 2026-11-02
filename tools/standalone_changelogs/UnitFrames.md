@@ -2,6 +2,11 @@
 
 All notable changes to ClassicUI Forever: Standalone Cast Bars and Unit Frames are documented here. It has version numbers of its own, apart from the full ClassicUI Forever's.
 
+## [1.1.0] - 2026-11-02
+
+### Added
+- Boss frames in the classic art: the boss frames of a dungeon or raid fight wear the old dragon frame, with the level in its round ring, the raid mark at the end of the bars and the threat percent over the name. Their cast bars sit clear of the art, beside the frame or under it as Edit Mode's Cast Bar on Side picks. On for everyone; uncheck Boss in the Frames list to get the game's own back.
+
 ## [1.0.1] - 2026-10-30
 
 ### Changed
