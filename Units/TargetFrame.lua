@@ -1,6 +1,6 @@
 local _, ns = ...
 
--- Target and focus frames on 1.x art, their aura rows, and the ToT under the portrait.
+-- Target and focus frames on 1.x art, their aura rows, the ToT under the portrait, and the boss frames.
 
 local UF = ns.UF
 local Busy, Keeper, Update = UF.Busy, UF.Keeper, UF.Update
@@ -58,6 +58,17 @@ local TOT_PIECES = { "FrameTexture", "HealthBar", "ManaBar" }
 local TOT_BARS = { "HealthBar", "ManaBar" }
 local TOT_DEBUFFS = { { -23, -8 }, { -10, -8 }, { -23, -21 }, { -10, -21 } }
 local TARGET_EVENTS = { "PLAYER_TARGET_CHANGED", "PLAYER_FOCUS_CHANGED" }
+-- Boss frames: the target's bars on Wrath's boss sheet, no portrait or auras. Level, raid mark and threat percent where
+-- Wrath's TargetFrame.lua put them (its art 20 left of ours): the level in the ring, the mark on the bars' end.
+local BOSS_ART = { coords = { 0.09375, 1, 0, 0.78125 }, w = FRAME_W, h = FRAME_H, point = "TOPLEFT", x = 20, y = -4 }
+local BOSS_FLASH = { 0, 0.9453125, 0, 0.73125 }
+local BOSS_LEVEL_X = 148
+local BOSS_SKULL = { coords = FULL, w = 16, h = 16, point = "CENTER", relPoint = "TOPLEFT", x = BOSS_LEVEL_X, y = -70 }
+local BOSS_MARK_X, BOSS_MARK_Y = 149, -54
+local BOSS_THREAT_X, BOSS_THREAT_Y = -65, -26
+-- The cast bar's right end: beside the art (Edit Mode's Cast Bar on Side), or under the bars left of the ring.
+local BOSS_BAR_SIDE_X = 13
+local BOSS_BAR_UNDER_X, BOSS_BAR_UNDER_Y = 124, -77
 local UNIT_TARGET = { "UNIT_TARGET" }
 
 -- The game's own spot under the split art (ART_FOOT): kept on each re-lay trigger (UnitFrames.lua), so it only acts on
@@ -256,25 +267,12 @@ function UF.PlaceTargetName(unit)
     end
 end
 
-local function SkinTarget(frame, unit)
-    if Busy() then return end
-    if not frame then return end
-    local container = frame.TargetFrameContainer
-    local main = ns.Path(frame, "TargetFrameContent", "TargetFrameContentMain")
-    local contextual = ns.Path(frame, "TargetFrameContent", "TargetFrameContentContextual")
-    if not container or not main or not contextual then ns.MissingPiece(frame:GetName() .. " layout") return end
+-- Our bars over the faded client ones, with the client's texts and its heal and absorb fills.
+local function SkinBars(frame, container, main, contextual, unit)
     local healthContainer = main.HealthBarsContainer
     local blizzHealth = healthContainer and healthContainer.HealthBar
     local blizzMana = main.ManaBar
-
-    if container.Portrait then
-        container.Portrait:SetSize(PORTRAIT, PORTRAIT)
-        ns.SetPointOnce(container.Portrait, "TOPRIGHT", frame, "TOPRIGHT", -22, -16)
-    end
-    Dress(container.PortraitMask, "portraitMask", MASK, frame)
-
     local host, health, power, bg = BuildBars(frame, container, contextual, BAR_X, 25, HEALTH_Y, unit, blizzHealth, blizzMana)
-
     if blizzHealth then
         ns.Fade(blizzHealth)
         UF.HoldCover(healthContainer, health)
@@ -288,6 +286,39 @@ local function SkinTarget(frame, unit)
         BarTexts(frame, contextual, power, texts, TEXTS, blizzMana, frame, unit, true)
         UF.PowerTexts(frame, texts)
     end
+    return host, health, power, bg
+end
+
+-- The level at x; 1.x drew a skull far above you. The hidden text keeps the last unit's level: show only one the
+-- client wrote.
+local function KeepLevel(main, contextual, host, who, x)
+    local level = main.LevelText
+    if not level then return end
+    SetPointIf(level, "CENTER", host, "TOPLEFT", x, LEVEL_TEXT_Y)
+    local clientSkull = ClientHidesLevel(who)
+    local skull = clientSkull or ns.SkullLevel(UnitLevel(who), who)
+    if skull or clientSkull ~= nil then
+        SetShownIf(level, not skull)
+        if contextual.HighLevelTexture then SetShownIf(contextual.HighLevelTexture, skull) end
+    end
+    if level:IsShown() then EraLevel(level, who) end
+end
+
+local function SkinTarget(frame, unit)
+    if Busy() then return end
+    if not frame then return end
+    local container = frame.TargetFrameContainer
+    local main = ns.Path(frame, "TargetFrameContent", "TargetFrameContentMain")
+    local contextual = ns.Path(frame, "TargetFrameContent", "TargetFrameContentContextual")
+    if not container or not main or not contextual then ns.MissingPiece(frame:GetName() .. " layout") return end
+
+    if container.Portrait then
+        container.Portrait:SetSize(PORTRAIT, PORTRAIT)
+        ns.SetPointOnce(container.Portrait, "TOPRIGHT", frame, "TOPRIGHT", -22, -16)
+    end
+    Dress(container.PortraitMask, "portraitMask", MASK, frame)
+
+    local host, health, power, bg = SkinBars(frame, container, main, contextual, unit)
 
     -- The reaction colour behind the name uses the old level strip.
     PlaceName(main.Name, contextual, host, NAME_X, unit)
@@ -321,18 +352,7 @@ local function SkinTarget(frame, unit)
         if beat and not frame:IsShown() then return end
         TargetPvp(beat)
         ApplyClassification(frame)
-        if main.LevelText then
-            SetPointIf(main.LevelText, "CENTER", host, "TOPLEFT", LEVEL_X, LEVEL_TEXT_Y)
-            -- 1.x drew a skull far above you. The hidden text keeps the last unit's level: show only one the client wrote.
-            local who = frame.unit or unit
-            local clientSkull = ClientHidesLevel(who)
-            local skull = clientSkull or ns.SkullLevel(UnitLevel(who), who)
-            if skull or clientSkull ~= nil then
-                SetShownIf(main.LevelText, not skull)
-                if contextual.HighLevelTexture then SetShownIf(contextual.HighLevelTexture, skull) end
-            end
-            if main.LevelText:IsShown() then EraLevel(main.LevelText, who) end
-        end
+        KeepLevel(main, contextual, host, frame.unit or unit, LEVEL_X)
         -- On the beat the aura job puts the row back.
         if not beat then KeepAuraRow(frame, true) end
         -- The client refills the ToT bars gray, in its own place, on a unit change.
@@ -407,6 +427,83 @@ local function RestoreTargetLike(frame)
         FadeKeys(tot, TOT_PIECES, 1)
     end
     ns.needsReload = true
+end
+
+-- Boss frames skinned -> our bar host; the keeper walks the shown ones.
+local bossHosts = setmetatable({}, { __mode = "k" })
+
+local function BossFrames()
+    local container = _G.BossTargetFrameContainer
+    return container and container.BossTargetFrames or {}
+end
+
+-- The client's two cast bar spots run under our wider art; its own re-place (a fight too) comes back here.
+local function PlaceBossBar(bar)
+    local frame = bar:GetParent()
+    if not UF.active or not UF.frames[frame] then return end
+    if InCombatLockdown() and bar:IsProtected() then return end
+    bar:ClearAllPoints()
+    if bar.castBarOnSide then
+        local alt = frame.powerBarAlt and frame.powerBarAlt:IsShown()
+        bar:SetPoint("TOPRIGHT", frame, "TOPLEFT", BOSS_BAR_SIDE_X, alt and -57 or -34)
+    else
+        bar:SetPoint("TOPRIGHT", frame, "TOPLEFT", BOSS_BAR_UNDER_X, BOSS_BAR_UNDER_Y)
+    end
+end
+
+-- The client lays its boss frames once at load and never redraws the art: dressed here, out of combat.
+local function SkinBoss(frame, unit)
+    local container = frame.TargetFrameContainer
+    local main = ns.Path(frame, "TargetFrameContent", "TargetFrameContentMain")
+    local contextual = ns.Path(frame, "TargetFrameContent", "TargetFrameContentContextual")
+    if not container or not main or not contextual then ns.MissingPiece(frame:GetName() .. " layout") return end
+    local host, health, power, bg = SkinBars(frame, container, main, contextual, unit)
+    Dress(container.FrameTexture, "bossFrame", BOSS_ART, frame)
+    UF.DressGlow(container.Flash, "bossFlash", FLASH, frame, -4, -4, 242, 93, BOSS_FLASH)
+    ns.Fade(container.BossPortraitFrameTexture)
+    ns.Fade(contextual.BossIcon)
+    PlaceName(main.Name, contextual, host, NAME_X, unit)
+    Dress(main.ReputationColor, "levelBackground", REPUTATION, frame)
+    PlaceLevel(main.LevelText, contextual, host, BOSS_LEVEL_X)
+    ns.Fade(main.LevelBackgroundCircle)
+    ns.FadeCircles(main)
+    ns.FadeCircles(contextual)
+    Dress(contextual.HighLevelTexture, "skull", BOSS_SKULL, host)
+    if contextual.RaidTargetIcon then
+        ns.SetPointOnce(contextual.RaidTargetIcon, "CENTER", host, "TOPLEFT", BOSS_MARK_X, BOSS_MARK_Y)
+    end
+    if contextual.NumericalThreat then
+        ns.SetPointOnce(contextual.NumericalThreat, "BOTTOM", frame, "TOP", BOSS_THREAT_X, BOSS_THREAT_Y)
+    end
+    bossHosts[frame] = host
+    UF.frames[frame] = { unit = unit, frame = frame, health = health, power = power, bg = bg }
+    if frame.spellbar then
+        ns.HookMethod(frame.spellbar, "AdjustPosition", PlaceBossBar)
+        PlaceBossBar(frame.spellbar)
+    end
+    Update(UF.frames[frame])
+end
+
+-- The client writes the level and its skull as a boss engages, in a fight too.
+local function KeepBosses()
+    if not UF.active then return end
+    for frame, host in pairs(bossHosts) do
+        local entry = UF.frames[frame]
+        if entry and frame:IsShown() and UnitExists(entry.unit) then
+            KeepLevel(ns.Path(frame, "TargetFrameContent", "TargetFrameContentMain"),
+                ns.Path(frame, "TargetFrameContent", "TargetFrameContentContextual"), host, entry.unit, BOSS_LEVEL_X)
+        end
+    end
+end
+
+function UF.SkinBosses()
+    if Busy() then return end
+    for _, frame in ipairs(BossFrames()) do SkinBoss(frame, "boss" .. frame:GetID()) end
+    Keeper("boss.frames", KeepBosses)
+end
+
+function UF.RestoreBosses()
+    for _, frame in ipairs(BossFrames()) do RestoreTargetLike(frame) end
 end
 
 UF.KeepAuraRow, UF.SkinTarget, UF.RestoreTargetLike = KeepAuraRow, SkinTarget, RestoreTargetLike

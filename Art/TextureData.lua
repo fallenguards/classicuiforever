@@ -50,6 +50,8 @@ ns.TEX = {
     plateRare = "Tooltips\\RareEliteNameplateIcon",
     targetingFlash = "TargetingFrame\\UI-TargetingFrame-Flash",
     targetingMinusFlash = "TargetingFrame\\UI-TargetingFrame-Minus-Flash",
+    bossFrame = "TargetingFrame\\UI-UnitFrame-Boss",
+    bossFlash = "TargetingFrame\\UI-UnitFrame-Boss-Flash",
     levelBackground = "TargetingFrame\\UI-TargetingFrame-LevelBackground",
     skull = "TargetingFrame\\UI-TargetingFrame-Skull",
     targetOfTarget = "TargetingFrame\\UI-TargetofTargetFrame",
@@ -272,13 +274,13 @@ for _, name in ipairs({ "CharacterNightElf", "Spellbook", "Talents", "Achievemen
 end
 
 -- Redrawn by the client under the old names: Socials (a guild banner), Quest ("!" for the goblet), the game menu,
--- the "no tracking" minimap icon, the targeting sheets (oval level ring), the tabs (a gold rim on the picked one)
--- and the minimap clock's plate (a gold rim, wings at its top corners).
+-- the "no tracking" minimap icon, the targeting and boss sheets (oval level ring; the boss copy is Wrath's), the tabs
+-- (a gold rim on the picked one) and the minimap clock's plate (a gold rim, wings at its top corners).
 B.PREFER = {}
 for _, key in ipairs({ "microSocialsUp", "microSocialsDown", "microSocialsDisabled", "microQuestUp", "microQuestDown",
     "microQuestDisabled", "microMainMenuUp", "microMainMenuDown", "microMainMenuDisabled", "trackingNone",
     "targetingFrame", "targetingElite", "targetingRare", "targetingRareElite", "targetingMinus",
-    "targetingFlash", "targetingMinusFlash", "tabActive", "tabInactive", "clockBackground" }) do
+    "targetingFlash", "targetingMinusFlash", "bossFrame", "bossFlash", "tabActive", "tabInactive", "clockBackground" }) do
     B.PREFER[key] = true
 end
 
@@ -465,7 +467,7 @@ local METAL = {
     targetingFrameThickMana = true, targetingFrameThickName = true, targetingEliteThickMana = true,
     targetingEliteThickName = true, targetingRareThickMana = true, targetingRareThickName = true,
     targetingRareEliteThickMana = true, targetingRareEliteThickName = true,
-    targetingMinus = true, targetOfTarget = true, smallTargetingFrame = true, partyFrame = true,
+    targetingMinus = true, targetOfTarget = true, smallTargetingFrame = true, partyFrame = true, bossFrame = true,
     castBorder = true, castBorderSmall = true, castSmallShield = true,
     minimapBorder = true, minimapBorderSquare = true, trackingBorder = true, clockBackground = true,
     zoomInUp = true, zoomInDown = true, zoomInDisabled = true, zoomOutUp = true, zoomOutDown = true, zoomOutDisabled = true,
@@ -483,7 +485,7 @@ B.AS_DRAWN = {
     targetingEliteThickMana = "themeIgnoreElite", targetingEliteThickName = "themeIgnoreElite",
     targetingRareThickMana = "themeIgnoreElite", targetingRareThickName = "themeIgnoreElite",
     targetingRareEliteThickMana = "themeIgnoreElite", targetingRareEliteThickName = "themeIgnoreElite",
-    plateElite = "themeIgnorePlateDragon", plateRare = "themeIgnorePlateDragon",
+    plateElite = "themeIgnorePlateDragon", plateRare = "themeIgnorePlateDragon", bossFrame = "themeIgnoreElite",
 }
 -- Ignore theme for elite frames, each frame picked under it (on unless unchecked), found up the art's parents.
 local ELITE_FRAMES = { PlayerFrame = "themeIgnoreElitePlayer", TargetFrame = "themeIgnoreEliteTarget",

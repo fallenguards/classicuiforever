@@ -42,7 +42,7 @@ end
 local function Shape(bar)
     local look = LookOf(bar)
     if look == "UNITFRAME" then
-        bar:SetSize(150, 10)
+        bar:SetSize(bar.boss and 120 or 150, 10)
         Dress(bar.Border, "castBorderSmall", BORDER_SMALL, bar)
         if bar.BorderShield then
             bar.BorderShield:ClearAllPoints()
@@ -194,7 +194,8 @@ local function Skin(bar)
         skinned[bar] = true
         ns.HookMethod(bar, "SetLook", DressBar)
         ns.HookMethod(bar, "UpdateShownState", DressBar)
-        if bar.AdjustPosition then
+        -- Boss bars are placed by the boss frames' skin (Units/TargetFrame.lua PlaceBossBar).
+        if bar.AdjustPosition and not bar.boss then
             ns.HookMethod(bar, "AdjustPosition", Position)
             local parent = bar:GetParent()
             if parent and parent.SetSmallSize then

@@ -262,4 +262,5 @@ return {
     hideHelpButtons = "same for everyone: on by default, the game's help buttons hidden on every window; replaces the map-only box, which was off by default",
     questListFontSize = "same for everyone: 0, the game's font size until the player steps it",
     questTextFontSize = "same for everyone: 0, the game's font size until the player steps it",
+    unitFrameBoss = "on for everyone, a restyle: Wrath's boss frame art on the game's boss frames; unchecked gives the game's back",
 }

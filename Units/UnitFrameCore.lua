@@ -64,7 +64,8 @@ ns.OnToggle(function(key)
 end)
 
 -- Per-frame toggles under the module switch.
-local KEYS = { player = "unitFramePlayer", target = "unitFrameTarget", focus = "unitFrameFocus", pet = "unitFramePet", party = "unitFrameParty" }
+local KEYS = { player = "unitFramePlayer", target = "unitFrameTarget", focus = "unitFrameFocus", pet = "unitFramePet",
+    party = "unitFrameParty", boss = "unitFrameBoss" }
 function UF.On(kind) return ns.db == nil or ns.db[KEYS[kind]] ~= false end
 
 -- In combat unit frames and their children refuse points (blocked-addon warning): flag for after.

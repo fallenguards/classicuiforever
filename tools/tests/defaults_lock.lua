@@ -448,6 +448,7 @@ return {
     tradeSkillSearch = true,
     trainer = true,
     unitBarTexture = "classic",
+    unitFrameBoss = true,
     unitFrameFocus = true,
     unitFrameParty = true,
     unitFramePet = true,

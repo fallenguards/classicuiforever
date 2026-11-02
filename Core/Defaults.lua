@@ -269,6 +269,7 @@ ns.DB_DEFAULTS = {
     unitFrameFocus = true,
     unitFramePet = true,
     unitFrameParty = true,
+    unitFrameBoss = true,
     questMapPane = true,
     worldMap = true,
     mapNavClassic = true,
@@ -423,6 +424,8 @@ ns.RELOAD_KEYS = {
     unitFramePet = { off = L["CORE_THE_PET_FRAME_KEEPS_THE"] },
     -- Party frames (RestoreParty).
     unitFrameParty = { off = L["CORE_THE_PARTY_FRAMES_KEEP_SOME"] },
+    -- Boss frames (RestoreTargetLike each).
+    unitFrameBoss = { off = L["CORE_THE_BOSS_FRAMES_KEEP_SOME"] },
     -- Restore puts the atlases back only; fill, spark and flash keep our texture and size.
     castBars = { off = L["CORE_THE_CAST_BARS_KEEP_THE"] },
     -- Restore hides the dark ground only; the bars keep our border, texture and size.

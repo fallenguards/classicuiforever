@@ -16,7 +16,7 @@ local BAR_EVENTS = { "UNIT_HEALTH", "UNIT_MAXHEALTH", "UNIT_POWER_UPDATE", "UNIT
 local HEALTH_EVENTS = { UNIT_HEALTH = true, UNIT_MAXHEALTH = true }
 -- A party frame shows partypetN while its member is in a vehicle, and skinning records it (PartyMemberFrame.lua 154).
 local BAR_UNITS = { { "player", "pet" }, { "target", "focus" }, { "party1", "party2" }, { "party3", "party4" },
-    { "partypet1", "partypet2" }, { "partypet3", "partypet4" } }
+    { "partypet1", "partypet2" }, { "partypet3", "partypet4" }, { "boss1", "boss2" }, { "boss3", "boss4" }, { "boss5" } }
 -- Unfiltered: each runs the full keeper pass.
 local DRIVER_EVENTS = { "PLAYER_TARGET_CHANGED", "PLAYER_FOCUS_CHANGED", "PLAYER_ENTERING_WORLD", "UNIT_ENTERED_VEHICLE",
     "UNIT_EXITED_VEHICLE", "GROUP_ROSTER_UPDATE", "PARTY_MEMBER_ENABLE", "PARTY_MEMBER_DISABLE", "PLAYER_REGEN_ENABLED",
@@ -27,11 +27,13 @@ local DRIVER_EVENTS = { "PLAYER_TARGET_CHANGED", "PLAYER_FOCUS_CHANGED", "PLAYER
     "PLAYER_SPECIALIZATION_CHANGED",
     -- Party art (PartyMemberFrame.lua UpdateMember/UpdateArt), the pet frame's refresh (PetFrame.lua OnEvent) and
     -- a layout applied outside edit mode (focus size and its ToT, raid-style party frames).
-    "UNIT_CONNECTION", "UPDATE_ACTIVE_BATTLEFIELD", "PET_UI_UPDATE", "EDIT_MODE_LAYOUTS_UPDATED" }
+    "UNIT_CONNECTION", "UPDATE_ACTIVE_BATTLEFIELD", "PET_UI_UPDATE", "EDIT_MODE_LAYOUTS_UPDATED",
+    -- Boss frames fill as a boss engages or turns targetable (Mainline/TargetFrame.lua BossTargetFrameMixin).
+    "INSTANCE_ENCOUNTER_ENGAGE_UNIT", "UNIT_TARGETABLE_CHANGED" }
 -- Driver events carrying a unit: they come for every nameplate and group member, so only units our frames show pass.
 local UNIT_DRIVER_EVENTS = { UNIT_ENTERED_VEHICLE = true, UNIT_EXITED_VEHICLE = true, UNIT_PET = true,
     UNIT_CLASSIFICATION_CHANGED = true, UNIT_FACTION = true, UNIT_LEVEL = true, UNIT_CONNECTION = true,
-    PLAYER_FLAGS_CHANGED = true }
+    PLAYER_FLAGS_CHANGED = true, UNIT_TARGETABLE_CHANGED = true }
 local SHOWN_UNITS = { player = true, pet = true, vehicle = true, target = true, focus = true, targettarget = true,
     focustarget = true }
 for i = 1, 4 do
@@ -289,6 +291,9 @@ function ns.SetUnitNameSize(value)
     UF.NameFont(PlayerName)
     UF.NameFont(ns.Path(TargetFrame, "TargetFrameContent", "TargetFrameContentMain", "Name"))
     UF.NameFont(ns.Path(FocusFrame, "TargetFrameContent", "TargetFrameContentMain", "Name"))
+    for _, boss in ipairs(BossTargetFrameContainer and BossTargetFrameContainer.BossTargetFrames or {}) do
+        if UF.frames[boss] then UF.NameFont(ns.Path(boss, "TargetFrameContent", "TargetFrameContentMain", "Name")) end
+    end
 end
 
 local function OwnName(text, unit)
@@ -359,6 +364,7 @@ local function Apply()
     ns.ThreatNumberSync()
     if On("pet") then SkinPet() end
     if On("party") then SkinParty() else RestoreParty() end
+    if On("boss") then UF.SkinBosses() else UF.RestoreBosses() end
     SkinRaidManager()
     WatchEdges()
     for i = 1, #SNAP_FRAMES do SnapToPixels(_G[SNAP_FRAMES[i]]) end
@@ -379,6 +385,7 @@ local function Restore()
     RestoreTargetLike(FocusFrame)
     ns.ThreatNumberSync()
     RestoreParty()
+    UF.RestoreBosses()
     ns.needsReload = true
 end
 

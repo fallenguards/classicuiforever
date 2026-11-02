@@ -234,6 +234,8 @@ ns.TOGGLES = {
     { "unitFrameFocus", L["OPT_unitFrameFocus"], L["OPT_unitFrameFocus_TIP"], parent = "unitFrames", checks = "unitFrameList", drop = true },
     { "unitFramePet", L["OPT_unitFramePet"], L["OPT_unitFramePet_TIP"], parent = "unitFrames", checks = "unitFrameList", drop = true },
     { "unitFrameParty", L["OPT_unitFrameParty"], L["OPT_unitFrameParty_TIP"], parent = "unitFrames", checks = "unitFrameList", drop = true },
+    { "unitFrameBoss", L["OPT_unitFrameBoss"], L["OPT_unitFrameBoss_TIP"], parent = "unitFrames", checks = "unitFrameList", drop = true,
+        search = "boss encounter dungeon raid dragon" },
     { "eliteFrames", L["OPT_eliteFrames"], L["OPT_eliteFrames_TIP"], parent = "unitFrames" },
     { "eliteFramePlayer", L["OPT_eliteFramePlayer"], L["OPT_eliteFramePlayer_TIP"], parent = "eliteFrames", checks = "eliteFrameList", drop = true, dropLabel = L["OPT_DROP_FRAMES"], dropTip = L["OPT_eliteFrames_TIP"] },
     { "eliteFrameTarget", L["OPT_eliteFrameTarget"], L["OPT_eliteFrameTarget_TIP"], parent = "eliteFrames", checks = "eliteFrameList", drop = true },

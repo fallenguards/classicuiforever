@@ -271,6 +271,7 @@ local ROOTS = {
     { "unitFrameFocus", "FocusFrame" },
     { "unitFramePet", "PetFrame" },
     { "unitFrameParty", "PartyFrame" },
+    { "unitFrameBoss", "BossTargetFrameContainer" },
     { "classicBar", "MainActionBar", "BagsBar", "MicroMenuContainer", "StatusTrackingBarManager" },
     { "castBars", "PlayerCastingBarFrame", "PetCastingBarFrame", "TargetFrameSpellBar", "FocusFrameSpellBar" },
     { "mirrorTimers", "MirrorTimerContainer" },
