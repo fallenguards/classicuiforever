@@ -3,6 +3,8 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN61_1_TITLE"] = "Preguntas de tamaño más claras"
+L["WN61_1_TEXT"] = "Las preguntas y casillas sobre el tamaño de la interfaz nombran la escala de la interfaz del juego y el porcentaje que ponen, en menos palabras."
 L["WN60_1_TITLE"] = "Marcos de jefe clásicos"
 L["WN60_1_TEXT"] = "Los marcos de jefe de los combates de mazmorra y banda llevan el antiguo marco de dragón, con el nivel en su anillo redondo y la barra de lanzamiento al lado o debajo del marco. Para recuperar los del juego, desmarca Jefe en la lista Marcos de las opciones (/fcui), en Marcos de unidad."
 L["WN60_2_TITLE"] = "Ocultar bordes de calidad"

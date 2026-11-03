@@ -2,6 +2,11 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.41.1] - 2026-11-03
+
+### Changed
+- The interface size questions and check boxes name the game's UI Scale and the percent they set, in fewer words. The classic layout's size question also says what your UI Scale is now.
+
 ## [0.41.0] - 2026-11-02
 
 ### Added

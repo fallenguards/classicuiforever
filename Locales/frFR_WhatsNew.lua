@@ -3,6 +3,8 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN61_1_TITLE"] = "Questions de taille plus claires"
+L["WN61_1_TEXT"] = "Les questions et cases sur la taille de l'interface nomment l'échelle de l'interface du jeu et le pourcentage qu'elles règlent, en moins de mots."
 L["WN60_1_TITLE"] = "Cadres de boss classiques"
 L["WN60_1_TEXT"] = "Les cadres de boss des combats en donjon et en raid portent l'ancien cadre au dragon, avec le niveau dans son anneau rond et la barre d'incantation à côté ou sous le cadre. Pour retrouver ceux du jeu, décochez Boss dans la liste Cadres des options (/fcui), sous Cadres d'unité."
 L["WN60_2_TITLE"] = "Masquer les bordures de qualité"

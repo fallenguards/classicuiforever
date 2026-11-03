@@ -3,6 +3,8 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN61_1_TITLE"] = "Domande sulla dimensione più chiare"
+L["WN61_1_TEXT"] = "Le domande e le caselle sulla dimensione dell'interfaccia indicano la scala dell'interfaccia del gioco e la percentuale che impostano, in meno parole."
 L["WN60_1_TITLE"] = "Riquadri dei boss classici"
 L["WN60_1_TEXT"] = "I riquadri dei boss negli scontri di spedizioni e incursioni indossano il vecchio riquadro col drago, con il livello nel suo anello rotondo e la barra di lancio accanto o sotto il riquadro. Per riavere quelli del gioco, togli la spunta a Boss nella lista Riquadri delle opzioni (/fcui), sotto Riquadri delle unità."
 L["WN60_2_TITLE"] = "Nascondi bordi di qualità"

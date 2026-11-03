@@ -2,6 +2,8 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN61_1_TITLE"] = "Clearer size questions"
+L["WN61_1_TEXT"] = "The questions and boxes about the interface size name the game's UI Scale and the percent they set, in fewer words."
 L["WN60_1_TITLE"] = "Classic boss frames"
 L["WN60_1_TEXT"] = "The boss frames of dungeon and raid fights wear the old dragon frame, with the level in its round ring and the cast bar beside or under the frame. To get the game's own back, uncheck Boss in the Frames list in the options (/fcui), under Unit frames."
 L["WN60_2_TITLE"] = "Hide quality borders"
