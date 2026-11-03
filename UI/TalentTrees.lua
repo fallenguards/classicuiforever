@@ -96,6 +96,13 @@ local function Step(mode) return mode == "scroll" and BAR_STEP or VIEW_STEP end
 -- Past the single tree's view and bar (22 to 340).
 local function Wide(mode) return 3 * Step(mode) - SEAM - 318 end
 
+-- The row width at one tree: opts.slot, or what it gives when a function (nil: the row's own step).
+local function OneSlot(trees)
+    local slot = trees.opts.slot
+    if type(slot) == "function" then return slot() end
+    return slot
+end
+
 local function Pane(frame, lines)
     local pane = ns.NewFrame("Frame", nil, frame)
     pane:SetAllPoints(frame)
@@ -144,7 +151,17 @@ local function Size(frame, mode, room)
     Lay(frame, mode, room)
     Grow(frame, wide, tall)
     -- The row stands the next window past its full width.
-    ns.SetSlotWidth(frame, (trees.opts.slot or 352) + wide)
+    ns.SetSlotWidth(frame, (OneSlot(trees) or 352) + wide)
+end
+
+-- The row width again, after what opts.slot reads changed.
+local function Reslot(frame)
+    local trees = frame.trees
+    if trees.on and trees.mode then
+        ns.SetSlotWidth(frame, (OneSlot(trees) or 352) + Wide(trees.mode))
+    elseif not trees.on then
+        ns.SetSlotWidth(frame, OneSlot(trees))
+    end
 end
 
 -- A pane's tree and tab: one of the trees given (look.trees, a tab each), or one of the tree's three tabs.
@@ -236,7 +253,7 @@ local function Shape(frame, on)
         trees.mode, trees.room = nil, nil
         frame:SetSize(WINDOW_W, WINDOW_H)
         for _, tex in ipairs(trees.art) do tex:Hide() end
-        ns.SetSlotWidth(frame, trees.opts.slot)
+        ns.SetSlotWidth(frame, OneSlot(trees))
     end
 end
 
@@ -244,19 +261,21 @@ local function Reshape(frame)
     Shape(frame, frame.trees.opts.wanted(frame) == true)
 end
 
--- The talents window's: its option and height pick, the game's own window in place while hosted or ours is off.
+-- The talents window's: its option and height pick, the game's own window in place while hosted or ours is off; the
+-- spec tabs' room while they show (Skills/TalentSpecs.lua).
 local TALENTS = {
     wanted = function(frame)
         return ns.db and ns.db.talentsThreePane == true and not frame.spec.hosted and ns.TalentsActive()
     end,
     mode = TalentsMode,
+    slot = function() return ns.talents and ns.talents.specSlot end,
     keys = { talentsThreePane = true, talentsScroll = true, talentsTall = true, talentsSqueeze = true, talents = true },
 }
 
 local windows = {}
--- A talent window as built (Skills/Talents.lua, or the Legacy tree's page): its panes, and its shape for the option
--- now. opts (the talents' when none): wanted(frame), mode() for the height pick, keys (toggles that reshape it), slot
--- (its row width at one tree; the talents' default). frame.trees.Reshape() after anything wanted() reads changes.
+-- A talent window as built (Skills/Talents.lua, or the Legacy tree): its panes and shape. opts (the talents' when none):
+-- wanted(frame), mode() the height pick, keys (toggles that reshape it), slot (row width at one tree, or a function
+-- giving it). frame.trees.Reshape() after what wanted() reads changes, frame.trees.Reslot() after what slot() reads.
 function ns.TalentTrees(frame, opts)
     windows[#windows + 1] = frame
     -- Over the trees' art and arrows; the seams and foot pass clear of the buttons.
@@ -270,7 +289,8 @@ function ns.TalentTrees(frame, opts)
     end
     lines:SetFrameLevel(frame.panes[3].arrows:GetFrameLevel() + 2)
     frame.trees = { on = false, lines = lines, foot = Edge(lines, INSET_FOOT), art = {}, opts = opts or TALENTS,
-        Draw = function(tree, look) Draw(frame, tree, look) end, Reshape = function() Reshape(frame) end }
+        Draw = function(tree, look) Draw(frame, tree, look) end, Reshape = function() Reshape(frame) end,
+        Reslot = function() Reslot(frame) end }
     Reshape(frame)
 end
 

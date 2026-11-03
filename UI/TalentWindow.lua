@@ -245,7 +245,7 @@ local function Button_OnClick(self, mouse)
         if link and not IsSecret(link) then ChatFrameUtil.InsertLink(link) end
         return
     end
-    if not talent or not tree or tree.inspect or InCombatLockdown() then return end
+    if not talent or not tree or tree.inspect or tree.locked or InCombatLockdown() then return end
     if mouse == "RightButton" then
         if talent.canRefund then pcall(C_Traits.RefundRank, tree.configID, talent.nodeID) end
     elseif talent.canBuy then
@@ -533,14 +533,15 @@ function ns.TalentWindowShown(frame, shown)
     end
 end
 
--- The background, pulled to the tree's length. Lower files are 128 tall but painted for 75 rows (the old cut);
--- drawn whole they left the tree's foot bare.
-local function DrawBackground(frame, name, height)
+-- The background, pulled to the tree's length; gray for a spec not in use, as Era's. Lower files are 128 tall but
+-- painted for 75 rows (the old cut); drawn whole they left the tree's foot bare.
+local function DrawBackground(frame, name, height, gray)
     local top, bottom = height * 256 / 331, height * 75 / 331
     local art = frame.background
     for key, piece in pairs(art) do
         if name then
             if frame.backgroundName ~= name then piece:SetTexture(ART .. name .. "-" .. key) end
+            piece:SetDesaturated(gray == true)
             piece:Show()
         else
             piece:Hide()
@@ -615,12 +616,13 @@ end
 -- A tab's tree in a view's cells (its down pitch may be squeezed).
 local function TreeHeight(view, tab) return 2 * view.geo[2] + (tab.tiers - 1) * view.geo[4] + BUTTON end
 
--- A view's tab drawn (view.tree set): background and buttons as tall as the tree, scrolled in its view's height.
+-- A view's tab drawn (view.tree set): background and buttons as tall as the tree, scrolled in its view's height; a
+-- locked tree's background gray.
 local function DrawView(view, tab, look)
     local room = view.scroll:GetHeight() or VIEW_H
     local height = math.max(room, TreeHeight(view, tab))
     view.child:SetSize(VIEW_W, height)
-    DrawBackground(view, look.background and look.background(tab), height)
+    DrawBackground(view, look.background and look.background(tab), height, view.tree and view.tree.locked)
     DrawButtons(view, tab)
     local over = math.max(0, height - room)
     view.bar:SetRange(over, 20)

@@ -267,6 +267,7 @@ UI\TalentWindow.lua
 UI\TalentTrees.lua
 Skills\Talents.lua
 Skills\TalentsTree.lua
+Skills\TalentSpecs.lua
 Legacy\LegacyWindow.lua
 Legacy\LegacyTree.lua
 Legacy\LegacyChallenges.lua

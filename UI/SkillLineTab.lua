@@ -8,12 +8,13 @@ local FIRST_X, FIRST_Y, GAP = -32, -65, -17
 -- A window with these tabs, beside the next (ns.SetSlotWidth): its art's 352 and the tabs clear of the next window.
 ns.SIDE_TAB_SLOT = 392
 
--- SkillLineTab(parent, prev) -> a hidden check button under prev (or at the first spot); its icon, scripts and id are the caller's.
-function ns.SkillLineTab(parent, prev)
+-- SkillLineTab(parent, prev, gap) -> a hidden check button gap under prev (the spellbook's 17), or at the first spot; its
+-- icon, scripts and id are the caller's.
+function ns.SkillLineTab(parent, prev, gap)
     local tab = ns.NewFrame("CheckButton", nil, parent)
     tab:SetSize(32, 32)
     if prev then
-        tab:SetPoint("TOPLEFT", prev, "BOTTOMLEFT", 0, GAP)
+        tab:SetPoint("TOPLEFT", prev, "BOTTOMLEFT", 0, gap or GAP)
     else
         tab:SetPoint("TOPLEFT", parent, "TOPRIGHT", FIRST_X, FIRST_Y)
     end

@@ -32,7 +32,7 @@ local BACKGROUNDS = {
     WARRIOR = { "WarriorArms", "WarriorFury", "WarriorProtection" },
 }
 local TREE_EVENTS = { "TRAIT_CONFIG_UPDATED", "TRAIT_TREE_CURRENCY_INFO_UPDATED", "TRAIT_NODE_CHANGED", "PLAYER_TALENT_UPDATE",
-    "ACTIVE_COMBAT_CONFIG_CHANGED", "PLAYER_LEVEL_UP" }
+    "ACTIVE_COMBAT_CONFIG_CHANGED", "PLAYER_LEVEL_UP", "ACTIVE_TALENT_GROUP_CHANGED" }
 
 ----------------------------------------------------------------- the view
 
@@ -43,11 +43,14 @@ end
 
 local function Refresh()
     if not frame or not active then return end
-    local tree = TL.ReadTree(inspectUnit)
-    local title = TALENTS or "Talents"
+    -- The spec tabs (Skills/TalentSpecs.lua): on the player's own talents, out of the game's window.
+    local tabsOn = not inspectUnit and not Hosted()
+    local tree = TL.ReadTree(inspectUnit, TL.OtherSpec(tabsOn))
+    local title = TL.SpecTitle(tabsOn) or TALENTS or "Talents"
     if tree and tree.inspect then title = UnitName(inspectUnit) or title end
     ns.DrawTalentTab(frame, tree, { background = Background, title = title,
         points = tree and not tree.inspect and ((TALENT_POINTS or "Talent Points") .. ": |cffffffff" .. tree.points .. "|r") or "" })
+    TL.DrawSpecs(frame, tabsOn)
 end
 
 -- Next-frame refresh after a tree change.
@@ -74,10 +77,12 @@ local function Build()
     frame = ns.TalentWindow("ClassicUIForeverTalents", { hosted = Hosted(), refresh = Refresh, learn = Learn })
     frame.title:SetText(TALENTS or "Talents")
     ns.TalentTrees(frame)
+    TL.BuildSpecs(frame, Refresh)
 
     frame:SetScript("OnShow", function()
         -- Hidden and shown in one go (inspect to own) with a talent tooltip up: keep listening.
         ns.TalentWindowShown(frame, true)
+        TL.ShowActiveSpec()
         if SetPortraitTexture then SetPortraitTexture(frame.portrait, inspectUnit or "player") end
         -- Hosted, the game's window sounds its own.
         if not Hosted() then PlaySound(SOUNDKIT.IG_CHARACTER_INFO_OPEN) end
@@ -116,7 +121,8 @@ local function Build()
     end
 
     -- A change to the tree is a burst of events: one refresh, next frame.
-    ns.EventFrame(TREE_EVENTS, function()
+    ns.EventFrame(TREE_EVENTS, function(_, event)
+        if event == "ACTIVE_TALENT_GROUP_CHANGED" then TL.ShowActiveSpec() end
         if not frame:IsShown() then return end
         ns.Sched.NextFrame("talents.refresh", RefreshIfShown)
     end)

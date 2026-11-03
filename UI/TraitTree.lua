@@ -95,8 +95,16 @@ local function GroupTabs(tree)
     return byGroup
 end
 
--- ReadTraitTree(configID, treeID, opts) -> tree { configID, treeID, points, cap, tabs, nodesByID, staged, inspect } or nil.
--- opts.name: one tab of every node, so named (else one tab per group); opts.cell: "auto" or nil (600); opts.inspect.
+-- ReadTraitGroups(configID, treeID) -> the groups as tabs (name, icon, spent) without their talents, or nil.
+function ns.ReadTraitGroups(configID, treeID)
+    if not (configID and treeID and C_Traits) then return nil end
+    local tree = { configID = configID, treeID = treeID, tabs = {} }
+    return GroupTabs(tree) and tree.tabs or nil
+end
+
+-- ReadTraitTree(configID, treeID, opts) -> tree { configID, treeID, points, cap, tabs, nodesByID, staged, inspect,
+-- locked } or nil. opts.name: one tab of every node, so named (else one tab per group); opts.cell: "auto" or nil (600);
+-- opts.inspect; opts.locked: the player's spec not in use, shown as it is with nothing to buy.
 function ns.ReadTraitTree(configID, treeID, opts)
     if not (configID and treeID and C_Traits) then return nil end
     opts = opts or ns.EMPTY
@@ -116,7 +124,8 @@ function ns.ReadTraitTree(configID, treeID, opts)
     end
     local nodesByID = {}
     for _, nodeID in ipairs(C_Traits.GetTreeNodes(treeID) or {}) do
-        local talent, node = ReadTalent(configID, nodeID, tree.points)
+        local talent, node = ReadTalent(configID, nodeID, opts.locked and 0 or tree.points)
+        if talent and opts.locked then talent.canRefund = false end
         local tab = talent and not byGroup and tree.tabs[1]
         for _, groupID in ipairs(talent and byGroup and node.groupIDs or {}) do
             if byGroup[groupID] then tab = byGroup[groupID] break end
@@ -137,6 +146,8 @@ function ns.ReadTraitTree(configID, treeID, opts)
     for _, tab in ipairs(tree.tabs) do Grid(tab, topY, cell, nodesByID) end
     tree.nodesByID = nodesByID
     tree.inspect = opts.inspect and true or false
-    tree.staged = not tree.inspect and C_Traits.ConfigHasStagedChanges and C_Traits.ConfigHasStagedChanges(configID) and true or false
+    tree.locked = opts.locked and true or false
+    tree.staged = not tree.inspect and not tree.locked and C_Traits.ConfigHasStagedChanges
+        and C_Traits.ConfigHasStagedChanges(configID) and true or false
     return tree
 end
