@@ -2,6 +2,11 @@
 
 All notable changes to ClassicUI Forever: Standalone Nameplates are documented here. It has version numbers of its own, apart from the full ClassicUI Forever's.
 
+## [1.0.2] - 2026-11-03
+
+### Changed
+- The size box in Default toggles' confirm names the game's UI Scale and the percent it sets.
+
 ## [1.0.1] - 2026-10-30
 
 ### Changed
