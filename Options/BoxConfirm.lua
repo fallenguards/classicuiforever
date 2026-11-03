@@ -6,9 +6,17 @@ local _, ns = ...
 local O = ns.options
 local W, PAD, CHECK = 320, 16, 26
 
--- tip(): the box's tooltip text. Returns show(withBox, onOk); onOk(checked) runs on OK.
+-- boxLabel: text or a function giving it; tip: the box's tooltip text. Returns show(withBox, onOk); onOk(checked) runs on OK.
 function O.BoxConfirm(name, text, boxLabel, tip)
-    local dialog, row, check, line, onOk
+    local dialog, row, check, label, line, onOk
+    -- The box and its label centered under the text, as wide as the label asks up to the text's width.
+    local function FitLabel()
+        label:SetText(type(boxLabel) == "function" and boxLabel() or boxLabel)
+        local wide = math.min(CHECK + 2 + math.ceil(label:GetUnboundedStringWidth()), W - 2 * PAD)
+        row:SetWidth(wide)
+        -- The label clicks and explains too.
+        check:SetHitRectInsets(0, -(wide - CHECK), 0, 0)
+    end
     local function Build()
         dialog = O.DialogWindow(name, 120, nil, { toplevel = true })
         -- A whole box from the start: the text's width comes from its edges, else it measures as one cut line.
@@ -17,7 +25,6 @@ function O.BoxConfirm(name, text, boxLabel, tip)
         line:SetPoint("TOPLEFT", dialog, "TOPLEFT", PAD, -PAD)
         line:SetPoint("TOPRIGHT", dialog, "TOPRIGHT", -PAD, -PAD)
         line:SetText(text)
-        -- The box and its label centered under the text, as wide as the label asks up to the text's width.
         row = ns.NewFrame("Frame", nil, dialog)
         row:SetHeight(CHECK)
         row:SetPoint("TOP", line, "BOTTOM", 0, -6)
@@ -25,15 +32,10 @@ function O.BoxConfirm(name, text, boxLabel, tip)
         check:SetSize(CHECK, CHECK)
         check:SetPoint("LEFT", row, "LEFT", 0, 0)
         ns.SkinCheckbox(check)
-        local label = check:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        label = check:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         label:SetPoint("LEFT", check, "RIGHT", 2, 0)
         label:SetPoint("RIGHT", row, "RIGHT", 0, 0)
         label:SetJustifyH("LEFT")
-        label:SetText(boxLabel)
-        local wide = math.min(CHECK + 2 + math.ceil(label:GetUnboundedStringWidth()), W - 2 * PAD)
-        row:SetWidth(wide)
-        -- The label clicks and explains too.
-        check:SetHitRectInsets(0, -(wide - CHECK), 0, 0)
         ns.AttachTip(check, { text = boxLabel, lines = { { tip, 1, 1, 1, true } } })
         local ok, cancel = ns.PanelButton(dialog, OKAY, 110), ns.PanelButton(dialog, CANCEL, 110)
         ok:SetPoint("BOTTOMRIGHT", dialog, "BOTTOM", -4, PAD)
@@ -50,6 +52,7 @@ function O.BoxConfirm(name, text, boxLabel, tip)
         if not dialog then Build() end
         onOk = fn
         row:SetShown(withBox)
+        FitLabel()
         check:SetChecked(true)
         dialog:Show()
         dialog:Raise()

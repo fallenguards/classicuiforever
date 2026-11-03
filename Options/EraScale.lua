@@ -57,7 +57,9 @@ function ns.AskEraScale(onDone)
         onDone(true)
         return
     end
-    if StaticPopup_Show then StaticPopup_Show("FCUI_ERA_SCALE_ASK", UI_SCALE or "UI Scale", nil, onDone) end
+    if StaticPopup_Show then
+        StaticPopup_Show("FCUI_ERA_SCALE_ASK", ns.EraScalePercent(), math.floor(UIParent:GetScale() * 100 + 0.5), onDone)
+    end
 end
 
 ns.Popup("FCUI_ERA_SCALE_ASK", {
@@ -150,7 +152,7 @@ ns.Popup("FCUI_SCALE_HELP", {
     OnAccept = function() ns.OpenUiScaleSettings() end,
 })
 function ns.ShowScaleHelp()
-    StaticPopup_Show("FCUI_SCALE_HELP", _G.GRAPHICS_LABEL or "Graphics", _G.USE_UISCALE or "Use UI Scale")
+    StaticPopup_Show("FCUI_SCALE_HELP", _G.GRAPHICS_LABEL or "Graphics")
 end
 
 -- An install from before 0.17.0, offered Era's size once.
@@ -160,7 +162,7 @@ function ns.MarkEraScaleOffer()
 end
 
 ns.Popup("FCUI_ERA_SCALE_OFFER", {
-    text = TITLE .. "\n\n" .. string.format(L["ERASCALE_OFFER"], UI_SCALE or "UI Scale"),
+    text = TITLE .. "\n\n" .. L["ERASCALE_OFFER"],
     button1 = L["ERASCALE_SWITCH"],
     button2 = L["OPTWIN_KEEP_MINE"],
     OnAccept = function()
@@ -174,5 +176,5 @@ function ns.OfferEraScale()
     if not ns.db or not ns.db.eraScaleOffer or InCombatLockdown() then return end
     ns.db.eraScaleOffer = nil
     if ns.GetCVar("useUiScale") == "1" or not SizeOff() then return end
-    if StaticPopup_Show then StaticPopup_Show("FCUI_ERA_SCALE_OFFER") end
+    if StaticPopup_Show then StaticPopup_Show("FCUI_ERA_SCALE_OFFER", ns.EraScalePercent()) end
 end

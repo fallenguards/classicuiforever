@@ -271,7 +271,7 @@ local function HasWindows()
 end
 
 local confirmReset = O.BoxConfirm("ForeverClassicUIPieceResetConfirm", L["OPTWIN_PAGE_RESET_CONFIRM"]:format(SETTINGS_TAB),
-    L["OPTWIN_RESET_SCALE"], function() return L["OPTWIN_RESET_SCALE_TIP"]:format(ns.EraScalePercent() or 90) end)
+    function() return L["OPTWIN_RESET_SCALE"]:format(ns.EraScalePercent() or 90) end, L["OPTWIN_RESET_SCALE_TIP"])
 
 local function ResetAll(frame)
     confirmReset(ns.EraScaleWanted and ns.EraScaleWanted() or false, function(scale)

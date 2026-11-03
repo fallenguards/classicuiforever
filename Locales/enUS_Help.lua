@@ -72,10 +72,10 @@ L["SUPPORT_DONATE"] = "%s is free. If you would like to support it, you can do s
 L["SUPPORT_DONATE_BUTTON"] = "Buy Me a Coffee"
 
 -- Era's interface size (Options/EraScale.lua).
-L["ERASCALE_OFFER"] = "Classic Era draws its interface larger than Forever does by default. Switch to Era's size, with the classic-sized bars? The interface reloads. The game's %s setting changes the size any time."
-L["ERASCALE_GIVEN_BACK"] = "Interface size set back. Looks different than you expected? Click %s."
-L["ERASCALE_HELP"] = "The interface size went back to the one from before the classic layout changed it, or to the game's automatic size. If it still looks too big or too small, set it under %s in the game's Options: uncheck \"%s\" for the automatic size, or move its slider."
+L["ERASCALE_OFFER"] = "Switch to Classic Era's size, %d%% UI Scale with Classic-sized bars? The interface reloads."
+L["ERASCALE_GIVEN_BACK"] = "UI Scale set back. Looks wrong? Click %s."
+L["ERASCALE_HELP"] = "UI Scale is back to your size from before, or the game's automatic size. Change it under %s in the game's options."
 L["ERASCALE_OPEN_SETTINGS"] = "Game options"
 L["ERASCALE_SWITCH"] = "Use Era's size"
-L["ERASCALE_ASK"] = "Your interface is at a different size than Classic Era's on this screen. Switch to Era's size, with the classic-sized bars? The game's %s setting changes it any time."
+L["ERASCALE_ASK"] = "Switch to Classic Era's size, %d%% UI Scale with Classic-sized bars? Yours is at %d%%."
 L["ERASCALE_KEEP"] = "Keep my size"

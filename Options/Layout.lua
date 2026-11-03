@@ -695,7 +695,7 @@ function ns.CreateClassicLayout(reloadNow)
             return
         end
         local key = exists and "OPTWIN_SWITCHING_TO_LAYOUT" or "OPTWIN_SETTING_UP_LAYOUT"
-        ns.AskLayoutReload(string.format(L[sized and key .. "_ERA" or key], LAYOUT_NAME))
+        ns.AskLayoutReload(string.format(L[sized and key .. "_ERA" or key], LAYOUT_NAME, ns.EraScalePercent() or 90))
     end)
 end
 

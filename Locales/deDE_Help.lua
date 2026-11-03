@@ -73,10 +73,10 @@ L["SUPPORT_DONATE"] = "%s ist kostenlos. Wenn du es unterstützen möchtest, kan
 L["SUPPORT_DONATE_BUTTON"] = "Buy Me a Coffee"
 
 -- Era's interface size (Options/EraScale.lua).
-L["ERASCALE_OFFER"] = "Classic Era zeigt seine Oberfläche größer, als Forever es standardmäßig tut. Zur Größe von Era wechseln, mit den Leisten in klassischer Größe? Die Oberfläche wird neu geladen. Die Spieleinstellung %s ändert die Größe jederzeit."
-L["ERASCALE_GIVEN_BACK"] = "Oberflächengröße zurückgesetzt. Sieht sie anders aus als erwartet? Klicke %s."
-L["ERASCALE_HELP"] = "Die Oberflächengröße ist wieder die von vor dem klassischen Layout, oder die automatische Größe des Spiels. Wirkt sie noch zu groß oder zu klein, stelle sie unter %s in den Optionen des Spiels ein: ohne Haken bei „%s“ gilt die automatische Größe, sonst verschiebe ihren Regler."
+L["ERASCALE_OFFER"] = "Zur Größe von Classic Era wechseln, %d%% UI-Skalierung mit Leisten in klassischer Größe? Die Oberfläche wird neu geladen."
+L["ERASCALE_GIVEN_BACK"] = "UI-Skalierung zurückgesetzt. Sieht es falsch aus? Klicke %s."
+L["ERASCALE_HELP"] = "Die UI-Skalierung steht wieder auf deiner Größe von vorher, oder auf der automatischen Größe des Spiels. Ändern lässt sie sich unter %s in den Optionen des Spiels."
 L["ERASCALE_OPEN_SETTINGS"] = "Spieloptionen"
 L["ERASCALE_SWITCH"] = "Größe von Era nutzen"
-L["ERASCALE_ASK"] = "Deine Oberfläche ist auf diesem Bildschirm anders groß als in Classic Era. Zur Größe von Era wechseln, mit den Leisten in klassischer Größe? Die Spieleinstellung %s ändert sie jederzeit."
+L["ERASCALE_ASK"] = "Zur Größe von Classic Era wechseln, %d%% UI-Skalierung mit Leisten in klassischer Größe? Deine steht bei %d%%."
 L["ERASCALE_KEEP"] = "Meine Größe behalten"

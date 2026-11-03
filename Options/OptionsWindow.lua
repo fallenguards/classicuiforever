@@ -74,13 +74,8 @@ end
 
 -- Toggle none and Default toggles for every page: the interface size's box in their confirms (#181). Toggle none's
 -- while Era's size we set still stands; Default toggles' while the interface stands at another size than Era's.
-local function ScalePercent()
-    local scale = tonumber(ns.db.eraScale) or tonumber(ns.GetCVar("uiScale")) or 1
-    return math.floor(scale * 100 + 0.5)
-end
-
 local confirmNone = O.BoxConfirm("ForeverClassicUINoneConfirm", L["OPTWIN_ALL_NONE_CONFIRM"], L["OPTWIN_NONE_SCALE"],
-    function() return L["OPTWIN_NONE_SCALE_TIP"]:format(ScalePercent()) end)
+    L["OPTWIN_NONE_SCALE_TIP"])
 local function ConfirmNone()
     confirmNone(ns.EraScaleOurs and ns.EraScaleOurs() or false, function(scale)
         TurnOff(nil)
@@ -88,8 +83,8 @@ local function ConfirmNone()
     end)
 end
 
-local confirmReset = O.BoxConfirm("ForeverClassicUIResetConfirm", L["OPTWIN_ALL_RESET_CONFIRM"], L["OPTWIN_RESET_SCALE"],
-    function() return L["OPTWIN_RESET_SCALE_TIP"]:format(ns.EraScalePercent() or 90) end)
+local confirmReset = O.BoxConfirm("ForeverClassicUIResetConfirm", L["OPTWIN_ALL_RESET_CONFIRM"],
+    function() return L["OPTWIN_RESET_SCALE"]:format(ns.EraScalePercent() or 90) end, L["OPTWIN_RESET_SCALE_TIP"])
 local function ConfirmReset()
     confirmReset(ns.EraScaleWanted and ns.EraScaleWanted() or false, function(scale)
         Reset(nil, window and NumberRows(window.built.rows) or EMPTY)

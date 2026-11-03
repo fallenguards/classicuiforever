@@ -73,10 +73,10 @@ L["SUPPORT_DONATE"] = "%s es gratuito. Si quieres apoyarlo, puedes hacerlo a tra
 L["SUPPORT_DONATE_BUTTON"] = "Buy Me a Coffee"
 
 -- Era's interface size (Options/EraScale.lua).
-L["ERASCALE_OFFER"] = "Classic Era muestra su interfaz más grande que Forever por defecto. ¿Cambiar al tamaño de Era, con las barras de tamaño clásico? La interfaz se recarga. El ajuste %s del juego cambia el tamaño cuando quieras."
-L["ERASCALE_GIVEN_BACK"] = "Tamaño de la interfaz restablecido. ¿Se ve distinto de lo que esperabas? Haz clic %s."
-L["ERASCALE_HELP"] = "El tamaño de la interfaz volvió al de antes de que el diseño clásico lo cambiara, o al tamaño automático del juego. Si aún se ve demasiado grande o pequeño, ajústalo en %s, en las opciones del juego: desmarca \"%s\" para el tamaño automático, o mueve su control deslizante."
+L["ERASCALE_OFFER"] = "¿Cambiar al tamaño de Classic Era, %d%% de escala de la interfaz con las barras de tamaño clásico? La interfaz se recarga."
+L["ERASCALE_GIVEN_BACK"] = "Escala de la interfaz restablecida. ¿Se ve mal? Haz clic %s."
+L["ERASCALE_HELP"] = "La escala de la interfaz volvió a tu tamaño de antes, o al tamaño automático del juego. Cámbiala en %s, en las opciones del juego."
 L["ERASCALE_OPEN_SETTINGS"] = "Opciones del juego"
 L["ERASCALE_SWITCH"] = "Usar el tamaño de Era"
-L["ERASCALE_ASK"] = "Tu interfaz tiene en esta pantalla otro tamaño que la de Classic Era. ¿Cambiar al tamaño de Era, con las barras de tamaño clásico? El ajuste %s del juego lo cambia cuando quieras."
+L["ERASCALE_ASK"] = "¿Cambiar al tamaño de Classic Era, %d%% de escala de la interfaz con las barras de tamaño clásico? La tuya está en %d%%."
 L["ERASCALE_KEEP"] = "Mantener mi tamaño"
