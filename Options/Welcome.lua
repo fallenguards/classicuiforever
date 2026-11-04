@@ -127,6 +127,8 @@ local function OnItemRef(link)
         ns.ShowScaleHelp()
     elseif target == "curseforge" then
         CopyCurseForge()
+    elseif target == "github" then
+        CopyGitHub()
     elseif target == "barsnote" then
         ns.OpenOptionsAt("barsTakenNote")
     end
@@ -715,9 +717,17 @@ local function Returning()
     return ns.ClassicLayoutActive()
 end
 
+-- Forever's launch: every login, thanks and the bug report link (the issues copy box).
+local function AnnounceLaunch()
+    if not OnForever() or ns.db.addonMessages == false then return end
+    HookLinks()
+    ns.Print(L["LAUNCH_THANKS"]:format(TITLE, Link("github", L["WELCOME_HERE"])))
+end
+
 -- A new player gets the welcome, then the layout question as it closes; everyone else the What's New, once per list.
 function ns.FirstRun()
     if not ns.db then return end
+    ns.SafeCall(AnnounceLaunch)
     -- A standalone package: one chat line naming the full addon (the color picker: its look pick too), no news; the
     -- layout question only with the classic bar.
     if ns.PACKAGE then
