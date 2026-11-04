@@ -2,6 +2,14 @@
 
 All notable changes to ClassicUI Forever: Standalone Cast Bars and Unit Frames are documented here. It has version numbers of its own, apart from the full ClassicUI Forever's.
 
+## [1.1.3] - 2026-11-04
+
+### Changed
+- The welcome line at login on Forever also points to EasyFind.
+
+### Fixed
+- With Status Text on, the target and focus frames' health number on the right stays on the health bar; on Forever's launch build it stood past the portrait.
+
 ## [1.1.2] - 2026-11-04
 
 ### Changed

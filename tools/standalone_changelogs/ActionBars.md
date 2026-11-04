@@ -2,6 +2,11 @@
 
 All notable changes to ClassicUI Forever: Standalone Action Bars are documented here. It has version numbers of its own, apart from the full ClassicUI Forever's.
 
+## [1.1.3] - 2026-11-04
+
+### Changed
+- The welcome line at login on Forever also points to EasyFind.
+
 ## [1.1.2] - 2026-11-04
 
 ### Changed
