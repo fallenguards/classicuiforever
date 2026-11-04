@@ -39,7 +39,7 @@ RULES = ["CVAR", "CVARREAD", "CVARLOGIN", "CVARREG", "REGISTRY", "HOOK", "ONUPDA
          "LOADADDON", "EDITMODE", "EDITQUERY", "SETTLE",
          "PANELMGR", "SECRET", "WALK", "REGEVENTS", "EVENTFRAME", "POINTONCE", "SETIF", "THEME", "ONCEFLAG",
          "FRAMEFIELD", "GAMEMENU", "SHAREDART", "PLATES", "FORBIDDEN", "SYSBASE", "LAYOUTFIELD", "CLIENTKEY",
-         "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS", "DRAGPOINT", "STRETCHED", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "SNIPPETHIDE", "PVPINFOART", "CLUSTERSCALE", "DBRAW", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "LOADORDER", "TOC"]
+         "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS", "DRAGPOINT", "STRETCHED", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "SNIPPETHIDE", "PVPINFOART", "CLUSTERSCALE", "DBRAW", "FLOORSIZE", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "LOADORDER", "TOC"]
 # A hit of these on a line the change adds fails even within the baseline, so swapping one call for another fails.
 # SINCE, DEADNS, FRAMEFIELD, CVARLOGIN and THROTTLEFRAME stay count-only, so a kept line can still be rewritten.
 LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", "EDITMODE", "PANELMGR", "SEARCHBOX", "ADDONCHAR",
@@ -50,7 +50,7 @@ LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", 
               "DRAGPOINT", "STRETCHED", "ERASPOT", "WINDOWORIGIN", "CVARREG", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST",
               "POINTEXACT",
               "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE",
-              "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "SNIPPETHIDE", "PVPINFOART", "CLUSTERSCALE", "DBRAW")
+              "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "SNIPPETHIDE", "PVPINFOART", "CLUSTERSCALE", "DBRAW", "FLOORSIZE")
 
 # The files allowed to hold each pattern, each with its reason; an entry ending in / is a folder.
 ALLOWED = {
@@ -191,6 +191,7 @@ FIX = {
                   "(HonorArt in Units/UnitFrameCore.lua)",
     "DBRAW": "read and write settings by key (db.x, db[key]); a pass's reader notes each key read, and a whole-table "
              "walk sees none of them",
+    "FLOORSIZE": "add a slack under one pixel before the floor (ROW_SLACK in S.RowCount, Social/SocialWindow.lua)",
     "CLUSTERSCALE": "scale the map container and our pieces' frame (MM.scaled) instead, the cluster's box grown to "
                     "match at scale 1 (Layout in Map/Minimap.lua)",
     "EDITDRAG": "read the edit mode system's selection box, system.Selection:IsDragging() (Dragged in Map/MinimapEye.lua)",
@@ -387,6 +388,8 @@ LINE_PATTERNS = {
     "EDITDRAG": re.compile(r"(?<!\.Selection):IsDragging\s*\("),
     "PVPINFOART": re.compile(r"\.(?:prestigePortraitAtlas|prestigeBadgeFileDataID|pvpIconAtlas)\b"),
     "DBRAW": re.compile(r"\b(?:rawget|rawset|next|pairs|wipe)\s*\(\s*(?:ns\s*\.\s*)?db\s*[,)]"),
+    # Whole rows from a drawn size: a frame's edges are floats, so a list 13 rows tall can read 207.9999 (#232).
+    "FLOORSIZE": re.compile(r"\bmath\s*\.\s*floor\s*\([^\n]*:\s*Get(?:Height|Width)\s*\(\s*\)[^\n]*?/\s*[\w.]+\s*\)"),
     "CLUSTERSCALE": re.compile(r"\b(?:MinimapCluster|cluster)\s*:\s*SetScale\s*\(|SetScaleIf\s*\(\s*(?:MinimapCluster|cluster)\s*,"),
     "COMBATMOUSE": re.compile(r"\b(?:SetPropagateMouseMotion|SetPropagateMouseClicks|SetPropagateKeyboardInput|SetPassThroughButtons)\b"),
     "PCALLMANY": re.compile(r"\bpcall\s*\(\s*[\w.:\[\]\"]+\s*[.:]\s*(?:GetChildren|GetRegions|GetAnimations)\b"),
@@ -502,6 +505,8 @@ MESSAGES = {
                   "badge drew nothing (2026-10-26, /fcuidev honor)",
     "DBRAW": "the saved settings walked or written raw: during a pass ns.db is a reader (Core/Core.lua) that notes the "
              "keys each module reads, so a whole-table walk finds nothing and a raw write never reaches the save",
+    "FLOORSIZE": "a drawn size floored into whole rows: frame edges are floats, so the guild list 13 rows tall read "
+                 "207.9999 and showed 12 (#232)",
     "CLUSTERSCALE": "the minimap cluster scaled: the game reads its bottom in the cluster's own units and shrank bars 4 "
                     "and 5 to fit above it (#230, /fcuidev rightbars)",
     "EDITDRAG": "IsDragging on a frame edit mode moves reads false: its selection box takes the drag (the queue eye snapped back to the rim mid-drag)",

@@ -1,6 +1,6 @@
 -- Offline test under Lua 5.4 for the social window's foot tabs: retail's client has a Who tab of its own, which leaves
--- the row while ours stands in it and comes back when ours goes; a row too long for the window is pulled in to fit
--- (Social/SocialWindow.lua).
+-- the row while ours stands in it and comes back when ours goes; a row too long for the window is pulled in to fit;
+-- the lists' whole rows (Social/SocialWindow.lua).
 -- Run from the addon root: lua tools/tests/social_tabs_test.lua (CI runs every tools/tests/*_test.lua).
 -- luacheck: std lua54
 -- luacheck: ignore 111 112 113 121 212
@@ -103,6 +103,13 @@ do
     S.PlaceTabs()
     Check(FriendsFrameTab2.alpha == 1 and FriendsFrameTab2.mouse == true, "retail: handed back, it shows and takes the mouse")
     Check(FriendsFrameTab3.after == FriendsFrameTab2, "retail: handed back, it stands in the row again")
+end
+
+do
+    local S = Social(true)
+    local function Rows(height) return S.RowCount({ list = { GetHeight = function() return height end } }) end
+    Check(Rows(208) == 13 and Rows(207.99998) == 13, "13 rows tall: 13 rows, its edges' float error too (#232)")
+    Check(Rows(207.5) == 12 and Rows(214) == 13, "a part row is never shown")
 end
 
 do

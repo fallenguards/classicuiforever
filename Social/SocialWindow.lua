@@ -352,9 +352,11 @@ function S.NewPanel(host, name)
     return panel
 end
 
+-- Whole rows: a list set 13 rows tall can read 207.9999 where the window stands (#232).
+local ROW_SLACK = 0.01
 function S.RowCount(panel)
     if not panel then return 0 end
-    return math.max(1, math.floor((panel.list:GetHeight() or 0) / ROW_H))
+    return math.max(1, math.floor((panel.list:GetHeight() or 0) / ROW_H + ROW_SLACK))
 end
 
 -- A list row: gold bar (or bar) on the chosen row and under the mouse, one text per column (row.Name, row.Zone, ...).
