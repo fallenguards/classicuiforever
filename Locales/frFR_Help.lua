@@ -80,3 +80,9 @@ L["ERASCALE_OPEN_SETTINGS"] = "Options du jeu"
 L["ERASCALE_SWITCH"] = "Taille d'Era"
 L["ERASCALE_ASK"] = "Passer à la taille de Classic Era, %d %% d'échelle de l'interface avec les barres à la taille classique ? La vôtre est à %d %%."
 L["ERASCALE_KEEP"] = "Garder ma taille"
+
+-- WoW Forever's welcome line at login
+L["LAUNCH_THANKS"] = "Merci d'utiliser %s. Comme il s'agit d'un nouveau client, il peut y avoir quelques bugs. Signalez-les %s et je les corrigerai au plus vite."
+L["LAUNCH_EASYFIND"] = "Si vous l'appréciez, vous aimerez peut-être aussi mon autre addon %s."
+L["OPT_foreverWelcome"] = "Accueil WoW Forever"
+L["OPT_foreverWelcome_TIP"] = "Une ligne dans la discussion à chaque connexion sur Forever, avec le lien pour signaler les bugs."

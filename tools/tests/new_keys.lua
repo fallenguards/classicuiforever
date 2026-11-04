@@ -190,6 +190,7 @@ return {
     bar2Right = "same for everyone: opt-in, off by default",
     bar2Left = "same for everyone: opt-in, off by default",
     barsTakenNote = "same for everyone: on by default, a chat line at login only while another addon holds the action bars (#120)",
+    foreverWelcome = "same for everyone: on by default, Forever's welcome line at each login till its options row turns it off",
     damageFlash ="off for everyone, a restyle: the game's red flash of lost health on the player frame goes, as 1.x had none (#85); checked brings it back",
     mapMarkers ="on for everyone, a restyle: Era's tower on capitals and house on towns on the continent maps (#165); unchecked gives the game's markers back",
     leaveGameWindows ="same for everyone: opt-in, off by default; the game's windows keep our places, sizes and locks",

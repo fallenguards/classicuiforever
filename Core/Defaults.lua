@@ -195,6 +195,7 @@ ns.DB_DEFAULTS = {
     druidManaGlowOver = false,
     mapFade = false,
     welcomeNote = true,
+    foreverWelcome = true,
     addonMessages = true,
     barsNote = false,
     barsNoteOff = false,

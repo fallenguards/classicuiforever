@@ -24,7 +24,7 @@ local BOX_OWNERS = { character = { "characterSheet" }, professions = { "professi
     questGiver = { "panelQuest" }, gossip = { "panelGossip" }, minimapOptionsButton = { "minimapButton" } }
 
 -- Settings with no row in a package that keep their default there: chat notes (another addon holds the bars) still say.
-local AT_DEFAULT = { addonMessages = true, barsTakenNote = true }
+local AT_DEFAULT = { addonMessages = true, barsTakenNote = true, foreverWelcome = true }
 
 local function Set(list)
     local set = {}

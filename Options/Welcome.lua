@@ -129,6 +129,8 @@ local function OnItemRef(link)
         CopyCurseForge()
     elseif target == "github" then
         CopyGitHub()
+    elseif target == "easyfind" then
+        CopyLink("EasyFind on CurseForge", O.EASYFIND_URL)
     elseif target == "barsnote" then
         ns.OpenOptionsAt("barsTakenNote")
     end
@@ -717,11 +719,13 @@ local function Returning()
     return ns.ClassicLayoutActive()
 end
 
--- Forever's launch: every login, thanks and the bug report link (the issues copy box).
+-- Forever's welcome at every login, its options row or Addon messages off hush it: the bug report link (the issues
+-- copy box) and EasyFind's page. No hide link in the line: the row is there for whoever looks for it.
 local function AnnounceLaunch()
-    if not OnForever() or ns.db.addonMessages == false then return end
+    if not OnForever() or ns.db.addonMessages == false or ns.db.foreverWelcome == false then return end
     HookLinks()
-    ns.Print(L["LAUNCH_THANKS"]:format(TITLE, Link("github", L["WELCOME_HERE"])))
+    ns.Print(L["LAUNCH_THANKS"]:format(TITLE, Link("github", L["WELCOME_HERE"])) .. " "
+        .. L["LAUNCH_EASYFIND"]:format(Link("easyfind", "EasyFind")))
 end
 
 -- A new player gets the welcome, then the layout question as it closes; everyone else the What's New, once per list.

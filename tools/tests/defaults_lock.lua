@@ -90,6 +90,7 @@ return {
     eraCoins = true,
     eyeSnapMinimap = true,
     focusBuffsOnTop = false,
+    foreverWelcome = true,
     fullPlates = true,
     gameDamageNumbers = true,
     gameMenu = true,

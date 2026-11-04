@@ -533,6 +533,8 @@ ns.TOGGLES = {
         search = "help tutorial info i button map professions spellbook hints tips" },
     { "addonMessages", L["OPT_addonMessages"], L["OPT_addonMessages_TIP"], search = "chat login lines quiet" },
     { "welcomeNote", L["OPT_welcomeNote"], L["OPT_welcomeNote_TIP"], parent = "addonMessages" },
+    { "foreverWelcome", L["OPT_foreverWelcome"], L["OPT_foreverWelcome_TIP"], parent = "addonMessages", hideIf = OnRetail,
+        search = "welcome forever login chat bug report message" },
     { "barsTakenNote", L["OPT_barsTakenNote"], L["OPT_barsTakenNote_TIP"], parent = "addonMessages",
         search = "warning message chat login another addon action bars takeover" },
     { "leaveGameWindows", L["OPT_leaveGameWindows"], L["OPT_leaveGameWindows_TIP"],

@@ -9,6 +9,7 @@ local TITLE = O.TITLE
 local ANSWER_GAP, ITEM_GAP, BUTTON_GAP = 3, 12, 6
 local BUTTON_W, POST_W = 170, 220
 local EASYFIND_URL = "https://www.curseforge.com/wow/addons/easyfind"
+O.EASYFIND_URL = EASYFIND_URL
 local SUITE, SUITE_URL = "ClassicUI Forever", "https://www.curseforge.com/wow/addons/classicui-forever"
 local DONATE_URL = "https://buymeacoffee.com/easyfind"
 
