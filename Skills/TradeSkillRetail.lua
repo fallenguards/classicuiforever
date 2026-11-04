@@ -48,6 +48,15 @@ local function Fit(frame)
     end
 end
 
+-- In the game's center slot beside our book, which it spaces as its own 575 wide window; the book is ours in the row
+-- and stands past this one (Spells/BookPages.lua), so this one takes the row's start, as when it opened first (#233).
+local function BesideBook(frame)
+    local getPanel = _G.GetUIPanel
+    if not (getPanel and getPanel("center") == frame) then return false end
+    local left = getPanel("left")
+    return left ~= nil and ns.BookPageWindow(left) ~= nil
+end
+
 -- The game lays this window for its own 658 tall page, raised by its fit to stay on screen, and 35 right of the row's
 -- start; ours is shorter and stands on the row's line and start as the game's other windows do (profwin read -55
 -- against the line's -116). The offset comes off each time the game lays it again. Out of a fight, by snippet.
@@ -60,11 +69,12 @@ local function OnLine(frame)
     if rel and rel ~= UIParent and rel ~= ns.windowParts.eraHost then return end
     local ratio = ns.WindowRatio(frame) or 1
     local laidAgain = not ns.Near(x, stoodX, 0.5)
-    local _, top = ns.GameRow()
+    local start, top = ns.GameRow()
     local wantY = top / ratio
     if not laidAgain and ns.Near(y, wantY, 0.5) then return end
     if ns.FramePlaced(frame) then return end
-    local wantX = laidAgain and x - ns.GameXOffset(frame) / ratio or x
+    local wantX = x
+    if laidAgain then wantX = BesideBook(frame) and start / ratio or x - ns.GameXOffset(frame) / ratio end
     if ns.windowParts.TopLeft(frame, wantX, wantY) then stoodX = wantX end
 end
 
