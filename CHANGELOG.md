@@ -2,6 +2,11 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.41.2] - 2026-11-04
+
+### Changed
+- On Forever, a chat line at login thanks you for playing on the new client and links the page to report bugs, so they get fixed as soon as possible.
+
 ## [0.41.1] - 2026-11-03
 
 ### Changed
