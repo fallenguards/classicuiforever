@@ -246,7 +246,21 @@ FadeBlizzardArt = function(frame, keep)
     ns.EachChild(frame, FadeArtChild, keep)
 end
 
+-- Era gives an item's tooltip to its icon, the tooltip beside it over the window; Forever's to the whole row, so it
+-- opened past the window's right edge. Put on the icon after the client fills it, while our look is on.
+local function TipOnIcon(tip)
+    local owner = tip:GetOwner()
+    local item = owner and owner.Item
+    local box, sheet = LootFrame and LootFrame.ScrollBox, LootFrame and LootFrame.fcui and LootFrame.fcui.lootPanel
+    if not (item and box and sheet and sheet:IsShown()) then return end
+    local target = owner:GetParent()
+    if not (target and target:GetParent() == box) then return end
+    ns.SetPointOnce(tip, "BOTTOMLEFT", item, "TOPRIGHT", 0, 0)
+end
+
 local function SkinLoot(frame)
+    ns.HookMethod(GameTooltip, "SetLootItem", TipOnIcon)
+    ns.HookMethod(GameTooltip, "SetLootCurrency", TipOnIcon)
     local close = frame.ClosePanelButton or frame.CloseButton
     local title = frame.TitleContainer and frame.TitleContainer.TitleText
     local keep = {}
