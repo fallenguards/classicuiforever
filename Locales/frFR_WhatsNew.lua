@@ -3,6 +3,9 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN63_1_TITLE"] = "Infobulles du butin à côté de l'objet"
+L["WN63_1_TEXT"] = "Dans la fenêtre de butin, l'infobulle d'un objet s'ouvre à côté de son icône, comme dans Classic Era, et non plus au-delà du bord droit de la fenêtre."
+
 L["WN62_1_TITLE"] = "Espacez vos barres d'action"
 L["WN62_1_TEXT"] = "L'espacement des icônes du mode Édition écarte désormais les boutons de chaque barre d'action. Sur la barre d'action 1, la bande de pierre s'élargit avec lui et chaque bouton reste dans son logement."
 L["WN62_2_TITLE"] = "Déballez vos cadeaux dans les Collections"

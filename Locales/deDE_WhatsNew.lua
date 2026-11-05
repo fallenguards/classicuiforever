@@ -3,6 +3,9 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN63_1_TITLE"] = "Beute-Tooltips neben dem Gegenstand"
+L["WN63_1_TEXT"] = "Im Beutefenster öffnet sich der Tooltip eines Gegenstands neben seinem Symbol, wie in Classic Era, nicht mehr hinter dem rechten Fensterrand."
+
 L["WN62_1_TITLE"] = "Aktionsleisten auseinanderziehen"
 L["WN62_1_TEXT"] = "Der Symbolabstand aus dem Bearbeitungsmodus zieht jetzt die Tasten jeder Aktionsleiste auseinander. Bei Aktionsleiste 1 wird das Steinband mit breiter, jede Taste bleibt in ihrer Fassung."
 L["WN62_2_TITLE"] = "Geschenke in der Sammlung auspacken"

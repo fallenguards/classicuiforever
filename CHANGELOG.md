@@ -2,6 +2,11 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.43.1] - 2026-11-05
+
+### Fixed
+- An item's tooltip in the loot window opens beside its icon, as in Classic Era, not past the window's right edge.
+
 ## [0.43.0] - 2026-11-04
 
 ### Added

@@ -3,6 +3,9 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN63_1_TITLE"] = "Descrizioni del bottino accanto all'oggetto"
+L["WN63_1_TEXT"] = "Nella finestra del bottino la descrizione di un oggetto si apre accanto alla sua icona, come in Classic Era, e non oltre il bordo destro della finestra."
+
 L["WN62_1_TITLE"] = "Distanzia le barre delle azioni"
 L["WN62_1_TEXT"] = "La spaziatura delle icone della modalità Modifica ora distanzia i pulsanti di ogni barra delle azioni. Sulla barra delle azioni 1 la fascia di pietra si allarga con essa e ogni pulsante resta nel suo alloggiamento."
 L["WN62_2_TITLE"] = "Scarta i regali nelle Collezioni"

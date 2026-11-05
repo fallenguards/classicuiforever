@@ -3,6 +3,9 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN63_1_TITLE"] = "Descripciones del botín junto al objeto"
+L["WN63_1_TEXT"] = "En la ventana de botín, la descripción de un objeto se abre junto a su icono, como en Classic Era, y no más allá del borde derecho de la ventana."
+
 L["WN62_1_TITLE"] = "Separa tus barras de acción"
 L["WN62_1_TEXT"] = "El espaciado de iconos del modo de edición ahora separa los botones de cada barra de acción. En la barra de acción 1 la franja de piedra se ensancha con él y cada botón sigue en su hueco."
 L["WN62_2_TITLE"] = "Desenvuelve regalos en Colecciones"

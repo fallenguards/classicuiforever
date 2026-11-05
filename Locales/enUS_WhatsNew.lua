@@ -2,6 +2,9 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN63_1_TITLE"] = "Loot tooltips beside the item"
+L["WN63_1_TEXT"] = "In the loot window, an item's tooltip opens beside its icon, as in Classic Era, not past the window's right edge."
+
 L["WN62_1_TITLE"] = "Spread your action bars"
 L["WN62_1_TEXT"] = "Edit Mode's Icon Padding now spreads the buttons of every action bar. On Action Bar 1 the stone band widens with it, each button still on its socket."
 L["WN62_2_TITLE"] = "Unwrap gifts in Collections"
