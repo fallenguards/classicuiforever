@@ -39,7 +39,7 @@ RULES = ["CVAR", "CVARREAD", "CVARLOGIN", "CVARREG", "REGISTRY", "HOOK", "ONUPDA
          "LOADADDON", "EDITMODE", "EDITQUERY", "SETTLE",
          "PANELMGR", "SECRET", "WALK", "REGEVENTS", "EVENTFRAME", "POINTONCE", "SETIF", "THEME", "ONCEFLAG",
          "FRAMEFIELD", "GAMEMENU", "SHAREDART", "PLATES", "FORBIDDEN", "SYSBASE", "LAYOUTFIELD", "CLIENTKEY",
-         "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS", "DRAGPOINT", "STRETCHED", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "PVPINFOART", "CLUSTERSCALE", "DBRAW", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "LOADORDER", "TOC"]
+         "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS", "DRAGPOINT", "STRETCHED", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "SNIPPETHIDE", "PVPINFOART", "CLUSTERSCALE", "DBRAW", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "LOADORDER", "TOC"]
 # A hit of these on a line the change adds fails even within the baseline, so swapping one call for another fails.
 # SINCE, DEADNS, FRAMEFIELD, CVARLOGIN and THROTTLEFRAME stay count-only, so a kept line can still be rewritten.
 LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", "EDITMODE", "PANELMGR", "SEARCHBOX", "ADDONCHAR",
@@ -50,7 +50,7 @@ LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", 
               "DRAGPOINT", "STRETCHED", "ERASPOT", "WINDOWORIGIN", "CVARREG", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST",
               "POINTEXACT",
               "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE",
-              "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "PVPINFOART", "CLUSTERSCALE", "DBRAW")
+              "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "SNIPPETHIDE", "PVPINFOART", "CLUSTERSCALE", "DBRAW")
 
 # The files allowed to hold each pattern, each with its reason; an entry ending in / is a folder.
 ALLOWED = {
@@ -194,6 +194,8 @@ FIX = {
     "CLUSTERSCALE": "scale the map container and our pieces' frame (MM.scaled) instead, the cluster's box grown to "
                     "match at scale 1 (Layout in Map/Minimap.lua)",
     "EDITDRAG": "read the edit mode system's selection box, system.Selection:IsDragging() (Dragged in Map/MinimapEye.lua)",
+    "SNIPPETHIDE": "pass true to leave statehidden alone (button:Show(true), button:Hide(true)); on a frame of ours where "
+                   "statehidden is meant, say so with a statehidden comment on the line",
     "PAGEINK": "color it through ns.PageInk(r, g, b) at paint time and repaint on ns.ThemeKey toggles (MISSING_INK in "
                "Skills/ProfessionsBook.lua)",
     "COMBATMOUSE": "set it through ns.Sched.OnHover (it answers refused in a fight) or guard the call with InCombatLockdown() and list the file in ALLOWED with the guard",
@@ -503,6 +505,8 @@ MESSAGES = {
     "CLUSTERSCALE": "the minimap cluster scaled: the game reads its bottom in the cluster's own units and shrank bars 4 "
                     "and 5 to fit above it (#230, /fcuidev rightbars)",
     "EDITDRAG": "IsDragging on a frame edit mode moves reads false: its selection box takes the drag (the queue eye snapped back to the rim mid-drag)",
+    "SNIPPETHIDE": "a plain Show()/Hide() in a secure snippet also sets the frame's statehidden: a game action button so "
+                   "marked is never shown by its bar again (the book's empty slots, #241)",
     "PAGEINK": "dark text set by number in a file whose pages a theme darkens: unreadable on the dark page (the professions book's unlearned rows)",
     "COMBATMOUSE": "the client refuses mouse and key propagation in a fight (ADDON_ACTION_BLOCKED; a pcall still says ok)",
     "PCALLMANY": "a pcall straight around GetChildren/GetRegions/GetAnimations: 22 or more results abort the beta client",
@@ -969,6 +973,22 @@ def template_names(lx):
 PAGE_FILE_RX = re.compile(r"\bns\.(?:PageInk|InkPage|InkChrome|PageDark)\b")
 PAGE_TEXT_RX = re.compile(r":SetTextColor\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*[,)]")
 PAGE_DARK_TEXT = 0.3
+
+
+SNIPPET_SHOWHIDE = re.compile(r":\s*(?:Show|Hide)\s*\(\s*\)")
+
+
+def snippet_hide_hits(lx):
+    """A plain Show()/Hide() inside a [[ ]] snippet string, unless the line names statehidden."""
+    found, depth = set(), 0
+    for no, line in enumerate(lx.keep, 1):
+        opened = line.count("[[")
+        closed = line.count("]]")
+        inside = depth > 0 or opened > 0
+        if inside and SNIPPET_SHOWHIDE.search(line) and "statehidden" not in line:
+            found.add(("SNIPPETHIDE", no))
+        depth = max(0, depth + opened - closed)
+    return found
 
 
 def page_ink_hits(lx):
@@ -1582,6 +1602,7 @@ def pattern_hits(path, lx, funcs):
     found |= held_cvar_hits(lx, funcs)
     found |= client_template_hits(lx)
     found |= page_ink_hits(lx)
+    found |= snippet_hide_hits(lx)
     if not allowed("THROTTLEFRAME", path):
         found |= throttle_frame_hits(lx)
     if not allowed("SEARCHBOX", path):
