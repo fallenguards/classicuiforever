@@ -25,6 +25,10 @@ local PIECES = { "TopLeftCorner", "TopRightCorner", "BottomLeftCorner", "BottomR
 -- UI-Tooltip-Border cells as BackdropTemplate cuts them, stretched not tiled: no size math on secret widths.
 local S, E = 0.0625, 0.9375
 local EDGE, INSET = 16, 5
+-- Era's tooltip fill as drawn: its flat image (16, 21, 29 at 230) times the tooltip color both clients share (23, 23,
+-- 48). Forever's own fill under that name is another image, so it goes while our rim shows.
+local ERA_FILL = { 16 * 23 / 65025, 21 * 23 / 65025, 29 * 48 / 65025, 230 / 255 }
+ns.ERA_TIP_FILL = ERA_FILL
 
 local rims = {}      -- tooltip -> our rim, false once a dress failed
 local active = false
@@ -64,13 +68,13 @@ local function MakeRim(slice)
     Edge(rim, bl, "TOPRIGHT", br, "BOTTOMLEFT", 0.3828125, E, 0.4921875, E, 0.3828125, S, 0.4921875, S)
     Edge(rim, tl, "BOTTOMLEFT", bl, "TOPRIGHT", 0.0078125, 0.1171875, S, E)
     Edge(rim, tr, "BOTTOMLEFT", br, "TOPRIGHT", 0.1328125, 0.2421875, S, E)
-    -- Under the client's fill, which keeps its own colours; shows only where that stops short of the rim.
+    -- Era's fill in the client's place: one flat color, 5 in from the edge as Era's (2 inside its 7 px corners).
     local fill = rim:CreateTexture(nil, "BACKGROUND", nil, -8)
-    fill:SetTexture(ART.TIP_BG)
+    fill:SetTexture(ART.WHITE)
+    fill:SetVertexColor(ERA_FILL[1], ERA_FILL[2], ERA_FILL[3], ERA_FILL[4])
     fill:SetPoint("TOPLEFT", rim, "TOPLEFT", INSET, -INSET)
     fill:SetPoint("BOTTOMRIGHT", rim, "BOTTOMRIGHT", -INSET, INSET)
-    local color = _G.TOOLTIP_DEFAULT_BACKGROUND_COLOR
-    if color then fill:SetVertexColor(color:GetRGB()) else fill:SetVertexColor(0.09, 0.09, 0.19) end
+    rim.fill = fill
     return rim
 end
 
@@ -80,8 +84,12 @@ local function Paint(tip, on)
         local piece = slice[PIECES[i]]
         if piece then piece:SetAlpha(on and 1 or 0) end
     end
+    if slice.Center then slice.Center:SetAlpha(on and 1 or 0) end
     rims[tip]:SetShown(not on)
 end
+
+-- Read by the dev addon's probe: a tooltip's rim (its fill at .fill).
+function ns.TooltipRim(tip) return rims[tip] or nil end
 
 local function Dress(tip)
     if ns.IsForbidden(tip) then return end
@@ -109,10 +117,10 @@ local function StyleAuras()
     if want == auraClassic or not inbound then return end
     if want then
         local ok = pcall(inbound.SetTooltipBackdrop, {
-            backdropInfo = { bgFile = ART.TIP_BG, edgeFile = ART.TIP_BORDER, tile = true, tileEdge = true,
+            backdropInfo = { bgFile = ART.WHITE, edgeFile = ART.TIP_BORDER, tile = true, tileEdge = true,
                 tileSize = 16, edgeSize = EDGE, insets = { left = INSET, right = INSET, top = INSET, bottom = INSET } },
             borderColor = CreateColor(1, 1, 1, 1),
-            centerColor = _G.TOOLTIP_DEFAULT_BACKGROUND_COLOR,
+            centerColor = CreateColor(ERA_FILL[1], ERA_FILL[2], ERA_FILL[3], ERA_FILL[4]),
         })
         if ok then auraClassic = true end
     elseif pcall(inbound.ResetTooltipStyle) then
