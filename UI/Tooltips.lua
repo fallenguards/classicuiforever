@@ -1,8 +1,8 @@
 local _, ns = ...
 
--- Client tooltips in the 1.x white rim (tinted with a theme); the bronze theme gives back Forever's own.
--- Watch only: our rim is a scriptless child of each NineSlice, so the client's show, hide and
--- re-layout carry it, and ApplyLayout never touches the region alpha that fades its bronze.
+-- Client tooltips in the 1.x white rim (tinted with a theme) on Era's fill; bronze keeps Forever's rim over that fill
+-- (Forever's gray center read blue and light against Era's near-black). Watch only: our rim is a scriptless child of
+-- each NineSlice, so the client's show, hide and re-layout carry it; ApplyLayout never touches the region alpha.
 
 local ART = ns.ART
 local pairs, type = pairs, type
@@ -24,7 +24,8 @@ local PIECES = { "TopLeftCorner", "TopRightCorner", "BottomLeftCorner", "BottomR
 
 -- UI-Tooltip-Border cells as BackdropTemplate cuts them, stretched not tiled: no size math on secret widths.
 local S, E = 0.0625, 0.9375
-local EDGE, INSET = 16, 5
+-- The fill reaches the rim line's inner side (texel 3 of 16 is the line; Era's rim pieces carry their fill to it).
+local EDGE, INSET = 16, 4
 -- Era's tooltip fill as drawn: its flat image (16, 21, 29 at 230) times the tooltip color both clients share (23, 23,
 -- 48). Forever's own fill under that name is another image, so it goes while our rim shows.
 local ERA_FILL = { 16 * 23 / 65025, 21 * 23 / 65025, 29 * 48 / 65025, 230 / 255 }
@@ -52,6 +53,7 @@ local function Edge(rim, from, fromPoint, to, toPoint, ...)
     tex:SetTexCoord(...)
     tex:SetPoint("TOPLEFT", from, fromPoint)
     tex:SetPoint("BOTTOMRIGHT", to, toPoint)
+    return tex
 end
 
 local function MakeRim(slice)
@@ -64,11 +66,12 @@ local function MakeRim(slice)
     local bl = Corner(rim, "BOTTOMLEFT", 0.7578125, 0.8671875)
     local br = Corner(rim, "BOTTOMRIGHT", 0.8828125, 0.9921875)
     -- Top and bottom cells are stored upright: rotated coords.
-    Edge(rim, tl, "TOPRIGHT", tr, "BOTTOMLEFT", 0.2578125, E, 0.3671875, E, 0.2578125, S, 0.3671875, S)
-    Edge(rim, bl, "TOPRIGHT", br, "BOTTOMLEFT", 0.3828125, E, 0.4921875, E, 0.3828125, S, 0.4921875, S)
-    Edge(rim, tl, "BOTTOMLEFT", bl, "TOPRIGHT", 0.0078125, 0.1171875, S, E)
-    Edge(rim, tr, "BOTTOMLEFT", br, "TOPRIGHT", 0.1328125, 0.2421875, S, E)
-    -- Era's fill in the client's place: one flat color, 5 in from the edge as Era's (2 inside its 7 px corners).
+    rim.border = { tl, tr, bl, br,
+        Edge(rim, tl, "TOPRIGHT", tr, "BOTTOMLEFT", 0.2578125, E, 0.3671875, E, 0.2578125, S, 0.3671875, S),
+        Edge(rim, bl, "TOPRIGHT", br, "BOTTOMLEFT", 0.3828125, E, 0.4921875, E, 0.3828125, S, 0.4921875, S),
+        Edge(rim, tl, "BOTTOMLEFT", bl, "TOPRIGHT", 0.0078125, 0.1171875, S, E),
+        Edge(rim, tr, "BOTTOMLEFT", br, "TOPRIGHT", 0.1328125, 0.2421875, S, E) }
+    -- Era's fill in the client's place: one flat color, under the rim line's inner side.
     local fill = rim:CreateTexture(nil, "BACKGROUND", nil, -8)
     fill:SetTexture(ART.WHITE)
     fill:SetVertexColor(ERA_FILL[1], ERA_FILL[2], ERA_FILL[3], ERA_FILL[4])
@@ -78,14 +81,18 @@ local function MakeRim(slice)
     return rim
 end
 
+-- false: our rim and fill. true: the client's rim over our fill (bronze). nil: the client's own, whole (restore).
+-- Hidden, never faded: the client's hide sets its center's color with alpha 1, the texture's one alpha, so a faded
+-- center came back on every tooltip after the first; the item quality border color likewise.
 local function Paint(tip, on)
-    local slice = tip.NineSlice
+    local slice, rim = tip.NineSlice, rims[tip]
     for i = 1, #PIECES do
         local piece = slice[PIECES[i]]
-        if piece then piece:SetAlpha(on and 1 or 0) end
+        if piece then piece:SetShown(on ~= false) end
     end
-    if slice.Center then slice.Center:SetAlpha(on and 1 or 0) end
-    rims[tip]:SetShown(not on)
+    if slice.Center then slice.Center:SetShown(on == nil) end
+    for i = 1, #rim.border do rim.border[i]:SetShown(on == false) end
+    rim:SetShown(on ~= nil)
 end
 
 -- Read by the dev addon's probe: a tooltip's rim (its fill at .fill).
@@ -109,10 +116,11 @@ local function DressNew()
     end
 end
 
--- The target and focus aura tooltip is forbidden; the client's own secure delegate styles it.
+-- The target and focus aura tooltip is forbidden; the client's own secure delegate styles it. A backdrop takes a file
+-- rim only, so under bronze it wears Era's rim too, over the fill every look shares.
 local auraClassic = false
 local function StyleAuras()
-    local want = active and clientArt == false
+    local want = active == true
     local inbound = _G.AuraContainerInbound
     if want == auraClassic or not inbound then return end
     if want then
@@ -132,7 +140,7 @@ local watch
 local function OnAddonLoaded()
     if not active then return end
     DressNew()
-    if auraClassic ~= (clientArt == false) and _G.AuraContainerInbound then ns.WhenCalm("tooltipAuras", StyleAuras) end
+    if auraClassic ~= active and _G.AuraContainerInbound then ns.WhenCalm("tooltipAuras", StyleAuras) end
 end
 
 -- Every pass calls these: work only on a change.
@@ -153,7 +161,7 @@ local function Restore()
     if not active then return end
     active, theme.on, clientArt = false, nil, nil
     for tip, rim in pairs(rims) do
-        if rim then ns.SafeCall(Paint, tip, true) end
+        if rim then ns.SafeCall(Paint, tip, nil) end
     end
     ns.WhenCalm("tooltipAuras", StyleAuras)
 end
