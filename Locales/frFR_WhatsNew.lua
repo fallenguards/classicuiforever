@@ -9,6 +9,8 @@ L["WN64_2_TITLE"] = "Erreur des barres de nom corrigée"
 L["WN64_2_TEXT"] = "Avec les barres de nom du jeu et les auras d'un autre addon dessus, les nouvelles barres de nom ne causent plus d'erreur Lua."
 L["WN64_3_TITLE"] = "Emplacements vides après le grimoire"
 L["WN64_3_TEXT"] = "Avec Toujours afficher les boutons désactivé, les emplacements vides de vos barres réapparaissent pour un sort ou un objet pris après avoir fermé le grimoire."
+L["WN64_4_TITLE"] = "Corrections de ClassicUI Forever Windows"
+L["WN64_4_TEXT"] = "Sa case en mode Édition répond de nouveau aux clics, et la taille de la carte du monde y varie régulièrement à partir de celle de son ouverture."
 
 L["WN63_1_TITLE"] = "Infobulles du butin à côté de l'objet"
 L["WN63_1_TEXT"] = "Dans la fenêtre de butin, l'infobulle d'un objet s'ouvre à côté de son icône, comme dans Classic Era, et non plus au-delà du bord droit de la fenêtre."

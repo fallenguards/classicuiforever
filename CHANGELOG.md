@@ -10,6 +10,8 @@ All notable changes to ClassicUI Forever are documented here.
 ### Fixed
 - With the game's own nameplates up and another addon drawing nameplate auras, new nameplates appearing no longer throw a Lua error from the theme (#237).
 - With Always Show Buttons off, a bar's empty slots show again for a spell or item you pick up after closing the spellbook; they stayed hidden until you logged out (#241).
+- The ClassicUI Forever Windows check in Edit Mode takes clicks again; the game's Edit Mode tutorial box lay over it.
+- The world map's size in ClassicUI Forever Windows now steps from the size it opens at: 95% and 105% are a little smaller and bigger, not huge, and the map no longer jumps around.
 
 ## [0.43.1] - 2026-11-05
 

@@ -9,6 +9,8 @@ L["WN64_2_TITLE"] = "Error de las placas de nombre corregido"
 L["WN64_2_TEXT"] = "Con las placas de nombre del juego y las auras de otro addon en ellas, las placas nuevas ya no causan un error de Lua."
 L["WN64_3_TITLE"] = "Huecos vacíos tras el libro de hechizos"
 L["WN64_3_TEXT"] = "Con Mostrar siempre los botones desactivado, los huecos vacíos de tus barras vuelven a verse para un hechizo u objeto que cojas tras cerrar el libro de hechizos."
+L["WN64_4_TITLE"] = "Correcciones en ClassicUI Forever Windows"
+L["WN64_4_TEXT"] = "Su casilla en el modo de edición vuelve a responder a los clics, y el tamaño del mapa del mundo ahí cambia de forma uniforme desde el tamaño con que se abre."
 
 L["WN63_1_TITLE"] = "Descripciones del botín junto al objeto"
 L["WN63_1_TEXT"] = "En la ventana de botín, la descripción de un objeto se abre junto a su icono, como en Classic Era, y no más allá del borde derecho de la ventana."

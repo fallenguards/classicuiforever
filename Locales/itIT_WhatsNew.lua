@@ -9,6 +9,8 @@ L["WN64_2_TITLE"] = "Errore delle targhette corretto"
 L["WN64_2_TEXT"] = "Con le targhette del gioco e le aure di un altro addon sopra, le nuove targhette non causano più un errore Lua."
 L["WN64_3_TITLE"] = "Spazi vuoti dopo il libro degli incantesimi"
 L["WN64_3_TEXT"] = "Con Mostra sempre i pulsanti disattivato, gli spazi vuoti delle barre tornano visibili per un incantesimo o un oggetto preso dopo aver chiuso il libro degli incantesimi."
+L["WN64_4_TITLE"] = "Correzioni a ClassicUI Forever Windows"
+L["WN64_4_TEXT"] = "La sua casella in modalità Modifica risponde di nuovo ai clic, e la dimensione della mappa del mondo lì cambia in modo uniforme da quella con cui si apre."
 
 L["WN63_1_TITLE"] = "Descrizioni del bottino accanto all'oggetto"
 L["WN63_1_TEXT"] = "Nella finestra del bottino la descrizione di un oggetto si apre accanto alla sua icona, come in Classic Era, e non oltre il bordo destro della finestra."

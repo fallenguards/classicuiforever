@@ -8,6 +8,8 @@ L["WN64_2_TITLE"] = "Nameplate error fixed"
 L["WN64_2_TEXT"] = "With the game's own nameplates and another addon's nameplate auras, new nameplates no longer cause a Lua error."
 L["WN64_3_TITLE"] = "Empty slots after the spellbook"
 L["WN64_3_TEXT"] = "With Always Show Buttons off, your bars' empty slots show again for a spell or item you pick up after closing the spellbook."
+L["WN64_4_TITLE"] = "ClassicUI Forever Windows fixes"
+L["WN64_4_TEXT"] = "Its check in Edit Mode takes clicks again, and the world map's size there steps evenly from the size it opens at."
 
 L["WN63_1_TITLE"] = "Loot tooltips beside the item"
 L["WN63_1_TEXT"] = "In the loot window, an item's tooltip opens beside its icon, as in Classic Era, not past the window's right edge."

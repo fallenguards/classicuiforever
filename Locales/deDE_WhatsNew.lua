@@ -9,6 +9,8 @@ L["WN64_2_TITLE"] = "Fehler bei Namensplaketten behoben"
 L["WN64_2_TEXT"] = "Mit den Namensplaketten des Spiels und den Auren eines anderen Addons darauf lösen neue Namensplaketten keinen Lua-Fehler mehr aus."
 L["WN64_3_TITLE"] = "Leere Plätze nach dem Zauberbuch"
 L["WN64_3_TEXT"] = "Mit ausgeschaltetem Immer Tasten anzeigen erscheinen die leeren Plätze deiner Leisten wieder für einen Zauber oder Gegenstand, den du nach dem Schließen des Zauberbuchs aufnimmst."
+L["WN64_4_TITLE"] = "Korrekturen an ClassicUI Forever Windows"
+L["WN64_4_TEXT"] = "Sein Kästchen im Bearbeitungsmodus lässt sich wieder anklicken, und die Größe der Weltkarte dort ändert sich gleichmäßig ab der Größe, mit der sie sich öffnet."
 
 L["WN63_1_TITLE"] = "Beute-Tooltips neben dem Gegenstand"
 L["WN63_1_TEXT"] = "Im Beutefenster öffnet sich der Tooltip eines Gegenstands neben seinem Symbol, wie in Classic Era, nicht mehr hinter dem rechten Fensterrand."
