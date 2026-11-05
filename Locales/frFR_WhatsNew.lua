@@ -3,6 +3,11 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN65_1_TITLE"] = "Déplacez toutes vos fenêtres d'un coup"
+L["WN65_1_TEXT"] = "ClassicUI Forever Windows a un cadre Rangée de fenêtres : faites-le glisser et toutes les fenêtres qui s'ouvrent côte à côte s'y déplacent ensemble."
+L["WN65_2_TITLE"] = "Le dressage compte de nouveau en points d'entraînement"
+L["WN65_2_TEXT"] = "La fenêtre du dresseur affiche les points d'entraînement de votre familier et ce que coûte chaque technique en points, et Entraîner s'y fie, comme dans Classic Era."
+
 L["WN64_1_TITLE"] = "Estompez vos barres d'action"
 L["WN64_1_TEXT"] = "Choisissez une barre en mode Édition : sous les réglages du jeu pour elle, réglez jusqu'où elle s'estompe ou cochez Afficher seulement au survol. Elle redevient pleine sous la souris ou quand vous y faites glisser un sort."
 L["WN64_2_TITLE"] = "Erreur des barres de nom corrigée"

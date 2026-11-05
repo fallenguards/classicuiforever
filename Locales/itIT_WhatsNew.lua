@@ -3,6 +3,11 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN65_1_TITLE"] = "Sposta tutte le finestre insieme"
+L["WN65_1_TEXT"] = "ClassicUI Forever Windows ha un riquadro Fila di finestre: trascinalo e tutte le finestre che si aprono una accanto all'altra si spostano lì insieme."
+L["WN65_2_TITLE"] = "L'addestramento del famiglio torna in punti addestramento"
+L["WN65_2_TEXT"] = "La finestra dell'addestratore mostra i punti addestramento del tuo famiglio e quanti punti costa ogni abilità, e Addestra si basa su quelli, come in Classic Era."
+
 L["WN64_1_TITLE"] = "Sbiadisci le barre delle azioni"
 L["WN64_1_TEXT"] = "Scegli una barra in modalità Modifica: sotto le impostazioni del gioco per essa, imposta fin dove sbiadisce o spunta Mostra solo al passaggio del mouse. Torna piena con il mouse sopra o mentre trascini un incantesimo su di essa."
 L["WN64_2_TITLE"] = "Errore delle targhette corretto"

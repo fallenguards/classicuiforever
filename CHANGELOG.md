@@ -2,6 +2,17 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.45.0] - 2026-11-05
+
+### Added
+- ClassicUI Forever Windows has a Window row box: drag it to move every window that opens side by side, all together, and they still open beside each other there (#162).
+
+### Changed
+- The spellbook's Collections and professions pages share the spellbook's place and size, and have no box of their own in ClassicUI Forever Windows.
+
+### Fixed
+- A hunter's pet trainer window counts in the pet's training points again: the points in the foot, each skill's cost in points, Train by the points, the pet's level for requirements, and the skills listed flat as in the game's own window (#243).
+
 ## [0.44.0] - 2026-11-05
 
 ### Added

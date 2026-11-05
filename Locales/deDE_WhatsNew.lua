@@ -3,6 +3,11 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN65_1_TITLE"] = "Alle Fenster auf einmal verschieben"
+L["WN65_1_TEXT"] = "ClassicUI Forever Windows hat ein Feld Fensterreihe: Ziehst du es, wandern alle Fenster, die sich nebeneinander öffnen, gemeinsam dorthin."
+L["WN65_2_TITLE"] = "Tierausbildung rechnet wieder in Trainingspunkten"
+L["WN65_2_TEXT"] = "Das Fenster des Tierausbilders zeigt die Trainingspunkte deines Begleiters und was jede Fähigkeit an Punkten kostet, und Ausbilden richtet sich danach, wie in Classic Era."
+
 L["WN64_1_TITLE"] = "Aktionsleisten verblassen lassen"
 L["WN64_1_TEXT"] = "Wähle im Bearbeitungsmodus eine Leiste: unter den Einstellungen des Spiels für sie stellst du ein, worauf sie verblasst, oder hakst Nur beim Überfahren zeigen an. Sie wird wieder voll sichtbar, solange die Maus darauf ist oder ein Zauber darauf gezogen wird."
 L["WN64_2_TITLE"] = "Fehler bei Namensplaketten behoben"

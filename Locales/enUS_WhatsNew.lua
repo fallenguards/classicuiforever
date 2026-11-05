@@ -2,6 +2,11 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN65_1_TITLE"] = "Move all your windows at once"
+L["WN65_1_TEXT"] = "ClassicUI Forever Windows has a Window row box: drag it, and every window that opens side by side moves there together."
+L["WN65_2_TITLE"] = "Beast Training counts in training points again"
+L["WN65_2_TEXT"] = "The pet trainer window shows your pet's training points and what each skill costs in points, and Train goes by them, as Classic Era's Beast Training did."
+
 L["WN64_1_TITLE"] = "Fade your action bars"
 L["WN64_1_TEXT"] = "Select a bar in Edit Mode: under the game's own settings for it, set its Faded Opacity or check Show Only On Hover. It comes back to full while the mouse is on it or a spell is dragged to it."
 L["WN64_2_TITLE"] = "Nameplate error fixed"

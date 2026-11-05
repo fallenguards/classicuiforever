@@ -3,6 +3,11 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN65_1_TITLE"] = "Mueve todas tus ventanas a la vez"
+L["WN65_1_TEXT"] = "ClassicUI Forever Windows tiene un recuadro Fila de ventanas: arrástralo y todas las ventanas que se abren una al lado de otra se mueven juntas allí."
+L["WN65_2_TITLE"] = "El adiestramiento vuelve a contar en puntos de entrenamiento"
+L["WN65_2_TEXT"] = "La ventana del adiestrador muestra los puntos de entrenamiento de tu mascota y lo que cuesta cada habilidad en puntos, y Entrenar se guía por ellos, como en Classic Era."
+
 L["WN64_1_TITLE"] = "Atenúa tus barras de acción"
 L["WN64_1_TEXT"] = "Elige una barra en el modo de edición: bajo los ajustes del juego para ella, fija hasta dónde se atenúa o marca Mostrar solo al pasar el ratón. Vuelve a verse entera con el ratón encima o al arrastrar un hechizo a ella."
 L["WN64_2_TITLE"] = "Error de las placas de nombre corregido"
