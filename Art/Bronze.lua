@@ -22,11 +22,13 @@ function ns.BronzeOn()
     return ThemeName() ~= nil
 end
 
--- Another addon's frame: its global name set outside the game's own code, and not ours.
-function B.AddonFrame(frame)
-    local name = frame.GetName and frame:GetName()
+-- Another addon's frame by its global name: set outside the game's own code, and not ours.
+local function AddonName(name)
     if type(name) ~= "string" or ns.IsSecret(name) or issecurevariable(name) then return false end
     return not (name:find("^ForeverClassicUI") or name:find("^ClassicUIForever"))
+end
+function B.AddonFrame(frame)
+    return AddonName(frame.GetName and frame:GetName())
 end
 
 -- A subtree none of whose art the theme copies or tints, left out of the walks over the game's windows: another
@@ -35,7 +37,11 @@ end
 function B.PlainTree(frame)
     -- A forbidden frame may not even be asked its name.
     if ns.IsForbidden(frame) then return true end
-    if B.AddonFrame(frame) and (not ns.ThemeAddonsOn() or frame:GetName():find("^EasyFind")) then return true end
+    -- Aura icons the game makes for another addon's nameplate auras refuse every call from ours though not forbidden,
+    -- and no API says so (#237): the name is asked under pcall, and a refusal leaves the subtree out.
+    local answered, name = pcall(frame.GetName, frame)
+    if not answered then return true end
+    if AddonName(name) and (not ns.ThemeAddonsOn() or name:find("^EasyFind")) then return true end
     local spells = _G.PlayerSpellsFrame
     local talents = spells and spells.TalentsFrame
     return talents ~= nil and frame == talents.ButtonsParent
