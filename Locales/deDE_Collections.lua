@@ -18,6 +18,7 @@ L["CORE_COLLECTIONS_BUTTON_OPENS"] = "Die Sammlungstaste öffnet nach dem Neulad
 L["COLL_PETS"] = "Haustiere"
 L["COLL_TOYS"] = "Spielzeugkiste"
 L["COLL_SUMMON"] = "Herbeirufen"
+L["COLL_UNWRAP"] = "Auspacken"
 L["COLL_DISMISS"] = "Entlassen"
 L["COLL_APPEARANCES"] = "Vorlagen"
 L["COLL_FILTER"] = "Filter"

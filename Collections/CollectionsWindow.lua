@@ -113,6 +113,26 @@ function CW.AddPage(page)
     CW.pages[page.tab] = page
 end
 
+-- Gift-wrapped entries (the shop's, a collector's edition's) wear the game's gift icon till unwrapped here (#235). The
+-- dev addon's giftwrap fakes some on entries already open: unwrapped without telling the server.
+CW.GIFT_ICON = "Interface\\Icons\\Item_Shop_GiftBox01"
+CW.fakeWrapped = {}
+
+function CW.Wrapped(key, id, needs)
+    local fake = CW.fakeWrapped[key]
+    return needs == true or (fake ~= nil and fake[id] == true)
+end
+
+function CW.Unwrap(key, id, clear)
+    local fake = CW.fakeWrapped[key]
+    if fake and fake[id] then fake[id] = nil else clear(id) end
+end
+
+function CW.ShowGift(box)
+    box.bigIcon:SetTexture(CW.GIFT_ICON)
+    box.bigIcon:Show()
+end
+
 -- A creature (a mount, a pet) in the box's model, which frames it itself; its camera pulled back a step for room round
 -- it, turned a little to show its side.
 local function FrameCreature(model)
@@ -188,7 +208,7 @@ local function DrawBox()
     local box, entry = W.box, PickedEntry()
     -- The same pick drawn again (an event burst refreshes the page): its model kept as it stands, not set up again (it
     -- jumped back to its first pose and turn each time). The window's show draws afresh.
-    local key = entry and (W.current.key .. ":" .. tostring(entry.id)) or nil
+    local key = entry and (W.current.key .. ":" .. tostring(entry.id) .. (entry.wrapped and ":gift" or "")) or nil
     local same = key ~= nil and key == W.drawn
     W.drawn = key
     box.name:SetText(entry and entry.name or "")

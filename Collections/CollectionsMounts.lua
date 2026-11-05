@@ -25,8 +25,9 @@ local function List()
         local id = MJ.GetDisplayedMountID(i)
         local name, spellID, icon, isActive, isUsable, _, _, _, _, hidden, collected = MJ.GetMountInfoByID(id)
         if type(name) == "string" and not IsSecret(name) and not hidden then
-            out[#out + 1] = { id = id, name = name, icon = icon, spellID = spellID, active = isActive == true,
-                usable = isUsable == true, collected = collected == true }
+            local wrapped = CW.Wrapped("mounts", id, MJ.NeedsFanfare(id))
+            out[#out + 1] = { id = id, name = name, icon = wrapped and CW.GIFT_ICON or icon, spellID = spellID,
+                active = isActive == true, usable = isUsable == true, collected = collected == true, wrapped = wrapped }
         end
     end
     table.sort(out, CW.ByCollectedName)
@@ -34,19 +35,27 @@ local function List()
 end
 
 local function Show(entry, box)
+    if entry.wrapped then return CW.ShowGift(box) end
     local displayID, _, source = MJ.GetMountInfoExtraByID(entry.id)
     if type(source) == "string" and not IsSecret(source) then box.source:SetText(source) end
     CW.ShowCreature(box, displayID)
 end
 
 local function Action(entry)
+    if entry.wrapped then return CW.Text("UNWRAP", "COLL_UNWRAP"), true end
     if entry.active then return CW.Text("BINDING_NAME_DISMOUNT", "COLL_DISMOUNT"), true end
     return CW.Text("MOUNT", "COLL_MOUNT"), entry.collected and entry.usable
 end
 
 -- The game refuses either in a fight with its own message.
 local function Act(entry)
-    if entry.active then MJ.Dismiss() else MJ.SummonByID(entry.id) end
+    if entry.wrapped then
+        CW.Unwrap("mounts", entry.id, MJ.ClearFanfare)
+    elseif entry.active then
+        MJ.Dismiss()
+    else
+        MJ.SummonByID(entry.id)
+    end
 end
 
 -- The journal's own pickup needs the mount's place in its shown list; past its filters, the mount's spell.

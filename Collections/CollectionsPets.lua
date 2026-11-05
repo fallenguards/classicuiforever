@@ -11,14 +11,20 @@ local PETS_ICON = "Interface\\Icons\\INV_Box_PetCarrier_01"
 local OWNED_ONLY = ns.OnForever()
 local searched = false
 
+local function Wrapped(petID)
+    return petID ~= nil and CW.Wrapped("pets", petID, PJ.PetNeedsFanfare(petID))
+end
+
 local function OwnedList()
     local out = {}
     for _, petID in ipairs(PJ.GetOwnedPetIDs and PJ.GetOwnedPetIDs() or ns.EMPTY) do
         local info = PJ.GetPetInfoTableByPetID(petID)
         local name = info and (info.customName or info.name)
         if type(name) == "string" and not IsSecret(name) then
-            out[#out + 1] = { id = petID, petID = petID, speciesID = info.speciesID, name = name, icon = info.icon,
-                collected = true, displayID = info.displayID, source = info.sourceText }
+            local wrapped = Wrapped(petID)
+            out[#out + 1] = { id = petID, petID = petID, speciesID = info.speciesID, name = name,
+                icon = wrapped and CW.GIFT_ICON or info.icon, collected = true, displayID = info.displayID,
+                source = info.sourceText, wrapped = wrapped }
         end
     end
     table.sort(out, CW.ByCollectedName)
@@ -36,8 +42,10 @@ local function GameList()
         local petID, speciesID, owned, customName, _, _, revoked, speciesName, icon, _, _, source = PJ.GetPetInfoByIndex(i)
         local name = customName or speciesName
         if type(name) == "string" and not IsSecret(name) and not revoked then
+            local wrapped = Wrapped(petID)
             out[#out + 1] = { id = petID or ("species" .. tostring(speciesID)), petID = petID, speciesID = speciesID,
-                name = name, icon = icon, collected = owned == true, source = source }
+                name = name, icon = wrapped and CW.GIFT_ICON or icon, collected = owned == true, source = source,
+                wrapped = wrapped }
         end
     end
     table.sort(out, CW.ByCollectedName)
@@ -52,6 +60,7 @@ local function DisplayID(entry)
 end
 
 local function Show(entry, box)
+    if entry.wrapped then return CW.ShowGift(box) end
     if type(entry.source) == "string" and not IsSecret(entry.source) then box.source:SetText(entry.source) end
     CW.ShowCreature(box, DisplayID(entry))
 end
@@ -61,13 +70,18 @@ local function Summoned(entry)
 end
 
 local function Action(entry)
+    if entry.wrapped then return CW.Text("UNWRAP", "COLL_UNWRAP"), true end
     if Summoned(entry) then return CW.Text("PET_DISMISS", "COLL_DISMISS"), true end
     return CW.Text("SUMMON", "COLL_SUMMON"), entry.petID ~= nil and PJ.PetIsSummonable(entry.petID) == true
 end
 
 -- A second summon of the out pet sends it home.
 local function Act(entry)
-    if entry.petID then PJ.SummonPetByGUID(entry.petID) end
+    if entry.wrapped then
+        CW.Unwrap("pets", entry.petID, PJ.ClearFanfare)
+    elseif entry.petID then
+        PJ.SummonPetByGUID(entry.petID)
+    end
 end
 
 local function Pickup(entry)

@@ -18,6 +18,7 @@ L["CORE_COLLECTIONS_BUTTON_OPENS"] = "El botón de Colecciones vuelve a abrir la
 L["COLL_PETS"] = "Mascotas"
 L["COLL_TOYS"] = "Caja de juguetes"
 L["COLL_SUMMON"] = "Invocar"
+L["COLL_UNWRAP"] = "Desenvolver"
 L["COLL_DISMISS"] = "Retirar"
 L["COLL_APPEARANCES"] = "Apariencias"
 L["COLL_FILTER"] = "Filtro"

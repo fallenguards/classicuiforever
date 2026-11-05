@@ -5,6 +5,7 @@ local _, ns = ...
 
 local CW = ns.collections
 local TB = C_ToyBox
+local TBI = _G.C_ToyBoxInfo
 local IsSecret = ns.IsSecret
 
 local TOYS_ICON = "Interface\\Icons\\Trade_Archaeology_ChestofTinyGlassAnimals"
@@ -25,7 +26,9 @@ local function List()
             local _, name, icon = TB.GetToyInfo(itemID)
             local owned = PlayerHasToy(itemID) == true
             if type(name) == "string" and not IsSecret(name) and (owned or not OWNED_ONLY) then
-                out[#out + 1] = { id = itemID, name = name, icon = icon, collected = owned }
+                local wrapped = owned and CW.Wrapped("toys", itemID, TBI.NeedsFanfare(itemID))
+                out[#out + 1] = { id = itemID, name = name, icon = wrapped and CW.GIFT_ICON or icon, collected = owned,
+                    wrapped = wrapped }
             end
         end
     end
@@ -33,9 +36,18 @@ local function List()
     return out
 end
 
--- What the action button's pad runs: the game uses a known toy by its name.
+-- What the action button's pad runs: the game uses a known toy by its name. A wrapped one has no pad: the click unwraps.
 local function Macro(entry)
-    if entry.collected then return "/use " .. entry.name end
+    if entry.collected and not entry.wrapped then return "/use " .. entry.name end
+end
+
+local function Act(entry)
+    if entry.wrapped then CW.Unwrap("toys", entry.id, TBI.ClearFanfare) end
+end
+
+-- A wrapped toy's line under its name, where a spell's rank sits: the click unwraps it.
+local function Sub(entry)
+    if entry.wrapped then return CW.Text("UNWRAP", "COLL_UNWRAP") end
 end
 
 local function Pickup(entry)
@@ -69,6 +81,6 @@ CW.AddPage({
     key = "toys", tab = 3, icon = TOYS_ICON, tip = { "TOY_BOX", "COLL_TOYS" }, ownedOnly = OWNED_ONLY,
     -- A toy not yet in the item cache has no name: listed as the game sends it.
     events = OWNED_ONLY and { "TOYS_UPDATED", "NEW_TOY_ADDED" } or { "TOYS_UPDATED", "NEW_TOY_ADDED", "GET_ITEM_INFO_RECEIVED" },
-    book = true, List = List, Macro = Macro, Pickup = Pickup, Tip = Tip,
+    book = true, List = List, Macro = Macro, Act = Act, Sub = Sub, Pickup = Pickup, Tip = Tip,
     Shown = not OWNED_ONLY and CW.AllShown or nil, FilterEntries = not OWNED_ONLY and FilterEntries or nil,
 })

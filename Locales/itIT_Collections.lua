@@ -18,6 +18,7 @@ L["CORE_COLLECTIONS_BUTTON_OPENS"] = "Il pulsante Collezioni riapre la finestra 
 L["COLL_PETS"] = "Mascotte"
 L["COLL_TOYS"] = "Scatola dei giocattoli"
 L["COLL_SUMMON"] = "Evoca"
+L["COLL_UNWRAP"] = "Scarta"
 L["COLL_DISMISS"] = "Congeda"
 L["COLL_APPEARANCES"] = "Aspetti"
 L["COLL_FILTER"] = "Filtro"

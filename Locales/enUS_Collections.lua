@@ -17,6 +17,7 @@ L["CORE_COLLECTIONS_BUTTON_OPENS"] = "The Collections button opens the game's ow
 L["COLL_PETS"] = "Pets"
 L["COLL_TOYS"] = "Toy Box"
 L["COLL_SUMMON"] = "Summon"
+L["COLL_UNWRAP"] = "Unwrap"
 L["COLL_DISMISS"] = "Dismiss"
 L["COLL_APPEARANCES"] = "Appearances"
 L["COLL_FILTER"] = "Filter"
