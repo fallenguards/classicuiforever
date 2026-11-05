@@ -3,6 +3,13 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN62_1_TITLE"] = "Espacez vos barres d'action"
+L["WN62_1_TEXT"] = "L'espacement des icônes du mode Édition écarte désormais les boutons de chaque barre d'action. Sur la barre d'action 1, la bande de pierre s'élargit avec lui et chaque bouton reste dans son logement."
+L["WN62_2_TITLE"] = "Déballez vos cadeaux dans les Collections"
+L["WN62_2_TEXT"] = "Les montures, mascottes et jouets emballés peuvent être déballés dans la fenêtre classique des Collections : choisissez-en un et cliquez sur Déballer, ou cliquez sur un jouet emballé."
+L["WN62_3_TITLE"] = "Infobulles comme dans Classic Era"
+L["WN62_3_TEXT"] = "Les infobulles de l'apparence classique ont le fond de Classic Era : la même couleur sombre et la même transparence, là où elles étaient plus bleues et plus opaques."
+
 L["WN61_1_TITLE"] = "Questions de taille plus claires"
 L["WN61_1_TEXT"] = "Les questions et cases sur la taille de l'interface nomment l'échelle de l'interface du jeu et le pourcentage qu'elles règlent, en moins de mots."
 L["WN60_1_TITLE"] = "Cadres de boss classiques"

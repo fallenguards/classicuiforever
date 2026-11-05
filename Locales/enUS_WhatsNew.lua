@@ -2,6 +2,13 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN62_1_TITLE"] = "Spread your action bars"
+L["WN62_1_TEXT"] = "Edit Mode's Icon Padding now spreads the buttons of every action bar. On Action Bar 1 the stone band widens with it, each button still on its socket."
+L["WN62_2_TITLE"] = "Unwrap gifts in Collections"
+L["WN62_2_TEXT"] = "Gift-wrapped mounts, pets and toys can be unwrapped in the classic Collections window: pick one and click Unwrap, or click a wrapped toy."
+L["WN62_3_TITLE"] = "Tooltips as in Classic Era"
+L["WN62_3_TEXT"] = "Tooltips in the classic look have Classic Era's background: the same dark color and see-through, where they were bluer and more solid."
+
 L["WN61_1_TITLE"] = "Clearer size questions"
 L["WN61_1_TEXT"] = "The questions and boxes about the interface size name the game's UI Scale and the percent they set, in fewer words."
 L["WN60_1_TITLE"] = "Classic boss frames"

@@ -2,6 +2,15 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.43.0] - 2026-11-04
+
+### Added
+- Action bars follow Edit Mode's Icon Padding: raise it on a bar to spread its buttons apart. On Action Bar 1 the stone band widens with it, each button still on its socket.
+
+### Fixed
+- Gift-wrapped mounts, pets and toys can be unwrapped in the classic Collections window: a wrapped one shows the gift, and its Unwrap button opens it; a wrapped toy opens on a click (#235).
+- Tooltips in the classic look have Classic Era's background: the same dark color and see-through, where they were bluer and more solid.
+
 ## [0.42.0] - 2026-11-04
 
 ### Fixed

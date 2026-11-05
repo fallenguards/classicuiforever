@@ -3,6 +3,13 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN62_1_TITLE"] = "Distanzia le barre delle azioni"
+L["WN62_1_TEXT"] = "La spaziatura delle icone della modalità Modifica ora distanzia i pulsanti di ogni barra delle azioni. Sulla barra delle azioni 1 la fascia di pietra si allarga con essa e ogni pulsante resta nel suo alloggiamento."
+L["WN62_2_TITLE"] = "Scarta i regali nelle Collezioni"
+L["WN62_2_TEXT"] = "Cavalcature, mascotte e giocattoli incartati si possono scartare nella finestra classica delle Collezioni: scegline uno e fai clic su Scarta, oppure fai clic su un giocattolo incartato."
+L["WN62_3_TITLE"] = "Descrizioni come in Classic Era"
+L["WN62_3_TEXT"] = "Le descrizioni del look classico hanno lo sfondo di Classic Era: lo stesso colore scuro e la stessa trasparenza, dove prima erano più blu e più coprenti."
+
 L["WN61_1_TITLE"] = "Domande sulla dimensione più chiare"
 L["WN61_1_TEXT"] = "Le domande e le caselle sulla dimensione dell'interfaccia indicano la scala dell'interfaccia del gioco e la percentuale che impostano, in meno parole."
 L["WN60_1_TITLE"] = "Riquadri dei boss classici"

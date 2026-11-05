@@ -3,6 +3,13 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN62_1_TITLE"] = "Separa tus barras de acción"
+L["WN62_1_TEXT"] = "El espaciado de iconos del modo de edición ahora separa los botones de cada barra de acción. En la barra de acción 1 la franja de piedra se ensancha con él y cada botón sigue en su hueco."
+L["WN62_2_TITLE"] = "Desenvuelve regalos en Colecciones"
+L["WN62_2_TEXT"] = "Las monturas, mascotas y juguetes envueltos para regalo se pueden desenvolver en la ventana clásica de Colecciones: elige uno y pulsa Desenvolver, o haz clic en un juguete envuelto."
+L["WN62_3_TITLE"] = "Descripciones como en Classic Era"
+L["WN62_3_TEXT"] = "Las descripciones emergentes del aspecto clásico tienen el fondo de Classic Era: el mismo color oscuro y la misma transparencia, donde antes eran más azules y opacas."
+
 L["WN61_1_TITLE"] = "Preguntas de tamaño más claras"
 L["WN61_1_TEXT"] = "Las preguntas y casillas sobre el tamaño de la interfaz nombran la escala de la interfaz del juego y el porcentaje que ponen, en menos palabras."
 L["WN60_1_TITLE"] = "Marcos de jefe clásicos"

@@ -2,6 +2,11 @@
 
 All notable changes to ClassicUI Forever: Standalone Action Bars are documented here. It has version numbers of its own, apart from the full ClassicUI Forever's.
 
+## [1.2.0] - 2026-11-04
+
+### Added
+- Action bars follow Edit Mode's Icon Padding: raise it on a bar to spread its buttons apart. On Action Bar 1 the stone band widens with it, each button still on its socket.
+
 ## [1.1.3] - 2026-11-04
 
 ### Changed

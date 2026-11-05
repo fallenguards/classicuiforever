@@ -3,6 +3,13 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN62_1_TITLE"] = "Aktionsleisten auseinanderziehen"
+L["WN62_1_TEXT"] = "Der Symbolabstand aus dem Bearbeitungsmodus zieht jetzt die Tasten jeder Aktionsleiste auseinander. Bei Aktionsleiste 1 wird das Steinband mit breiter, jede Taste bleibt in ihrer Fassung."
+L["WN62_2_TITLE"] = "Geschenke in der Sammlung auspacken"
+L["WN62_2_TEXT"] = "Als Geschenk verpackte Reittiere, Haustiere und Spielzeuge lassen sich im klassischen Sammlungsfenster auspacken: wähle eins und klicke auf Auspacken, oder klicke ein verpacktes Spielzeug an."
+L["WN62_3_TITLE"] = "Tooltips wie in Classic Era"
+L["WN62_3_TEXT"] = "Tooltips im klassischen Aussehen haben den Hintergrund von Classic Era: dieselbe dunkle Farbe und Durchsichtigkeit, wo sie bisher blauer und deckender waren."
+
 L["WN61_1_TITLE"] = "Klarere Fragen zur Größe"
 L["WN61_1_TEXT"] = "Die Fragen und Kästchen zur Oberflächengröße nennen die UI-Skalierung des Spiels und den Prozentwert, den sie einstellen, in weniger Worten."
 L["WN60_1_TITLE"] = "Klassische Bossfenster"
