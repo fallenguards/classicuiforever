@@ -146,7 +146,8 @@ local function Row(index, parent)
     return row
 end
 
--- One bar's buttons in a 1.x row or column: containers on a scaled row frame, so buttons come out 36 px (30 on pet/stance), 6 apart.
+-- One bar's buttons in a 1.x row or column: containers on a scaled row frame, so buttons come out 36 px (30 on pet/stance),
+-- 6 apart and the bar's Icon Padding more.
 local function LayoutButtons(bar, rowIndex, point, relTo, relPoint, x, y, vertical, pitch, target, origin, rows)
     if not bar or not bar.actionButtons then return end
     local art = B.art
@@ -154,7 +155,7 @@ local function LayoutButtons(bar, rowIndex, point, relTo, relPoint, x, y, vertic
     local size = first and first:GetWidth() or 45
     if not size or size == 0 then size = 45 end
     local scale = (target or BUTTON_SIZE) / size
-    local step = (pitch or BUTTON_PITCH) / scale
+    local step = ((pitch or BUTTON_PITCH) + B.PadGap(bar, target or BUTTON_SIZE)) / scale
     -- Icon Size rides on the slots, as the client puts it on its containers; the bar keeps scale 1
     -- (edit mode boxes the frame and would count the size twice), and its rectangle is what is drawn.
     -- A bar the game holds keeps its own frame (B.GameHolds).
@@ -406,7 +407,7 @@ function B.LayoutPetRow(lift)
             if pinned and bar:IsShown() and bar.actionButtons then
                 -- A bar larger than the band pushes the next one out by its growth.
                 local grown = math.max(1, IconScale(bar) / BandScale())
-                x = x + (#bar.actionButtons * SMALL_PITCH + 8) * grown
+                x = x + (#bar.actionButtons * (SMALL_PITCH + B.PadGap(bar, SMALL_BUTTON)) + 8) * grown
             end
         end
     end
@@ -423,10 +424,12 @@ local SIDE_COL_H = 12 * BUTTON_PITCH
 local ERA_SIDE_Y, ERA_SIDE_GAP = -35, 7
 local SIDE_COL_DRAWN = SIDE_COL_H - (BUTTON_PITCH - BUTTON_SIZE)
 
--- The column's top: the screen point it hangs from and its offset there, in the column's own units.
-local function SideTop(icon)
-    if ns.db.sideBarsEra then return "RIGHT", ERA_SIDE_Y / icon + SIDE_COL_DRAWN / 2 end
-    return "BOTTOMRIGHT", SIDE_BAR_Y + SIDE_COL_H
+-- The column's top: the screen point it hangs from and its offset there, in the column's own units. gap: its Icon
+-- Padding's px between buttons, the column that much taller each.
+local function SideTop(icon, gap)
+    local grown = 11 * (gap or 0)
+    if ns.db.sideBarsEra then return "RIGHT", ERA_SIDE_Y / icon + (SIDE_COL_DRAWN + grown) / 2 end
+    return "BOTTOMRIGHT", SIDE_BAR_Y + SIDE_COL_H + grown
 end
 
 -- dbVersion 27: an install from before keeps 1.12's spot.
@@ -448,7 +451,7 @@ local function SideColumn(bar, rowIndex, x)
     end
     -- Frame starts at the first button and spans the buttons, so edit mode's box is the column itself.
     local icon = IconScale(bar)
-    local relPoint, top = SideTop(icon)
+    local relPoint, top = SideTop(icon, B.PadGap(bar))
     if not B.GameHolds(bar) then
         Remember(bar)
         ns.SetScaleIf(bar, 1)

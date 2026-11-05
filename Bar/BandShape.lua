@@ -5,7 +5,7 @@ local B = ns.band
 -- Edit mode can take micro or bags off; the band ends at what remains, right gryphon on the last piece.
 -- Micro moved: bags close up against bar 1's page arrows; both moved: bar 1 alone.
 
-local ART_W, PAGE_ROOM, PAGE_POST = B.ART_W, B.PAGE_ROOM, B.PAGE_POST
+local ART_W, PAGE_ROOM, PAGE_POST, BUTTON_PITCH = B.ART_W, B.PAGE_ROOM, B.PAGE_POST, B.BUTTON_PITCH
 local MICRO_LEAD, MICRO_REGION_MAX, MICRO_END_GAP = B.MICRO_LEAD, B.MICRO_REGION_MAX, B.MICRO_END_GAP
 local POST_U, POST_W = B.POST_U, B.POST_W
 local ROW_X, ROW_Y = B.ROW_X, B.ROW_Y
@@ -196,7 +196,10 @@ end
 local function BandPlan(microOn, bagsOn, bagsFirst, region, bar2W, bar2Left)
     local plan = { bagsFirst = (bagsFirst and microOn and bagsOn) and true or false }
     plan.cut = shape.cut or 0
-    local x = ART_W / 2 - plan.cut
+    -- Icon Padding: each wall between bar 1's shown sockets that much wider (B.Segments); bar 2's is in bar2W.
+    plan.bar1Gap, plan.bar2Gap = shape.bar1Gap or 0, shape.bar2Gap or 0
+    local shown = 12 - math.floor(plan.cut / BUTTON_PITCH + 0.5)
+    local x = ART_W / 2 - plan.cut + math.max(0, shown - 1) * plan.bar1Gap
     -- Bar 1's run and first button, and bar 2's (option): a run of sockets right after bar 1's, or before it with bar 1's
     -- run then starting past the shared wall; the rest of the band after both.
     plan.bar1Start, plan.bar1X, plan.bar2X = 0, ROW_X, nil
@@ -339,6 +342,52 @@ function B.MicroRuns(x, width, u0)
     return runs
 end
 
+-- Sheets 1 and 2 as one (u 0 to 512) from a to b, drawn w wide at x: split where they meet.
+local function SheetRun(list, x, a, b, w)
+    if b <= a then return end
+    if b <= 256 or a >= 256 then
+        local sheet, off = 1, 0
+        if a >= 256 then sheet, off = 2, 256 end
+        list[#list + 1] = { x, w, sheet, (a - off) / 256, (b - off) / 256, "bar" }
+        return
+    end
+    local first = w * (256 - a) / (b - a)
+    list[#list + 1] = { x, first, 1, a / 256, 1, "bar" }
+    list[#list + 1] = { x + first, w - first, 2, 0, (b - 256) / 256, "bar" }
+end
+
+-- Sockets u0 to u1 at x, each wall between two of the run's pits gap wider (Icon Padding). Pit k: 36 from 8 + 42 (k - 1).
+local SOCKET = BUTTON_PITCH - 6
+local function SpreadSockets(list, x, u0, u1, gap)
+    local at = u0
+    for k = 1, 11 do
+        local pit, nextPit = ROW_X + (k - 1) * BUTTON_PITCH, ROW_X + k * BUTTON_PITCH
+        if pit >= u0 and nextPit + SOCKET <= u1 then
+            local wall = pit + SOCKET
+            SheetRun(list, x, at, wall, wall - at)
+            x = x + wall - at
+            SheetRun(list, x, wall, nextPit, nextPit - wall + gap)
+            x = x + nextPit - wall + gap
+            at = nextPit
+        end
+    end
+    SheetRun(list, x, at, u1, u1 - at)
+end
+
+-- Bar 1's and bar 2's sockets with Icon Padding on either: the same runs as below, their walls widened.
+local function SpreadBars(list, plan)
+    local cut, gap2 = plan.cut, plan.bar2Gap
+    local run2 = 0
+    if plan.bar2W then run2 = math.floor((plan.bar2W + gap2) / (BUTTON_PITCH + gap2) + 0.5) * BUTTON_PITCH end
+    if plan.bar2Start and plan.bar2Start < plan.bar1Start then
+        SpreadSockets(list, 0, 512 - ROW_X - run2, 512, gap2)
+        SpreadSockets(list, plan.bar1Start, cut + plan.bar1Skip, 512, plan.bar1Gap)
+        return
+    end
+    SpreadSockets(list, 0, cut, 512, plan.bar1Gap)
+    if plan.bar2Start then SpreadSockets(list, plan.bar2Start, ROW_X, ROW_X + run2, gap2) end
+end
+
 -- The art as runs of the four sheets: { x, width, sheet, u0, u1, owner }; owner (bar, micro, bags, key) is whose Hide Bar
 -- Art takes the run.
 function B.Segments()
@@ -360,7 +409,9 @@ function B.Segments()
             list[#list + 1] = { x, 512 - u, 2, (u - 256) / 256, 1, "bar" }
         end
     end
-    if plan.bar2Start and plan.bar2Start < plan.bar1Start then
+    if plan.bar1Gap > 0 or plan.bar2Gap > 0 then
+        SpreadBars(list, plan)
+    elseif plan.bar2Start and plan.bar2Start < plan.bar1Start then
         -- Bar 2 left of bar 1: its own run trimmed at the left for fewer icons, bar 1's past the shared wall.
         Sockets(0, 512 - ROW_X - plan.bar2W)
         Sockets(plan.bar1Start, cut + plan.bar1Skip)

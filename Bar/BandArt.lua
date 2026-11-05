@@ -90,6 +90,8 @@ function B.PaintArt()
     local art = B.art
     ns.SetLevelIf(art.capLayer, B.CapLevel())
     local segments = Segments()
+    -- Icon Padding cuts bar 1's sockets into a run each: more pieces than the plain band's.
+    for i = #art.pieces + 1, #segments do art.pieces[i] = art:CreateTexture(nil, "BACKGROUND") end
     -- Hide Bar Art on Action Bar 1 drops its runs and the gryphons like the client's art; the micro menu's, the bags' and
     -- the key ring's runs go by their own Hide Bar Art. Buttons and the xp bar stay.
     local main = ns.GetMainBar()
@@ -328,11 +330,12 @@ local function ApplyArtShape(bar)
     art.artHidden = hide
     PlaceCaps(bar, w)
     for i, tex in ipairs(art.maxLevel) do
-        -- Cut to the band's length, not a whole number of sheets.
-        local seen = math.max(0, math.min(256, w - (i - 1) * 256))
+        -- Cut to the band's length, not a whole number of sheets; the last stretched over a band past the four.
+        local left = w - (i - 1) * 256
+        local seen = math.max(0, i == #art.maxLevel and left or math.min(256, left))
         ns.SetPointOnce(tex, "BOTTOMLEFT", art, "TOPLEFT", (i - 1) * 256, -11)
         tex:SetWidth(math.max(seen, 1))
-        tex:SetTexCoord(0, seen / 256, (i - 1) * 0.25, (i - 1) * 0.25 + 0.21875)
+        tex:SetTexCoord(0, math.min(1, seen / 256), (i - 1) * 0.25, (i - 1) * 0.25 + 0.21875)
         tex.fcuiInBand = seen > 0
     end
 end

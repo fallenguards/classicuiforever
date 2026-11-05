@@ -46,8 +46,9 @@ local function PairWidths()
     local lower, upper, bar = MultiBarBottomLeft, MultiBarBottomRight, ns.GetMainBar()
     if OneBar() or not bar or (B.shape.bar2W or 0) > 0 or not (OnBandRow(lower) and OnBandRow(upper)) then return nil end
     local band = BandScale(bar)
-    local lowerW = RowSlots(lower) * BUTTON_PITCH * IconScale(lower) / band
-    return lowerW, lowerW + (RowSlots(upper) * BUTTON_PITCH - SLOT_SPACE) * IconScale(upper) / band
+    local lowerGap, upperGap = B.PadGap(lower), B.PadGap(upper)
+    local lowerW = RowSlots(lower) * (BUTTON_PITCH + lowerGap) * IconScale(lower) / band
+    return lowerW, lowerW + (RowSlots(upper) * (BUTTON_PITCH + upperGap) - SLOT_SPACE - upperGap) * IconScale(upper) / band
 end
 
 -- The band follows Action Bar 1 instead of centring only after a player drag in edit mode with the band on
@@ -82,10 +83,14 @@ local function ReadShape()
     local icons = BarSetting(ns.GetMainBar(), "NumIcons")
     if not icons or icons < 1 or icons > 12 then icons = 12 end
     shape.cut = (12 - math.floor(icons + 0.5)) * BUTTON_PITCH
+    -- Icon Padding widens the walls between the sockets of bar 1, and of bar 2 on the line (B.Segments).
+    shape.bar1Gap = B.PadGap(ns.GetMainBar())
     -- Bar 2 on the line (option): its default-placed row joins the band beside bar 1, at its own icon count.
     local lower = MultiBarBottomLeft
     local side = ns.db.bar2Right == true or ns.db.bar2Left == true
-    shape.bar2W = (side and not OneBar() and OnBandRow(lower)) and RowSlots(lower) * BUTTON_PITCH or 0
+    local lowerSlots = (side and not OneBar() and OnBandRow(lower)) and RowSlots(lower) or 0
+    shape.bar2Gap = B.PadGap(lower)
+    shape.bar2W = lowerSlots > 0 and lowerSlots * BUTTON_PITCH + (lowerSlots - 1) * shape.bar2Gap or 0
     shape.bar2Left = ns.db.bar2Left == true
     -- Bags dropped near a band spot go into it, judged before any preview. No layout write (it marks every piece as
     -- ours): our record holds them, and the size they wore reads as socket size.
@@ -219,8 +224,8 @@ local function Layout()
     end
     LayoutPetRow(petLift)
     LayoutSideBars()
-    -- Bars 6-8 have no band spot. Left to the client they were spaced by its Icon Padding (2 between 45) and the 1.x rings
-    -- (drawn for 6 between 36) overlapped at any size: laid out on their own frames like a placed bar, at their own size and 1.x spacing.
+    -- Bars 6-8 have no band spot. Left to the client the 1.x rings (drawn for 6 between 36) overlapped at its spacing: laid
+    -- out on their own frames like a placed bar, at their own size, 1.x spacing and Icon Padding.
     for i, name in ipairs(EXTRA_BARS) do
         local extra = _G[name]
         if extra and extra.actionButtons then

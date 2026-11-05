@@ -272,6 +272,15 @@ local function BarRows(bar)
 end
 B.BarRows = BarRows
 
+-- Edit mode Icon Padding past the game's least (2) as px added between 36 px buttons, as the game adds them between its
+-- 45: whole band px, so a run of the band's sockets widens by as much. size: the buttons' 1.x size (30 on pet, stance).
+local PAD_LEAST = 2
+function B.PadGap(bar, size)
+    local pad = BarSetting(bar, "IconPadding")
+    if not pad or pad <= PAD_LEAST then return 0 end
+    return math.floor((pad - PAD_LEAST) * 36 / 45 + 0.5) * (size or 36) / 36
+end
+
 -- Edit mode Icon Size as a scale: the client scales each button's container, which this layout overwrites,
 -- so the bar carries it; Action Bar 1's sizes the whole band (art, bags, micro menu, status bars).
 local function IconScale(bar)

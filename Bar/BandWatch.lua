@@ -580,6 +580,16 @@ local function RelightSaveRevert(editing)
     end
 end
 
+-- Icon Padding fires nothing either, on any bar: bar 1's and bars 6-8's too, which have no mark of their own.
+local padSeen = {}
+local function PadMoved(bar)
+    if not bar then return false end
+    local pad = BarSetting(bar, "IconPadding")
+    local moved = edit.marked and padSeen[bar] ~= pad
+    padSeen[bar] = pad
+    return moved
+end
+
 -- Turning or folding a bar in edit mode fires nothing: its settings are read while edit mode is up, re-laid on a change.
 local function ScanEditMarks(editing)
     if not editing then
@@ -596,6 +606,11 @@ local function ScanEditMarks(editing)
             changed = true
         end
         mark.has, mark.vertical, mark.rows, mark.icons = has, vertical, rows, icons
+        if PadMoved(bar) then changed = true end
+    end
+    if PadMoved(ns.GetMainBar()) then changed = true end
+    for _, name in ipairs(EXTRA_BARS) do
+        if PadMoved(_G[name]) then changed = true end
     end
     if changed then ns.QueueApply() end
     edit.marked = true
