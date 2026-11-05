@@ -8,13 +8,14 @@ local BARS = { "MultiBarBottomLeft", "MultiBarBottomRight", "MultiBarRight", "Mu
     "MultiBar7" }
 local SLOTS = 12
 
--- 1024: clear of the client's reasons (1, 2, 4). A button the bar holds back ("statehidden") stays hidden.
+-- 1024: clear of the client's reasons (1, 2, 4). A button the bar holds back ("statehidden") stays hidden. Shown and
+-- hidden with skipAttr: a snippet's plain Hide also sets "statehidden", and the bars never showed that button again (#241).
 local GRID_ON = [[
     for i = 1, control:GetAttribute("count") or 0 do
         local button = control:GetFrameRef("b" .. i)
         local grid = button:GetAttribute("showgrid") or 0
         if grid % 2048 < 1024 then button:SetAttribute("showgrid", grid + 1024) end
-        if not button:GetAttribute("statehidden") then button:Show() end
+        if not button:GetAttribute("statehidden") then button:Show(true) end
     end
 ]]
 local GRID_OFF = [[
@@ -25,7 +26,7 @@ local GRID_OFF = [[
             grid = grid - 1024
             button:SetAttribute("showgrid", grid)
         end
-        if grid == 0 and not HasAction(control:GetAttribute("s" .. i)) then button:Hide() end
+        if grid == 0 and not HasAction(control:GetAttribute("s" .. i)) then button:Hide(true) end
     end
 ]]
 
