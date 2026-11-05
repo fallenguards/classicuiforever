@@ -2,6 +2,14 @@
 
 All notable changes to ClassicUI Forever: Standalone Action Bars are documented here. It has version numbers of its own, apart from the full ClassicUI Forever's.
 
+## [1.3.0] - 2026-11-05
+
+### Added
+- Fade any action bar: select it in Edit Mode, and under the game's own settings for it set its Faded Opacity, or check Show Only On Hover. A faded bar comes back to full while the mouse is on it or a spell is dragged to it; the stone band and gryphons stay.
+
+### Fixed
+- With the game's own nameplates up and another addon drawing nameplate auras, new nameplates appearing no longer throw a Lua error from the theme (#237).
+
 ## [1.2.0] - 2026-11-04
 
 ### Added

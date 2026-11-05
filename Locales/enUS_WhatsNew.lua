@@ -2,6 +2,11 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN64_1_TITLE"] = "Fade your action bars"
+L["WN64_1_TEXT"] = "Select a bar in Edit Mode: under the game's own settings for it, set its Faded Opacity or check Show Only On Hover. It comes back to full while the mouse is on it or a spell is dragged to it."
+L["WN64_2_TITLE"] = "Nameplate error fixed"
+L["WN64_2_TEXT"] = "With the game's own nameplates and another addon's nameplate auras, new nameplates no longer cause a Lua error."
+
 L["WN63_1_TITLE"] = "Loot tooltips beside the item"
 L["WN63_1_TEXT"] = "In the loot window, an item's tooltip opens beside its icon, as in Classic Era, not past the window's right edge."
 

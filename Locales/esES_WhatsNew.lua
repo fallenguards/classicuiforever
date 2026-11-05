@@ -3,6 +3,11 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN64_1_TITLE"] = "Atenúa tus barras de acción"
+L["WN64_1_TEXT"] = "Elige una barra en el modo de edición: bajo los ajustes del juego para ella, fija hasta dónde se atenúa o marca Mostrar solo al pasar el ratón. Vuelve a verse entera con el ratón encima o al arrastrar un hechizo a ella."
+L["WN64_2_TITLE"] = "Error de las placas de nombre corregido"
+L["WN64_2_TEXT"] = "Con las placas de nombre del juego y las auras de otro addon en ellas, las placas nuevas ya no causan un error de Lua."
+
 L["WN63_1_TITLE"] = "Descripciones del botín junto al objeto"
 L["WN63_1_TEXT"] = "En la ventana de botín, la descripción de un objeto se abre junto a su icono, como en Classic Era, y no más allá del borde derecho de la ventana."
 

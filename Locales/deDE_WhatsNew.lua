@@ -3,6 +3,11 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN64_1_TITLE"] = "Aktionsleisten verblassen lassen"
+L["WN64_1_TEXT"] = "Wähle im Bearbeitungsmodus eine Leiste: unter den Einstellungen des Spiels für sie stellst du ein, worauf sie verblasst, oder hakst Nur beim Überfahren zeigen an. Sie wird wieder voll sichtbar, solange die Maus darauf ist oder ein Zauber darauf gezogen wird."
+L["WN64_2_TITLE"] = "Fehler bei Namensplaketten behoben"
+L["WN64_2_TEXT"] = "Mit den Namensplaketten des Spiels und den Auren eines anderen Addons darauf lösen neue Namensplaketten keinen Lua-Fehler mehr aus."
+
 L["WN63_1_TITLE"] = "Beute-Tooltips neben dem Gegenstand"
 L["WN63_1_TEXT"] = "Im Beutefenster öffnet sich der Tooltip eines Gegenstands neben seinem Symbol, wie in Classic Era, nicht mehr hinter dem rechten Fensterrand."
 
