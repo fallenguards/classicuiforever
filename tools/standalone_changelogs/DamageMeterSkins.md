@@ -5,7 +5,7 @@ All notable changes to ClassicUI Forever: Standalone Damage Meter Skins are docu
 ## [1.0.3] - 2026-11-04
 
 ### Changed
-- The welcome line at login on Forever also points to EasyFind.
+- Kept in step with ClassicUI Forever 0.42.0.
 
 ## [1.0.2] - 2026-11-04
 

@@ -4,9 +4,6 @@ All notable changes to ClassicUI Forever are documented here.
 
 ## [0.42.0] - 2026-11-04
 
-### Added
-- WoW Forever welcome, under Other with Addon messages: uncheck it to stop only the welcome line at login on Forever. That line now also points to EasyFind.
-
 ### Fixed
 - With Status Text on, the target and focus frames' health number on the right stays on the health bar; on Forever's launch build it stood past the portrait.
 
