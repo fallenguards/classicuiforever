@@ -26,6 +26,31 @@ local CHANGED = { changed = true }
 local FOOT_EDGE = { "TopEdge", "TopLeftCorner", "TopRightCorner" }
 local TRAINER_EVENTS = { "TRAINER_SHOW", "TRAINER_UPDATE", "TRAINER_CLOSED", "TRAINER_DESCRIPTION_UPDATE",
     "TRAINER_SERVICE_INFO_NAME_UPDATE", "PLAYER_MONEY" }
+local POINTS_EVENTS = { "UNIT_PET_TRAINING_POINTS" }
+
+-- Forever's hunter pet training opens this window too: its costs are the pet's training points (#243).
+local pet = false
+local function PetTraining()
+    local trainer, types = C_Trainer, Enum and Enum.TrainerType
+    return trainer and trainer.GetTrainerType and types and types.Pet ~= nil and trainer.GetTrainerType() == types.Pet
+        or false
+end
+
+local function FreePoints()
+    local get = C_PetInfo and C_PetInfo.GetPetTrainingPoints
+    if not get then return 0 end
+    local total, used = get()
+    if type(total) ~= "number" or ns.AnySecret(total, used) then return 0 end
+    return math.max(total - (used or 0), 0)
+end
+
+-- Money, or the pet's training points while pet training; and whether it opens a profession.
+local function ServiceCost(index)
+    if not GetTrainerServiceCost then return 0, false end
+    local ok, value, isProfession = pcall(GetTrainerServiceCost, index)
+    if not ok or type(value) ~= "number" or IsSecret(value) then return 0, false end
+    return value, isProfession and true or false
+end
 
 local function Services()
     local count = GetNumTrainerServices and GetNumTrainerServices() or 0
@@ -49,8 +74,9 @@ local function Collect()
     wipe(lines)
     local order, groups = Services()
     for _, category in ipairs(order) do
-        lines[#lines + 1] = { header = true, id = category, name = category }
-        if not collapsed[category] then
+        -- Pet training lists flat, as the game's own window does: its skills carry no category.
+        if not pet then lines[#lines + 1] = { header = true, id = category, name = category } end
+        if pet or not collapsed[category] then
             for _, service in ipairs(groups[category]) do lines[#lines + 1] = service end
         end
     end
@@ -78,13 +104,33 @@ local function DrawItem(row, line)
     if line.sub and line.sub ~= "" then label = label .. " (" .. line.sub .. ")" end
     row.text:SetText(label)
     local color = KIND_COLOR[line.kind] or KIND_COLOR.used
-    if line.index == selected then
+    local picked = line.index == selected
+    if picked then
         row.selectedTex:SetVertexColor(unpack(color))
         row.selectedTex:Show()
         row.text:SetTextColor(1, 1, 1)
     else
         row.selectedTex:Hide()
         row.text:SetTextColor(unpack(color))
+    end
+    -- Era's Beast Training: the points on the row's right in its color; red here when the pet is short of them.
+    local cost = pet and ServiceCost(line.index) or 0
+    if cost > 0 then
+        row.cost = row.cost or row:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+        row.cost:SetPoint("RIGHT", row, "RIGHT", -6, 0)
+        row.cost:SetText(string.format(TRAINING_POINTS_ABBREV or "%s TP", cost))
+        if cost > FreePoints() then
+            row.cost:SetTextColor(unpack(KIND_COLOR.unavailable))
+        elseif picked then
+            row.cost:SetTextColor(1, 1, 1)
+        else
+            row.cost:SetTextColor(unpack(color))
+        end
+        row.cost:Show()
+        row.text:SetPoint("RIGHT", row.cost, "LEFT", -4, 0)
+    else
+        if row.cost then row.cost:Hide() end
+        row.text:SetPoint("RIGHT", row, "RIGHT", -4, 0)
     end
 end
 
@@ -276,7 +322,10 @@ end
 local function Requirements(line)
     local parts = {}
     if line.level and line.level > 1 then
-        AddNeed(parts, string.format(TRAINER_REQ_LEVEL or "Level %d", line.level), (UnitLevel("player") or 0) >= line.level)
+        -- A pet skill asks the pet's level, as Era's Beast Training did.
+        local level = UnitLevel(pet and "pet" or "player")
+        if IsSecret(level) then level = nil end
+        AddNeed(parts, string.format(TRAINER_REQ_LEVEL or "Level %d", line.level), (level or 0) >= line.level)
     end
     if GetTrainerServiceSkillReq then
         local ok, skill, rank, has = pcall(GetTrainerServiceSkillReq, line.index)
@@ -297,8 +346,20 @@ local function Requirements(line)
     return table.concat(parts, ", ")
 end
 
+-- The foot: money, or Era's "Training Points:" with the pet's free points while pet training.
+local function UpdateFoot()
+    panel.oval:SetShown(not pet)
+    panel.points:SetShown(pet)
+    if not pet then return end
+    local points = WHITE .. FreePoints() .. "|r"
+    local shape = TRAINING_POINTS and TRAINING_POINTS:find("%s", 1, true) and TRAINING_POINTS
+    panel.points:SetText(shape and string.format(shape, points)
+        or ((TRAINING_POINTS_LABEL or "Training Points") .. ": " .. points))
+end
+
 UpdateDetail = function()
     if not panel then return end
+    UpdateFoot()
     local detail = panel.detail
     local line = selected and ServiceByIndex(selected)
     local money = GetMoney and GetMoney() or 0
@@ -318,15 +379,12 @@ UpdateDetail = function()
     detail.sub:SetText((line.sub and line.sub ~= "") and ("(" .. line.sub .. ")") or "")
     local needs = Requirements(line)
     detail.requires:SetText(needs ~= "" and ((REQUIRES_LABEL or "Requires:") .. " " .. needs) or "")
-    local cost, profession = 0, false
-    if GetTrainerServiceCost then
-        local ok, value, isProfession = pcall(GetTrainerServiceCost, line.index)
-        if ok and type(value) == "number" then cost = value end
-        profession = ok and isProfession and true or false
-    end
+    local cost, profession = ServiceCost(line.index)
+    -- Pet training pays in the pet's points: Era's "Cost: 3 Training Points", the number red when short.
+    local purse = pet and FreePoints() or money
     if cost > 0 then
-        local coins = Coins(cost)
-        detail.cost:SetText((COSTS_LABEL or "Cost:") .. " " .. (cost > money and "|cffff2020" or "|cffffffff") .. coins .. "|r")
+        local price = pet and (cost .. "|r " .. WHITE .. (TRAINING_POINTS_LABEL or "Training Points")) or Coins(cost)
+        detail.cost:SetText((COSTS_LABEL or "Cost:") .. " " .. (cost > purse and RED or WHITE) .. price .. "|r")
     else
         detail.cost:SetText("")
     end
@@ -338,11 +396,12 @@ UpdateDetail = function()
     detail.text:SetText(words)
     -- A new profession with both slots taken: Train grays out, as Era's and the game's own do.
     local noSlot = profession and GetProfessions and select(2, GetProfessions()) ~= nil
-    panel.train:SetEnabled(line.kind == "available" and cost <= money and not noSlot)
+    panel.train:SetEnabled(line.kind == "available" and cost <= purse and not noSlot)
 end
 
 local function Refresh()
     if not panel or not active then return end
+    pet = PetTraining()
     Collect()
     FitList()
     -- Keep the pick while listed; else the first learnable, as Era opens; else the first.
@@ -500,6 +559,10 @@ local function Build()
     moneyBox:SetPoint("BOTTOMLEFT", panel, "BOTTOMLEFT", 1, 4)
     moneyBox:SetPoint("RIGHT", train, "LEFT", 1, 0)
     moneyBox:SetHeight(32)
+    -- Pet training's points in the money's place (UpdateFoot): Era's gold label, the number white.
+    panel.points = moneyBox:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    panel.points:SetPoint("LEFT", moneyBox, "LEFT", 12, 0)
+    panel.points:Hide()
     -- Train and Exit in the same thin border, level with the money's.
     for _, button in ipairs({ train, exit }) do
         local box = ns.SkillInsetBox(panel, 16, true)
@@ -556,12 +619,13 @@ end
 local events = CreateFrame("Frame")
 events:SetScript("OnEvent", function(_, event)
     if not active then return end
-    if event == "TRAINER_CLOSED" or event == "PLAYER_MONEY" then
+    if event == "TRAINER_CLOSED" or event == "PLAYER_MONEY" or event == "UNIT_PET_TRAINING_POINTS" then
         -- A pending Open lands first, as when it ran at once.
         OpenNow()
         if event == "TRAINER_CLOSED" then
             selected = nil
         elseif panel and panel:IsVisible() then
+            UpdateRows()
             UpdateDetail()
         end
         return
@@ -573,6 +637,7 @@ end)
 local function Apply()
     active = true
     ns.RegisterEvents(events, TRAINER_EVENTS)
+    ns.RegisterEvents(events, POINTS_EVENTS, "player", "pet")
     if ClassTrainerFrame and ClassTrainerFrame:IsShown() then Open() end
 end
 
