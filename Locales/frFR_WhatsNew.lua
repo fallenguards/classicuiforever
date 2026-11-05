@@ -7,6 +7,8 @@ L["WN64_1_TITLE"] = "Estompez vos barres d'action"
 L["WN64_1_TEXT"] = "Choisissez une barre en mode Édition : sous les réglages du jeu pour elle, réglez jusqu'où elle s'estompe ou cochez Afficher seulement au survol. Elle redevient pleine sous la souris ou quand vous y faites glisser un sort."
 L["WN64_2_TITLE"] = "Erreur des barres de nom corrigée"
 L["WN64_2_TEXT"] = "Avec les barres de nom du jeu et les auras d'un autre addon dessus, les nouvelles barres de nom ne causent plus d'erreur Lua."
+L["WN64_3_TITLE"] = "Emplacements vides après le grimoire"
+L["WN64_3_TEXT"] = "Avec Toujours afficher les boutons désactivé, les emplacements vides de vos barres réapparaissent pour un sort ou un objet pris après avoir fermé le grimoire."
 
 L["WN63_1_TITLE"] = "Infobulles du butin à côté de l'objet"
 L["WN63_1_TEXT"] = "Dans la fenêtre de butin, l'infobulle d'un objet s'ouvre à côté de son icône, comme dans Classic Era, et non plus au-delà du bord droit de la fenêtre."

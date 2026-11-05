@@ -9,6 +9,7 @@ All notable changes to ClassicUI Forever are documented here.
 
 ### Fixed
 - With the game's own nameplates up and another addon drawing nameplate auras, new nameplates appearing no longer throw a Lua error from the theme (#237).
+- With Always Show Buttons off, a bar's empty slots show again for a spell or item you pick up after closing the spellbook; they stayed hidden until you logged out (#241).
 
 ## [0.43.1] - 2026-11-05
 

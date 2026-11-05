@@ -7,6 +7,8 @@ L["WN64_1_TITLE"] = "Sbiadisci le barre delle azioni"
 L["WN64_1_TEXT"] = "Scegli una barra in modalità Modifica: sotto le impostazioni del gioco per essa, imposta fin dove sbiadisce o spunta Mostra solo al passaggio del mouse. Torna piena con il mouse sopra o mentre trascini un incantesimo su di essa."
 L["WN64_2_TITLE"] = "Errore delle targhette corretto"
 L["WN64_2_TEXT"] = "Con le targhette del gioco e le aure di un altro addon sopra, le nuove targhette non causano più un errore Lua."
+L["WN64_3_TITLE"] = "Spazi vuoti dopo il libro degli incantesimi"
+L["WN64_3_TEXT"] = "Con Mostra sempre i pulsanti disattivato, gli spazi vuoti delle barre tornano visibili per un incantesimo o un oggetto preso dopo aver chiuso il libro degli incantesimi."
 
 L["WN63_1_TITLE"] = "Descrizioni del bottino accanto all'oggetto"
 L["WN63_1_TEXT"] = "Nella finestra del bottino la descrizione di un oggetto si apre accanto alla sua icona, come in Classic Era, e non oltre il bordo destro della finestra."

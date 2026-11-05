@@ -148,6 +148,7 @@ local WHATSNEW = {
     { id = 64, version = "0.44.0",
         { L["WN64_1_TITLE"], L["WN64_1_TEXT"] },
         { L["WN64_2_TITLE"], L["WN64_2_TEXT"] },
+        { L["WN64_3_TITLE"], L["WN64_3_TEXT"] },
     },
     { id = 63, version = "0.43.1",
         { L["WN63_1_TITLE"], L["WN63_1_TEXT"] },
