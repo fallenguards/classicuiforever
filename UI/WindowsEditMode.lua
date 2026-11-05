@@ -45,10 +45,13 @@ local saved
 
 local function Picked() return Clean("editWindowsShown", ValidFlag) end
 
+-- A page following its leader's window (the spellbook's) has no row or box: its leader's places and sizes it.
+local function PageNow(entry) return entry.page == true and W.Leader(entry) ~= entry end
+
 local function ShowPicked(on)
     local picked = Picked()
     for _, entry in ipairs(WINDOWS) do
-        if not entry.gameEdit then ShowHandle(entry, on and picked[entry.key] == true) end
+        if not entry.gameEdit then ShowHandle(entry, on and picked[entry.key] == true and not PageNow(entry)) end
     end
     if not on then W.HideDialog() end
 end
@@ -302,6 +305,7 @@ local function ModeCheck(list, entry, index, top)
     local label = check:CreateFontString(nil, "ARTWORK", "GameFontHighlightMedium")
     label:SetPoint("LEFT", check, "RIGHT", 5, 0)
     label:SetText(entry.label)
+    if entry.tipSpec then ns.AttachTip(check, entry.tipSpec) end
     check.entry = entry
     check:SetScript("OnClick", function(self)
         local on = self:GetChecked() and true or false
@@ -348,8 +352,9 @@ local function Mode()
     -- The windows first, then each piece section (the minimap's) under its own heading; gameEdit pieces have no row.
     local windows, sections, byTitle = {}, {}, {}
     for _, entry in ipairs(WINDOWS) do
-        local title = entry.section
-        if title and not entry.gameEdit then
+        -- A page following its leader is folded into the leader's row.
+        local title, listed = entry.section, not entry.gameEdit and not PageNow(entry)
+        if title and listed then
             local list = byTitle[title]
             if not list then
                 list = { title = title }
@@ -357,7 +362,7 @@ local function Mode()
                 sections[#sections + 1] = list
             end
             list[#list + 1] = entry
-        elseif not entry.gameEdit then
+        elseif listed then
             windows[#windows + 1] = entry
         end
     end

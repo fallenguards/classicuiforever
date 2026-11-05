@@ -406,7 +406,7 @@ local function Refresh()
     dialog.narrow:SetChecked(mapOnly)
     ns.SetPointOnce(dialog.check, "TOPLEFT", dialog, "TOPLEFT", 20, views and FREE_Y - VIEW_H or FREE_Y)
     dialog.check:SetChecked(IsFree(selected))
-    dialog.check:SetShown(not selected.piece)
+    dialog.check:SetShown(not selected.piece and not selected.row)
     -- The map's fade is the addon's own setting (the game's mapFade), the same as in the options.
     dialog.fade:SetShown(views)
     dialog.fade:SetChecked(ns.db.mapFade == true)
@@ -441,6 +441,7 @@ local function Refresh()
     end
     dialog.reset:SetEnabled(PlaceOf(selected) ~= nil or (OnRing(selected) and ns.db[selected.ringKey] ~= nil))
     dialog.resize:SetEnabled(Scales()[SizeKey(selected)] ~= nil and not Fixed(selected))
+    for _, part in ipairs({ dialog.sizeLabel, dialog.sizeSlider, dialog.resize }) do part:SetShown(not selected.row) end
     if dialog.InitSlider then dialog.InitSlider() end
 end
 
@@ -496,8 +497,7 @@ local function ChoiceRow(dialog)
 end
 
 local function Percent(value) return string.format("%d%%", value) end
--- sizeBase: a size the piece wears under its own (the eye's, the minimap's); the slider shows both together.
-local function Base() return selected and selected.sizeBase and selected.sizeBase() or 1 end
+local function Base() return selected and selected.sizeBase and selected.sizeBase() or 1 end -- the eye's, the minimap's
 local function SizeValues()
     local scale = (selected and Scales()[SizeKey(selected)] or 1) * Base()
     return math.floor(scale * 100 + 0.5), 50, 150, 20
@@ -592,6 +592,7 @@ local function Dialog()
     size:SetText(HUD_EDIT_MODE_SETTING_MICRO_MENU_SIZE or "Size")
     local slider, formatters = B.StepperSlider(dialog, CONTROL_W, size, 5, Percent)
     if slider then
+        dialog.sizeSlider = slider
         -- Greyed while the piece is fixed (the calendar behind the day/night: sized by the icon).
         dialog.InitSlider = B.GuardedSlider(slider, SizeValues, OnSize, { formatters = formatters, owner = dialog,
             enabled = function() return not (selected and Fixed(selected)) end, label = size })
@@ -748,8 +749,7 @@ local function Handle(entry)
     if handle then return handle end
     handle = CreateFrame("Frame", nil, UIParent)
     handle.entry = entry
-    -- Over the windows it stands for, under our mode window and dialogs; a band piece (the gryphons) over the game's
-    -- boxes but under the band's smaller ones (key ring, latency bar, micro menu at 1010).
+    -- Over its windows, under our mode window; a band piece (gryphon) over the game's boxes, under the band's at 1010.
     local strata, level = "DIALOG", 50
     if entry.gameEdit then strata, level = "MEDIUM", 1004 end
     handle:SetFrameStrata(strata)
@@ -758,6 +758,7 @@ local function Handle(entry)
     handle:SetScript("OnDragStart", HandleDragStart)
     handle:SetScript("OnMouseDown", HandleDown)
     handle:SetScript("OnMouseUp", HandleUp)
+    if entry.tipSpec then ns.AttachTip(handle, entry.tipSpec) end
     -- Edit mode's selection box over it; the mouse stays the placeholder's.
     local sel = ns.band.SelectionHandle(handle, entry.label)
     sel:SetFrameStrata(strata)
@@ -791,8 +792,7 @@ ns.windowEdit = {
     STRIP_LEFT = STRIP_LEFT, STRIP_LIFT = STRIP_LIFT, StripOf = function(frame) return strips[frame] end,
     ShowHandle = ShowHandle, Set = Set, DialogKeys = DialogKeys, PlaceOf = PlaceOf, SetFree = SetFree, SetPlace = SetPlace, Worn = Worn,
     Leader = Leader, SizeKey = SizeKey, ByKey = byKey, DrawnSize = DrawnSize, SaveFrom = SaveFrom, HandleShown = function(key) return handles[key] ~= nil and handles[key]:IsShown() end,
-    HideDialog = function() if dialog then dialog:Hide() end end,
-    -- The drags (UI/WindowDrags.lua): the tables they keep with us.
+    HideDialog = function() if dialog then dialog:Hide() end end, -- the drags (UI/WindowDrags.lua) keep these with us:
     Moving = moving, EntryOf = entryOf, Strips = strips, ClampWas = clampWas, STRIP_RIGHT = STRIP_RIGHT, STRIP_H = STRIP_H,
 }
 

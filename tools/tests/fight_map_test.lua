@@ -33,6 +33,7 @@ local ns = {
     },
     MoverTakes = function() return false end, FramePlaced = function() return false end,
     GameWindowOffRow = function() return false end,
+    WindowRowShift = function() return 0, 0 end,
     WindowRatio = function() return 1 end, GameXOffset = function() return 0 end,
     GamePanelWidth = function(frame) return frame.right - frame.left end, GamePanelValue = function() return 0 end,
     GameRow = function() return 16, -116 end,

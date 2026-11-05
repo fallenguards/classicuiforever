@@ -3,10 +3,14 @@ local L = ns.L
 
 -- Every piece ClassicUI Forever Windows moves and sizes (UI/WindowHandles.lua), one entry each.
 
--- w, h: box before made; cut: old 384 x 512 frame's bare edges; stripRight, stripH: strip inset, height or function; toggle: unlock key;
--- quests: the map; section: heading; piece: laid by ns.LayPiece; ringKey: minimap angle (while ringIf); fixedIf: no drag then; choice:
--- radio list; switch: a setting's check; client: game window; follows: place, unlock (while followIf), followSize: size; gameEdit.
+-- w, h: box before made; cut: old frame's bare edges; stripRight, stripH: strip; toggle: unlock key; quests: the map; section;
+-- piece: laid by ns.LayPiece; ringKey: minimap angle (while ringIf); fixedIf: no drag; choice; switch; client: game window;
+-- follows: place, unlock (while followIf), followSize: size; gameEdit; row: the row's box; page: no box while it follows.
 ns.WINDOW_LIST = {
+    -- Where every window that opens side by side starts (UI/Windows.lua RowStart, UI/GameSpot.lua for the game's own): one
+    -- box moves them all (#162). No frame of its own: its box stands at the row's start, one window's size.
+    { key = "windowRow", label = L["UI_WINDOW_ROW"], name = "ForeverClassicUIWindowRow", w = 350, h = 433, row = true,
+        tipSpec = { text = L["UI_WINDOW_ROW"], r = 1, g = 1, b = 1, lines = { { L["UI_WINDOW_ROW_TIP"], nil, nil, nil, true } } } },
     -- dressed: a game window is ours while its restyle is on; off, nothing of ours goes on it (#192).
     { key = "character", label = L["UI_CHARACTER"], name = "CharacterFrame", w = 354, h = 467, cut = { 30, 45 }, client = true,
         dressed = function() return ns.ModuleInForce("characterSheet") end },
@@ -15,13 +19,13 @@ ns.WINDOW_LIST = {
     { key = "professions", label = L["UI_PROFESSIONS"], name = ns.OnForever() and "ProfessionsFrame" or "ProfessionsBookFrame",
         w = 339, h = 425, client = true, zoom = function() return ns.ProfessionsZoom and ns.ProfessionsZoom() or 1 end,
         dressed = function() return ns.ModuleInForce("professionsBook") or ns.ModuleInForce("tradeSkill") end,
-        follows = "spellBook", followIf = "professionsBook", followX = 12, followY = -14 },
+        follows = "spellBook", followIf = "professionsBook", followX = 12, followY = -14, followSize = true, page = true },
     { key = "talents", label = L["UI_TALENTS"], name = "ClassicUIForeverTalents", w = 354, h = 467, cut = { 30, 45 },
         padHost = true },
     { key = "legacy", label = L["UI_LEGACY"], name = "ClassicUIForeverLegacy", w = 354, h = 467, cut = { 30, 45 } },
-    -- A page of the spellbook: on its spot, moved with it.
+    -- A page of the spellbook: on its spot, at its size, moved with it; page: no box of its own while it follows.
     { key = "collections", label = L["UI_COLLECTIONS"], name = "ClassicUIForeverCollections", w = 350, h = 433, cut = { 34, 79 },
-        follows = "spellBook", followX = 0, followY = 0 },
+        follows = "spellBook", followX = 0, followY = 0, followSize = true, page = true },
     { key = "questLog", label = L["UI_QUEST_LOG"], name = "ForeverClassicUIQuestLog", w = 349, h = 437, cut = { 35, 75 } },
     { key = "map", label = L["UI_WORLD_MAP"], name = "WorldMapFrame", w = 1035, h = 534, stripH = 24, toggle = "mapUnlocked",
         quests = true, dressed = function() return ns.db.worldMap ~= false end },

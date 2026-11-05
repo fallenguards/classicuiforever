@@ -97,8 +97,34 @@ function ns.GameDown(frame)
     return down
 end
 
--- The classic sheet stands 12 above the game's line (Era's spot, UI/Windows.lua); within LINE_SLACK is on the line.
-local ERA_RAISE, LINE_SLACK = 12, 1.5
+-- The classic sheet stands 12 above the game's line and 16 left (Era's spot, UI/Windows.lua); within LINE_SLACK: on it.
+local ERA_RAISE, ERA_STEP, LINE_SLACK = 12, 16, 1.5
+
+-- The Window row box's place in ClassicUI Forever Windows (windowPos.windowRow: UIParent units, top left from the screen's
+-- bottom left), or nil: every window that stands in the row starts there.
+function ns.WindowRowPlaced()
+    local pos = ns.db and ns.DbTable("windowPos").windowRow
+    if type(pos) == "table" and type(pos[1]) == "number" and type(pos[2]) == "number" then return pos end
+end
+
+-- How far that place moves the row from its own start (Era's spot, 16 left of and 12 over the game's), x right and y up
+-- in UIParent units; 0, 0 with none. The game's own row windows stand off their manager's spot by as much.
+function ns.WindowRowShift()
+    local pos = ns.WindowRowPlaced()
+    if not pos then return 0, 0 end
+    local left, top = ns.GameRow()
+    return pos[1] - (left - ERA_STEP), pos[2] - UIParent:GetHeight() - (top + ERA_RAISE)
+end
+
+-- A game window's y on its TOPLEFT anchor (oy, its own units; k its ratio) with the row's shift: the manager's own y,
+-- read again whenever it lays the window anew, and the shift on top.
+local managerY, ourY = setmetatable({}, { __mode = "k" }), setmetatable({}, { __mode = "k" })
+function ns.GameRowY(panel, oy, k)
+    if ourY[panel] == nil or math.abs(oy - ourY[panel]) > 0.5 then managerY[panel] = oy end
+    local _, dy = ns.WindowRowShift()
+    ourY[panel] = managerY[panel] + dy / k
+    return ourY[panel]
+end
 
 -- A window's top in UIParent units, or nil while unreadable.
 local function Top(panel)
@@ -133,17 +159,20 @@ end
 function ns.GameWindowOffRow(panel)
     local top = Top(panel)
     if not top then return false end
+    -- On the game's line or the row box's (its shift): we stand the game's windows on the box's only with the classic sheet.
+    local _, dy = ns.WindowRowShift()
     local line = UIParent:GetHeight() + LayoutValue("TOP_OFFSET", GAME_TOP) + (Offset(panel, "yoffset") or 0)
     local highest = UIParent:GetHeight() + (Offset(panel, "minYOffset") or GAME_MIN_Y) + ERA_RAISE
-    return top < line - LINE_SLACK or top > highest + LINE_SLACK
+    return top < line + math.min(0, dy) - LINE_SLACK or top > highest + math.max(0, dy) + LINE_SLACK
 end
 
 -- How far the game's left window stands from where its manager put it: an addon that moves the game's windows (a
 -- centering one, by its own anchor or by the offset on UIParent's) moves ours by as much. Read from where it is drawn,
 -- on its line, less Era's step left where the sheet stands at Era's spot; kept while no game window is up.
-local ERA_LEFT = 16
+local ERA_LEFT = ERA_STEP
 local shift, shiftFrom = 0, nil
 local function Learn(left)
+    if ns.WindowRowPlaced() then return end
     local panel = _G.GetUIPanel and _G.GetUIPanel("left")
     if not (panel and panel:IsVisible()) or (ns.FramePlaced and ns.FramePlaced(panel)) or ns.MoverHolds(panel) then return end
     -- The loot window is the game's left panel too, at its own edit mode spot (on the line, far right): never the row's.
@@ -178,7 +207,8 @@ end
 -- The game's left spot for a window in UIParent units, from the row's start. Left, and down from the top.
 function ns.GameHome(frame, h)
     local left, top = ns.GameRow()
-    return Spot(frame, h, left, top)
+    local dx, dy = ns.WindowRowShift()
+    return Spot(frame, h, left + dx, top + dy)
 end
 
 -- The manager's start for the slot it holds a window in (its UpdateUIPanelPositions; read, never driven), with the

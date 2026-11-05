@@ -299,8 +299,10 @@ function ns.SetSlotWidth(frame, width) slotWidths[frame] = width end
 local slotShares = setmetatable({}, { __mode = "k" })
 function ns.SetSlotShares(frame, names) slotShares[frame] = names end
 
--- Our row's first spot, UIParent units: Era's spot from the game's row start, wherever the game's layout puts that.
+-- Our row's first spot, UIParent units: the Window row box's place, else Era's spot from the game's row start.
 local function RowStart()
+    local placed = ns.WindowRowPlaced()
+    if placed then return placed[1], placed[2] - UIParent:GetHeight() end
     local left, top = ns.GameRow()
     return left + ERA_X, top + ERA_Y
 end
@@ -598,8 +600,7 @@ ns.windowParts = { Seen = Seen, BlockSpan = BlockSpan, Locked = Locked, SheetGap
     StandAt = function(...) return StandAt(...) end, TopLeft = function(...) return SecureTopLeft(...) end }
 function ns.LayWindowsNow() PlaceClassicWindows() end
 
--- Moves a client window's left edge to x on its manager's anchor, on screen; nil if it cannot move.
--- A protected client window moved by our code is tainted: out of combat a snippet moves it; in combat not at all.
+-- A client window's left edge to x on its manager's anchor; nil if it cannot. A protected one by snippet, never in a fight.
 local positioner
 local POSITION_BODY = [[
     local f = self:GetFrameRef("f")
@@ -628,17 +629,20 @@ StandAt = function(panel, x)
     local left, right, k = Span(panel)
     if not left then return end
     if x > left then x = math.max(left, math.min(x, UIParent:GetWidth() - (right - left))) end
-    if math.abs(x - left) < 0.5 then return left end
+    local _, dy = ns.WindowRowShift()
+    if math.abs(x - left) < 0.5 and dy == 0 then return left end
     if Plain(panel:GetNumPoints()) ~= 1 then return end
     local point, rel, relPoint, ox, oy = panel:GetPoint(1)
     ox, oy = Plain(ox), Plain(oy)
     if not ox or not oy or Plain(point) ~= "TOPLEFT" or Plain(relPoint) ~= "TOPLEFT" then return end
     -- UIParent, or the sheet's Era anchor (the same corner), kept as it is.
     if rel ~= nil and Plain(rel) ~= UIParent and rel ~= eraHost then return end
-    local newX = ox + (x - left) / k
+    -- Off the manager's line by the row's shift too (its box moved the row).
+    local newX, newY = ox + (x - left) / k, ns.GameRowY(panel, oy, k)
+    if math.abs(x - left) < 0.5 and math.abs(newY - oy) < 0.5 then return left end
     if Locked(panel) then
-        if not SecureTopLeft(panel, newX, oy) then return end
-    elseif not pcall(panel.SetPoint, panel, "TOPLEFT", rel or UIParent, "TOPLEFT", newX, oy) then
+        if not SecureTopLeft(panel, newX, newY) then return end
+    elseif not pcall(panel.SetPoint, panel, "TOPLEFT", rel or UIParent, "TOPLEFT", newX, newY) then
         return
     end
     return x
@@ -649,7 +653,7 @@ local GAP_SLOTS = { "left", "center", "right" }
 local function CloseGameGaps()
     local getPanel = _G.GetUIPanel
     if not ForeverClassicUI_CharacterSheetActive or not getPanel or getPanel("doublewide") then return end
-    local cursor, start = nil, (ns.GameRow())
+    local cursor, start = nil, RowStart() - ERA_X
     for _, key in ipairs(GAP_SLOTS) do
         local panel = getPanel(key)
         if panel and panel:IsShown() and not (ns.BookPageWindow and ns.BookPageWindow(panel)) then
@@ -720,10 +724,7 @@ local function SheetPastHeld()
     end
 end
 
--- The sheet at Era's spot (ERA_X, ERA_Y from the game's). Only the client's own anchor moves: a y we set stays, and an
--- edit mode place (off the foot) is never touched; one that gave way is on the client's anchor, so it takes Era's height.
-
--- The y this pass last set per window.
+-- The sheet at Era's spot (ERA_X, ERA_Y from the game's), from the client's own anchor only; the y this pass last set.
 local eraY = setmetatable({}, { __mode = "k" })
 
 local function AtEraSpot(frame)
@@ -784,8 +785,7 @@ function ns.RegisterClassicWindow(frame, pushable)
                 other:Hide()
             end
         end
-        -- fcuiKeep names the client window it belongs beside (the inspect window's talents).
-        -- A held one showing itself again (its own comeback) closes nothing.
+        -- fcuiKeep: the client window it belongs beside (the inspect window's talents); a held one's comeback closes nothing.
         if not selfHeld then HideClientPanels(self, self.fcuiKeep and self:fcuiKeep() or nil) end
         PlaceClassicWindows()
         if ns.GameSpellsRoomChanged then ns.GameSpellsRoomChanged() end

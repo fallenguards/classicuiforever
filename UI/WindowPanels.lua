@@ -39,7 +39,9 @@ function ns.ShowPanel(frame)
     if frame.IsProtected and frame:IsProtected() then return false end
     -- No anchor until its panel call has opened it once: a spot to measure from; the row lays it as it shows.
     if frame.GetNumPoints and frame:GetNumPoints() == 0 then
-        frame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", ns.GameRow())
+        local left, top = ns.GameRow()
+        local dx, dy = ns.WindowRowShift()
+        frame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", left + dx, top + dy)
     end
     frame:Show()
     rawShown[frame] = true
@@ -141,7 +143,7 @@ function ns.LayFightRaw(row)
     local sheet = ForeverClassicUI_CharacterSheetActive and CharacterFrame
     for i, frame in ipairs(laidFrames) do Describe(i, frame, sheet) end
     for i = #laidFrames + 1, #fight.members do fight.members[i] = nil end
-    fight.gap, fight.screen, fight.start = ns.windowParts.SheetGap(), UIParent:GetWidth(), ns.GameRow()
+    fight.gap, fight.screen, fight.start = ns.windowParts.SheetGap(), UIParent:GetWidth(), ns.GameRow() + (ns.WindowRowShift())
     ns.LayFightWindows(fight, laidX)
     -- Laid, they are the game's row: ours stand past what each draws.
     for i, frame in ipairs(laidFrames) do
@@ -154,10 +156,11 @@ end
 -- The game's height for each (its y offset, its fit for a tall one); the classic sheet on Era's anchor and spot.
 function ns.PlaceFightRaw()
     local P = ns.windowParts
+    local _, dy = ns.WindowRowShift()
     for i, frame in ipairs(laidFrames) do
         local k, x, m = ns.WindowRatio(frame), laidX[i], fight.members[i]
         if k and x then
-            local down = ns.GameDown(frame)
+            local down = ns.GameDown(frame) - dy
             if m.shift ~= 0 then
                 ns.SetPointIf(frame, "TOPLEFT", P.eraHost, "TOPLEFT", x / k + P.ERA_X, -down / k + P.ERA_Y)
             else

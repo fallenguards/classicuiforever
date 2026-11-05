@@ -21,7 +21,9 @@ local BOX_OWNERS = { character = { "characterSheet" }, professions = { "professi
     talents = { "talents" }, legacy = { "legacyWindow" }, collections = { "collectionsWindow" }, questLog = { "questLog" },
     map = { "worldMap" }, spellBook = { "spellBook" }, questWatch = { "questWatch" }, gryphonLeft = { "classicBar" },
     gryphonRight = { "classicBar" }, social = { "panelSocial" }, groupFinder = { "groupFinder" },
-    questGiver = { "panelQuest" }, gossip = { "panelGossip" }, minimapOptionsButton = { "minimapButton" } }
+    questGiver = { "panelQuest" }, gossip = { "panelGossip" }, minimapOptionsButton = { "minimapButton" },
+    windowRow = { "characterSheet", "talents", "legacyWindow", "collectionsWindow", "questLog", "spellBook",
+        "professionsBook", "panelSocial", "panelQuest", "panelGossip" } }
 
 -- Settings with no row in a package that keep their default there: chat notes (another addon holds the bars) still say.
 local AT_DEFAULT = { addonMessages = true, barsTakenNote = true, foreverWelcome = true }
