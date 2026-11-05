@@ -127,6 +127,7 @@ Bar\GameMicro.lua
 Bar\BandStatusHide.lua
 Bar\RestedTip.lua
 Bar\TotemBar.lua
+Bar\BarFade.lua
 Bar\BandStatus.lua
 Bar\BandStatusBack.lua
 Bar\BandCast.lua

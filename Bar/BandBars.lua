@@ -69,8 +69,8 @@ local function Holder(bar)
         holder:SetAllPoints(UIParent)
         holderOf[bar] = holder
     end
-    -- At the bar's own alpha.
-    holder:SetAlpha(bar:GetAlpha())
+    -- At the bar's own alpha, times its Faded Opacity while faded (Bar/BarFade.lua).
+    holder:SetAlpha(bar:GetAlpha() * (B.FadeNow and B.FadeNow(bar) or 1))
     if not InCombatLockdown() then
         -- A spell drag lifts the bar to TOOLTIP for the drop: never copied, and its frame takes no mouse, or the lifted empty
         -- frame over our slots eats the drop (bar 1 is mouse-enabled).

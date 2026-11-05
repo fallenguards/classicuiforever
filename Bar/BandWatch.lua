@@ -570,8 +570,9 @@ local function MicroFootClick(revert)
     end
 end
 
--- Micro moves light Save/Revert All; the client may dim them, so relit while noted.
+-- Micro moves and bar fades light Save/Revert All; the client may dim them, so relit while noted.
 local function RelightSaveRevert(editing)
+    if B.FadeRelight then B.FadeRelight(editing) end
     if editing and ns.microDirty then
         ns.LightEditFoot("microHooked", MicroFootClick)
     elseif not editing and ns.microDirty then
