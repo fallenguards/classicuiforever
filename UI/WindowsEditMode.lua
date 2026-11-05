@@ -270,12 +270,13 @@ local function PressedClose() closing = true end
 local function ModeToggle()
     if modeToggle then return modeToggle end
     modeToggle = Toggle()
-    modeToggle:SetFrameStrata("DIALOG")
+    -- A layer over edit mode's own: its tutorial's box (DIALOG, level 9000) lies over this corner and took the clicks.
+    modeToggle:SetFrameStrata("FULLSCREEN_DIALOG")
     modeToggle:Hide()
     ns.Sched.Attach(modeToggle, { name = "windows.follow", every = 0, fn = Follow })
     ns.Sched.Attach(modeToggle, { name = "windows.gameDirty", every = 0.2, fn = SyncGameFoot })
     local close = EditModeManagerFrame and EditModeManagerFrame.CloseButton
-    if close then ns.MapPad(modeToggle, "DIALOG", PressedClose, close, nil, true) end
+    if close then ns.MapPad(modeToggle, "FULLSCREEN_DIALOG", PressedClose, close, nil, true) end
     return modeToggle
 end
 
