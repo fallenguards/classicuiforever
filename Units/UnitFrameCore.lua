@@ -163,10 +163,22 @@ local function AttachTexts(bar, texts, offsets, textParent)
     end
 end
 
+-- Forever re-anchors the target and focus right number to its parent's RIGHT -3 on each update (Camelot
+-- UpdateHealthBarVisuals, 70790): each bar's texts get a parent ending where that lands on our right offset.
+UF.CLIENT_RIGHT_X = -3
+function UF.BarTextParent(holder, bar, offsets, power)
+    local parent = Child(holder, power and "powerTexts" or "healthTexts", holder:GetFrameLevel())
+    local right = offsets[3] and offsets[3][2] or 0
+    parent:ClearAllPoints()
+    parent:SetPoint("TOPLEFT", bar, "TOPLEFT", 0, 0)
+    parent:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", right - UF.CLIENT_RIGHT_X, 0)
+    return parent
+end
+
 -- Client texts onto our bar, plus our both-numbers hover strings.
 function UF.BarTexts(frame, above, bar, texts, offsets, clientBar, owner, unit, power)
     local holder = TextHolder(frame, above)
-    AttachTexts(bar, texts, offsets, holder)
+    AttachTexts(bar, texts, offsets, UF.BarTextParent(holder, bar, offsets, power))
     UF.HoverBoth(clientBar, bar, holder, offsets, owner, unit, power)
 end
 
