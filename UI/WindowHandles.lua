@@ -1,9 +1,8 @@
 local _, ns = ...
 local L = ns.L
 
--- ClassicUI Forever Windows: our edit mode for the windows. A placeholder drag places a window; its dialog holds Movable
--- anytime, Size and resets. Places (db.windowPos, UIParent units) and sizes (db.windowScale) are put back the frame after
--- anyone moves the window, never inside the client's pass.
+-- ClassicUI Forever Windows: a placeholder drag places a window; its dialog holds Movable anytime, Size and resets. Places
+-- (db.windowPos, UIParent units) and sizes (db.windowScale) come back the frame after anyone moves it, never in a pass.
 
 local WINDOWS = ns.WINDOW_LIST
 -- The whole painted title bar, clear of the portrait on the left and the lock and close on the right.
@@ -187,8 +186,9 @@ local function Apply(entry)
     -- A size the window's own look asks on top of the player's (the full size book); a mover's window wears only it.
     local zoom = entry.zoom and entry.zoom() or 1
     if zoom ~= 1 then scale = (scale or 1) * zoom end
-    -- Windowed, the map's header style at its own size till the player gives it one.
-    if entry.quests and not (scale or held) and ns.MapWindowedScale then scale = ns.MapWindowedScale() end
+    -- Windowed, the map wears its header style's size with the player's on top: 100% is the style's own.
+    local style = entry.quests and not held and ns.MapWindowedScale and ns.MapWindowedScale()
+    if style then scale = (scale or 1) * style end
     if not held and Full(entry, frame) then left, scale = nil, FullScale() end
     if scale then scale = ns.ScreenFitScale(frame, scale, DrawnSize(entry, frame)) end
     if not (left or scale or scaled[frame]) then return end
