@@ -92,7 +92,7 @@ local function Stop()
     wipe(drag)
     job:Sleep()
     which:SetButtonState("NORMAL", false)
-    ns.MapFight.Relay()
+    ns.MapRelay()
 end
 
 -- The picture's corner on the cursor (less where it was grabbed): its share from the hole's top left, snapped.
@@ -154,7 +154,7 @@ function MC.Reset()
     local db = ns.db
     if (db.mapQuestShare or 0) == 0 and (db.mapQuestListW or 0) == 0 and (db.mapQuestPagesH or 0) == 0 then return end
     db.mapQuestShare, db.mapQuestListW, db.mapQuestPagesH = 0, 0, 0
-    ns.MapFight.Relay()
+    ns.MapRelay()
 end
 
 local function Handle(button, map, tip)

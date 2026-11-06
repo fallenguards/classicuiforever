@@ -218,8 +218,8 @@ Map\MapFade.lua
 Map\WorldMapEraLarge.lua
 Map\WorldMapOptions.lua
 Map\WorldMapClassic.lua
+Map\WorldMapFightLay.lua
 Map\WorldMapCombined.lua
-Map\WorldMapFight.lua
 Map\WorldMapMarkers.lua
 Windows\BagBand.lua
 Windows\Bags.lua

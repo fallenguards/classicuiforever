@@ -2,7 +2,7 @@ local _, ns = ...
 
 -- Classic Era's world map in the header style picked: Classic (WorldMapEraLarge.lua), none (Era's small map) or the
 -- game's own. The quest pane in a second hole the art widens across; Map Options at the foot (WorldMapOptions.lua).
--- Size and anchors change inside a snippet, out of combat: from our code the map's refit would run as ours.
+-- Size and anchors change in a snippet out of combat (the refit stays the game's); in a fight from our code, the map no protected frame.
 
 local P = ns.panels
 
@@ -260,7 +260,11 @@ local PANE_KEYS = { "qp", "qx1", "qy1", "qr", "qx2", "qy2", "dh", "dtx", "dty", 
 local layFailed   -- a refused snippet stops the layout for the session, reported once
 local laidAt      -- when a lay last moved the picture's box; its fit is checked a frame later
 local function Lay(t)
-    if layFailed or InCombatLockdown() or Laid(t) then return end
+    if layFailed or Laid(t) then return end
+    if InCombatLockdown() then
+        ns.LayMapInFight(t)
+        return
+    end
     laidAt = GetTime()
     local lay = Layout()
     lay:SetAttribute("w", t.w)
@@ -693,11 +697,8 @@ local function Pass()
         else
             Unfade()
             DressForever()
-            -- In a fight its size stays as it is (a pass that could not lay it is not the game's own look).
-            if not InCombatLockdown() then
-                Fill(nil)
-                Windowed(nil)
-            end
+            Fill(nil)
+            Windowed(nil)
         end
     elseif touched then
         Unfade()
@@ -712,18 +713,8 @@ end
 -- The Era art frame, or nil before the first lay (dev selftest map.fightmouse).
 function ns.ClassicMapArt() return art end
 
--- For the fight layer (Map/WorldMapFight.lua): the layout header, the style worn and its box, quest pane open or shut.
-ns.MapFight = {
-    Map = Map, Layout = Layout, EraStyle = EraStyle, Target = Target, PANE_KEYS = PANE_KEYS, Relay = Pass,
-    FullScale = function(w, h) return FullScale({ w = w, h = h }) end,
-    -- The style's own windowed size (the header style's), nil for the rest.
-    WindowedBase = function(style) return style == "classic" and WindowedScale() or nil end,
-    Size = function(style, withPane)
-        if style == "classic" and Combined() then return ns.MapLarge.CombinedSize(ns.MapCombined.Shape()) end
-        if style == "classic" then return ns.MapLarge.Size(withPane and QUEST_PANE_W or nil) end
-        return withPane and PaneWindowW() or ERA_W, ERA_H
-    end,
-}
+-- The pass now, for the combined layout's own changes (Map/WorldMapCombined.lua).
+ns.MapRelay = Pass
 
 -- How far the Era layout lifts the quest details' text (its Back button follows, Quest/QuestMapPane.lua).
 function ns.MapDetailsLift() return eraDressed and DETAILS_LIFT or 0 end

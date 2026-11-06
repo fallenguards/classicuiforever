@@ -201,11 +201,8 @@ local function Apply(entry)
         ns.WhenCalm("windowPlaces", PlaceAll)
         return
     end
-    -- In a fight the map keeps the size it wears: its look re-laid there gave it the game's own for a pass (huge).
-    if entry.quests and InCombatLockdown() then
-        ns.WhenCalm("windowPlaces", PlaceAll)
     -- No size of ours (or the map maximized): its own.
-    elseif scale then
+    if scale then
         ScaleKept(frame, scale)
         scaled[frame] = true
     elseif scaled[frame] then

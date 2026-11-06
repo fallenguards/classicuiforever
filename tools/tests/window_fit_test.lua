@@ -1,5 +1,5 @@
--- Offline test under Lua 5.4 for a window's size kept inside the screen (UI/GameSpot.lua ns.ScreenFitScale, and the map's
--- fight lay, Map/WorldMapFight.lua MapPlace): a size saved in another look or UI scale never lays it past the screen.
+-- Offline test under Lua 5.4 for a window's size kept inside the screen (UI/GameSpot.lua ns.ScreenFitScale): a size
+-- saved in another look or UI scale never lays it past the screen.
 -- 134% on the Classic map's 768 tall sheet ran 1029 tall on a screen 853 tall at UI scale 0.9 (2026-10-28).
 -- Run from the addon root: lua tools/tests/window_fit_test.lua (CI runs every tools/tests/*_test.lua).
 -- luacheck: std lua54
@@ -49,24 +49,6 @@ Check(Near(ns.Fit(Window(1), 1.5, 1300, 500), SCREEN_W / 1300), "a wide one fits
 -- Under a scaled parent (half size), the same window may be twice as big.
 Check(Near(ns.Fit(Window(1, 0.5), 1.5, 1002, 768), 1.5), "a scaled parent's room counts")
 Check(ns.Fit(Window(1), 1.2, nil, nil) == 1.2, "no size read, no change")
-
--- The fight lay's own reckoning of the map's scale: the player's size on the style's own, kept inside the screen.
-local scales = { map = 1.34 }
-ns.windowEdit = {
-    ByKey = { map = { key = "map" } }, Worn = function() return true end, Scales = function() return scales end,
-    SizeKey = function(entry) return entry.key end, PlaceOf = function() return 16, 737 end,
-}
-local MapPlace = assert(load(Cut(Read("Map/WorldMapFight.lua"), "local function MapPlace", "-- Out of combat, last")
-    .. "\nreturn MapPlace", "map", "t", env))()
-local k, left, top = MapPlace(1002, 768, 0.6)
-Check(Near(k, 1.34 * 0.6), "in a fight the player's size rides the style's own, as out of one")
-Check(left == 16 and top == 737, "and stands where placed")
-scales.map = 2.5
-k, left, top = MapPlace(1002, 768, 0.6)
-Check(Near(k, SCREEN_H / 768), "in a fight the map fits the screen too")
-Check(left == 16 and Near(top, SCREEN_H), "and stands inside it")
-scales.map = nil
-Check(Near(MapPlace(1002, 768, 0.6), 0.6), "no size of the player's: the style's own")
 
 if failed > 0 then os.exit(1) end
 print("window fit: ok")
