@@ -9,9 +9,8 @@ ns.MapLarge = LM
 
 local SHEET = 256
 local ART_W, ART_H = 1024, 768
--- Drawn at Era's own size, its text and buttons too; edit mode's size shrinks the whole map.
+-- The sheets' scale (LM.Fit): Era's own maximized, the game's own map height windowed. The text keeps the game's size.
 local K = 1
-LM.SCALE = K
 -- The picture's hole (Era's ScrollContainer: 11 in, 70 down, 11 from the right, 30 up) and its rim rows.
 local HOLE_L, HOLE_T, HOLE_R, HOLE_B = 11, 70, 1013, 738
 -- Pane open: the sheets' own divider (columns 702 to 711, joined to the header and footer rims at rows 62 and 744) with
@@ -43,6 +42,12 @@ local COL_COLS = { { LIST_L, LIST_R - COL_TRACK_W }, { LIST_R - COL_TRACK_W, LIS
 local DROP_W, DROP_H, DROP_X, DROP_Y, DROP_GAP = 130, 24, -80, -36, 5
 local ZOOM_W, ZOOM_H, ZOOM_Y = 110, 22, 0
 local LABEL_Y, TITLE_Y = 12, -12
+-- Windowed, the band is 30 short of Era's at the text's size: the labels beside their drop downs, one row under the
+-- title. The title's middle and the row's from the band's top (+ up); a label to its drop down; after a drop down.
+local WIN_TITLE_Y = -10
+local WIN_ROW_Y = -35
+local WIN_LABEL_GAP = 4
+local WIN_GAP = 10
 -- The zoom note: 179 x 40, its left 468 left of the middle and 86 down; the glass 32, the text 32 in and 5 down.
 local NOTE_W, NOTE_H, NOTE_X, NOTE_Y, GLASS, NOTE_TEXT_X, NOTE_TEXT_Y = 179, 40, -468, -86, 32, 32, -5
 -- Close in the right socket as Era's (its top right 4 past the edge and 4 up), the size button 12 into it.
@@ -54,16 +59,20 @@ for row, name in ipairs({ "Top", "Middle", "Bottom" }) do
     for col = 1, 4 do SHEETS[row][col] = "Interface\\WorldMap\\UI-WorldMap-" .. name .. col end
 end
 
-local art, header, over
-local textures, used = {}, 0
+local art, header, over, rim
+-- The sheets' pieces on art; the right rim beside the pane on rim, over the pane's scroll column (it runs past its hole).
+local pool = { list = {}, used = 0 }
+local rimPool = { list = {}, used = 0 }
+local drawing = pool
 local laidPane
 
 local function NextTexture(layer, sublevel)
-    used = used + 1
-    local tex = textures[used]
+    local p = drawing
+    p.used = p.used + 1
+    local tex = p.list[p.used]
     if not tex then
-        tex = art:CreateTexture(nil, "ARTWORK")
-        textures[used] = tex
+        tex = p.frame:CreateTexture(nil, "ARTWORK")
+        p.list[p.used] = tex
     end
     tex:SetDrawLayer(layer or "ARTWORK", sublevel or 0)
     tex:ClearAllPoints()
@@ -95,26 +104,31 @@ local function Split(share)
     return w, h, HOLE_L + w, HOLE_T + h
 end
 
+-- The footer (the rim and rail under the picture, 30 rows) keeps the text's height whatever the sheets wear: its rows
+-- are stretched by 1/K, so Map Options and the coordinates fit it. The sheets' height with it, in the sheets' units.
+local function FootH(k) return (ART_H - HOLE_B) / (k or K) end
+local function SheetsH(k) return HOLE_B + FootH(k) end
+
 -- The combined window for a shape (the picture's share, the list column's width, the pages' height): the rims and
 -- bands round them as the sheets have them.
-local function CombinedSize(shape)
+local function CombinedSize(shape, k)
     local w, h = Split(shape.share)
-    return w + HOLE_L + DIV_R - DIV_L + shape.listW + ART_W - HOLE_R, h + HOLE_T + BAND_B - BAND_T + shape.pagesH + ART_H - HOLE_B
+    return w + HOLE_L + DIV_R - DIV_L + shape.listW + ART_W - HOLE_R, h + HOLE_T + BAND_B - BAND_T + shape.pagesH + FootH(k)
 end
 
--- The sheets' rows y0..y1 drawn dy down at width w: the left part to its right end, plain stone repeated for the rest
--- (cut short of the right end when narrower), the right end last.
-local function HRun(y0, y1, dy, w)
+-- The sheets' rows y0..y1 drawn dy down at width w (ky stretching them): the left part to its right end, plain stone
+-- repeated for the rest (cut short of the right end when narrower), the right end last.
+local function HRun(y0, y1, dy, w, ky)
     local extra = w - ART_W
     if extra >= 0 then
-        Slice(0, y0, RIGHT_END, y1, 0, dy)
+        Slice(0, y0, RIGHT_END, y1, 0, dy, 0, 1, ky)
         for x = RIGHT_END, RIGHT_END + extra - 1, FILL_R - FILL_L do
-            Slice(FILL_L, y0, FILL_L + math.min(FILL_R - FILL_L, RIGHT_END + extra - x), y1, x, dy)
+            Slice(FILL_L, y0, FILL_L + math.min(FILL_R - FILL_L, RIGHT_END + extra - x), y1, x, dy, 0, 1, ky)
         end
     else
-        Slice(0, y0, RIGHT_END + extra, y1, 0, dy)
+        Slice(0, y0, RIGHT_END + extra, y1, 0, dy, 0, 1, ky)
     end
-    Slice(RIGHT_END, y0, ART_W, y1, w - (ART_W - RIGHT_END), dy)
+    Slice(RIGHT_END, y0, ART_W, y1, w - (ART_W - RIGHT_END), dy, 0, 1, ky)
 end
 
 -- A rim's columns x0..x1 drawn dx right at the hole's height hgt: the picture's rows to the band, the plain run
@@ -152,53 +166,61 @@ end
 local function LayCombined(shape)
     local w, h, splitX, splitY = Split(shape.share)
     local W, H = CombinedSize(shape)
-    local inner = H - HOLE_T - (ART_H - HOLE_B)
+    local inner = H - HOLE_T - FootH()
     HRun(0, HOLE_T, 0, W)
-    HRun(HOLE_B, ART_H, H - (ART_H - HOLE_B), W)
+    HRun(HOLE_B, ART_H, H - FootH(), W, 1 / K)
     VRun(0, HOLE_L, 0, inner)
     VRun(HOLE_R, ART_W, W - (ART_W - HOLE_R), inner)
     local kx = w / NATIVE_W
     Slice(HOLE_L, HOLE_T, DIV_L, BAND_T, HOLE_L, HOLE_T, 0, kx, h / NATIVE_H)
-    Slice(DIV_L, DIV_T, DIV_R, DIV_B, splitX, DIV_T, 1, 1, (H - DIV_T - (ART_H - DIV_B)) / (DIV_B - DIV_T))
+    Slice(DIV_L, DIV_T, DIV_R, DIV_B, splitX, DIV_T, 1, 1, (H - DIV_T - (ART_H - DIV_B) / K) / (DIV_B - DIV_T))
     LayColumn(splitX + DIV_R - DIV_L, shape.listW, inner)
     Slice(HOLE_L, BAND_T, DIV_L, BAND_B, HOLE_L, splitY, 0, kx, 1)
     Slice(HOLE_L, BAND_B, DIV_L, PAGES_B, HOLE_L, splitY + BAND_B - BAND_T, 0, kx, shape.pagesH / (PAGES_B - BAND_B))
     art.paneBack:Hide()
     art:SetSize(W, H)
-    header:SetWidth(W)
+    header:SetWidth(W * K)
 end
 
--- How far the right end moves out for the pane, in the sheets' units: the divider and the pane's width.
-function LM.Widen(paneW) return PANE_X - HOLE_R + paneW / K end
+-- How far the right end moves out for the pane, in the sheets' units: the divider and the pane's width (the map's units).
+function LM.Widen(paneW, k) return PANE_X - HOLE_R + paneW / (k or K) end
 
 local function Lay(paneW, shape)
-    used = 0
+    pool.used, rimPool.used = 0, 0
     if shape then
         LayCombined(shape)
     elseif not paneW then
-        Slice(0, 0, ART_W, ART_H, 0, 0)
+        Slice(0, 0, ART_W, HOLE_B, 0, 0)
+        Slice(0, HOLE_B, ART_W, ART_H, 0, HOLE_B, 0, 1, 1 / K)
         art.paneBack:Hide()
     else
         local widen = LM.Widen(paneW)
-        Slice(0, 0, RIGHT_END, ART_H, 0, 0)
+        Slice(0, 0, RIGHT_END, HOLE_B, 0, 0)
+        Slice(0, HOLE_B, RIGHT_END, ART_H, 0, HOLE_B, 0, 1, 1 / K)
         for x = RIGHT_END, RIGHT_END + widen - 1, FILL_R - FILL_L do
             local w = math.min(FILL_R - FILL_L, RIGHT_END + widen - x)
             Slice(FILL_L, 0, FILL_L + w, HOLE_T, x, 0)
-            Slice(FILL_L, HOLE_B, FILL_L + w, ART_H, x, HOLE_B)
+            Slice(FILL_L, HOLE_B, FILL_L + w, ART_H, x, HOLE_B, 0, 1, 1 / K)
         end
         Slice(RIGHT_END, 0, ART_W, HOLE_T, RIGHT_END + widen, 0)
-        Slice(RIGHT_END, HOLE_B, ART_W, ART_H, RIGHT_END + widen, HOLE_B)
-        Slice(HOLE_R, HOLE_T, ART_W, HOLE_B, HOLE_R + widen, HOLE_T)
-        Slice(DIV_L, DIV_T, DIV_R, DIV_B, DIV_X, DIV_T, 1)
+        Slice(RIGHT_END, HOLE_B, ART_W, ART_H, RIGHT_END + widen, HOLE_B, 0, 1, 1 / K)
+        Slice(DIV_L, DIV_T, DIV_R, HOLE_B, DIV_X, DIV_T, 1)
+        Slice(DIV_L, HOLE_B, DIV_R, DIV_B, DIV_X, HOLE_B, 1, 1, 1 / K)
+        -- The rim beside the pane, rim joint to rim joint, over the pane's scroll column.
+        drawing = rimPool
+        Slice(HOLE_R, DIV_T, ART_W, HOLE_B, HOLE_R + widen, DIV_T)
+        Slice(HOLE_R, HOLE_B, ART_W, DIV_B, HOLE_R + widen, HOLE_B, 0, 1, 1 / K)
+        drawing = pool
         art.paneBack:ClearAllPoints()
         art.paneBack:SetPoint("TOPLEFT", art, "TOPLEFT", PANE_X, -HOLE_T)
         art.paneBack:SetPoint("BOTTOMRIGHT", art, "TOPLEFT", HOLE_R + widen, -HOLE_B)
         art.paneBack:Show()
     end
-    for i = used + 1, #textures do textures[i]:Hide() end
+    for i = pool.used + 1, #pool.list do pool.list[i]:Hide() end
+    for i = rimPool.used + 1, #rimPool.list do rimPool.list[i]:Hide() end
     if shape then return end
-    art:SetSize(ART_W + (paneW and LM.Widen(paneW) or 0), ART_H)
-    header:SetWidth(ART_W)
+    art:SetSize(ART_W + (paneW and LM.Widen(paneW) or 0), SheetsH())
+    header:SetWidth(ART_W * K)
 end
 
 ------------------------------------------------------------------ header
@@ -253,46 +275,74 @@ local function ZoneMenu(_, root)
     for _, info in ipairs(zones) do root:CreateRadio(info.name, ZonePicked, Go, info) end
 end
 
-local function Dropdown(parent, label, menu)
+local function Dropdown(parent, menu)
     local dd = ns.NewFrame("DropdownButton", nil, parent, "WowStyle1DropdownTemplate")
     dd:SetSize(DROP_W, DROP_H)
     ns.EraDropdownArt(dd, -1, -1, -24)
     if dd.Text then dd.Text:SetFontObject("GameFontHighlightSmall") end
     if dd.SetDefaultText then dd:SetDefaultText("") end
     dd:SetupMenu(menu)
-    local text = dd:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    text:SetPoint("TOPLEFT", dd, "TOPLEFT", 0, LABEL_Y)
-    text:SetText(label)
     return dd
+end
+
+local function Label(text)
+    local label = header:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    label:SetText(text)
+    return label
+end
+
+-- The header over the sheets' band: Era's layout at Era's scale, the one row windowed.
+local function LayHeader()
+    local h = header
+    h:SetSize(ART_W * K, HOLE_T * K)
+    local title, continent, zone, zoom = h.title, h.continent, h.zone, h.zoomOut
+    local continentLabel, zoneLabel = h.continentLabel, h.zoneLabel
+    for _, piece in ipairs({ title, continent, zone, zoom, continentLabel, zoneLabel }) do piece:ClearAllPoints() end
+    if K == 1 then
+        title:SetPoint("CENTER", h, "TOP", 0, TITLE_Y)
+        continent:SetPoint("TOPLEFT", h, "TOP", DROP_X - DROP_W / 2, DROP_Y)
+        continentLabel:SetPoint("TOPLEFT", continent, "TOPLEFT", 0, LABEL_Y)
+        zone:SetPoint("LEFT", continent, "RIGHT", DROP_GAP, 0)
+        zoneLabel:SetPoint("TOPLEFT", zone, "TOPLEFT", 0, LABEL_Y)
+        zoom:SetPoint("LEFT", zone, "RIGHT", DROP_GAP, ZOOM_Y)
+        return
+    end
+    title:SetPoint("CENTER", h, "TOP", 0, WIN_TITLE_Y)
+    local row = continentLabel:GetStringWidth() + zoneLabel:GetStringWidth() + 2 * (WIN_LABEL_GAP + DROP_W + WIN_GAP) + ZOOM_W
+    continentLabel:SetPoint("LEFT", h, "TOP", -row / 2, WIN_ROW_Y)
+    continent:SetPoint("LEFT", continentLabel, "RIGHT", WIN_LABEL_GAP, 0)
+    zoneLabel:SetPoint("LEFT", continent, "RIGHT", WIN_GAP, 0)
+    zone:SetPoint("LEFT", zoneLabel, "RIGHT", WIN_LABEL_GAP, 0)
+    zoom:SetPoint("LEFT", zone, "RIGHT", WIN_GAP, 0)
 end
 
 local function Header(map)
     header = ns.NewFrame("Frame", nil, map.BorderFrame)
-    header:SetScale(K)
-    header:SetSize(ART_W, HOLE_T)
     header:SetPoint("TOPLEFT", map, "TOPLEFT", 0, 0)
     header.title = header:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    header.title:SetPoint("CENTER", header, "TOP", 0, TITLE_Y)
     header.title:SetText(WORLDMAP_BUTTON or WORLD_MAP)
-    header.continent = Dropdown(header, CONTINENT, ContinentMenu)
-    header.continent:SetPoint("TOPLEFT", header, "TOP", DROP_X - DROP_W / 2, DROP_Y)
-    header.zone = Dropdown(header, ZONE, ZoneMenu)
-    header.zone:SetPoint("LEFT", header.continent, "RIGHT", DROP_GAP, 0)
+    header.continent = Dropdown(header, ContinentMenu)
+    header.continentLabel = Label(CONTINENT)
+    header.zone = Dropdown(header, ZoneMenu)
+    header.zoneLabel = Label(ZONE)
     header.zoomOut = ns.PanelButton(header, ZOOM_OUT, ZOOM_W)
     header.zoomOut:SetHeight(ZOOM_H)
-    header.zoomOut:SetPoint("LEFT", header.zone, "RIGHT", DROP_GAP, ZOOM_Y)
     header.zoomOut:SetScript("OnClick", ZoomOut)
+    LayHeader()
+end
+
+-- The note's spot over the picture's corner, in the map's units.
+local function LayNote()
+    over:SetSize(ART_W * K, ART_H * K)
+    ns.SetPointIf(over.note, "TOPLEFT", over, "TOPLEFT", (ART_W / 2 + NOTE_X) * K, NOTE_Y * K)
 end
 
 -- Era's zoom note over the picture's top left: a click on it zooms out too.
 local function Note(map)
     over = ns.NewFrame("Frame", nil, map)
-    over:SetScale(K)
-    over:SetSize(ART_W, ART_H)
     over:SetPoint("TOPLEFT", map, "TOPLEFT", 0, 0)
     local note = ns.NewFrame("Button", nil, over)
     note:SetSize(NOTE_W, NOTE_H)
-    note:SetPoint("TOPLEFT", over, "TOPLEFT", ART_W / 2 + NOTE_X, NOTE_Y)
     note:RegisterForClicks("LeftButtonUp", "RightButtonUp")
     note:SetScript("OnClick", ZoomOut)
     local glass = note:CreateTexture(nil, "BACKGROUND")
@@ -303,6 +353,7 @@ local function Note(map)
     text:SetPoint("TOPLEFT", note, "TOPLEFT", NOTE_TEXT_X, NOTE_TEXT_Y)
     text:SetText(ZOOM_OUT_BUTTON_TEXT)
     over.note = note
+    LayNote()
 end
 
 ------------------------------------------------------------------ for WorldMapClassic.lua
@@ -316,6 +367,9 @@ function LM.Art(map, level)
     art:SetFrameLevel(level)
     art.paneBack = art:CreateTexture(nil, "BACKGROUND")
     art.paneBack:SetColorTexture(0, 0, 0, 1)
+    rim = ns.NewFrame("Frame", nil, art)
+    rim:SetAllPoints(art)
+    pool.frame, rimPool.frame = art, rim
     Header(map)
     Note(map)
     art:Hide()
@@ -328,7 +382,15 @@ function LM.Frame() return art end
 
 -- Ours, kept when a fight's fade walks the map.
 function LM.Keep(into)
-    if art then into[art], into[header], into[over] = true, true, true end
+    if art then into[art], into[header], into[over], into[rim] = true, true, true, true end
+end
+
+-- The rim beside the pane over both of the pane's scroll bars (their column runs past the hole into it).
+local function BarLevel(bar) return bar and bar:GetFrameLevel() or 0 end
+local function RimLevel(noteLevel)
+    local list = _G.QuestScrollFrame and _G.QuestScrollFrame.ScrollBar
+    local details = QuestMapFrame and QuestMapFrame.DetailsFrame and QuestMapFrame.DetailsFrame.ScrollFrame
+    return math.max(noteLevel, BarLevel(list), BarLevel(details and details.ScrollBar)) + 1
 end
 
 -- paneW: the quest pane's width in the map's units, nil while it is shut; shape: the combined layout's (its own list
@@ -343,6 +405,7 @@ function LM.Show(map, paneW, noteLevel, shape)
     ns.SetShownIf(header, true)
     ns.SetShownIf(over, true)
     ns.SetLevelIf(over, noteLevel)
+    ns.SetLevelIf(rim, RimLevel(noteLevel))
     local id = map:GetMapID()
     if header.forMap ~= id then
         header.forMap = id
@@ -359,21 +422,29 @@ function LM.Hide()
     over:Hide()
 end
 
--- The window's size, the picture's box and the pane's, in the map's units from its top left (y down).
-function LM.Size(paneW) return (ART_W + (paneW and LM.Widen(paneW) or 0)) * K, ART_H * K end
+-- The window's size, the picture's box and the pane's, in the map's units from its top left (y down); k: a sheet
+-- scale other than the one worn (the edit mode box asks the windowed one).
+function LM.Size(paneW, k)
+    k = k or K
+    return (ART_W + (paneW and LM.Widen(paneW, k) or 0)) * k, SheetsH(k) * k
+end
 function LM.Picture() return HOLE_L * K, HOLE_T * K, HOLE_R * K, HOLE_B * K end
 function LM.Pane(paneW) return PANE_X * K, HOLE_T * K, PANE_X * K + paneW, HOLE_B * K end
+LM.SHEET_H = ART_H
+function LM.Scale() return K end
 
 -- The combined layout's boxes for a shape, in the map's units from its top left (y down): the picture, the list
--- column, the left and right pages' parchment, the divider. One table, rebuilt as the shape changes.
+-- column, the left and right pages' parchment, the divider. One table, rebuilt as the shape or the scale changes.
 local boxes, boxesFor = {}, nil
 LM.NATIVE_SHARE, LM.NATIVE_LIST_W, LM.NATIVE_PAGES_H = NATIVE_W / PICTURE_W, LIST_R - LIST_L, PAGES_B - BAND_B
 -- The window's width past the picture and list, and its height past the picture and pages (the map's units).
-LM.SIDE_ROOM, LM.FOOT_ROOM = (HOLE_L + DIV_R - DIV_L + ART_W - HOLE_R) * K, (HOLE_T + BAND_B - BAND_T + ART_H - HOLE_B) * K
+function LM.SideRoom() return (HOLE_L + DIV_R - DIV_L + ART_W - HOLE_R) * K end
+function LM.FootRoom() return (HOLE_T + BAND_B - BAND_T + FootH()) * K end
 function LM.ClampShare(share) return math.max(SHARE_MIN, math.min(SHARE_MAX, share or LM.NATIVE_SHARE)) end
-function LM.CombinedSize(shape)
-    local W, H = CombinedSize(shape)
-    return W * K, H * K
+function LM.CombinedSize(shape, k)
+    k = k or K
+    local W, H = CombinedSize(shape, k)
+    return W * k, H * k
 end
 function LM.CombinedBoxes(shape)
     if boxesFor == shape then return boxes end
@@ -410,13 +481,24 @@ function LM.PlaceButtons(close, sizer)
 end
 
 -- Map Options in Classic style: its box's right edge from the window's right (+ right), its bottom from the bottom
--- (+ up), in the sheets' units; clear of the unlocked map's corner grip.
+-- (+ up: the box 24 tall in the footer's 30), in the map's units; clear of the unlocked map's corner grip.
 local CLASSIC_MAP_OPTIONS_X = -3
-local CLASSIC_MAP_OPTIONS_Y = 5
+local CLASSIC_MAP_OPTIONS_Y = 3
 function LM.FootSpot()
     local x = math.min(CLASSIC_MAP_OPTIONS_X, -ns.WindowGripRoom("map"))
-    return art, art:GetWidth() + x, CLASSIC_MAP_OPTIONS_Y - art:GetHeight()
+    return art, art:GetWidth() * K + x, CLASSIC_MAP_OPTIONS_Y - art:GetHeight() * K
 end
 
--- The footer's left: the picture's left edge, the art's bottom.
-function LM.FootLeft() return art, HOLE_L, -art:GetHeight() end
+-- The footer's left: the picture's left edge, the art's bottom (the map's units).
+function LM.FootLeft() return art, HOLE_L * K, -art:GetHeight() * K end
+
+-- The sheets' scale for the map's mode (Map/WorldMapClassic.lua): the art re-laid, the header and note placed again.
+function LM.Fit(k)
+    if k == K then return end
+    K = k
+    laidPane, boxesFor = nil, nil
+    if not art then return end
+    art:SetScale(K)
+    LayHeader()
+    LayNote()
+end

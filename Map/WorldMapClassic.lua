@@ -32,10 +32,14 @@ local QUEST_PANE_X = 607        -- pane's left (+ right)
 local QUEST_PANE_Y = 22         -- pane's top, down from the frame's top (+ lower)
 local QUEST_PANE_W = 330        -- pane's width (+ wider; the window widens with it)
 local QUEST_PANE_H = 390        -- pane's height (+ taller): down to the footer, as the map's picture
--- The quest pane's scroll column moved from the game's spot to meet each frame's border (+ right).
-local CLASSIC_SCROLL_COLUMN_X = 7
+-- The quest pane's scroll column (both bars with their housings, arrows and knobs) moved from the game's spot to meet
+-- each frame's border: sideways (+ right) and up (+ up).
+local CLASSIC_SCROLL_COLUMN_X = 5
+local CLASSIC_SCROLL_COLUMN_Y = 0
 local NONE_SCROLL_COLUMN_X = 0
-local PANE_BAR_SHIFT = { classic = CLASSIC_SCROLL_COLUMN_X, none = NONE_SCROLL_COLUMN_X }
+local NONE_SCROLL_COLUMN_Y = 0
+local PANE_BAR_SHIFT = { classic = { CLASSIC_SCROLL_COLUMN_X, CLASSIC_SCROLL_COLUMN_Y },
+    none = { NONE_SCROLL_COLUMN_X, NONE_SCROLL_COLUMN_Y } }
 local DIVIDER_X = 598           -- divider between map and pane: its left, its rim on the map's right end (+ right)
 -- The large map's one divider (UI-WorldMap-Middle3, columns 190 to 199: a rim each side), straight, rows 20 to 412.
 local DIVIDER_FILE = "Interface\\WorldMap\\UI-WorldMap-Middle3"
@@ -137,18 +141,14 @@ local function Fill(k)
 end
 function ns.FullMapScale() return fullScale end
 
--- Windowed, the header style (Era's full screen sheets, 768 tall) at the game's own map height: beside the other
--- styles, not the screen's whole height. A size the player gives the map stands in for it.
-local windowedScale
-local function Windowed(k)
-    if k == windowedScale then return end
-    windowedScale = k
-    ns.PlaceSavedWindows()
+-- Windowed, the header style's sheets (Era's full screen ones, 768 tall) shrink to the game's own map height, the text
+-- and the pane at the game's size; maximized they are Era's own, the whole map scaled to the screen (Fill).
+local function WindowedSheets(map)
+    return ((map and map.minimizedHeight) or FOREVER_H) / ns.MapLarge.SHEET_H
 end
-function ns.MapWindowedScale() return windowedScale end
-local function WindowedScale()
-    local _, h = ns.MapLarge.Size(nil)
-    return (Map().minimizedHeight or FOREVER_H) / h
+local function SheetScale(map)
+    if map:IsMaximized() then return 1 end
+    return WindowedSheets(map)
 end
 
 local function FullScale(t)
@@ -397,9 +397,10 @@ local function Coords(map)
     return coords
 end
 
--- One line in the footer under the picture, from its left edge, level with Map Options' middle (its box 24 tall, 5 up):
--- the player's, the cursor's beside it. The game stacks its rows; only their labels move, its settings still show them.
-local FOOT_MID = 17
+-- One line in the footer under the picture, from its left edge, level with Map Options' middle (its box 24 tall, 3 up
+-- in the Classic style's footer, 5 in Era's small map's): the player's, the cursor's beside it. The game stacks its
+-- rows; only their labels move, its settings still show them.
+local FOOT_MID = { classic = 15, none = 17 }
 local COORDS_GAP = 16
 local labelPoints = {}   -- label -> the game's points, taken back with its look
 
@@ -417,7 +418,7 @@ local function PlaceCoords(map, style)
     if not panel then return end
     local rel, x, y
     if style == "classic" then rel, x, y = ns.MapLarge.FootLeft() else rel, x, y = Art(), CANVAS_LEFT, -ERA_H end
-    y = y + FOOT_MID
+    y = y + FOOT_MID[style]
     local player = panel.PlayerCoords.Label
     PlaceLabel(player, rel, "TOPLEFT", x, y)
     local after = panel.PlayerCoords:IsShown()
@@ -435,7 +436,7 @@ local function GameCoords()
     wipe(labelPoints)
 end
 
--- The pane's two scroll bars moved right by shift, or back on the game's own points (nil).
+-- The pane's two scroll bars moved by shift ({ x, y }), or back on the game's own points (nil).
 local barPoints = setmetatable({}, { __mode = "k" })
 local function PaneBars()
     local details = QuestMapFrame and QuestMapFrame.DetailsFrame and QuestMapFrame.DetailsFrame.ScrollFrame
@@ -452,9 +453,9 @@ local function ShiftBar(bar, shift)
             barPoints[bar] = was
         end
         local first = was[1]
-        if not first or ns.IsAt(bar, first[1], first[2], first[3], first[4] + shift, first[5]) then return end
+        if not first or ns.IsAt(bar, first[1], first[2], first[3], first[4] + shift[1], first[5] + shift[2]) then return end
         bar:ClearAllPoints()
-        for _, p in ipairs(was) do bar:SetPoint(p[1], p[2], p[3], p[4] + shift, p[5]) end
+        for _, p in ipairs(was) do bar:SetPoint(p[1], p[2], p[3], p[4] + shift[1], p[5] + shift[2]) end
     elseif was then
         barPoints[bar] = nil
         bar:ClearAllPoints()
@@ -514,7 +515,7 @@ local function DressLarge(map, close, sizer)
     LM.Show(map, paneW, level + FOOT_LINE_OVER_MAP, shape)
     if close then LM.PlaceButtons(close, sizer) end
     local rel, x, y = LM.FootSpot()
-    ns.MapOptions.Place(map, rel, x, y, LM.SCALE)
+    ns.MapOptions.Place(map, rel, x, y, 1)
     ns.MapCombined.Lay(map, shape and LM.CombinedBoxes(shape) or nil)
 end
 
@@ -682,6 +683,7 @@ local function Pass()
     local style = EraStyle()
     if style then
         touched = true
+        if style == "classic" then ns.MapLarge.Fit(SheetScale(map)) end
         local t = Target(style)
         Lay(t)
         -- Laid taller than the game's own size it was placed with: raised as the game would fit it.
@@ -690,7 +692,6 @@ local function Pass()
             DressEra(style)
             Unfade()
             Fill(map:IsMaximized() and FullScale(t) or nil)
-            Windowed(style == "classic" and not map:IsMaximized() and WindowedScale() or nil)
         elseif InCombatLockdown() and PictureLaid(t) then
             DressEra(style)
             FadeOutside(map, style)
@@ -698,14 +699,12 @@ local function Pass()
             Unfade()
             DressForever()
             Fill(nil)
-            Windowed(nil)
         end
     elseif touched then
         Unfade()
         DressForever()
         Lay(Target(nil))
         Fill(nil)
-        Windowed(nil)
     end
     Refit()
 end
@@ -725,15 +724,16 @@ function ns.ClassicMapBorder()
     return eraDressed and art or nil
 end
 
--- The edit mode box: the size the header style draws, the client's for its own layout.
+-- The edit mode box: the size the header style draws windowed, the client's for its own layout.
 function ns.ClassicMapSize()
     local style = ns.ModuleInForce("worldMap") and NavStyle()
+    local k = WindowedSheets(Map())
     if style == "classic" and Combined() then
-        local w, h = ns.MapLarge.CombinedSize(ns.MapCombined.Shape())
+        local w, h = ns.MapLarge.CombinedSize(ns.MapCombined.Shape(), k)
         return w, h, 0
     elseif style == "classic" then
-        local w, h = ns.MapLarge.Size(nil)
-        return w, h, ns.MapLarge.Size(QUEST_PANE_W) - w
+        local w, h = ns.MapLarge.Size(nil, k)
+        return w, h, ns.MapLarge.Size(QUEST_PANE_W, k) - w
     elseif style == "none" then
         return ERA_W, ERA_H, PaneWindowW() - ERA_W
     end

@@ -190,9 +190,6 @@ local function Apply(entry)
     -- A size the window's own look asks on top of the player's (the full size book); a mover's window wears only it.
     local zoom = entry.zoom and entry.zoom() or 1
     if zoom ~= 1 then scale = (scale or 1) * zoom end
-    -- Windowed, the map wears its header style's size with the player's on top: 100% is the style's own.
-    local style = entry.quests and not held and ns.MapWindowedScale and ns.MapWindowedScale()
-    if style then scale = (scale or 1) * style end
     if not held and Full(entry, frame) then left, scale = nil, FullScale() end
     if scale then scale = ns.ScreenFitScale(frame, scale, DrawnSize(entry, frame)) end
     if not (left or scale or scaled[frame]) then return end
@@ -265,7 +262,7 @@ PlaceAll = function()
         if ours and ns.MakeWindowLock then ns.MakeWindowLock(entry) end
         if ours and ns.MakeWindowGrip then ns.MakeWindowGrip(entry) end
         if (ours and (PlaceOf(entry) or Scales()[SizeKey(entry)] or IsFree(entry))) or (frame and scaled[frame])
-            or (entry.quests and ours and (FullScale() or (ns.MapWindowedScale and ns.MapWindowedScale())))
+            or (entry.quests and ours and FullScale())
             or (entry.zoom and entry.zoom() ~= 1) then
             if ours then Watch(entry) end
             Apply(entry)

@@ -105,16 +105,20 @@ local function CornerStep(x, y, left, top)
 end
 
 -- The divider on the cursor: the list takes the width left of it, the picture the rest (aspect kept), the pages the
--- height left under the picture; the window stays as it was.
+-- height left under the picture; the window stays as it was. The list's width and the pages' height are the sheets'
+-- units (k to the map's); the window and the picture the map's.
 local function EdgeStep(x)
     local lm, W, H = LM(), drag.w, drag.h
-    local listW = math.max(LIST_MIN, math.min(LIST_MAX, drag.listW - (x - drag.x)))
-    local share = math.min(lm.ShareForWidth(W - lm.SIDE_ROOM - listW), lm.ShareForHeight(H - lm.FOOT_ROOM - PAGES_MIN))
+    local k = lm.Scale()
+    local listW = math.max(LIST_MIN, math.min(LIST_MAX, drag.listW - (x - drag.x) / k))
+    local share = math.min(lm.ShareForWidth(W - lm.SideRoom() - listW * k),
+        lm.ShareForHeight(H - lm.FootRoom() - PAGES_MIN * k))
     share = math.floor(share / EDGE_SNAP + 0.5) * EDGE_SNAP
     local w, h = lm.PictureSize(share)
     local now = MC.Shape()
     if math.abs(share - now.share) < EDGE_SNAP / 2 then return end
-    ns.db.mapQuestShare, ns.db.mapQuestListW, ns.db.mapQuestPagesH = share, W - lm.SIDE_ROOM - w, H - lm.FOOT_ROOM - h
+    ns.db.mapQuestShare = share
+    ns.db.mapQuestListW, ns.db.mapQuestPagesH = (W - lm.SideRoom() - w) / k, (H - lm.FootRoom() - h) / k
 end
 
 -- The map's pass that frame lays the art, our hosts and the picture (scaled to it) at the new shape.
