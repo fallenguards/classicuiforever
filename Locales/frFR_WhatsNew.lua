@@ -3,6 +3,14 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN67_1_TITLE"] = "Les éléments de la minicarte y restent"
+L["WN67_1_TEXT"] = "Chaque élément de la minicarte dans ClassicUI Forever Windows a une case Rester sur la minicarte. Cochée, l'élément garde sa place sur la minicarte. Décochez-la pour le déplacer où vous voulez."
+L["WN67_2_TITLE"] = "La fenêtre Options suit le thème"
+L["WN67_2_TEXT"] = "Sa bordure et les éléments de Classic Era portent le look sombre, bronze ou personnalisé, et le look classique ne laisse plus de bronze sur ses bords."
+L["WN67_3_TITLE"] = "Les cases et l'en-tête du sac unique"
+L["WN67_3_TEXT"] = "Les cases vides n'affichent pas d'icône de sac, la recherche va jusqu'au bouton Ranger, et la bande d'en-tête est entière."
+L["WN67_4_TITLE"] = "La carte du monde en combat"
+L["WN67_4_TEXT"] = "Ouverte en combat, la carte est dimensionnée par l'addon seul, si bien qu'un autre addon de carte ne peut plus déclencher d'erreur d'action bloquée."
 L["WN66_1_TITLE"] = "Les infobulles retrouvent le fond sombre de Classic Era"
 L["WN66_1_TEXT"] = "Chaque infobulle porte le fond sombre d'Era dans tous les styles. Le fond plus clair et plus bleu du jeu transparaissait dès la deuxième infobulle, avec un jour le long du bord."
 L["WN66_2_TITLE"] = "La minicarte se déplace de nouveau en mode Édition"

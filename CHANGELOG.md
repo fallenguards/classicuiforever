@@ -2,6 +2,18 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.46.0] - 2026-11-06
+
+### Added
+- Stay on minimap: every minimap piece's box in ClassicUI Forever Windows has a Stay on minimap check, on by default. Checked, the piece keeps its spot on the minimap and cannot be dragged off it; a ring icon still drags round the ring. Uncheck it to drag the piece anywhere.
+
+### Fixed
+- The Options window takes the theme like the other windows: its border and Classic Era's pieces wear the dark, bronze or custom look, and no bronze is left on its corners and edges in the classic look.
+- The one bag's empty slots show no bag icon (the launch client put one there), its search box runs across to the Clean Up button, and its header band is drawn whole, with the search box and Clean Up on their line.
+- The world map opened in a fight is sized by the addon alone, with nothing secure hung under it, so another map addon's touch no longer has the game block the map's own zoom reset in a fight with a blocked-action error.
+- A trade skill opened from the action bar closes the open spellbook, as the spellbook's own button does.
+- The loot window stays where it is when a loot opens again while it is up, as a click on an item that will not fit in the bags does.
+
 ## [0.45.1] - 2026-11-05
 
 ### Fixed

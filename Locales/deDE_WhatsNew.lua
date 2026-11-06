@@ -3,6 +3,14 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN67_1_TITLE"] = "Minimap-Teile bleiben auf der Minikarte"
+L["WN67_1_TEXT"] = "Jedes Minimap-Teil in ClassicUI Forever Windows hat ein Kästchen Auf der Minikarte bleiben. Angehakt behält das Teil seinen Platz auf der Minikarte. Abgehakt lässt es sich überallhin ziehen."
+L["WN67_2_TITLE"] = "Das Optionsfenster folgt dem Theme"
+L["WN67_2_TEXT"] = "Sein Rahmen und die Teile aus Classic Era tragen den dunklen, bronzenen oder eigenen Look, und im klassischen Look bleibt kein Bronze an seinen Rändern."
+L["WN67_3_TITLE"] = "Plätze und Kopfleiste der einen Tasche"
+L["WN67_3_TEXT"] = "Leere Plätze zeigen kein Taschensymbol, das Suchfeld reicht bis zum Aufräumen-Knopf, und die Kopfleiste ist vollständig."
+L["WN67_4_TITLE"] = "Die Weltkarte im Kampf"
+L["WN67_4_TEXT"] = "Im Kampf geöffnet wird die Karte allein vom Addon bemessen, sodass ein anderes Karten-Addon keinen Fehler wegen einer blockierten Aktion mehr auslösen kann."
 L["WN66_1_TITLE"] = "Tooltips wieder so dunkel wie in Classic Era"
 L["WN66_1_TEXT"] = "Jeder Tooltip trägt in jedem Look die dunkle Füllung von Era. Die hellere, blauere Füllung des Spiels schien ab dem zweiten Tooltip durch, mit einer Lücke innen am Rand."
 L["WN66_2_TITLE"] = "Die Minimap lässt sich im Bearbeitungsmodus wieder verschieben"

@@ -2,6 +2,14 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN67_1_TITLE"] = "Minimap pieces stay on the minimap"
+L["WN67_1_TEXT"] = "Every minimap piece's box in ClassicUI Forever Windows has a Stay on minimap check. Checked, the piece keeps its spot on the minimap. Uncheck it to drag the piece anywhere."
+L["WN67_2_TITLE"] = "The Options window follows the theme"
+L["WN67_2_TEXT"] = "Its border and Classic Era's pieces wear the dark, bronze or custom look, with no bronze left on its edges in the classic look."
+L["WN67_3_TITLE"] = "The one bag's slots and header"
+L["WN67_3_TEXT"] = "Empty slots show no bag icon, the search box reaches the Clean Up button, and the header band is whole."
+L["WN67_4_TITLE"] = "The world map in a fight"
+L["WN67_4_TEXT"] = "Opened during a fight, the map is sized by the addon alone, so another map addon can no longer set off a blocked-action error."
 L["WN66_1_TITLE"] = "Tooltips are Classic Era's dark again"
 L["WN66_1_TEXT"] = "Every tooltip wears Era's dark fill in every look. The game's lighter, bluer fill showed through from the second tooltip on, with a gap inside the border."
 L["WN66_2_TITLE"] = "The minimap moves in Edit Mode again"

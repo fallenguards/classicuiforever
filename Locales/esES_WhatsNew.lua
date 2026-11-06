@@ -3,6 +3,14 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN67_1_TITLE"] = "Las piezas del minimapa se quedan en él"
+L["WN67_1_TEXT"] = "Cada pieza del minimapa en ClassicUI Forever Windows tiene una casilla Quedarse en el minimapa. Marcada, la pieza conserva su sitio en el minimapa. Desmárcala para arrastrarla a cualquier parte."
+L["WN67_2_TITLE"] = "La ventana de Opciones sigue el tema"
+L["WN67_2_TEXT"] = "Su borde y las piezas de Classic Era llevan el aspecto oscuro, bronce o personalizado, y en el aspecto clásico no queda bronce en sus bordes."
+L["WN67_3_TITLE"] = "Los huecos y la cabecera de la bolsa única"
+L["WN67_3_TEXT"] = "Los huecos vacíos no muestran icono de bolsa, la búsqueda llega hasta el botón Limpiar y la banda de cabecera está completa."
+L["WN67_4_TITLE"] = "El mapa del mundo en combate"
+L["WN67_4_TEXT"] = "Abierto en combate, el mapa lo dimensiona solo el addon, así que otro addon de mapa ya no puede provocar un error de acción bloqueada."
 L["WN66_1_TITLE"] = "Las descripciones vuelven a ser oscuras como en Classic Era"
 L["WN66_1_TEXT"] = "Cada descripción lleva el fondo oscuro de Era en todos los estilos. El fondo más claro y azulado del juego se veía a partir de la segunda descripción, con un hueco dentro del borde."
 L["WN66_2_TITLE"] = "El minimapa vuelve a moverse en el modo de edición"

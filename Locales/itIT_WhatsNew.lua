@@ -3,6 +3,14 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN67_1_TITLE"] = "I pezzi della minimappa restano su di essa"
+L["WN67_1_TEXT"] = "Ogni pezzo della minimappa in ClassicUI Forever Windows ha una casella Resta sulla minimappa. Spuntata, il pezzo tiene il suo posto sulla minimappa. Togli la spunta per trascinarlo ovunque."
+L["WN67_2_TITLE"] = "La finestra Opzioni segue il tema"
+L["WN67_2_TEXT"] = "Il suo bordo e i pezzi di Classic Era vestono il look scuro, bronzo o personalizzato, e nel look classico non resta bronzo sui suoi bordi."
+L["WN67_3_TITLE"] = "Gli slot e l'intestazione della borsa unica"
+L["WN67_3_TEXT"] = "Gli slot vuoti non mostrano l'icona della borsa, la ricerca arriva al pulsante Riordina e la fascia d'intestazione è intera."
+L["WN67_4_TITLE"] = "La mappa del mondo in combattimento"
+L["WN67_4_TEXT"] = "Aperta in combattimento, la mappa è dimensionata dal solo addon, così un altro addon di mappe non può più causare un errore di azione bloccata."
 L["WN66_1_TITLE"] = "I tooltip tornano scuri come in Classic Era"
 L["WN66_1_TEXT"] = "Ogni tooltip ha lo sfondo scuro di Era in ogni stile. Lo sfondo più chiaro e bluastro del gioco traspariva dal secondo tooltip in poi, con uno spazio vuoto lungo il bordo."
 L["WN66_2_TITLE"] = "La minimappa si sposta di nuovo in modalità Modifica"
