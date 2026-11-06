@@ -522,8 +522,8 @@ ns.TOGGLES = {
     { "communitiesNoGuildTab", L["OPT_communitiesNoGuildTab"], L["OPT_communitiesNoGuildTab_TIP"], parent = "communitiesButton",
         search = "communities tab no guild" },
 
-    { "gameDamageNumbers", L["OPT_gameDamageNumbers"], L["OPT_gameDamageNumbers_TIP"], group = L["GROUP_OTHER"], sub = L["SUB_COMBAT"] },
-    { "damageMeter", L["OPT_damageMeter"], L["OPT_damageMeter_TIP"], search = "dps meter recount details" },
+    { "damageMeter", L["OPT_damageMeter"], L["OPT_damageMeter_TIP"], search = "dps meter recount details",
+        group = L["GROUP_OTHER"], sub = L["SUB_COMBAT"] },
     { "lootToast", L["OPT_lootToast"], L["OPT_lootToast_TIP"], search = "loot toast popup you received alert won drop" },
     { "levelUpBanner", L["OPT_levelUpBanner"], L["OPT_levelUpBanner_TIP"], search = "level up ding banner toast popup reached",
         sub = L["SUB_MESSAGES"] },

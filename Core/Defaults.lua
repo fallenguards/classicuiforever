@@ -91,7 +91,6 @@ ns.DB_DEFAULTS = {
     spellBookHidePassives = false,
     spellBookFlyouts = false,
     bagsBesideBars = true,
-    gameDamageNumbers = true,
     levelUpBanner = false,
     zoneTerritory = true,
     hideZoneText = false,

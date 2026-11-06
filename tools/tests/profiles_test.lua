@@ -18,11 +18,11 @@ local function Check(ok, msg)
 end
 
 local ns = {}
-ns.DB_DEFAULTS = { a = true, b = false, barScale = 1, microScale = 1, oneBagColumns = 8, gameDamageNumbers = true }
-ns.TOGGLES = { { "a" }, { "b" }, { "gameDamageNumbers" } }
+ns.DB_DEFAULTS = { a = true, b = false, barScale = 1, microScale = 1, oneBagColumns = 8, englishSettings = true }
+ns.TOGGLES = { { "a" }, { "b" }, { "englishSettings" } }
 local changedLog
 function ns.TogglesChanged(changed) changedLog = table.concat(changed, ",") end
-ns.db = { a = false, b = false, barScale = 1.2, microScale = 1, oneBagColumns = 8, gameDamageNumbers = false,
+ns.db = { a = false, b = false, barScale = 1.2, microScale = 1, oneBagColumns = 8, englishSettings = false,
     whatsNewSeen = 3 }
 
 -- The real shared helpers (ns.DbTable) first, as the addon loads them.
@@ -37,7 +37,7 @@ ForeverClassicUICharDB = nil
 ns.LoadProfile()
 Check(ns.ProfileName() == "Default", "starts on Default")
 Check(ns.db.profiles.Default.a == false and ns.db.profiles.Default.barScale == 1.2, "Default keeps the settings in use")
-Check(ns.db.profiles.Default.gameDamageNumbers == nil, "the game's own setting is left out")
+Check(ns.db.profiles.Default.englishSettings == nil, "an account-wide pick is left out")
 
 local name = ns.NewProfile("  Tank  ", false)
 Check(name == "Tank" and ns.ProfileName() == "Tank", "new profile trimmed and in use")

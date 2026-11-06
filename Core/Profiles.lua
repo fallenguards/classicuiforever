@@ -11,8 +11,8 @@ local EXTRA = { "themeColor", "themeDarkness", "barScale", "microScale", "microW
     "swingColorMain", "swingColorOff", "swingColorRanged", "swingBorder", "meterBackground", "prdGap", "meterHeader", "unitNameSize", "thickEnemyColor", "unitBarTexture", "meterArtPan",
     "meterPanPreview", "statPaneLeft", "statPaneRight", "minimapButtonPicks",
     "fadeBar1", "fadeBar2", "fadeBar3", "fadeBar4", "fadeBar5", "fadeBar6", "fadeBar7", "fadeBar8", "fadeStance", "fadePet" }
--- The game's own setting mirrored, and the English text picks (read before the profile loads): account-wide.
-local SKIP = { gameDamageNumbers = true, englishSettings = true, englishNews = true, englishMessages = true,
+-- The English text picks (read before the profile loads): account-wide.
+local SKIP = { englishSettings = true, englishNews = true, englishMessages = true,
     englishWindows = true }
 ns.PROFILE_DEFAULT = DEFAULT
 

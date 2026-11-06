@@ -481,8 +481,6 @@ end
 
 -- Every row's box from the settings (this window's and a standalone piece's).
 function O.RefreshRows(built)
-    -- The one box mirroring a game setting: read fresh.
-    ns.ReadGameDamageNumbers()
     local parentOf = built.parentOf
     for _, row in ipairs(built.rows) do
         -- Done by another toggle (offBy): checked and grayed, as it is in force.

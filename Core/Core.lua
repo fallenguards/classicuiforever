@@ -493,7 +493,6 @@ local function PickRadio(key)
 end
 
 local function KeyEffects(key)
-    if key == "gameDamageNumbers" then ns.WriteGameDamageNumbers() end
     if key == "oneBag" then ns.SetCVarOrHold("combinedBags", ns.db.oneBag == true and "1" or "0") end
     if key == "questLevels" then ns.SetCVarOrHold("showQuestLevel", ns.db.questLevels == true and "1" or "0") end
     if key == "plainNumbers" then ns.SetCVarOrHold("breakUpLargeNumbers", ns.db.plainNumbers == true and "0" or "1") end
@@ -631,7 +630,6 @@ frame:SetScript("OnEvent", function(_, event, arg1)
     elseif event == "PLAYER_LOGIN" then
         ns.ready = true
         ns.padSession = ns.GamepadUI() and true or false
-        ns.ReadGameDamageNumbers()
         OrderModules()
         for _, mod in ipairs(ns.modules) do
             if mod.init then ns.SafeCall(mod.init) end

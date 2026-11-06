@@ -103,7 +103,6 @@ return {
     focusBuffsOnTop = false,
     foreverWelcome = true,
     fullPlates = true,
-    gameDamageNumbers = true,
     gameMenu = true,
     gameMenuMinimapButton = false,
     gameObjectiveTracker = false,

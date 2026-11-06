@@ -20,17 +20,8 @@ function ns.CopyDefaults(dst, src)
     end
 end
 
--- The game's floating damage option lives in its cvars; db.gameDamageNumbers mirrors them.
+-- The game's floating damage option, in its cvars.
 local DAMAGE_CVARS = { "floatingCombatTextCombatDamage", "floatingCombatTextCombatDamage_v2" }
-function ns.ReadGameDamageNumbers()
-    if not (ns.db and C_CVar and C_CVar.GetCVar) then return end
-    local shown
-    for _, name in ipairs(DAMAGE_CVARS) do
-        local value = ns.GetCVar(name)
-        if value ~= nil then shown = shown or value == "1" end
-    end
-    if shown ~= nil then ns.db.gameDamageNumbers = shown end
-end
 
 -- Raw write for the player's own value or a hand-back: never recorded in cvarWas, no combat refusal, no same-value skip.
 function ns.WriteCVar(name, value)
@@ -49,18 +40,7 @@ end
 function ns.RepairDamageNumbers()
     if not ns.db or ns.db.damageNumbersRepaired then return end
     ns.db.damageNumbersRepaired = true
-    local on = false
-    for _, name in ipairs(DAMAGE_CVARS) do
-        if ns.TurnCVarBackOn(name) then on = true end
-    end
-    if on then ns.db.gameDamageNumbers = true end
-end
-
--- Not ns.SetCVar: the player's own choice, never handed back at turn-off.
-function ns.WriteGameDamageNumbers()
-    for _, name in ipairs(DAMAGE_CVARS) do
-        ns.WriteCVar(name, ns.db.gameDamageNumbers and "1" or "0")
-    end
+    for _, name in ipairs(DAMAGE_CVARS) do ns.TurnCVarBackOn(name) end
 end
 
 -- Guarded cvars (the nameplate family) block any addon write in combat, same-value included.

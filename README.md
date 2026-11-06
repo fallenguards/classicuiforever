@@ -12,7 +12,7 @@ Puts the original Classic look back on top of the modern interface in World of W
 ### Unit frames and combat
 
 - Player, target, focus, target of target, pet and party frames with the old art, elite dragons and class colors.
-- Classic cast bars, combo points, swing timers, the breath and fatigue bars, and classic damage numbers over the mob you hit.
+- Classic cast bars, combo points, swing timers, and the breath and fatigue bars.
 - The 1.x nameplates, with the elite dragon and class colors if you like.
 - The game's damage meter in the old look.
 
