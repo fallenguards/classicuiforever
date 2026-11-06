@@ -1,8 +1,7 @@
 local _, ns = ...
 
--- 1.x bags on the client's containers: bag sheet in Classic's three cuts (top with ring and name, middles per rows, bottom lip),
--- backpack sheet with its money strip, slots on the 41px pitch, the old ring per icon; client art faded.
--- Combined bags (not in 1.x) are one tall backpack, four across unless picked.
+-- 1.x bags on the client's containers: the bag sheet in Classic's three cuts (top, middles per row, lip), the backpack's with
+-- its money strip, slots on the 41px pitch, the old ring per icon; client art faded. Combined bags (not in 1.x): one tall backpack.
 
 local B = ns.bags
 local NewBand = B.NewBand
@@ -292,8 +291,10 @@ local function TokenRow(frame)
     if row and row:GetParent() == frame and row:IsShown() then return row end
 end
 
+-- Forever 70790 lays the bag's own icon over the combined bag's empty slots on each update (EmptyBagIcon): hidden, never faded.
 local function EmptyLook(button)
     if button.icon then button.icon:SetAlpha(button.hasItem and 1 or 0) end
+    if button.EmptyBagIcon and button.EmptyBagIcon:IsShown() then button.EmptyBagIcon:Hide() end
 end
 
 -- A slot's marks, each off by its option (quest border, quality border, a vendor's junk coin); the game only shows them.
@@ -515,9 +516,8 @@ local function Park(frame)
     parked[frame] = true
 end
 
--- Runs inside the client's layout pass: it stacks bags by height, so a deferred
--- pass would misplace them or flash the client's layout.
--- part: what a layout step of the game's just undid ("size", "items", "trim", "search"); nil is the whole skin.
+-- Runs inside the client's layout pass (it stacks bags by height; deferred, ours would misplace them or flash its layout).
+-- part: the layout step of the game's just undone ("size", "items", "trim", "search"); nil is the whole skin.
 local function Skin(frame, part)
     if not active or not frame or not frame.GetBagSize then
         if ns.debugSink then
