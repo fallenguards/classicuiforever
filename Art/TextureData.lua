@@ -185,6 +185,11 @@ ns.TEX = {
     frameSheet = "!_UI-Frame",
     -- Era's frame corner sheet (the button bar's end posts); the client's copy is the same file.
     frameCorners = "=FrameGeneral\\UI-Frame",
+    -- The settings window's Era border (ButtonFrameTemplateNoPortrait) on the theme's copies of the client's
+    -- UI-Frame sheets, so its metal masks dress it: corners, strips across, strips down.
+    uiFrameCorners = "!theme-base\\UIFrame-Inner-Atlas.tga",
+    uiFrameTilesH = "!theme-base\\UIFrame-HTile-Atlas.tga",
+    uiFrameTilesV = "!theme-base\\UIFrame-VTile-Atlas.tga",
     merchantBottom = "!UI-Merchant-BottomBorder",
     merchantLabelSlots = "!UI-Merchant-LabelSlots",
     -- Old bag sheets: the shared bag pieces and the backpack's own.

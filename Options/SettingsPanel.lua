@@ -120,16 +120,18 @@ local ERA_ART = {
     ["common-dropdown-ticksquare"] = { "eraDropdownC", 0.94531, 0.99219, 0.49219, 0.53906 },
 }
 
--- Era's frame border (ButtonFrameTemplateNoPortrait): piece, atlas, size, and its anchors from the frame and corners.
+-- Era's frame border (ButtonFrameTemplateNoPortrait) from the theme's copies of the client's UI-Frame sheets (the
+-- same art on every client): piece, sheet key, its pixels { left, right, top, bottom }, size, tiled across or down.
+local SHEET = { uiFrameCorners = { 128, 128 }, uiFrameTilesH = { 256, 128 }, uiFrameTilesV = { 64, 256 } }
 local BORDER = {
-    { "TopLeftCorner", "UI-Frame-TopLeftCornerNoPortrait", 34, 33 },
-    { "TopRightCorner", "UI-Frame-TopCornerRight", 33, 33 },
-    { "BottomLeftCorner", "UI-Frame-BotCornerLeft", 14, 14 },
-    { "BottomRightCorner", "UI-Frame-BotCornerRight", 11, 11 },
-    { "TopEdge", "_UI-Frame-TitleTile", nil, 28 },
-    { "BottomEdge", "_UI-Frame-Bot", nil, 9 },
-    { "LeftEdge", "!UI-Frame-LeftTile", 16, nil },
-    { "RightEdge", "!UI-Frame-RightTile", 10, nil },
+    { "TopLeftCorner", "uiFrameCorners", { 81, 115, 1, 34 }, 34, 33 },
+    { "TopRightCorner", "uiFrameCorners", { 81, 114, 36, 69 }, 33, 33 },
+    { "BottomLeftCorner", "uiFrameCorners", { 57, 71, 81, 95 }, 14, 14 },
+    { "BottomRightCorner", "uiFrameCorners", { 116, 127, 63, 74 }, 11, 11 },
+    { "TopEdge", "uiFrameTilesH", { 0, 256, 46, 74 }, nil, 28, "across" },
+    { "BottomEdge", "uiFrameTilesH", { 0, 256, 95, 104 }, nil, 9, "across" },
+    { "LeftEdge", "uiFrameTilesV", { 1, 17, 0, 256 }, 16, nil, "down" },
+    { "RightEdge", "uiFrameTilesV", { 19, 29, 0, 256 }, 10, nil, "down" },
 }
 local CORNER_POINTS = { TopLeftCorner = "TOPLEFT", TopRightCorner = "TOPRIGHT", BottomLeftCorner = "BOTTOMLEFT",
     BottomRightCorner = "BOTTOMRIGHT" }
@@ -201,15 +203,22 @@ local function EraTree(frame, depth)
     ns.EachChild(frame, EraTree, depth + 1)
 end
 
+-- Our own themed art on the client's pieces, its metal masks with it (by file: the wraps go with the repaint). An
+-- atlas here fed the client-copy path, which left four pieces in the last theme's paint.
 local function EraBorder(panel)
     local slice = panel.NineSlice
     if not slice then return end
     for _, piece in ipairs(BORDER) do
         local tex = slice[piece[1]]
         if tex then
-            tex:SetAtlas(piece[2])
-            if piece[3] then tex:SetWidth(piece[3]) end
-            if piece[4] then tex:SetHeight(piece[4]) end
+            local px, sheet, tile = piece[3], SHEET[piece[2]], piece[6]
+            ns.SetFile(tex, (ns.TexPaths(piece[2])), tile == "across" and "REPEAT" or "CLAMP",
+                tile == "down" and "REPEAT" or "CLAMP")
+            tex:SetTexCoord(px[1] / sheet[1], px[2] / sheet[1], px[3] / sheet[2], px[4] / sheet[2])
+            tex:SetHorizTile(tile == "across")
+            tex:SetVertTile(tile == "down")
+            if piece[4] then tex:SetWidth(piece[4]) end
+            if piece[5] then tex:SetHeight(piece[5]) end
         end
     end
     for key, point in pairs(CORNER_POINTS) do

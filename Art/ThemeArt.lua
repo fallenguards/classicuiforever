@@ -10,8 +10,15 @@ theme-base\ChatFrame-Atlas.tga
 ClockBackground.blp
 theme-base\Common-Input-Border.tga
 CommonDropdownClassic.blp
+EraDropdownC.blp
 EraLFGBrowseTop.blp
 EraLFGFrame.blp
+EraOptions.blp
+EraOptionsListExpand.blp
+EraScrollBarArrows.blp
+EraScrollBarThumbCaps.blp
+EraScrollBarTrack.blp
+EraSearchBox.blp
 HelpFrameTab-Active.blp
 HelpFrameTab-Inactive.blp
 theme-base\MailItemBorder.tga
@@ -236,6 +243,7 @@ UIFrame-VTile-Atlas
 ns.CHROME_ART = [[
 CharacterCreate-LabelFrame
 Common-Input-Border
+EraSearchBox
 HelpFrameTab-Active
 HelpFrameTab-Inactive
 SkillFrame-BotLeft
