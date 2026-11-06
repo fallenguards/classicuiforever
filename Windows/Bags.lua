@@ -22,7 +22,7 @@ local BOTTOM_TOP, BOTTOM_BOTTOM, BOTTOM_H = 0.330078125, 0.349609375, 10
 local BACKPACK_ROWS = 4          -- the backpack sheet carries four rows and the money strip
 local BACKPACK_TOP, BACKPACK_SPLIT = 255, 210   -- the sheet's height, and where it splits when rows are added
 local BACKPACK_BASE_H = 240
-local BACKPACK_FIRST_Y = -211    -- the first backpack slot's bottom, from the top, with four rows
+local BACKPACK_FIRST_Y, BACKPACK_HEADER = -211, 51   -- the first backpack slot's bottom with four rows; the sheet above the first slot row
 local BACKPACK_MIDDLE_TOP = 215 / 512   -- backpack extra rows start lower on the sheet than a bag's
 local MONEY_Y = -215
 -- Close button, its top right from the frame's: the backpack (and the one bag), then every other bag and the key ring.
@@ -246,9 +246,9 @@ local function DrawBackpack(frame, rows, token)
     -- With a currency strip the sheet stops at the money strip's foot; the strip and the rim follow.
     local sheetEnd = token and STRIP_END or BACKPACK_TOP
     if extra < 0 then
-        -- A combined bag of few slots across many columns: the header, then the sheet from as many lattice lines
-        -- down as rows go unused (the top row was left an empty lattice).
-        local header = BACKPACK_SPLIT - BACKPACK_ROWS * ROW
+        -- A combined bag of few slots across many columns: the sheet to the first slot row's top (the header band whole;
+        -- cut shorter, the band ended in the lattice gap and the search box read low), then from as many rows down.
+        local header = BACKPACK_HEADER
         local from = header - extra * ROW
         top:SetHeight(header)
         top:SetTexCoord(0, header / BACKPACK_TOP)
@@ -469,7 +469,8 @@ local SORT_W, SORT_H, SORT_GLOW_W, SORT_GLOW_H = 24, 22, 21, 20
 local function PlaceSearch(frame)
     if BagItemSearchBox and BagItemSearchBox:GetParent() == frame then
         ns.SetPointOnce(BagItemSearchBox, "TOPLEFT", frame, "TOPLEFT", 52, -31)
-        BagItemSearchBox:SetSize(104, 16)
+        BagItemSearchBox:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -(10 + SORT_W + 4), -31)
+        BagItemSearchBox:SetHeight(16)
     end
     if BagItemAutoSortButton and BagItemAutoSortButton:GetParent() == frame then
         ns.SetPointOnce(BagItemAutoSortButton, "TOPRIGHT", frame, "TOPRIGHT", -10, -28)
@@ -516,8 +517,7 @@ local function Park(frame)
     parked[frame] = true
 end
 
--- Runs inside the client's layout pass (it stacks bags by height; deferred, ours would misplace them or flash its layout).
--- part: the layout step of the game's just undone ("size", "items", "trim", "search"); nil is the whole skin.
+-- Inside the client's layout pass (deferred, ours would misplace or flash). part: the step the game just undid, nil the whole skin.
 local function Skin(frame, part)
     if not active or not frame or not frame.GetBagSize then
         if ns.debugSink then
