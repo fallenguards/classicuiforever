@@ -50,10 +50,12 @@ function ns.ListSearch(list, area, search, rows, shown, visible, draw)
     return bar
 end
 
--- rows: { key, label, tip } each; isOn(key) and flip(key). Returns the list; list:Toggle(owner) opens it under owner.
-function ns.CheckList(rows, isOn, flip)
+-- rows: { key, label, tip } each; isOn(key) and flip(key); fill(rows), when given, refills them as the list opens.
+-- Returns the list; list:Toggle(owner) opens it under owner.
+function ns.CheckList(rows, isOn, flip, fill)
     local list, inset = ns.IronList()
     local shown, buttons = {}, {}
+    if fill then list.OnOpen = function() fill(rows) end end
 
     local probe = list:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
     local widest = 0
@@ -93,6 +95,9 @@ function ns.CheckList(rows, isOn, flip)
         button.tick:SetPoint("LEFT", button, "LEFT", 0, 0)
         button.label = button:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
         button.label:SetPoint("LEFT", button.tick, "RIGHT", GAP, 0)
+        button.label:SetPoint("RIGHT", button, "RIGHT", 0, 0)
+        button.label:SetJustifyH("LEFT")
+        button.label:SetWordWrap(false)
         ns.MenuHighlight(button)
         button:SetScript("OnClick", function(self)
             if not self.row then return end

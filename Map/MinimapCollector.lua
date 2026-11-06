@@ -49,8 +49,14 @@ local function Pocket(button)
     ns.ThemeAddonRing(button)
 end
 
+-- Kept on the ring (minimapCollectorKeep: key -> true, in the profile): never taken; one in the bag goes back.
+local function Kept(button)
+    local keep = ns.db.minimapCollectorKeep
+    return type(keep) == "table" and keep[ns.MM.AddonButtonKey(button)] == true
+end
+
 local function Take(button, libName)
-    if not button then return end
+    if not button or Kept(button) then return end
     if collected[button] then
         if button:GetParent() ~= popout then Pocket(button) end
         return
@@ -250,26 +256,57 @@ local ShowRing, HideRing = ns.RingButton({
     } },
 })
 
--- Every button back on its parent and points; LibDBIcon puts its own back in place.
+-- The i-th button back on its parent and points; LibDBIcon puts its own back in place.
+local function Give(i, lib)
+    local button = order[i]
+    local record = collected[button]
+    button:SetParent(record.parent)
+    button:SetFrameStrata(record.strata)
+    button:SetFrameLevel(record.level)
+    button:SetFixedFrameStrata(record.fixedStrata)
+    button:SetFixedFrameLevel(record.fixedLevel)
+    button:SetScale(record.scale or 1)
+    button:ClearAllPoints()
+    for _, point in ipairs(record.points) do button:SetPoint(unpack(point)) end
+    button:RegisterForDrag("LeftButton")
+    button.showOnMouseover = record.mouseover
+    if record.lib and lib and lib.Refresh then pcall(lib.Refresh, lib, record.lib) end
+    collected[button] = nil
+    table.remove(order, i)
+end
+
 local function Release()
     local lib = DBIcon()
-    for i = #order, 1, -1 do
-        local button = order[i]
-        local record = collected[button]
-        button:SetParent(record.parent)
-        button:SetFrameStrata(record.strata)
-        button:SetFrameLevel(record.level)
-        button:SetFixedFrameStrata(record.fixedStrata)
-        button:SetFixedFrameLevel(record.fixedLevel)
-        button:SetScale(record.scale or 1)
-        button:ClearAllPoints()
-        for _, point in ipairs(record.points) do button:SetPoint(unpack(point)) end
-        button:RegisterForDrag("LeftButton")
-        button.showOnMouseover = record.mouseover
-        if record.lib and lib and lib.Refresh then pcall(lib.Refresh, lib, record.lib) end
-        collected[button], order[i] = nil, nil
-    end
+    for i = #order, 1, -1 do Give(i, lib) end
 end
+
+-- Every addon button, in the bag or on the ring, for the keep list: ours first while it is on, the rest by name.
+function ns.AddonBagButtons()
+    local list, seen = {}, {}
+    local function Note(button)
+        local key = ns.MM.AddonButtonKey(button)
+        if key and key ~= OURS and not seen[key] then
+            seen[key] = true
+            list[#list + 1] = { key = key, label = Label(key) }
+        end
+    end
+    for _, button in ipairs(order) do Note(button) end
+    ns.EachAddonRingButton(Note)
+    table.sort(list, ByLabel)
+    if ns.db.minimapButton then table.insert(list, 1, { key = OURS, label = L["MAP_CLASSICUI_FOREVER"] }) end
+    return list
+end
+
+-- The keep list changed: the kept go back to the ring, the rest come in (one let go earlier still on the map).
+ns.OnToggle(function(key)
+    if key ~= "minimapCollectorKeep" or not active then return end
+    local lib = DBIcon()
+    for i = #order, 1, -1 do
+        if Kept(order[i]) then Give(i, lib) end
+    end
+    Scan()
+    if popout:IsShown() then Layout() end
+end)
 
 -- A button made later joins at once (LibDBIcon says so); others on the next opening.
 local listener

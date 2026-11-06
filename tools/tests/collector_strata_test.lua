@@ -54,13 +54,15 @@ local lib = {
 }
 function LibStub() return lib end
 
-local apply, restore, sweep
+local apply, restore, sweep, toggled
 local children = {}
 local ns = {
     L = setmetatable({}, { __index = function(_, key) return key end }),
     db = {},
-    MM = { OUR_BUTTON = "ForeverClassicUIMinimapButton" },
+    MM = { OUR_BUTTON = "ForeverClassicUIMinimapButton",
+        AddonButtonKey = function(button) return button.name and (button.name:gsub("^LibDBIcon10_", "")) end },
     RingButton = function() return noop, noop end,
+    OnToggle = function(fn) toggled = fn end,
     RegisterModule = function(key, spec)
         if key == "minimapCollector" then apply, restore = spec.apply, spec.restore end
     end,
@@ -88,6 +90,23 @@ restore()
 Check(sack:GetFrameStrata() == "MEDIUM" and sack:GetFrameLevel() == 8, "handed back: its own strata and level")
 Check(sack.fixedStrata == true and sack.fixedLevel == true, "handed back: pinned again, as its library left it")
 Check(late:GetParent() == Minimap, "the late button handed back to the map")
+
+-- Keep on the ring (minimapCollectorKeep): a kept button goes back as the list changes and is never taken again.
+apply()
+Check(sack:GetParent() ~= Minimap and late:GetParent() ~= Minimap, "both in the bag again")
+ns.db.minimapCollectorKeep = { BugSack = true }
+toggled("minimapCollectorKeep")
+Check(sack:GetParent() == Minimap and sack:GetFrameLevel() == 8, "a button ticked to keep goes back to the ring as its own")
+Check(late:GetParent() ~= Minimap, "the rest stay in the bag")
+sweep.fn({ Sleep = noop })
+Check(sack:GetParent() == Minimap, "a kept button is left on the ring by the sweep")
+local names = {}
+for i, row in ipairs(ns.AddonBagButtons()) do names[i] = row.label end
+Check(table.concat(names, ",") == "BoundToLearn,BugSack", "the keep list names every button, bag and ring, by name: " .. table.concat(names, ","))
+ns.db.minimapCollectorKeep = nil
+toggled("minimapCollectorKeep")
+Check(sack:GetParent() ~= Minimap, "unticked, it is collected again")
+restore()
 
 if failed > 0 then
     print(failed .. " check(s) failed")

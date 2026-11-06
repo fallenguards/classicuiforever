@@ -491,6 +491,46 @@ local function AlsoRow(child, key, colW, add, parent)
 end
 
 -- Rows that are not toggles hang under their toggle; colW: a column's width, for the labels.
+-- A setting holding a set of keys (db[key][item] = true, none: nil) ticked in our list, filled as it opens (fill gives
+-- the rows); the drop down counts the ticks.
+local function SetListRow(parent, key, label, tooltip, fill)
+    local row = DropShell(parent, label)
+    local function IsOn(item)
+        local set = ns.db[key]
+        return type(set) == "table" and set[item] == true
+    end
+    local function Count()
+        local on, items = 0, fill()
+        for _, item in ipairs(items) do
+            if IsOn(item.key) then on = on + 1 end
+        end
+        row.dropdown:OverrideText(L["OPTWIN_N_OF_N"]:format(on, #items))
+    end
+    local function Flip(item)
+        local set = type(ns.db[key]) == "table" and ns.db[key] or {}
+        if set[item] then set[item] = nil else set[item] = true end
+        ns.db[key] = next(set) ~= nil and set or nil
+        ns.ToggleChanged(key)
+        Count()
+    end
+    local function Fill(rows)
+        wipe(rows)
+        for _, item in ipairs(fill()) do rows[#rows + 1] = item end
+    end
+    local list
+    row.dropdown:HookScript("OnMouseDown", function(self)
+        if not self:IsEnabled() then return end
+        if not list then
+            list = ns.CheckList({}, IsOn, Flip, Fill)
+            list:Follow(row)
+        end
+        list:Toggle(self)
+    end)
+    row.SetChecked = Count
+    Describe(row, key, label, tooltip)
+    return row
+end
+
 local function Extras(entry, child, colW, add)
     local function Step(parent, key, label, tip, low, high, apply, words)
         local row = Stepper(child, key, label, tip, low, high, apply)
@@ -513,6 +553,13 @@ local function Extras(entry, child, colW, add)
     elseif key == "hideKeyText" then
         Step("buttons", "keyTextSize", L["OPTWIN_KEY_TEXT_SIZE"], L["OPTWIN_HOW_BIG_THE_KEY_NAMES"],
             ns.KEY_TEXT_MIN or 8, ns.KEY_TEXT_MAX or 20, ns.SetKeyTextSize, "keybind font hotkey")
+    elseif key == "hoverAddonBag" then
+        -- Under Collect addon buttons, after its Show row: the buttons left on the ring.
+        local row = SetListRow(child, "minimapCollectorKeep", L["OPT_minimapCollectorKeep"], L["OPT_minimapCollectorKeep_TIP"],
+            ns.AddonBagButtons)
+        row.text:SetWidth(colW - 14 - DROP_W - INDENT)
+        row.keyLow = row.keyLow .. " exset exclude keep ring bag some"
+        add(row, "minimapCollector")
     elseif key == "themeDark" then
         add(O.DarknessRow(child, colW - 2 * INDENT - 14), "themeDark")
         -- Broad mode's panes take their own shade under any theme.
