@@ -71,8 +71,18 @@ local active = false
 local built = false
 local floorTex, paperTex, parchmentTex, headerTex
 
--- The game's own page under the list instead of the marble, an option.
+-- The game's own page under the list; the dark marble is the option.
 local function PaperOn() return ns.db.questMapPanePaper == true end
+
+-- The page became the default (0.47.0): on for everyone, in the account and every profile. Runs before the defaults fill.
+function ns.PaneOnPaper()
+    local db = ns.db
+    db.questMapPanePaper = true
+    for _, shot in pairs(type(db.profiles) == "table" and db.profiles or {}) do
+        if type(shot) == "table" then shot.questMapPanePaper = nil end
+    end
+    db.dbVersion = 33
+end
 
 ------------------------------------------------------------------ list rows
 

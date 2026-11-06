@@ -2,7 +2,7 @@ local _, ns = ...
 local L = ns.L
 
 ns.DB_DEFAULTS = {
-    dbVersion = 32,
+    dbVersion = 33,
     classicBar = true,
     oneBar = false,
     classicBarSize = false,
@@ -302,7 +302,7 @@ ns.DB_DEFAULTS = {
     mapQuestPagesH = 0,
     mapPlayerCoords = true,
     mapCursorCoords = true,
-    questMapPanePaper = false,
+    questMapPanePaper = true,
     questListFontSize = 0,
     questTextFontSize = 0,
     mapQuestCombinedPaper = false,

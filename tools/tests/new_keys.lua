@@ -268,7 +268,7 @@ return {
     mapQuestPagesH = "same for everyone: 0, the sheets' own pages height until the player drags the divider",
     mapPlayerCoords = "mirrors the game's worldMapShowPlayerCoords: read from the game at every apply",
     mapCursorCoords = "mirrors the game's worldMapShowCursorCoords: read from the game at every apply",
-    questMapPanePaper = "same for everyone: opt-in, off by default",
+    questMapPanePaper = "same for everyone: on by default since dbVersion 33 (Quest/QuestMapPane.lua PaneOnPaper); the row brings the dark marble back",
     mapQuestCombinedPaper = "same for everyone: opt-in, off by default",
     hideHelpButtons = "same for everyone: on by default, the game's help buttons hidden on every window; replaces the map-only box, which was off by default",
     questListFontSize = "same for everyone: 0, the game's font size until the player steps it",
