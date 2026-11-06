@@ -325,7 +325,9 @@ local function EyeTick(job, now)
     end
     if editing then FollowDialog() end
     local eye = QueueStatusButton
-    if eye then PinCatch(eye, not Held(eye)) end
+    -- Loose through edit mode: hung on the eye, which hangs on the minimap, it cost the cluster its rect on its own
+    -- drag (#246, /fcuidev clusterdrag); the poll is per frame there.
+    if eye then PinCatch(eye, not editing and not Held(eye)) end
     if MM.active and eye then
         local moved, scale, mapScale = EyeMoved(eye), eye:GetEffectiveScale(), Minimap:GetEffectiveScale() * OwnScale(eye)
         local dragging = Dragged(eye)
@@ -358,7 +360,7 @@ end
 
 -- The game's edit mode passes lay the eye at the micro menu's corner (a look a frame later drew it there once): a child
 -- stretched to the screen's corner resizes as the eye moves, before the draw. Let go on the press of edit mode's box
--- that selects the eye, before any StartMoving; the poll hangs it on again once the eye is no longer selected.
+-- that selects the eye, before any StartMoving, and through edit mode (EyeTick); the poll hangs it on again after.
 local function CatchMoves(eye)
     catch = CreateFrame("Frame", nil, eye)
     PinCatch(eye, true)

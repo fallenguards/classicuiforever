@@ -104,13 +104,14 @@ for n = 1, 3 do
     Check(placed == 1, "in edit mode, frame " .. n .. " after the game lays it at the micro menu, it is back on the rim")
     eye.points = { { "CENTER", Minimap, "CENTER", -95.2, -12.5 } }
 end
--- Selected in edit mode (the press that starts a drag): the catch is off the eye; deselected, or out of edit mode, on.
+-- Through edit mode the catch is off the eye, selected or not (hung on the eye, which hangs on the minimap, it cost the
+-- cluster its rect on its own drag, #246); out of edit mode, on.
 eye.isSelected = true
 EyeTick(job, frameClock + 0.016)
 Check(eye.catchOn == false, "selected in edit mode, the catch is let go")
 eye.isSelected = false
 EyeTick(job, frameClock + 0.032)
-Check(eye.catchOn == true, "deselected, the catch hangs on again")
+Check(eye.catchOn == false, "deselected in edit mode, the catch stays let go (#246)")
 eye.isSelected = true
 env.ns.EditMode.state = false
 clock = frameClock + 1
