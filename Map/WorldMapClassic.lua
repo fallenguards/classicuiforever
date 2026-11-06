@@ -524,7 +524,8 @@ local function DressEra(style)
     ns.SetAlphaIf(_G["WorldMapFrameBg"], 0)
     for _, key in ipairs(EXTRAS) do HoldHidden(ns.MapOverlay(map, key)) end
     -- The combined layout has its own list: the client's pane, opened by its toggle or a tracker, is put away.
-    if Combined() and map.QuestLog and map.QuestLog:IsShown() then map.QuestLog:Hide() end
+    -- Protected in a fight (the fight layer's watcher under it): shut after.
+    if Combined() and map.QuestLog and map.QuestLog:IsShown() and not InCombatLockdown() then map.QuestLog:Hide() end
     -- The quest pane toggle sits on the footer's border: over its line.
     if map.SidePanelToggle then
         ns.SetLevelIf(map.SidePanelToggle, map.ScrollContainer:GetFrameLevel() + FOOT_LINE_OVER_MAP + 1)
@@ -781,7 +782,9 @@ local sizeSaid
 
 ns.OnToggle(function(key)
     -- Turned on by the player: the client's pane shuts for good (its CVar too), as its toggle goes away.
-    if key == "mapQuestCombined" and ns.db[key] == true and QuestMapFrame_Close then QuestMapFrame_Close(true) end
+    if key == "mapQuestCombined" and ns.db[key] == true and QuestMapFrame_Close and not InCombatLockdown() then
+        QuestMapFrame_Close(true)
+    end
     if PASS_KEYS[key] then
         if Map() and Map():IsShown() then Pass() else LayShut() end
     end

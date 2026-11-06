@@ -50,7 +50,7 @@ Check(Near(ns.Fit(Window(1), 1.5, 1300, 500), SCREEN_W / 1300), "a wide one fits
 Check(Near(ns.Fit(Window(1, 0.5), 1.5, 1002, 768), 1.5), "a scaled parent's room counts")
 Check(ns.Fit(Window(1), 1.2, nil, nil) == 1.2, "no size read, no change")
 
--- The fight lay's own reckoning of the map's scale.
+-- The fight lay's own reckoning of the map's scale: the player's size on the style's own, kept inside the screen.
 local scales = { map = 1.34 }
 ns.windowEdit = {
     ByKey = { map = { key = "map" } }, Worn = function() return true end, Scales = function() return scales end,
@@ -59,6 +59,10 @@ ns.windowEdit = {
 local MapPlace = assert(load(Cut(Read("Map/WorldMapFight.lua"), "local function MapPlace", "-- Out of combat, last")
     .. "\nreturn MapPlace", "map", "t", env))()
 local k, left, top = MapPlace(1002, 768, 0.6)
+Check(Near(k, 1.34 * 0.6), "in a fight the player's size rides the style's own, as out of one")
+Check(left == 16 and top == 737, "and stands where placed")
+scales.map = 2.5
+k, left, top = MapPlace(1002, 768, 0.6)
 Check(Near(k, SCREEN_H / 768), "in a fight the map fits the screen too")
 Check(left == 16 and Near(top, SCREEN_H), "and stands inside it")
 scales.map = nil

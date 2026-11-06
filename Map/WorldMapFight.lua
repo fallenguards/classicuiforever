@@ -6,9 +6,9 @@ local _, ns = ...
 
 local MF = ns.MapFight
 
--- Under the quest pane toggle, which the game shows after its restore and hides after its maximize, last in its own
--- sizing and placing; and under the map for an open already maximized. The toggle shown is the state: restored.
--- v: the quest pane open (1) or shut (0), told by the width the game left the map (its own, or ours).
+-- Under the quest pane toggle (shown after the game's restore, hidden after its maximize, last in its sizing), under the
+-- quest pane (shown and hidden after the width the game gives the map for it: its first open sizes the map before) and
+-- under the map (an open already maximized). Toggle shown = restored; v: pane open (1) or shut (0), by the map's width.
 local FIGHT_LAY = [[
     if not PlayerInCombat() then return end
     local lay = self:GetFrameRef("lay")
@@ -18,18 +18,24 @@ local FIGHT_LAY = [[
     local width = map:GetWidth()
     local v = (math.abs(width - lay:GetAttribute("cw1")) < 1 or math.abs(width - lay:GetAttribute("w1")) < 1) and 1 or 0
     lay:SetAttribute("busy", true)
+    -- Read by the dev probe mapfight: runs, the width seen and the branch taken.
+    lay:SetAttribute("ran", (lay:GetAttribute("ran") or 0) + 1)
+    lay:SetAttribute("seen", width)
     map:SetWidth(lay:GetAttribute("w" .. v))
     map:SetHeight(lay:GetAttribute("h" .. v))
     if lay:GetAttribute("place") ~= 1 then
+        lay:SetAttribute("branch", "box only")
         lay:SetAttribute("busy", nil)
         return
     end
     map:ClearAllPoints()
     if self:GetFrameRef("toggle"):IsShown() then
         local k = lay:GetAttribute("k")
+        lay:SetAttribute("branch", "windowed " .. v)
         map:SetScale(k)
         map:SetPoint("TOPLEFT", "$parent", "BOTTOMLEFT", lay:GetAttribute("x" .. v) / k, lay:GetAttribute("y" .. v) / k)
     else
+        lay:SetAttribute("branch", "full " .. v)
         map:SetScale(lay:GetAttribute("full" .. v))
         map:SetPoint("TOP", "$parent", "TOP", 0, 0)
     end
@@ -43,8 +49,9 @@ local function MapPlace(w, h, base)
     local entry = W.ByKey.map
     local worn = entry and W.Worn(entry)
     local screenW, screenH = UIParent:GetSize()
-    -- Inside the screen, as out of a fight (ns.ScreenFitScale).
-    local scale = math.min((worn and W.Scales()[W.SizeKey(entry)]) or base or 1, screenW / w, screenH / h)
+    -- The player's size on top of the style's own, as UI/WindowHandles.lua wears them (a size alone opened the map at
+    -- 1.05 in a fight, 2026-11-05); inside the screen, as out of a fight (ns.ScreenFitScale).
+    local scale = math.min(((worn and W.Scales()[W.SizeKey(entry)]) or 1) * (base or 1), screenW / w, screenH / h)
     local left, top
     if worn then left, top = W.PlaceOf(entry) end
     if not left then return scale end
@@ -117,8 +124,12 @@ local function MakeWatchers()
     shelf:Hide()
     Watch(map, false)
     Watch(map.SidePanelToggle, true)
+    if map.QuestLog then Watch(map.QuestLog, true) end
     FightValues()
 end
+
+-- For the dev probe mapfight: each watcher with the frame it hangs on, and the shelf.
+function MF.Watchers() return watchers, shelf end
 
 -- Not yet locked as the fight's first event dispatches: the values are set then, and on every login and load.
 ns.EventFrame({ "PLAYER_REGEN_DISABLED", "PLAYER_ENTERING_WORLD", "ADDON_LOADED" }, function(_, event)
