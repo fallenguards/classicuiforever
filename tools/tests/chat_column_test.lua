@@ -49,6 +49,9 @@ function Frame:SetHeight(h) self._h = h end
 function Frame:GetWidth() return self._w or 0 end
 function Frame:GetHeight() return self._h or 0 end
 function Frame:GetBottom() return nil end
+function Frame:GetLeft() return 10 end
+function Frame:GetTop() return 100 end
+function Frame:GetRight() return 50 end
 function Frame:GetEffectiveScale() return 1 end
 function Frame:SetScript(name, fn) self._scripts[name] = fn end
 function Frame:GetScript(name) return self._scripts[name] end
@@ -65,11 +68,13 @@ function Frame:SetPushedAtlas() end
 function Frame:SetHighlightAtlas() end
 function Frame:ClearDisabledTexture() end
 
+local ALL = {}
 function CreateFrame(kind, name, parent)
     local level = parent and (parent._level or 0) + 1 or 0
     local frame = setmetatable({ _kind = kind, _name = name, _parent = parent, _level = level, _strata = "MEDIUM",
         _shown = true, _points = {}, _scripts = {} }, Frame)
     if name then _G[name] = frame end
+    ALL[#ALL + 1] = frame
     return frame
 end
 
@@ -91,6 +96,9 @@ CHAT_FRAMES = { "ChatFrame1", "ChatFrame2" }
 local menu = CreateFrame("Button", "ChatFrameMenuButton", general.buttonFrame)
 local channel = CreateFrame("Button", "ChatFrameChannelButton", general.buttonFrame)
 local alerts = CreateFrame("Frame", "ChatAlertFrame", UIParent)
+alerts:SetPoint("BOTTOMLEFT", general.buttonFrame, "TOPLEFT", 0, 27)
+local deafen = CreateFrame("Button", "ChatFrameToggleVoiceDeafenButton", UIParent)
+local mute = CreateFrame("Button", "ChatFrameToggleVoiceMuteButton", UIParent)
 menu:SetPoint("BOTTOM", general.buttonFrame, "BOTTOM", 0, 0)
 local toBottom = CreateFrame("Button", nil, general)
 general.ScrollToBottomButton = toBottom
@@ -124,7 +132,9 @@ ns.EventFrame, ns.StateTexture, ns.BronzeCopy, ns.DressStates, ns.PaintCopy, ns.
 ns.SkinMinimalScrollBar = noop
 ns.RegisterModule = function(_, mod) module = mod end
 ns.OnToggle = noop
+ns.OnEditMode = noop
 
+assert(loadfile(ROOT .. "/Windows/ChatAlerts.lua"))("ClassicUIForever", ns)
 local chunk = assert(loadfile(ROOT .. "/Windows/Chat.lua"))
 chunk("ClassicUIForever", ns)
 
@@ -144,6 +154,29 @@ local function Under(frame)
     return rel
 end
 
+local function InTree(frame, root)
+    while frame do
+        if frame == root then return true end
+        frame = frame:GetParent()
+    end
+    return false
+end
+
+-- Frames outside the chat's tree with a point into it: a non-child hung on the chat ends the game's own sizing stop
+-- with the chat left without points (#247). The dock's own hangers are not in this stub; none of ours may be.
+local function OutsideHangers(chat)
+    local names = {}
+    for _, frame in ipairs(ALL) do
+        if frame ~= chat and not InTree(frame, chat) then
+            for i = 1, frame:GetNumPoints() do
+                local _, rel = frame:GetPoint(i)
+                if rel and InTree(rel, chat) then names[#names + 1] = frame:GetName() or "unnamed" end
+            end
+        end
+    end
+    return table.concat(names, ", ")
+end
+
 -- Shows chat, hides the other, and fires the bottom slot's show as the client's tab pass would.
 local function Pick(chat, other)
     other:Hide()
@@ -160,7 +193,11 @@ local function Stacked(chat, label)
     local slot = Under(menu)
     Check(slot ~= nil and slot:GetParent() == chat.buttonFrame, label .. ": menu stands on the shown window's column")
     Check(Under(channel) == menu, label .. ": voice above the menu")
-    Check(Under(alerts) == channel, label .. ": friends above the voice button")
+    Check(Under(alerts) == UIParent, label .. ": the friends container stands on the screen, not hung on the chat")
+    Check(deafen:GetParent() == chat.buttonFrame and mute:GetParent() == chat.buttonFrame,
+        label .. ": the voice toggles carried onto the chat as children")
+    local hangers = OutsideHangers(chat)
+    Check(hangers == "", label .. ": nothing of ours hangs on the chat from outside: " .. hangers)
 end
 
 assert(module and module.apply, "Windows/Chat.lua registered no module")

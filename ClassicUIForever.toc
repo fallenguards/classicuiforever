@@ -188,6 +188,7 @@ Quest\QuestLogDetail.lua
 Quest\QuestLog.lua
 Quest\QuestMapPane.lua
 Quest\QuestMapList.lua
+Windows\ChatAlerts.lua
 Windows\Chat.lua
 Windows\ChatHover.lua
 Windows\WindowChrome.lua

@@ -313,18 +313,6 @@ local function FitRight(chat)
     Edge(chat.CombatLogQuickButtonFrame, "BOTTOMRIGHT", chat, "TOPRIGHT", QUICK_RIGHT)
 end
 
--- The alert container at rel with the friends button 4 above it: the container stacks its alerts from its foot, and an
--- unseen one under the button stood it 40 up; the button's measured rise is taken off.
-local function PlaceAlerts(alerts, rel)
-    local rise = 0
-    local quick = _G["QuickJoinToastButton"]
-    local qb, ab = quick and quick:IsShown() and quick:GetBottom(), alerts:GetBottom()
-    if qb and ab and not ns.AnySecret(qb, ab) then
-        rise = math.max(0, math.floor((qb * quick:GetEffectiveScale() - ab * alerts:GetEffectiveScale()) / alerts:GetEffectiveScale() + 0.5))
-    end
-    Place(alerts, "BOTTOM", rel, "TOP", 0, 4 - rise)
-end
-
 local function Slot(chat, strata)
     local slot = ns.NewFrame("Frame", nil, chat.buttonFrame)
     slot:SetSize(SIZE, SIZE)
@@ -364,8 +352,15 @@ local function Stack(col)
     col.top = StackSlot(col, col.up, top, Off("scroll"))
 end
 
+-- The alert container over the column's top button, by the screen's coordinates (Windows/ChatAlerts.lua): again as the
+-- chat moves or resizes.
+local function FollowAlerts()
+    local col = sharedAt
+    if active and col and col.alertRel then ns.PlaceChatAlerts(col.alertRel, col.chat, Off("friends"), SIZE) end
+end
+
 -- Menu, voice and friends buttons on the docked column showing, in the 1.x order and gaps: the client hangs the
--- first two on ChatFrame1, which hides on other tabs.
+-- first two on ChatFrame1, which hides on other tabs; the voice toggles are carried onto it too, as children.
 local function StackShared(col)
     local chat = col.chat
     local top = col.top or col.up
@@ -386,17 +381,14 @@ local function StackShared(col)
         for _, name in ipairs(VOICE_TOGGLES) do
             local button = _G[name]
             if button then
+                Carry(button, chat)
                 Place(button, right and "LEFT" or "RIGHT", last, right and "RIGHT" or "LEFT", right and 2 or -2, 0)
                 last = button
             end
         end
     end
-    -- The friends button anchors first in ChatAlertFrame: move the container, toasts follow.
-    local alerts = _G.ChatAlertFrame
-    if alerts then
-        alerts:SetWidth(SIZE)
-        PlaceAlerts(alerts, top)
-    end
+    col.alertRel = top
+    ns.PlaceChatAlerts(top, chat, Off("friends"), SIZE)
     sharedAt = col
 end
 
@@ -564,6 +556,7 @@ local function Watch()
     local log = _G.COMBATLOG
     if log then FitRight(log) end
     GuardChannel()
+    FollowAlerts()
 end
 
 -- Hide chat buttons: the picked buttons left of the chat go; with all of them gone the chat can sit flush at the
@@ -757,6 +750,7 @@ local function Apply()
         holder = CreateFrame("Frame", nil, UIParent)
         holder:Hide()
         ns.EventFrame(WATCH_EVENTS, WatchSoon)
+        ns.OnEditMode(WatchSoon)   -- its layout moves the chat with no event of its own
     end
     primaryChat = _G.ChatFrame1
     Redress(ns.ThemeTurned(theme, "themePartChat") and theme.was ~= nil)
@@ -789,6 +783,7 @@ local function Restore()
     UndressChannel(_G.ChatFrameChannelButton)
     for frame, saved in pairs(was) do RestorePoints(frame, saved) end
     wipe(was)
+    ns.RestoreChatAlerts()
     HoldButtons()
 end
 
