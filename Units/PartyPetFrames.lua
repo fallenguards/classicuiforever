@@ -94,6 +94,13 @@ local function DrainPartyTrim(frame, undo)
     paint(frame.VehicleTexture)
 end
 
+-- Under the portrait by the point the client lays it with (TOPRIGHT, each art state): its lay-out moves the icon, never
+-- stretches it between two points (a join mid fight smeared it until the fight's end); the keeper puts it back.
+local function PlaceRoleIcon(frame)
+    local icon = frame.PartyMemberOverlay and frame.PartyMemberOverlay.RoleIcon
+    if icon then ns.SetPointOnce(icon, "TOPRIGHT", frame, "TOPLEFT", 19, -41) end
+end
+
 -- Placed for the game's own frame art, it stood above our portrait (#225).
 local function DressStatus(frame)
     local overlay = frame.PartyMemberOverlay
@@ -142,9 +149,9 @@ local function SkinPartyMember(frame)
     local overlay = frame.PartyMemberOverlay
     if overlay then
         Dress(overlay.LeaderIcon, "leaderIcon", PARTY_LEADER, frame)
-        if overlay.RoleIcon then ns.SetPointOnce(overlay.RoleIcon, "TOPLEFT", frame, "TOPLEFT", 7, -41) end
         if overlay.PVPIcon then ns.SetPointOnce(overlay.PVPIcon, "TOPLEFT", frame, "TOPLEFT", -9, -23) end
     end
+    PlaceRoleIcon(frame)
     DressStatus(frame)
     UF.DressGlow(frame.Flash, "partyFlash", PARTY_FLASH_LAYERED, frame)
 end
@@ -190,6 +197,7 @@ local function KeepParty()
             if frame.Name then ns.SetPointOnce(frame.Name, "TOPLEFT", frame, "TOPLEFT", 49, -7) end
             UF.DressGlow(frame.Flash, "partyFlash", PARTY_FLASH, frame)
             DressStatus(frame)
+            PlaceRoleIcon(frame)
             DrainPartyTrim(frame)
             if undone and not Busy() then SkinPartyMember(frame) end
         end
