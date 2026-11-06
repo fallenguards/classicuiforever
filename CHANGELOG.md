@@ -2,6 +2,25 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.47.0] - 2026-11-06
+
+### Added
+- The talents window has the two specs' tabs down its edge, as Classic's talent window did. Click a tab to look at that spec.
+- Keep on the ring, under Collect addon buttons: a list of every addon button with a check for each one that stays on the ring while the rest are collected into the bag.
+- Skill toast, under Other: the game's "New Recipe Learned" box that pops up as a profession teaches you something. Off by default, as 1.x had none; check it to have the box back.
+
+### Changed
+- The Classic style world map's text is the game's size windowed. Its header, quest pane and Map Options were drawn at 70% to fit the map to the game's map height; now the frame's art alone shrinks, the quest pane is its full width, the footer holds Map Options and the coordinates, and the Continent and Zone labels sit beside their drop downs in one row. Maximized, the map is Classic Era's own layout as before.
+- The map's quest pane lists quests on the game's parchment by default. Uncheck List on the game's parchment, under World map, for the dark stone.
+- A talent below its top rank is green with or without points to spend and gold only at its top rank, as Classic Era colors it. A part-ranked talent turned gold once the points ran out.
+
+### Fixed
+- The social window's lists count their rows whole: a rounding error in a list's height could leave the guild tab's last row cut or doubled (#232).
+- Small alignment fixes on the world map's quest pane scroll column.
+
+### Removed
+- The Damage numbers row under Other. It only mirrored the game's own floating combat text setting, which stays where it is.
+
 ## [0.46.0] - 2026-11-06
 
 ### Added

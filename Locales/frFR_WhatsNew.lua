@@ -3,6 +3,18 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN68_1_TITLE"] = "Onglets de double spécialisation sur la fenêtre des talents"
+L["WN68_1_TEXT"] = "Les onglets des deux spécialisations descendent le long du bord de la fenêtre des talents, comme dans Classic. Cliquez sur l'un d'eux pour voir cette spécialisation."
+L["WN68_2_TITLE"] = "Le texte de la carte du monde à la taille du jeu"
+L["WN68_2_TEXT"] = "Dans le style Classic de l'en-tête, l'en-tête, le volet des quêtes et les Options de la carte s'affichaient à 70 % de la taille du texte du jeu en fenêtre. Ils sont maintenant à la taille du jeu, le volet des quêtes a sa pleine largeur, et les libellés Continent et Zone sont à côté de leurs menus déroulants."
+L["WN68_3_TITLE"] = "Les quêtes sur parchemin dans le volet de la carte"
+L["WN68_3_TEXT"] = "Le volet des quêtes de la carte liste les quêtes sur le parchemin du jeu. Pour la pierre sombre, décochez Liste sur le parchemin du jeu sous Carte du monde."
+L["WN68_4_TITLE"] = "Boutons d'addons laissés sur l'anneau"
+L["WN68_4_TEXT"] = "Avec Regrouper les boutons d'addons activé, Laisser sur l'anneau liste chaque bouton d'addon ; cochez ceux qui restent sur l'anneau pendant que les autres vont dans le sac. Regrouper les boutons d'addons est désactivé par défaut ; activez-le dans les options (/fcui), sous Minicarte."
+L["WN68_5_TITLE"] = "Plus de boîte Nouvelle recette apprise"
+L["WN68_5_TEXT"] = "La boîte du jeu qui surgit quand un métier vous enseigne quelque chose a disparu, car 1.x n'en avait pas. Pour la retrouver, activez-la dans les options (/fcui) : cochez Avis de compétence sous Autre."
+L["WN68_6_TITLE"] = "Changements mineurs"
+L["WN68_6_TEXT"] = "Un talent sous son rang maximal est vert, que vous ayez des points à dépenser ou non, comme dans Classic Era. Les listes de la fenêtre sociale comptent leurs lignes entières (#232), et la ligne Chiffres de dégâts a disparu, car elle ne faisait que refléter le réglage du jeu lui-même."
 L["WN67_1_TITLE"] = "Les éléments de la minicarte y restent"
 L["WN67_1_TEXT"] = "Chaque élément de la minicarte dans ClassicUI Forever Windows a une case Rester sur la minicarte. Cochée, l'élément garde sa place sur la minicarte. Décochez-la pour le déplacer où vous voulez."
 L["WN67_2_TITLE"] = "La fenêtre Options suit le thème"

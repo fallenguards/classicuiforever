@@ -2,7 +2,6 @@ local _, ns = ...
 local L = ns.L
 
 -- One-time welcome note. The game cannot open a browser, so links open a copy box.
-
 local O = ns.options
 local TITLE = O.TITLE
 local WIDTH = 420
@@ -145,6 +144,14 @@ end
 -- line once per new version, and the box shows only the versions since the one they saw last. An entry marked
 -- on = "forever" or on = "retail" is that client's alone; unmarked is both.
 local WHATSNEW = {
+    { id = 68, version = "0.47.0",
+        { L["WN68_1_TITLE"], L["WN68_1_TEXT"], on = "forever" },
+        { L["WN68_2_TITLE"], L["WN68_2_TEXT"] },
+        { L["WN68_3_TITLE"], L["WN68_3_TEXT"] },
+        { L["WN68_4_TITLE"], L["WN68_4_TEXT"] },
+        { L["WN68_5_TITLE"], L["WN68_5_TEXT"] },
+        { L["WN68_6_TITLE"], L["WN68_6_TEXT"] },
+    },
     { id = 67, version = "0.46.0",
         { L["WN67_1_TITLE"], L["WN67_1_TEXT"] },
         { L["WN67_2_TITLE"], L["WN67_2_TEXT"] },

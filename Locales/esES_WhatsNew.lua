@@ -3,6 +3,18 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN68_1_TITLE"] = "Pestañas de doble especialización en la ventana de talentos"
+L["WN68_1_TEXT"] = "Las pestañas de las dos especializaciones bajan por el borde de la ventana de talentos, como en Classic. Haz clic en una para ver esa especialización."
+L["WN68_2_TITLE"] = "El texto del mapa del mundo a tamaño del juego"
+L["WN68_2_TEXT"] = "En el estilo Classic de la cabecera, la cabecera, el panel de misiones y Opciones del mapa se veían al 70 % del tamaño del texto del juego en ventana. Ahora tienen el tamaño del juego, el panel de misiones tiene su anchura completa, y las etiquetas Continente y Zona van junto a sus desplegables."
+L["WN68_3_TITLE"] = "Misiones sobre pergamino en el panel del mapa"
+L["WN68_3_TEXT"] = "El panel de misiones del mapa lista las misiones sobre el pergamino del juego. Para la piedra oscura, desmarca Lista sobre el pergamino del juego en Mapa del mundo."
+L["WN68_4_TITLE"] = "Botones de accesorios que se quedan en el anillo"
+L["WN68_4_TEXT"] = "Con Agrupar botones de accesorios activado, Dejar en el anillo lista cada botón de accesorio; marca los que se quedan en el anillo mientras los demás van a la bolsa. Agrupar botones de accesorios está desactivado por defecto; actívalo en las opciones (/fcui), en Minimapa."
+L["WN68_5_TITLE"] = "Sin recuadro de Nueva receta aprendida"
+L["WN68_5_TEXT"] = "El recuadro del juego que aparece cuando una profesión te enseña algo ha desaparecido, pues 1.x no tenía ninguno. Para recuperarlo, actívalo en las opciones (/fcui): marca Aviso de habilidad en Otros."
+L["WN68_6_TITLE"] = "Cambios menores"
+L["WN68_6_TEXT"] = "Un talento por debajo de su rango máximo es verde tengas o no puntos que gastar, como en Classic Era. Las listas de la ventana social cuentan sus filas enteras (#232), y la fila Números de daño ha desaparecido, pues solo reflejaba el ajuste del propio juego."
 L["WN67_1_TITLE"] = "Las piezas del minimapa se quedan en él"
 L["WN67_1_TEXT"] = "Cada pieza del minimapa en ClassicUI Forever Windows tiene una casilla Quedarse en el minimapa. Marcada, la pieza conserva su sitio en el minimapa. Desmárcala para arrastrarla a cualquier parte."
 L["WN67_2_TITLE"] = "La ventana de Opciones sigue el tema"

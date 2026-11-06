@@ -3,6 +3,18 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN68_1_TITLE"] = "Schede della doppia specializzazione sulla finestra dei talenti"
+L["WN68_1_TEXT"] = "Le schede delle due specializzazioni scendono lungo il bordo della finestra dei talenti, come in Classic. Cliccane una per vedere quella specializzazione."
+L["WN68_2_TITLE"] = "Il testo della mappa del mondo a grandezza di gioco"
+L["WN68_2_TEXT"] = "Nello stile Classic dell'intestazione, l'intestazione, il pannello delle missioni e le Opzioni mappa erano al 70% della grandezza del testo di gioco in finestra. Ora sono a grandezza di gioco, il pannello delle missioni ha la sua larghezza piena, e le etichette Continente e Zona stanno accanto ai loro menu a discesa."
+L["WN68_3_TITLE"] = "Missioni su pergamena nel pannello della mappa"
+L["WN68_3_TEXT"] = "Il pannello delle missioni della mappa elenca le missioni sulla pergamena del gioco. Per la pietra scura, togli la spunta a Elenco sulla pergamena del gioco sotto Mappa del mondo."
+L["WN68_4_TITLE"] = "Pulsanti degli addon lasciati sull'anello"
+L["WN68_4_TEXT"] = "Con Raccogli i pulsanti degli addon attivo, Lascia sull'anello elenca ogni pulsante degli addon; spunta quelli che restano sull'anello mentre gli altri vanno nella borsa. Raccogli i pulsanti degli addon è disattivato per impostazione predefinita; attivalo nelle opzioni (/fcui), sotto Minimappa."
+L["WN68_5_TITLE"] = "Niente più riquadro Nuova ricetta appresa"
+L["WN68_5_TEXT"] = "Il riquadro del gioco che compare quando una professione ti insegna qualcosa è sparito, perché 1.x non ne aveva. Per riaverlo, attivalo nelle opzioni (/fcui): spunta Avviso di abilità sotto Altro."
+L["WN68_6_TITLE"] = "Modifiche minori"
+L["WN68_6_TEXT"] = "Un talento sotto il suo grado massimo è verde, che tu abbia punti da spendere o no, come in Classic Era. Le liste della finestra sociale contano le righe intere (#232), e la riga Numeri dei danni è sparita, perché rispecchiava solo l'impostazione del gioco stesso."
 L["WN67_1_TITLE"] = "I pezzi della minimappa restano su di essa"
 L["WN67_1_TEXT"] = "Ogni pezzo della minimappa in ClassicUI Forever Windows ha una casella Resta sulla minimappa. Spuntata, il pezzo tiene il suo posto sulla minimappa. Togli la spunta per trascinarlo ovunque."
 L["WN67_2_TITLE"] = "La finestra Opzioni segue il tema"

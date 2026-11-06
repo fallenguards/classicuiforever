@@ -2,6 +2,18 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN68_1_TITLE"] = "Dual spec tabs on the talents window"
+L["WN68_1_TEXT"] = "The two specs' tabs run down the talents window's edge, as Classic's did. Click one to look at that spec."
+L["WN68_2_TITLE"] = "The world map's text at the game's size"
+L["WN68_2_TEXT"] = "In the Classic header style the map's header, quest pane and Map Options read at 70% of the game's text size windowed. They are the game's size now, the quest pane is its full width, and the Continent and Zone labels sit beside their drop downs."
+L["WN68_3_TITLE"] = "Quests on parchment in the map's pane"
+L["WN68_3_TEXT"] = "The map's quest pane lists quests on the game's parchment. For the dark stone, uncheck List on the game's parchment under World map."
+L["WN68_4_TITLE"] = "Addon buttons kept on the ring"
+L["WN68_4_TEXT"] = "With Collect addon buttons on, Keep on the ring lists every addon button; check the ones that stay on the ring while the rest go into the bag. Collect addon buttons is off by default; turn it on in the options (/fcui), under Minimap."
+L["WN68_5_TITLE"] = "No New Recipe Learned box"
+L["WN68_5_TEXT"] = "The game's box that pops up as a profession teaches you something is gone, as 1.x had none. To have it back, turn it on in the options (/fcui): check Skill toast under Other."
+L["WN68_6_TITLE"] = "Smaller changes"
+L["WN68_6_TEXT"] = "A talent below its top rank is green whether or not you have points to spend, as Classic Era colors it. The social window's lists count their rows whole (#232), and the Damage numbers row is gone, as it only mirrored the game's own setting."
 L["WN67_1_TITLE"] = "Minimap pieces stay on the minimap"
 L["WN67_1_TEXT"] = "Every minimap piece's box in ClassicUI Forever Windows has a Stay on minimap check. Checked, the piece keeps its spot on the minimap. Uncheck it to drag the piece anywhere."
 L["WN67_2_TITLE"] = "The Options window follows the theme"

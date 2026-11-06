@@ -3,6 +3,18 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN68_1_TITLE"] = "Doppelspezialisierungs-Reiter am Talentfenster"
+L["WN68_1_TEXT"] = "Die Reiter der beiden Spezialisierungen laufen an der Kante des Talentfensters entlang, wie in Classic. Klick einen, um dir diese Spezialisierung anzusehen."
+L["WN68_2_TITLE"] = "Der Text der Weltkarte in Spielgröße"
+L["WN68_2_TEXT"] = "Im Classic-Stil der Kopfzeile waren Kopfzeile, Questleiste und Kartenoptionen der Karte im Fenster nur 70 % so groß wie der Spieltext. Jetzt haben sie Spielgröße, die Questleiste hat ihre volle Breite, und die Beschriftungen Kontinent und Zone stehen neben ihren Auswahlmenüs."
+L["WN68_3_TITLE"] = "Quests auf Pergament in der Kartenleiste"
+L["WN68_3_TEXT"] = "Die Questleiste der Karte listet Quests auf dem Pergament des Spiels. Für den dunklen Stein hak unter Weltkarte Liste auf dem Pergament des Spiels ab."
+L["WN68_4_TITLE"] = "Addontasten am Ring behalten"
+L["WN68_4_TEXT"] = "Bei eingeschaltetem Addontasten sammeln listet Am Ring lassen jede Addontaste auf; hak die an, die am Ring bleiben, während die übrigen in die Tasche wandern. Addontasten sammeln ist standardmäßig aus; schalte es in den Optionen (/fcui) unter Minikarte ein."
+L["WN68_5_TITLE"] = "Kein Kästchen Neues Rezept erlernt mehr"
+L["WN68_5_TEXT"] = "Das Kästchen des Spiels, das aufspringt, wenn ein Beruf euch etwas beibringt, ist weg, denn 1.x hatte keines. Um es zurückzuholen, schalte es in den Optionen (/fcui) ein: hak unter Sonstiges Fertigkeitsmeldung an."
+L["WN68_6_TITLE"] = "Kleinere Änderungen"
+L["WN68_6_TEXT"] = "Ein Talent unter seinem höchsten Rang ist grün, ob ihr Punkte zu vergeben habt oder nicht, wie in Classic Era. Die Listen des Sozialfensters zählen ihre Zeilen ganz (#232), und die Zeile Schadenszahlen ist weg, da sie nur die Einstellung des Spiels spiegelte."
 L["WN67_1_TITLE"] = "Minimap-Teile bleiben auf der Minikarte"
 L["WN67_1_TEXT"] = "Jedes Minimap-Teil in ClassicUI Forever Windows hat ein Kästchen Auf der Minikarte bleiben. Angehakt behält das Teil seinen Platz auf der Minikarte. Abgehakt lässt es sich überallhin ziehen."
 L["WN67_2_TITLE"] = "Das Optionsfenster folgt dem Theme"
