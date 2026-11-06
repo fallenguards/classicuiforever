@@ -262,6 +262,7 @@ return {
     hideBagSearch = "off for everyone: the bags' search box shows as before; checked hides it",
     hideBagCleanup = "off for everyone: the bags' Clean Up button shows as before; checked hides it",
     lootToast = "off for everyone, a restyle: the game's loot toasts go, as 1.x had none; checked brings them back",
+    skillToast = "off for everyone, a restyle: the game's new recipe toasts go, as 1.x had none; checked brings them back",
     mapQuestCombined = "same for everyone: opt-in, off by default",
     mapQuestShare = "same for everyone: 0, the sheets' own share of the map until the player drags its corner",
     mapQuestListW = "same for everyone: 0, the sheets' own list width until the player drags the divider",

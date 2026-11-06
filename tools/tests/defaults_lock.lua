@@ -404,6 +404,7 @@ return {
     showMinimapZoomIn = true,
     showMinimapZoomOut = true,
     sideBarsEra = true,
+    skillToast = false,
     socialTitleDrag = false,
     spellBook = true,
     spellBookCollectionsTab = true,
