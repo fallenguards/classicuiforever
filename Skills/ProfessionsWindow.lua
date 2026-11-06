@@ -609,6 +609,9 @@ local function WatchTick(self, elapsed)
         end
     end
     if ns.ShowTradeSkill then ns.ShowTradeSkill(craftUp) end
+    -- One page of the book at a time: a trade skill opened from the action bar shuts the spellbook, as its own press does.
+    local book = _G.ForeverClassicUISpellBook
+    if craftUp and book and book:IsShown() and book:GetAlpha() > 0 and ns.HideSpellBook then ns.HideSpellBook() end
     -- Build and place as soon as the window exists, open or not: impossible once combat starts.
     if active then
         if not T.built then Build() end
