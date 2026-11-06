@@ -267,6 +267,15 @@ ns.DB_DEFAULTS = {
     gryphonHiddenCarried = false,
     mapUnlocked = false,
     minimapButtonAngle = 213,
+    -- Stay on minimap per ring icon (ClassicUI Forever Windows): off, the icon is placed anywhere.
+    minimapButtonSnap = true, minimapCollectorSnap = true, minimapZoomInSnap = true, minimapZoomOutSnap = true,
+    minimapTrackingIconSnap = true, minimapCharacterSnap = true, minimapSpellbookSnap = true, minimapTalentsSnap = true,
+    minimapProfessionsSnap = true, minimapQuestLogSnap = true, minimapLegacySnap = true, minimapWorldMapSnap = true,
+    minimapGuildSnap = true, minimapCollectionsSnap = true, minimapHelpSnap = true, minimapGameMenuSnap = true,
+    minimapShopSnap = true, minimapHousingSnap = true, minimapAchievementsSnap = true, minimapJournalSnap = true,
+    -- The other minimap pieces: fixed at their minimap spot while on; off, placed anywhere.
+    minimapZoneSnap = true, minimapTrackingSnap = true, minimapMailSnap = true, minimapClockSnap = true, minimapDielSnap = true,
+    minimapCoordsSnap = true, calendarSnap = true,
     namePlates = true,
     fullPlates = true,
     questTracker = true,

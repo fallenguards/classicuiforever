@@ -228,11 +228,14 @@ local function LayHome(key, parent, level, w, h, rel, relPoint, x, y)
     return home
 end
 
--- A ring piece: its middle at its angle, dragged round the ring in edit mode.
+-- A ring piece: its middle at its angle, dragged round the ring in edit mode; placed off it (Snap to minimap off), the
+-- windows lay it.
 local function LayRingHome(key, parent, level, w, h)
     local piece = PIECES[key]
     local home = Home(key, parent, level, w, h)
-    ns.RingPoint(home, tonumber(ns.db[piece.ring]) or piece.angle, ZOOM_R, home:GetEffectiveScale() / Minimap:GetEffectiveScale())
+    if not (ns.WindowPlaced and ns.WindowPlaced(key)) then
+        ns.RingPoint(home, tonumber(ns.db[piece.ring]) or piece.angle, ZOOM_R, home:GetEffectiveScale() / Minimap:GetEffectiveScale())
+    end
     ns.MinimapShow(home, piece.show)
     return home
 end

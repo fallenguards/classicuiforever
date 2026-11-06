@@ -1,8 +1,7 @@
 local _, ns = ...
 local L = ns.L
 
--- ClassicUI Forever Windows: a placeholder drag places a window; its dialog holds Movable anytime, Size and resets. Places
--- (db.windowPos, UIParent units) and sizes (db.windowScale) come back the frame after anyone moves it, never in a pass.
+-- ClassicUI Forever Windows: placeholder drags place windows; places and sizes (db.windowPos, db.windowScale) return frames after a move.
 
 local WINDOWS = ns.WINDOW_LIST
 -- The whole painted title bar, clear of the portrait on the left and the lock and close on the right.
@@ -25,7 +24,7 @@ local function Clean(key, valid)
     return list
 end
 
-local function ValidSpot(pos) return type(pos) == "table" and type(pos[1]) == "number" and type(pos[2]) == "number" end
+local function ValidSpot(pos) return type(pos) == "table" and type(pos[1]) == "number" and type(pos[2]) == "number" and pos[3] == nil end
 local function ValidScale(scale) return type(scale) == "number" and scale >= 0.5 and scale <= 1.5 end
 local function ValidFlag(flag) return flag == true end
 
@@ -109,8 +108,9 @@ function ns.WindowPlaced(key)
     if byKey[key] then return Worn(byKey[key]) and PlaceOf(byKey[key]) ~= nil end
     return Places()[key] ~= nil
 end
--- A place carried over from an older record (the gryphons' old handle).
+-- A place carried over from an older record (the gryphons' old handle); a ring icon snapped to the minimap again drops its.
 function ns.SetWindowPlace(key, x, y) SetPlace(byKey[key], x, y) end
+function ns.ClearWindowPlace(key) Places()[key] = nil end
 -- A window the player placed (ours or the game's): out of the windows' row.
 function ns.FramePlaced(frame)
     for _, entry in ipairs(WINDOWS) do
@@ -158,13 +158,17 @@ end
 
 local PlaceAll
 
--- A piece on the minimap ring drags round it: an angle, not a place.
+-- A piece on the minimap ring drags round it: an angle, not a place; its Stay on minimap (ringIf) off, a place.
 local function OnRing(entry) return entry.ringKey ~= nil and (entry.ringIf == nil or ns.db[entry.ringIf] == true) end
--- fixedIf: a setting's key, or a function (the eye off the rim).
+-- fixedIf: a setting's key, or a function (the eye off the rim). Fixed: no drag and no size.
 local function Fixed(entry)
     local fixed = entry.fixedIf
     if type(fixed) == "function" then return fixed() == true end
     return fixed ~= nil and ns.db[fixed] == true
+end
+-- No drag: fixed, or a minimap piece staying at its spot (Stay on minimap on), unless it rides the ring.
+local function Pinned(entry)
+    return Fixed(entry) or (entry.stays == true and ns.db[entry.switch] ~= false and not OnRing(entry))
 end
 
 -- A new size on the game's own spot (no place of ours) keeps it on screen: the offsets count in the window's scale.
@@ -276,19 +280,6 @@ PlaceAll = function()
 end
 
 ns.OnToggle(function(key) if key == MAP_ENTRY.toggle or key == "worldMap" or key == "socialTitleDrag" then PlaceAll() end end)
-
--- Leave game windows to other addons: our sizes go back to the game's (a protected one after a fight); off, ours return.
-local function LeaveGameWindows()
-    if InCombatLockdown() then ns.WhenCalm("windowsLeft", LeaveGameWindows) return end
-    for frame in pairs(scaled) do
-        if ns.MoverHolds(frame) then
-            ns.SetScaleIf(frame, 1)
-            scaled[frame] = nil
-        end
-    end
-    PlaceAll()
-end
-ns.OnToggle(function(key) if key == "leaveGameWindows" then LeaveGameWindows() end end)
 
 -- Our windows are made on first open; client ones as their addon loads.
 ns.PlaceSavedWindows = PlaceAll
@@ -690,7 +681,7 @@ end
 
 local function HandleDragStart(self)
     dragged[self] = true
-    if Fixed(self.entry) then return end
+    if Pinned(self.entry) then return end
     if OnRing(self.entry) then
         ringJob = ringJob or ns.Sched.OnFrame(CreateFrame("Frame"), { name = "windows.ringDrag", every = 0, awake = false,
             fn = RingStep })
@@ -719,7 +710,7 @@ local function HandleDropped(self)
     if entry.gameEdit then Follow(self, false) end
     local left, top = Plain(self:GetLeft()), Plain(self:GetTop())
     if not (left and top) then return end
-    if Fixed(entry) then
+    if Pinned(entry) then
         LayHandle(entry)
         return
     end
@@ -794,6 +785,7 @@ ns.windowEdit = {
     Leader = Leader, SizeKey = SizeKey, ByKey = byKey, DrawnSize = DrawnSize, SaveFrom = SaveFrom, HandleShown = function(key) return handles[key] ~= nil and handles[key]:IsShown() end,
     HideDialog = function() if dialog then dialog:Hide() end end, -- the drags (UI/WindowDrags.lua) keep these with us:
     Moving = moving, EntryOf = entryOf, Strips = strips, ClampWas = clampWas, STRIP_RIGHT = STRIP_RIGHT, STRIP_H = STRIP_H,
+    Scaled = scaled,
 }
 
 -- The map's lock and option switch its Movable anytime too.

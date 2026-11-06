@@ -45,6 +45,16 @@ function ns.LayPiece(key, anyway)
     if ns.LayTrackingIcon then ns.LayTrackingIcon(key) end
 end
 
+-- Stay on minimap switched on a piece's box: its place drops and it is laid at its minimap spot (a ring icon round the ring).
+ns.OnToggle(function(key)
+    for _, entry in ipairs(ns.WINDOW_LIST) do
+        if entry.switch == key and (entry.ringIf == key or entry.stays) and ns.db[key] ~= false then
+            ns.ClearWindowPlace(entry.key)
+            ns.LayPiece(entry.key, true)
+        end
+    end
+end)
+
 -- Picking a spot (options or its edit mode dropdown) puts it there: a place dragged in edit mode goes.
 ns.OnToggle(function(key)
     local group = ns.TOGGLE_RADIO and ns.TOGGLE_RADIO[key]

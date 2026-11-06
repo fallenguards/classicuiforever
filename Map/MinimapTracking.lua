@@ -91,7 +91,8 @@ end
 local TRACK_KEY, TRACK_ANGLE, TRACK_R = "minimapTrackingIcon", "trackingIconAngle", 83.6
 local function PlaceTracking()
     local frame = trackFrame
-    if not frame then return end
+    -- Placed off the ring in edit mode (Snap to minimap off): the windows lay it.
+    if not frame or (ns.WindowPlaced and ns.WindowPlaced(TRACK_KEY)) then return end
     local degrees = ns.db and ns.db[TRACK_ANGLE]
     if degrees then
         ns.RingPoint(frame, degrees, TRACK_R, frame:GetEffectiveScale() / Minimap:GetEffectiveScale())

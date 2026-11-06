@@ -478,7 +478,7 @@ L["MAP_LEFT_CLICK_THE_OTHER_ADDONS"] = "Left-click: the other addons' minimap bu
 
 -- Map/MinimapEye.lua
 L["MAP_DEFAULT_SIZE"] = "Default Size"
-L["MAP_EYE_SNAP"] = "Snap to minimap"
+L["MAP_EYE_SNAP"] = "Stay on minimap"
 L["MAP_EYE_IDLE"] = "Show when not queued"
 L["MAP_EYE_OPTIONS_APPLY"] = "These options apply and save the moment you change them."
 

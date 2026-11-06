@@ -224,3 +224,17 @@ ns.Popup("FCUI_WINDOWS_RESET", {
 -- For the dev addon's window test.
 function ns.WindowLockButtons(key) return locks[key], resets[key] end
 ns.OnToggle(function(key) if key == "windowLocksAlways" then SyncLocks() end end)
+
+-- Leave game windows to other addons: our sizes go back to the game's (a protected one after a fight); off, ours return.
+local function LeaveGameWindows()
+    local W = ns.windowEdit
+    if InCombatLockdown() then ns.WhenCalm("windowsLeft", LeaveGameWindows) return end
+    for frame in pairs(W.Scaled) do
+        if ns.MoverHolds(frame) then
+            ns.SetScaleIf(frame, 1)
+            W.Scaled[frame] = nil
+        end
+    end
+    W.PlaceAll()
+end
+ns.OnToggle(function(key) if key == "leaveGameWindows" then LeaveGameWindows() end end)

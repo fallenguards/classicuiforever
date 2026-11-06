@@ -117,6 +117,11 @@ local function Position(ring)
         ns.SetPointOnce(button, "CENTER", host, "CENTER", 0, 0)
         return
     end
+    -- Placed off the ring in edit mode (Snap to minimap off): the windows lay it; snapped again, laid afresh.
+    if ns.WindowPlaced and ns.WindowPlaced(ring.key) then
+        ring.placedAngle = nil
+        return
+    end
     local degrees = Angle(ring)
     local r = Radius()
     local k = button:GetEffectiveScale() / Minimap:GetEffectiveScale()
