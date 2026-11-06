@@ -208,10 +208,13 @@ local function LootPager(frame)
     look:SetScript("OnShow", function() job:Kick() end)
     -- After the client's own show pass, ahead of the first draw: a hook ran inside it, and an error of ours there cut
     -- the client's loot open short.
+    local kept, up
     ns.Sched.AfterShow(frame, "loot.pages", function()
         UpdateLootPages(frame)
         Place(frame)
+        kept, up = { frame:GetLeft(), frame:GetTop() }, true
     end)
+    ns.Sched.OnVisible(frame, "loot.up", function(shown) if not shown then up = false end end)
     -- Slot change: look next frame, after the client redraws the row.
     local slots = ns.NewFrame("Frame", nil, pager)
     ns.RegisterEvents(slots, LOOT_EVENTS)
@@ -221,7 +224,11 @@ local function LootPager(frame)
         cleared = false
     end
     slots:SetScript("OnEvent", function(_, event)
-        if event == "LOOT_OPENED" then page = 0 end
+        if event == "LOOT_OPENED" then
+            page = 0
+            -- The same loot opened again (a click with full bags): the game's open put the window at the mouse again.
+            if up and kept then ns.SetPointOnce(frame, "TOPLEFT", nil, "BOTTOMLEFT", kept[1], kept[2]) end
+        end
         if event == "LOOT_SLOT_CLEARED" then cleared = true end
         ns.Sched.NextFrame("loot.update", Redraw)
     end)
