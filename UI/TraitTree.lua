@@ -95,6 +95,20 @@ local function GroupTabs(tree)
     return byGroup
 end
 
+-- /fcuidev talentranks sets ns.talents.fakeRanks: no points left, the first multi-rank talent at its top rank and the
+-- others one below it, for a look at Era's rank colors on a character without talents.
+local function FakeRanks(tree, talents)
+    tree.points = 0
+    local top = false
+    for _, talent in ipairs(talents) do
+        talent.canBuy = false
+        if talent.maxRank > 1 then
+            talent.rank = top and 1 or talent.maxRank
+            top = true
+        end
+    end
+end
+
 -- ReadTraitGroups(configID, treeID) -> the groups as tabs (name, icon, spent) without their talents, or nil.
 function ns.ReadTraitGroups(configID, treeID)
     if not (configID and treeID and C_Traits) then return nil end
@@ -142,6 +156,7 @@ function ns.ReadTraitTree(configID, treeID, opts)
             if not topY or talent.y < topY then topY = talent.y end
         end
     end
+    if ns.talents and ns.talents.fakeRanks and not opts.inspect then FakeRanks(tree, all) end
     local cell = opts.cell == "auto" and AutoCell(all) or CELL
     for _, tab in ipairs(tree.tabs) do Grid(tab, topY, cell, nodesByID) end
     tree.nodesByID = nodesByID

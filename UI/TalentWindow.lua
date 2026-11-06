@@ -573,8 +573,9 @@ local function DrawButtons(frame, tab)
         button.talent = talent
         ns.SetPointOnce(button, "TOPLEFT", child, "TOPLEFT", CellX(frame, talent.column), CellY(frame, talent.tier))
         button.icon:SetTexture(talent.icon or "Interface\\Icons\\INV_Misc_QuestionMark")
+        -- Era's TalentFrameBase: gold at the top rank only; green below it, points to spend or not; gray out of reach.
         local ranked, maxed = talent.rank > 0, talent.rank >= talent.maxRank
-        if maxed or (ranked and not talent.canBuy) then
+        if maxed then
             button.icon:SetDesaturated(false)
             button.slot:SetVertexColor(1, 0.82, 0)
             button.rankText:SetTextColor(1, 0.82, 0)
