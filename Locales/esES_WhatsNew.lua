@@ -3,6 +3,12 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN66_1_TITLE"] = "Las descripciones vuelven a ser oscuras como en Classic Era"
+L["WN66_1_TEXT"] = "Cada descripción lleva el fondo oscuro de Era en todos los estilos. El fondo más claro y azulado del juego se veía a partir de la segunda descripción, con un hueco dentro del borde."
+L["WN66_2_TITLE"] = "El minimapa vuelve a moverse en el modo de edición"
+L["WN66_2_TEXT"] = "Al arrastrar el minimapa en el modo de edición sigue a la vista y se guarda su nuevo sitio."
+L["WN66_3_TITLE"] = "El mapa del mundo mantiene su tamaño en combate"
+L["WN66_3_TEXT"] = "Abierto en combate, el mapa tiene el mismo tamaño que fuera de él, con o sin el registro de misiones."
 L["WN65_1_TITLE"] = "Mueve todas tus ventanas a la vez"
 L["WN65_1_TEXT"] = "ClassicUI Forever Windows tiene un recuadro Fila de ventanas: arrástralo y todas las ventanas que se abren una al lado de otra se mueven juntas allí."
 L["WN65_2_TITLE"] = "El adiestramiento vuelve a contar en puntos de entrenamiento"

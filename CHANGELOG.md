@@ -2,6 +2,14 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.45.1] - 2026-11-05
+
+### Fixed
+- Tooltips wear Classic Era's dark fill in every look again. The game's own lighter, bluer fill showed through from the second tooltip of a session on, and the fill stopped short of the border.
+- The minimap can be dragged in Edit Mode again. It went unseen mid drag and its new place was never saved (#246).
+- The world map opened during a fight is the size it is out of one, with or without the quest log, not far past the screen.
+- A party member's role icon no longer stretches across the frame after a group change mid fight.
+
 ## [0.45.0] - 2026-11-05
 
 ### Added

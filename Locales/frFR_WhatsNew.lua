@@ -3,6 +3,12 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN66_1_TITLE"] = "Les infobulles retrouvent le fond sombre de Classic Era"
+L["WN66_1_TEXT"] = "Chaque infobulle porte le fond sombre d'Era dans tous les styles. Le fond plus clair et plus bleu du jeu transparaissait dès la deuxième infobulle, avec un jour le long du bord."
+L["WN66_2_TITLE"] = "La minicarte se déplace de nouveau en mode Édition"
+L["WN66_2_TEXT"] = "Glissée en mode Édition, la minicarte reste visible et sa nouvelle place est enregistrée."
+L["WN66_3_TITLE"] = "La carte du monde garde sa taille en combat"
+L["WN66_3_TEXT"] = "Ouverte en combat, la carte a la même taille qu'en dehors, avec ou sans le journal des quêtes."
 L["WN65_1_TITLE"] = "Déplacez toutes vos fenêtres d'un coup"
 L["WN65_1_TEXT"] = "ClassicUI Forever Windows a un cadre Rangée de fenêtres : faites-le glisser et toutes les fenêtres qui s'ouvrent côte à côte s'y déplacent ensemble."
 L["WN65_2_TITLE"] = "Le dressage compte de nouveau en points d'entraînement"

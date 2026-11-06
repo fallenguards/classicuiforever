@@ -3,6 +3,12 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN66_1_TITLE"] = "I tooltip tornano scuri come in Classic Era"
+L["WN66_1_TEXT"] = "Ogni tooltip ha lo sfondo scuro di Era in ogni stile. Lo sfondo più chiaro e bluastro del gioco traspariva dal secondo tooltip in poi, con uno spazio vuoto lungo il bordo."
+L["WN66_2_TITLE"] = "La minimappa si sposta di nuovo in modalità Modifica"
+L["WN66_2_TEXT"] = "Trascinata in modalità Modifica, la minimappa resta visibile e la nuova posizione viene salvata."
+L["WN66_3_TITLE"] = "La mappa del mondo mantiene le dimensioni in combattimento"
+L["WN66_3_TEXT"] = "Aperta in combattimento, la mappa ha le stesse dimensioni che ha fuori, con o senza il registro delle missioni."
 L["WN65_1_TITLE"] = "Sposta tutte le finestre insieme"
 L["WN65_1_TEXT"] = "ClassicUI Forever Windows ha un riquadro Fila di finestre: trascinalo e tutte le finestre che si aprono una accanto all'altra si spostano lì insieme."
 L["WN65_2_TITLE"] = "L'addestramento del famiglio torna in punti addestramento"

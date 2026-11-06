@@ -3,6 +3,12 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN66_1_TITLE"] = "Tooltips wieder so dunkel wie in Classic Era"
+L["WN66_1_TEXT"] = "Jeder Tooltip trägt in jedem Look die dunkle Füllung von Era. Die hellere, blauere Füllung des Spiels schien ab dem zweiten Tooltip durch, mit einer Lücke innen am Rand."
+L["WN66_2_TITLE"] = "Die Minimap lässt sich im Bearbeitungsmodus wieder verschieben"
+L["WN66_2_TEXT"] = "Beim Ziehen im Bearbeitungsmodus bleibt die Minimap sichtbar und ihr neuer Platz wird gespeichert."
+L["WN66_3_TITLE"] = "Die Weltkarte behält ihre Größe im Kampf"
+L["WN66_3_TEXT"] = "Im Kampf geöffnet ist die Karte so groß wie außerhalb, mit oder ohne Questlog."
 L["WN65_1_TITLE"] = "Alle Fenster auf einmal verschieben"
 L["WN65_1_TEXT"] = "ClassicUI Forever Windows hat ein Feld Fensterreihe: Ziehst du es, wandern alle Fenster, die sich nebeneinander öffnen, gemeinsam dorthin."
 L["WN65_2_TITLE"] = "Tierausbildung rechnet wieder in Trainingspunkten"

@@ -2,6 +2,12 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN66_1_TITLE"] = "Tooltips are Classic Era's dark again"
+L["WN66_1_TEXT"] = "Every tooltip wears Era's dark fill in every look. The game's lighter, bluer fill showed through from the second tooltip on, with a gap inside the border."
+L["WN66_2_TITLE"] = "The minimap moves in Edit Mode again"
+L["WN66_2_TEXT"] = "Dragging the minimap in Edit Mode keeps it in view and saves its new place."
+L["WN66_3_TITLE"] = "The world map keeps its size in a fight"
+L["WN66_3_TEXT"] = "Opened during a fight, the map is the size it is out of one, with or without the quest log."
 L["WN65_1_TITLE"] = "Move all your windows at once"
 L["WN65_1_TEXT"] = "ClassicUI Forever Windows has a Window row box: drag it, and every window that opens side by side moves there together."
 L["WN65_2_TITLE"] = "Beast Training counts in training points again"
