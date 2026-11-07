@@ -8,11 +8,13 @@ local UF = ns.UF
 local IsSecret = ns.IsSecret
 local UnitDetailedThreatSituation, UnitThreatPercentageOfLead = UnitDetailedThreatSituation, UnitThreatPercentageOfLead
 local GetThreatStatusColor = GetThreatStatusColor
+local min = math.min
 
 -- Era's numbers: a 49 x 18 box, its colored fill 37 x 14 and the label 3 and 4 down from the box's top; the box where
 -- TargetFrame.lua puts the game's own.
 local BOX_W, BOX_H, FILL_W, FILL_H, FILL_Y, TEXT_Y = 49, 18, 37, 14, -3, -4
 local BOX_X, BOX_Y = -30, -26
+local MAX_SHOWN = 999   -- Era's MAX_DISPLAYED_THREAT_PERCENT
 local BORDER_COORDS = { 0, 0.765625, 0, 0.5625 }
 local FRAMES = { target = "TargetFrame", focus = "FocusFrame" }
 -- The mobs' threat lists and the player's standing on them; a new target or focus, the fight's end, a group or zone change.
@@ -63,7 +65,7 @@ local function UpdateBox(unit)
         local value = raw
         if tanking and not IsSecret(tanking) then value = UnitThreatPercentageOfLead("player", unit) end
         if value and status and not IsSecret(value) and not IsSecret(status) and value ~= 0 then
-            box.text:SetFormattedText("%1.0f%%", value)
+            box.text:SetFormattedText("%1.0f%%", min(value, MAX_SHOWN))
             box.fill:SetVertexColor(GetThreatStatusColor(status))
             show = true
         end
