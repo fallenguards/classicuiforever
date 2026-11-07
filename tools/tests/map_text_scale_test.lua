@@ -87,9 +87,13 @@ local withPane = LM.Size(330)
 Check(Near(withPane - w, 330 + 7 * WINDOWED), "the pane adds its own width, the divider at the sheets' scale")
 local x1, _, x2 = LM.Pane(330)
 Check(Near(x2 - x1, 330), "the pane's hole is the pane's width in the map's units")
-local x = header.continentLabel.points[1]
-Check(x and x[1] == "LEFT" and header.continent.points[1][2] == header.continentLabel,
-    "windowed, the labels sit beside their drop downs in one row")
+local cont, zone = header.continent.points[1], header.zone.points[1]
+Check(cont and zone and cont[1] == "RIGHT" and zone[1] == "LEFT" and cont[2] == header and zone[2] == header
+    and Near(cont[4], -zone[4]) and cont[4] < 0 and cont[5] == zone[5],
+    "windowed, the two drop downs' facing edges the same way off the middle, on one row")
+local zoneLabel = header.zoneLabel.points[1]
+Check(zoneLabel and zoneLabel[1] == "RIGHT" and zoneLabel[2] == header.zone,
+    "windowed, the Zone label sits left of its drop down")
 local notePoint = note.note.points[1]
 Check(notePoint and Near(notePoint[4], (512 - 468) * WINDOWED) and Near(notePoint[5], -86 * WINDOWED),
     "the note sits over the picture's corner at the sheets' scale")

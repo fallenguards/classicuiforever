@@ -43,9 +43,10 @@ local DROP_W, DROP_H, DROP_X, DROP_Y, DROP_GAP = 130, 24, -80, -36, 5
 local ZOOM_W, ZOOM_H, ZOOM_Y = 110, 22, 0
 local LABEL_Y, TITLE_Y = 12, -12
 -- Windowed, the band is 30 short of Era's at the text's size: the labels beside their drop downs, one row under the
--- title. The title's middle and the row's from the band's top (+ up); a label to its drop down; after a drop down.
+-- title, the two drop downs' facing edges the same way off the middle with the Zone label between them. The title's
+-- middle and the row's from the band's top (+ up); a label to its drop down; after a drop down.
 local WIN_TITLE_Y = -10
-local WIN_ROW_Y = -35
+local WIN_ROW_Y = -32
 local WIN_LABEL_GAP = 4
 local WIN_GAP = 10
 -- The zoom note: 179 x 40, its left 468 left of the middle and 86 down; the glass 32, the text 32 in and 5 down.
@@ -308,11 +309,11 @@ local function LayHeader()
         return
     end
     title:SetPoint("CENTER", h, "TOP", 0, WIN_TITLE_Y)
-    local row = continentLabel:GetStringWidth() + zoneLabel:GetStringWidth() + 2 * (WIN_LABEL_GAP + DROP_W + WIN_GAP) + ZOOM_W
-    continentLabel:SetPoint("LEFT", h, "TOP", -row / 2, WIN_ROW_Y)
-    continent:SetPoint("LEFT", continentLabel, "RIGHT", WIN_LABEL_GAP, 0)
-    zoneLabel:SetPoint("LEFT", continent, "RIGHT", WIN_GAP, 0)
-    zone:SetPoint("LEFT", zoneLabel, "RIGHT", WIN_LABEL_GAP, 0)
+    local half = (WIN_GAP + zoneLabel:GetStringWidth() + WIN_LABEL_GAP) / 2
+    continent:SetPoint("RIGHT", h, "TOP", -half, WIN_ROW_Y)
+    continentLabel:SetPoint("RIGHT", continent, "LEFT", -WIN_LABEL_GAP, 0)
+    zone:SetPoint("LEFT", h, "TOP", half, WIN_ROW_Y)
+    zoneLabel:SetPoint("RIGHT", zone, "LEFT", -WIN_LABEL_GAP, 0)
     zoom:SetPoint("LEFT", zone, "RIGHT", WIN_GAP, 0)
 end
 
