@@ -97,9 +97,12 @@ local function FitList()
     panel.listBox:SetPoint("RIGHT", panel, "RIGHT", over > 0 and panel.listRight or 0, 0)
 end
 
+-- Era's names: a class trainer's two spaces past its headers' (21); Beast Training's 2 past the All label's.
+local ITEM_X, PET_ITEM_X = 33, 22
+
 local function DrawItem(row, line)
     row.toggle:Hide()
-    row.text:SetPoint("LEFT", row, "LEFT", 33, 0)
+    row.text:SetPoint("LEFT", row, "LEFT", pet and PET_ITEM_X or ITEM_X, 0)
     local label = line.name
     if line.sub and line.sub ~= "" then label = label .. " (" .. line.sub .. ")" end
     row.text:SetText(label)
