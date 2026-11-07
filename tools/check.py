@@ -38,7 +38,7 @@ DUPFN_MIN = 3
 RULES = ["CVAR", "CVARREAD", "CVARLOGIN", "CVARREG", "REGISTRY", "HOOK", "ONUPDATE", "SINCE", "TIMER", "THROTTLEFRAME", "SEARCHBOX", "ADDONCHAR", "ADDONSELF", "KEYONLY",
          "LOADADDON", "EDITMODE", "EDITQUERY", "SETTLE",
          "PANELMGR", "SECRET", "WALK", "REGEVENTS", "EVENTFRAME", "POINTONCE", "SETIF", "THEME", "ONCEFLAG",
-         "FRAMEFIELD", "GAMEMENU", "SHAREDART", "PLATES", "FORBIDDEN", "SYSBASE", "LAYOUTFIELD", "CLIENTKEY",
+         "FRAMEFIELD", "GAMEMENU", "SHAREDART", "PLATES", "FORBIDDEN", "SYSBASE", "LAYOUTFIELD", "LISTWRITE", "CLIENTKEY",
          "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS", "DRAGPOINT", "STRETCHED", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "SNIPPETHIDE", "PVPINFOART", "CLUSTERSCALE", "DBRAW", "FLOORSIZE", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "LOADORDER", "TOC"]
 # A hit of these on a line the change adds fails even within the baseline, so swapping one call for another fails.
 # SINCE, DEADNS, FRAMEFIELD, CVARLOGIN and THROTTLEFRAME stay count-only, so a kept line can still be rewritten.
@@ -46,7 +46,7 @@ LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", 
               "ADDONSELF", "KEYONLY",
               "CVARREAD", "THEME", "POINTONCE", "SECRET", "SETIF", "REGEVENTS", "ONCEFLAG", "TIMER", "EDITQUERY",
               "PLATES", "FORBIDDEN", "EVENTFRAME",
-              "WALK", "GAMEMENU", "SHAREDART", "SYSBASE", "LAYOUTFIELD", "CLIENTKEY", "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS",
+              "WALK", "GAMEMENU", "SHAREDART", "SYSBASE", "LAYOUTFIELD", "LISTWRITE", "CLIENTKEY", "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS",
               "DRAGPOINT", "STRETCHED", "ERASPOT", "WINDOWORIGIN", "CVARREG", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST",
               "POINTEXACT",
               "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE",
@@ -253,6 +253,8 @@ FIX = {
     "REGEVENTS": "use ns.RegisterEvents(frame, LIST) (Core/Util.lua) on the same frame, same order",
     "LAYOUTFIELD": "write no layout field on any frame; keep watcher children off client layout frames (hang them "
                    "under a child the client marks out of layout, e.g. EditModeManagerFrame.Border)",
+    "LISTWRITE": "write no row height, padding or scroll spot into a game list's view: lay our rows round the game's, "
+                 "or write only where the gamepad navigator never walks (Windows/Loot.lua PadList)",
     "PADART": "give a secure pad no art or text of its own: light the control under it (LockHighlight in OnEnter, "
               "UnlockHighlight in OnLeave), so a pad that outlives its window (a fight blocks its hide) draws nothing",
     "ADDONCHAR": "name the character by UnitGUID(\"player\"), as the game's AddOns list does",
@@ -368,6 +370,7 @@ LINE_PATTERNS = {
     "AURAREAD": re.compile(r"\bGetAuraDataBy\w+\s*\(|\b(?:UnitAura|UnitBuff|UnitDebuff)\s*\(|\bAuraUtil\s*\.\s*\w+\s*\("),
     "LAYOUTFIELD": re.compile(r"\.\s*(?:ignoreInLayout|includeInLayout|layoutIndex|includeAsLayoutChildWhenHidden"
                               r"|ignoreAllChildren|expand|align|topPadding|bottomPadding|leftPadding|rightPadding)\s*=(?!=)"),
+    "LISTWRITE": re.compile(r":\s*(?:SetElementExtent|SetElementExtentCalculator|SetScrollPercentage|SetPadding)\s*\("),
     "SYSBASE": re.compile(
         r"(?<![\w.])(?:MainActionBar|MultiBar\w+|StanceBar|PetActionBar|PossessActionBar|BagsBar|MicroMenuContainer"
         r"|\w*StatusTrackingBarContainer|PlayerCastingBarFrame|PlayerFrame|TargetFrame|FocusFrame|PetFrame|MinimapCluster"
@@ -564,6 +567,8 @@ MESSAGES = {
     "HELDCVAR": "ns.SetCVar in code a toggle runs at once, in a fight too (KeyEffects, an ns.OnToggle handler)",
     "CVARREG": "an addon-registered cvar (a settings copy outside saved variables)",
     "LAYOUTFIELD": "a field client layout code reads, written from our code (its layout pass then runs in our name)",
+    "LISTWRITE": "a row height, padding or scroll spot written into a game list (the gamepad navigator's step to the next "
+                 "row reads it, runs in our name and quits: loot rows, #264)",
     "PADART": "a secure pad on UIParent with art or text of its own (a ghost bar where it outlives its window)",
     "SEARCHBOX": "an input box built by hand (the Legacy challenges' search came out with no X to clear it)",
     "KEYONLY": "a trainer piece by a key retail lacks (retail's Train did nothing, #144)",

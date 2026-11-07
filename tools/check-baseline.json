@@ -136,6 +136,9 @@
     "SHAREDART": {
       "Spells/SpellBook.lua": 2
     },
+    "LISTWRITE": {
+      "Windows/Loot.lua": 3
+    },
     "PASSWRITE": {
       "Bar/Band.lua": 2,
       "Bar/BandArt.lua": 4,
