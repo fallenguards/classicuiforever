@@ -71,7 +71,42 @@ function T.TakeAlpha(region) Take(region, "alpha") end
 local GLOW_LEFT, GLOW_TOP, GLOW_BOTTOM = 11, -13, 76
 -- The ring lies this far inside its box (the game's FrameGlowTable, PortraitFrameTemplate): the box reaches out by it.
 local RING_LEFT, RING_TOP, RING_RIGHT, RING_BOTTOM = 20, 24, 14, 14
+
+-- The game's gold flash when an enchant takes (Era has none): faded unless picked, else laid on the same border,
+-- scaled as Forever lays it on its pane (70862: frame 387 x 420, mask 855 x 670 at 2, -3 off it, glows at -2, -3).
+local FX_W, FX_H, FX_MASK_W, FX_MASK_H, FX_GLOW, FX_SPARKLES = 387, 420, 855, 670, 650, 585
+local function FlashPiece(piece, frame, x, y, w, h)
+    if not piece then return end
+    Take(piece, "points", "size")
+    ns.SetPointIf(piece, "CENTER", frame, "TOPLEFT", x, y)
+    ns.SetSizeIf(piece, w, h)
+end
+
+local function LayEnchantFlash(frame, right)
+    local flash = CharacterModelScene and CharacterModelScene.GearEnchantAnimation
+    if not flash then return end
+    Take(flash, "alpha")
+    ns.SetAlphaIf(flash, ns.db and ns.db.sheetEnchantGlow == true and 1 or 0)
+    local w, h = right - GLOW_LEFT, T.HEIGHT - GLOW_BOTTOM + GLOW_TOP
+    local kx, ky = w / FX_W, h / FX_H
+    local x, y, k = GLOW_LEFT + w / 2, GLOW_TOP - h / 2, math.max(kx, ky)
+    FlashPiece(flash.TopFrame and flash.TopFrame.Frame, frame, x, y, w, h)
+    local fx = flash.FrameFX
+    if not fx then return end
+    FlashPiece(fx.Mask, frame, x + 2 * kx, y - 3 * ky, FX_MASK_W * kx, FX_MASK_H * ky)
+    FlashPiece(fx.PurpleGlow, frame, x - 2 * kx, y - 3 * ky, FX_GLOW * k, FX_GLOW * k)
+    FlashPiece(fx.BlueGlow, frame, x - 2 * kx, y - 3 * ky, FX_GLOW * k, FX_GLOW * k)
+    FlashPiece(fx.Sparkles, frame, x - 2 * kx, y - 3 * ky, FX_SPARKLES * k, FX_SPARKLES * k)
+end
+
+-- Answers in a fight too: nothing here is protected.
+ns.OnToggle(function(key)
+    if key ~= "sheetEnchantGlow" or not (T.active and T.built) then return end
+    LayEnchantFlash(CharacterFrame, T.ART_RIGHT_EDGE + (ns.EquipmentPaneExtent and ns.EquipmentPaneExtent() or 0))
+end)
+
 function T.PlaceGlow(frame, extra)
+    LayEnchantFlash(frame, T.ART_RIGHT_EDGE + extra)
     local glow = frame.FrameGlow
     if not glow then return end
     Take(glow, "points")

@@ -392,6 +392,7 @@ return {
     reagentSlotsLast = false,
     resourceDisplay = true,
     settingsPanel = true,
+    sheetEnchantGlow = false,
     shopMinimapButton = false,
     showAddonBag = true,
     showBags = true,

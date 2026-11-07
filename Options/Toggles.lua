@@ -482,6 +482,8 @@ ns.TOGGLES = {
     { "weaponSkillDetail", L["OPT_weaponSkillDetail"], L["OPT_weaponSkillDetail_TIP"], parent = "characterSheet" },
     { "hideSheetQuality", L["OPT_hideSheetQuality"], L["OPT_hideSheetQuality_TIP"], parent = "characterSheet",
         search = "quality border rarity color colour green blue purple item equipped gear slot" },
+    { "sheetEnchantGlow", L["OPT_sheetEnchantGlow"], L["OPT_sheetEnchantGlow_TIP"], parent = "characterSheet",
+        search = "enchant glow gold flash sharpening stone oil armor kit weapon" },
     { "statsSearch", L["OPT_statsSearch"], L["OPT_statsSearch_TIP"], parent = "characterSheet", hideIf = OnRetail,
         search = "statistics stats search find filter" },
     { "spellBook", L["OPT_spellBook"], L["OPT_spellBook_TIP"] },

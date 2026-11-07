@@ -234,6 +234,7 @@ return {
     hideItemQuality = "same for everyone: opt-in, off by default",
     hideJunkCoin = "same for everyone: opt-in, off by default",
     hideSheetQuality = "same for everyone: opt-in, off by default",
+    sheetEnchantGlow = "same for everyone: off, a fix (#262): the game's enchant flash is not Era's and stood at its own pane's size; on lays it round the slots",
     modernPageArrows = "kept as before: dbVersion 22 (Bar/BandShape.lua OneBarAloneGone) turns it on where One bar kept its page arrows; else opt-in, off (#207)",
     themePartParchment = "same for everyone: on by default, every part took the theme before",
     themePartUnits = "same for everyone: on by default, every part took the theme before",
