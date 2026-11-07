@@ -104,6 +104,8 @@ local function FreeSpot(ring)
     ring.freeAngle = best
 end
 
+local PositionAll
+
 -- Only we move these buttons, so an unchanged angle, radius and size means no move.
 -- Not while collected into the addon button bag (another parent). Offsets count in the button's own size (edit mode's).
 local function Position(ring)
@@ -112,6 +114,10 @@ local function Position(ring)
     -- Riding another frame (the group finder icon on the game's queue eye, which edit mode places and sizes).
     local host = ring.ride and ring.ride()
     if host then
+        -- The host taken into another addon's frame (a button tray): our move helpers on the rider would leave that
+        -- frame no anchor on its own drag. Its reparent places again.
+        ns.HookMethod(host, "SetParent", function() PositionAll() end)
+        ns.Sched.LetGo(button, ring.rideParent ~= nil and host:GetParent() ~= ring.rideParent)
         local own, theirs = ns.Safe(button:GetParent():GetEffectiveScale()), ns.Safe(host:GetEffectiveScale())
         if own and theirs and own > 0 then ns.SetScaleIf(button, theirs / own, 0.001) end
         ns.SetPointOnce(button, "CENTER", host, "CENTER", 0, 0)
@@ -133,7 +139,7 @@ local function Position(ring)
     ns.RingPoint(button, degrees, r, k)
 end
 
-local function PositionAll()
+PositionAll = function()
     for i = 1, #rings do
         if rings[i].active then Position(rings[i]) end
     end
@@ -255,6 +261,10 @@ local function Build(ring)
         { name = ring.name .. ".drag", every = 0, awake = false, fn = OnDragUpdate })
     dragJob.ring = ring
     b:SetMovable(true)
+    -- In a button gatherer's tray, our move helpers on it would leave the tray no anchor on its drag.
+    ns.HookMethod(b, "SetParent", function(self, parent)
+        ns.Sched.LetGo(self, parent ~= Home(ring) and parent ~= _G.ForeverClassicUIMinimapBag)
+    end)
     -- Named: a gatherer that takes the button shows its <name>Icon.
     b.icon = ns.RingLook(b, ring.face, ring.name .. "Icon")
     ns.RingPressable(b, b.icon)
@@ -276,8 +286,8 @@ local function Build(ring)
 end
 
 -- spec: { name, key (edit mode entry), angleKey, angle (default degrees), free (nearest clear spot), show (on hover id),
--- piece (the map's own), face(texture), onClick(button, mouse), tip, ride() (a frame it sits on, at its size),
--- addonButton (one of Addon buttons, with a pick of its own over theirs, #194) }; returns show and hide.
+-- piece (the map's own), face(texture), onClick(button, mouse), tip, ride() (a frame it sits on, at its size), rideParent
+-- (its game parent; elsewhere another addon holds it), addonButton (a pick of its own over theirs, #194) }; returns show, hide.
 function ns.RingButton(spec)
     rings[#rings + 1] = spec
     local function Show()

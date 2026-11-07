@@ -35,7 +35,7 @@ local MICROS = {
     -- Its frame and entry keep their first names.
     { toggle = "lfgMinimapButton", micro = "LFDMicroButton", face = "eye", id = "GroupFinder", angle = 137,
         name = "ForeverClassicUIGroupFinderButton", entry = "minimapGroupFinder", angleKey = "lfgButtonAngle",
-        ride = function() return QueueStatusButton end,
+        ride = function() return QueueStatusButton end, rideParent = UIParent,
         -- Retail's edit mode has no box for the eye: a Shift-drag of the icon slides eye and icon round the rim.
         dragHost = not ns.OnForever() and function(angle) ns.MM.EyeDragTo(angle) end or nil,
         label = L["OPT_hideMicroGroupFinder"], rule = "FinderPanelDisabled" },
@@ -119,6 +119,7 @@ for _, spec in ipairs(MICROS) do
         angle = spec.angle,
         free = spec.free,
         ride = spec.ride,
+        rideParent = spec.rideParent,
         dragHost = spec.dragHost,
         piece = true,
         show = "GroupFinderButton",

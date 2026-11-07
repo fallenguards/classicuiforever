@@ -454,11 +454,27 @@ end
 -- the client's StartMoving/StopMovingOrSizing, so the helpers let go while edit mode (the only drags) is open.
 local moveHelpers = {}
 local helpersLoose, editHooked = false, false
+local held = setmetatable({}, { __mode = "k" })   -- frame -> true: its helpers stay loose (Sched.LetGo)
+
+local function Inside(region, frame)
+    while region do
+        if region == frame then return true end
+        region = region:GetParent()
+    end
+    return false
+end
+
+local function Held(entry)
+    for frame in pairs(held) do
+        if Inside(entry[3], frame) or Inside(entry[5], frame) then return true end
+    end
+    return false
+end
 
 -- Retail refuses an anchor that would join two anchor families (FriendsFrame): that helper stays loose and hears nothing.
 local function PinHelper(entry)
     local helper = entry[1]
-    if not (pcall(helper.SetPoint, helper, "TOPLEFT", entry[3], entry[2])
+    if Held(entry) or not (pcall(helper.SetPoint, helper, "TOPLEFT", entry[3], entry[2])
         and pcall(helper.SetPoint, helper, "BOTTOMRIGHT", entry[5], entry[4])) then
         helper:ClearAllPoints()
     end
@@ -496,17 +512,12 @@ function Sched.OnMove(frame, fn)
     MoveHelper("TOPLEFT", UIParent, "BOTTOMRIGHT", frame, fn)
 end
 
-local function Inside(region, frame)
-    while region do
-        if region == frame then return true end
-        region = region:GetParent()
-    end
-    return false
-end
-
 -- LetGo(frame, loose): the helpers hung on frame or anything in it (a pad's button) let go for a drag of ours
--- (StartMoving left it with no anchor, unseen) and pin again after it.
+-- (StartMoving left it with no anchor, unseen), or while another addon's frame holds it, and pin again after.
 function Sched.LetGo(frame, loose)
+    loose = loose == true
+    if (held[frame] == true) == loose then return end
+    held[frame] = loose or nil
     if helpersLoose then return end
     for i = 1, #moveHelpers do
         local entry = moveHelpers[i]
