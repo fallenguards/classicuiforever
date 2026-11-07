@@ -39,6 +39,98 @@ local function PadShown(i)
     return up and page ~= nil and page:IsShown()
 end
 
+-- What's Training's professions list (recipes still to learn) opens from a side tab of ours on the book page, as the
+-- spellbook's own side tab opens its spells list; its own tabs on this window stand down, hidden as they show (#260).
+local TRAINING_TABS = { "WhatsTrainingCraftingTab", "WhatsTrainingCraftingReturnTab" }
+-- The spellbook's first side tab spot (Spells/SpellBook.lua): just past the art's right edge, 65 down.
+local TRAIN_X, TRAIN_Y, TRAIN_GAP = 2, -65, -17
+local trainTab
+local function TrainingOurs()
+    return ns.OnForever() and ns.ModuleInForce("professionsBook") and ns.SpellBookActive and ns.SpellBookActive()
+end
+local function TrainingOff(piece)
+    if TrainingOurs() and piece:IsShown() then piece:Hide() end
+end
+local function TrainingListUp()
+    local list = _G.WhatsTrainingCraftingPage
+    return list ~= nil and list:IsShown()
+end
+
+-- Its list is laid for the game's wide window (a 552 search row, centered): on our book the search box starts clear of
+-- the portrait ring and takes the page's width less the Filter button, which ends over the list's scroll bar; its own
+-- title stands down for ours.
+local SEARCH_X, SEARCH_Y, FILTER_W, FILTER_GAP, LIST_GUTTER = 62, -16, 108, 4, 14
+local titleTaken = false
+local function FitTraining(list)
+    local title = _G.WhatsTrainingCraftingTitle
+    if not TrainingOurs() then
+        if titleTaken and title then title:Show() end
+        titleTaken = false
+        return
+    end
+    local search = _G.WhatsTrainingCraftingSearchBox
+    if search then
+        ns.SetPointOnce(search, "TOPLEFT", list, "TOPLEFT", SEARCH_X, SEARCH_Y)
+        local width = list:GetWidth() - SEARCH_X - FILTER_W - FILTER_GAP - LIST_GUTTER
+        if width > 0 then search:SetWidth(width) end
+    end
+    if title and title:IsShown() then
+        title:Hide()
+        titleTaken = true
+    end
+end
+
+-- Its own launcher's handler, as its click runs it.
+local function OpenTraining(self)
+    local launcher = _G.WhatsTrainingCraftingTab
+    local open = launcher and launcher.customMouseUpHandler
+    if type(open) == "function" then open(launcher, "LeftButton", true) end
+    self:SetChecked(TrainingListUp())
+end
+
+-- Under the profession side tabs while they are up (hover or always), else at the column's top.
+local function PlaceTrainTab(frame)
+    local last
+    if not (ns.db and ns.db.professionTabsHidden == true) then
+        for _, tab in ipairs(frame.rightProfessionTabs or ns.EMPTY) do
+            if tab:IsShown() then last = tab end
+        end
+    end
+    if last then
+        ns.SetPointOnce(trainTab, "TOPLEFT", last, "BOTTOMLEFT", 0, TRAIN_GAP)
+    else
+        ns.SetPointOnce(trainTab, "TOPLEFT", frame, "TOPLEFT", T.BookW() + TRAIN_X, TRAIN_Y)
+    end
+end
+
+local function TrainingStandsDown(frame, page)
+    for _, name in ipairs(TRAINING_TABS) do
+        local piece = _G[name]
+        if piece then
+            ns.HookScriptOnce(piece, "OnShow", TrainingOff, "profTraining")
+            TrainingOff(piece)
+        end
+    end
+    local list = _G.WhatsTrainingCraftingPage
+    if list then
+        ns.HookScriptOnce(list, "OnShow", FitTraining, "profTrainingFit")
+        if list:IsShown() then FitTraining(list) end
+    end
+    if not (_G.WhatsTrainingCraftingTab and ns.NewSideTab and TrainingOurs()) then
+        if trainTab then trainTab:Hide() end
+        return
+    end
+    if not trainTab then
+        trainTab = ns.NewSideTab(page, 1, nil)
+        trainTab:SetNormalTexture("Interface\\Icons\\INV_Misc_Book_09")
+        trainTab.tooltip = L["SPELL_WHAT_CAN_I_TRAIN"]
+        trainTab:SetScript("OnClick", OpenTraining)
+    end
+    PlaceTrainTab(frame)
+    trainTab:SetChecked(TrainingListUp())
+    trainTab:Show()
+end
+
 -- The game's controller footer under the foot tabs, not over them (widget calls only: its fields stay the game's).
 local FOOTER_Y = -28
 local function PlaceFooter()
@@ -135,6 +227,7 @@ end
 function T.BookTabs()
     local frame, page = T.Host(), Page()
     if not frame or not page or not ns.NewBookTab then return end
+    TrainingStandsDown(frame, page)
     local on = ns.SpellBookActive and ns.SpellBookActive() and true or false
     if not bookTabs then
         if not on then return end

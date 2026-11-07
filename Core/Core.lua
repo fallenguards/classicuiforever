@@ -555,6 +555,7 @@ local function Migrate(saved)
     if saved < 31 then ns.PaneShadeMiddle() end
     if saved < 32 then ns.OneKeyRingArtRow() end
     if saved < 33 then ns.PaneOnPaper() end
+    if saved < 34 then ns.ProfTabsHidden() end
 end
 
 -- Our first frame: db loads and the post-combat pass runs before any other frame of ours sees the event.

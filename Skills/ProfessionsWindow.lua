@@ -109,10 +109,24 @@ function ns.OneProfTabsChoice()
     if ns.db.professionTabs == true then ns.db.professionTabsHover = false end
 end
 
+-- dbVersion 34: hidden by default (Era had no such tabs); only Always kept, on hover moves to hidden.
+function ns.ProfTabsHidden()
+    local db = ns.db
+    if db.professionTabs ~= true then
+        db.professionTabsHover, db.professionTabsHidden = false, true
+    end
+    for _, shot in pairs(type(db.profiles) == "table" and db.profiles or {}) do
+        if type(shot) == "table" and shot.professionTabs ~= true then
+            shot.professionTabsHover, shot.professionTabsHidden = nil, nil
+        end
+    end
+    db.dbVersion = 34
+end
+
 -- The option's three picks: shown on hover, always (professionTabs), or never (no mouse either, out of combat).
 local function TabsMode()
     local db = ns.db
-    if not db then return "hover" end
+    if not db then return "hidden" end
     if db.professionTabsHidden == true then return "hidden" end
     return db.professionTabs == true and "always" or "hover"
 end
