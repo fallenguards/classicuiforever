@@ -3,24 +3,31 @@ local B = ns.band
 local L = ns.L
 
 -- Each action bar's Faded Opacity, under its own edit mode dialog: below 100% its buttons stand at that till the mouse
--- is on one of them or something is in hand to drop on a bar. Our holders carry the alpha (Bar/BandBars.lua); the
--- band's art stays. Alpha is free in a fight, so a bar fades and lights there too.
+-- is on one of them, or on any bar linked with it, or something is in hand to drop on a bar. Our holders carry the alpha
+-- (Bar/BandBars.lua); the band's art stays. Alpha is free in a fight, so a bar fades and lights there too.
 
 local FADE_TIME = 0.2   -- seconds from faded to full
 local GRACE = 0.15      -- between two buttons the mouse leaves one first: no fade for that
 local FLYOUT_LOOK = 0.25
--- Each bar by name and its setting; bar 1 is whichever the client has.
-local BARS = { { nil, "fadeBar1" }, { "MultiBarBottomLeft", "fadeBar2" }, { "MultiBarBottomRight", "fadeBar3" },
-    { "MultiBarRight", "fadeBar4" }, { "MultiBarLeft", "fadeBar5" }, { "MultiBar5", "fadeBar6" },
-    { "MultiBar6", "fadeBar7" }, { "MultiBar7", "fadeBar8" }, { "StanceBar", "fadeStance" }, { "PetActionBar", "fadePet" } }
+-- Each bar by name, its fade setting and its link; bar 1 is whichever the client has.
+local BARS = { { nil, "fadeBar1", "fadeLinkBar1" }, { "MultiBarBottomLeft", "fadeBar2", "fadeLinkBar2" },
+    { "MultiBarBottomRight", "fadeBar3", "fadeLinkBar3" }, { "MultiBarRight", "fadeBar4", "fadeLinkBar4" },
+    { "MultiBarLeft", "fadeBar5", "fadeLinkBar5" }, { "MultiBar5", "fadeBar6", "fadeLinkBar6" },
+    { "MultiBar6", "fadeBar7", "fadeLinkBar7" }, { "MultiBar7", "fadeBar8", "fadeLinkBar8" },
+    { "StanceBar", "fadeStance", "fadeLinkStance" }, { "PetActionBar", "fadePet", "fadeLinkPet" } }
 
-local F = { now = {}, hovered = {}, keyOf = {}, holding = false, hooked = {}, before = {}, panels = {} }
+local F = { now = {}, hovered = {}, keyOf = {}, linkOf = {}, holding = false, hooked = {}, before = {}, panels = {} }
 
 local function BarOf(row) return row[1] and _G[row[1]] or ns.GetMainBar() end
 
 local function Faded(bar)
     local key = F.keyOf[bar]
     return math.max(0, math.min(100, tonumber(key and ns.db[key]) or 100)) / 100
+end
+
+local function Linked(bar)
+    local key = F.linkOf[bar]
+    return key ~= nil and ns.db[key] == true
 end
 
 -- A flyout opened from one of the bar's buttons, still up.
@@ -34,9 +41,18 @@ local function FlyoutFrom(bar)
     return false
 end
 
+-- The mouse on a linked bar, or a flyout open from one, lights every linked bar.
+local function LinkedLit()
+    for bar in pairs(F.linkOf) do
+        if Linked(bar) and (F.hovered[bar] or FlyoutFrom(bar)) then return true end
+    end
+    return false
+end
+
 local function Want(bar)
     local faded = Faded(bar)
     if faded >= 1 or F.holding or F.hovered[bar] or ns.EditMode.Live() or FlyoutFrom(bar) then return 1 end
+    if Linked(bar) and LinkedLit() then return 1 end
     return faded
 end
 
@@ -92,12 +108,12 @@ local function HookButtons(bar)
         if not F.hooked[button] then
             F.hooked[button] = true
             ns.HookScriptOnce(button, "OnEnter", function()
-                if Faded(bar) >= 1 then return end
+                if Faded(bar) >= 1 and not Linked(bar) then return end
                 F.hovered[bar] = true
                 Update()
             end, "barFade")
             ns.HookScriptOnce(button, "OnLeave", function()
-                if Faded(bar) >= 1 then return end
+                if Faded(bar) >= 1 and not Linked(bar) then return end
                 ns.Sched.AfterPerFrame("barFade.leave", GRACE, function() Recheck(bar) end)
             end, "barFade")
         end
@@ -114,10 +130,11 @@ end
 local function Watch()
     local any = false
     for bar in pairs(F.keyOf) do
-        if Faded(bar) < 1 then
-            any = true
-            HookButtons(bar)
-        end
+        if Faded(bar) < 1 then any = true end
+    end
+    -- A bar shown in full but linked lights the faded ones it is linked with: its buttons are watched too.
+    for bar in pairs(F.keyOf) do
+        if Faded(bar) < 1 or (any and Linked(bar)) then HookButtons(bar) end
     end
     if any and not F.grid then F.grid = ns.EventFrame({}, OnGrid) end
     if F.grid and any ~= (F.grid.on == true) then
@@ -144,6 +161,7 @@ local function FootClick(revert)
         if panel:IsShown() then
             panel.hoverOnly()
             panel.fade()
+            panel.link()
         end
     end
 end
@@ -154,24 +172,26 @@ function B.FadeRelight(editing)
     if editing then ns.LightEditFoot("barFade", FootClick) else F.snapshot = nil end
 end
 
-local function SetFade(key, value)
+local function SetBarSetting(key, value)
     if ns.EditMode.Live() then
         if not F.snapshot then
             F.snapshot = {}
-            for _, row in ipairs(BARS) do F.snapshot[row[2]] = ns.db[row[2]] end
+            for _, row in ipairs(BARS) do F.snapshot[row[2]], F.snapshot[row[3]] = ns.db[row[2]], ns.db[row[3]] end
         end
         ns.LightEditFoot("barFade", FootClick)
     end
-    ns.db[key] = math.floor(value / 5 + 0.5) * 5
+    ns.db[key] = value
     Watch()
 end
+
+local function SetFade(key, value) SetBarSetting(key, math.floor(value / 5 + 0.5) * 5) end
 
 local function Percent(value) return string.format("%d%%", math.floor(value + 0.5)) end
 
 local function Start()
     for _, row in ipairs(BARS) do
         local bar = BarOf(row)
-        if bar then F.keyOf[bar] = row[2] end
+        if bar then F.keyOf[bar], F.linkOf[bar] = row[2], row[3] end
     end
     F.job = ns.Sched.OnFrame(ns.NewFrame("Frame", nil, UIParent), { name = "barFade.step", every = 0, awake = false, fn = Step })
     Watch()
@@ -200,11 +220,15 @@ for _, row in ipairs(BARS) do
                     SetFade(key, value)
                     panel.hoverOnly()
                 end, Percent)
+            local link = row[3]
+            panel.link = ns.DialogExtraCheck(panel, L["BAR_FADE_LINK"], function() return ns.db[link] == true end,
+                function(on) SetBarSetting(link, on and true or false) end)
             ns.DialogExtraNote(panel, L["BAR_FADE_NOTE"])
         end,
         fill = function(panel)
             panel.hoverOnly()
             panel.fade()
+            panel.link()
         end,
     })
 end
