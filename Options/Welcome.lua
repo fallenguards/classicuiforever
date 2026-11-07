@@ -144,6 +144,12 @@ end
 -- line once per new version, and the box shows only the versions since the one they saw last. An entry marked
 -- on = "forever" or on = "retail" is that client's alone; unmarked is both.
 local WHATSNEW = {
+    { id = 70, version = "0.49.0",
+        { L["WN70_1_TITLE"], L["WN70_1_TEXT"] },
+        { L["WN70_2_TITLE"], L["WN70_2_TEXT"] },
+        { L["WN70_4_TITLE"], L["WN70_4_TEXT"] },
+        { L["WN70_3_TITLE"], L["WN70_3_TEXT"], on = "forever" },
+    },
     { id = 69, version = "0.48.0",
         { L["WN69_1_TITLE"], L["WN69_1_TEXT"], on = "forever" },
         { L["WN69_2_TITLE"], L["WN69_2_TEXT"], on = "forever" },
@@ -545,11 +551,8 @@ local WHATSNEW = {
         { L["WN9_6_TITLE"], L["WN9_6_TEXT"] },
         { L["WN9_7_TITLE"], L["WN9_7_TEXT"] },
     },
-    { id = 8, version = "0.11.7",
-        { L["WN8_1_TITLE"], L["WN8_1_TEXT"] },
-        { L["WN8_2_TITLE"], L["WN8_2_TEXT"] },
-        { L["WN8_3_TITLE"], L["WN8_3_TEXT"] },
-    },
+    { id = 8, version = "0.11.7", { L["WN8_1_TITLE"], L["WN8_1_TEXT"] }, { L["WN8_2_TITLE"], L["WN8_2_TEXT"] },
+        { L["WN8_3_TITLE"], L["WN8_3_TEXT"] } },
     { id = 7, version = "0.11.6", { L["WN7_1_TITLE"], L["WN7_1_TEXT"] }, { L["WN7_2_TITLE"], L["WN7_2_TEXT"] } },
     { id = 6, version = "0.11.5", { L["WN6_1_TITLE"], L["WN6_1_TEXT"] } },
     { id = 5, version = "0.11.4", { L["WN5_1_TITLE"], L["WN5_1_TEXT"] } },

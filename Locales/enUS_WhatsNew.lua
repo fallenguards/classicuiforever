@@ -2,6 +2,14 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN70_1_TITLE"] = "Linked bar fading"
+L["WN70_1_TEXT"] = "Faded action bars can come back together: check Linked to other faded bars under each bar's Faded Opacity in edit mode, and the mouse on any of them shows them all (#255)."
+L["WN70_2_TITLE"] = "Enchant glow"
+L["WN70_2_TEXT"] = "The game's gold glow after a sharpening stone, oil or enchant is off, as Classic Era had none. To have it back, turn it on in the options (/fcui): Gold glow on enchant under Character sheet. It now runs along the window's border (#262)."
+L["WN70_4_TITLE"] = "Titles tab"
+L["WN70_4_TEXT"] = "The character window's side panel has the Titles tab again (#261). Talent icons fill their slots as in Classic Era (#260)."
+L["WN70_3_TITLE"] = "Loot window on the controller"
+L["WN70_3_TEXT"] = "With the controller, the d-pad moves through the loot window's items (#264)."
 L["WN69_1_TITLE"] = "Our windows on the controller"
 L["WN69_1_TEXT"] = "With the gamepad interface on, the classic spellbook, talents, quest log, collections, Legacy window and one bag work with the controller: the d-pad moves, A selects, B closes, and the buttons to press are shown under the window. The spellbook and talents open as their own windows again. In the quest log the list scrolls as you go, and Y opens the map."
 L["WN69_2_TITLE"] = "Bind spells from the spellbook"

@@ -3,6 +3,14 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN70_1_TITLE"] = "Atenuado enlazado"
+L["WN70_1_TEXT"] = "Las barras de acción atenuadas pueden volver juntas: marca Enlazada con otras barras atenuadas en las barras atenuadas, en el modo de edición, y el ratón sobre cualquiera de ellas las muestra todas (#255)."
+L["WN70_2_TITLE"] = "Brillo al encantar"
+L["WN70_2_TEXT"] = "El brillo dorado del juego tras una piedra de afilar, un aceite o un encantamiento está desactivado, pues Classic Era no lo tenía. Para recuperarlo, actívalo en las opciones (/fcui): Brillo dorado al encantar en Ficha de personaje. Ahora recorre el borde de la ventana (#262)."
+L["WN70_4_TITLE"] = "Pestaña de títulos"
+L["WN70_4_TEXT"] = "El panel lateral de la ventana de personaje vuelve a tener la pestaña Títulos (#261). Los iconos de talentos llenan sus casillas como en Classic Era (#260)."
+L["WN70_3_TITLE"] = "Ventana de botín con el mando"
+L["WN70_3_TEXT"] = "Con el mando, la cruceta recorre los objetos de la ventana de botín (#264)."
 L["WN69_1_TITLE"] = "Nuestras ventanas con el mando"
 L["WN69_1_TEXT"] = "Con la interfaz de mando activa, el libro de hechizos clásico, los talentos, el registro de misiones, las colecciones, la ventana Legacy y la bolsa única funcionan con el mando: la cruceta mueve, A selecciona, B cierra, y los botones que pulsar se ven bajo la ventana. El libro de hechizos y los talentos vuelven a abrirse como ventanas propias. En el registro de misiones la lista se desplaza al avanzar, y Y abre el mapa."
 L["WN69_2_TITLE"] = "Asignar hechizos desde el libro de hechizos"

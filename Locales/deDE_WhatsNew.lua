@@ -3,6 +3,14 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN70_1_TITLE"] = "Verknüpftes Verblassen"
+L["WN70_1_TEXT"] = "Verblasste Aktionsleisten können gemeinsam zurückkommen: Aktiviert im Bearbeitungsmodus bei verblassten Leisten Mit anderen verblassten Leisten verknüpft, dann zeigt die Maus über einer davon alle (#255)."
+L["WN70_2_TITLE"] = "Leuchten beim Verzaubern"
+L["WN70_2_TEXT"] = "Das goldene Leuchten des Spiels nach einem Wetzstein, Öl oder einer Verzauberung ist aus, denn Classic Era hatte keines. Um es zurückzuholen, schalte es in den Optionen (/fcui) ein: Goldenes Leuchten beim Verzaubern unter Charakterfenster. Es läuft jetzt am Rahmen des Fensters entlang (#262)."
+L["WN70_4_TITLE"] = "Titel-Reiter"
+L["WN70_4_TEXT"] = "Die Seitenleiste des Charakterfensters hat wieder den Reiter Titel (#261). Talentsymbole füllen ihre Felder wie in Classic Era (#260)."
+L["WN70_3_TITLE"] = "Beutefenster mit dem Controller"
+L["WN70_3_TEXT"] = "Mit dem Controller bewegt sich das Steuerkreuz durch die Gegenstände im Beutefenster (#264)."
 L["WN69_1_TITLE"] = "Unsere Fenster mit dem Controller"
 L["WN69_1_TEXT"] = "Mit der Gamepad-Oberfläche funktionieren das klassische Zauberbuch, die Talente, das Questlog, die Sammlungen, das Legacy-Fenster und die eine Tasche mit dem Controller: Das Steuerkreuz bewegt, A wählt, B schließt, und die Tasten stehen unter dem Fenster. Zauberbuch und Talente öffnen sich wieder als eigene Fenster. Im Questlog rollt die Liste mit, und Y öffnet die Karte."
 L["WN69_2_TITLE"] = "Zauber aus dem Zauberbuch belegen"

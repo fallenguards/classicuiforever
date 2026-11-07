@@ -3,6 +3,14 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN70_1_TITLE"] = "Estompage lié"
+L["WN70_1_TEXT"] = "Les barres d'action estompées peuvent revenir ensemble : cochez Liée aux autres barres estompées sur les barres estompées, en mode édition, et la souris sur l'une d'elles les affiche toutes (#255)."
+L["WN70_2_TITLE"] = "Lueur d'enchantement"
+L["WN70_2_TEXT"] = "La lueur dorée du jeu après une pierre à aiguiser, une huile ou un enchantement est désactivée, car Classic Era n'en avait pas. Pour la retrouver, activez-la dans les options (/fcui) : Lueur dorée à l'enchantement sous Fiche de personnage. Elle suit désormais le bord de la fenêtre (#262)."
+L["WN70_4_TITLE"] = "Onglet des titres"
+L["WN70_4_TEXT"] = "Le panneau latéral de la fenêtre du personnage retrouve l'onglet Titres (#261). Les icônes de talents remplissent leurs cases comme dans Classic Era (#260)."
+L["WN70_3_TITLE"] = "Fenêtre de butin à la manette"
+L["WN70_3_TEXT"] = "À la manette, la croix directionnelle parcourt les objets de la fenêtre de butin (#264)."
 L["WN69_1_TITLE"] = "Nos fenêtres à la manette"
 L["WN69_1_TEXT"] = "Avec l'interface manette active, le grimoire classique, les talents, le journal de quêtes, les collections, la fenêtre Legacy et le sac unique fonctionnent à la manette : la croix directionnelle déplace, A sélectionne, B ferme, et les boutons à presser s'affichent sous la fenêtre. Le grimoire et les talents s'ouvrent de nouveau dans leurs propres fenêtres. Dans le journal de quêtes la liste défile au fil des déplacements, et Y ouvre la carte."
 L["WN69_2_TITLE"] = "Assigner des sorts depuis le grimoire"

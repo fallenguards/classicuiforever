@@ -3,6 +3,14 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN70_1_TITLE"] = "Sbiadimento collegato"
+L["WN70_1_TEXT"] = "Le barre delle azioni sbiadite possono tornare insieme: spunta Collegata alle altre barre sbiadite sulle barre sbiadite, in modalità modifica, e il mouse su una qualsiasi le mostra tutte (#255)."
+L["WN70_2_TITLE"] = "Bagliore dell'incantamento"
+L["WN70_2_TEXT"] = "Il bagliore dorato del gioco dopo una cote, un olio o un incantamento è disattivato, perché Classic Era non lo aveva. Per riaverlo, attivalo nelle opzioni (/fcui): Bagliore dorato all'incantamento sotto Scheda del personaggio. Ora segue il bordo della finestra (#262)."
+L["WN70_4_TITLE"] = "Scheda dei titoli"
+L["WN70_4_TEXT"] = "Il pannello laterale della finestra del personaggio ha di nuovo la scheda Titoli (#261). Le icone dei talenti riempiono i loro riquadri come in Classic Era (#260)."
+L["WN70_3_TITLE"] = "Finestra del bottino col controller"
+L["WN70_3_TEXT"] = "Col controller, la croce direzionale scorre gli oggetti della finestra del bottino (#264)."
 L["WN69_1_TITLE"] = "Le nostre finestre con il controller"
 L["WN69_1_TEXT"] = "Con l'interfaccia controller attiva, il libro degli incantesimi classico, i talenti, il registro missioni, le collezioni, la finestra Legacy e la borsa unica funzionano con il controller: la croce direzionale sposta, A seleziona, B chiude, e i tasti da premere sono mostrati sotto la finestra. Il libro degli incantesimi e i talenti si aprono di nuovo come finestre proprie. Nel registro missioni l'elenco scorre mentre ti muovi, e Y apre la mappa."
 L["WN69_2_TITLE"] = "Assegna incantesimi dal libro degli incantesimi"

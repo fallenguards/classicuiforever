@@ -2,6 +2,20 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.49.0] - 2026-11-07
+
+### Added
+- Faded action bars can be linked: check Linked to other faded bars under a bar's Faded Opacity in edit mode, and the mouse on any linked bar brings all of them back, a linked bar shown in full included (#255).
+
+### Changed
+- The game's gold glow after a sharpening stone, oil or enchant is off by default, as Classic Era had none. Turn on Gold glow on enchant under Character sheet to have it back; it now runs along the classic window's border instead of a larger box beside it (#262).
+
+### Fixed
+- The character window's side panel has the Titles tab again, to pick your title (#261).
+- Talent icons fill their slots as in Classic Era, without the dark ring round them (#260).
+- With the controller, the d-pad moves through the loot window's items (#264).
+- Small alignment fixes in the pet training list.
+
 ## [0.48.0] - 2026-11-06
 
 ### Added
