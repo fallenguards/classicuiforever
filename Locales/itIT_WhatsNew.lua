@@ -3,6 +3,14 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN69_1_TITLE"] = "Le nostre finestre con il controller"
+L["WN69_1_TEXT"] = "Con l'interfaccia controller attiva, il libro degli incantesimi classico, i talenti, il registro missioni, le collezioni, la finestra Legacy e la borsa unica funzionano con il controller: la croce direzionale sposta, A seleziona, B chiude, e i tasti da premere sono mostrati sotto la finestra. Il libro degli incantesimi e i talenti si aprono di nuovo come finestre proprie. Nel registro missioni l'elenco scorre mentre ti muovi, e Y apre la mappa."
+L["WN69_2_TITLE"] = "Assegna incantesimi dal libro degli incantesimi"
+L["WN69_2_TEXT"] = "Con il controller premi X su un incantesimo del libro degli incantesimi classico, poi il tasto per esso; tieni premuto LT o RT per i gruppi laterali, come nel libro del gioco. Y apre l'editor delle barre delle azioni del gioco."
+L["WN69_3_TITLE"] = "Schede professione nascoste"
+L["WN69_3_TEXT"] = "Le schede accanto alla finestra delle professioni sono nascoste, perché Classic Era non le aveva. Per riaverle, attivale nelle opzioni (/fcui): scegli Schede professione: al passaggio o sempre visibili sotto Libro delle professioni. L'elenco delle ricette da imparare di What's Training si apre da una scheda accanto al libro (#260)."
+L["WN69_4_TITLE"] = "Modifiche minori"
+L["WN69_4_TEXT"] = "La finestra della chat resta al suo posto quando un altro addon la ridimensiona dal bordo superiore (#247). Con il controller, le schede Libro degli incantesimi e Collezioni della finestra delle professioni girano la pagina sul posto, e il contorno della finestra del personaggio aderisce alla sua cornice."
 L["WN68_1_TITLE"] = "Schede della doppia specializzazione sulla finestra dei talenti"
 L["WN68_1_TEXT"] = "Le schede delle due specializzazioni scendono lungo il bordo della finestra dei talenti, come in Classic. Cliccane una per vedere quella specializzazione."
 L["WN68_2_TITLE"] = "Il testo della mappa del mondo a grandezza di gioco"

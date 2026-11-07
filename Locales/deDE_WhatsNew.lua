@@ -3,6 +3,14 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN69_1_TITLE"] = "Unsere Fenster mit dem Controller"
+L["WN69_1_TEXT"] = "Mit der Gamepad-Oberfläche funktionieren das klassische Zauberbuch, die Talente, das Questlog, die Sammlungen, das Legacy-Fenster und die eine Tasche mit dem Controller: Das Steuerkreuz bewegt, A wählt, B schließt, und die Tasten stehen unter dem Fenster. Zauberbuch und Talente öffnen sich wieder als eigene Fenster. Im Questlog rollt die Liste mit, und Y öffnet die Karte."
+L["WN69_2_TITLE"] = "Zauber aus dem Zauberbuch belegen"
+L["WN69_2_TEXT"] = "Mit dem Controller drückst du im klassischen Zauberbuch X auf einen Zauber und dann die Taste dafür; halte LT oder RT für die seitlichen Gruppen, wie im Buch des Spiels. Y öffnet den Aktionsleisten-Editor des Spiels."
+L["WN69_3_TITLE"] = "Berufsreiter ausgeblendet"
+L["WN69_3_TEXT"] = "Die Reiter neben dem Berufsfenster sind ausgeblendet, denn Classic Era hatte keine. Um sie zurückzuholen, schalte sie in den Optionen (/fcui) ein: wähle unter Berufebuch Berufsreiter: beim Darüberfahren oder immer sichtbar. Die Liste der noch erlernbaren Rezepte von What's Training öffnet sich über einen Reiter neben dem Buch (#260)."
+L["WN69_4_TITLE"] = "Kleinere Änderungen"
+L["WN69_4_TEXT"] = "Das Chatfenster bleibt an seinem Platz, wenn ein anderes Addon es an der Oberkante in der Größe ändert (#247). Mit dem Controller blättern die Reiter Zauberbuch und Sammlungen im Berufsfenster an Ort und Stelle um, und der Rahmen um das Charakterfenster passt."
 L["WN68_1_TITLE"] = "Doppelspezialisierungs-Reiter am Talentfenster"
 L["WN68_1_TEXT"] = "Die Reiter der beiden Spezialisierungen laufen an der Kante des Talentfensters entlang, wie in Classic. Klick einen, um dir diese Spezialisierung anzusehen."
 L["WN68_2_TITLE"] = "Der Text der Weltkarte in Spielgröße"

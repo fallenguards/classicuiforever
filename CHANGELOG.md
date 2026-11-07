@@ -2,6 +2,22 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.48.0] - 2026-11-06
+
+### Added
+- The classic spellbook, talents, quest log, collections, Legacy window and one bag work with the controller. With the gamepad interface on, the d-pad moves a pointer over the window's buttons, A selects, B closes, and the buttons to press are shown under the window. The spellbook and talents open as their own windows with the controller, no longer inside the game's spell window.
+- Bind to Action Bar from the classic spellbook with the controller: X on a spell, then the button for it, holding LT or RT for the side groups, as in the game's own book. The group the button lands in lights up while you choose. Y opens the game's action bar editor.
+- In the quest log with the controller, the list scrolls as the pointer reaches its end, and Y opens the map.
+
+### Changed
+- The profession tabs beside the professions window are hidden by default, as Classic Era had none. Pick Profession tabs: on hover or always shown, under Professions book, to have them back; anyone on always shown keeps it.
+
+### Fixed
+- What's Training's professions list opens from a side tab beside the professions book, as its spells list does beside the spellbook. Its own tab sat on the professions window and covered the book page (#260).
+- The chat window keeps its place when another addon resizes it by its top edge. The chat's alert boxes hung on it, and the game then left the chat with no place at all (#247).
+- With the controller, the professions window's Spellbook and Collections tabs turn the page in place instead of opening a second window, and the game's button guide no longer covers them. The character window's focus outline fits its frame, and the pointer starts on a slot, not on an unseen button.
+- Small alignment fixes in the world map's header row.
+
 ## [0.47.0] - 2026-11-06
 
 ### Added

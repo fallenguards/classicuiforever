@@ -3,6 +3,14 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN69_1_TITLE"] = "Nos fenêtres à la manette"
+L["WN69_1_TEXT"] = "Avec l'interface manette active, le grimoire classique, les talents, le journal de quêtes, les collections, la fenêtre Legacy et le sac unique fonctionnent à la manette : la croix directionnelle déplace, A sélectionne, B ferme, et les boutons à presser s'affichent sous la fenêtre. Le grimoire et les talents s'ouvrent de nouveau dans leurs propres fenêtres. Dans le journal de quêtes la liste défile au fil des déplacements, et Y ouvre la carte."
+L["WN69_2_TITLE"] = "Assigner des sorts depuis le grimoire"
+L["WN69_2_TEXT"] = "À la manette, appuyez sur X sur un sort du grimoire classique, puis sur le bouton voulu ; maintenez LT ou RT pour les groupes latéraux, comme dans le grimoire du jeu. Y ouvre l'éditeur de barres d'action du jeu."
+L["WN69_3_TITLE"] = "Onglets de métier masqués"
+L["WN69_3_TEXT"] = "Les onglets à côté de la fenêtre des métiers sont masqués, car Classic Era n'en avait pas. Pour les retrouver, activez-les dans les options (/fcui) : choisissez Onglets de métier : au survol ou toujours visibles sous Livre des métiers. La liste des recettes à apprendre de What's Training s'ouvre depuis un onglet à côté du livre (#260)."
+L["WN69_4_TITLE"] = "Changements mineurs"
+L["WN69_4_TEXT"] = "La fenêtre de discussion garde sa place quand un autre addon la redimensionne par son bord supérieur (#247). À la manette, les onglets Grimoire et Collections de la fenêtre des métiers tournent la page sur place, et le contour de la fenêtre du personnage épouse son cadre."
 L["WN68_1_TITLE"] = "Onglets de double spécialisation sur la fenêtre des talents"
 L["WN68_1_TEXT"] = "Les onglets des deux spécialisations descendent le long du bord de la fenêtre des talents, comme dans Classic. Cliquez sur l'un d'eux pour voir cette spécialisation."
 L["WN68_2_TITLE"] = "Le texte de la carte du monde à la taille du jeu"

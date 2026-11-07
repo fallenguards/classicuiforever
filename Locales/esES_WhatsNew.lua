@@ -3,6 +3,14 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN69_1_TITLE"] = "Nuestras ventanas con el mando"
+L["WN69_1_TEXT"] = "Con la interfaz de mando activa, el libro de hechizos clásico, los talentos, el registro de misiones, las colecciones, la ventana Legacy y la bolsa única funcionan con el mando: la cruceta mueve, A selecciona, B cierra, y los botones que pulsar se ven bajo la ventana. El libro de hechizos y los talentos vuelven a abrirse como ventanas propias. En el registro de misiones la lista se desplaza al avanzar, y Y abre el mapa."
+L["WN69_2_TITLE"] = "Asignar hechizos desde el libro de hechizos"
+L["WN69_2_TEXT"] = "Con el mando, pulsa X sobre un hechizo del libro de hechizos clásico y luego el botón para él; mantén LT o RT para los grupos laterales, como en el libro del propio juego. Y abre el editor de barras de acción del juego."
+L["WN69_3_TITLE"] = "Pestañas de profesión ocultas"
+L["WN69_3_TEXT"] = "Las pestañas junto a la ventana de profesiones están ocultas, pues Classic Era no las tenía. Para recuperarlas, actívalas en las opciones (/fcui): elige Pestañas de profesión: al pasar el ratón o siempre visibles en Libro de profesiones. La lista de recetas por aprender de What's Training se abre desde una pestaña junto al libro (#260)."
+L["WN69_4_TITLE"] = "Cambios menores"
+L["WN69_4_TEXT"] = "La ventana de chat conserva su sitio cuando otro accesorio la redimensiona por su borde superior (#247). Con el mando, las pestañas Libro de hechizos y Colecciones de la ventana de profesiones pasan la página en su sitio, y el contorno de la ventana del personaje se ajusta a su marco."
 L["WN68_1_TITLE"] = "Pestañas de doble especialización en la ventana de talentos"
 L["WN68_1_TEXT"] = "Las pestañas de las dos especializaciones bajan por el borde de la ventana de talentos, como en Classic. Haz clic en una para ver esa especialización."
 L["WN68_2_TITLE"] = "El texto del mapa del mundo a tamaño del juego"

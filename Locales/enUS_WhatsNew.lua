@@ -2,6 +2,14 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN69_1_TITLE"] = "Our windows on the controller"
+L["WN69_1_TEXT"] = "With the gamepad interface on, the classic spellbook, talents, quest log, collections, Legacy window and one bag work with the controller: the d-pad moves, A selects, B closes, and the buttons to press are shown under the window. The spellbook and talents open as their own windows again. In the quest log the list scrolls as you go, and Y opens the map."
+L["WN69_2_TITLE"] = "Bind spells from the spellbook"
+L["WN69_2_TEXT"] = "With the controller, press X on a spell in the classic spellbook, then the button for it; hold LT or RT for the side groups, as in the game's own book. Y opens the game's action bar editor."
+L["WN69_3_TITLE"] = "Profession tabs hidden"
+L["WN69_3_TEXT"] = "The tabs beside the professions window are hidden, as Classic Era had none. To have them back, turn them on in the options (/fcui): pick Profession tabs: on hover or always shown under Professions book. What's Training's list of recipes to learn opens from a side tab beside the book (#260)."
+L["WN69_4_TITLE"] = "Smaller changes"
+L["WN69_4_TEXT"] = "The chat window keeps its place when another addon resizes it by its top edge (#247). With the controller, the professions window's Spellbook and Collections tabs turn the page in place, and the character window's outline fits its frame."
 L["WN68_1_TITLE"] = "Dual spec tabs on the talents window"
 L["WN68_1_TEXT"] = "The two specs' tabs run down the talents window's edge, as Classic's did. Click one to look at that spec."
 L["WN68_2_TITLE"] = "The world map's text at the game's size"
