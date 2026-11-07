@@ -21,8 +21,7 @@ ns.WINDOW_LIST = {
         w = 339, h = 425, client = true, zoom = function() return ns.ProfessionsZoom and ns.ProfessionsZoom() or 1 end,
         dressed = function() return ns.ModuleInForce("professionsBook") or ns.ModuleInForce("tradeSkill") end,
         follows = "spellBook", followIf = "professionsBook", followX = 12, followY = -14, followSize = true, page = true },
-    { key = "talents", label = L["UI_TALENTS"], name = "ClassicUIForeverTalents", w = 354, h = 467, cut = { 30, 45 },
-        padHost = true },
+    { key = "talents", label = L["UI_TALENTS"], name = "ClassicUIForeverTalents", w = 354, h = 467, cut = { 30, 45 } },
     { key = "legacy", label = L["UI_LEGACY"], name = "ClassicUIForeverLegacy", w = 354, h = 467, cut = { 30, 45 } },
     -- A page of the spellbook: on its spot, at its size, moved with it; page: no box of its own while it follows.
     { key = "collections", label = L["UI_COLLECTIONS"], name = "ClassicUIForeverCollections", w = 350, h = 433, cut = { 34, 79 },
@@ -35,7 +34,7 @@ ns.WINDOW_LIST = {
         choiceLabel = L["UI_MODE"], stays = true, switch = "calendarSnap", switchLabel = SNAP },
     -- The spellbook art ends 34 short of its frame's right and 79 short of its foot (its foot tabs hang there).
     { key = "spellBook", label = L["UI_SPELLBOOK"], name = "ForeverClassicUISpellBook", w = 350, h = 433, cut = { 34, 79 },
-        calm = true, padHost = true },
+        calm = true },
     { key = "minimapZone", label = L["UI_ZONE_NAME"], name = "ForeverClassicUIMinimapZoneHome", w = 140, h = 12,
         section = L["UI_MINIMAP"], piece = true, choice = "minimapZoneShow", choiceLabel = L["UI_SHOW"], stays = true,
         switch = "minimapZoneSnap", switchLabel = SNAP },

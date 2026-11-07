@@ -111,6 +111,8 @@ UI\HelpButtons.lua
 UI\LevelBanner.lua
 UI\LootToast.lua
 UI\SecurePad.lua
+UI\PadNav.lua
+UI\PadBind.lua
 Bar\BarSkins.lua
 Bar\MicroFlash.lua
 Bar\Band.lua
@@ -223,6 +225,7 @@ Map\WorldMapFightLay.lua
 Map\WorldMapCombined.lua
 Map\WorldMapMarkers.lua
 Windows\BagBand.lua
+Windows\BagGamepad.lua
 Windows\Bags.lua
 Windows\BagHeader.lua
 Windows\BagReagent.lua
@@ -248,7 +251,6 @@ Spells\PetPool.lua
 Spells\BookFlyouts.lua
 Spells\BookGrid.lua
 Spells\SpellBook.lua
-Spells\SpellsHost.lua
 Skills\SkillShell.lua
 Skills\ProfessionsBook.lua
 Skills\ProfessionsBookFrame.lua

@@ -371,8 +371,7 @@ local function ShowMapButton(parent)
     glow:SetBlendMode("ADD")
     glow:SetAllPoints(icon)
     button:SetScript("OnClick", ShowMapClick)
-    -- A secure pad clicks the client's map button: opening it ourselves taints its pins
-    -- and breaks the map key in combat. DIALOG to sit over the HIGH log.
+    -- A secure pad clicks the client's map button (ours would taint its pins, the map key in combat); DIALOG over the log.
     ns.MapPad(button, "DIALOG", CloseLog)
     return button
 end
@@ -644,6 +643,15 @@ local function LogHidden()
     ns.RefreshMicroButtons()
 end
 
+-- The pad at the list's shown end scrolls it a row, the pointer staying on that row (UI/PadNav.lua).
+local function PadScroll(button, dy)
+    local bar = frame.listBar
+    local value, _, max = bar:GetValue(), bar:GetMinMaxValues()
+    if dy < 0 and button == rows[Rows()] and value < max then bar:SetValue(value + 1) return true end
+    if dy > 0 and button == rows[1] and value > 0 then bar:SetValue(value - 1) return true end
+    return false
+end
+
 local function Build()
     frame = CreateFrame("Frame", FRAME_NAME, UIParent)
     frame:SetSize(WIDTH, HEIGHT)
@@ -652,8 +660,7 @@ local function Build()
     frame:EnableMouse(true)
     frame:SetFrameStrata("HIGH")
     TakeOldPlace()
-    -- OnShow order matters: RegisterClassicWindow, CloseOnEscape, then ours.
-    -- Era's quest log's pushable (0): the spellbook and social window replace it, as there.
+    -- OnShow order: RegisterClassicWindow, CloseOnEscape, then ours; Era's pushable 0 (the book and social replace it).
     ns.RegisterClassicWindow(frame, 0)
     -- Escape closes the log before clearing the target.
     ns.CloseOnEscape(frame, CloseLog)
@@ -681,6 +688,10 @@ local function Build()
     frame.dualToggle = RadioCheck(frame, frame.allTab, 0, L["OPT_questLogDual"])
     frame.dualToggle:SetScript("OnClick", DualClick)
     frame.showMap = ShowMapButton(frame)
+    -- Y on to the map through Show Map's own secure pad: the game's radial opens this log for its Quests and Maps slot.
+    local mapPad = ns.PadOf and ns.PadOf(frame.showMap)
+    ns.PadNav(frame, { close = CloseLog, scroll = PadScroll, prompts = mapPad and mapPad:GetName()
+        and { { key = GAMEPAD_FACE_TOP or "PAD4", text = SHOW_MAP or WORLD_MAP, click = mapPad:GetName() } } or nil })
     frame.showMap:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -36, -40)
 
     local listArea = ns.NewFrame("Frame", nil, frame)

@@ -100,7 +100,7 @@ local function Restore()
     UpdateBinding()
 end
 
-ns.RegisterModule("questLog", { init = Init, apply = Apply, restore = Restore, padLogin = true })
+ns.RegisterModule("questLog", { init = Init, apply = Apply, restore = Restore })
 -- Same window, other shape; must register after questLog.
 ns.RegisterModule("questLogDual", {
     -- Our own window, nothing protected in it: the toggle answers in a fight.

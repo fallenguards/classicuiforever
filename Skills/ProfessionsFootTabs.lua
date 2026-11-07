@@ -27,10 +27,34 @@ local function Spec()
     return ns.BookCollectionsTab and ns.BookCollectionsTab() and NARROW or WIDE
 end
 
+-- Gamepad on at login: the game's navigator walks this window and would press the drawn tab (our Lua, which cannot
+-- shut a window the gamepad holds), so the secure pads wear the tabs and the drawn ones go.
+local function PadTabs() return ns.padSession == true end
+local wanted = {}   -- tab index -> it would show (the drawn tab hidden for its pad)
+
 -- Shown with its tab inside the window, never by the window: placed while it was shut, a pad went hidden for the fight.
 local function PadShown(i)
     local page = Page()
-    return bookTabs[i]:IsShown() and page ~= nil and page:IsShown()
+    local up = PadTabs() and wanted[i] or bookTabs[i]:IsShown()
+    return up and page ~= nil and page:IsShown()
+end
+
+-- The game's controller footer under the foot tabs, not over them (widget calls only: its fields stay the game's).
+local FOOTER_Y = -28
+local function PlaceFooter()
+    local frame, page = T.Host(), Page()
+    local footer = frame and frame.bookPageFooter
+    local legend = footer and footer.inputLegend
+    if legend and page and page:IsShown() then ns.SetPointIf(legend, "TOPLEFT", frame, "BOTTOMLEFT", 0, FOOTER_Y) end
+end
+
+-- A pad worn as its tab: the full sheet on the tab's spot, its art and label.
+local function WearTab(pad, i, x, y, r, narrow)
+    local tab = bookTabs[i]
+    ns.SetPointOnce(pad, "CENTER", T.Host(), "TOPLEFT", x, y)
+    pad:SetSize(tab:GetWidth() * r, tab:GetHeight() * r)
+    pad:SetText(tab:GetText())
+    if ns.DressBookTab then ns.DressBookTab(pad, narrow) end
 end
 
 -- From the tabs' fixed layout, so a shut window places them too. From the window's top: the tabs hang from the shape's
@@ -46,6 +70,11 @@ local function PlaceBookPads()
         -- The wide row has no Collections tab
         if not slot then
             pad:Hide()
+        elseif PadTabs() then
+            local r = tab:GetEffectiveScale() / k
+            WearTab(pad, i, ((firstX or spec.x) + slot * spec.step) * r, TabY() * r - T.BookH(), r, spec == NARROW)
+            pad:SetFrameLevel(tab:GetFrameLevel() + 5)
+            pad:SetShown(PadShown(i))
         else
             local r = tab:GetEffectiveScale() / k
             local w, h = tab:GetWidth(), tab:GetHeight()
@@ -71,6 +100,36 @@ function T.SyncBookPads()
             return
         end
     end
+end
+
+-- A secure pad for a foot tab: no art, the tab under it shows the press and glow; worn as the tab under the gamepad.
+-- HIGH: the toplevel window raises itself over a same-strata pad on every click.
+local function NewPad(frame, tab)
+    local pad = ns.NewFrame("Button", nil, frame, "SecureActionButtonTemplate")
+    pad:SetFrameStrata("HIGH")
+    pad:RegisterForClicks("AnyUp", "AnyDown")
+    pad:SetAttribute("useOnKeyDown", false)
+    if PadTabs() then
+        pad.picked = "sbTab1Selected"
+        pad.Text = pad:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
+        pad.Text:SetHeight(13)
+        pad.Text:SetPoint("CENTER", pad, "CENTER", 2, 3)
+        pad:SetFontString(pad.Text)
+        pad:SetNormalFontObject(GameFontNormalSmall)
+        pad:SetHighlightFontObject(GameFontHighlightSmall)
+    else
+        pad:SetScript("OnMouseDown", function() if tab:IsEnabled() then tab:SetButtonState("PUSHED") end end)
+        pad:SetScript("OnMouseUp", function() if tab:IsEnabled() then tab:SetButtonState("NORMAL") end end)
+        pad:SetScript("OnEnter", function() tab:LockHighlight() end)
+        pad:SetScript("OnLeave", function() tab:UnlockHighlight() end)
+        -- Shut under the cursor by its own click: no OnLeave comes, so the glow goes here.
+        pad:SetScript("OnHide", function()
+            tab:UnlockHighlight()
+            if tab:IsEnabled() then tab:SetButtonState("NORMAL") end
+        end)
+    end
+    pad:Hide()
+    return pad
 end
 
 function T.BookTabs()
@@ -101,16 +160,11 @@ function T.BookTabs()
         end
         -- Each pad turns the book to its tab (SpellBook's wrap), then presses the spellbook key (its macro closes this
         -- window first): the book opens on that tab in a fight too.
-        -- HIGH: the toplevel window raises itself over a same-strata pad on every click.
         local key = ns.SpellBookBindButton and ns.SpellBookBindButton()
         if key then
             bookPads = {}
             for _, i in ipairs({ 1, 3 }) do
-                local tab = bookTabs[i]
-                local pad = ns.NewFrame("Button", nil, frame, "SecureActionButtonTemplate")
-                pad:SetFrameStrata("HIGH")
-                pad:RegisterForClicks("AnyUp", "AnyDown")
-                pad:SetAttribute("useOnKeyDown", false)
+                local pad = NewPad(frame, bookTabs[i])
                 pad:SetAttribute("type", "click")
                 pad:SetAttribute("clickbutton", key)
                 if ns.SpellBookTurnPad then ns.SpellBookTurnPad(pad, i == 3) end
@@ -120,39 +174,21 @@ function T.BookTabs()
                     PlaySound(SOUNDKIT.IG_ABILITY_PAGE_TURN)
                     ns.HidePanel(frame)
                 end)
-                -- No art: the tab under it shows the press and glow.
-                pad:SetScript("OnMouseDown", function() if tab:IsEnabled() then tab:SetButtonState("PUSHED") end end)
-                pad:SetScript("OnMouseUp", function() if tab:IsEnabled() then tab:SetButtonState("NORMAL") end end)
-                pad:SetScript("OnEnter", function() tab:LockHighlight() end)
-                pad:SetScript("OnLeave", function() tab:UnlockHighlight() end)
-                -- Shut under the cursor by its own click: no OnLeave comes, so the glow goes here.
-                pad:SetScript("OnHide", function()
-                    tab:UnlockHighlight()
-                    if tab:IsEnabled() then tab:SetButtonState("NORMAL") end
-                end)
-                pad:Hide()
                 bookPads[i] = pad
             end
-            -- Collections: the hidden micro button's own click, in a fight too.
+            -- Collections: the hidden micro button's own click, in a fight too; under the gamepad the game holds its
+            -- window open, so its own close goes first, natively.
             local coll = _G.CollectionsMicroButton
             if coll then
-                local tab = bookTabs[4]
-                local pad = ns.NewFrame("Button", nil, frame, "SecureActionButtonTemplate")
-                pad:SetFrameStrata("HIGH")
-                pad:RegisterForClicks("AnyUp", "AnyDown")
-                pad:SetAttribute("useOnKeyDown", false)
-                pad:SetAttribute("type", "click")
-                pad:SetAttribute("clickbutton", coll)
+                local pad = NewPad(frame, bookTabs[4])
+                if PadTabs() then
+                    pad:SetAttribute("type", "macro")
+                    pad:SetAttribute("macrotext", "/click ProfessionsFrameCloseButton\n/click CollectionsMicroButton")
+                else
+                    pad:SetAttribute("type", "click")
+                    pad:SetAttribute("clickbutton", coll)
+                end
                 if ns.BookCollectionsPad then ns.BookCollectionsPad(pad) end
-                pad:SetScript("OnMouseDown", function() tab:SetButtonState("PUSHED") end)
-                pad:SetScript("OnMouseUp", function() tab:SetButtonState("NORMAL") end)
-                pad:SetScript("OnEnter", function() tab:LockHighlight() end)
-                pad:SetScript("OnLeave", function() tab:UnlockHighlight() end)
-                pad:SetScript("OnHide", function()
-                    tab:UnlockHighlight()
-                    tab:SetButtonState("NORMAL")
-                end)
-                pad:Hide()
                 bookPads[4] = pad
             end
         end
@@ -182,9 +218,12 @@ function T.BookTabs()
     local pet = on and ns.SpellBookPetTitle and ns.SpellBookPetTitle() or nil
     if pet and narrow then pet = PET or "Pet" end
     if pet and bookTabs[3]:GetText() ~= pet then bookTabs[3]:SetText(pet) end
-    SetShownIf(bookTabs[1], on)
+    wanted[1], wanted[3], wanted[4] = on, on and pet ~= nil, on and narrow
+    local padTabs = PadTabs() and bookPads ~= nil
+    SetShownIf(bookTabs[1], wanted[1] and not padTabs)
     SetShownIf(bookTabs[2], on)
-    SetShownIf(bookTabs[3], on and pet ~= nil)
-    SetShownIf(bookTabs[4], on and narrow)
+    SetShownIf(bookTabs[3], wanted[3] and not padTabs)
+    SetShownIf(bookTabs[4], wanted[4] and not padTabs)
     PlaceBookPads()
+    if PadTabs() then ns.Sched.Attach(frame, { name = "prof.padFooter", every = 0.2, fn = PlaceFooter }) end
 end

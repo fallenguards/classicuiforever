@@ -287,11 +287,6 @@ local function TalentButton(frame, index)
     return button
 end
 
--- Buttons made ahead, hidden (the gamepad's read of a hosted window finds them all).
-function ns.TalentButtons(frame, count)
-    for i = 1, count do TalentButton(frame, i):Hide() end
-end
-
 -- One tab face as a list: its three pieces and, named by face, its hover glow (the picked face has none: 1.x
 -- disabled the picked tab).
 local function FootFace(tab, spec, face)

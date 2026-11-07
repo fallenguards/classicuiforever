@@ -151,7 +151,7 @@ do
     Load("Skills/Talents.lua", ns)
     local module = seen.modules.talents
     Check(module and module.apply == rowApply and module.restore == rowRestore, "retail: the Talent window row runs the panels' pass")
-    Check(module and not module.padHost, "retail: no gamepad hosting of our window")
+    Check(module and not module.padHost and not module.padLogin, "retail: the game's spell window hosts nothing of ours")
     PlayerSpellsFrame = nil
 end
 
@@ -166,7 +166,8 @@ do
     ns.panels.RowPass = function() asked = true end
     Load("Skills/Talents.lua", ns)
     local module = seen.modules.talents
-    Check(module and module.padHost == true and not asked, "Forever: the Talent window row is our own window")
+    Check(module and not module.padHost and not module.padLogin and not asked,
+        "Forever: the Talent window row is our own window, under the gamepad too")
 end
 
 ------------------------------------------------------------------ the spellbook's macro for a pad

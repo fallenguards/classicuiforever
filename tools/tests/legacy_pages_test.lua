@@ -71,6 +71,7 @@ local ns = {
     L = setmetatable({}, { __index = function(_, key) return key end }), EMPTY = {}, SIDE_TAB_SLOT = 0,
     db = { legacyThreePane = true },
     OnForever = function() return true end,
+    PadNav = NOOP,
     WindowOpeners = function() return NOOP end,
     GameText = function(_, key) return key end,
     SideTabsFor = function(_, pages, onClick)

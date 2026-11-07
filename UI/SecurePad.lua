@@ -6,6 +6,7 @@ local _, ns = ...
 local mapPads = {}
 local padWhen = {}   -- button -> its pad's when()
 local padMacro = {}  -- button -> its pad's macro text function
+local mapPadCount = 0   -- pads are named: the gamepad's A binds to one by name (UI/PadNav.lua)
 local MapPad
 local Report = ns.Report
 
@@ -67,7 +68,8 @@ MapPad = function(button, strata, after, target, when, editMode, before)
         end)
         return
     end
-    local mapPad = CreateFrame("Button", nil, UIParent, "SecureActionButtonTemplate")
+    mapPadCount = mapPadCount + 1
+    local mapPad = CreateFrame("Button", "ClassicUIForeverMapPad" .. mapPadCount, UIParent, "SecureActionButtonTemplate")
     mapPads[button] = mapPad
     padWhen[button] = when
     padMacro[button] = macroFn

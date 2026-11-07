@@ -379,9 +379,9 @@ local function LaySlots(frame, list, count, columns, combined, backpackExtra, ti
     for i = 1, count do
         local button = list[i]
         list[i] = nil
-        SlotArt(button)
+        if not B.PadBags[button] then SlotArt(button) end
         Place(button, i - 1, 0, 0, frame, columns, rows, count, combined, backpackExtra)
-        Tint(button, B.SlotTint(button, tint))
+        if not B.PadBags[button] then Tint(button, B.SlotTint(button, tint)) end
     end
     local missing = rows * columns - count
     if noBlank or missing <= 0 then return 0 end
@@ -406,7 +406,7 @@ local function AddReagentSlots(list, count, own, n)
 end
 
 -- The slots to lay, foot to top: the game's (locked ones out), ours for the reagent bag before or after (option), the
--- key ring's after everything (option), all in one grid.
+-- key ring's after everything (option), the gamepad's bag buttons last, all in one grid.
 local function SlotList(frame, combined)
     local list = spare or {}
     spare = nil
@@ -427,6 +427,7 @@ local function SlotList(frame, combined)
         end
     end
     if not last then count = AddReagentSlots(list, count, own, n) end
+    if combined then count = B.AddPadBags(list, count) end
     return list, count
 end
 
@@ -435,7 +436,7 @@ local function LayoutItems(frame, backpackExtra, combined, plusTwo)
     local list, count = SlotList(frame, combined)
     local tint = combined and ns.db and ns.db.reagentBagTint == true
     local blanks
-    if combined and B.Sectioned() then
+    if combined and B.Sectioned() and not ns.GamepadUI() then
         blanks = B.LaySections(frame, list, count, ColumnsOf(frame), backpackExtra, tint)
     else
         if combined then B.ClearSections(frame) end
@@ -446,9 +447,8 @@ local function LayoutItems(frame, backpackExtra, combined, plusTwo)
     if made then for j = blanks + 1, #made do made[j]:Hide() end end
 end
 
--- The gamepad's bag bar in the combined bag (backpack and bag buttons): since beta 70291 the client no longer hides it
--- without a controller, and its buttons, unplaced, pile up over the sort button. Faded and deaf then, never hidden: its
--- buttons' close code would run in our name.
+-- The gamepad's bag bar in the combined bag: since beta 70291 the client no longer hides it without a controller, and its
+-- unplaced buttons pile up over the sort button. Faded and deaf, never hidden: its buttons' close code would run as ours.
 local function Deaf(frame, depth)
     if frame.IsMouseEnabled and frame:IsMouseEnabled() then frame:EnableMouse(false) end
     if depth < 3 then ns.EachChild(frame, Deaf, depth + 1) end
@@ -547,9 +547,9 @@ local function Skin(frame, part)
     local tokenRow = main and TokenRow(frame)
     if part ~= "trim" then
         local columns = ColumnsOf(frame)
-        local own = combined and (select(2, ns.OwnReagentSlots()) + select(2, ns.OwnKeyringSlots())) or 0
+        local own = combined and (select(2, ns.OwnReagentSlots()) + select(2, ns.OwnKeyringSlots()) + #B.PadBagButtons()) or 0
         local rows = math.ceil((size + own) / columns)
-        if combined and B.Sectioned() then
+        if combined and B.Sectioned() and not ns.GamepadUI() then
             local list, count = SlotList(frame, true)
             rows = B.SectionRows(list, count, columns)
             wipe(list)

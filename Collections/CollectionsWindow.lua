@@ -731,6 +731,8 @@ local function Build()
     ns.CloseWithGameMenu(frame)
     ns.MicroButtonFollows(_G.CollectionsMicroButton, function() return frame:IsShown() end, frame)
     ShowPage(CW.pages[1])
+    -- The legend under the foot tabs (their centre 61 up, drawn 30 tall), in from the art's left.
+    ns.PadNav(frame, { foot = 46, footX = 12 })
     return frame
 end
 
@@ -757,9 +759,7 @@ local function SetActive(on)
     if not active and W.frame and W.frame:IsShown() then W.frame:Hide() end
 end
 
--- The gamepad cannot navigate our windows (Core/Gamepad.lua): with it on at login the game's window stays.
-ns.RegisterModule("collectionsWindow", { apply = function() SetActive(true) end, restore = function() SetActive(false) end,
-    padLogin = true })
+ns.RegisterModule("collectionsWindow", { apply = function() SetActive(true) end, restore = function() SetActive(false) end })
 
 -- The window shown on a page (its key: mounts, pets, toys, heirlooms, appearances); false when it cannot show.
 function ns.ShowCollections(pageKey)

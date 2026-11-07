@@ -444,10 +444,13 @@ local function LayoutNow()
     end
     -- Forever: stats pane, its toggle and the mode tab column; the tabs stay live under ours.
     Fade(frame.RightPaneHost)
+    -- Hidden, not only faded: the gamepad's navigator walks shown buttons whatever their alpha, and this one, highest in
+    -- the window, took its first pick. The client only swaps its textures, never shows or hides it.
     if frame.RightPaneToggleButton then
-        Take(frame.RightPaneToggleButton, "mouse")
+        Take(frame.RightPaneToggleButton, "mouse", "shown")
         Fade(frame.RightPaneToggleButton)
         frame.RightPaneToggleButton:EnableMouse(false)
+        frame.RightPaneToggleButton:Hide()
     end
     if frame.ModeTabs then
         Take(frame.ModeTabs, "mouse")

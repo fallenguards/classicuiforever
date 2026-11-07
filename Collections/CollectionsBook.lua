@@ -80,11 +80,10 @@ local function BuildTabs(frame)
         if i < 4 then tab:Show() end
         tabs[i] = tab
     end
-    -- Retail's book opens only for the player's press: the tab's secure pad presses the game's button, then this shuts.
-    if not FOREVER then
-        ns.MapPad(tabs[2], "HIGH", function() B.frame:Hide() end, "/click ProfessionMicroButton",
-            function() return B.frame:IsVisible() end)
-    end
+    -- The professions window opens only for the player's own press (retail's book, the gamepad's A on Forever): the
+    -- tab's secure pad presses the game's button, then this shuts.
+    ns.MapPad(tabs[2], "HIGH", function() B.frame:Hide() end, "/click ProfessionMicroButton",
+        function() return B.frame:IsVisible() end)
     tabs[1]:SetText(SPELLBOOK or "Spellbook")
     tabs[2]:SetText(TRADE_SKILLS or "Professions")
     tabs[3]:SetText(L["SKILL_COLLECTIONS"])

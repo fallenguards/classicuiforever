@@ -165,6 +165,8 @@ local function Build()
     -- The talent art, scroll bar, Apply foot and foot tabs are the tree page's: hidden until it shows.
     ns.TalentTreeShown(frame, false)
     ShowPage(LG.pages[1])
+    -- The legend under the drawn window (the art ends 45 above the frame's foot: UI/WindowList.lua cut).
+    ns.PadNav(frame, { foot = 45 })
     return frame
 end
 
@@ -197,8 +199,7 @@ local function Restore()
     if frame and frame:IsShown() then frame:Hide() end
 end
 
--- The gamepad cannot navigate our windows (Core/Gamepad.lua): with it on at login the game's window stays.
-ns.RegisterModule("legacyWindow", { apply = Apply, restore = Restore, padLogin = true })
+ns.RegisterModule("legacyWindow", { apply = Apply, restore = Restore })
 
 -- Public API (Core/API.lua): the window shown, on a page if given (its key: rewards, challenges, tree; or its tab
 -- number); false when it cannot show.

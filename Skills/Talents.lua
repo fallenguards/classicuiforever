@@ -10,8 +10,8 @@ ns.talents = TL
 
 local active = false
 local frame
--- Gamepad on at login: the window lives in the game's spell window (Spells/SpellsHost.lua), which opens and closes it.
-local function Hosted() return ns.padSession == true end
+-- The window is its own under the gamepad too (UI/PadNav.lua); the game's spell window hosts nothing.
+local function Hosted() return false end
 -- Up only while someone's talents are shown.
 local inspectWatch
 -- nil for the player, or the inspected unit (its own read-only config).
@@ -128,6 +128,8 @@ local function Build()
     end)
     -- The inspect watcher's handle on the window, now that it exists.
     TakeMenuInspect()
+    -- The legend under the drawn window (the art ends 45 above the frame's foot: UI/WindowList.lua cut).
+    ns.PadNav(frame, { foot = 45 })
     return frame
 end
 
@@ -259,11 +261,6 @@ ns.OnGameSpellsRoom(function() key:PressFirst(active and not Hosted() and ns.Gam
 
 local function Apply()
     active = true
-    if Hosted() then
-        -- Nothing of the client's is taken: its keys and buttons open the window the talents sit in.
-        if ns.HostSpellsWindow then ns.HostSpellsWindow() end
-        return
-    end
     TakeButton(true)
     TakeInspectButton(true)
     TakeMenuInspect()
@@ -276,28 +273,15 @@ local function Restore()
     TakeButton(false)
     TakeInspectButton(false)
     key:Set(false)
-    if frame and not Hosted() then frame:Hide() end
-    if ns.HostSpellsWindow then ns.HostSpellsWindow() end
+    if frame then frame:Hide() end
 end
 
 -- Our window reads Forever's tree; retail keeps the game's spells window, dressed by the panels pass under this row.
 if ns.OnForever() then
-    ns.RegisterModule("talents", { apply = Apply, restore = Restore, padHost = true })
+    ns.RegisterModule("talents", { apply = Apply, restore = Restore })
 else
     local apply, restore = ns.panels.RowPass(function() return _G.PlayerSpellsFrame end)
     ns.RegisterModule("talents", { apply = apply, restore = restore })
 end
 
 function ns.TalentsActive() return active end
-function ns.TalentsRefresh() if frame and frame:IsShown() then Refresh() end end
-
--- Hosted: built with a button for every talent of the largest tree, so the window's read on opening finds them all.
-function ns.TalentsBuilt()
-    if not active or InCombatLockdown() then return frame end
-    Build()
-    local tree = TL.ReadTree and TL.ReadTree()
-    local most = 0
-    for _, tab in ipairs(tree and tree.tabs or {}) do most = math.max(most, #tab.nodes) end
-    ns.TalentButtons(frame, most)
-    return frame
-end
