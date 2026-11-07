@@ -1,4 +1,5 @@
--- TBC side panel: the arrow widens the sheet with its own art; tabs: stats (StatPanes.lua) and the client's equipment manager, anchored in.
+-- TBC side panel: the arrow widens the sheet with its own art; tabs: stats (StatPanes.lua), the client's equipment manager
+-- and its titles list, anchored in.
 local _, ns = ...
 
 local TAB_ART = "Interface\\PaperDollInfoFrame\\PaperDollSidebarTabs"
@@ -43,19 +44,22 @@ local NEW_SET_TEXT_X = 0
 local NEW_SET_TEXT_Y = -1
 local CARD_ATLAS = "UI-Character-Info-OutfitCard"
 local NAME_GAP = 4
--- Tabs sit on the inset's top line, centred as a pair over the list column (both pages' rows run 4..190).
-local TABS_Y, TAB_GAP = -40, 4
+-- Tabs sit on the inset's top line, the three centred over the list column (the pages' rows run 4..190).
+local TABS_Y, TAB_GAP, TAB_W = -40, 4, 33
+-- Titles list: no buttons under it, so it runs this far up from the pane's bottom.
+local TITLES_LIST_BOTTOM = 8
 local LIST_MID = (INNER_W - LIST_BAR) / 2
 -- The arrow: in the sheet's bottom strip, under the right column of slots.
 local ARROW_SIZE = 26
 local ARROW_X, ARROW_Y = 324, -416
 
-local STATS, EQUIPMENT = 1, 2
+local STATS, EQUIPMENT, TITLES = 1, 2, 3
 -- The client's own sidebar tabs: the stats tab is the player's portrait.
 local TABS = {
     { name = _G.PAPERDOLL_SIDEBAR_STATS or "Character Stats" },
     { name = _G.PAPERDOLL_EQUIPMENTMANAGER or EQUIPMENT_MANAGER or "Equipment Manager",
         coords = { 0.015625, 0.53125, 0.46875, 0.60546875 } },
+    { name = _G.PAPERDOLL_SIDEBAR_TITLES or "Titles", coords = { 0.015625, 0.53125, 0.32421875, 0.4609375 } },
 }
 -- Laid out as the mainline PaperDollSidebarTabTemplate.
 local TAB_BG = { set = "raw", layer = "BACKGROUND", tint = true, w = 50, h = 43, point = "BOTTOMLEFT", x = -9, y = -2 }
@@ -73,6 +77,7 @@ local QUICK_SIZE = 24
 local QUICK_X = 0
 local QUICK_Y = 4
 local savedPoints, popupPoints, listPoints
+local titlesPoints, titlesListPoints
 local Sync
 
 local function Manager()
@@ -274,6 +279,39 @@ local function Unplace(manager)
     savedPoints = nil
 end
 
+------------------------------------------------------------ the titles list
+
+local function Titles()
+    return PaperDollFrame and PaperDollFrame.TitleManagerPane
+end
+
+-- The client's titles list in our pane while its tab is up (#261); the client's points back on Restore.
+local function PlaceTitles(titles)
+    local box, bar = titles.ScrollBox, titles.ScrollBar
+    if not titlesPoints then
+        titlesPoints = PointsOf(titles)
+        titlesListPoints = box and bar and { box = PointsOf(box), bar = PointsOf(bar) } or nil
+        ns.FadeTextures(titles)
+    end
+    ns.SetTwoPointsIf(titles, "TOPLEFT", pane, "TOPLEFT", 0, INNER_TOP, "BOTTOMRIGHT", pane, "TOPLEFT", INNER_W, INNER_BOTTOM)
+    if not (box and bar) or OnList(titles, box) then return end
+    box:ClearAllPoints()
+    box:SetPoint("TOPLEFT", titles, "TOPLEFT", EQUIP_LIST_LEFT, EQUIP_LIST_TOP)
+    box:SetPoint("BOTTOMRIGHT", titles, "BOTTOMRIGHT", -(PAGE_INSET + EQUIP_LIST_RIGHT_INSET), TITLES_LIST_BOTTOM)
+    ns.PlaceSidePanelScroll(bar, pages[TITLES])
+end
+
+local function UnplaceTitles(titles)
+    if not titlesPoints then return end
+    if titlesListPoints then
+        PutPoints(titles.ScrollBox, titlesListPoints.box)
+        PutPoints(titles.ScrollBar, titlesListPoints.bar)
+    end
+    PutPoints(titles, titlesPoints)
+    ns.FadeTextures(titles, 1)
+    titlesPoints, titlesListPoints = nil, nil
+end
+
 ----------------------------------------------------------------- the art
 
 -- Columns a..384 of a 256+128 sheet pair, rows sy..sy+h, drawn 1:1 at doll x, y on a panel.
@@ -410,6 +448,16 @@ Sync = function()
             manager:Hide()
         end
     end
+    local titles = Titles()
+    if titles then
+        if shown and current == TITLES then
+            PlaceTitles(titles)
+            ns.KeepSidePane(titles)
+            if not titles:IsShown() then titles:Show() end
+        elseif titles:IsShown() and (active or titlesPoints) then
+            titles:Hide()
+        end
+    end
     ns.PanelToggleFace(toggle, open, ARROW_FILES)
     if toggle then ns.SetShownIf(toggle, active and not pet) end
     if quick then ns.SetShownIf(quick, active and not open and not pet and ns.db and ns.db.equipmentQuickButton == true) end
@@ -469,6 +517,11 @@ local function EquipmentWatch()
     if listPoints then FitRows(manager.ScrollBox) end
 end
 
+local function TitlesWatch()
+    local titles = Titles()
+    if titles and not titles:IsShown() then Sync() end
+end
+
 local function Build()
     if pane or not PaperDollFrame or not CharacterFrame then return end
     pane = ns.NewFrame("Frame", "ForeverClassicUIEquipmentPane", PaperDollFrame)
@@ -482,17 +535,19 @@ local function Build()
     pane:Hide()
     BuildArt(pane)
 
-    tabs = { Tab(STATS), Tab(EQUIPMENT) }
-    tabs[STATS]:SetPoint("TOPRIGHT", pane, "TOPLEFT", LIST_MID - TAB_GAP / 2, TABS_Y)
+    tabs = { Tab(STATS), Tab(EQUIPMENT), Tab(TITLES) }
+    tabs[STATS]:SetPoint("TOPRIGHT", pane, "TOPLEFT", LIST_MID - TAB_W / 2 - TAB_GAP, TABS_Y)
     tabs[EQUIPMENT]:SetPoint("LEFT", tabs[STATS], "RIGHT", TAB_GAP, 0)
+    tabs[TITLES]:SetPoint("LEFT", tabs[EQUIPMENT], "RIGHT", TAB_GAP, 0)
 
-    pages = { ns.StatList(pane), ns.NewFrame("Frame", nil, pane) }
+    pages = { ns.StatList(pane), ns.NewFrame("Frame", nil, pane), ns.NewFrame("Frame", nil, pane) }
     for _, page in ipairs(pages) do
         page:SetPoint("TOPLEFT", pane, "TOPLEFT", PAGE_INSET, INNER_TOP - 3)
         page:SetPoint("BOTTOMRIGHT", pane, "TOPLEFT", INNER_W - PAGE_INSET, INNER_BOTTOM + 3)
         page:Hide()
     end
     ns.Sched.OnFrame(pages[EQUIPMENT], { name = "equipment.watch", every = 0, fn = EquipmentWatch })
+    ns.Sched.OnFrame(pages[TITLES], { name = "titles.watch", every = 0, fn = TitlesWatch })
     pane:SetScript("OnShow", function()
         Portrait(tabs[STATS].icon)
         SetTabs()
@@ -528,5 +583,10 @@ function ns.EquipmentPaneRestore()
     if manager then
         if manager:IsShown() and savedPoints then manager:Hide() end
         Unplace(manager)
+    end
+    local titles = Titles()
+    if titles then
+        if titles:IsShown() and titlesPoints then titles:Hide() end
+        UnplaceTitles(titles)
     end
 end
