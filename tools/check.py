@@ -302,6 +302,8 @@ FIX = {
     "TOC": "list every addon .lua in " + TOC_NAME + " and remove entries for files that are gone",
     "BASELINE": "run python tools/check.py --carry-renames, then git add " + BASELINE_NAME,
     "NEWSOPTIN": "a What's New entry naming an off-by-default option says to turn it on in the options, and where",
+    "NEWSISSUE": "say what changed in players' words; issue numbers stay in commits, the tracker and replies (a "
+                 "player only asks what the number means)",
     "USSPELL": "American spelling in English text: color, gray, center(ed), armor, -ize, check/checked (not tick)",
     "EOL": "stage the file with LF line endings (git add --renormalize PATH; .gitattributes holds * text=auto eol=lf): "
            "a CRLF commit rewrites every line of the file in the diff",
@@ -2008,6 +2010,45 @@ def news_hits():
     return hits
 
 
+ISSUE_REF = re.compile(r"#\d+")
+
+
+def tagged(version):
+    return bool(subprocess.run(["git", "tag", "-l", "v" + version], capture_output=True, text=True).stdout.strip())
+
+
+def issue_hits():
+    """No issue number in what players read: the newest What's New in every language and the changelog's newest entry."""
+    hits = []
+    welcome = "Options/Welcome.lua"
+    newest = None
+    if os.path.isfile(welcome):
+        with open(welcome, encoding="utf-8") as fh:
+            newest = re.search(r'WHATSNEW = \{\s*\{ id = (\d+), version = "([\d.]+)"', fh.read())
+    # A shipped version's text stays as players saw it.
+    if newest and not tagged(newest.group(2)) and os.path.isdir(LOCALE_DIR):
+        prefix = 'L["WN%s_' % newest.group(1)
+        for name in sorted(os.listdir(LOCALE_DIR)):
+            if not name.endswith("_WhatsNew.lua"):
+                continue
+            with open(os.path.join(LOCALE_DIR, name), encoding="utf-8") as fh:
+                for number, line in enumerate(fh, 1):
+                    if line.startswith(prefix) and ISSUE_REF.search(line):
+                        hits.append((LOCALE_DIR + "/" + name, number, "NEWSISSUE", "an issue number in What's New"))
+    if os.path.isfile("CHANGELOG.md"):
+        with open("CHANGELOG.md", encoding="utf-8") as fh:
+            lines = fh.read().splitlines()
+        heads = [i for i, line in enumerate(lines) if line.startswith("## [")]
+        top = heads[0] if heads else None
+        version = re.match(r"## \[([\d.]+)\]", lines[top]) if top is not None else None
+        if version and not tagged(version.group(1)):
+            stop = heads[1] if len(heads) > 1 else len(lines)
+            for i in range(top + 1, stop):
+                if ISSUE_REF.search(lines[i]):
+                    hits.append(("CHANGELOG.md", i + 1, "NEWSISSUE", "an issue number in the changelog's newest entry"))
+    return hits
+
+
 def spelling_hits():
     """British spellings in what players read in English: enUS strings, What's New, changelog, readme, description."""
     hits = []
@@ -2349,7 +2390,7 @@ def run(argv):
                 continue
         fail(path, line, rule, msg)
 
-    for path, line, rule, msg in locale_hits() + spelling_hits() + news_hits() + eol_hits(root, have_git):
+    for path, line, rule, msg in locale_hits() + spelling_hits() + news_hits() + issue_hits() + eol_hits(root, have_git):
         fail(path, line, rule, msg)
 
     elapsed = time.time() - started
