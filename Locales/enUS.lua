@@ -551,8 +551,8 @@ L["SOCIAL_GUILD_MESSAGE_OF_THE_DAY"] = "Guild Message Of The Day:"
 
 -- Spells/SpellBook.lua
 L["SPELL_WHAT_CAN_I_TRAIN"] = "What can I train?"
-L["CORE_GAMEPAD_ON_RELOAD"] = "Gamepad on: reload (/reload) to use the game's spellbook, talents and quest log, which the controller can navigate."
-L["CORE_GAMEPAD_OFF_RELOAD"] = "Gamepad off: reload (/reload) to bring back the classic spellbook, talents and quest log."
+L["CORE_GAMEPAD_ON_RELOAD"] = "Gamepad on: reload (/reload) so the controller can move through the loot window."
+L["CORE_GAMEPAD_OFF_RELOAD"] = "Gamepad off: reload (/reload) to bring back the loot window's classic rows."
 L["SPELL_PAD_NO_FREE_SLOT"] = "No free gamepad bar slot on this page."
 L["SPELL_PAD_CANNOT_ADD"] = "That spell cannot go on the gamepad bar."
 L["SPELL_PAD_ADDED"] = "Added to the gamepad bar. Y moves it."

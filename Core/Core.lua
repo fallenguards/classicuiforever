@@ -182,10 +182,12 @@ local function Runs(mod)
     return not (mod.padOff and ns.GamepadUI and ns.GamepadUI())
 end
 
--- The interface switched since login while a padLogin or padHost module is ticked: only a reload swaps those windows.
+-- The interface switched since login while the loot window (its list laid for the login's interface, Windows/Loot.lua
+-- PadList) or a padLogin or padHost module is on: only a reload swaps them.
 function ns.PadSwapOwed()
     if ns.padSession == nil or not ns.GamepadUI then return false end
     if ns.GamepadUI() == ns.padSession then return false end
+    if ns.ModuleInForce("lootWindow") then return true end
     for _, mod in ipairs(ns.modules) do
         if (mod.padLogin or mod.padHost) and ModuleOn(mod.key) then return true end
     end

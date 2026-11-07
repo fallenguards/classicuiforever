@@ -60,9 +60,24 @@ local function SyncBox(element)
     nameBox:SetShown(filled and true or false)
 end
 
+-- Gamepad interface at login: the list keeps the game's rows (46 tall, 2 apart, 6 in) and scrolls itself, as a row
+-- height, padding or scroll spot we write into it taints the navigator's step to the next row (#264). Era's spots come
+-- back by moving what shows: the list 6 up and left, each row's item up to the Era slot of the row it stands in.
+local function PadList() return ns.padSession == true end
+local GAME_IN, GAME_STEP = 6, 48
+local ITEM_X, ITEM_Y = 5, -4   -- the game's item spot in its row
+local function PadRow(element)
+    local item, box = element.Item, LootFrame and LootFrame.ScrollBox
+    local top, boxTop = element:GetTop(), box and box:GetTop()
+    if not (item and top and boxTop) or AnySecret(top, boxTop) then return end
+    local slot = math.floor((boxTop - GAME_IN - top) / GAME_STEP + 0.5)
+    ns.SetPointIf(item, "TOPLEFT", element, "TOPLEFT", ITEM_X, ITEM_Y + boxTop - GAME_IN - slot * LOOT_ROW - top)
+end
+
 local function PageRow(element)
     SyncBox(element)
     Measure(element)
+    if PadList() then PadRow(element) end
 end
 
 -- The look's visitor: also hushes and dresses rows.
@@ -70,6 +85,7 @@ local function LookRow(element)
     SkinLootElement(element)
     SyncBox(element)
     Measure(element)
+    if PadList() then PadRow(element) end
 end
 
 local function Walk(box, visit)
@@ -90,7 +106,8 @@ end
 
 -- Set the list's foot only if it moved (secret points count as moved); no
 -- ClearAllPoints, the top left anchor stays.
-local function KeepFoot(box, frame, y)
+local function KeepFoot(box, frame, y, right)
+    right = right or 10
     local count = box:GetNumPoints()
     if not IsSecret(count) then
         for i = 1, count do
@@ -98,12 +115,12 @@ local function KeepFoot(box, frame, y)
             if AnySecret(point, rel, relPoint, x, py) then break end
             if point == "BOTTOMRIGHT" then
                 if rel == frame and relPoint == "BOTTOMRIGHT" and type(x) == "number" and type(py) == "number"
-                    and Near(x, 10) and Near(py, y) then return end
+                    and Near(x, right) and Near(py, y) then return end
                 break
             end
         end
     end
-    box:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 10, y)
+    box:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", right, y)
 end
 
 local function EnableIf(button, on)
@@ -124,6 +141,11 @@ local function UpdateLootPages(frame, visit, cleared)
     local pitch = Walk(box, visit or PageRow)
     local pager = frame.fcuiPager
     if not pager then return end
+    if PadList() then
+        ns.SetShownIf(pager, false)
+        KeepFoot(box, frame, LOOT_H - LOOT_TOP - LootRows(LOOT_ROW, false) * LOOT_ROW, 10 + GAME_IN)
+        return
+    end
     local total = box.GetDataProviderSize and box:GetDataProviderSize() or 0
     local paged = total > LootRows(pitch, false)
     ns.SetShownIf(pager, paged)
@@ -198,8 +220,8 @@ local function LootPager(frame)
     end
     pager.up:SetScript("OnClick", function() Page(-1) end)
     pager.down:SetScript("OnClick", function() Page(1) end)
-    -- The wheel turns pages instead of free scrolling.
-    box:SetScript("OnMouseWheel", function(_, delta) Turn(-delta) end)
+    -- The wheel turns pages instead of free scrolling; the gamepad's list scrolls as the game's.
+    if not PadList() then box:SetScript("OnMouseWheel", function(_, delta) Turn(-delta) end) end
     -- Polled from our own frame, never a callback on the client's list (that
     -- taints the rest of its pass). Not the pager's frame: it hides when all fits.
     local look = ns.NewFrame("Frame", nil, frame)
@@ -287,11 +309,12 @@ local function SkinLoot(frame)
     end
     local box = frame.ScrollBox
     if box then
-        ns.SetPointOnce(box, "TOPLEFT", frame, "TOPLEFT", 21, -LOOT_TOP)
-        local pitch = LootPitch(box)
-        box:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 10, LOOT_H - LOOT_TOP - LootRows(pitch, false) * pitch)
+        local inset = PadList() and GAME_IN or 0
+        ns.SetPointOnce(box, "TOPLEFT", frame, "TOPLEFT", 21 - inset, inset - LOOT_TOP)
+        local pitch = PadList() and LOOT_ROW or LootPitch(box)
+        box:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 10 + inset, LOOT_H - LOOT_TOP - LootRows(pitch, false) * pitch)
         local view = box.GetView and box:GetView()
-        if view and ns.Once(view, "loot") then
+        if view and not PadList() and ns.Once(view, "loot") then
             if view.SetElementExtent then view:SetElementExtent(LOOT_ROW) end
             if view.SetPadding then view:SetPadding(0, 0, 0, 0, 0) end
             if box.FullUpdate then box:FullUpdate(ScrollBoxConstants and ScrollBoxConstants.UpdateImmediately) end
