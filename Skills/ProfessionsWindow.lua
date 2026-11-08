@@ -480,6 +480,11 @@ local function EnsureOpenHost(frame)
         local tick = watch:GetScript("OnUpdate")
         if tick then tick(watch, 0) end
     end })
+    -- A craft's refresh (a disenchant cast) paints its profession on the portrait, book page up too: ours back in the
+    -- same breath, not at the watch's next pass (the icon flickered to Enchanting on every cast).
+    ns.HookMethod(frame, "SetPortraitToAsset", function()
+        if active then ns.ProfessionPortrait() end
+    end)
 end
 
 local function NoteShown(w, bookShown)
