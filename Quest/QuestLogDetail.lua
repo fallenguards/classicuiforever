@@ -68,10 +68,15 @@ local function RewardEnter(self)
     GameTooltip:Show()
 end
 
+-- A modified click as the game's own reward buttons take it: a chat link, the dressing room on Ctrl-click, and the rest.
 local function RewardClick(self)
-    if IsModifiedClick("CHATLINK") and ChatFrameUtil and ChatFrameUtil.InsertLink then
-        local ok, link = pcall(GetQuestLogItemLink, self.rewardType, self.index, self.questID)
-        if ok and link then ChatFrameUtil.InsertLink(link) end
+    if not IsModifiedClick() then return end
+    local ok, link = pcall(GetQuestLogItemLink, self.rewardType, self.index, self.questID)
+    if not (ok and link) then return end
+    if HandleModifiedItemClick then
+        HandleModifiedItemClick(link)
+    elseif IsModifiedClick("CHATLINK") and ChatFrameUtil and ChatFrameUtil.InsertLink then
+        ChatFrameUtil.InsertLink(link)
     end
 end
 
