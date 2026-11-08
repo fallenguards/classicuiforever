@@ -244,6 +244,7 @@ ns.DB_DEFAULTS = {
     panelCollections = true,
     panelCooldowns = true,
     panelDressUp = true,
+    dressUpLarge = false,
     panelTaxi = true,
     panelGossip = true,
     panelGroupFinder = true,

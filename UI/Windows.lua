@@ -40,8 +40,8 @@ local function Replaces(opener, other)
 end
 -- How much of the character window the old sheet's art fills.
 local BESIDE_WIDTH = 352
--- Pieces a client window hangs past its right edge.
-local SIDE_PIECES = { CharacterFrame = { "ModeTabs" } }
+-- Pieces a client window hangs past its right edge (the dressing room's appearance list and set panels, the player's pick).
+local SIDE_PIECES = { CharacterFrame = { "ModeTabs" }, DressUpFrame = { "CustomSetDetailsPanel", "SetSelectionPanel" } }
 local PlaceClassicWindows, StandAt, SheetSettle, SecureTopLeft   -- forward declared: must stay local
 
 -- The gamepad's windows close only by their own hand (Core/Gamepad.lua). opener: ours, closing by Era's rule alone.

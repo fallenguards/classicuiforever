@@ -17,6 +17,7 @@ return {
     honorBadge = "same for everyone: opt-in, off by default (retail only)",
     unitBarTexture = "same for everyone: Classic by default, the 1.x fill drawn smooth (its compression showed on thick bars)",
     hideWhoTab = "same for everyone: opt-in, off by default",
+    dressUpLarge = "same for everyone: opt-in, off by default (the dressing room at the 1.x size unless checked)",
     hideFinderWho = "on by default since dbVersion 35 (Social/FinderTabs.lua HideFinderWhoNow): every install's Who side tab hidden; Hide Who side tab under Social turns it back",
     socialTitleDrag = "same for everyone: opt-in, off by default",
     microWidth = "same for everyone: 1 is the row as before; Menu Width in the micro menu's edit dialog",

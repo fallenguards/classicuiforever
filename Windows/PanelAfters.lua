@@ -66,17 +66,36 @@ local function PlaceDressTitleButtons(frame)
     if sizer and close then ns.SetPointIf(sizer, "RIGHT", close, "LEFT", DRESS_SIZE_BUTTON_GAP, 0) end
 end
 
+-- The 1.x room, or the bigger one of later clients with Large dressing room: the game's small and full sizes and their
+-- arrow give way, after each of its own sizings. The appearance list beside it stays the player's pick.
+local DRESS_W, DRESS_H, DRESS_LARGE_W, DRESS_LARGE_H = 384, 512, 450, 545
+local function SizeRoom(frame)
+    local sizer = frame.MaximizeMinimizeFrame
+    if not ns.ModuleInForce("panelDressUp") then
+        if sizer then ns.SetShownIf(sizer, true) end
+        return
+    end
+    if ns.db.dressUpLarge then ns.SetSizeIf(frame, DRESS_LARGE_W, DRESS_LARGE_H) else ns.SetSizeIf(frame, DRESS_W, DRESS_H) end
+    if sizer then ns.SetShownIf(sizer, false) end
+end
+
 -- Footer 2 up off the lifted bottom edge: Close (Reset hangs from it) and Link.
 function A.DressUpFrame(frame)
     local close, link = Named("DressUpFrameCancelButton"), frame.LinkButton
     if close then ns.SetPointIf(close, "BOTTOMRIGHT", frame, "BOTTOMRIGHT", -7, 6) end
     if link then ns.SetPointIf(link, "BOTTOMLEFT", frame, "BOTTOMLEFT", 2, 6) end
-    -- The size button in the classic look and size the map's has.
-    if frame.MaximizeMinimizeFrame then P.MaxMinBeside(frame.MaximizeMinimizeFrame, frame.CloseButton, DRESS_SIZE_BUTTON_GAP) end
-    -- The small and full size swap the scene's height and the title buttons while the window shows.
+    ns.HookMethod(frame, "ConfigureSize", SizeRoom)
+    SizeRoom(frame)
+    if ns.Once(frame, "dressSize") then
+        ns.OnToggle(function(key)
+            if key == "dressUpLarge" or key == "panelDressUp" then SizeRoom(frame) end
+        end)
+    end
+    -- The scene's height and the title buttons follow the size while the window shows.
     ns.Sched.Attach(frame, { name = "dressup.background", every = 0, fn = function()
         FitDressBackground(frame)
         PlaceDressTitleButtons(frame)
+        SizeRoom(frame)
     end })
 end
 
