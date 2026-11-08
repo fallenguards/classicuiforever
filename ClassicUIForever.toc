@@ -251,10 +251,12 @@ Spells\PetPool.lua
 Spells\BookFlyouts.lua
 Spells\BookGrid.lua
 Spells\SpellBook.lua
+Spells\BookTraining.lua
 Skills\SkillShell.lua
 Skills\ProfessionsBook.lua
 Skills\ProfessionsBookFrame.lua
 Skills\ProfessionsFootTabs.lua
+Skills\ProfessionsTraining.lua
 Skills\ProfessionsWindow.lua
 Skills\ProfessionsBookRetail.lua
 Skills\TradeSkillExtras.lua

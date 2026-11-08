@@ -39,12 +39,13 @@ local function PadShown(i)
     return up and page ~= nil and page:IsShown()
 end
 
--- What's Training's professions list (recipes still to learn) opens from a side tab of ours on the book page, as the
--- spellbook's own side tab opens its spells list; its own tabs on this window stand down, hidden as they show (#260).
+-- What's Training's professions list (recipes still to learn) opens from a side tab of ours on the book page, under a
+-- Professions tab that turns back to the book; its own tabs on this window stand down, hidden as they show (#260).
 local TRAINING_TABS = { "WhatsTrainingCraftingTab", "WhatsTrainingCraftingReturnTab" }
 -- The spellbook's first side tab spot (Spells/SpellBook.lua): just past the art's right edge, 65 down.
 local TRAIN_X, TRAIN_Y, TRAIN_GAP = 2, -65, -17
-local trainTab
+local PROF_ICON = "Interface\\Icons\\INV_SideTab_Professions_c60"
+local profTab, trainTab
 local function TrainingOurs()
     return ns.OnForever() and ns.ModuleInForce("professionsBook") and ns.SpellBookActive and ns.SpellBookActive()
 end
@@ -80,16 +81,32 @@ local function FitTraining(list)
     end
 end
 
--- Its own launcher's handler, as its click runs it.
-local function OpenTraining(self)
-    local launcher = _G.WhatsTrainingCraftingTab
-    local open = launcher and launcher.customMouseUpHandler
-    if type(open) == "function" then open(launcher, "LeftButton", true) end
-    self:SetChecked(TrainingListUp())
+-- The page up checks its tab, the book its own.
+local function CheckSideTabs()
+    if not profTab then return end
+    local up = TrainingListUp()
+    profTab:SetChecked(not up)
+    trainTab:SetChecked(up)
 end
 
--- Under the profession side tabs while they are up (hover or always), else at the column's top.
-local function PlaceTrainTab(frame)
+-- Its own launcher's and return tab's handlers, as their clicks run them.
+local function Press(name)
+    local tab = _G[name]
+    local handler = tab and tab.customMouseUpHandler
+    if type(handler) == "function" then handler(tab, "LeftButton", true) end
+end
+local function OpenTraining()
+    if not TrainingListUp() then Press("WhatsTrainingCraftingTab") end
+    CheckSideTabs()
+end
+local function CloseTraining()
+    if TrainingListUp() then Press("WhatsTrainingCraftingReturnTab") end
+    CheckSideTabs()
+end
+
+-- Under the profession side tabs while they are up (hover or always), else at the column's top; the list's tab hangs
+-- under the book's.
+local function PlaceSideTabs(frame)
     local last
     if not (ns.db and ns.db.professionTabsHidden == true) then
         for _, tab in ipairs(frame.rightProfessionTabs or ns.EMPTY) do
@@ -97,9 +114,9 @@ local function PlaceTrainTab(frame)
         end
     end
     if last then
-        ns.SetPointOnce(trainTab, "TOPLEFT", last, "BOTTOMLEFT", 0, TRAIN_GAP)
+        ns.SetPointOnce(profTab, "TOPLEFT", last, "BOTTOMLEFT", 0, TRAIN_GAP)
     else
-        ns.SetPointOnce(trainTab, "TOPLEFT", frame, "TOPLEFT", T.BookW() + TRAIN_X, TRAIN_Y)
+        ns.SetPointOnce(profTab, "TOPLEFT", frame, "TOPLEFT", T.BookW() + TRAIN_X, TRAIN_Y)
     end
 end
 
@@ -114,20 +131,31 @@ local function TrainingStandsDown(frame, page)
     local list = _G.WhatsTrainingCraftingPage
     if list then
         ns.HookScriptOnce(list, "OnShow", FitTraining, "profTrainingFit")
+        ns.HookScriptOnce(list, "OnShow", CheckSideTabs, "profTrainingTabs")
+        ns.HookScriptOnce(list, "OnHide", CheckSideTabs, "profTrainingTabs")
         if list:IsShown() then FitTraining(list) end
+        ns.TrainingPageLook(list, TrainingOurs())
     end
     if not (_G.WhatsTrainingCraftingTab and ns.NewSideTab and TrainingOurs()) then
-        if trainTab then trainTab:Hide() end
+        if profTab then
+            profTab:Hide()
+            trainTab:Hide()
+        end
         return
     end
-    if not trainTab then
-        trainTab = ns.NewSideTab(page, 1, nil)
+    if not profTab then
+        profTab = ns.NewSideTab(page, 1, nil)
+        profTab:SetNormalTexture(PROF_ICON)
+        profTab.tooltip = TRADE_SKILLS or "Professions"
+        profTab:SetScript("OnClick", CloseTraining)
+        trainTab = ns.NewSideTab(page, 2, profTab)
         trainTab:SetNormalTexture("Interface\\Icons\\INV_Misc_Book_09")
         trainTab.tooltip = L["SPELL_WHAT_CAN_I_TRAIN"]
         trainTab:SetScript("OnClick", OpenTraining)
     end
-    PlaceTrainTab(frame)
-    trainTab:SetChecked(TrainingListUp())
+    PlaceSideTabs(frame)
+    CheckSideTabs()
+    profTab:Show()
     trainTab:Show()
 end
 

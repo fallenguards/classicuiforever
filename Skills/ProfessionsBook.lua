@@ -675,3 +675,11 @@ function T.ShowOurs(on)
         if rows[i] then SetShownIf(rows[i], on) end
     end
 end
+
+-- The page under What's Training's list (Skills/ProfessionsTraining.lua): the content (cards, rows) and the art faded,
+-- never hidden (the cards hold casting buttons, which a fight guards).
+function T.FadePage(on)
+    local content = Content()
+    if content then content:SetAlpha(on and 0 or 1) end
+    if rows.clip then rows.clip:SetAlpha(on and 0 or 1) end
+end

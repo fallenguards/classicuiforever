@@ -33,6 +33,11 @@ function ns.SkillInsetBox(parent, edge, bare, fillAlpha)
     return box
 end
 
+-- The skill windows' black marble as a floor elsewhere (What's Training's pages); sublevel: over the host's own art.
+function ns.MarbleFloor(parent, sublevel)
+    return ns.TileTex(parent:CreateTexture(nil, "BACKGROUND", nil, sublevel or 0), "marbleBg", MARBLE_TILE, MARBLE)
+end
+
 -- Stone strip over border edges the old window tucked under its stone.
 local function StoneStrip(parent, level)
     local strip = ns.NewFrame("Frame", nil, parent)

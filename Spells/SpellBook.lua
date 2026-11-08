@@ -76,6 +76,7 @@ local state = {
     slots = {},         -- spell book slot indices for the selected tab, future spells dropped
     search = "",        -- text in the search box; while set, the slots come from every tab
     lines = {},         -- scratch: the skill lines in tab order (Spells/BookLines.lua)
+    training = false,   -- the trainer list's page is up (Spells/BookTraining.lua)
 }
 
 local function CurrentPageKey()
@@ -616,6 +617,7 @@ local function SkillTab_OnClick(self)
     end
     state.bank = BANK_PLAYER
     state.line = self.line
+    state.training = false
     heldLine = nil
     PlaySound(SOUNDKIT.IG_ABILITY_PAGE_TURN)
     book:Refresh()
@@ -653,6 +655,7 @@ local function BookTab_OnClick(self)
     end
     if InCombatLockdown() then return end
     state.bank = self.bank
+    state.training = false
     PlaySound(SOUNDKIT.IG_ABILITY_PAGE_TURN)
     book:Refresh()
 end
@@ -1080,8 +1083,8 @@ local function CreateBook()
         if f:IsShown() then f:Refresh() end
     end)
 
-    -- Any hide drops the layer: left up, a click on empty ground would cast.
-    f:HookScript("OnShow", function(self) self:SetLayer(true) end)
+    -- Any hide drops the layer: left up, a click on empty ground would cast. The trainer list's page has no layer.
+    f:HookScript("OnShow", function(self) self:SetLayer(not state.training) end)
     f:HookScript("OnHide", function(self)
         if not InCombatLockdown() then
             self:SetLayer(false)
@@ -1105,24 +1108,18 @@ local function CreateBook()
         f.SkillTabs[i] = CreateSkillTab(f, i, f.SkillTabs[i - 1])
     end
 
-    -- What's Training tab: that addon hangs its tab on the client book we
-    -- replace, so open its window through its slash command.
+    -- What's Training tab: that addon's list on a page of this book, as its own tab shows it (Spells/BookTraining.lua).
     f.TrainTab = CreateSkillTab(f, MAX_SKILL_TABS + 1, nil)
     f.TrainTab:SetNormalTexture("Interface\\Icons\\INV_Misc_Book_09")
     f.TrainTab.tooltip = L["SPELL_WHAT_CAN_I_TRAIN"]
     f.TrainTab:SetScript("OnClick", function(self)
-        self:SetChecked(false)
-        local open = SlashCmdList and SlashCmdList.WHATSTRAINING
-        if type(open) ~= "function" then return end
-        PlaySound(SOUNDKIT.IG_ABILITY_PAGE_TURN)
-        pcall(open, "")
-        local window = _G["WhatsTrainingFloatingFrame"]
-        if window and window:IsShown() and not window.fcuiDocked then
-            -- Docked beside the book once; the player may move it after.
-            window.fcuiDocked = true
-            window:ClearAllPoints()
-            window:SetPoint("TOPLEFT", f, "TOPRIGHT", -28, -12)
+        if InCombatLockdown() or not (ns.TrainingList and ns.TrainingList(f)) then
+            self:SetChecked(state.training)
+            return
         end
+        state.training = true
+        PlaySound(SOUNDKIT.IG_ABILITY_PAGE_TURN)
+        f:Refresh()
     end)
 
     f.BookTabs, f.FootPads = {}, {}
@@ -1552,7 +1549,7 @@ local function CreateBook()
                 tab.line = i
                 tab.tooltip = info.name
                 tab:SetNormalTexture(info.iconID or "")
-                tab:SetChecked(state.line == i)
+                tab:SetChecked(not state.training and state.line == i)
                 tab:Show()
                 firstLine = firstLine or i
                 if state.line == i then selectedVisible = true end
@@ -1565,6 +1562,7 @@ local function CreateBook()
         if train then
             local there = state.bank == BANK_PLAYER and SlashCmdList and type(SlashCmdList.WHATSTRAINING) == "function"
             train:SetShown(there and true or false)
+            train:SetChecked(state.training)
             if there then
                 train:ClearAllPoints()
                 if shown > 0 then
@@ -1586,7 +1584,7 @@ local function CreateBook()
             end
             if want then
                 state.line = want
-                for i = 1, shown do self.SkillTabs[i]:SetChecked(self.SkillTabs[i].line == want) end
+                for i = 1, shown do self.SkillTabs[i]:SetChecked(not state.training and self.SkillTabs[i].line == want) end
             end
         end
     end
@@ -1718,8 +1716,17 @@ local function CreateBook()
             pcall(self.Search.SetEnabled, self.Search, not fight)
             if fight and self.Search:HasFocus() then self.Search:ClearFocus() end
         end
+        -- The trainer list's page yields to a layer a fight holds up (a secure open): its unseen buttons would cast.
+        if fight and state.training and self:LayerUp() then state.training = false end
         self:UpdateBookTabs()
         self:UpdateSkillTabs()
+        if not fight and self:IsShown() and self:LayerUp() == state.training then self:SetLayer(not state.training) end
+        if ns.ShowTrainingPage then ns.ShowTrainingPage(self, state.training) end
+        if state.training then
+            wipe(state.slots)
+            for _, btn in ipairs(self.Buttons) do UpdateButton(btn) end
+            return
+        end
         -- Show the list the casting buttons were armed from, where there is one.
         local c, content = self.ContainerFor()
         local usable = c and (not fight or (c.slots and (c.kind ~= "dyn" or c.content == content)))
@@ -1771,10 +1778,10 @@ end
 -- book shows without it.
 local wanted = false
 local closedInFight = false
--- The layer follows the book, out of combat only (it holds casting buttons).
+-- The layer follows the book, out of combat only (it holds casting buttons); never under the trainer list's page.
 local function ShowClicks(on)
     if not book then return end
-    book:SetLayer(on and book:IsShown())
+    book:SetLayer(on and book:IsShown() and not state.training)
 end
 
 local function Show()
@@ -2074,6 +2081,7 @@ function ns.SpellBookBindButton() return bindButton end
 function ns.SpellBookTurnTo(pet)
     if not (active and book and book:IsShown()) or InCombatLockdown() then return false end
     state.bank = pet and BANK_PET or BANK_PLAYER
+    state.training = false
     book:Refresh()
     return true
 end
@@ -2086,6 +2094,24 @@ function ns.ShowSpellBookBank(pet)
     -- One page of the book at a time, as the key's macro does: the professions window shut first.
     if _G.ProfessionsFrame and _G.ProfessionsFrame:IsShown() and not InCombatLockdown() then ns.HidePanel(_G.ProfessionsFrame) end
     state.bank = pet and BANK_PET or BANK_PLAYER
+    state.training = false
+    Show()
+    if book and book:IsShown() then book:Refresh() end
+    return true
+end
+
+-- The trainer list's page, from its own openers (its slash command, its minimap button). A fight that holds the
+-- layer up refuses it: nothing can drop the layer there.
+function ns.SpellBookTrainingUp() return state.training end
+function ns.ShowSpellBookTraining()
+    if not active then return false end
+    if InCombatLockdown() and book and book:IsShown() and book:LayerUp() then
+        ns.SayNotInCombat()
+        return false
+    end
+    if _G.ProfessionsFrame and _G.ProfessionsFrame:IsShown() and not InCombatLockdown() then ns.HidePanel(_G.ProfessionsFrame) end
+    state.bank = BANK_PLAYER
+    state.training = true
     Show()
     if book and book:IsShown() then book:Refresh() end
     return true
@@ -2179,7 +2205,7 @@ ns.RegisterModule("spellBookFlyouts", { apply = RelistBook, restore = RelistBook
 
 -- Search toggle; off clears any search.
 ns.RegisterModule("spellBookSearch", {
-    apply = function() if book and book.Search then book.Search:Show() end end,
+    apply = function() if book and book.Search and not state.training then book.Search:Show() end end,
     restore = function()
         if book and book.Search then
             book.Search:SetText("")

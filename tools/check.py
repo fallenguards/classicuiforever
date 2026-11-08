@@ -96,6 +96,9 @@ ALLOWED = {
     "SEARCHBOX": {"UI/Controls.lua": "ns.SearchBox",
                   "Social/SocialWindow.lua": "the who line: the lens, ns.SearchClear",
                   "Spells/SpellBook.lua": "its search, X built in, Escape keeps the text"},
+    # Another addon's list, not the game's: its own code wrote these, and under the gamepad it takes its page out of
+    # the window the navigator walks.
+    "LISTWRITE": {"Skills/ProfessionsTraining.lua": "What's Training's recipe list, folded to the spellbook list's lines"},
 }
 # Frames allowed a pattern by file and variable: plan 4.2 keeps their own frames and registrations untouched.
 ALLOWED_SITES = {
