@@ -259,7 +259,10 @@ local function Pad(index)
     local pad = bridge.pads[index]
     if pad then return pad end
     pad = CreateFrame("Button", "ClassicUIForeverGuildRowPad" .. index, UIParent, "SecureActionButtonTemplate")
+    -- Both clicks reach the client's row: its right-click menu holds the member's remove, promote and demote, which
+    -- the client keeps from addons, and runs them as its own.
     pad:SetAttribute("type1", "click")
+    pad:SetAttribute("type2", "click")
     pad:SetAttribute("useOnKeyDown", false)
     pad:RegisterForClicks("AnyUp", "AnyDown")
     pad:Hide()
@@ -290,7 +293,7 @@ local function Pad(index)
             return
         end
         lastPadClick.entry, lastPadClick.at = row.entry, now
-        Row_OnClick(row, button)
+        Row_OnClick(row, button, true)
     end)
     bridge.pads[index] = pad
     return pad

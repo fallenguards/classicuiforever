@@ -117,7 +117,7 @@ fight = true
 G.ShowMemberCard()
 local card = ClassicUIForeverGuildMemberCard
 Check(CardUp() and card.Name.text == "Amy", "in a fight a click opens our card for the picked member")
-Check(card.GroupInviteButton.enabled and card.RemoveButton.enabled, "invite and remove follow the client's rules")
+Check(card.GroupInviteButton.enabled, "invite follows the client's rules")
 watch()
 Check(CardUp(), "the client's window on its unseen guild window does not close our card")
 
@@ -144,7 +144,7 @@ Check(not CardUp(), "another member picked closes the card until its click opens
 
 G.selected = "me"
 G.ShowMemberCard()
-Check(CardUp() and not card.GroupInviteButton.enabled and not card.RemoveButton.enabled, "no invite or remove on oneself")
+Check(CardUp() and not card.GroupInviteButton.enabled, "no invite on oneself")
 
 fight = false
 G.selected = "amy"

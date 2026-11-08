@@ -19,15 +19,6 @@ local VALUE_ROWS = {
 
 local card
 
-ns.Popup("FCUI_GUILD_REMOVE", {
-    text = REMOVE_GUILDMEMBER_LABEL or "Remove %s from the guild?",
-    button1 = YES or "Yes",
-    button2 = NO or "No",
-    OnAccept = function(_, name)
-        if name and C_GuildInfo and C_GuildInfo.Uninvite then C_GuildInfo.Uninvite(name) end
-    end,
-})
-
 -- Where the member window stands beside the social window, the client's and ours alike.
 function G.DockMemberWindow(frame, host)
     ns.SetPointOnce(frame, "TOPLEFT", host, "TOPRIGHT", -6, -70)
@@ -165,13 +156,9 @@ local function Card()
         HideCard()
     end)
 
-    card.RemoveButton = FootButton(card, REMOVE or "Remove")
-    card.RemoveButton:SetPoint("BOTTOMLEFT", card, "BOTTOMLEFT", 16, 12)
-    card.RemoveButton:SetScript("OnClick", function()
-        if card.name then StaticPopup_Show("FCUI_GUILD_REMOVE", card.name, nil, card.name) end
-    end)
+    -- No Remove here: the client keeps it from addons, and this card shows only in a fight, where no pad can press its own.
     card.GroupInviteButton = FootButton(card, GROUP_INVITE or "Group Invite")
-    card.GroupInviteButton:SetPoint("LEFT", card.RemoveButton, "RIGHT", 1, 0)
+    card.GroupInviteButton:SetPoint("BOTTOM", card, "BOTTOM", 0, 12)
     card.GroupInviteButton:SetScript("OnClick", function()
         if card.name then S.Invite(card.name) end
     end)
@@ -207,7 +194,6 @@ local function Fill(entry)
     if officer then NoteText(card.OfficerNoteBackground, entry.officerNote, Can(C_GuildInfo.CanEditOfficerNote)) end
     card:SetHeight((officer and CARD_OFFICER_H or CARD_H) + card.Name:GetHeight() + card.RankLabel:GetHeight())
 
-    card.RemoveButton:SetEnabled(not isMe and me ~= nil and Can(CanGuildRemove) and entry.rankIndex > me.rankIndex)
     card.GroupInviteButton:SetEnabled(not isMe and entry.online)
 end
 

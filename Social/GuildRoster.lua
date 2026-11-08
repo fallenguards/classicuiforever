@@ -138,13 +138,8 @@ regen:SetScript("OnEvent", function()
     if G.panel and G.panel:IsShown() then Refresh() end
 end)
 
--- A C_GuildInfo call by name, where this client has it.
-local function GuildCall(method, name)
-    local call = C_GuildInfo and C_GuildInfo[method]
-    if call then call(name) end
-end
-
--- Right-click menu; closes on a click elsewhere or with the roster.
+-- Right-click menu without a row pad (a fight): remove, promote and demote are the client's alone (its own menu, through
+-- the pad); closes on a click elsewhere or with the roster.
 local rowMenu
 
 local function NotMe(entry) return entry.name ~= UnitName("player") end
@@ -157,12 +152,6 @@ local function ShowRowMenu(entry)
               function(e) return NotMe(e) and e.online end },
             { WHISPER or "Whisper", function(e) ns.Whisper(e.name) end,
               function(e) return NotMe(e) and e.online end },
-            { GUILD_PROMOTE or "Promote", function(e) GuildCall("Promote", e.name) end,
-              function(e) return NotMe(e) and CanGuildPromote and CanGuildPromote() end },
-            { GUILD_DEMOTE or "Demote", function(e) GuildCall("Demote", e.name) end,
-              function(e) return NotMe(e) and CanGuildDemote and CanGuildDemote() end },
-            { REMOVE or "Remove", function(e) GuildCall("Uninvite", e.name) end,
-              function(e) return NotMe(e) and CanGuildRemove and CanGuildRemove() end },
             { section = S.MENU_OTHER },
             { ADD_FRIEND or "Add Friend", function(e) S.AddFriend(e.name) end, NotMe },
             { IGNORE or "Ignore", function(e) S.Ignore(e.name) end, NotMe },
@@ -173,12 +162,13 @@ local function ShowRowMenu(entry)
 end
 
 -- The member's status is the client's own frame, opened by the row pad's click on its row; in a fight our card.
-local function Row_OnClick(self, button)
+-- A right-click through the pad opened the client's member menu (clientMenu); without a pad, ours.
+local function Row_OnClick(self, button, clientMenu)
     if not self.entry then return end
     G.selected = EntryKey(self.entry)
     if button == "RightButton" then
         UpdateRows()
-        ShowRowMenu(self.entry)
+        if not clientMenu then ShowRowMenu(self.entry) end
         return
     end
     if SetGuildRosterSelection then pcall(SetGuildRosterSelection, self.entry.index) end
