@@ -3,6 +3,12 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN71_1_TITLE"] = "La barra dei totem resta al suo posto"
+L["WN71_1_TEXT"] = "Una barra agganciata a una barra delle azioni in modalità modifica, come la barra dei totem dello sciamano, mantiene il suo posto alla chiusura della modalità modifica e dopo un ricaricamento."
+L["WN71_2_TITLE"] = "Vassoi dei pulsanti della minimappa"
+L["WN71_2_TEXT"] = "Un vassoio dei pulsanti della minimappa di un altro addon si può spostare di nuovo con ClassicUI Forever attivo."
+L["WN71_3_TITLE"] = "Percentuale di minaccia"
+L["WN71_3_TEXT"] = "La percentuale di minaccia su bersaglio e focus si ferma al 999%, come in Classic Era."
 L["WN70_1_TITLE"] = "Sbiadimento collegato"
 L["WN70_1_TEXT"] = "Le barre delle azioni sbiadite possono tornare insieme: spunta Collegata alle altre barre sbiadite sulle barre sbiadite, in modalità modifica, e il mouse su una qualsiasi le mostra tutte (#255)."
 L["WN70_2_TITLE"] = "Bagliore dell'incantamento"

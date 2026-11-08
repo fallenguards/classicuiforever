@@ -2,6 +2,14 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.49.1] - 2026-11-07
+
+### Fixed
+- A bar snapped to an action bar in edit mode, like the shaman's totem bar, keeps its spot once edit mode closes and after a reload.
+- A minimap button tray from another addon can be moved again with ClassicUI Forever on.
+- The threat percent over the target and focus stops at 999%, as Classic Era's did.
+- The pet training list's names line up at the row's left edge.
+
 ## [0.49.0] - 2026-11-07
 
 ### Added

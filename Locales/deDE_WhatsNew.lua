@@ -3,6 +3,12 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN71_1_TITLE"] = "Totemleiste bleibt an Ort und Stelle"
+L["WN71_1_TEXT"] = "Eine im Bearbeitungsmodus an eine Aktionsleiste geheftete Leiste, etwa die Totemleiste des Schamanen, behält ihren Platz nach dem Bearbeitungsmodus und nach einem Neuladen."
+L["WN71_2_TITLE"] = "Minimap-Button-Leisten"
+L["WN71_2_TEXT"] = "Eine Minimap-Button-Leiste eines anderen Addons lässt sich mit ClassicUI Forever wieder verschieben."
+L["WN71_3_TITLE"] = "Bedrohung in Prozent"
+L["WN71_3_TEXT"] = "Die Bedrohung in Prozent über Ziel und Fokus endet bei 999 %, wie in Classic Era."
 L["WN70_1_TITLE"] = "Verknüpftes Verblassen"
 L["WN70_1_TEXT"] = "Verblasste Aktionsleisten können gemeinsam zurückkommen: Aktiviert im Bearbeitungsmodus bei verblassten Leisten Mit anderen verblassten Leisten verknüpft, dann zeigt die Maus über einer davon alle (#255)."
 L["WN70_2_TITLE"] = "Leuchten beim Verzaubern"

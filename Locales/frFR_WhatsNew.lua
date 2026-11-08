@@ -3,6 +3,12 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN71_1_TITLE"] = "La barre de totems reste en place"
+L["WN71_1_TEXT"] = "Une barre accrochée à une barre d'action en mode édition, comme la barre de totems du chaman, garde sa place à la fermeture du mode édition et après un rechargement."
+L["WN71_2_TITLE"] = "Barres de boutons de la minicarte"
+L["WN71_2_TEXT"] = "Une barre de boutons de la minicarte d'un autre addon peut de nouveau être déplacée avec ClassicUI Forever."
+L["WN71_3_TITLE"] = "Pourcentage de menace"
+L["WN71_3_TEXT"] = "Le pourcentage de menace sur la cible et la focalisation s'arrête à 999 %, comme dans Classic Era."
 L["WN70_1_TITLE"] = "Estompage lié"
 L["WN70_1_TEXT"] = "Les barres d'action estompées peuvent revenir ensemble : cochez Liée aux autres barres estompées sur les barres estompées, en mode édition, et la souris sur l'une d'elles les affiche toutes (#255)."
 L["WN70_2_TITLE"] = "Lueur d'enchantement"

@@ -2,6 +2,12 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN71_1_TITLE"] = "Totem bar stays put"
+L["WN71_1_TEXT"] = "A bar snapped to an action bar in edit mode, like the shaman's totem bar, keeps its spot once edit mode closes and after a reload."
+L["WN71_2_TITLE"] = "Minimap button trays"
+L["WN71_2_TEXT"] = "A minimap button tray from another addon can be moved again with ClassicUI Forever on."
+L["WN71_3_TITLE"] = "Threat percent"
+L["WN71_3_TEXT"] = "The threat percent over the target and focus stops at 999%, as Classic Era's did."
 L["WN70_1_TITLE"] = "Linked bar fading"
 L["WN70_1_TEXT"] = "Faded action bars can come back together: check Linked to other faded bars under each bar's Faded Opacity in edit mode, and the mouse on any of them shows them all (#255)."
 L["WN70_2_TITLE"] = "Enchant glow"

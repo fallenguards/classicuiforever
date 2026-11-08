@@ -3,6 +3,12 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN71_1_TITLE"] = "La barra de tótems se queda en su sitio"
+L["WN71_1_TEXT"] = "Una barra ajustada a una barra de acción en el modo de edición, como la barra de tótems del chamán, conserva su sitio al cerrar el modo de edición y tras recargar."
+L["WN71_2_TITLE"] = "Bandejas de botones del minimapa"
+L["WN71_2_TEXT"] = "Una bandeja de botones del minimapa de otro addon vuelve a poder moverse con ClassicUI Forever activo."
+L["WN71_3_TITLE"] = "Porcentaje de amenaza"
+L["WN71_3_TEXT"] = "El porcentaje de amenaza sobre el objetivo y el foco se detiene en 999 %, como en Classic Era."
 L["WN70_1_TITLE"] = "Atenuado enlazado"
 L["WN70_1_TEXT"] = "Las barras de acción atenuadas pueden volver juntas: marca Enlazada con otras barras atenuadas en las barras atenuadas, en el modo de edición, y el ratón sobre cualquiera de ellas las muestra todas (#255)."
 L["WN70_2_TITLE"] = "Brillo al encantar"
