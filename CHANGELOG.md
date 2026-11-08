@@ -2,6 +2,25 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.50.0] - 2026-11-08
+
+### Added
+- The dressing room opens at the 1.x size. Turn on Large dressing room under All windows for the bigger room of later clients; our windows make room beside it for its side panels.
+- The micro menu fades like the action bars: Faded Opacity and Show Only On Hover in its edit mode dialog, and it can be linked with the faded bars.
+- Guild: Add Member and Guild Information press the game's own buttons, so the invite and the info editor work, and the member right-click menu is the game's own, with Remove, Promote and Demote.
+
+### Changed
+- The group finder's Who side tab is hidden for everyone. Turn off Hide Who side tab under Social to have it back.
+- Same size near and far under Nameplates changes the game's own nameplate settings and is kept per character, outside profiles.
+
+### Fixed
+- A long guild roster name ends in dots before the zone column instead of running under it.
+- The trainer window scrolls a long description, as Classic Era's did.
+- Ctrl-click on a quest reward opens the dressing room.
+- The shaman's totem bar buttons wear the classic action button look.
+- A quest's party count in the quest lists stays when quest levels are off.
+- What's Training's lists sit on a page of the spellbook, with a Professions tab beside it.
+
 ## [0.49.1] - 2026-11-07
 
 ### Fixed

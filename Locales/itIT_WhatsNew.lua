@@ -3,6 +3,18 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN72_1_TITLE"] = "Camerino"
+L["WN72_1_TEXT"] = "Il camerino si apre alla dimensione di 1.x. Per il camerino più grande dei client successivi, attiva Camerino grande nelle opzioni (/fcui), sotto Tutte le finestre; le nostre finestre gli lasciano spazio accanto per i suoi pannelli laterali."
+L["WN72_2_TITLE"] = "Dissolvenza del micromenu"
+L["WN72_2_TEXT"] = "Il micromenu può attenuarsi come le barre delle azioni: imposta Opacità attenuata o Mostra solo al passaggio del mouse nella sua finestra della modalità modifica, e collegalo alle barre attenuate."
+L["WN72_3_TITLE"] = "Finestra della gilda"
+L["WN72_3_TEXT"] = "Aggiungi membro, Informazioni gilda e il menu del clic destro su un membro passano dai pulsanti e dal menu del gioco stesso, così invitare, modificare le informazioni, rimuovere, promuovere e retrocedere funzionano."
+L["WN72_4_TITLE"] = "Scheda laterale Chi"
+L["WN72_4_TEXT"] = "La scheda laterale Chi della ricerca gruppi è nascosta per tutti. Disattiva Nascondi scheda laterale Chi nelle opzioni (/fcui), sotto Sociale, per riaverla."
+L["WN72_5_TITLE"] = "Dimensione delle targhette"
+L["WN72_5_TEXT"] = "Stessa dimensione vicino e lontano tiene le targhette a una sola dimensione come in Classic Era, ora tramite le impostazioni del gioco e salvata per personaggio, fuori dai profili. Attivala nelle opzioni (/fcui), sotto Targhette."
+L["WN72_6_TITLE"] = "Correzioni"
+L["WN72_6_TEXT"] = "Un nome lungo di gilda termina con i puntini prima della colonna della zona, la finestra dell'addestratore scorre una descrizione lunga, Ctrl+clic su una ricompensa di missione apre il camerino, i pulsanti della barra dei totem hanno l'aspetto classico, il numero del gruppo di una missione resta anche senza i livelli delle missioni, e gli elenchi di What's Training stanno su una pagina del libro degli incantesimi con una scheda Professioni accanto."
 L["WN71_1_TITLE"] = "La barra dei totem resta al suo posto"
 L["WN71_1_TEXT"] = "Una barra agganciata a una barra delle azioni in modalità modifica, come la barra dei totem dello sciamano, mantiene il suo posto alla chiusura della modalità modifica e dopo un ricaricamento."
 L["WN71_2_TITLE"] = "Vassoi dei pulsanti della minimappa"

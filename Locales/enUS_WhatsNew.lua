@@ -2,6 +2,18 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN72_1_TITLE"] = "Dressing room"
+L["WN72_1_TEXT"] = "The dressing room opens at the 1.x size. For the bigger room of later clients, turn on Large dressing room in the options (/fcui), under All windows; our windows make room beside it for its side panels."
+L["WN72_2_TITLE"] = "Micro menu fade"
+L["WN72_2_TEXT"] = "The micro menu can fade like the action bars: set Faded Opacity or Show Only On Hover in its edit mode dialog, and link it with the faded bars."
+L["WN72_3_TITLE"] = "Guild window"
+L["WN72_3_TEXT"] = "Add Member, Guild Information and the member right-click menu go through the game's own buttons and menu, so inviting, editing the info, removing, promoting and demoting work."
+L["WN72_4_TITLE"] = "Who side tab"
+L["WN72_4_TEXT"] = "The group finder's Who side tab is hidden for everyone. Turn off Hide Who side tab in the options (/fcui), under Social, to have it back."
+L["WN72_5_TITLE"] = "Nameplate size"
+L["WN72_5_TEXT"] = "Same size near and far keeps plates one size as in Classic Era, now through the game's own settings and kept per character, outside profiles. Turn it on in the options (/fcui), under Nameplates."
+L["WN72_6_TITLE"] = "Fixes"
+L["WN72_6_TEXT"] = "A long guild name ends in dots before the zone column, the trainer window scrolls a long description, Ctrl-click on a quest reward opens the dressing room, the totem bar's buttons wear the classic look, a quest's party count stays when quest levels are off, and What's Training's lists sit on a page of the spellbook with a Professions tab beside it."
 L["WN71_1_TITLE"] = "Totem bar stays put"
 L["WN71_1_TEXT"] = "A bar snapped to an action bar in edit mode, like the shaman's totem bar, keeps its spot once edit mode closes and after a reload."
 L["WN71_2_TITLE"] = "Minimap button trays"

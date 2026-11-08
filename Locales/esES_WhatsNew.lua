@@ -3,6 +3,18 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN72_1_TITLE"] = "Probador"
+L["WN72_1_TEXT"] = "El probador se abre al tamaño de 1.x. Para el probador más grande de los clientes posteriores, activa Probador grande en las opciones (/fcui), en Todas las ventanas; nuestras ventanas le dejan sitio al lado para sus paneles laterales."
+L["WN72_2_TITLE"] = "Atenuar el micromenú"
+L["WN72_2_TEXT"] = "El micromenú puede atenuarse como las barras de acción: ajusta Opacidad atenuada o Mostrar solo al pasar el ratón en su diálogo del modo de edición, y enlázalo con las barras atenuadas."
+L["WN72_3_TITLE"] = "Ventana de hermandad"
+L["WN72_3_TEXT"] = "Añadir miembro, Información de hermandad y el menú de clic derecho de un miembro pasan por los botones y el menú propios del juego, así que invitar, editar la información, expulsar, ascender y degradar funcionan."
+L["WN72_4_TITLE"] = "Pestaña lateral Quién"
+L["WN72_4_TEXT"] = "La pestaña lateral Quién del buscador de grupos está oculta para todos. Desactiva Ocultar pestaña lateral Quién en las opciones (/fcui), en Social, para recuperarla."
+L["WN72_5_TITLE"] = "Tamaño de las placas de nombre"
+L["WN72_5_TEXT"] = "Mismo tamaño cerca y lejos mantiene las placas a un solo tamaño como en Classic Era, ahora mediante los ajustes propios del juego y guardado por personaje, fuera de los perfiles. Actívalo en las opciones (/fcui), en Placas de nombre."
+L["WN72_6_TITLE"] = "Correcciones"
+L["WN72_6_TEXT"] = "Un nombre largo de hermandad termina en puntos antes de la columna de zona, la ventana del instructor desplaza una descripción larga, Ctrl+clic en una recompensa de misión abre el probador, los botones de la barra de tótems llevan el aspecto clásico, el número de grupo de una misión se mantiene con los niveles de misión desactivados, y las listas de What's Training están en una página del libro de hechizos con una pestaña Profesiones al lado."
 L["WN71_1_TITLE"] = "La barra de tótems se queda en su sitio"
 L["WN71_1_TEXT"] = "Una barra ajustada a una barra de acción en el modo de edición, como la barra de tótems del chamán, conserva su sitio al cerrar el modo de edición y tras recargar."
 L["WN71_2_TITLE"] = "Bandejas de botones del minimapa"

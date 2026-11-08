@@ -3,6 +3,18 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN72_1_TITLE"] = "Anprobe"
+L["WN72_1_TEXT"] = "Die Anprobe öffnet in der Größe von 1.x. Für die größere Anprobe späterer Clients schalte Große Anprobe in den Optionen (/fcui) unter Alle Fenster ein; unsere Fenster machen daneben Platz für ihre Seitenleisten."
+L["WN72_2_TITLE"] = "Mikromenü ausblenden"
+L["WN72_2_TEXT"] = "Das Mikromenü kann wie die Aktionsleisten verblassen: Verblasste Deckkraft oder Nur bei Mausberührung in seinem Bearbeitungsmodus-Dialog setzen und es mit den verblassten Leisten verknüpfen."
+L["WN72_3_TITLE"] = "Gildenfenster"
+L["WN72_3_TEXT"] = "Mitglied hinzufügen, Gildeninformation und das Rechtsklick-Menü eines Mitglieds laufen über die spieleigenen Buttons und Menüs, sodass Einladen, Bearbeiten der Information, Entfernen, Befördern und Degradieren funktionieren."
+L["WN72_4_TITLE"] = "Seitenreiter Wer"
+L["WN72_4_TEXT"] = "Der Seitenreiter Wer der Gruppensuche ist für alle ausgeblendet. Schalte Seitenreiter Wer ausblenden in den Optionen (/fcui) unter Soziales aus, um ihn zurückzuholen."
+L["WN72_5_TITLE"] = "Größe der Namensplaketten"
+L["WN72_5_TEXT"] = "Gleiche Größe nah und fern hält die Plaketten auf einer Größe wie in Classic Era, jetzt über die spieleigenen Einstellungen und pro Charakter gespeichert, außerhalb der Profile. Schalte es in den Optionen (/fcui) unter Namensplaketten ein."
+L["WN72_6_TITLE"] = "Korrekturen"
+L["WN72_6_TEXT"] = "Ein langer Gildenname endet mit Punkten vor der Zonenspalte, das Lehrerfenster scrollt eine lange Beschreibung, Strg-Klick auf eine Questbelohnung öffnet die Anprobe, die Buttons der Totemleiste tragen den klassischen Look, die Gruppenzahl einer Quest bleibt auch ohne Queststufen, und die Listen von What's Training liegen auf einer Seite des Zauberbuchs mit einem Reiter Berufe daneben."
 L["WN71_1_TITLE"] = "Totemleiste bleibt an Ort und Stelle"
 L["WN71_1_TEXT"] = "Eine im Bearbeitungsmodus an eine Aktionsleiste geheftete Leiste, etwa die Totemleiste des Schamanen, behält ihren Platz nach dem Bearbeitungsmodus und nach einem Neuladen."
 L["WN71_2_TITLE"] = "Minimap-Button-Leisten"

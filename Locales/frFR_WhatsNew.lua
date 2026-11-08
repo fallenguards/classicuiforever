@@ -3,6 +3,18 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN72_1_TITLE"] = "Cabine d'essayage"
+L["WN72_1_TEXT"] = "La cabine d'essayage s'ouvre à la taille de 1.x. Pour la cabine plus grande des clients ultérieurs, activez Grande cabine d'essayage dans les options (/fcui), sous Toutes les fenêtres ; nos fenêtres lui laissent la place à côté pour ses panneaux latéraux."
+L["WN72_2_TITLE"] = "Fondu du micromenu"
+L["WN72_2_TEXT"] = "Le micromenu peut s'estomper comme les barres d'action : réglez Opacité estompée ou Afficher seulement au survol dans sa fenêtre du mode d'édition, et liez-le aux barres estompées."
+L["WN72_3_TITLE"] = "Fenêtre de guilde"
+L["WN72_3_TEXT"] = "Ajouter un membre, Informations de guilde et le menu du clic droit sur un membre passent par les boutons et le menu du jeu lui-même, donc inviter, modifier les informations, renvoyer, promouvoir et rétrograder fonctionnent."
+L["WN72_4_TITLE"] = "Onglet latéral Qui"
+L["WN72_4_TEXT"] = "L'onglet latéral Qui de la recherche de groupe est masqué pour tous. Désactivez Masquer l'onglet latéral Qui dans les options (/fcui), sous Social, pour le retrouver."
+L["WN72_5_TITLE"] = "Taille des plaques de nom"
+L["WN72_5_TEXT"] = "Même taille de près et de loin garde les plaques à une seule taille comme dans Classic Era, désormais via les réglages du jeu et gardée par personnage, hors profils. Activez-la dans les options (/fcui), sous Plaques de nom."
+L["WN72_6_TITLE"] = "Corrections"
+L["WN72_6_TEXT"] = "Un long nom de guilde se termine par des points avant la colonne de zone, la fenêtre du maître fait défiler une longue description, Ctrl-clic sur une récompense de quête ouvre la cabine d'essayage, les boutons de la barre de totems portent l'aspect classique, le nombre du groupe d'une quête reste sans les niveaux de quête, et les listes de What's Training tiennent sur une page du grimoire avec un onglet Métiers à côté."
 L["WN71_1_TITLE"] = "La barre de totems reste en place"
 L["WN71_1_TEXT"] = "Une barre accrochée à une barre d'action en mode édition, comme la barre de totems du chaman, garde sa place à la fermeture du mode édition et après un rechargement."
 L["WN71_2_TITLE"] = "Barres de boutons de la minicarte"
