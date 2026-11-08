@@ -6,6 +6,9 @@ local FadeKeys, KEYS = ns.FadeKeys, ns.KEYS
 
 local KNOB_H = 24
 local KNOB_COORDS = { 0.2, 0.8, 0.125, 0.875 }
+-- The knob's crop carries empty rows at both ends and its picture fades in over two more: the arrows stand over the
+-- slider's ends up to the same half-tone row at each end, so the knob meets them.
+local KNOB_CLEAR_TOP, KNOB_CLEAR_FOOT = 3, 3
 local KNOB = { layer = "ARTWORK", w = 18, h = KNOB_H, coords = KNOB_COORDS }
 local OWN_KNOB = { own = "knob", layer = "ARTWORK", w = 18, h = KNOB_H, coords = KNOB_COORDS }
 -- The arrow sheets are 32x32 with the 16x16 arrow in the middle.
@@ -27,16 +30,16 @@ function ns.ClassicScrollBar(parent, anchorTo, onValue)
     bar:SetMinMaxValues(0, 0)
     bar:SetValue(0)
 
-    local function Arrow(kind, point, relPoint)
+    local function Arrow(kind, point, relPoint, y)
         local button = ns.NewFrame("Button", nil, bar)
         button:SetSize(16, 16)
-        button:SetPoint(point, bar, relPoint, 0, 0)
+        button:SetPoint(point, bar, relPoint, 0, y)
         local key = "scroll" .. kind .. "Button"
         ns.DressStates(button, key .. "Up", key .. "Down", key .. "Disabled", key .. "Highlight", ARROW)
         return button
     end
-    bar.up = Arrow("Up", "BOTTOM", "TOP")
-    bar.down = Arrow("Down", "TOP", "BOTTOM")
+    bar.up = Arrow("Up", "BOTTOM", "TOP", -KNOB_CLEAR_TOP)
+    bar.down = Arrow("Down", "TOP", "BOTTOM", KNOB_CLEAR_FOOT)
     bar.up:SetScript("OnClick", function() bar:SetValue(bar:GetValue() - bar.step) PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON) end)
     bar.down:SetScript("OnClick", function() bar:SetValue(bar:GetValue() + bar.step) PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON) end)
     bar.step = 1
