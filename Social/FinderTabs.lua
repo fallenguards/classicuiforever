@@ -117,7 +117,11 @@ local function SyncCatchers()
     local up = finder:IsShown()
     local micro = MicroHost(finder, up)
     local own = S.FinderOnOwnWho()
-    for _, side in ipairs(finderTabs) do ns.SetShownIf(side, not own) end
+    local whoHidden = FinderWhoHidden()
+    for _, side in ipairs(finderTabs) do ns.SetShownIf(side, not own and not (side.index == nil and whoHidden)) end
+    -- Hide Who side tab also covers the client's own Who page tab, which stands at its place with our who list on.
+    local clientWho = Catcher(WHO_PAGE)
+    if clientWho and not lent[WHO_PAGE] then ns.SetShownIf(clientWho, not (whoHidden and not S.FinderWhoOwn())) end
     for index = 1, #CATCH_KEYS do
         local host
         if index == WHO_PAGE then
@@ -325,12 +329,13 @@ ns.OnToggle(function(key)
     end
 end)
 
--- dbVersion 28: an install from before keeps the finder's Who side tab.
-function ns.KeepFinderWho()
+-- dbVersion 35: the finder's Who side tab hidden for every install (dbVersion 28 had kept it for installs from before);
+-- Hide Who side tab under Social turns it back.
+function ns.HideFinderWhoNow()
     local db = ns.db
-    if db.hideFinderWho == nil then db.hideFinderWho = false end
+    db.hideFinderWho = true
     for _, shot in pairs(type(db.profiles) == "table" and db.profiles or {}) do
-        if type(shot) == "table" and shot.hideFinderWho == nil then shot.hideFinderWho = false end
+        if type(shot) == "table" then shot.hideFinderWho = nil end
     end
-    db.dbVersion = 28
+    db.dbVersion = 35
 end

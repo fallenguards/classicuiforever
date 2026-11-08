@@ -551,13 +551,13 @@ local function Migrate(saved)
     if saved < 25 then ns.KeepLootRollOff() end
     if saved < 26 then ns.DropWindowsSwitch() end
     if saved < 27 then ns.KeepSideBarSpot() end
-    if saved < 28 then ns.KeepFinderWho() end
     if saved < 29 then ns.SplitThemeParts() end
     if saved < 30 then ns.ShopOffRow() end
     if saved < 31 then ns.PaneShadeMiddle() end
     if saved < 32 then ns.OneKeyRingArtRow() end
     if saved < 33 then ns.PaneOnPaper() end
     if saved < 34 then ns.ProfTabsHidden() end
+    if saved < 35 then ns.HideFinderWhoNow() end
 end
 
 -- Our first frame: db loads and the post-combat pass runs before any other frame of ours sees the event.

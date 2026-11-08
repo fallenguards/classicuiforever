@@ -71,7 +71,7 @@ return {
     damageFlash = false,
     damageMeter = true,
     damageNumbersRepaired = false,
-    dbVersion = 34,
+    dbVersion = 35,
     druidMana = true,
     druidManaGlowAround = true,
     druidManaGlowBehind = false,
