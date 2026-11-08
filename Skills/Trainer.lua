@@ -90,6 +90,44 @@ end
 
 local UpdateDetail
 
+-- Era's detail scrolls: a long description runs past the pane, and the bar on the pane's right edge, like the list's,
+-- shows only then. The content is as tall as the text; a line is the wheel's step.
+local DETAIL_TEXT_TOP, DETAIL_LINE = 62, 14
+local function FitDetail()
+    local detail, scroll = panel.detail, panel.detailScroll
+    if not scroll then return end
+    local room = scroll:GetHeight() or 0
+    detail:SetWidth(scroll:GetWidth() or 1)
+    local bottom = DETAIL_TEXT_TOP + (detail.cost:GetStringHeight() or 0) + 6 + (detail.text:GetStringHeight() or 0) + 8
+    local height = math.max(room, bottom)
+    detail:SetHeight(height)
+    panel.detailBar:SetRange(height - room, DETAIL_LINE)
+end
+
+-- The detail pane runs to the window's edge and under the foot: the scroll stops short of both, its bar in the list
+-- bar's column (the list pane ends panel.listRight in from the edge), above the foot's buttons.
+local DETAIL_FOOT = 17
+local function DetailScroll()
+    local box = panel.detail
+    local scroll = ns.NewFrame("ScrollFrame", nil, box)
+    scroll:SetPoint("TOPLEFT", box, "TOPLEFT", 0, -4)
+    scroll:SetPoint("BOTTOMRIGHT", box, "BOTTOMRIGHT", panel.listRight - 14, DETAIL_FOOT)
+    local content = ns.NewFrame("Frame", nil, scroll)
+    content:SetSize(1, 1)
+    scroll:SetScrollChild(content)
+    local bar = ns.ShellScrollBar(panel, scroll, function(value) scroll:SetVerticalScroll(value) end)
+    bar.hideWhenIdle = true
+    bar:ClearAllPoints()
+    bar:SetPoint("TOPLEFT", panel.detailBox, "TOPRIGHT", panel.listRight - 9, -27)
+    bar:SetPoint("BOTTOMLEFT", panel.detailBox, "BOTTOMRIGHT", panel.listRight - 9, DETAIL_FOOT + 2)
+    bar:SetFrameLevel(panel.detailBox:GetFrameLevel() + 6)
+    scroll:EnableMouseWheel(true)
+    scroll:SetScript("OnMouseWheel", function(_, delta) bar:SetValue(bar:GetValue() - delta * DETAIL_LINE) end)
+    scroll:SetScript("OnSizeChanged", FitDetail)
+    panel.detailScroll, panel.detailBar, panel.detail = scroll, bar, content
+    return content
+end
+
 -- Scroll column only when the list overflows, as Era's
 local function FitList()
     local over = math.max(0, #lines - LIST_ROWS)
@@ -373,6 +411,7 @@ UpdateDetail = function()
         detail.requires:SetText("")
         detail.cost:SetText("")
         detail.text:SetText("")
+        FitDetail()
         panel.train:Disable()
         return
     end
@@ -397,6 +436,12 @@ UpdateDetail = function()
         if ok and type(text) == "string" then words = text end
     end
     detail.text:SetText(words)
+    -- Another service: read from its top.
+    if detail.shownIndex ~= line.index then
+        detail.shownIndex = line.index
+        panel.detailBar:SetValue(0)
+    end
+    FitDetail()
     -- A new profession with both slots taken: Train grays out, as Era's and the game's own do.
     local noSlot = profession and GetProfessions and select(2, GetProfessions()) ~= nil
     panel.train:SetEnabled(line.kind == "available" and cost <= purse and not noSlot)
@@ -534,13 +579,13 @@ local function Build()
         panel.filterList:Toggle(self)
     end)
 
-    -- The chosen service.
-    local detail = panel.detail
+    -- The chosen service, in its scroll.
+    local detail = DetailScroll()
     detail.iconButton = ns.ShellDetailHeader(detail, Service_OnEnter)
     detail.sub = detail:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
     detail.sub:SetPoint("LEFT", detail.name, "RIGHT", 4, 0)
     detail.cost = detail:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
-    detail.cost:SetPoint("TOPLEFT", detail, "TOPLEFT", 21, -62)
+    detail.cost:SetPoint("TOPLEFT", detail, "TOPLEFT", 21, -DETAIL_TEXT_TOP)
     detail.cost:SetJustifyH("LEFT")
     detail.text = detail:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
     detail.text:SetPoint("TOPLEFT", detail.cost, "BOTTOMLEFT", 0, -6)
