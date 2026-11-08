@@ -197,3 +197,18 @@ end
 
 -- For the dev addon's fight probe: the last fight lay's input, answer and windows.
 function ns.WindowFightState() return fight, laidX, laidFrames end
+
+-- A closed window's home before a fight (UI/Windows.lua HomeClosedWindows) counts only the game's row windows its opening
+-- leaves up: the map (LOOSE_PANELS) and, by Era's rule, pushable 0 on pushable 0 close as it opens (HideClientPanels).
+local homeBlocks = {}
+function ns.HomeBlocks(frame, blocks)
+    local P = ns.windowParts
+    wipe(homeBlocks)
+    for _, block in ipairs(blocks) do
+        local name = block[3]
+        local panel = _G[name]
+        local stays = P.LeaveOpen[name] or P.Beside[name] or not (panel and (panel == _G.WorldMapFrame or P.Replaces(frame, panel)))
+        if stays then homeBlocks[#homeBlocks + 1] = block end
+    end
+    return homeBlocks
+end

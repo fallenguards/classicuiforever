@@ -543,29 +543,26 @@ function ns.ReturnClassicWindow(frame)
     return true
 end
 
--- Out of a fight, closed windows wait where they would open next: a book opened in a fight cannot move then.
+-- Out of a fight, closed windows wait where they would open next: a book opened in a fight cannot move then. The map and
+-- the game's windows its opening closes take no room there (UI/WindowPanels.lua ns.HomeBlocks).
 local function HomeClosedWindows()
     if InCombatLockdown() then return end
-    local y = Solve(true)
+    local y, blocks = Solve(true), row.game
     local n = #order + 1
     for frame in pairs(classicWindows) do
         if not frame:IsShown() and not Moved(frame) then
             Describe(n, frame).held = nil
+            row.game = ns.HomeBlocks(frame, blocks)
             ns.SolveWindowRow(row, laid)
             if laid.x[n] then PlaceAt(frame, laid.x[n], y) end
         end
     end
-    row.ours[n] = nil
+    row.game, row.ours[n] = blocks, nil
 end
 -- The last moment before combat anything may move, and the first after, to re-place what it held.
-local HOME_EVENTS = { "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED" }
-ns.EventFrame(HOME_EVENTS, function(_, event)
-    if event == "PLAYER_REGEN_DISABLED" then
-        HomeClosedWindows()
-    else
-        PlaceClassicWindows()
-        HomeClosedWindows()
-    end
+ns.EventFrame({ "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED" }, function(_, event)
+    if event == "PLAYER_REGEN_ENABLED" then PlaceClassicWindows() end
+    HomeClosedWindows()
 end)
 
 -- Room past the game's windows for one of ours opened now, and whether the game's spell window is in that row.
@@ -597,6 +594,7 @@ end
 
 -- For the fight lay of the game's windows our code opened (UI/WindowPanels.lua), and a pass on demand.
 ns.windowParts = { Seen = Seen, BlockSpan = BlockSpan, Locked = Locked, SheetGap = SheetGap, ERA_X = ERA_X, ERA_Y = ERA_Y,
+    Replaces = Replaces, LeaveOpen = LEAVE_OPEN, Beside = BESIDE,
     StandAt = function(...) return StandAt(...) end, TopLeft = function(...) return SecureTopLeft(...) end }
 function ns.LayWindowsNow() PlaceClassicWindows() end
 
