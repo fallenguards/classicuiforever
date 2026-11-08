@@ -277,6 +277,13 @@ local function DressListing(page, first)
             SmallActivityFonts()
         end
     end
+    -- The not-the-leader note's view in the list box too: on the game's own corner it stood 16 right and 12 down of
+    -- the box, its text past the edge.
+    local locked = page.LockedView
+    if locked then
+        ns.SetTwoPointsIf(locked, "TOPLEFT", Origin(), "TOPLEFT", LIST_X, -LIST_Y,
+            "BOTTOMRIGHT", Origin(), "TOPLEFT", LIST_X + LIST_W, -(LIST_Y + LIST_H))
+    end
 end
 
 -- The shared parent's close button and portrait, in the sheet's socket and ring.
