@@ -34,6 +34,19 @@ local function Hook(piece, info, target)
     ns.SetPointOnce(piece, info.point, target, info.relativePoint, info.offsetX / scale, info.offsetY / scale)
 end
 
+-- A bar as the band draws it (its slots' box, B.ColumnBox) on a frame of ours, for the client's own point math: outside
+-- edit mode the game holds the bar's frame at its spot (B.GameHolds), and a snap measured there sat a bar's width off (#263).
+local measure
+local function Drawn(target)
+    if not (target.actionButtons and B.ColumnBox) then return target end
+    local left, right, top, bottom = B.ColumnBox(target)
+    if not left then return target end
+    measure = measure or ns.NewFrame("Frame", nil, UIParent)
+    ns.SetSizeIf(measure, right - left, top - bottom)
+    ns.SetPointIf(measure, "BOTTOMLEFT", UIParent, "BOTTOMLEFT", left, bottom)
+    return measure
+end
+
 -- End of a band pass, bars on the band: each such piece onto the screen at the spot its snap gives there.
 function B.UnhookPieces()
     if InCombatLockdown() or EditModeLive() then return end
@@ -42,7 +55,7 @@ function B.UnhookPieces()
     for _, piece in ipairs(mgr and mgr.registeredSystemFrames or NONE) do
         local info, target = SnapOnBand(piece)
         if info then
-            Hook(piece, info, target)
+            Hook(piece, info, Drawn(target))
             local left, bottom = ns.Safe(piece:GetLeft()), ns.Safe(piece:GetBottom())
             if left and bottom then
                 ns.SetPointOnce(piece, "BOTTOMLEFT", UIParent, "BOTTOMLEFT", left, bottom)
