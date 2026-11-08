@@ -1964,7 +1964,7 @@ NEWS_TURN_ON = re.compile(r"\bturn (?:it |them )?on\b", re.I)
 def news_hits():
     """The newest What's New: an entry naming an off-by-default option says to turn it on in the options."""
     hits = []
-    welcome, defaults, toggles = "Options/Welcome.lua", "Core/Defaults.lua", "Options/Toggles.lua"
+    welcome, defaults, toggles = "Options/WhatsNewList.lua", "Core/Defaults.lua", "Options/Toggles.lua"
     if not all(os.path.isfile(f) for f in (welcome, defaults, toggles)):
         return hits
     with open(welcome, encoding="utf-8") as fh:
@@ -2020,7 +2020,7 @@ def tagged(version):
 def issue_hits():
     """No issue number in what players read: the newest What's New in every language and the changelog's newest entry."""
     hits = []
-    welcome = "Options/Welcome.lua"
+    welcome = "Options/WhatsNewList.lua"
     newest = None
     if os.path.isfile(welcome):
         with open(welcome, encoding="utf-8") as fh:

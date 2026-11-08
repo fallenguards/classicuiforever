@@ -304,6 +304,7 @@ Options\HelpPanes.lua
 Options\PieceWindow.lua
 Options\GameMenu.lua
 Options\SettingsPanel.lua
+Options\WhatsNewList.lua
 Options\Welcome.lua
 Options\LookPick.lua
 Options\Status.lua

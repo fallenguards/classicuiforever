@@ -1,6 +1,6 @@
--- Offline test under Lua 5.4: What's New is per client (Options/Welcome.lua). An entry marked on = "forever" or
--- on = "retail" shows on that client alone, and a version with no entry for a client is skipped whole there: no chat
--- line, no section. The list is cut out of the file and run with the file's own filter.
+-- Offline test under Lua 5.4: What's New is per client (Options/WhatsNewList.lua, filtered in Options/Welcome.lua).
+-- An entry marked on = "forever" or on = "retail" shows on that client alone, and a version with no entry for a
+-- client is skipped whole there: no chat line, no section. The list is cut out of its file and run with the filter.
 -- Run from the addon root: lua tools/tests/whats_new_test.lua (CI runs every tools/tests/*_test.lua).
 -- luacheck: std lua54
 -- luacheck: ignore 111 112 113 121 122 212
@@ -16,14 +16,19 @@ local function Check(ok, what)
     end
 end
 
-local handle = assert(io.open(ROOT .. "/Options/Welcome.lua", "r"))
-local source = handle:read("a")
-handle:close()
+local function Source(path)
+    local handle = assert(io.open(ROOT .. path, "r"))
+    local text = handle:read("a")
+    handle:close()
+    return text
+end
+local list, welcome = Source("/Options/WhatsNewList.lua"), Source("/Options/Welcome.lua")
 
--- The list and the filter after it, as the file has them.
-local from = assert(source:find("local WHATSNEW = {", 1, true), "the list is in the file")
-local to = assert(source:find("local GOLD, GREY", from, true), "the filter ends before the colours")
-local chunk = source:sub(from, to - 1)
+-- The list from its file, then the filter after the list's handle, as the files have them.
+local listFrom = assert(list:find("ns.WHATSNEW = {", 1, true), "the list is in its file")
+local from = assert(welcome:find("local WHATSNEW = ns.WHATSNEW", 1, true), "the filter takes the list")
+local to = assert(welcome:find("local GOLD, GREY", from, true), "the filter ends before the colours")
+local chunk = list:sub(listFrom) .. "\n" .. welcome:sub(from, to - 1)
 
 local function Load(forever)
     local L = setmetatable({}, { __index = function(_, key) return key end })
