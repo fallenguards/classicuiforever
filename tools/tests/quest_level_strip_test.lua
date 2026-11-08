@@ -27,12 +27,18 @@ assert(loadfile(ROOT .. "/Quest/QuestLogData.lua"))("ClassicUIForever", ns)
 local function Text(s)
     return { s = s, GetText = function(self) return self.s end, SetText = function(self, v) self.s = v end }
 end
-local function Stripped(s)
+local function Stripped(s, level)
     local text = Text(s)
-    ns.StripQuestLevel(text)
+    ns.StripQuestLevel(text, level)
     return text.s
 end
 
+-- Party members on the quest: the game puts their count first, and it stays; only the level comes off.
+Check(Stripped("[2] [17] Wolves", 17) == "[2] Wolves", "the party count stays, the level comes off")
+Check(Stripped("[2] [17+] Elite Quest", 17) == "[2] Elite Quest", "the party count stays before an elite level")
+Check(Stripped("|cff40c040[2] [17] Wolves|r", 17) == "|cff40c040[2] Wolves|r", "the party count stays inside a colour")
+Check(Stripped("[2] Wolves", 17) == "[2] Wolves", "a lone party count is not the level")
+Check(Stripped("[17] Wolves", 17) == "Wolves", "the quest's own level comes off")
 Check(Stripped("[17] The Defias Brotherhood") == "The Defias Brotherhood", "a plain prefix comes off")
 Check(Stripped("[24+] Elite Quest (Elite)") == "Elite Quest (Elite)", "an elite prefix comes off")
 Check(Stripped("|cff40c040[12] Wolves|r") == "|cff40c040Wolves|r", "inside a difficulty colour the colour stays")

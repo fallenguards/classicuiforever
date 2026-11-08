@@ -250,7 +250,8 @@ local function SkinTitle(button)
         -- The client restores its own color on leave.
         button:HookScript("OnLeave", ColorTitle)
     end
-    ns.StripQuestLevel(button.Text)
+    local info = button.questLogIndex and C_QuestLog.GetInfo(button.questLogIndex)
+    ns.StripQuestLevel(button.Text, info and (info.difficultyLevel or info.level))
     ColorTitle(button)
 end
 

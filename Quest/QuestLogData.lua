@@ -80,14 +80,20 @@ end
 
 -- Forever's titles carry the game's level prefix whatever Show Quest Levels says (build 70291, #140): taken off
 -- while it is off, read live (the map's filter rebuilds its list before our copy of the setting hears the change).
--- "[17] " or "[17+] ", inside a color code too.
-function ns.StripQuestLevel(text)
+-- "[17] " or "[17+] ", in a color code, after the party count "[2] " the game puts first (kept); level: the quest's own.
+function ns.StripQuestLevel(text, level)
     if not text or not ns.OnForever() or tostring(ns.GetCVar("showQuestLevel")) == "1" then return end
     local title = text:GetText()
     if ns.IsSecret(title) or type(title) ~= "string" then return end
-    local bare = title:gsub("^(|c%x%x%x%x%x%x%x%x)%[%d+%+?%] ", "%1", 1)
-    if bare == title then bare = title:gsub("^%[%d+%+?%] ", "", 1) end
-    if bare ~= title then text:SetText(bare) end
+    local lead, rest = title:match("^(|c%x%x%x%x%x%x%x%x)(.*)$")
+    if not lead then lead, rest = "", title end
+    local party, number, tail = rest:match("^(%[%d+%] )%[(%d+)%+?%] (.*)$")
+    if not party then
+        party = ""
+        number, tail = rest:match("^%[(%d+)%+?%] (.*)$")
+    end
+    if not number or (level and tonumber(number) ~= tonumber(level)) then return end
+    text:SetText(lead .. party .. tail)
 end
 
 -- Headers: the client's header colour or grey; quests: the 1.x difficulty colour.
