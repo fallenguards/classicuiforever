@@ -228,6 +228,27 @@ local function SmallFont(button)
     if label then ns.SetPointOnce(label, "CENTER", button, "CENTER", 0, 0) end
 end
 
+-- Addons may not invite to the guild or set its info, and the client's dialog opened by our call is refused at Accept:
+-- a secure pad over our button presses the client's own (UI/SecurePad.lua), once its window exists, for those who may.
+local CLIENT_PADS = {
+    { key = "add", may = function() return CanGuildInvite and CanGuildInvite() == true end,
+      theirs = function() return CommunitiesFrame and CommunitiesFrame.InviteButton end },
+    { key = "info", may = function() return CanEditGuildInfo and CanEditGuildInfo() == true end,
+      theirs = function()
+          local details = CommunitiesFrame and CommunitiesFrame.GuildDetailsFrame
+          return details and details.Info and details.Info.EditDetailsButton
+      end },
+}
+local function ClientPads(panel)
+    for _, spec in ipairs(CLIENT_PADS) do
+        local theirs = not spec.padded and spec.theirs()
+        if theirs then
+            spec.padded = true
+            ns.MapPad(panel[spec.key], "HIGH", nil, theirs, function() return G.active and spec.may() end)
+        end
+    end
+end
+
 function G.Build()
     local host = FriendsFrame
     if not host then return end
@@ -261,17 +282,11 @@ function G.Build()
         Refresh()
     end)
 
-    -- The foot: the three old buttons.
+    -- The foot: the three old buttons. Add Member acts through its pad alone (ClientPads below).
     panel.add = ns.PanelButton(panel, ADDMEMBER or "Add Member", GUILD_ADD_MEMBER_BUTTON_WIDTH)
     panel.add:SetPoint("BOTTOMLEFT", host, "BOTTOMLEFT", GUILD_ADD_MEMBER_BUTTON_X, GUILD_BUTTONS_Y)
     SmallFont(panel.add)
-    panel.add:SetScript("OnClick", function()
-        -- The client's dialog errors unless told the guild's club.
-        if StaticPopup_Show then
-            local clubId = C_Club and C_Club.GetGuildClubId and C_Club.GetGuildClubId()
-            StaticPopup_Show("ADD_GUILDMEMBER", nil, nil, { clubId = clubId })
-        end
-    end)
+    ns.Sched.Attach(panel, { name = "guild.clientPads", every = 0.5, fn = function() ClientPads(panel) end })
 
     panel.control = ns.PanelButton(panel, GUILDCONTROL or "Guild Control", GUILD_CONTROL_BUTTON_WIDTH)
     panel.control:SetPoint("BOTTOMLEFT", host, "BOTTOMLEFT", GUILD_CONTROL_BUTTON_X, GUILD_BUTTONS_Y)
