@@ -14,8 +14,9 @@ local EXTRA = { "themeColor", "themeDarkness", "barScale", "microScale", "microW
     "fadeLinkBar1", "fadeLinkBar2", "fadeLinkBar3", "fadeLinkBar4", "fadeLinkBar5", "fadeLinkBar6", "fadeLinkBar7",
     "fadeLinkBar8", "fadeLinkStance", "fadeLinkPet" }
 -- The English text picks (read before the profile loads): account-wide.
+-- platesOneSize mirrors two game settings the game keeps per character: a profile would write them on every one.
 local SKIP = { englishSettings = true, englishNews = true, englishMessages = true,
-    englishWindows = true }
+    englishWindows = true, platesOneSize = true }
 ns.PROFILE_DEFAULT = DEFAULT
 
 local keys
