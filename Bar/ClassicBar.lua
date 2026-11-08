@@ -117,8 +117,10 @@ local function ReadShape()
         B.bagsInHand = false
     end
     -- Back on the bar by any route (Reset To Default Position keeps their Size): the size they return with reads as
-    -- socket size, without a write; an oversized row was squeezed into the sockets.
-    if shape.bagsReal and bagsWereOut and BagsBar and math.abs((BagsBar:GetScale() or 1) - 1) > 0.001 then
+    -- socket size, without a write; an oversized row was squeezed into the sockets. A fresh save's first session with
+    -- the bags already on the bar (a reinstall on a layout holding a sized bag bar) takes the size it finds the same way.
+    if shape.bagsReal and (bagsWereOut or (ns.freshSettings and ns.db.bagsSnapScale == 0)) and BagsBar
+        and math.abs((BagsBar:GetScale() or 1) - 1) > 0.001 then
         ns.db.bagsSnapScale = BagsBar:GetScale() or 1
     end
     bagsWereOut = not shape.bagsReal
