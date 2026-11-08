@@ -41,9 +41,9 @@ local function TrackerHeaderClick(_, block, button)
     QuestDetailsOpened(block and block.id)
 end
 
-local function MicroClick()
-    ns.ToggleQuestLog()
-end
+-- A gamepad session keeps the game's own click on the button (the windowed map with its quest list beside it, our
+-- pane, Quest/QuestMapPane.lua): run from our click, its open taints the gamepad's focus state for the session.
+local function MicroClick() ns.ToggleQuestLog() end
 local TakeButton = ns.WindowMicro({ "QuestLogMicroButton" }, MicroClick)
 
 -- While the game's spell window leaves the log no room, the key's and the pad's macro close it first, in the player's
@@ -69,8 +69,9 @@ local function Init()
     -- Opened in a fight: the key's and the pad's secure click bind Escape to ours (UI/Escape.lua). The events live on
     -- a side frame: a frame with registrations can be refused by the secure environment.
     if ns.EscArmOnClick then ns.EscArmOnClick(bindButton, "questlog") end
+    -- Never in a gamepad session: the button stays the game's there (TakeButton), its click secure.
     if QuestLogMicroButton and ns.MapPad then
-        local pad = ns.MapPad(QuestLogMicroButton, nil, MicroClick, KeyMacro, function() return QL.active end)
+        local pad = ns.MapPad(QuestLogMicroButton, nil, MicroClick, KeyMacro, function() return QL.active and ns.padSession ~= true end)
         if pad and ns.EscArmOnClick then ns.EscArmOnClick(pad, "questlog") end
     end
     ns.EventFrame({ "UPDATE_BINDINGS", "PLAYER_REGEN_ENABLED", "PLAYER_ENTERING_WORLD" }, UpdateBinding)
@@ -88,8 +89,8 @@ end
 local function Apply()
     QL.active = true
     -- The button's own click opens the map's quest panel: ours stands in wherever the pad is not over it (a fight
-    -- moves the micro row and the pad cannot follow there).
-    TakeButton(true)
+    -- moves the micro row and the pad cannot follow there). A gamepad session leaves the button the game's.
+    TakeButton(ns.padSession ~= true)
     UpdateBinding()
 end
 
