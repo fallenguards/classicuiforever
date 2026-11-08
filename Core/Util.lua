@@ -93,9 +93,12 @@ function ns.GetCVarBool(name)
     return nil
 end
 
--- Missing or forbidden: may not be asked anything.
+-- Missing or forbidden: may not be asked anything. Some frames say they are not forbidden yet refuse addon code (the
+-- target's aura buttons, 12.x): the name read, guarded, tells.
 function ns.IsForbidden(object)
-    return not object or (object.IsForbidden and object:IsForbidden())
+    if not object then return true end
+    if object.IsForbidden and object:IsForbidden() then return true end
+    return object.GetName ~= nil and not pcall(object.GetName, object)
 end
 
 -- A texture the game locks against new art from addon code (forbidden aspect SetTexture: the rotating minimap's

@@ -27,8 +27,11 @@ local function AddonName(name)
     if type(name) ~= "string" or ns.IsSecret(name) or issecurevariable(name) then return false end
     return not (name:find("^ForeverClassicUI") or name:find("^ClassicUIForever"))
 end
+-- A frame refusing its name (a forbidden one, asked by a walk that did not ask first) is nobody's.
 function B.AddonFrame(frame)
-    return AddonName(frame.GetName and frame:GetName())
+    if not frame.GetName then return false end
+    local answered, name = pcall(frame.GetName, frame)
+    return answered and AddonName(name)
 end
 
 -- A subtree none of whose art the theme copies or tints, left out of the walks over the game's windows: another
