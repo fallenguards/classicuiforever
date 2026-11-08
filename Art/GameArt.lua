@@ -276,7 +276,7 @@ local ROOTS = {
     { "castBars", "PlayerCastingBarFrame", "PetCastingBarFrame", "TargetFrameSpellBar", "FocusFrameSpellBar" },
     { "mirrorTimers", "MirrorTimerContainer" },
     { "swingTimers", "SwingTimerMainHandFrame", "SwingTimerOffHandFrame", "SwingTimerRangedFrame" },
-    { "buttons", "StanceBar", "PetActionBar", "PossessActionBar" },
+    { "buttons", "StanceBar", "PetActionBar", "PossessActionBar", "MultiCastActionBarFrame" },
     { "questTracker", "ObjectiveTrackerFrame" },
     { "questMapPane", "QuestMapFrame" },
     { "groupFinder", "PVEFrame", "LFGParentFrame" },

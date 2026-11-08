@@ -2,9 +2,15 @@ local _, ns = ...
 
 -- 1.x slot art on every action button, watched against the client's repaints, handed back on restore.
 
--- Bars 1 to 8, then the stance, pet and possess rows: the game art tint leaves all of them to this skin (Art/GameArt.lua).
+-- Bars 1 to 8, the stance, pet and possess rows, then the totem bar: the game art tint leaves all of them to this skin
+-- (Art/GameArt.lua).
 local BAR_NAMES = { "MainActionBar", "MainMenuBar", "MultiBarBottomLeft", "MultiBarBottomRight", "MultiBarRight",
-    "MultiBarLeft", "MultiBar5", "MultiBar6", "MultiBar7", "StanceBar", "PetActionBar", "PossessActionBar" }
+    "MultiBarLeft", "MultiBar5", "MultiBar6", "MultiBar7", "StanceBar", "PetActionBar", "PossessActionBar",
+    "MultiCastActionBarFrame" }
+-- The totem bar's buttons with action button chrome: the summon and recall spells and the three pages of totems. Its
+-- slot buttons are the colored totem frames themselves and keep their look.
+local TOTEM_BUTTONS = { "MultiCastSummonSpellButton", "MultiCastRecallSpellButton" }
+for i = 1, 12 do TOTEM_BUTTONS[#TOTEM_BUTTONS + 1] = "MultiCastActionButton" .. i end
 local BASE = 36 -- 1.x button size the classic art was drawn around
 local PITCH = 42 -- 1.x button step: 36 and a 6 px gap
 local CLIENT_PAD = 2 -- the client's least Icon Padding (ActionBar.lua minButtonPadding)
@@ -16,8 +22,12 @@ local active = false
 local function ButtonsOf(bar)
     if bar.actionButtons then return bar.actionButtons end
     local name = bar:GetName()
-    local prefix = (name == "MainActionBar" or name == "MainMenuBar") and "ActionButton" or name .. "Button"
     local list = {}
+    if name == "MultiCastActionBarFrame" then
+        for i, button in ipairs(TOTEM_BUTTONS) do list[i] = _G[button] end
+        return list
+    end
+    local prefix = (name == "MainActionBar" or name == "MainMenuBar") and "ActionButton" or name .. "Button"
     for i = 1, 12 do
         list[i] = _G[prefix .. i]
     end
