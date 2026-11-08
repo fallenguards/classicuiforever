@@ -48,12 +48,28 @@ UIParent = {}
 
 ------------------------------------------------------------------ the addon
 
-local start, step
+-- The micro menu: its row's buttons (alpha of their own) and its group frame, the box the mouse is read on.
+local micro = { NewButton(), NewButton() }
+for _, button in ipairs(micro) do
+    button.alpha = 1
+    function button:SetAlpha(a) self.alpha = a end
+    function button:GetAlpha() return self.alpha end
+end
+local microHome = { over = false, visible = true }
+function microHome:IsVisible() return self.visible end
+function microHome:IsMouseOver() return self.over end
+
+local start, step, look, looking, watch
 local ns = { EMPTY = {}, band = {}, L = setmetatable({}, { __index = function(_, k) return k end }) }
 ns.db = {}
 for i = 1, 8 do ns.db["fadeBar" .. i], ns.db["fadeLinkBar" .. i] = 100, false end
 ns.db.fadeStance, ns.db.fadePet, ns.db.fadeLinkStance, ns.db.fadeLinkPet = 100, 100, false, false
+ns.db.fadeMicro, ns.db.fadeLinkMicro = 100, false
 ns.band.HolderOf = function(bar) return bar.holder end
+ns.band.MicroRowButtons = function() return micro end
+ns.band.MicroHomeFrame = function() return microHome end
+ns.MicroSeatHidden = function() return false end
+ns.SetAlphaIf = function(region, a) if region:GetAlpha() ~= a then region:SetAlpha(a) end end
 ns.GetMainBar = function() return bars.Main end
 ns.IsSecret = function() return false end
 ns.EditMode = { Live = function() return false end }
@@ -62,6 +78,10 @@ ns.Sched = {
     OnFrame = function(_, spec)
         step = spec.fn
         return { Wake = function() end, Sleep = function() end }
+    end,
+    Job = function(spec)
+        look = spec.fn
+        return { Wake = function() looking = true end, Sleep = function() looking = false end }
     end,
     AfterPerFrame = function(_, _, fn) fn() end,
 }
@@ -75,7 +95,7 @@ ns.HookScriptOnce = function(button, script, fn)
     table.insert(button.hooks[script], fn)
 end
 ns.OnEditMode = function() end
-ns.OnToggle = function() end
+ns.OnToggle = function(fn) watch = fn end
 ns.DialogExtra = function() end
 ns.LightEditFoot = function() end
 
@@ -111,6 +131,43 @@ ns.db.fadeLinkBar3 = false
 b2.actionButtons[2]:Hover(true)
 Settle()
 Check(b2.holder.alpha == 1 and b3.holder.alpha == 0, "unlinked, bar 3 no longer lights with bar 2")
+b2.actionButtons[2]:Hover(false)
+Settle()
+
+------------------------------------------------------------------ the micro menu
+
+Check(looking == false, "the micro row is not looked at while shown in full")
+-- Set as a profile switch sets it: the watch reads the keys afresh.
+ns.db.fadeMicro = 0
+watch("fadeMicro")
+Settle()
+Check(looking == true, "hidden till hovered, the micro row is looked at")
+Check(micro[1].alpha == 0 and micro[2].alpha == 0, "the micro buttons start faded")
+
+microHome.over = true
+look()
+Settle()
+Check(micro[1].alpha == 1 and micro[2].alpha == 1, "the mouse on the micro group's box lights its buttons")
+
+micro[1]:SetAlpha(1)
+microHome.over = false
+look()
+Settle()
+Check(micro[1].alpha == 0 and micro[2].alpha == 0, "the mouse gone, the micro buttons fade back")
+
+-- The game put a button's alpha back: the next look paints ours again.
+micro[2]:SetAlpha(1)
+look()
+Check(micro[2].alpha == 0, "a button's alpha the game put back is ours again")
+
+ns.db.fadeLinkMicro, ns.db.fadeLinkBar2 = true, true
+watch("fadeLinkMicro")
+b2.actionButtons[1]:Hover(true)
+Settle()
+Check(micro[1].alpha == 1, "linked, the mouse on bar 2 lights the micro menu")
+b2.actionButtons[1]:Hover(false)
+Settle()
+Check(micro[1].alpha == 0, "and it fades back with bar 2")
 
 if failed > 0 then
     print(failed .. " check(s) failed")

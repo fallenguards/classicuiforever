@@ -28,6 +28,12 @@ local HANDLE_TIP = { anchor = "ANCHOR_TOP", text = L["BAR_MICRO_MENU"], r = 1, g
 
 -- This client's micro buttons in its order, read once before any is reparented (retail 13, Forever 14).
 local microButtons
+-- The row as last laid (the buttons on it), for its fade (Bar/BarFade.lua).
+local microRow = {}
+function B.MicroRowButtons() return microRow end
+function B.MicroHomeFrame() return B.art and B.art.microHome end
+-- The size dialog's height with the fade rows (Bar/BarFade.lua) under its art box.
+local MICRO_DIALOG_H = 362
 
 -- The key in gold, as the client's micro buttons show theirs.
 local function MapButtonTip()
@@ -393,9 +399,10 @@ end
 local function Percent(value) return string.format("%d%%", value) end
 
 local function RefreshMicroDialog()
-    local dialog = B.art.microDialog
+    local dialog = B.art and B.art.microDialog
     if dialog and dialog:IsShown() then dialog:Refresh() end
 end
+B.RefreshMicroDialog = RefreshMicroDialog
 -- The reset buttons alone: a slider under the player's hand is never refilled.
 local function RefreshMicroButtons()
     local dialog = B.art.microDialog
@@ -440,7 +447,7 @@ local function MicroDialog()
     local art = B.art
     local dialog = art.microDialog
     if dialog then return dialog end
-    dialog = B.EditDialog("ForeverClassicUIMicroDialog", 383, 262, L["BAR_MICRO_MENU"])
+    dialog = B.EditDialog("ForeverClassicUIMicroDialog", 383, MICRO_DIALOG_H, L["BAR_MICRO_MENU"])
     art.microDialog = dialog
 
     -- Size scales the group, buttons and art; Width widens or narrows the row round buttons of that size.
@@ -461,6 +468,10 @@ local function MicroDialog()
         ns.ToggleChanged("hideMicroArt")
     end)
     dialog.hideArt = hideArt
+    if B.MicroFadeRows then
+        local _, initFade = B.MicroFadeRows(dialog, hideArt, DialogSlider)
+        dialog.InitFade = initFade
+    end
 
     -- Back in its place means default size and width too, so the pieces fit.
     local reset = B.EditDialogReset(dialog, function()
@@ -490,6 +501,7 @@ local function MicroDialog()
         if self.InitSlider then self.InitSlider() end
         if self.InitWidth then self.InitWidth() end
         self.hideArt:SetChecked(ns.db.hideMicroArt == true)
+        if self.InitFade then self.InitFade() end
         self:Buttons()
     end
     dialog:SetScript("OnShow", function(self) self:Refresh() end)
@@ -668,6 +680,7 @@ function B.LayoutMicroButtons()
             wanted[#wanted + 1] = button
         end
     end
+    microRow = wanted
     if #wanted == 0 then microBusy = false return end
     -- Off the band (moved, or one-bar corner) the chosen size rides on the group frame with the band scale
     -- divided out; on it the row itself is drawn bigger or smaller.

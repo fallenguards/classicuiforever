@@ -108,6 +108,8 @@ return {
     fadeLinkBar8 = "same for everyone: off, no bar linked, until checked under its bar's edit mode dialog",
     fadeLinkStance = "same for everyone: off, no bar linked, until checked under its bar's edit mode dialog",
     fadeLinkPet = "same for everyone: off, no bar linked, until checked under its bar's edit mode dialog",
+    fadeMicro = "same for everyone: 100, no fade, until set under the micro menu's edit mode dialog",
+    fadeLinkMicro = "same for everyone: off, not linked, until checked under the micro menu's edit mode dialog",
     totemKeepRoom = "same for everyone: the game's own totem bar layout until changed under its edit mode dialog",
     nameBoxPlayer = "same for everyone: off by default; the player's name box stays plain as in 1.x unless picked",
     nameBoxTarget = "same for everyone: on by default, the game's color on the target's name box as before; unchecked makes it plain",

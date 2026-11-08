@@ -162,9 +162,11 @@ ns.DB_DEFAULTS = {
     fadeBar8 = 100,
     fadeStance = 100,
     fadePet = 100,
+    fadeMicro = 100,
     -- Each bar lit with the other linked bars (Bar/BarFade.lua).
     fadeLinkBar1 = false, fadeLinkBar2 = false, fadeLinkBar3 = false, fadeLinkBar4 = false, fadeLinkBar5 = false,
     fadeLinkBar6 = false, fadeLinkBar7 = false, fadeLinkBar8 = false, fadeLinkStance = false, fadeLinkPet = false,
+    fadeLinkMicro = false,
     eliteFrames = false,
     eliteFramePlayer = true,
     eliteFrameTarget = true,
