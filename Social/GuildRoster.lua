@@ -14,8 +14,9 @@ local CHECK_HOVER = ns.ART.CHECK .. "Highlight"
 
 -- Era's guild tab (Classic FriendsFrame.xml, eram guild), from the window's top left. Plates: w, barW with the scroll
 -- bar; row texts: x from the row's left (Era's highlight, 8 in), tw wide, barX/barTw with the bar.
+-- Era's name text (88) runs 7 under the zone's: 1.x names never filled it, Forever surnames do, so ours ends 3 short.
 local COLUMNS = {
-    { key = "name", label = NAME or "Name", w = 83, x = 9, tw = 88, justify = "LEFT" },
+    { key = "name", label = NAME or "Name", w = 83, x = 9, tw = 78, justify = "LEFT" },
     { key = "zone", label = ZONE or "Zone", w = 120, barW = 105, x = 90, tw = 110, barTw = 95, justify = "LEFT" },
     { key = "level", label = LEVEL_ABBR or "Lvl", w = 32, x = 204, barX = 189, tw = 20, justify = "CENTER" },
     { key = "class", label = CLASS or "Class", w = 92, x = 236, barX = 221, tw = 87, barTw = 80, justify = "LEFT" },
