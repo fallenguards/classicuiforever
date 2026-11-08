@@ -1,7 +1,6 @@
 local _, ns = ...
 
--- Classic art on the client's bag and micro buttons: applied once, undone on demand, and reapplied after the
--- client's own state changes (SetNormal, SetPushed, UpdateTextures) via hooks installed once.
+-- Classic art on the client's bag and micro buttons: applied once, undone on demand, reapplied after its state changes (hooks once).
 
 local STATES = ns.KEYS.STATES
 local KEY_STATES = { "Normal", "Pushed", "Highlight" }
@@ -15,8 +14,7 @@ local MICRO_ART = {
     QuestLogMicroButton = "Quest", GuildMicroButton = "Socials", LFDMicroButton = "LFG",
     CollectionsMicroButton = "Mounts", EJMicroButton = "EJ", HelpMicroButton = "Help",
     StoreMicroButton = "BStore", MainMenuMicroButton = "MainMenu",
-    -- The legacy adventure tree gets the old achievement sheet. Professions, Housing and the world map button are ours:
-    -- Forever's pictures redrawn at the old size, and BandMicro's.
+    -- Legacy takes the old achievement sheet; Professions, Housing and the map button are ours (Forever's pictures, old size).
     LegacyMicroButton = "Achievement", ProfessionMicroButton = "Professions", HousingMicroButton = "Housing",
     ForeverClassicUIWorldMapMicroButton = "World", ForeverClassicUIHelpMicroButton = "Help",
     ForeverClassicUISpellbookMicroButton = "Spellbook",
@@ -93,8 +91,15 @@ local function ClientMenuLook(button, state)
     end
 end
 
--- The client's disable also halves the button and grays its portrait and a few disabled textures: not while the menu
--- is open, handed back after. A hidden seat (Bar/BandMicro.lua) stays unseen through the client's 0.5 and 1.
+-- A micro button's alpha: the row's fade (Bar/BarFade.lua sets ns.MicroFade), a hidden seat dark, disabled half out of the menu.
+function ns.MicroFade() return 1 end
+function ns.MicroRowAlpha(button, fade, open)
+    if ns.MicroSeatHidden(button) then return 0 end
+    if open == nil then open = MenuOpen() end
+    return (not button:IsEnabled() and not open) and fade * 0.5 or fade
+end
+
+-- The client's disable halves the button and grays its portrait and disabled textures, its enable sets 1: ours back at once.
 local function MenuDim(button, state, open)
     local disabled = button:GetDisabledTexture()
     if disabled and open then
@@ -105,12 +110,8 @@ local function MenuDim(button, state, open)
         disabled:SetDesaturated(state.disabledGray)
         state.disabledGray = nil
     end
-    if ns.MicroSeatHidden(button) then
-        ns.SetFrameAlphaIf(button, 0)
-    elseif not button:IsEnabled() then
-        ns.SetFrameAlphaIf(button, open and 1 or 0.5)
-        if button.Portrait then button.Portrait:SetDesaturated(not open) end
-    end
+    ns.SetFrameAlphaIf(button, ns.MicroRowAlpha(button, ns.MicroFade(), open))
+    if button.Portrait and not button:IsEnabled() then button.Portrait:SetDesaturated(not open) end
 end
 
 local function ApplyMicroArt(button)
@@ -132,8 +133,7 @@ local function ApplyMicroArt(button)
         if button.PushedBackground then button.PushedBackground:Hide() end
         MenuDim(button, state, MenuOpen())
     elseif ns.OnForever() then
-        -- Forever's own art (1.x had no such button): the bronze frame behind the icon drained to silver in the
-        -- classic theme; the icon (the state textures) keeps its colors.
+        -- Forever's own art (1.x had no such button): its bronze frame drained to silver, the icon keeps its colors.
         Drained(button.Background)
         Drained(button.PushedBackground)
         ns.DressStates(button, nil, nil, nil, "microHighlight", MICRO_HOVER)
@@ -190,13 +190,14 @@ local function HookMicro(button)
     end
     -- The client fades the normal texture on hover (its highlight is the whole button); the 1.x sheet stays put.
     button:HookScript("OnEnter", function(self)
-        if state.active then
-            local normal = self:GetNormalTexture()
-            if normal then normal:SetAlpha(1) end
-        end
+        local normal = state.active and self:GetNormalTexture()
+        if normal then normal:SetAlpha(1) end
     end)
-    -- An atlas call (the game menu button's 1 s streaming update, texture kits) overwrites one state: redress that one.
-    -- Our dress never calls Set*Atlas; the guard stops a loop.
+    -- The client's disable sets 0.5 and its enable 1 inside the menu's show pass: ours back at once (a look later flashed).
+    for _, script in ipairs({ "OnDisable", "OnEnable" }) do
+        button:HookScript(script, function(self) if state.active then MenuDim(self, state, MenuOpen()) end end)
+    end
+    -- An atlas call (the menu button's 1 s update, texture kits) overwrites one state: redress that one; the guard stops a loop.
     for _, method in ipairs({ "SetNormalAtlas", "SetPushedAtlas", "SetDisabledAtlas", "SetHighlightAtlas" }) do
         local which = ATLAS_STATE[method]
         hooksecurefunc(button, method, function(self)
@@ -303,8 +304,7 @@ local MICRO_WINDOWS = {
     ForeverClassicUIHelpMicroButton = { "HelpFrame" },
     ForeverClassicUISpellbookMicroButton = { "ForeverClassicUISpellBook" },
 }
--- The client's one window for spells and talents, where ours is not on.
--- Retail has no spellbook button: the band's own (Bar/BandMicro.lua) takes the spells half of the client's window.
+-- The client's one spells and talents window where ours is off; retail's band spellbook button takes its spells half.
 local SHARED = { SpellbookMicroButton = true, TalentMicroButton = true, PlayerSpellsMicroButton = true,
     ForeverClassicUISpellbookMicroButton = true }
 local BOOK_BUTTONS = { SpellbookMicroButton = true, ForeverClassicUISpellbookMicroButton = true }
@@ -347,8 +347,7 @@ local function WindowUp(name)
     return false
 end
 
--- A press to open holds its button down until the window shows: the talents window shows a frame after
--- the click in combat (C_Timer), and there the pass or the client's update lifted it.
+-- A press to open holds its button down till the window shows (talents show a frame after the click in combat).
 local OPEN_GRACE = 0.25
 local opening, openingWith, openUntil   -- button, mouse button, nil while held
 

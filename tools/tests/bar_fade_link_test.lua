@@ -69,6 +69,7 @@ ns.band.HolderOf = function(bar) return bar.holder end
 ns.band.MicroRowButtons = function() return micro end
 ns.band.MicroHomeFrame = function() return microHome end
 ns.MicroSeatHidden = function() return false end
+ns.MicroRowAlpha = function(_, fade) return fade end
 ns.SetAlphaIf = function(region, a) if region:GetAlpha() ~= a then region:SetAlpha(a) end end
 ns.GetMainBar = function() return bars.Main end
 ns.IsSecret = function() return false end

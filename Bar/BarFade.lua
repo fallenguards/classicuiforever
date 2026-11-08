@@ -70,13 +70,11 @@ local function Want(bar)
     return faded
 end
 
--- The holder's alpha: the bar's own times the fade. The micro buttons each (a seat hidden by its option stays dark).
+-- The holder's alpha: the bar's own times the fade. The micro buttons each, by the row rule (Bar/BarSkins.lua).
 local function Apply(bar)
     local now = F.now[bar] or 1
     if bar == MICRO then
-        for _, button in ipairs(ButtonsOf(MICRO)) do
-            if not ns.MicroSeatHidden(button) then ns.SetAlphaIf(button, now) end
-        end
+        for _, button in ipairs(ButtonsOf(MICRO)) do ns.SetAlphaIf(button, ns.MicroRowAlpha(button, now)) end
         return
     end
     local holder = B.HolderOf(bar)
@@ -90,6 +88,8 @@ function B.FadeNow(bar)
     if F.now[bar] == nil and F.keyOf[bar] then F.now[bar] = Want(bar) end
     return F.now[bar] or 1
 end
+-- The micro row's fade now, for the skin's alpha writes (Bar/BarSkins.lua MenuDim; its default is 1).
+function ns.MicroFade() return B.FadeNow(MICRO) end
 
 local function Step(_, since)
     local moving = false

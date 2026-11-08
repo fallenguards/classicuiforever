@@ -27,9 +27,10 @@ local function Texture()
     return tex
 end
 
--- A client micro button: its enable and disable scripts set the alpha and the portrait's gray, on a change only.
+-- A client micro button: its enable and disable scripts set the alpha and the portrait's gray, on a change only, then
+-- run the hooks the addon put on them.
 local function MicroButton(name, portrait)
-    local button = Widget({ name = name, alpha = 1, enabled = true, Normal = Texture(), Disabled = Texture() })
+    local button = Widget({ name = name, alpha = 1, enabled = true, Normal = Texture(), Disabled = Texture(), hooks = {} })
     if portrait then button.Portrait = Texture() end
     function button:GetName() return self.name end
     function button:GetAlpha() return self.alpha end
@@ -40,11 +41,14 @@ local function MicroButton(name, portrait)
     function button:UpdateMicroButton() end
     function button:SetNormal() end
     function button:SetPushed() end
+    function button:HookScript(script, fn) self.hooks[script] = fn end
     function button:Able(enabled)
         if self.enabled == enabled then return end
         self.enabled = enabled
         self.alpha = enabled and 1 or 0.5
         if self.Portrait then self.Portrait:SetDesaturated(not enabled) end
+        local hook = self.hooks[enabled and "OnEnable" or "OnDisable"]
+        if hook then hook(self) end
     end
     return button
 end
@@ -147,6 +151,25 @@ end
 Open(SettingsPanel, true)
 Check(character.alpha == 1 and character.Portrait.gray == false, "settings open: the same as the game menu")
 Close(SettingsPanel)
+
+-- The row faded (Show Only On Hover at 0): the client's half on disable and full on enable never show a frame; ours
+-- is the fade, in the same breath.
+ns.MicroFade = function() return 0 end
+GameMenuFrame.shown = true
+character:Able(false)
+Check(character.alpha == 0, "faded row, menu opening: the client's half undone in the same breath")
+edges[GameMenuFrame](true)
+afterShow[GameMenuFrame]()
+Check(character.alpha == 0, "faded row, menu open: the row stays faded")
+GameMenuFrame.shown = false
+character:Able(true)
+Check(character.alpha == 0, "faded row, menu closing: the client's full undone in the same breath")
+edges[GameMenuFrame](false)
+ns.MicroFade = function() return 1 end
+character:Able(false)
+Check(character.alpha == 0.5, "full row, disabled with no menu up: the client's half stands")
+character:Able(true)
+Check(character.alpha == 1, "full row, enabled: full")
 
 -- Disabled with no menu up (a full-screen frame): the client's dim is its own.
 character:Able(false)
