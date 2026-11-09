@@ -6,18 +6,15 @@ local L = ns.L
 local QL = ns.QL
 
 -- QuestLogPushQuest is protected; the map's Share reads its quest off a row the game fills only as its quest pane shows.
--- One press, in one script run: the map, its pane and the quest's header open, the row, Share and Back are pressed, and
--- what was opened is shut. The Aim steps are ours: each points the next clicks at what the game has just built.
-local STEPS = { "Open", "AimPane", "Pane", "AimHeader", "Header", "AimRow", "Row", "Share", "Back", "AimShut", "Shut" }
--- The row's click leaves the map on the quest's zone, and the game sorts the whole quest log for the map's zone: the
--- map is opened and shut once more at the end, which puts it back on the player's.
-local ORDER = { "Open", "AimPane", "Pane", "AimHeader", "Header", "AimRow", "Row", "Share", "Back", "AimShut", "Shut", "Open",
-    "Open", "Open" }
+-- One press, one run: map and pane open, Back drops old details and draws the list, the header unfolds, Back draws the
+-- rows again, row and Share are pressed, the map shuts by the game's toggle rules (details left up; its next open resets).
+local STEPS = { "Open", "AimPane", "Pane", "AimReset", "Reset", "AimHeader", "Header", "Rebuild", "AimRow", "Row", "Share",
+    "AimShut", "Shut", "AimFix1", "Fix1", "AimFix2", "Fix2", "AimFix3", "Fix3" }
 -- Only what the press aims: Open stays aimed while a share is possible.
-local AIMED = { "Pane", "Header", "Row", "Share", "Back", "Shut" }
+local AIMED = { "Pane", "Reset", "Header", "Rebuild", "Row", "Share", "Shut", "Fix1", "Fix2", "Fix3" }
 local proxies, macro
 local armedID          -- the quest the pad shares
-local openedPane       -- the pane was shut and this press opened it
+local wantedLog        -- the pane's saved wish (questLogOpen) as the press began
 local pressed, shared  -- a press ran its aims; it reached the row
 
 local function Aim(step, target)
@@ -33,14 +30,29 @@ local function MapUp()
     return armedID ~= nil and not InCombatLockdown() and WorldMapFrame:IsShown()
 end
 
+local function PaneUp()
+    return MapUp() and QuestMapFrame:IsShown()
+end
+
+local function BackButton()
+    local details = QuestMapFrame.DetailsFrame
+    return details and details.BackFrame and details.BackFrame.BackButton
+end
+
 local function AimPane()
     -- A modifier skips the map's clicks: that press is no failed share.
-    pressed, shared, openedPane = not IsModifierKeyDown(), false, false
+    pressed, shared = not IsModifierKeyDown(), false
+    wantedLog = ns.GetCVar("questLogOpen") == "1"
     Disarm()
     if not MapUp() then return end
+    -- Shut, or hidden by a maximized map: its toggle shows it and draws its rows.
     local toggle = WorldMapFrame.SidePanelToggle
-    openedPane = not QuestMapFrame:IsShown() and toggle ~= nil and toggle.OpenButton ~= nil
-    Aim("Pane", openedPane and toggle.OpenButton or nil)
+    Aim("Pane", not QuestMapFrame:IsShown() and toggle and toggle.OpenButton or nil)
+end
+
+-- Back with no details up: the list drawn again at once, any left-over details and their map put away first.
+local function AimReset()
+    if PaneUp() then Aim("Reset", BackButton()) end
 end
 
 -- The header the quest sits under, by the log's own order; nil unless it is folded and has its button.
@@ -62,30 +74,58 @@ local function FoldedHeader(questID)
     end
 end
 
+-- The game folds every header but the map's own as the map opens: the quest's unfolds, and Back draws the rows again.
 local function AimHeader()
-    if MapUp() and QuestMapFrame:IsShown() then Aim("Header", FoldedHeader(armedID)) end
+    if not PaneUp() then return end
+    Aim("Header", FoldedHeader(armedID))
+    Aim("Rebuild", BackButton())
 end
 
 -- The quest's row, with a questID only client code wrote; reads only.
 local function AimRow()
-    if not (MapUp() and QuestMapFrame:IsShown()) then return end
+    if not PaneUp() then return end
     local find = _G.QuestLogQuests_GetQuestButton
     local row = find and find(armedID)
     local details = QuestMapFrame.DetailsFrame
-    local back = details and details.BackFrame and details.BackFrame.BackButton
-    if not (row and issecurevariable(row, "questID") and details and details.ShareButton and back) then return end
+    if not (row and issecurevariable(row, "questID") and details and details.ShareButton) then return end
     shared = true
     Aim("Row", row)
     Aim("Share", details.ShareButton)
-    Aim("Back", back)
 end
 
+-- The pane as its saved wish had it: shown by this press against a saved "closed", its toggle shuts it (and writes 0).
 local function AimShut()
     local toggle = WorldMapFrame.SidePanelToggle
-    if MapUp() and openedPane and toggle then Aim("Shut", toggle.CloseButton) end
+    if PaneUp() and not wantedLog and toggle then Aim("Shut", toggle.CloseButton) end
 end
 
-local AIMS = { AimPane = AimPane, AimHeader = AimHeader, AimRow = AimRow, AimShut = AimShut }
+local function Rule(name)
+    local rules = C_GameRules and Enum and Enum.GameRule
+    return rules ~= nil and rules[name] ~= nil and C_GameRules.IsGameRuleActive(rules[name]) == true
+end
+
+-- The map's toggle (QuestLogOwnerMixin:HandleUserActionToggleSelf) shuts a maximized map, or a minimized one whose
+-- pane agrees with its saved wish; a map that wants to be big maximizes first, a pane at odds with its wish is
+-- toggled into agreement first. Three steps, each aimed from the live state, cover every path; a shut map aims none.
+local function AimFix(step)
+    if not MapUp() then Aim(step, nil) return end
+    local map = WorldMapFrame
+    local wantsBig = not Rule("MaximizeWorldMapDisabled") and ns.GetCVar("miniWorldMap") ~= "1"
+    if (map.IsMaximized and map:IsMaximized()) or wantsBig then
+        Aim(step, MinimapCluster.ZoneTextButton)
+        return
+    end
+    local wantsLog = not Rule("QuestLogPanelDisabled") and ns.GetCVar("questLogOpen") == "1"
+    if wantsLog ~= QuestMapFrame:IsShown() then
+        local toggle = map.SidePanelToggle
+        Aim(step, toggle and (QuestMapFrame:IsShown() and toggle.CloseButton or toggle.OpenButton) or nil)
+        return
+    end
+    Aim(step, MinimapCluster.ZoneTextButton)
+end
+
+local AIMS = { AimPane = AimPane, AimReset = AimReset, AimHeader = AimHeader, AimRow = AimRow, AimShut = AimShut,
+    AimFix1 = function() AimFix("Fix1") end, AimFix2 = function() AimFix("Fix2") end, AimFix3 = function() AimFix("Fix3") end }
 
 local function Build()
     if proxies then return end
@@ -94,9 +134,7 @@ local function Build()
     for i, step in ipairs(STEPS) do
         proxies[step] = ns.ClickProxy("FCUIQS" .. i)
         if AIMS[step] then proxies[step]:SetScript("PreClick", AIMS[step]) end
-    end
-    -- [nomod] on the map's own two: shift on a map row toggles tracking and the chat-link modifier links it.
-    for i, step in ipairs(ORDER) do
+        -- [nomod] on the map's open: shift on a map row toggles tracking and the chat-link modifier links it.
         lines[i] = string.format(step == "Open" and "/click [nomod] %s" or "/click %s", proxies[step]:GetName())
     end
     macro = table.concat(lines, "\n")
