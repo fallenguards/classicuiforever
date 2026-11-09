@@ -1110,7 +1110,7 @@ local function CreateBook()
 
     -- What's Training tab: that addon's list on a page of this book, as its own tab shows it (Spells/BookTraining.lua).
     f.TrainTab = CreateSkillTab(f, MAX_SKILL_TABS + 1, nil)
-    f.TrainTab:SetNormalTexture("Interface\\Icons\\INV_Misc_Book_09")
+    ns.WearTrainingIcon(f.TrainTab, false)
     f.TrainTab.tooltip = L["SPELL_WHAT_CAN_I_TRAIN"]
     f.TrainTab:SetScript("OnClick", function(self)
         if InCombatLockdown() or not (ns.TrainingList and ns.TrainingList(f)) then
@@ -1564,6 +1564,7 @@ local function CreateBook()
             train:SetShown(there and true or false)
             train:SetChecked(state.training)
             if there then
+                ns.WearTrainingIcon(train, false)
                 train:ClearAllPoints()
                 if shown > 0 then
                     train:SetPoint("TOPLEFT", self.SkillTabs[shown], "BOTTOMLEFT", 0, -17)

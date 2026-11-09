@@ -51,16 +51,23 @@ local function HideSelf(self)
     if styled then self:Hide() end
 end
 
--- The skill windows' black marble on the book's own art frame (the spellbook's frame on this window), under its gray
--- border and header as on the spellbook page; its own dark page and the covers over bars this book fades go.
-local marble
+-- The skill windows' black marble on the face's own art frame (the spellbook's on the book, Era's trade skill window on
+-- a profession), under its gray border and header as on the spellbook page; its own dark page goes.
+local marbles = {}
 local function Marble()
-    if marble then return marble end
-    local holder = T.EraHolder and T.EraHolder("book")
+    local kind = T.EraKind and T.EraKind()
+    local holder = kind and T.EraHolder(kind)
     if not holder then return nil end
-    marble = ns.TrainingMarble(holder)
-    marble:Hide()
-    return marble
+    local floor = marbles[holder]
+    if not floor then
+        floor = ns.TrainingMarble(holder)
+        floor:Hide()
+        marbles[holder] = floor
+    end
+    return floor
+end
+local function HideMarbles()
+    for _, floor in pairs(marbles) do floor:Hide() end
 end
 
 -- The list's heights: a recipe line, a heading, a profession header folded.
@@ -199,11 +206,13 @@ local function Relist(box)
     if box.FullUpdate then box:FullUpdate(ScrollBoxConstants and ScrollBoxConstants.UpdateImmediately) end
 end
 
--- The page up: the book's page faded under it and the marble shown; its art frame is made out of a fight, so the
--- marble may come at a later show.
+-- The page up: the book's page faded and our trade skill page hidden under it, the face's marble shown; its art frame
+-- is made out of a fight, so the marble may come at a later show.
 local function Fade(on)
     if not styled then return end
     T.FadePage(on)
+    ns.TradeSkillCover(on)
+    HideMarbles()
     local floor = Marble()
     if floor then floor:SetShown(on) end
 end
@@ -214,7 +223,7 @@ local function Style(page, view)
     styled = true
     -- The title stands down in ProfessionsFootTabs.
     ns.EachChild(page, HideUnnamed)
-    undo[#undo + 1] = function() if marble then marble:Hide() end end
+    undo[#undo + 1] = HideMarbles
     Hide(view.footer)
     local box = view.scrollBox
     ns.SetTwoPointsIf(box, "TOPLEFT", view, "TOPLEFT", BOX_LEFT, BOX_TOP, "BOTTOMRIGHT", view, "BOTTOMRIGHT", BOX_RIGHT, BOX_FOOT)
@@ -243,6 +252,7 @@ local function Unstyle()
     wipe(undo)
     wipe(looked)
     T.FadePage(false)
+    ns.TradeSkillCover(false)
 end
 
 -- The look on (the book ours) or off, applied once; new rows dressed every 0.1 s while the page shows.

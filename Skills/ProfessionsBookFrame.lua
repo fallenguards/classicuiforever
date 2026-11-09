@@ -66,8 +66,9 @@ local function Holder(frame, kind)
     return holder
 end
 
--- A kind's art frame once made (What's Training's marble goes on the book's, Skills/ProfessionsTraining.lua).
+-- A kind's art frame once made, and the kind up now (What's Training's marble goes on it, Skills/ProfessionsTraining.lua).
 function T.EraHolder(kind) return holders[kind] end
+function T.EraKind() return current end
 
 -- Every kind's art made ahead, out of combat: a page opened in a fight finds it, and its files are loaded before the
 -- first open (made as it opened, the art drew a frame late).

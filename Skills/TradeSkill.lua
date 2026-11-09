@@ -720,8 +720,11 @@ local function Build()
     return panel
 end
 
--- From the professions watcher: whether a profession's crafting page is up.
+-- From the professions watcher: whether a profession's crafting page is up. covered: What's Training's list stands over
+-- the window (Skills/ProfessionsTraining.lua), and ours waits out of sight under it.
+local covered, lastUp = false, false
 function ns.ShowTradeSkill(up)
+    lastUp = up and true or false
     if not active then
         if panel then panel:Hide() end
         return
@@ -739,8 +742,13 @@ function ns.ShowTradeSkill(up)
         ns.SetPointOnce(page, "TOPLEFT", ProfessionsFrame, "TOPLEFT", 6000, 0)
         page:SetAlpha(0)
     end
-    local show = up and page and page.fcuiAway and true or false
+    local show = up and page and page.fcuiAway and not covered and true or false
     ns.SetShownIf(panel, show)
+end
+
+function ns.TradeSkillCover(on)
+    covered = on and true or false
+    if panel then ns.ShowTradeSkill(lastUp) end
 end
 
 function ns.TradeSkillWindowSize()

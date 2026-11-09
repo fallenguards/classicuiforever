@@ -45,6 +45,25 @@ local function Pieces(book)
     return pieces
 end
 
+-- The icon What's Training's own tabs wear (its setting, a question mark unless the player picked another): its
+-- spellbook launcher's for the book, its crafting tab's for the professions window; our book icon until that tab exists.
+local OWN_ICON = "Interface\\Icons\\INV_Misc_Book_09"
+function ns.TrainingTabIcon(crafting)
+    local tab = crafting and _G.WhatsTrainingCraftingTab or _G.WhatsTrainingLauncher
+    local icon = tab and (tab.Icon or tab.icon)
+    local texture = icon and icon.GetTexture and icon:GetTexture()
+    return texture or OWN_ICON
+end
+
+-- That icon on a training tab of ours, set again only as it changes.
+local worn = setmetatable({}, { __mode = "k" })
+function ns.WearTrainingIcon(tab, crafting)
+    local icon = ns.TrainingTabIcon(crafting)
+    if worn[tab] == icon then return end
+    worn[tab] = icon
+    tab:SetNormalTexture(icon)
+end
+
 local function BookShowsList(book)
     return book:IsShown() and ns.SpellBookTrainingUp()
 end

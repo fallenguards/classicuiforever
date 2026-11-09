@@ -39,13 +39,14 @@ local function PadShown(i)
     return up and page ~= nil and page:IsShown()
 end
 
--- What's Training's professions list (recipes still to learn) opens from a side tab of ours on the book page, under a
--- Professions tab that turns back to the book; its own tabs on this window stand down, hidden as they show (#260).
+-- What's Training's professions list (recipes still to learn) opens from a side tab of ours on either face of this
+-- window, under a tab that turns back to the face: the book, or the open profession under its own icon; its own tabs
+-- on this window stand down, hidden as they show (#260).
 local TRAINING_TABS = { "WhatsTrainingCraftingTab", "WhatsTrainingCraftingReturnTab" }
--- The spellbook's first side tab spot (Spells/SpellBook.lua): just past the art's right edge, 65 down.
+-- The spellbook's first side tab spot (Spells/SpellBook.lua): just past the window's right edge, 65 down.
 local TRAIN_X, TRAIN_Y, TRAIN_GAP = 2, -65, -17
 local PROF_ICON = "Interface\\Icons\\INV_SideTab_Professions_c60"
-local profTab, trainTab
+local faceTab, trainTab, faceIcon
 local function TrainingOurs()
     return ns.OnForever() and ns.ModuleInForce("professionsBook") and ns.SpellBookActive and ns.SpellBookActive()
 end
@@ -81,12 +82,34 @@ local function FitTraining(list)
     end
 end
 
--- The page up checks its tab, the book its own.
+-- The list up checks its tab, the face its own.
 local function CheckSideTabs()
-    if not profTab then return end
+    if not faceTab then return end
     local up = TrainingListUp()
-    profTab:SetChecked(not up)
+    faceTab:SetChecked(not up)
     trainTab:SetChecked(up)
+end
+
+-- The face under the list: the book's page, else the open profession's crafting page (ours or the game's).
+local function CraftFace(frame, page)
+    local crafting = frame.CraftingPage
+    return not page:IsShown() and crafting ~= nil and crafting:IsShown()
+end
+
+-- The face tab wears its face: the book's icon and name, or the open profession's.
+local function WearFace(frame, page)
+    local icon, tip = PROF_ICON, TRADE_SKILLS or "Professions"
+    if CraftFace(frame, page) then
+        local api = C_TradeSkillUI
+        local info = api and api.GetBaseProfessionInfo and api.GetBaseProfessionInfo()
+        local own = info and info.professionID and api.GetTradeSkillTexture and api.GetTradeSkillTexture(info.professionID)
+        if own then icon, tip = own, info.professionName or tip end
+    end
+    if faceIcon ~= icon then
+        faceIcon = icon
+        faceTab:SetNormalTexture(icon)
+    end
+    faceTab.tooltip = tip
 end
 
 -- Its own launcher's and return tab's handlers, as their clicks run them.
@@ -104,9 +127,9 @@ local function CloseTraining()
     CheckSideTabs()
 end
 
--- Under the profession side tabs while they are up (hover or always), else at the column's top; the list's tab hangs
--- under the book's.
-local function PlaceSideTabs(frame)
+-- Under the profession side tabs while they are up (hover or always), else at the column's top, past the face's
+-- width (the book's, our trade skill window's, or the game's own page); the list's tab hangs under the face's.
+local function PlaceSideTabs(frame, page)
     local last
     if not (ns.db and ns.db.professionTabsHidden == true) then
         for _, tab in ipairs(frame.rightProfessionTabs or ns.EMPTY) do
@@ -114,10 +137,15 @@ local function PlaceSideTabs(frame)
         end
     end
     if last then
-        ns.SetPointOnce(profTab, "TOPLEFT", last, "BOTTOMLEFT", 0, TRAIN_GAP)
-    else
-        ns.SetPointOnce(profTab, "TOPLEFT", frame, "TOPLEFT", T.BookW() + TRAIN_X, TRAIN_Y)
+        ns.SetPointOnce(faceTab, "TOPLEFT", last, "BOTTOMLEFT", 0, TRAIN_GAP)
+        return
     end
+    local width = T.BookW()
+    if CraftFace(frame, page) then
+        local ours = ns.TradeSkillActive and ns.TradeSkillActive()
+        width = ours and (ns.TradeSkillWindowSize()) or frame:GetWidth()
+    end
+    ns.SetPointOnce(faceTab, "TOPLEFT", frame, "TOPLEFT", width + TRAIN_X, TRAIN_Y)
 end
 
 local function TrainingStandsDown(frame, page)
@@ -137,26 +165,31 @@ local function TrainingStandsDown(frame, page)
         ns.TrainingPageLook(list, TrainingOurs())
     end
     if not (_G.WhatsTrainingCraftingTab and ns.NewSideTab and TrainingOurs()) then
-        if profTab then
-            profTab:Hide()
+        if faceTab then
+            faceTab:Hide()
             trainTab:Hide()
         end
         return
     end
-    if not profTab then
-        profTab = ns.NewSideTab(page, 1, nil)
-        profTab:SetNormalTexture(PROF_ICON)
-        profTab.tooltip = TRADE_SKILLS or "Professions"
-        profTab:SetScript("OnClick", CloseTraining)
-        trainTab = ns.NewSideTab(page, 2, profTab)
-        trainTab:SetNormalTexture("Interface\\Icons\\INV_Misc_Book_09")
+    -- On the window itself, not a face's page: they stay as the faces turn under the list.
+    if not faceTab then
+        faceTab = ns.NewSideTab(frame, 1, nil)
+        faceTab:SetScript("OnClick", CloseTraining)
+        trainTab = ns.NewSideTab(frame, 2, faceTab)
         trainTab.tooltip = L["SPELL_WHAT_CAN_I_TRAIN"]
         trainTab:SetScript("OnClick", OpenTraining)
     end
-    PlaceSideTabs(frame)
+    WearFace(frame, page)
+    ns.WearTrainingIcon(trainTab, true)
+    PlaceSideTabs(frame, page)
     CheckSideTabs()
-    profTab:Show()
-    trainTab:Show()
+    -- Over the Era art frames, children of the window too; the toplevel window's raise re-levels, so each pass.
+    local level = frame:GetFrameLevel() + 3
+    ns.SetLevelIf(faceTab, level)
+    ns.SetLevelIf(trainTab, level)
+    local up = page:IsShown() or CraftFace(frame, page)
+    SetShownIf(faceTab, up)
+    SetShownIf(trainTab, up)
 end
 
 -- The game's controller footer under the foot tabs, not over them (widget calls only: its fields stay the game's).
