@@ -1923,7 +1923,9 @@ local function FollowLayer(_, _, down)
     if not active or down then return end
     local layer = book and book.Clicks
     if layer and layer.fcuiLinked then
-        if book:LayerUp() then
+        -- The trainer list's page keeps the layer down, so the macro's click raised it: that press closes the book;
+        -- hidden, the book opens on that page again.
+        if book:LayerUp() and not (state.training and book:IsShown()) then
             Show()
         elseif book:IsShown() then
             Hide()
