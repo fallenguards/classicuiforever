@@ -2,6 +2,17 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.51.0] - 2026-11-08
+
+### Added
+- With What's Training installed, a profession's window has two side tabs: the bottom one lists what its trainer can teach you, the top one returns to the profession. Training tabs wear What's Training's own icons, on the spellbook too.
+
+### Fixed
+- Looting a corpse in a fight opens the loot window. The game had refused it from the second loot of a session on, with the Interface action failed because of an AddOn message.
+- The spellbook's micro button and key close the book from the What's Training page, and a book closed there opens again.
+- In a fight the spellbook opens at the window row's start. It had opened far to the right when the map was open as the fight began.
+- Same size near and far applies each character's own choice when they log in. It took effect only after the box was toggled on that character.
+
 ## [0.50.0] - 2026-11-08
 
 ### Added

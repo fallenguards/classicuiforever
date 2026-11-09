@@ -3,6 +3,14 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN73_1_TITLE"] = "Formation dans la fenêtre d'un métier"
+L["WN73_1_TEXT"] = "Avec What's Training installé, la fenêtre d'un métier a deux onglets latéraux : celui du bas liste ce que son maître peut vous apprendre, celui du haut revient au métier. Les onglets de formation portent les icônes de What's Training, dans le grimoire aussi."
+L["WN73_2_TITLE"] = "Butin en combat"
+L["WN73_2_TEXT"] = "Fouiller un cadavre en combat ouvre la fenêtre de butin. Dès le deuxième butin d'une session, le jeu la refusait avec le message qu'une action de l'interface a échoué à cause d'un addon."
+L["WN73_3_TITLE"] = "Grimoire"
+L["WN73_3_TEXT"] = "Le bouton du micromenu et la touche ferment le livre depuis la page What's Training, et un livre fermé là se rouvre. En combat le livre s'ouvre au début de la rangée de fenêtres ; il s'ouvrait loin à droite quand la carte était ouverte au début du combat."
+L["WN73_4_TITLE"] = "Taille des plaques par personnage"
+L["WN73_4_TEXT"] = "Même taille de près et de loin applique le choix de chaque personnage à la connexion. Il ne prenait effet qu'après avoir changé la case sur ce personnage. Activez-la dans les options (/fcui), sous Plaques de nom."
 L["WN72_1_TITLE"] = "Cabine d'essayage"
 L["WN72_1_TEXT"] = "La cabine d'essayage s'ouvre à la taille de 1.x. Pour la cabine plus grande des clients ultérieurs, activez Grande cabine d'essayage dans les options (/fcui), sous Toutes les fenêtres ; nos fenêtres lui laissent la place à côté pour ses panneaux latéraux."
 L["WN72_2_TITLE"] = "Fondu du micromenu"

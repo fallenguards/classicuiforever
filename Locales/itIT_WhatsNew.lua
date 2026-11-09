@@ -3,6 +3,14 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN73_1_TITLE"] = "Addestramento nella finestra di una professione"
+L["WN73_1_TEXT"] = "Con What's Training installato, la finestra di una professione ha due schede laterali: quella in basso elenca ciò che il suo addestratore può insegnarti, quella in alto torna alla professione. Le schede di addestramento portano le icone di What's Training, anche nel libro degli incantesimi."
+L["WN73_2_TITLE"] = "Bottino in combattimento"
+L["WN73_2_TEXT"] = "Saccheggiare un cadavere in combattimento apre la finestra del bottino. Dal secondo saccheggio di una sessione il gioco la rifiutava con il messaggio che un'azione dell'interfaccia è fallita a causa di un addon."
+L["WN73_3_TITLE"] = "Libro degli incantesimi"
+L["WN73_3_TEXT"] = "Il pulsante del micromenu e il tasto chiudono il libro dalla pagina di What's Training, e un libro chiuso lì si riapre. In combattimento il libro si apre all'inizio della fila di finestre; si apriva molto a destra quando la mappa era aperta all'inizio del combattimento."
+L["WN73_4_TITLE"] = "Dimensione delle targhette per personaggio"
+L["WN73_4_TEXT"] = "Stessa dimensione vicino e lontano applica la scelta di ogni personaggio all'accesso. Aveva effetto solo dopo aver cambiato la casella su quel personaggio. Attivala nelle opzioni (/fcui), sotto Targhette."
 L["WN72_1_TITLE"] = "Camerino"
 L["WN72_1_TEXT"] = "Il camerino si apre alla dimensione di 1.x. Per il camerino più grande dei client successivi, attiva Camerino grande nelle opzioni (/fcui), sotto Tutte le finestre; le nostre finestre gli lasciano spazio accanto per i suoi pannelli laterali."
 L["WN72_2_TITLE"] = "Dissolvenza del micromenu"

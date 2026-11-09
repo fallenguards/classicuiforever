@@ -3,6 +3,14 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN73_1_TITLE"] = "Entrenamiento en la ventana de una profesión"
+L["WN73_1_TEXT"] = "Con What's Training instalado, la ventana de una profesión tiene dos pestañas laterales: la de abajo lista lo que su instructor puede enseñarte, la de arriba vuelve a la profesión. Las pestañas de entrenamiento llevan los iconos propios de What's Training, también en el libro de hechizos."
+L["WN73_2_TITLE"] = "Saquear en combate"
+L["WN73_2_TEXT"] = "Saquear un cadáver en combate abre la ventana de botín. Desde el segundo saqueo de una sesión, el juego lo rechazaba con el mensaje de que una acción de la interfaz falló por un addon."
+L["WN73_3_TITLE"] = "Libro de hechizos"
+L["WN73_3_TEXT"] = "El botón del micromenú y la tecla cierran el libro desde la página de What's Training, y un libro cerrado allí vuelve a abrirse. En combate el libro se abre al inicio de la fila de ventanas; se abría muy a la derecha cuando el mapa estaba abierto al empezar el combate."
+L["WN73_4_TITLE"] = "Tamaño de placas por personaje"
+L["WN73_4_TEXT"] = "Mismo tamaño cerca y lejos aplica la elección de cada personaje al conectarse. Solo surtía efecto tras cambiar la casilla en ese personaje. Actívalo en las opciones (/fcui), en Placas de nombre."
 L["WN72_1_TITLE"] = "Probador"
 L["WN72_1_TEXT"] = "El probador se abre al tamaño de 1.x. Para el probador más grande de los clientes posteriores, activa Probador grande en las opciones (/fcui), en Todas las ventanas; nuestras ventanas le dejan sitio al lado para sus paneles laterales."
 L["WN72_2_TITLE"] = "Atenuar el micromenú"

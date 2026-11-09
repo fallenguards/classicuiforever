@@ -2,6 +2,14 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN73_1_TITLE"] = "Training on a profession's window"
+L["WN73_1_TEXT"] = "With What's Training installed, a profession's window has two side tabs: the bottom one lists what its trainer can teach you, the top one returns to the profession. Training tabs wear What's Training's own icons, on the spellbook too."
+L["WN73_2_TITLE"] = "Loot in a fight"
+L["WN73_2_TEXT"] = "Looting a corpse in a fight opens the loot window. From the second loot of a session on, the game had refused it with the Interface action failed because of an AddOn message."
+L["WN73_3_TITLE"] = "Spellbook"
+L["WN73_3_TEXT"] = "The micro button and the key close the book from the What's Training page, and a book closed there opens again. In a fight the book opens at the window row's start; it had opened far to the right when the map was open as the fight began."
+L["WN73_4_TITLE"] = "Nameplate size per character"
+L["WN73_4_TEXT"] = "Same size near and far applies each character's own choice when they log in. It took effect only after the box was toggled on that character. Turn it on in the options (/fcui), under Nameplates."
 L["WN72_1_TITLE"] = "Dressing room"
 L["WN72_1_TEXT"] = "The dressing room opens at the 1.x size. For the bigger room of later clients, turn on Large dressing room in the options (/fcui), under All windows; our windows make room beside it for its side panels."
 L["WN72_2_TITLE"] = "Micro menu fade"

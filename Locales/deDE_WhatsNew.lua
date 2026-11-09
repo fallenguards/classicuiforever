@@ -3,6 +3,14 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN73_1_TITLE"] = "Lernen im Berufsfenster"
+L["WN73_1_TEXT"] = "Mit installiertem What's Training hat das Fenster eines Berufs zwei seitliche Reiter: der untere listet, was sein Lehrer dir beibringen kann, der obere kehrt zum Beruf zurück. Die Lern-Reiter tragen die eigenen Symbole von What's Training, auch im Zauberbuch."
+L["WN73_2_TITLE"] = "Plündern im Kampf"
+L["WN73_2_TEXT"] = "Das Plündern eines Leichnams im Kampf öffnet das Beutefenster. Ab dem zweiten Plündern einer Sitzung hatte das Spiel es mit der Meldung verweigert, eine Interface-Aktion sei wegen eines Addons fehlgeschlagen."
+L["WN73_3_TITLE"] = "Zauberbuch"
+L["WN73_3_TEXT"] = "Die Mikromenü-Schaltfläche und die Taste schließen das Buch von der What's-Training-Seite aus, und ein dort geschlossenes Buch öffnet sich wieder. Im Kampf öffnet sich das Buch am Anfang der Fensterreihe; es hatte sich weit rechts geöffnet, wenn die Karte zu Kampfbeginn offen war."
+L["WN73_4_TITLE"] = "Plakettengröße pro Charakter"
+L["WN73_4_TEXT"] = "Gleiche Größe nah und fern übernimmt beim Einloggen die Wahl jedes Charakters. Es wirkte erst, nachdem das Kästchen bei diesem Charakter umgeschaltet wurde. Schalte es in den Optionen (/fcui) unter Namensplaketten ein."
 L["WN72_1_TITLE"] = "Anprobe"
 L["WN72_1_TEXT"] = "Die Anprobe öffnet in der Größe von 1.x. Für die größere Anprobe späterer Clients schalte Große Anprobe in den Optionen (/fcui) unter Alle Fenster ein; unsere Fenster machen daneben Platz für ihre Seitenleisten."
 L["WN72_2_TITLE"] = "Mikromenü ausblenden"
