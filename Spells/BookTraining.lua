@@ -68,7 +68,18 @@ local function BookShowsList(book)
     return book:IsShown() and ns.SpellBookTrainingUp()
 end
 
-local function Attach(frame, book)
+-- Since 11.3 the window keeps its list on a child page, beside a professions page and its toggle; before, the window
+-- itself was the list.
+local function ListPage(frame)
+    local page = frame.spellsPage or frame
+    if page.rows and page.scrollBar and page.searchBox then return page end
+    return nil
+end
+
+-- The window's pieces that are not the list, by name suffix.
+local SPARE_CHILDREN = { "Close", "ProfessionToggle" }
+
+local function Attach(frame, page, book)
     frame:SetParent(book)
     frame:SetFrameStrata(book:GetFrameStrata())
     frame:SetFrameLevel(book:GetFrameLevel() + 5)
@@ -78,27 +89,35 @@ local function Attach(frame, book)
     -- Its rows take the mouse; the window itself leaves the book's to the book.
     frame:EnableMouse(false)
     ns.EachRegion(frame, HideRegion)
-    local close = _G[frame:GetName() .. "Close"]
-    if close then close:Hide() end
+    for _, suffix in ipairs(SPARE_CHILDREN) do
+        local child = _G[frame:GetName() .. suffix]
+        if child then child:Hide() end
+    end
+    if frame.professionsPage then frame.professionsPage:Hide() end
     ns.SetTwoPointsIf(frame, "TOPLEFT", book, "TOPLEFT", 0, BODY_TOP, "BOTTOMRIGHT", book, "BOTTOMRIGHT", BODY_RIGHT, BODY_FOOT)
-    ns.SetPointOnce(frame.searchBox, "TOPLEFT", book, "TOPLEFT", SEARCH_X, SEARCH_Y)
-    frame.searchBox:SetWidth(SEARCH_W)
-    ns.SetTwoPointsIf(frame.scrollBar, "TOPLEFT", book, "TOPLEFT", 0, BAR_TOP, "BOTTOMRIGHT", book, "BOTTOMRIGHT", BAR_RIGHT, BAR_FOOT)
-    local rows = frame.rows
-    ns.SetTwoPointsIf(rows[1], "TOPLEFT", book, "TOPLEFT", ROW_X, ROW_Y, "RIGHT", frame.scrollBar, "RIGHT", 0, 0)
+    ns.SetPointOnce(page.searchBox, "TOPLEFT", book, "TOPLEFT", SEARCH_X, SEARCH_Y)
+    page.searchBox:SetWidth(SEARCH_W)
+    ns.SetTwoPointsIf(page.scrollBar, "TOPLEFT", book, "TOPLEFT", 0, BAR_TOP, "BOTTOMRIGHT", book, "BOTTOMRIGHT", BAR_RIGHT, BAR_FOOT)
+    local rows = page.rows
+    ns.SetTwoPointsIf(rows[1], "TOPLEFT", book, "TOPLEFT", ROW_X, ROW_Y, "RIGHT", page.scrollBar, "RIGHT", 0, 0)
     -- Built for more rows than the page holds: the rest stay out of sight and its bar scrolls by the page's count.
-    frame.maxRows = ROWS
+    page.maxRows = ROWS
     for i = ROWS + 1, #rows do
         rows[i]:SetAlpha(0)
         rows[i]:EnableMouse(false)
     end
+    -- 11.3's window plays the spellbook's sounds as it shows and hides, which in the book is every page turn: its
+    -- scripts give way (its page refreshes itself as it shows); the older window's stay, hooked.
+    local paged = page ~= frame
+    local Script = paged and frame.SetScript or frame.HookScript
     -- Shown from outside (its slash command, its minimap button): the book opens on the page.
-    frame:HookScript("OnShow", function(self)
+    Script(frame, "OnShow", function(self)
         if BookShowsList(book) then return end
         if not ns.ShowSpellBookTraining() then self:Hide() end
     end)
-    -- Hidden from outside while the page is up (the client's Escape): the book goes with it, as Era's did.
-    frame:HookScript("OnHide", function(self)
+    -- Hidden from outside while the page is up (the client's Escape, its minimap button): the book goes with it.
+    Script(frame, "OnHide", function(self)
+        if paged then page.searchBox:ClearFocus() end
         if BookShowsList(book) and not self:IsShown() then ns.HideSpellBook() end
     end)
     book:HookScript("OnHide", function() frame:Hide() end)
@@ -115,8 +134,9 @@ function ns.TrainingList(book)
         pcall(open, "")
         frame = _G.WhatsTrainingFloatingFrame
     end
-    if not frame or not frame.rows or not frame.scrollBar or not frame.searchBox then return nil end
-    Attach(frame, book)
+    local page = frame and ListPage(frame)
+    if not page then return nil end
+    Attach(frame, page, book)
     list = frame
     return frame
 end
