@@ -19,6 +19,68 @@ local LEVEL_FRAMES = { "PlayerFrame", "TargetFrame", "FocusFrame", "PetFrame", "
 -- Windows whose combat protection is uncertain on this client.
 local COMBAT_WINDOWS = { "FriendsFrame", "ForeverClassicUISpellBook", "CharacterFrame", "PlayerSpellsFrame", "WorldMapFrame" }
 
+-- Frames outside the chat frame anchored into it, and what rides those: another addon's tab drag leaves the chat
+-- frame with no points when such a chain hangs on it (#247). UIParent's tree, walked once on the command.
+local function Within(frame, root)
+    while frame do
+        if frame == root then return true end
+        frame = frame:GetParent()
+    end
+    return false
+end
+
+local function AnchorInto(frame, test)
+    local count = frame:GetNumPoints()
+    if ns.IsSecret(count) then return nil end
+    for i = 1, count do
+        local point, rel, relPoint = frame:GetPoint(i)
+        if rel and not ns.IsSecret(rel) and test(rel) then return point, rel, relPoint end
+    end
+end
+
+local function FrameLabel(frame)
+    local name = frame:GetName()
+    if name then return name end
+    local parent = frame:GetParent()
+    return "unnamed under " .. tostring(parent and parent:GetName() or "?")
+end
+
+-- Every frame under the visited one anchored to a frame the test passes, into out.
+local function HungVisit(child, test, out)
+    if ns.IsForbidden(child) then return end
+    local point, rel, relPoint = AnchorInto(child, test)
+    if point then out[#out + 1] = { frame = child, point = point, rel = rel, relPoint = relPoint } end
+    ns.EachChild(child, HungVisit, test, out)
+end
+
+local function ChatHangers()
+    local chat = _G.ChatFrame1
+    if not chat then return end
+    local hung, hangers, set = {}, {}, {}
+    ns.EachChild(UIParent, HungVisit, function(rel) return Within(rel, chat) end, hung)
+    for _, hit in ipairs(hung) do
+        if not Within(hit.frame, chat) then
+            hangers[#hangers + 1] = hit
+            set[hit.frame] = true
+        end
+    end
+    if #hangers == 0 then
+        ns.Print("chat frame hangers: none")
+        return
+    end
+    local riders = {}
+    ns.EachChild(UIParent, HungVisit, function(rel) return set[rel] == true end, riders)
+    ns.Print("chat frame hangers (frames outside it anchored into it):")
+    for _, hit in ipairs(hangers) do
+        ns.Print(string.format("  %s %s -> %s %s shown=%s", FrameLabel(hit.frame), tostring(hit.point), FrameLabel(hit.rel),
+            tostring(hit.relPoint), tostring(hit.frame:IsShown())))
+    end
+    for _, hit in ipairs(riders) do
+        ns.Print(string.format("  rider %s %s -> %s, %d points, shown=%s", FrameLabel(hit.frame), tostring(hit.point),
+            FrameLabel(hit.rel), hit.frame:GetNumPoints(), tostring(hit.frame:IsShown())))
+    end
+end
+
 local function Debug()
     local version, build, _, toc = GetBuildInfo()
     ns.Print(string.format("client %s (%s) toc %s project %s", version, build, tostring(toc), tostring(WOW_PROJECT_ID)))
@@ -89,6 +151,7 @@ local function Debug()
         ns.Print("windows: " .. table.concat(parts, "; "))
         ns.Print("secure snippets usable: " .. tostring(loadstring_untainted ~= nil))
     end
+    ChatHangers()
     if ns.blocked and #ns.blocked > 0 then
         ns.Print("calls the client refused:")
         for _, hit in ipairs(ns.blocked) do
