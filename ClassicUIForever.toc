@@ -195,6 +195,7 @@ Windows\Chat.lua
 Windows\ChatHover.lua
 Windows\WindowChrome.lua
 Windows\Tabs.lua
+Windows\LootRows.lua
 Windows\Loot.lua
 Windows\LootRoll.lua
 Windows\NpcWindows.lua

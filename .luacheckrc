@@ -60,4 +60,7 @@ read_globals = {
     "TOOLTIP_DEFAULT_BACKGROUND_COLOR",
     "GetNumSpecGroups", "TALENT_SPEC_PRIMARY", "TALENT_SPEC_SECONDARY", "TALENT_ACTIVE_SPEC_STATUS", "TALENT_SPEC_ACTIVATE",
     "TALENT_ACTIVATION_SPELLS", "GREEN_FONT_COLOR", "HIGHLIGHT_FONT_COLOR",
+    "GetLootSlotInfo", "GetLootSlotLink", "GetLootSlotType", "LootSlot", "CursorUpdate", "ResetCursor",
+    "TEXTURE_ITEM_QUEST_BANG", "TEXTURE_ITEM_QUEST_BORDER", "ColorManager", "CurrencyContainerUtil",
+    "SetItemButtonTexture", "SetItemButtonTextureVertexColor", "SetItemButtonNormalTextureVertexColor",
 }

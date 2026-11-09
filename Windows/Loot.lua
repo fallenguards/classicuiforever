@@ -1,15 +1,14 @@
 local _, ns = ...
 
--- 1.x loot window: one 256x256 sheet over a 170x240 window, loot icon and skull
--- in the ring, old name box per row. List and rows stay the client's; the rest fades.
+-- 1.x loot window: one 256x256 sheet over a 170x240 window, loot icon and skull in the ring, four rows of ours with
+-- the old name box (Windows/LootRows.lua) and two page arrows. The game's list and bar stand parked off the window,
+-- never laid by us: a size or scroll spot of ours written there ran the list as ours and a fight refused its open (#275).
 
 local P = ns.panels
 local IsSecret, AnySecret = ns.IsSecret, ns.AnySecret
-local Near = ns.Near
 
 local LOOT_W, LOOT_H, LOOT_ROW = 170, 240, 41
--- List top from the window's top; the pager's room at the foot.
-local LOOT_TOP, LOOT_ARROWS = 71, 40
+local LOOT_TOP = 71   -- the list's top from the window's top
 local PAGER_ICONS = { "ScrollUp", "ScrollDown" }   -- the old chat buttons (Windows/Chat.lua)
 local LOOT_EVENTS = { "LOOT_SLOT_CLEARED", "LOOT_SLOT_CHANGED", "LOOT_OPENED" }
 -- Loot at the mouse: the cursor 31 in and 27 down on the first icon (26, -75), as Era puts it; Era's lowest window top.
@@ -21,6 +20,18 @@ local SHEET = { own = "lootPanel", layer = "BACKGROUND", sublevel = -2, coords =
 local ICON = { own = "lootIcon", layer = "BACKGROUND", sublevel = -1, w = 58, h = 58, point = "TOPLEFT", x = 10, y = -5, show = true }
 local SKULL = { own = "lootSkull", layer = "ARTWORK", sublevel = 0, w = 58, h = 58, point = "TOPLEFT", x = 10, y = -5, show = true }
 local CHANGED = { changed = true }
+local PARKED_X = -4000   -- off the screen, left of the window
+local ours = setmetatable({}, { __mode = "k" })   -- our children of the game's window: never faded with its art
+
+-- Gamepad interface at login: the game's list stays in the window at Era's list spot, its rows the game's (46 tall,
+-- 2 apart, 6 in) and its own scrolling, as the navigator's step reads the list's state (#264). Era's spots come back
+-- by moving what shows: each row's item up to the Era slot of the row it stands in.
+local function PadList() return ns.padSession == true end
+local GAME_IN, GAME_STEP = 6, 48
+local ITEM_X, ITEM_Y = 5, -4   -- the game's item spot in its row
+local PAD_LIST_X, PAD_LIST_Y = 21 - GAME_IN, GAME_IN - LOOT_TOP
+local PAD_LIST_H = LOOT_H + PAD_LIST_Y - 5   -- down to Era's foot
+local PAD_LIST_BODY = string.format([[ local box = self:GetFrameRef("box") box:SetHeight(%d) box:GetHeight() ]], PAD_LIST_H)
 
 local function SkinLootElement(element)
     -- Every look: the client re-lights these as it fills a row, after dressing.
@@ -35,16 +46,6 @@ local function SkinLootElement(element)
     end
 end
 
--- One walk over the rows per look; each visitor also measures the pitch and counts the rows seen and still filled.
-local walkPitch
-local walked, filledSeen = 0, 0
-
--- Real row height as drawn; LOOT_ROW until a row exists.
-local function Measure(element)
-    local height = element.GetHeight and element:GetHeight()
-    if height and height > 1 and (not walkPitch or height < walkPitch) then walkPitch = height end
-end
-
 -- A looted row stays as an empty slot until close; hide its name box with it.
 local function SyncBox(element)
     local nameBox = element.fcui and element.fcui.nameBox
@@ -55,17 +56,9 @@ local function SyncBox(element)
         local text = element.Text:GetText()
         if not IsSecret(text) and (text or "") == "" then filled = false end
     end
-    walked = walked + 1
-    if filled and element:IsShown() then filledSeen = filledSeen + 1 end
     nameBox:SetShown(filled and true or false)
 end
 
--- Gamepad interface at login: the list keeps the game's rows (46 tall, 2 apart, 6 in) and scrolls itself, as a row
--- height, padding or scroll spot we write into it taints the navigator's step to the next row (#264). Era's spots come
--- back by moving what shows: the list 6 up and left, each row's item up to the Era slot of the row it stands in.
-local function PadList() return ns.padSession == true end
-local GAME_IN, GAME_STEP = 6, 48
-local ITEM_X, ITEM_Y = 5, -4   -- the game's item spot in its row
 local function PadRow(element)
     local item, box = element.Item, LootFrame and LootFrame.ScrollBox
     local top, boxTop = element:GetTop(), box and box:GetTop()
@@ -76,51 +69,47 @@ end
 
 local function PageRow(element)
     SyncBox(element)
-    Measure(element)
-    if PadList() then PadRow(element) end
+    PadRow(element)
 end
 
 -- The look's visitor: also hushes and dresses rows.
 local function LookRow(element)
     SkinLootElement(element)
-    SyncBox(element)
-    Measure(element)
-    if PadList() then PadRow(element) end
+    PageRow(element)
 end
 
-local function Walk(box, visit)
-    walkPitch, walked, filledSeen = nil, 0, 0
-    if box.ForEachFrame then box:ForEachFrame(visit) end
-    return walkPitch or LOOT_ROW
+-- The game's list and its bar off the window's size: the same size, one anchor. Only once the game's own layout has
+-- settled them (a frame after the first show): a size change of theirs in our run would lay the list as ours.
+local parked, padSized = false, false
+local function Park(child, frame, x, y)
+    if not child then return true end
+    local w, h = child:GetSize()
+    if AnySecret(w, h) or not (w > 0 and h > 0) then return false end
+    child:SetSize(w, h)
+    ns.SetPointOnce(child, "TOPLEFT", frame, "TOPLEFT", x, y)
+    return true
 end
 
-local function LootPitch(box)
-    return Walk(box, Measure)
+local function ParkList(frame)
+    if parked then return true end
+    local box = frame.ScrollBox
+    if not box then return false end
+    local x, y = PARKED_X, 0
+    if PadList() then x, y = PAD_LIST_X, PAD_LIST_Y end
+    parked = Park(box, frame, x, y) and Park(frame.ScrollBar, frame, PARKED_X, 0)
+    return parked
 end
 
--- Whole rows only, as in 1.x.
-local function LootRows(pitch, paged)
-    local room = LOOT_H - LOOT_TOP - (paged and LOOT_ARROWS or 0)
-    return math.max(1, math.floor(room / pitch))
-end
-
--- Set the list's foot only if it moved (secret points count as moved); no
--- ClearAllPoints, the top left anchor stays.
-local function KeepFoot(box, frame, y, right)
-    right = right or 10
-    local count = box:GetNumPoints()
-    if not IsSecret(count) then
-        for i = 1, count do
-            local point, rel, relPoint, x, py = box:GetPoint(i)
-            if AnySecret(point, rel, relPoint, x, py) then break end
-            if point == "BOTTOMRIGHT" then
-                if rel == frame and relPoint == "BOTTOMRIGHT" and type(x) == "number" and type(py) == "number"
-                    and Near(x, right) and Near(py, y) then return end
-                break
-            end
-        end
+-- The pad list's height, Era's four rows: set in a secure run out of a fight, so the list's own layout stays the game's.
+local listWrap
+local function SizePadList(box)
+    if InCombatLockdown() then return false end
+    if not listWrap then
+        listWrap = CreateFrame("Frame", nil, UIParent, "SecureHandlerBaseTemplate")
+        listWrap:SetFrameRef("box", box)
     end
-    box:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", right, y)
+    listWrap:Execute(PAD_LIST_BODY)
+    return true
 end
 
 local function EnableIf(button, on)
@@ -130,39 +119,27 @@ end
 -- The page shown, from 0; a new loot starts on the first.
 local page = 0
 
--- Whole pages as in 1.x: the list can't scroll past its end, so the last page shrinks to what is left and scrolls
--- to the end, its rows at the top (a full last page repeated rows from the page before). cleared: a slot was just
--- looted; a page with nothing left on it turns to the next, as Era's.
+-- cleared: a slot was just looted (a page with nothing left turns to the next, Windows/LootRows.lua ns.LootPageOf).
 local function UpdateLootPages(frame, visit, cleared)
-    -- The client sizes the window as it opens and in edit mode; the old size goes back after its pass.
-    ns.SetSizeIf(frame, LOOT_W, LOOT_H)
-    local box = frame.ScrollBox
-    if not box then return end
-    local pitch = Walk(box, visit or PageRow)
+    -- The game sizes the window as it opens and in edit mode; the old size goes back after its pass, the list off it.
+    if parked then ns.SetSizeIf(frame, LOOT_W, LOOT_H) end
     local pager = frame.fcuiPager
     if not pager then return end
     if PadList() then
+        local box = frame.ScrollBox
+        if box and box.ForEachFrame then box:ForEachFrame(visit or PageRow) end
+        if box and parked and not padSized then padSized = SizePadList(box) end
         ns.SetShownIf(pager, false)
-        KeepFoot(box, frame, LOOT_H - LOOT_TOP - LootRows(LOOT_ROW, false) * LOOT_ROW, 10 + GAME_IN)
         return
     end
-    local total = box.GetDataProviderSize and box:GetDataProviderSize() or 0
-    local paged = total > LootRows(pitch, false)
+    local rows, last, paged
+    page, rows, last, paged = ns.LootPageOf(GetNumLootItems(), page, cleared, ns.LootSlotFilled)
+    ns.FillLootRows(frame, page, rows, pager.wheel)
     ns.SetShownIf(pager, paged)
-    local rows = LootRows(pitch, paged)
-    local last = paged and math.ceil(total / rows) - 1 or 0
-    if cleared and walked > 0 and filledSeen == 0 and page < last then page = page + 1 end
-    page = math.max(0, math.min(page, last))
-    local shown = paged and math.min(rows, total - page * rows) or rows
-    KeepFoot(box, frame, LOOT_H - LOOT_TOP - shown * pitch)
-    if not paged then return end
-    local range = (total - shown) * pitch
-    local want = range > 0 and math.min(1, page * rows * pitch / range) or 0
-    if box.SetScrollPercentage and not Near(box.GetScrollPercentage and box:GetScrollPercentage(), want, 0.001) then
-        box:SetScrollPercentage(want)
+    if paged then
+        EnableIf(pager.up, page > 0)
+        EnableIf(pager.down, page < last)
     end
-    EnableIf(pager.up, page > 0)
-    EnableIf(pager.down, page < last)
 end
 
 -- The client's spot at the mouse fits its own rows; ours put the skull ring under the cursor.
@@ -188,9 +165,8 @@ end
 -- Overflow pages with two arrows at the foot, as in 1.x.
 local function LootPager(frame)
     if frame.fcuiPager then UpdateLootPages(frame) return end
-    local box = frame.ScrollBox
-    if not box then return end
     local pager = ns.NewFrame("Frame", nil, frame)
+    ours[pager] = true
     pager:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 0, 0)
     pager:SetSize(LOOT_W, 40)
     frame.fcuiPager = pager
@@ -220,32 +196,46 @@ local function LootPager(frame)
     end
     pager.up:SetScript("OnClick", function() Page(-1) end)
     pager.down:SetScript("OnClick", function() Page(1) end)
-    -- The wheel turns pages instead of free scrolling; the gamepad's list scrolls as the game's.
-    if not PadList() then box:SetScript("OnMouseWheel", function(_, delta) Turn(-delta) end) end
-    -- Polled from our own frame, never a callback on the client's list (that
-    -- taints the rest of its pass). Not the pager's frame: it hides when all fits.
-    local look = ns.NewFrame("Frame", nil, frame)
-    local job = ns.Sched.OnFrame(look, { name = "loot.look", every = 0.02, fn = function() UpdateLootPages(frame, LookRow) end })
-    -- First look on the frame the window opens.
-    look:SetScript("OnShow", function() job:Kick() end)
-    -- After the client's own show pass, ahead of the first draw: a hook ran inside it, and an error of ours there cut
-    -- the client's loot open short.
+    -- Our shell over the window, mouse off (clicks go through to the rows and the close button): the loot events land
+    -- here, and the wheel turns pages instead of free scrolling; the gamepad's list scrolls as the game's.
+    local shell = ns.NewFrame("Frame", nil, frame)
+    ours[shell] = true
+    shell:SetPoint("TOPLEFT")
+    shell:SetSize(LOOT_W, LOOT_H)
+    shell:EnableMouse(false)
+    if not PadList() then
+        pager.wheel = function(_, delta) Turn(-delta) end
+        shell:EnableMouseWheel(true)
+        shell:SetScript("OnMouseWheel", pager.wheel)
+    else
+        -- The look's job over the game's rows while the window is up: its rows appear with its own scrolls, no event.
+        local look = ns.NewFrame("Frame", nil, frame)
+        ours[look] = true
+        local job = ns.Sched.OnFrame(look, { name = "loot.look", every = 0.02, fn = function() UpdateLootPages(frame, LookRow) end })
+        look:SetScript("OnShow", function() job:Kick() end)
+    end
+    -- After the game's own show pass, ahead of the first draw. The first show waits one frame more: the list parks once
+    -- the game's layout has settled it, and nothing of ours reads the window before that.
     local kept, up
-    ns.Sched.AfterShow(frame, "loot.pages", function()
+    local function Settle()
         UpdateLootPages(frame)
         Place(frame)
         kept, up = { frame:GetLeft(), frame:GetTop() }, true
+    end
+    ns.Sched.AfterShow(frame, "loot.pages", function()
+        if parked then return Settle() end
+        ns.Sched.NextFrame("loot.park", function()
+            if ParkList(frame) and frame:IsShown() then Settle() end
+        end)
     end)
     ns.Sched.OnVisible(frame, "loot.up", function(shown) if not shown then up = false end end)
-    -- Slot change: look next frame, after the client redraws the row.
-    local slots = ns.NewFrame("Frame", nil, pager)
-    ns.RegisterEvents(slots, LOOT_EVENTS)
+    ns.RegisterEvents(shell, LOOT_EVENTS)
     local cleared = false
     local function Redraw()
         if frame:IsShown() then UpdateLootPages(frame, nil, cleared) end
         cleared = false
     end
-    slots:SetScript("OnEvent", function(_, event)
+    shell:SetScript("OnEvent", function(_, event)
         if event == "LOOT_OPENED" then
             page = 0
             -- The same loot opened again (a click with full bags): the game's open put the window at the mouse again.
@@ -268,7 +258,7 @@ local function FadeArtRegion(region, frame, keep)
     end
 end
 local function FadeArtChild(child, keep)
-    if not keep[child] then FadeBlizzardArt(child, keep) end
+    if not (keep[child] or ours[child]) then FadeBlizzardArt(child, keep) end
 end
 FadeBlizzardArt = function(frame, keep)
     ns.EachRegion(frame, FadeArtRegion, frame, keep)
@@ -276,7 +266,7 @@ FadeBlizzardArt = function(frame, keep)
 end
 
 -- Era gives an item's tooltip to its icon, the tooltip beside it over the window; Forever's to the whole row, so it
--- opened past the window's right edge. Put on the icon after the client fills it, while our look is on.
+-- opened past the window's right edge. Put on the icon after the client fills it, while our look is on (the pad list).
 local function TipOnIcon(tip)
     local owner = tip:GetOwner()
     local item = owner and owner.Item
@@ -298,7 +288,6 @@ local function SkinLoot(frame)
     if title then keep[title] = true end
     FadeBlizzardArt(frame, keep)
     if frame.fcui and frame.fcui.titleStrip then frame.fcui.titleStrip:Hide() end
-    frame:SetSize(LOOT_W, LOOT_H)
     ns.DressNew(frame, "lootPanel", SHEET)
     ns.DressNew(frame, "lootIcon", ICON)
     ns.DressNew(frame, "lootSkull", SKULL)
@@ -309,23 +298,15 @@ local function SkinLoot(frame)
     end
     local box = frame.ScrollBox
     if box then
-        local inset = PadList() and GAME_IN or 0
-        ns.SetPointOnce(box, "TOPLEFT", frame, "TOPLEFT", 21 - inset, inset - LOOT_TOP)
-        local pitch = PadList() and LOOT_ROW or LootPitch(box)
-        box:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 10 + inset, LOOT_H - LOOT_TOP - LootRows(pitch, false) * pitch)
-        local view = box.GetView and box:GetView()
-        if view and not PadList() and ns.Once(view, "loot") then
-            if view.SetElementExtent then view:SetElementExtent(LOOT_ROW) end
-            if view.SetPadding then view:SetPadding(0, 0, 0, 0, 0) end
-            if box.FullUpdate then box:FullUpdate(ScrollBoxConstants and ScrollBoxConstants.UpdateImmediately) end
-        end
-        -- New rows are dressed by the pager's look, not a list callback.
-        if box.ForEachFrame then box:ForEachFrame(SkinLootElement) end
-        -- Its own shadows past an edge (more rows above or below) darkened the end rows; 1.x had none.
+        -- The pad list's rows are dressed by the look's job, not a list callback; its shadows darkened the end rows.
+        if PadList() and box.ForEachFrame then box:ForEachFrame(SkinLootElement) end
         if box.Shadows then box.Shadows:SetAlpha(0) end
     end
-    -- The thin scroll bar goes; the wheel still scrolls.
-    if frame.ScrollBar then frame.ScrollBar:SetAlpha(0) end
+    -- The thin scroll bar goes, deaf to the mouse; off the window once the list parks.
+    if frame.ScrollBar then
+        frame.ScrollBar:SetAlpha(0)
+        frame.ScrollBar:EnableMouse(false)
+    end
     LootPager(frame)
 end
 P.after.LootFrame = SkinLoot
