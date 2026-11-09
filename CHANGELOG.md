@@ -2,6 +2,11 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.51.1] - 2026-11-09
+
+### Fixed
+- The spellbook's training page works with What's Training 11.3. With that version the tab had opened What's Training's own floating window instead of the list in the book, and then nothing.
+
 ## [0.51.0] - 2026-11-08
 
 ### Added
