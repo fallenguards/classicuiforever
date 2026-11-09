@@ -2,6 +2,10 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN74_1_TITLE"] = "Spellbook training page"
+L["WN74_1_TEXT"] = "The spellbook's training page works with What's Training 11.3. That version had made the tab open What's Training's own window instead of the list in the book."
+L["WN74_2_TITLE"] = "Share Quest from the quest log"
+L["WN74_2_TEXT"] = "Share Quest in the quest log shares quests outside the zone you stand in too, dungeon quests among them, and leaves the world map shut afterward."
 L["WN73_1_TITLE"] = "Training on a profession's window"
 L["WN73_1_TEXT"] = "With What's Training installed, a profession's window has two side tabs: the bottom one lists what its trainer can teach you, the top one returns to the profession. Training tabs wear What's Training's own icons, on the spellbook too."
 L["WN73_2_TITLE"] = "Loot in a fight"

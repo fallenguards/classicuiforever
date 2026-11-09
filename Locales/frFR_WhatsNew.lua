@@ -3,6 +3,10 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN74_1_TITLE"] = "Page d'entraînement du grimoire"
+L["WN74_1_TEXT"] = "La page d'entraînement du grimoire fonctionne avec What's Training 11.3. Avec cette version, l'onglet ouvrait la propre fenêtre de What's Training au lieu de la liste dans le grimoire."
+L["WN74_2_TITLE"] = "Partager une quête depuis le journal"
+L["WN74_2_TEXT"] = "Partager une quête dans le journal des quêtes partage aussi les quêtes hors de la zone où vous êtes, donjons compris, et laisse la carte du monde fermée ensuite."
 L["WN73_1_TITLE"] = "Formation dans la fenêtre d'un métier"
 L["WN73_1_TEXT"] = "Avec What's Training installé, la fenêtre d'un métier a deux onglets latéraux : celui du bas liste ce que son maître peut vous apprendre, celui du haut revient au métier. Les onglets de formation portent les icônes de What's Training, dans le grimoire aussi."
 L["WN73_2_TITLE"] = "Butin en combat"

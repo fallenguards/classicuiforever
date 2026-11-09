@@ -5,7 +5,11 @@ All notable changes to ClassicUI Forever are documented here.
 ## [0.51.1] - 2026-11-09
 
 ### Fixed
+- Share Quest in the quest log shares quests outside the zone you stand in, dungeon quests among them, and leaves the world map shut afterward. The map folds those zones' headers as it opens, so the press found no row for the quest and could leave the map open.
 - The spellbook's training page works with What's Training 11.3. With that version the tab had opened What's Training's own floating window instead of the list in the book, and then nothing.
+
+### Changed
+- The debug command (/fcui debug) also lists what other frames hang on the chat frame, for chat reports.
 
 ## [0.51.0] - 2026-11-08
 

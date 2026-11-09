@@ -3,6 +3,10 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN74_1_TITLE"] = "Pagina di addestramento del libro degli incantesimi"
+L["WN74_1_TEXT"] = "La pagina di addestramento del libro degli incantesimi funziona con What's Training 11.3. Con quella versione la scheda apriva la finestra propria di What's Training invece dell'elenco nel libro."
+L["WN74_2_TITLE"] = "Condividi missione dal registro"
+L["WN74_2_TEXT"] = "Condividi missione nel registro delle missioni condivide anche le missioni fuori dalla zona in cui ti trovi, spedizioni comprese, e lascia la mappa del mondo chiusa dopo."
 L["WN73_1_TITLE"] = "Addestramento nella finestra di una professione"
 L["WN73_1_TEXT"] = "Con What's Training installato, la finestra di una professione ha due schede laterali: quella in basso elenca ciò che il suo addestratore può insegnarti, quella in alto torna alla professione. Le schede di addestramento portano le icone di What's Training, anche nel libro degli incantesimi."
 L["WN73_2_TITLE"] = "Bottino in combattimento"

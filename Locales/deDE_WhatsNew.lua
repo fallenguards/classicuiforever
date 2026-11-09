@@ -3,6 +3,10 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN74_1_TITLE"] = "Trainingsseite im Zauberbuch"
+L["WN74_1_TEXT"] = "Die Trainingsseite des Zauberbuchs funktioniert mit What's Training 11.3. Mit dieser Version öffnete der Reiter das eigene Fenster von What's Training statt der Liste im Buch."
+L["WN74_2_TITLE"] = "Quest teilen aus dem Questlog"
+L["WN74_2_TEXT"] = "Quest teilen im Questlog teilt auch Quests außerhalb der Zone, in der du stehst, Dungeonquests eingeschlossen, und lässt die Weltkarte danach geschlossen."
 L["WN73_1_TITLE"] = "Lernen im Berufsfenster"
 L["WN73_1_TEXT"] = "Mit installiertem What's Training hat das Fenster eines Berufs zwei seitliche Reiter: der untere listet, was sein Lehrer dir beibringen kann, der obere kehrt zum Beruf zurück. Die Lern-Reiter tragen die eigenen Symbole von What's Training, auch im Zauberbuch."
 L["WN73_2_TITLE"] = "Plündern im Kampf"

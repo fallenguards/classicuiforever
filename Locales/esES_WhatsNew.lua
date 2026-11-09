@@ -3,6 +3,10 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN74_1_TITLE"] = "Página de entrenamiento del libro de hechizos"
+L["WN74_1_TEXT"] = "La página de entrenamiento del libro de hechizos funciona con What's Training 11.3. Con esa versión la pestaña abría la propia ventana de What's Training en vez de la lista en el libro."
+L["WN74_2_TITLE"] = "Compartir misión desde el registro"
+L["WN74_2_TEXT"] = "Compartir misión en el registro de misiones también comparte misiones fuera de la zona en la que estás, mazmorras incluidas, y deja el mapa del mundo cerrado después."
 L["WN73_1_TITLE"] = "Entrenamiento en la ventana de una profesión"
 L["WN73_1_TEXT"] = "Con What's Training instalado, la ventana de una profesión tiene dos pestañas laterales: la de abajo lista lo que su instructor puede enseñarte, la de arriba vuelve a la profesión. Las pestañas de entrenamiento llevan los iconos propios de What's Training, también en el libro de hechizos."
 L["WN73_2_TITLE"] = "Saquear en combate"
