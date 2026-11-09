@@ -91,7 +91,7 @@ function ns.TrainingList(book)
     local open = SlashCmdList and SlashCmdList.WHATSTRAINING
     if type(open) ~= "function" then return nil end
     local frame = _G.WhatsTrainingFloatingFrame
-    if not frame then
+    if not frame or frame.spellsPage then
         -- Its command builds the window and shows it; another addon's code, kept from ending our click.
         pcall(open, "")
         frame = _G.WhatsTrainingFloatingFrame
