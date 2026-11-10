@@ -122,14 +122,29 @@ local function FillPortrait(frame)
     end
 end
 
+-- Era's slots on Era's steel lattice, 12 across and 7 down between, in Forever's 8 columns; the window as wide as the
+-- grid with Era's 20 each side. The client steps its rows 47; the bag label keeps 7 more under the grid's foot.
+local COLUMNS, SLOT, GAP_X, GAP_Y, GRID_X, GRID_Y = 8, 37, 12, 7, 20, -63
+local GRID_FOOT, CLIENT_ROW, CLIENT_ROWS = 7, 47, 6
+local WIDTH = GRID_X * 2 + COLUMNS * SLOT + (COLUMNS - 1) * GAP_X
+-- The lattice per slot from Forever's bank sheet (Era's lattice in 7 columns, slot 1 at 40,73, steps 49 and 44):
+-- outer slots give the edge cells, its one-row bag lattice the bag row's. Cells meet mid gap, 6 and 6, 3 over 4.
+local CELL_X = { 40, 138, 334 }        -- first, inner, last column
+local CELL_Y = { 73, 117, 205, 274 }    -- first, inner, last row; the bag row
+local SPLIT_X, SPLIT_UP, SPLIT_DOWN = 6, 3, 4
+local EDGE_LEFT, EDGE_TOP, EDGE_RIGHT, EDGE_BOTTOM = 3, 3, 6, 6
+local CELL = { set = "raw", tint = true }
+local SHEET = 512
+
 -- Era's bank under Forever's taller grid (eram bankframe): the bag row, the purchase line and the money strip spaced as
--- Era's, from the window's foot. The grid keeps Forever's 8 columns; the window grows FOOT_ROOM to hold Era's spacing.
+-- Era's from the grid's middle and the window's foot; the window grows FOOT_ROOM to hold Era's spacing.
 local FOOT_ROOM = 49
-local BAG_X, BAG_STEP, BAG_TOP, BAG_LABEL_TOP = 47, 50, 142, 160
-local GRID_MIDDLE = 240
-local BUY_Y, COST_X, BUY_RIGHT, BUY_TEXT_X, BUY_TEXT_Y, BUY_TEXT_W = 45, 116, 366, 246, 75, 280
--- The money on the strip's floor, its copper 3 short of the gold rim (468): the client's display ends 13 past it.
-local MONEY_X, MONEY_Y, MONEY_END = 303, 17.5, 468
+local BAG_STEP, BAG_TOP, BAG_LABEL_TOP = 49, 142, 160
+local GRID_MIDDLE = WIDTH / 2
+local BUY_Y, BUY_TEXT_Y, BUY_TEXT_W = 45, 75, 280
+local COST_X, BUY_RIGHT, BUY_TEXT_X = GRID_MIDDLE - 124, GRID_MIDDLE + 126, GRID_MIDDLE + 6
+-- The money on the strip's floor, its copper 3 short of the gold rim (12 in): the client's display ends 13 past it.
+local MONEY_X, MONEY_Y, MONEY_END = WIDTH - 177, 17.5, WIDTH - 12
 -- The foot of Forever's own bank sheet (the same art as Era's): metal bar and gold-rimmed strip, rows 391-411, ends
 -- kept and the middle stretched between the metal's inner edges; its foot 5 over the metal (seen in game).
 local BANK_SHEET = "Interface\\BankFrame\\UI-BankFrame"
@@ -139,18 +154,88 @@ local FOOT_LEFT = { set = "raw", tint = true, point = "BOTTOMLEFT", x = FOOT_IN,
 local FOOT_RIGHT = { set = "raw", tint = true, point = "BOTTOMRIGHT", x = -FOOT_IN, y = FOOT_Y, w = 30, h = FOOT_H,
     coords = { 360 / 512, 390 / 512, FOOT_V0, FOOT_V1 }, show = true }
 local FOOT_MIDDLE = { set = "raw", tint = true, coords = { 44 / 512, 360 / 512, FOOT_V0, FOOT_V1 }, show = true }
+local GetContainerNumSlots = C_Container and C_Container.GetContainerNumSlots
 
 local sized = setmetatable({}, { __mode = "k" })
 local purchaseText = setmetatable({}, { __mode = "k" })
+local gridRows = setmetatable({}, { __mode = "k" })
 
--- After each client layout (it sizes the window to its rows): the room for Era's foot, once per layout.
-local function Heighten(frame)
+-- After each client layout (it sizes the window to its rows, at the panel's width): the grid's width, and the room for
+-- Era's foot less what Era's shorter rows free, keeping the bag label as far under the plates as it stood.
+local function Fit(frame)
     local panel = frame and frame.BankPanel
+    local w, fw = panel and panel:GetWidth(), frame and frame:GetWidth()
+    if w and fw and not AnySecret(w, fw) and not (Near(w, WIDTH) and Near(fw, WIDTH)) then
+        panel:SetWidth(WIDTH)
+        frame:SetWidth(WIDTH)
+    end
     local h = panel and panel:GetHeight()
     if not h or IsSecret(h) or Near(h, sized[frame] or -1) then return end
-    sized[frame] = h + FOOT_ROOM
-    panel:SetHeight(h + FOOT_ROOM)
-    frame:SetHeight(h + FOOT_ROOM)
+    local rows = math.max(gridRows[panel] or CLIENT_ROWS, CLIENT_ROWS)
+    local height = h + FOOT_ROOM - ((rows - 1) * (CLIENT_ROW - SLOT - GAP_Y) - GRID_FOOT)
+    sized[frame] = height
+    panel:SetHeight(height)
+    frame:SetHeight(height)
+end
+
+-- One slot's lattice cell: edges where it ends the grid, a one-row cut for a row alone.
+local cellCoords = {}
+local function Cell(frame, key, button, first, last, top, bottom)
+    local alone = top and bottom
+    local sx = first and CELL_X[1] or last and CELL_X[3] or CELL_X[2]
+    local sy = alone and CELL_Y[4] or top and CELL_Y[1] or bottom and CELL_Y[3] or CELL_Y[2]
+    local l = first and EDGE_LEFT or SPLIT_X
+    local r = (last and not first) and EDGE_RIGHT or SPLIT_X
+    local t = top and EDGE_TOP or SPLIT_UP
+    local b = bottom and EDGE_BOTTOM or SPLIT_DOWN
+    cellCoords[1], cellCoords[2] = (sx - l) / SHEET, (sx + SLOT + r) / SHEET
+    cellCoords[3], cellCoords[4] = (sy - t) / SHEET, (sy + SLOT + b) / SHEET
+    local cell = ns.Dress(ns.OwnTexture(frame, key, "BORDER", -1), BANK_SHEET, CELL, nil, nil, nil, nil, nil, cellCoords)
+    cell:ClearAllPoints()
+    cell:SetPoint("TOPLEFT", button, "TOPLEFT", -l, t)
+    cell:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", r, -b)
+    cell:Show()
+end
+
+-- Our cells past the count hidden (a page with fewer slots).
+local function HideFrom(frame, prefix, first)
+    local own = frame.fcui
+    local i = first
+    while own[prefix .. i] do
+        own[prefix .. i]:Hide()
+        i = i + 1
+    end
+end
+
+-- The slots in the client's order: its tabs as listed, each tab's slots in turn (it pages through them the same way).
+local order, byKey = {}, {}
+local function SlotOrder(panel)
+    wipe(order)
+    wipe(byKey)
+    for button in panel.itemButtonPool:EnumerateActive() do
+        local tab, slot = button:GetBankTabID(), button:GetContainerSlotID()
+        if tab and slot then byKey[tab * 1000 + slot] = button end
+    end
+    for _, data in ipairs(panel.purchasedBankTabData or ns.EMPTY) do
+        for slot = 1, GetContainerNumSlots(data.ID) or 0 do
+            local button = byKey[data.ID * 1000 + slot]
+            if button then order[#order + 1] = button end
+        end
+    end
+end
+
+local function LayGrid(frame)
+    local panel = frame.BankPanel
+    if not (panel and panel.itemButtonPool and GetContainerNumSlots) then return end
+    SlotOrder(panel)
+    local count = #order
+    for i, button in ipairs(order) do
+        local column, row = (i - 1) % COLUMNS, math.floor((i - 1) / COLUMNS)
+        ns.SetPointOnce(button, "TOPLEFT", panel, "TOPLEFT", GRID_X + column * (SLOT + GAP_X), GRID_Y - row * (SLOT + GAP_Y))
+        Cell(frame, "bankCell" .. i, button, column == 0, column == COLUMNS - 1 or i == count, row == 0, i + COLUMNS > count)
+    end
+    HideFrom(frame, "bankCell", count + 1)
+    gridRows[panel] = math.ceil(count / COLUMNS)
 end
 
 local function LayFoot(frame)
@@ -200,13 +285,18 @@ local function PlaceFoot(frame)
     end
 end
 
+-- Full size under the item columns, from the first, on the bag row's lattice, as Era's.
 local function PlaceBagSlots(frame)
     if not frame.itemButtonBagPool then return end
+    local count = 0
     for button in frame.itemButtonBagPool:EnumerateActive() do
-        -- Full size under the item columns, from the first, as Era's.
+        count = math.max(count, (tonumber(button.bagSlotID) or 2) - 1)
+    end
+    for button in frame.itemButtonBagPool:EnumerateActive() do
         local i = (tonumber(button.bagSlotID) or 2) - 1
         button:SetScale(1)
-        ns.SetPointOnce(button, "TOPLEFT", frame, "BOTTOMLEFT", BAG_X + (i - 1) * BAG_STEP, BAG_TOP)
+        ns.SetPointOnce(button, "TOPLEFT", frame, "BOTTOMLEFT", GRID_X + (i - 1) * BAG_STEP, BAG_TOP)
+        Cell(frame, "bankBagCell" .. i, button, i == 1, i == count, true, true)
     end
 end
 
@@ -248,7 +338,8 @@ local function DressWindow(frame)
     SkinBagSlots(frame)
     -- Era's foot is for Forever's bank (its bag row and cost line); retail's tabbed bank keeps the game's layout.
     if ns.OnForever() then
-        Heighten(frame)
+        LayGrid(frame)
+        Fit(frame)
         PlaceFoot(frame)
         PlaceBagSlots(frame)
     end
@@ -257,7 +348,9 @@ end
 
 local function AfterLayout(panel)
     SkinSlots(panel)
-    if ns.OnForever() then Heighten(panel:GetParent()) end
+    if not ns.OnForever() then return end
+    LayGrid(panel:GetParent())
+    Fit(panel:GetParent())
 end
 
 local function AfterBagButtons(frame)
