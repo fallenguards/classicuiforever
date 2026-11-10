@@ -14,10 +14,11 @@ local W, H = 668, 426
 
 -- Spots in the page's units. rank: its top left, then its right end (single) or width (double); bar: x, top, bottom;
 -- detail: the scroll's corners; foot: each button's left and width (single: chained from Create All and Exit).
-local SINGLE = { rows = 8, rank = { 61, -24 }, rankRight = -9, list = { 10, -83 }, listW = 316, listWBar = 293,
+-- rowH: the single's rows 15, so row 1 stands 4 under the list's edge (Era's sits on it) and row 8 clears the divider.
+local SINGLE = { rows = 8, rowH = 15, rank = { 61, -24 }, rankRight = -9, list = { 10, -87 }, listW = 316, listWBar = 293,
     bar = { 311, -99, -197 }, all = { 14, -62 }, filter = { -11, -52 }, search = { 75, -57 },
     detail = { 8, -221, 305, -397 } }
-local DOUBLE = { rows = D.ROWS, rank = { 61, -32 }, rankW = 268, list = { 8, -84 }, listW = 296, listWBar = 296,
+local DOUBLE = { rows = D.ROWS, rowH = ROW_H, rank = { 61, -32 }, rankW = 268, list = { 8, -84 }, listW = 296, listWBar = 296,
     bar = { 313, -77, -379 }, all = { 12, -64 }, search = { 350, -32 },
     detail = { 336, -61, 636, -395 },
     -- Each button from the middle of its box's rims to the other's, across and down (the boxes' rims, art 410 to 435).
@@ -192,9 +193,15 @@ function D.Layout(panel)
         rank:SetPoint("RIGHT", panel, "RIGHT", panel.rankRight or s.rankRight, 0)
     end
     Rows(panel, s.rows)
+    for i, row in ipairs(panel.allRows) do
+        local y = -(i - 1) * s.rowH
+        row:SetHeight(s.rowH)
+        row:SetPoint("TOPLEFT", panel.list, "TOPLEFT", 0, y)
+        row:SetPoint("TOPRIGHT", panel.list, "TOPRIGHT", 0, y)
+    end
     panel.listW, panel.listWBar = s.listW, s.listWBar
     ns.SetPointOnce(panel.list, "TOPLEFT", panel, "TOPLEFT", s.list[1], s.list[2])
-    panel.list:SetSize(s.listW, s.rows * ROW_H)
+    panel.list:SetSize(s.listW, s.rows * s.rowH)
     panel.listBox:SetHeight(s.rows * ROW_H + 25)
     local bar = panel.bar
     bar:ClearAllPoints()

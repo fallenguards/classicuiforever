@@ -11,7 +11,8 @@ local PointShare, ShareClick, ShareMacro, SharePadAfter = QL.PointShare, QL.Shar
 local ART = ns.ART
 
 local WIDTH, HEIGHT = 384, 512
-local ROWS, ROW_H, ROW_GAP = 6, 15, 0.6   -- six rows fill the 93px track exactly
+-- Row 1 four under the art's list edge (Era's sits 1 under it); six rows of 15 then fill the track.
+local ROWS, ROW_H, ROW_PAD, ROW_GAP = 6, 15, 3, 0
 local LIST_X, LIST_Y, LIST_W = 19, -75, 300
 local LIST_H = 93   -- the art's list track; rows clip to it
 local DETAIL_GAP, DETAIL_H = 7, 260
@@ -23,7 +24,7 @@ local QUEST_LOG_CLOSE_Y = -8
 local QUEST_LOG_CLOSE_SIZE = 32
 -- 3.x double pane, measured from its two sheets; the frame is their opaque extent.
 local DUAL = { WIDTH = 680, HEIGHT = 440, LIST_X = 20, LIST_Y = -76, LIST_W = 296, LIST_H = 332, ROWS = 21,
-    DETAIL_X = 352, DETAIL_Y = -80, DETAIL_W = 292, DETAIL_H = 328 }
+    ROW_PAD = 2, ROW_GAP = 0.6, DETAIL_X = 352, DETAIL_Y = -80, DETAIL_W = 292, DETAIL_H = 328 }
 local MAX_ROWS = DUAL.ROWS
 
 local FRAME_NAME = "ForeverClassicUIQuestLog"   -- named by string in BarSkins' MICRO_WINDOWS
@@ -156,14 +157,9 @@ local function RowLeave(self)
     GameTooltip:Hide()
 end
 
-local function MakeRow(index)
+local function MakeRow()
     local row = ns.NewFrame("Button", nil, frame.listArea)
     row:SetSize(LIST_W, ROW_H)
-    if index == 1 then
-        row:SetPoint("TOPLEFT", frame.listArea, "TOPLEFT", 0, 0)
-    else
-        row:SetPoint("TOPLEFT", rows[index - 1], "BOTTOMLEFT", 0, -ROW_GAP)
-    end
     row.icon = row:CreateTexture(nil, "ARTWORK")
     row.icon:SetSize(16, 16)
     row.icon:SetPoint("LEFT", row, "LEFT", 3, 0)
@@ -488,7 +484,10 @@ function Layout()
         frame.listArea:SetPoint("TOPLEFT", frame, "TOPLEFT", LIST_X, LIST_Y)
         frame.listArea:SetSize(LIST_W, LIST_H)
     end
+    local pad, gap = dual and DUAL.ROW_PAD or ROW_PAD, dual and DUAL.ROW_GAP or ROW_GAP
+    rows[1]:SetPoint("TOPLEFT", frame.listArea, "TOPLEFT", 0, -pad)
     for i = 1, MAX_ROWS do rows[i]:SetWidth(listW) end
+    for i = 2, MAX_ROWS do rows[i]:SetPoint("TOPLEFT", rows[i - 1], "BOTTOMLEFT", 0, -gap) end
     frame.detail:ClearAllPoints()
     if dual then
         frame.detail:SetPoint("TOPLEFT", frame, "TOPLEFT", DUAL.DETAIL_X, DUAL.DETAIL_Y)
@@ -700,7 +699,7 @@ local function Build()
     listArea:SetSize(LIST_W, LIST_H)
     listArea:SetClipsChildren(true)
     frame.listArea = listArea
-    for i = 1, MAX_ROWS do rows[i] = MakeRow(i) end
+    for i = 1, MAX_ROWS do rows[i] = MakeRow() end
     listArea:EnableMouseWheel(true)
     listArea:SetScript("OnMouseWheel", function(_, delta) frame.listBar:SetValue(frame.listBar:GetValue() - delta) end)
     frame.listBar = ns.ClassicScrollBar(frame, listArea, function() UpdateList() end)
