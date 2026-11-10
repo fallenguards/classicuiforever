@@ -70,6 +70,7 @@ ns.DB_DEFAULTS = {
     professionsBook = true,
     tradeSkill = true,
     trainer = true,
+    trainerSearch = true,
     tradeSkillSearch = true,
     tradeSkillByDifficulty = false,
     tradeSkillDual = false,
@@ -412,7 +413,7 @@ ns.MODULE_ORDER = {
     "fullPlates", "platesOneSize", "classicFonts", "questTracker", "hideObjectiveTracker", "hideTrackerHeader", "questWatch", "questLog", "questLogDual", "questLevels", "questListFont", "questMapPane", "panels", "worldMap", "mapCoords", "lootWindow", "classicChat", "lootRoll", "lootToast", "skillToast", "zoneTerritory", "hideZoneText", "hideHelpButtons",
     "guildRoster", "whoList", "groupFinder", "hideLastNames", "mapFade", "oneBag", "bags", "characterSheet", "statPanes",
     "spellBook", "spellBookTopRank", "spellBookHidePassives", "spellBookFlyouts", "spellBookSearch", "professionsBook", "tradeSkillSearch", "tradeSkill", "tradeSkillDual",
-    "trainer", "talents", "legacyWindow", "collectionsWindow", "options", "gameMenu", "tooltips", "clientMenus", "settingsPanel", "damageMeter", "gameArt",
+    "trainer", "trainerSearch", "talents", "legacyWindow", "collectionsWindow", "options", "gameMenu", "tooltips", "clientMenus", "settingsPanel", "damageMeter", "gameArt",
 }
 
 -- Reload-only toggles per direction with popup text; unlisted apply live. Owed for art or anchors left on client frames,

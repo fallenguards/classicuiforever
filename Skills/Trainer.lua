@@ -7,6 +7,7 @@ local panel
 local LIST_ROWS = 9
 local lines, collapsed = {}, {}
 local selected
+local query = ""
 
 local SkillList = ns.SkillList
 local SetAlphaIf, SetScaleIf, SetLevelIf, SetPointIf = ns.SetAlphaIf, ns.SetScaleIf, ns.SetLevelIf, ns.SetPointIf
@@ -57,7 +58,7 @@ local function Services()
     local order, groups = {}, {}
     for index = 1, count do
         local name, kind, texture, level, sub, category = GetTrainerServiceInfo(index)
-        if name then
+        if name and (query == "" or name:lower():find(query, 1, true)) then
             if not category or category == "" then category = OTHER or "Other" end
             if not groups[category] then
                 groups[category] = {}
@@ -76,7 +77,7 @@ local function Collect()
     for _, category in ipairs(order) do
         -- Pet training lists flat, as the game's own window does: its skills carry no category.
         if not pet then lines[#lines + 1] = { header = true, id = category, name = category } end
-        if pet or not collapsed[category] then
+        if pet or query ~= "" or not collapsed[category] then
             for _, service in ipairs(groups[category]) do lines[#lines + 1] = service end
         end
     end
@@ -302,6 +303,8 @@ end
 function ns.TrainerPanel() return panel end
 function ns.TrainerRowFor(index)
     if not (active and panel and panel:IsShown()) or type(index) ~= "number" or not GetTrainerServiceInfo then return nil end
+    -- A search could hide it: cleared, the list redraws whole.
+    if query ~= "" then panel.search:SetText("") end
     local category = select(6, GetTrainerServiceInfo(index))
     if not category or category == "" then category = OTHER or "Other" end
     if collapsed[category] then
@@ -471,6 +474,23 @@ local function Refresh()
     UpdateDetail()
 end
 
+-- From past the All tab to the filter, its middle on the filter's (the input's art 5 out on the left).
+local function BuildSearch()
+    local search = ns.ShellSearch(panel, function(text)
+        if text == query then return end
+        query = text
+        panel.bar:SetValue(0)
+        Refresh()
+    end)
+    search:SetPoint("TOPLEFT", panel, "TOPLEFT", 90, -60)
+    search:SetPoint("RIGHT", panel.filter, "LEFT", -9, 0)
+    ns.ShellSearchShown(panel, ns.db and ns.db.trainerSearch ~= false)
+end
+ns.RegisterModule("trainerSearch", {
+    apply = function() ns.ShellSearchShown(panel, true) end,
+    restore = function() ns.ShellSearchShown(panel, false) end,
+})
+
 local function SetWidthIf(region, width)
     local current = region:GetWidth()
     if not IsSecret(current) and not IsSecret(width) and current == width then return end
@@ -578,6 +598,7 @@ local function Build()
         end
         panel.filterList:Toggle(self)
     end)
+    BuildSearch()
 
     -- The chosen service, in its scroll.
     local detail = DetailScroll()
@@ -672,6 +693,8 @@ events:SetScript("OnEvent", function(_, event)
         OpenNow()
         if event == "TRAINER_CLOSED" then
             selected = nil
+            -- The next trainer opens on its whole list.
+            if query ~= "" and panel then panel.search:SetText("") end
         elseif panel and panel:IsVisible() then
             UpdateRows()
             UpdateDetail()

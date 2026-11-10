@@ -519,6 +519,8 @@ ns.TOGGLES = {
     { "tradeSkillDual", L["OPT_tradeSkillDual"], L["OPT_tradeSkillDual_TIP"], parent = "tradeSkill",
         search = "double pane wide wider two side by side professions crafting" },
     { "trainer", L["OPT_trainer"], L["OPT_trainer_TIP"] },
+    { "trainerSearch", L["OPT_trainerSearch"], L["OPT_trainerSearch_TIP"], parent = "trainer",
+        search = "search find filter spells skills recipes trainer list" },
 
     { "whoList", L["OPT_whoList"], L["OPT_whoList_TIP"], group = L["GROUP_SOCIAL"] },
     { "hideWhoTab", L["OPT_hideWhoTab"], L["OPT_hideWhoTab_TIP"], search = "who tab hide remove social group finder" },
