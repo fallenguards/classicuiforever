@@ -3,6 +3,12 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN76_1_TITLE"] = "Ricerca nel registro delle missioni"
+L["WN76_1_TEXT"] = "Il registro delle missioni a riquadro doppio ha una casella di ricerca nell'intestazione. Elenca le missioni il cui nome o la cui zona contiene le parole."
+L["WN76_2_TITLE"] = "Ordina per difficoltà"
+L["WN76_2_TEXT"] = "Tutte le ricette di una professione in un unico elenco, prima arancione, poi giallo, verde e grigio. Attivalo nel menu Filtro della finestra di una professione o nelle opzioni (/fcui), in Professioni."
+L["WN76_3_TITLE"] = "Pulsanti di chiusura classici"
+L["WN76_3_TEXT"] = "La banca di gilda e la mappa del maestro di volo hanno la X classica."
 L["WN75_1_TITLE"] = "Tooltip di un link di oggetto"
 L["WN75_1_TEXT"] = "La X del tooltip di un link di oggetto è quella classica, al suo posto classico."
 L["WN75_2_TITLE"] = "Abilità del famiglio sul cursore"

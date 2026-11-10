@@ -3,6 +3,12 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN76_1_TITLE"] = "Suche im Questlog"
+L["WN76_1_TEXT"] = "Das Questlog mit Doppelseite hat ein Suchfeld in der Kopfzeile. Es listet die Quests, deren Name oder Zone die Wörter enthält."
+L["WN76_2_TITLE"] = "Nach Schwierigkeit sortieren"
+L["WN76_2_TEXT"] = "Alle Rezepte eines Berufs in einer Liste, zuerst orange, dann gelb, grün und grau. Schalte es im Filtermenü eines Berufsfensters oder in den Optionen (/fcui) unter Berufe ein."
+L["WN76_3_TITLE"] = "Klassische Schließknöpfe"
+L["WN76_3_TEXT"] = "Die Gildenbank und die Karte des Flugmeisters haben das klassische X."
 L["WN75_1_TITLE"] = "Tooltip eines Gegenstandslinks"
 L["WN75_1_TEXT"] = "Das X am Tooltip eines Gegenstandslinks ist das klassische, an seiner klassischen Stelle."
 L["WN75_2_TITLE"] = "Begleiterfähigkeiten am Mauszeiger"

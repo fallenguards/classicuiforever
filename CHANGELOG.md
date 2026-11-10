@@ -2,6 +2,15 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.52.0] - 2026-11-10
+
+### Added
+- The double pane quest log has a search box in its header. It lists the quests whose name or zone holds the words; Quest search, under Double pane in the options, turns it off.
+- Sort by difficulty lists every recipe of a profession in one run, orange first, then yellow, green and gray. Turn it on in a profession window's Filter menu or in the options (/fcui), under Professions.
+
+### Fixed
+- The guild bank's and the flight master's map's close buttons are the classic X.
+
 ## [0.51.2] - 2026-11-10
 
 ### Fixed

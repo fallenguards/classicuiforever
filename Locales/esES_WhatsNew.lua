@@ -3,6 +3,12 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN76_1_TITLE"] = "Búsqueda en el registro de misiones"
+L["WN76_1_TEXT"] = "El registro de misiones de panel doble tiene un cuadro de búsqueda en su cabecera. Muestra las misiones cuyo nombre o zona contiene las palabras."
+L["WN76_2_TITLE"] = "Ordenar por dificultad"
+L["WN76_2_TEXT"] = "Todas las recetas de una profesión en una sola lista, primero naranja, luego amarillo, verde y gris. Actívalo en el menú Filtro de la ventana de una profesión o en las opciones (/fcui), en Profesiones."
+L["WN76_3_TITLE"] = "Botones de cierre clásicos"
+L["WN76_3_TEXT"] = "El banco de hermandad y el mapa del maestro de vuelo tienen la X clásica."
 L["WN75_1_TITLE"] = "Descripción de un enlace de objeto"
 L["WN75_1_TEXT"] = "La X de la descripción de un enlace de objeto es la clásica, en su sitio clásico."
 L["WN75_2_TITLE"] = "Habilidades de mascota en el cursor"

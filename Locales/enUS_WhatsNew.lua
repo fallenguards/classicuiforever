@@ -2,6 +2,12 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN76_1_TITLE"] = "Quest log search"
+L["WN76_1_TEXT"] = "The double pane quest log has a search box in its header. It lists the quests whose name or zone holds the words."
+L["WN76_2_TITLE"] = "Sort by difficulty"
+L["WN76_2_TEXT"] = "Every recipe of a profession in one run, orange first, then yellow, green and gray. Turn it on in a profession window's Filter menu or in the options (/fcui), under Professions."
+L["WN76_3_TITLE"] = "Classic close buttons"
+L["WN76_3_TEXT"] = "The guild bank and the flight master's map have the classic X."
 L["WN75_1_TITLE"] = "Item link tooltip"
 L["WN75_1_TEXT"] = "The X on an item link's tooltip is the classic one, on its classic spot."
 L["WN75_2_TITLE"] = "Pet abilities on the cursor"

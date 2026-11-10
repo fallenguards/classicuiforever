@@ -3,6 +3,12 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN76_1_TITLE"] = "Recherche dans le journal de quêtes"
+L["WN76_1_TEXT"] = "Le journal de quêtes à double volet a un champ de recherche dans son en-tête. Il liste les quêtes dont le nom ou la zone contient les mots."
+L["WN76_2_TITLE"] = "Trier par difficulté"
+L["WN76_2_TEXT"] = "Toutes les recettes d'un métier en une seule liste, orange d'abord, puis jaune, vert et gris. Activez-le dans le menu Filtre de la fenêtre d'un métier ou dans les options (/fcui), sous Métiers."
+L["WN76_3_TITLE"] = "Boutons de fermeture classiques"
+L["WN76_3_TEXT"] = "La banque de guilde et la carte du maître de vol ont le X classique."
 L["WN75_1_TITLE"] = "Infobulle d'un lien d'objet"
 L["WN75_1_TEXT"] = "Le X de l'infobulle d'un lien d'objet est le classique, à sa place classique."
 L["WN75_2_TITLE"] = "Techniques de familier sur le curseur"
