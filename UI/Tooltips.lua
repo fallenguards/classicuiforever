@@ -106,7 +106,35 @@ local function Dress(tip)
     Paint(tip, clientArt == true)
 end
 
+-- The item link tooltip's X in Era's art on Era's spot (ItemRef.xml: 32 wide, 1 right of the corner); kept: the game's
+-- art, size and spot, handed back as the module goes off.
+local CLOSE_STATES = { "Normal", "Pushed", "Disabled", "Highlight" }
+local closeKept
+local function LinkTipClose(on)
+    local tip = _G.ItemRefTooltip
+    local close = tip and tip.CloseButton
+    if not close or ns.IsForbidden(close) or not ns.SkinCloseButton then return end
+    if on and not closeKept then
+        closeKept = { w = close:GetWidth(), h = close:GetHeight(), point = { close:GetPoint(1) }, art = {} }
+        for _, state in ipairs(CLOSE_STATES) do
+            local tex = ns.StateTexture(close, state)
+            closeKept.art[state] = tex and (tex:GetAtlas() or tex:GetTexture()) or nil
+        end
+        ns.SkinCloseButton(close, true)
+        ns.SetPointOnce(close, "TOPRIGHT", tip, "TOPRIGHT", 1, 0)
+    elseif not on and closeKept then
+        for _, state in ipairs(CLOSE_STATES) do
+            local tex, art = ns.StateTexture(close, state), closeKept.art[state]
+            if tex and type(art) == "string" and C_Texture.GetAtlasInfo(art) then tex:SetAtlas(art) elseif tex and art then tex:SetTexture(art) end
+        end
+        close:SetSize(closeKept.w, closeKept.h)
+        if closeKept.point[1] then ns.SetPointOnce(close, unpack(closeKept.point)) end
+        closeKept = nil
+    end
+end
+
 local function DressNew()
+    LinkTipClose(true)
     for i = 1, #TIPS do
         local tip = _G[TIPS[i]]
         if tip and rims[tip] == nil then
@@ -160,6 +188,7 @@ end
 local function Restore()
     if not active then return end
     active, theme.on, clientArt = false, nil, nil
+    LinkTipClose(false)
     for tip, rim in pairs(rims) do
         if rim then ns.SafeCall(Paint, tip, nil) end
     end
