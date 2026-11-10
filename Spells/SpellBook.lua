@@ -1113,6 +1113,12 @@ local function CreateBook()
     ns.WearTrainingIcon(f.TrainTab, false)
     f.TrainTab.tooltip = L["SPELL_WHAT_CAN_I_TRAIN"]
     f.TrainTab:SetScript("OnClick", function(self)
+        -- Its own window (the option), unless its page is already in the book until the interface reloads.
+        if ns.TrainingOwnWindow and ns.TrainingOwnWindow() and not ns.TrainingAttached() then
+            self:SetChecked(false)
+            ns.ToggleTrainingWindow(f)
+            return
+        end
         if InCombatLockdown() or not (ns.TrainingList and ns.TrainingList(f)) then
             self:SetChecked(state.training)
             return

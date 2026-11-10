@@ -502,6 +502,7 @@ return {
     tradeSkillDual = false,
     tradeSkillSearch = true,
     trainer = true,
+    trainingOwnWindow = false,
     unitBarTexture = "classic",
     unitFrameBoss = true,
     unitFrameFocus = true,

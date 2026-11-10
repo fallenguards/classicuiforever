@@ -394,6 +394,7 @@ ns.DB_DEFAULTS = {
     statsSearch = false,
     groupFinder = true,
     spellBookSearch = true,
+    trainingOwnWindow = false,
     welcomed = false,
     whatsNewSeen = 0,
     whatsNewFrom = 0,
@@ -441,6 +442,8 @@ ns.RELOAD_KEYS = {
     questLog = { off = L["CORE_THE_QUEST_LOG_BUTTON_OPENS"] },
     -- ToggleGuildFrame stays our wrapper once taken (Guild WrapGuildToggle).
     guildRoster = { off = L["CORE_THE_GUILD_KEY_AND_BUTTON"] },
+    -- What's Training's window, once carried into the book, has no way back out (Spells/BookTraining.lua Attach).
+    trainingOwnWindow = { on = L["CORE_WHATS_TRAINING_S_WINDOW_STAYS"] },
     -- Restore hides the Who tab only; the first tab keeps its name and the row its cut tabs.
     whoList = { off = L["CORE_THE_SOCIAL_WINDOW_S_TABS"] },
     -- Restore hides our host and bars; the client frames keep our anchors and art.

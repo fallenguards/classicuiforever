@@ -123,9 +123,49 @@ local function Attach(frame, page, book)
     book:HookScript("OnHide", function() frame:Hide() end)
 end
 
--- The list, carried into the book on first use; nil without the addon.
+-- What's Training in its own window (the option): the tab shows and hides its window, which goes with the book.
+function ns.TrainingOwnWindow() return ns.db and ns.db.trainingOwnWindow == true end
+-- Its window already carried into the book: the page stays until the interface reloads (Core RELOAD_KEYS).
+function ns.TrainingAttached() return list ~= nil end
+
+local closers = setmetatable({}, { __mode = "k" })
+-- Its window up, on its professions page when asked (11.3; false where it has none); shown already and not asked
+-- for a page, it goes, so the tab works as a switch. book: hidden, it takes the window with it.
+function ns.ToggleTrainingWindow(book, professions)
+    local open = SlashCmdList and SlashCmdList.WHATSTRAINING
+    if type(open) ~= "function" then return false end
+    local frame = _G.WhatsTrainingFloatingFrame
+    if frame and frame:IsShown() and not professions then
+        frame:Hide()
+        return true
+    end
+    local built = false
+    if not frame then
+        pcall(open, "")
+        frame = _G.WhatsTrainingFloatingFrame
+        built = true
+    end
+    if not frame then return false end
+    if professions and not frame.SetProfessionView then
+        if built then frame:Hide() end
+        return false
+    end
+    if frame.SetProfessionView then frame:SetProfessionView(professions == true) end
+    if not frame:IsShown() then frame:Show() end
+    if book and not closers[book] then
+        closers[book] = true
+        book:HookScript("OnHide", function()
+            local window = _G.WhatsTrainingFloatingFrame
+            if window and window:IsShown() then window:Hide() end
+        end)
+    end
+    return true
+end
+
+-- The list, carried into the book on first use; nil without the addon, or with its own window picked.
 function ns.TrainingList(book)
     if list then return list end
+    if ns.TrainingOwnWindow() then return nil end
     local open = SlashCmdList and SlashCmdList.WHATSTRAINING
     if type(open) ~= "function" then return nil end
     local frame = _G.WhatsTrainingFloatingFrame

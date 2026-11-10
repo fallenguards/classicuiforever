@@ -119,6 +119,11 @@ local function Press(name)
     if type(handler) == "function" then handler(tab, "LeftButton", true) end
 end
 local function OpenTraining()
+    -- Its own window (the option) on its professions page where it has one; else its list over this window.
+    if ns.TrainingOwnWindow and ns.TrainingOwnWindow() and not ns.TrainingAttached() and ns.ToggleTrainingWindow(nil, true) then
+        CheckSideTabs()
+        return
+    end
     if not TrainingListUp() then Press("WhatsTrainingCraftingTab") end
     CheckSideTabs()
 end

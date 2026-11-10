@@ -319,4 +319,5 @@ return {
     tradeSkillByDifficulty = "same for everyone: opt-in, off by default (the recipes under their headers as before)",
     questLogSearch = "same for everyone: on by default, a search box in the double pane log's header where nothing stood; Quest search off hides it",
     guildClassColors = "same for everyone: off by default, the roster's gold names as before",
+    trainingOwnWindow = "same for everyone: off by default, What's Training's list on the book's page as before",
 }
