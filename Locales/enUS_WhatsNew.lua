@@ -2,6 +2,10 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN75_1_TITLE"] = "Item link tooltip"
+L["WN75_1_TEXT"] = "The X on an item link's tooltip is the classic one, on its classic spot."
+L["WN75_2_TITLE"] = "Pet abilities on the cursor"
+L["WN75_2_TEXT"] = "After a pet change, a pet ability the game will not keep a copy of is placed once, not again and again. For some pets that had put icons on the cursor and stalled the game."
 L["WN74_1_TITLE"] = "Spellbook training page"
 L["WN74_1_TEXT"] = "The spellbook's training page works with What's Training 11.3. That version had made the tab open What's Training's own window instead of the list in the book."
 L["WN74_2_TITLE"] = "Share Quest from the quest log"

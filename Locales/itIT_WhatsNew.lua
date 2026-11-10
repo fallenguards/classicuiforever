@@ -3,6 +3,10 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN75_1_TITLE"] = "Tooltip di un link di oggetto"
+L["WN75_1_TEXT"] = "La X del tooltip di un link di oggetto è quella classica, al suo posto classico."
+L["WN75_2_TITLE"] = "Abilità del famiglio sul cursore"
+L["WN75_2_TEXT"] = "Dopo un cambio di famiglio, un'abilità del famiglio di cui il gioco non conserva la copia viene piazzata una volta, non di continuo. Con alcuni famigli questo metteva icone sul cursore e rallentava il gioco."
 L["WN74_1_TITLE"] = "Pagina di addestramento del libro degli incantesimi"
 L["WN74_1_TEXT"] = "La pagina di addestramento del libro degli incantesimi funziona con What's Training 11.3. Con quella versione la scheda apriva la finestra propria di What's Training invece dell'elenco nel libro."
 L["WN74_2_TITLE"] = "Condividi missione dal registro"

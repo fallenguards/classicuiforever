@@ -3,6 +3,10 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN75_1_TITLE"] = "Infobulle d'un lien d'objet"
+L["WN75_1_TEXT"] = "Le X de l'infobulle d'un lien d'objet est le classique, à sa place classique."
+L["WN75_2_TITLE"] = "Techniques de familier sur le curseur"
+L["WN75_2_TEXT"] = "Après un changement de familier, une technique de familier dont le jeu ne garde pas la copie est placée une fois, et non encore et encore. Avec certains familiers, cela mettait des icônes sur le curseur et ralentissait le jeu."
 L["WN74_1_TITLE"] = "Page d'entraînement du grimoire"
 L["WN74_1_TEXT"] = "La page d'entraînement du grimoire fonctionne avec What's Training 11.3. Avec cette version, l'onglet ouvrait la propre fenêtre de What's Training au lieu de la liste dans le grimoire."
 L["WN74_2_TITLE"] = "Partager une quête depuis le journal"

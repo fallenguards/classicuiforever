@@ -3,6 +3,10 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN75_1_TITLE"] = "Descripción de un enlace de objeto"
+L["WN75_1_TEXT"] = "La X de la descripción de un enlace de objeto es la clásica, en su sitio clásico."
+L["WN75_2_TITLE"] = "Habilidades de mascota en el cursor"
+L["WN75_2_TEXT"] = "Tras cambiar de mascota, una habilidad de mascota cuya copia el juego no conserva se coloca una vez, no una y otra vez. Con algunas mascotas eso dejaba iconos en el cursor y frenaba el juego."
 L["WN74_1_TITLE"] = "Página de entrenamiento del libro de hechizos"
 L["WN74_1_TEXT"] = "La página de entrenamiento del libro de hechizos funciona con What's Training 11.3. Con esa versión la pestaña abría la propia ventana de What's Training en vez de la lista en el libro."
 L["WN74_2_TITLE"] = "Compartir misión desde el registro"

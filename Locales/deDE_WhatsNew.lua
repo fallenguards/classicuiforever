@@ -3,6 +3,10 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN75_1_TITLE"] = "Tooltip eines Gegenstandslinks"
+L["WN75_1_TEXT"] = "Das X am Tooltip eines Gegenstandslinks ist das klassische, an seiner klassischen Stelle."
+L["WN75_2_TITLE"] = "Begleiterfähigkeiten am Mauszeiger"
+L["WN75_2_TEXT"] = "Nach einem Begleiterwechsel wird eine Begleiterfähigkeit, deren Kopie das Spiel nicht behält, einmal abgelegt statt immer wieder. Bei manchen Begleitern hatte das Symbole an den Mauszeiger gelegt und das Spiel ausgebremst."
 L["WN74_1_TITLE"] = "Trainingsseite im Zauberbuch"
 L["WN74_1_TEXT"] = "Die Trainingsseite des Zauberbuchs funktioniert mit What's Training 11.3. Mit dieser Version öffnete der Reiter das eigene Fenster von What's Training statt der Liste im Buch."
 L["WN74_2_TITLE"] = "Quest teilen aus dem Questlog"

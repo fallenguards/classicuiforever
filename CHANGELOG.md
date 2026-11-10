@@ -2,6 +2,12 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.51.2] - 2026-11-10
+
+### Fixed
+- The X on an item link's tooltip (a link clicked in chat) is the classic one, on its classic spot.
+- After a pet change, a pet ability whose copy the game will not keep on its hidden action slot is placed once, not again on every spell update. For some pets that had put icons on the cursor and stalled the game.
+
 ## [0.51.1] - 2026-11-09
 
 ### Fixed
