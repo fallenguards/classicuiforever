@@ -16,10 +16,10 @@ local W, H = 668, 426
 -- detail: the scroll's corners; foot: each button's left and width (single: chained from Create All and Exit).
 -- rowH: the single's rows 15, so row 1 stands 4 under the list's edge (Era's sits on it) and row 8 clears the divider.
 local SINGLE = { rows = 8, rowH = 15, rank = { 61, -24 }, rankRight = -9, list = { 10, -87 }, listW = 316, listWBar = 293,
-    bar = { 311, -99, -197 }, all = { 14, -62 }, filter = { -11, -52 }, search = { 75, -57 },
+    bar = { 311, -99, -197 }, all = { 14, -62 }, filter = { -11, -52 }, search = { 73, -55 },
     detail = { 8, -221, 305, -397 } }
 local DOUBLE = { rows = D.ROWS, rowH = ROW_H, rank = { 61, -32 }, rankW = 268, list = { 8, -84 }, listW = 296, listWBar = 296,
-    bar = { 313, -77, -379 }, all = { 12, -64 }, search = { 350, -32 },
+    bar = { 313, -77, -379 }, all = { 12, -64 }, search = { 348, -30 },
     detail = { 336, -61, 636, -395 },
     -- Each button from the middle of its box's rims to the other's, across and down (the boxes' rims, art 410 to 435).
     foot = { y = 6, h = 21, createAll = { 6, 109 }, create = { 211, 99 }, exit = { 581, 81 } } }
@@ -218,7 +218,7 @@ function D.Layout(panel)
     local search = panel.search
     search:ClearAllPoints()
     search:SetPoint("TOPLEFT", panel, "TOPLEFT", s.search[1], s.search[2])
-    search:SetPoint("RIGHT", panel.filter, "LEFT", -14, 0)
+    search:SetPoint("RIGHT", panel.filter, "LEFT", -9, 0)
     Box(panel.detailScroll, panel, s.detail[1], s.detail[2], s.detail[3], s.detail[4])
     Foot(panel, s)
 end

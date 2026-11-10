@@ -514,16 +514,9 @@ local function RunWatch()
     end)
 end
 
--- Search toggle; off clears any search.
-local function SearchShown(on)
-    if not panel or not panel.search then return end
-    if not on then panel.search:SetText("") end
-    panel.search:SetShown(on)
-    panel.searchBox:SetShown(on)
-end
 ns.RegisterModule("tradeSkillSearch", {
-    apply = function() SearchShown(true) end,
-    restore = function() SearchShown(false) end,
+    apply = function() ns.ShellSearchShown(panel, true) end,
+    restore = function() ns.ShellSearchShown(panel, false) end,
 })
 
 local function Result_OnEnter(self)
@@ -618,44 +611,16 @@ local function Build()
     -- Beside the title, placed each Refresh (Skills/TradeSkillExtras.lua).
     panel.link = ns.TradeSkillLink(panel)
 
-    -- Search box between the All tab and the filter (the old window had none), in
-    -- the count's thin border.
-    local search = ns.NewFrame("EditBox", nil, panel)
-    search:SetHeight(16)
-    search:SetFrameLevel(panel:GetFrameLevel() + 13)
-    search:SetAutoFocus(false)
-    search:SetFontObject("GameFontHighlightSmall")
-    search:SetMaxLetters(40)
-    search:SetTextInsets(2, 20, 0, 0)
-    local searchBox = ns.SkillInsetBox(panel, 16, true, 0.5)
-    searchBox:SetPoint("TOPLEFT", search, "TOPLEFT", -7, 5)
-    searchBox:SetPoint("BOTTOMRIGHT", search, "BOTTOMRIGHT", 5, -5)
-    searchBox:SetFrameLevel(panel:GetFrameLevel() + 12)
-    local searchHint = search:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
-    searchHint:SetPoint("LEFT", search, "LEFT", 3, 0)
-    searchHint:SetText(SEARCH or "Search")
-    local clear = ns.SearchClear(search)
-    search:SetScript("OnEscapePressed", function(self)
-        self:SetText("")
-        self:ClearFocus()
+    -- Between the All tab and the filter; placed by the shape (Skills/TradeSkillDual.lua).
+    ns.ShellSearch(panel, function(text)
+        if text == query then return end
+        query = text
+        panel.bar:SetValue(0)
+        Collect()
+        UpdateRows()
+        UpdateDetail()
     end)
-    search:SetScript("OnEnterPressed", function(self) self:ClearFocus() end)
-    search:SetScript("OnTextChanged", function(self)
-        local text = (self:GetText() or ""):lower()
-        searchHint:SetShown(text == "")
-        clear:SetShown(text ~= "")
-        if text ~= query then
-            query = text
-            panel.bar:SetValue(0)
-            Collect()
-            UpdateRows()
-            UpdateDetail()
-        end
-    end)
-    local shown = not (ns.db and ns.db.tradeSkillSearch == false)
-    search:SetShown(shown)
-    searchBox:SetShown(shown)
-    panel.search, panel.searchBox = search, searchBox
+    ns.ShellSearchShown(panel, not (ns.db and ns.db.tradeSkillSearch == false))
 
     local iconButton = ns.ShellDetailHeader(detail, Result_OnEnter)
     iconButton:SetPoint("TOPLEFT", detail, "TOPLEFT", 8, -ICON_TOP)

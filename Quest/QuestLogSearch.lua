@@ -1,15 +1,15 @@
 local _, ns = ...
 
--- The double pane quest log's search: a box in its header between the Double pane switch and Show Map, in the trade
--- skill window's look; the list keeps the quests whose name or zone holds the words (Quest/QuestLogData.lua).
+-- The double pane quest log's search: a box in its header between the Double pane switch and Show Map, in the old
+-- input look; the list keeps the quests whose name or zone holds the words (Quest/QuestLogData.lua).
 
 local QL = ns.QL
 -- Clear of the switch's label on the left and Show Map's on the right; narrower than this, no box.
 local GAP_LEFT, GAP_RIGHT, MIN_W = 14, 14, 60
--- The edit box inside its border (the trade skill search's); its middle this far under the switch label's.
-local PAD_LEFT, PAD_RIGHT, DROP = 7, 5, -4
+-- The input's art past the box (5 on the left); its middle this far under the switch label's.
+local PAD_LEFT, PAD_RIGHT, DROP = 5, 0, -1
 
-local frame, back, edit
+local frame, edit
 
 local function Wanted()
     return QL.active and frame.dual == true and ns.db ~= nil and ns.db.questLogSearch ~= false
@@ -28,7 +28,7 @@ end
 
 -- Up with the double pane and the option, as wide as the room between the two labels once they are laid.
 local function Sync()
-    if not back then return end
+    if not edit then return end
     local on = Wanted()
     if on then
         local left, right = Label(frame.dualToggle), Label(frame.showMap)
@@ -46,14 +46,14 @@ local function Sync()
         end
     end
     if not on and edit:GetText() ~= "" then edit:SetText("") end
-    ns.SetShownIf(back, on)
+    ns.SetShownIf(edit, on)
 end
 
 -- Typing refilters the list from its top; a log shut meanwhile is not opened again by it.
-local function TextChanged(self, hint, clear)
+local function TextChanged(self)
     local text = self:GetText() or ""
-    hint:SetShown(text == "")
-    clear:SetShown(text ~= "")
+    self.hint:SetShown(text == "")
+    self.clear:SetShown(text ~= "")
     QL.SetSearch(text)
     if frame.listBar then frame.listBar:SetValue(0) end
     if frame:IsShown() then ns.ShowQuestLog() end
@@ -65,30 +65,11 @@ local function LogShut()
 end
 
 function QL.BuildSearch(host)
-    if back then return end
+    if edit then return end
     frame = host
-    back = ns.SkillInsetBox(frame, 16, true, 0.5)
-    back:Hide()
-    -- A child of its border: the window's raise lifts both together, the box over the border.
-    edit = ns.NewFrame("EditBox", nil, back)
-    edit:SetHeight(16)
-    edit:SetAutoFocus(false)
-    edit:SetFontObject("GameFontHighlightSmall")
-    edit:SetMaxLetters(40)
-    edit:SetTextInsets(2, 20, 0, 0)
-    back:SetPoint("TOPLEFT", edit, "TOPLEFT", -PAD_LEFT, 5)
-    back:SetPoint("BOTTOMRIGHT", edit, "BOTTOMRIGHT", PAD_RIGHT, -5)
-    local hint = edit:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
-    hint:SetPoint("LEFT", edit, "LEFT", 3, 0)
-    hint:SetText(SEARCH or "Search")
-    local clear = ns.SearchClear(edit)
-    clear:Hide()
-    edit:SetScript("OnEscapePressed", function(self)
-        self:SetText("")
-        self:ClearFocus()
-    end)
-    edit:SetScript("OnEnterPressed", function(self) self:ClearFocus() end)
-    edit:SetScript("OnTextChanged", function(self) TextChanged(self, hint, clear) end)
+    edit = ns.SearchBox(frame, MIN_W, SEARCH or "Search")
+    edit:Hide()
+    edit:SetScript("OnTextChanged", TextChanged)
     frame:HookScript("OnSizeChanged", Sync)
     frame:HookScript("OnShow", Sync)
     frame:HookScript("OnHide", LogShut)

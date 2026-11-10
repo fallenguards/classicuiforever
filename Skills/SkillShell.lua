@@ -236,6 +236,28 @@ function ns.ShellFilterButton(parent)
     return filter
 end
 
+-- Search box beside the filter (the old windows had none), in the old input look (its art 5 out on the left);
+-- unplaced. onText gets the lowered text on each change.
+function ns.ShellSearch(panel, onText)
+    local search = ns.SearchBox(panel, 100, SEARCH or "Search")
+    search:SetFrameLevel(panel:GetFrameLevel() + 13)
+    search:SetScript("OnTextChanged", function(self)
+        local text = (self:GetText() or ""):lower()
+        self.hint:SetShown(text == "")
+        self.clear:SetShown(text ~= "")
+        onText(text)
+    end)
+    panel.search = search
+    return search
+end
+
+-- A search's option; off clears it.
+function ns.ShellSearchShown(panel, on)
+    if not panel or not panel.search then return end
+    if not on then panel.search:SetText("") end
+    panel.search:SetShown(on)
+end
+
 local function FilterButton(panel)
     local filter = ns.ShellFilterButton(panel)
     filter:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -9, -57)
