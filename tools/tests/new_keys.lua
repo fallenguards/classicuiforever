@@ -317,4 +317,5 @@ return {
     minimapCoordsSnap = "same for everyone: on by default, the box fixed at its spot; a place dragged before is kept until Stay on minimap is switched off",
     calendarSnap = "same for everyone: on by default, the box fixed at its spot; a place dragged before is kept until Stay on minimap is switched off",
     tradeSkillByDifficulty = "same for everyone: opt-in, off by default (the recipes under their headers as before)",
+    questLogSearch = "same for everyone: on by default, a search box in the double pane log's header where nothing stood; Quest search off hides it",
 }

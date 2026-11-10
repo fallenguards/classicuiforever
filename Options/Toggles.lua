@@ -466,6 +466,8 @@ ns.TOGGLES = {
 
     { "questLog", L["OPT_questLog"], L["OPT_questLog_TIP"], group = L["GROUP_QUESTS"] },
     { "questLogDual", L["OPT_questLogDual"], L["OPT_questLogDual_TIP"], parent = "questLog" },
+    { "questLogSearch", L["OPT_questLogSearch"], L["OPT_questLogSearch_TIP"], parent = "questLogDual",
+        search = "quest log search find filter box" },
     { "questLevels", L["OPT_questLevels"], L["OPT_questLevels_TIP"], search = "level map filter" },
     { "questTracker", L["OPT_questTracker"], L["OPT_questTracker_TIP"], radio = "objectiveTracker", drop = true,
         dropTip = L["OPT_objectiveTracker_TIP"], search = "quest tracker headers stone" },

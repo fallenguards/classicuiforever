@@ -693,6 +693,7 @@ local function Build()
     ns.PadNav(frame, { close = CloseLog, scroll = PadScroll, prompts = mapPad and mapPad:GetName()
         and { { key = GAMEPAD_FACE_TOP or "PAD4", text = SHOW_MAP or WORLD_MAP, click = mapPad:GetName() } } or nil })
     frame.showMap:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -36, -40)
+    if QL.BuildSearch then QL.BuildSearch(frame) end
 
     local listArea = ns.NewFrame("Frame", nil, frame)
     listArea:SetPoint("TOPLEFT", frame, "TOPLEFT", LIST_X, LIST_Y)
@@ -766,7 +767,6 @@ end
 function ns.HideQuestLog()
     if frame then frame:Hide() end
 end
-
 
 function ns.ToggleQuestLog()
     if frame and frame:IsShown() then ns.HideQuestLog() else ns.ShowQuestLog() end

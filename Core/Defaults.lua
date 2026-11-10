@@ -292,6 +292,7 @@ ns.DB_DEFAULTS = {
     questWatch = false,
     questLog = true,
     questLogDual = true,
+    questLogSearch = true,
     unitFramePlayer = true,
     unitFrameTarget = true,
     unitFrameFocus = true,

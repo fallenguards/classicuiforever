@@ -14,20 +14,32 @@ local function HeaderKey(info)
     return info.headerSortKey or info.title or info.questLogIndex
 end
 
--- Count re-read each pass: ExpandQuestHeader grows the log mid-walk.
+-- The search box's words (Quest/QuestLogSearch.lua), lower case; "" lists the whole log.
+local query = ""
+function QL.SetSearch(text) query = (text or ""):lower():match("^%s*(.-)%s*$") end
+local function Matches(text) return type(text) == "string" and text:lower():find(query, 1, true) ~= nil end
+
+-- Count re-read each pass: ExpandQuestHeader grows the log mid-walk. A search lists the quests whose name or zone holds
+-- the words, folded zones too, each zone only with a quest listed.
 function QL.CollectEntries()
     wipe(entries)
-    local skipping = false
+    local skipping, header, zoneHit, headerIn = false, nil, false, false
     local i = 1
     while i <= (C_QuestLog.GetNumQuestLogEntries() or 0) do
         local info = C_QuestLog.GetInfo(i)
         if info and info.isHeader then
             -- A client-collapsed header hides its quests: expand it, collapse in our list instead.
             if info.isCollapsed and ExpandQuestHeader then ExpandQuestHeader(info.questLogIndex) end
-            skipping = collapsed[HeaderKey(info)] == true
+            skipping = collapsed[HeaderKey(info)] == true and query == ""
             info.isCollapsed = skipping
-            entries[#entries + 1] = info
-        elseif info and not skipping and not info.isHidden and not info.isTask and not info.isBounty then
+            if query == "" then entries[#entries + 1] = info end
+            header, zoneHit, headerIn = info, Matches(info.title), false
+        elseif info and not skipping and not info.isHidden and not info.isTask and not info.isBounty
+            and (query == "" or zoneHit or Matches(info.title)) then
+            if query ~= "" and header and not headerIn then
+                entries[#entries + 1] = header
+                headerIn = true
+            end
             entries[#entries + 1] = info
         end
         i = i + 1

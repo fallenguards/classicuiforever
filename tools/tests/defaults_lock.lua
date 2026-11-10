@@ -378,6 +378,7 @@ return {
     questLog = true,
     questLogDual = true,
     questLogMinimapButton = false,
+    questLogSearch = true,
     questMapPane = true,
     questMapPanePaper = true,
     questTextFontSize = 0,

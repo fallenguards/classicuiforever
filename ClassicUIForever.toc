@@ -186,6 +186,7 @@ Quest\QuestLogData.lua
 Quest\QuestPaper.lua
 Quest\QuestLogShare.lua
 Quest\QuestLogWindow.lua
+Quest\QuestLogSearch.lua
 Quest\QuestLogDetail.lua
 Quest\QuestLog.lua
 Quest\QuestMapPane.lua
