@@ -2,6 +2,11 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.52.1] - 2026-11-10
+
+### Fixed
+- The minimap's zone name sits 1 pixel lower, at its classic height on the zone bar.
+
 ## [0.52.0] - 2026-11-10
 
 ### Added
