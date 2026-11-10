@@ -11,6 +11,9 @@ local BANK_PET = Enum.SpellBookSpellBank and Enum.SpellBookSpellBank.Pet or 1
 local PET_MACRO_TAG = "#fcuipet"
 
 local pool = {}   -- pet book index -> its copies' slots, in order
+-- slot -> the entry id placed there and not yet seen to hold: a copy the game will not keep is tried once, never again
+-- (a warlock's pet swap re-placed such entries on every pass: icons on the cursor and a stall).
+local tried = {}
 local macrosCleared = false
 
 local function ClearOldMacros()
@@ -102,7 +105,10 @@ function ns.SyncPetPool()
                 PickupAction(slot)
                 ClearCursor()
             end
-        elseif not Holds(slot, e) then
+        elseif Holds(slot, e) then
+            tried[slot] = nil
+        elseif tried[slot] ~= (e.spellID or e.actionID) then
+            tried[slot] = e.spellID or e.actionID
             C_SpellBook.PickupSpellBookItem(e.index, BANK_PET)
             PlaceAction(slot)
             ClearCursor()
