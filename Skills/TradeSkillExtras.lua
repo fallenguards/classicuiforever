@@ -1,4 +1,5 @@
 local _, ns = ...
+local L = ns.L
 
 -- The client's profession extras on the old trade skill window (Skills/TradeSkill.lua): its filters as Era's checkbox
 -- menu, the slots in a submenu, and Wrath's chain link beside the title.
@@ -50,6 +51,7 @@ function ns.TradeSkillFilterEntries()
             toggle = function() api.SetOnlyShowMakeableRecipes(not api.GetOnlyShowMakeableRecipes()) end },
         { TRADESKILL_FILTER_HAS_SKILL_UP or "Has Skill Up", check = api.GetOnlyShowSkillUpRecipes,
             toggle = function() api.SetOnlyShowSkillUpRecipes(not api.GetOnlyShowSkillUpRecipes()) end },
+        { L["OPT_tradeSkillByDifficulty"], check = ns.tradeReagents.ByDifficulty, toggle = ns.tradeReagents.ToggleByDifficulty },
     }
     local slots = api.GetAllFilterableInventorySlotsCount and api.GetAllFilterableInventorySlotsCount() or 0
     if slots > 0 then entries[#entries + 1] = { TRADESKILL_FILTER_SLOTS or "Slots", sub = SlotEntries } end

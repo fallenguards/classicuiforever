@@ -130,6 +130,25 @@ function R.PickLine(professionID)
     if R.Changed then R.Changed() end
 end
 
+-- Headers by the client's order; recipes hardest first (orange, yellow, green, gray), not learned last, then by name.
+function R.GroupOrder(a, b)
+    if a.sort ~= b.sort then return a.sort < b.sort end
+    return a.name < b.name
+end
+function R.RecipeOrder(a, b)
+    local da, db = a.learned == false and 4 or a.relativeDifficulty or 3, b.learned == false and 4 or b.relativeDifficulty or 3
+    if da ~= db then return da < db end
+    return (a.name or "") < (b.name or "")
+end
+
+-- Sort by difficulty (the Filter menu and the options): one list across the headers.
+function R.ByDifficulty() return ns.db ~= nil and ns.db.tradeSkillByDifficulty == true end
+function R.ToggleByDifficulty()
+    ns.db.tradeSkillByDifficulty = not R.ByDifficulty()
+    if ns.RefreshOptionsWindow then ns.RefreshOptionsWindow() end
+    if R.Changed then R.Changed() end
+end
+
 -- Recipes not learned yet listed too, as the game's Show Unlearned; R.Changed is the window's refresh.
 local unlearned = false
 function R.Unlearned() return unlearned end

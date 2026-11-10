@@ -510,6 +510,8 @@ ns.TOGGLES = {
         radio = "professionTabsShow", drop = true, search = "tabs hidden never side" },
     { "tradeSkill", L["OPT_tradeSkill"], L["OPT_tradeSkill_TIP"] },
     { "tradeSkillSearch", L["OPT_tradeSkillSearch"], L["OPT_tradeSkillSearch_TIP"], parent = "tradeSkill" },
+    { "tradeSkillByDifficulty", L["OPT_tradeSkillByDifficulty"], L["OPT_tradeSkillByDifficulty_TIP"], parent = "tradeSkill",
+        search = "sort order difficulty color orange yellow green gray grey skill up recipes" },
     { "tradeSkillDual", L["OPT_tradeSkillDual"], L["OPT_tradeSkillDual_TIP"], parent = "tradeSkill",
         search = "double pane wide wider two side by side professions crafting" },
     { "trainer", L["OPT_trainer"], L["OPT_trainer_TIP"] },

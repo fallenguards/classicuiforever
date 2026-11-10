@@ -496,6 +496,7 @@ return {
     totemSize = 100,
     trackingSameSize = false,
     tradeSkill = true,
+    tradeSkillByDifficulty = false,
     tradeSkillDual = false,
     tradeSkillSearch = true,
     trainer = true,

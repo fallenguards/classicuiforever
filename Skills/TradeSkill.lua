@@ -67,18 +67,6 @@ local function CategoryOf(id, cache)
     return cache[id] or nil
 end
 
-local function GroupOrder(a, b)
-    if a.sort ~= b.sort then return a.sort < b.sort end
-    return a.name < b.name
-end
-
-local function RecipeOrder(a, b)
-    -- Not learned (retail, on request): after the rest.
-    local da, db = a.learned == false and 4 or a.relativeDifficulty or 3, b.learned == false and 4 or b.relativeDifficulty or 3
-    if da ~= db then return da < db end
-    return (a.name or "") < (b.name or "")
-end
-
 -- Search text: lists matching recipes even under folded headers.
 local query = ""
 local wanted   -- a recipe asked for (public API): unfolded and picked once listed
@@ -123,12 +111,20 @@ local function Collect()
         end
     end
     table.sort(types)
-    table.sort(order, GroupOrder)
+    table.sort(order, R.GroupOrder)
+    -- Sort by difficulty: every recipe in one run, hardest first, under no header.
+    if R.ByDifficulty() then
+        local all = {}
+        for _, group in ipairs(order) do
+            for _, info in ipairs(group.recipes) do all[#all + 1] = info end
+        end
+        order = { { recipes = all, flat = true } }
+    end
     local first
     for _, group in ipairs(order) do
-        table.sort(group.recipes, RecipeOrder)
-        lines[#lines + 1] = { header = true, id = group.id, name = group.name }
-        if query ~= "" or not collapsed[group.id] then
+        table.sort(group.recipes, R.RecipeOrder)
+        if not group.flat then lines[#lines + 1] = { header = true, id = group.id, name = group.name } end
+        if group.flat or query ~= "" or not collapsed[group.id] then
             for _, info in ipairs(group.recipes) do
                 lines[#lines + 1] = { info = info }
                 first = first or info.recipeID
@@ -701,6 +697,7 @@ local function Build()
     ns.tradeDual.Built(panel, Refresh)
     panel:SetScript("OnShow", Refresh)
     R.Changed = Refresh
+    ns.OnToggle(function(key) if key == "tradeSkillByDifficulty" then Refresh() end end)
     RunWatch()
 
     local events = CreateFrame("Frame")

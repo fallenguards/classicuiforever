@@ -71,6 +71,7 @@ ns.DB_DEFAULTS = {
     tradeSkill = true,
     trainer = true,
     tradeSkillSearch = true,
+    tradeSkillByDifficulty = false,
     tradeSkillDual = false,
     talents = true,
     talentsThreePane = false,

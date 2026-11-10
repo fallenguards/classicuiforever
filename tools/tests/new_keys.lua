@@ -316,4 +316,5 @@ return {
     minimapDielSnap = "same for everyone: on by default, the box fixed at its spot; a place dragged before is kept until Stay on minimap is switched off",
     minimapCoordsSnap = "same for everyone: on by default, the box fixed at its spot; a place dragged before is kept until Stay on minimap is switched off",
     calendarSnap = "same for everyone: on by default, the box fixed at its spot; a place dragged before is kept until Stay on minimap is switched off",
+    tradeSkillByDifficulty = "same for everyone: opt-in, off by default (the recipes under their headers as before)",
 }
