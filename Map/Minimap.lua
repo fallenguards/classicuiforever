@@ -435,8 +435,8 @@ local function Layout()
     -- Buttons over the map's edge must stand above it to take clicks.
     local above = map:GetFrameLevel() + 5
 
-    -- Zone name centred on the zone bar, whatever the calendar's spot.
-    local zone = LayHome("minimapZone", box, cluster:GetFrameLevel() + 2, MAP, 12, cluster, "TOP", ZONE_X, -12 + plateY)
+    -- Zone name centered on the zone bar, whatever the calendar's spot; Era's height, 13 under the top.
+    local zone = LayHome("minimapZone", box, cluster:GetFrameLevel() + 2, MAP, 12, cluster, "TOP", ZONE_X, -13 + plateY)
     if cluster.ZoneTextButton then
         cluster.ZoneTextButton:SetParent(zone)
         cluster.ZoneTextButton:SetSize(MAP, 12)
