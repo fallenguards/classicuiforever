@@ -478,7 +478,8 @@ function S.ScrollRows(panel, foot, gap, onValue, columns, onClick, onDoubleClick
 end
 
 -- A row of either list: gold name, white zone and level, class colour or white; dim greys all four (offline).
-function S.ShowRow(row, entry, zone, level, class, classFile, selected, dim)
+-- nameClass: the name in that class's color (the guild roster's option); else 1.x gold.
+function S.ShowRow(row, entry, zone, level, class, classFile, selected, dim, nameClass)
     row.entry = entry
     row.Name:SetText(entry.name)
     row.Zone:SetText(zone)
@@ -490,7 +491,8 @@ function S.ShowRow(row, entry, zone, level, class, classFile, selected, dim)
         row.Level:SetTextColor(0.5, 0.5, 0.5)
         row.Class:SetTextColor(0.5, 0.5, 0.5)
     else
-        row.Name:SetTextColor(1, 0.82, 0)
+        local nr, ng, nb = ns.ClassRGB(nameClass)
+        if nr then row.Name:SetTextColor(nr, ng, nb) else row.Name:SetTextColor(1, 0.82, 0) end
         row.Zone:SetTextColor(1, 1, 1)
         row.Level:SetTextColor(1, 1, 1)
         local r, g, b = ns.ClassRGB(classFile)

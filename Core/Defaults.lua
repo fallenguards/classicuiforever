@@ -384,6 +384,7 @@ ns.DB_DEFAULTS = {
     statPaneRight = "section3",
     spellBook = true,
     guildRoster = true,
+    guildClassColors = false,
     communitiesButton = false,
     communitiesNoGuildTab = true,
     whoList = true,

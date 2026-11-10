@@ -525,6 +525,8 @@ ns.TOGGLES = {
     { "socialTitleDrag", L["OPT_socialTitleDrag"], L["OPT_socialTitleDrag_TIP"],
         search = "social window drag move title bar status online away busy" },
     { "guildRoster", L["OPT_guildRoster"], L["OPT_guildRoster_TIP"] },
+    { "guildClassColors", L["OPT_guildClassColors"], L["OPT_guildClassColors_TIP"], parent = "guildRoster",
+        search = "guild roster names class color colored colour" },
     { "communitiesButton", L["OPT_communitiesButton"], L["OPT_communitiesButton_TIP"], parent = "guildRoster",
         search = "communities tab button tabs" },
     { "communitiesNoGuildTab", L["OPT_communitiesNoGuildTab"], L["OPT_communitiesNoGuildTab_TIP"], parent = "communitiesButton",

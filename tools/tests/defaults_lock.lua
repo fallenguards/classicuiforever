@@ -122,6 +122,7 @@ return {
     groupFinder = true,
     gryphonHiddenCarried = false,
     gryphonsOverBars = false,
+    guildClassColors = false,
     guildMinimapButton = false,
     guildRoster = true,
     helpMinimapButton = false,

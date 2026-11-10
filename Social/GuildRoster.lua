@@ -90,16 +90,18 @@ local function UpdateRows()
     local roster, selected = G.roster, G.selected
     local offset = ns.ListOffset(panel.bar)
     local shown = S.RowCount(panel)
+    local classNames = ns.db.guildClassColors == true
     for i, row in ipairs(panel.rows) do
         local entry = i <= shown and roster[offset + i] or nil
+        local nameClass = classNames and entry and entry.classFile or nil
         if not entry then
             S.HideRow(row)
         elseif statusView then
             -- Rank, note and last online in the zone, level and class slots, uncolored.
-            S.ShowRow(row, entry, entry.rank, entry.note, LastOnline(entry), nil, EntryKey(entry) == selected, not entry.online)
+            S.ShowRow(row, entry, entry.rank, entry.note, LastOnline(entry), nil, EntryKey(entry) == selected, not entry.online, nameClass)
         else
             -- Era's roster: the class in white, as the zone and level.
-            S.ShowRow(row, entry, entry.zone, entry.level, entry.class, nil, EntryKey(entry) == selected, not entry.online)
+            S.ShowRow(row, entry, entry.zone, entry.level, entry.class, nil, EntryKey(entry) == selected, not entry.online, nameClass)
         end
     end
     panel.bar:SetRange(math.max(0, #roster - shown))
@@ -137,6 +139,8 @@ regen:RegisterEvent("PLAYER_REGEN_ENABLED")
 regen:SetScript("OnEvent", function()
     if G.panel and G.panel:IsShown() then Refresh() end
 end)
+-- Plain text of ours: the option answers at once, in a fight too.
+ns.OnToggle(function(key) if key == "guildClassColors" then Refresh() end end)
 
 -- Right-click menu without a row pad (a fight): remove, promote and demote are the client's alone (its own menu, through
 -- the pad); closes on a click elsewhere or with the roster.
