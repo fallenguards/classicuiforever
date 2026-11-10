@@ -163,6 +163,18 @@ function ns.SkinCloseButton(button, keepPosition)
     if not keepPosition then P.PlaceInSocket(button, button:GetParent()) end
 end
 
+-- A window left as the game draws it: its X alone in Era's art, its centre where the game's stood, dx further right.
+function P.SkinCloseInPlace(button, dx)
+    if not button then return end
+    local point, rel, relPoint, x, y = button:GetPoint(1)
+    local w, h = button:GetSize()
+    ns.SkinCloseButton(button, true)
+    if point == "TOPRIGHT" and relPoint == "TOPRIGHT" and x and y and w and h then
+        local size = button:GetWidth()
+        ns.SetPointOnce(button, "TOPRIGHT", rel, "TOPRIGHT", x - w / 2 + size / 2 + (dx or 0), y - h / 2 + size / 2)
+    end
+end
+
 local MAX_MIN = {
     { "MaximizeButton", "biggerUp", "biggerDown", "biggerDisabled" },
     { "MinimizeButton", "smallerUp", "smallerDown", "smallerDisabled" },
@@ -286,6 +298,12 @@ function ns.SkinWindow(frame, opts)
     -- first loaded in a fight) is dressed where it stands.
     if InCombatLockdown() and frame.IsProtected and frame:IsProtected() then
         SkinLater(frame, opts)
+        return
+    end
+    -- closeOnly: the game's own look kept, the X alone dressed (the old basic frame: guild bank, flight master).
+    if opts.closeOnly then
+        P.SkinCloseInPlace(frame.CloseButton or (name and _G[name .. "CloseButton"]), opts.closeX)
+        P.skinned[frame] = true
         return
     end
     -- A border over its content (the map) passes a smaller lift.

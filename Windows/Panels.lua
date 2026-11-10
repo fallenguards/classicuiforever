@@ -107,7 +107,8 @@ local WINDOWS = {
     { "QuestFrame", key = "panelQuest", lift = 5, after = A.QuestFrame },
     { "GossipFrame", key = "panelGossip", lift = 5, after = A.GossipFrame },
     { "TradeFrame", key = "panelTrade", lift = 5, after = A.TradeFrame },
-    { "TaxiFrame", key = "panelTaxi" },
+    -- The flight master's map: the guild bank's old basic frame, so its X alone, on the same spot.
+    { "TaxiFrame", key = "panelTaxi", closeOnly = true, closeX = 2 },
     { "DressUpFrame", key = "panelDressUp", after = A.DressUpFrame },
     { "PetStableFrame", key = "panelStable" },
     -- Era's own title line, 15 right of the window's middle; its foot line low enough for the scroll column's end.
@@ -139,7 +140,8 @@ local WINDOWS = {
     { "ProfessionsFrame", toggle = PROFESSIONS, addon = "Blizzard_Professions", lift = not ns.OnForever() and CLIENT_FOOT_LIFT or nil,
         tabLift = not ns.OnForever() and 0 or nil },
     { "ProfessionsBookFrame", toggle = PROFESSIONS, addon = "Blizzard_ProfessionsBook" },
-    { "GuildBankFrame", key = "panelGuildBank", addon = "Blizzard_GuildBankUI" },
+    -- The X alone: the guild bank's old basic frame has no border of the kind we dress; 2 right sits it in the corner.
+    { "GuildBankFrame", key = "panelGuildBank", addon = "Blizzard_GuildBankUI", closeOnly = true, closeX = 2 },
     { "CalendarFrame", key = "panelCalendar", addon = "Blizzard_Calendar", portrait = false },
     { "ItemSocketingFrame", key = "panelSocketing", addon = "Blizzard_ItemSocketingUI" },
     -- scrollBars = false from here: no client hooks; the afters dress any bars they name.
