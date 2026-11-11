@@ -346,11 +346,15 @@ local function Blocks(built, text, page, pageOnly)
         return block
     end
     -- A page's top-level heading keeps the rows after it in its block, so the columns never split a heading from them.
-    local section
+    local section, header
     for _, row in ipairs(built.rows) do
         local shown = hit[row.key] and (across or row.page == page) and not (row.hideIf and row.hideIf())
         if not shown then
             row:Hide()
+        elseif row.header and not across then
+            -- The page's own switch (Gamepad's): beside the title, its rows the page's blocks, split at headings.
+            header = row
+            section = AddKids(NewBlock(), row.key)
         elseif not row.parent then
             -- Searching: one block per page under its title; a page: one per top-level row, or per heading's run.
             local block = across and byPage[row.page] or (not across and not row.sub and section)
@@ -363,7 +367,7 @@ local function Blocks(built, text, page, pageOnly)
             if not across and (row.sub or section) then section = last end
         end
     end
-    return blocks, count, matched
+    return blocks, count, matched, header
 end
 
 local function Clean(box) return ((box:GetText() or ""):lower():gsub("^%s+", ""):gsub("%s+$", "")) end
@@ -374,7 +378,7 @@ local function PlaceRows(frame)
     local text, own = Clean(frame.search), Clean(frame.pageSearch)
     local pageOnly = text == "" and own ~= ""
     if pageOnly then text = own end
-    local blocks, count, matched = Blocks(built, text, frame.page, pageOnly)
+    local blocks, count, matched, header = Blocks(built, text, frame.page, pageOnly)
     for _, head in pairs(built.heads) do head:Hide() end
     -- Column-major, whole blocks in order: split where the taller column is shortest.
     local split, shortest, before = #blocks, math.huge, 0
@@ -406,6 +410,15 @@ local function PlaceRows(frame)
     end
     child:SetHeight(math.max(1, per * ROW))
     frame.listBar:SetRange(math.max(0, per * ROW - frame.list:GetHeight()), ROW)
+    -- The header row stands on the page's box (the list clips its own), and goes back to the list for a search.
+    for _, other in ipairs(built.rows) do
+        if other.header and other ~= header and other:GetParent() ~= child then other:SetParent(child) end
+    end
+    if header then
+        if header:GetParent() ~= frame.pageBox then header:SetParent(frame.pageBox) end
+        ns.SetPointOnce(header, "LEFT", frame.pageTitle, "RIGHT", 16, 0)
+        header:Show()
+    end
 end
 
 -- What the right side shows: a toggles page, a reading page, or the search's matches from every page. keepScroll: a

@@ -553,6 +553,26 @@ local function Extras(entry, child, colW, add)
     elseif key == "hideKeyText" then
         Step("buttons", "keyTextSize", L["OPTWIN_KEY_TEXT_SIZE"], L["OPTWIN_HOW_BIG_THE_KEY_NAMES"],
             ns.KEY_TEXT_MIN or 8, ns.KEY_TEXT_MAX or 20, ns.SetKeyTextSize, "keybind font hotkey")
+    elseif key == "padGroupsCustom" then
+        -- Each trigger's bar and first button, after the Trigger groups pick.
+        local bars, starts = {}, {}
+        for n = 1, 5 do bars[n] = { key = n, label = L["PAD_BAR_N"]:format(n) } end
+        for n, start in ipairs({ 1, 5, 9 }) do starts[n] = { key = start, label = L["PAD_BUTTON_N"]:format(start) } end
+        for _, trigger in ipairs({ "None", "LT", "RT", "Both" }) do
+            local name = L["PAD_TRIGGER_" .. trigger]
+            Drop("padClassic", "padBar" .. trigger, L["OPT_padBar"]:format(name), L["OPT_padPlace_TIP"], bars, ns.PadPlace,
+                "gamepad trigger bar group custom")
+            Drop("padClassic", "padStart" .. trigger, L["OPT_padStart"]:format(name), L["OPT_padPlace_TIP"], starts,
+                ns.PadPlace, "gamepad trigger first button custom")
+        end
+    elseif key == "padCursorMenu" then
+        -- The buttons for autorun and chat, after the cursor's clicks.
+        local runs = { { key = "", label = L["PAD_KEY_NONE"] } }
+        for _, pad in ipairs({ "PADBACK", "PADFORWARD", "PADLSTICK", "PADRSTICK" }) do
+            runs[#runs + 1] = { key = pad, label = _G.GetBindingText and _G.GetBindingText(pad, 1) or pad }
+        end
+        Drop("padClassic", "padAutorunKey", L["OPT_padAutorun"], L["OPT_padAutorun_TIP"], runs, ns.PadPick, "autorun run walk")
+        Drop("padClassic", "padChatKey", L["OPT_padChat"], L["OPT_padChat_TIP"], runs, ns.PadPick, "chat open type talk")
     elseif key == "hoverAddonBag" then
         -- Under Collect addon buttons, after its Show row: the buttons left on the ring.
         local row = SetListRow(child, "minimapCollectorKeep", L["OPT_minimapCollectorKeep"], L["OPT_minimapCollectorKeep_TIP"],
