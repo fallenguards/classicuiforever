@@ -744,16 +744,21 @@ function B.StartWatch()
     placer:RegisterEvent("PLAYER_FOCUS_CHANGED")
     -- Same for fight start (not yet locked while this event dispatches), fight end, and pet/stance bars: the client's
     -- re-laid stack is put back before a frame is drawn, nothing written.
-    for _, event in ipairs({ "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "PET_BAR_UPDATE", "UPDATE_SHAPESHIFT_FORMS",
-        "UPDATE_BONUS_ACTIONBAR", "UPDATE_VEHICLE_ACTIONBAR", "UPDATE_OVERRIDE_ACTIONBAR" }) do
-        pcall(placer.RegisterEvent, placer, event)
-    end
-    pcall(placer.RegisterUnitEvent, placer, "UNIT_PET", "player")
-    -- The client's bag bar re-lays in its own CURSOR_CHANGED handler; ours runs after it, before the frame is drawn.
-    -- Tripwire only: it fires often.
-    pcall(placer.RegisterEvent, placer, "CURSOR_CHANGED")
+    ns.RegisterEvents(placer, { "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED", "PET_BAR_UPDATE", "UPDATE_SHAPESHIFT_FORMS",
+        "UPDATE_BONUS_ACTIONBAR", "UPDATE_VEHICLE_ACTIONBAR", "UPDATE_OVERRIDE_ACTIONBAR" })
+    ns.RegisterEvents(placer, { "UNIT_PET" }, "player")
+    -- The client's bag bar re-lays in its own CURSOR_CHANGED handler; ours runs after it, before the frame is drawn
+    -- (a tripwire only: it fires often). A bank or vendor shut late in the frame re-lays bags the player opened at the
+    -- client's spot after this frame's pass: heard after its handler, they stand beside the bars again before the draw.
+    ns.RegisterEvents(placer, { "CURSOR_CHANGED", "PLAYER_INTERACTION_MANAGER_FRAME_HIDE" })
     placer:SetScript("OnEvent", function(_, event)
         B.WakeLane()
+        if event == "PLAYER_INTERACTION_MANAGER_FRAME_HIDE" then
+            -- The whole pass, so the bags still go after the bars.
+            local pass = placer:GetScript("OnUpdate")
+            if B.active and pass then pass(placer, 0) end
+            return
+        end
         if event == "CURSOR_CHANGED" then
             -- Rows only; the full pass in edit mode, where a piece may be in hand.
             if B.active and B.hot.Trip() then
