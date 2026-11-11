@@ -120,20 +120,27 @@ local function NewTab(key, name, id, text, onClick)
     return tab
 end
 
+-- An after makes it a window's pad, hidden as a fight starts: the window shut in one left it over the spot.
+local function Pressed() end
 local function PadTo(tab, client)
-    ns.MapPad(tab, "HIGH", nil, function() return S.StandInMacro(client) end, Up, nil, OpenSocial)
+    ns.MapPad(tab, "HIGH", Pressed, function() return S.StandInMacro(client) end, Up, nil, OpenSocial)
 end
+
+-- Without the pad, in a fight (the client's tab cannot be pressed for us then): Friends opens the social window, Raid waits.
+local function FriendsInFight() if InCombatLockdown() then OpenSocial() end end
+local function RaidInFight() if InCombatLockdown() then ns.SayNotInCombat() end end
 
 local function Build(frame)
     if host then return end
     host = frame
-    PadTo(NewTab("friends", "ClassicUIForeverCommunitiesFriendsTab", 94, FRIENDS or "Friends"), _G.FriendsFrameTab1)
+    PadTo(NewTab("friends", "ClassicUIForeverCommunitiesFriendsTab", 94, FRIENDS or "Friends", FriendsInFight),
+        _G.FriendsFrameTab1)
     NewTab("who", "ClassicUIForeverCommunitiesWhoTab", 95, WHO or "Who", ToWho)
     NewTab("guild", "ClassicUIForeverCommunitiesGuildTab", 96, GUILD or "Guild", ToGuild)
     local here = NewTab("communities", "ClassicUIForeverCommunitiesPageTab", 97, COMMUNITIES or "Communities")
     if PanelTemplates_SelectTab then PanelTemplates_SelectTab(here) end
     local raid = S.ClientTab(_G.FRIEND_TAB_RAID)
-    if raid then PadTo(NewTab("raid", "ClassicUIForeverCommunitiesRaidTab", 98, RAID or "Raid"), raid) end
+    if raid then PadTo(NewTab("raid", "ClassicUIForeverCommunitiesRaidTab", 98, RAID or "Raid", RaidInFight), raid) end
     ns.Sched.Attach(host, { name = "communities.foot", every = 0.25, fn = Sync })
     -- The client sizes the window as the mode turns: ours before the draw.
     ns.Sched.OnMove(host, Sync)

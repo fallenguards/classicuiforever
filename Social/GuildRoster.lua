@@ -233,12 +233,14 @@ local CLIENT_PADS = {
           return details and details.Info and details.Info.EditDetailsButton
       end },
 }
+-- An after makes it a window's pad, hidden as a fight starts: the window shut in one left it over the spot (a quest's Continue).
+local function Pressed() end
 local function ClientPads(panel)
     for _, spec in ipairs(CLIENT_PADS) do
         local theirs = not spec.padded and spec.theirs()
         if theirs then
             spec.padded = true
-            ns.MapPad(panel[spec.key], "HIGH", nil, theirs, function() return G.active and spec.may() end)
+            ns.MapPad(panel[spec.key], "HIGH", Pressed, theirs, function() return G.active and spec.may() end)
         end
     end
 end
