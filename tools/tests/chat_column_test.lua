@@ -115,6 +115,7 @@ ns.Sched = {
     NextFrame = noop,
     Soon = noop,
     OnVisible = function(host, _, fn) shownHooks[host] = fn end,
+    AfterShow = noop,
 }
 ns.NewFrame = CreateFrame
 ns.SetPointOnce = function(frame, ...) frame:ClearAllPoints() frame:SetPoint(...) end
