@@ -238,7 +238,7 @@ local function LootPager(frame)
     shell:SetScript("OnEvent", function(_, event)
         if event == "LOOT_OPENED" then
             page = 0
-            -- The same loot opened again (a click with full bags): the game's open put the window at the mouse again.
+            -- The same loot opened again (a click with full bags): the game's open placed the window again.
             if up and kept then ns.SetPointOnce(frame, "TOPLEFT", nil, "BOTTOMLEFT", kept[1], kept[2]) end
         end
         if event == "LOOT_SLOT_CLEARED" then cleared = true end
@@ -277,7 +277,22 @@ local function TipOnIcon(tip)
     ns.SetPointOnce(tip, "BOTTOMLEFT", item, "TOPRIGHT", 0, 0)
 end
 
+-- Era's window shows at once: the game's open slide and fade replayed on a reopen (a click with full bags), a jump.
+local function StillOpen(frame)
+    local anim = frame.ShowAnim
+    if not anim then return end
+    for _, piece in ipairs({ anim:GetAnimations() }) do
+        if piece:IsObjectType("Translation") then
+            piece:SetOffset(0, 0)
+        elseif piece:IsObjectType("Alpha") then
+            piece:SetFromAlpha(1)
+            piece:SetToAlpha(1)
+        end
+    end
+end
+
 local function SkinLoot(frame)
+    StillOpen(frame)
     ns.HookMethod(GameTooltip, "SetLootItem", TipOnIcon)
     ns.HookMethod(GameTooltip, "SetLootCurrency", TipOnIcon)
     local close = frame.ClosePanelButton or frame.CloseButton
