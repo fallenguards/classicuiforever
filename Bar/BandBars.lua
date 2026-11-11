@@ -65,8 +65,10 @@ local mouseOff = {}
 local function Holder(bar)
     local holder = holderOf[bar]
     if not holder then
+        -- Its slots hang on the rows, so its own box is a pixel off the screen's corner, out of /fstack's list (#283).
         holder = CreateFrame("Frame", nil, UIParent, "SecureHandlerStateTemplate")
-        holder:SetAllPoints(UIParent)
+        holder:SetSize(1, 1)
+        holder:SetPoint("TOPRIGHT", UIParent, "BOTTOMLEFT", 0, 0)
         holderOf[bar] = holder
     end
     -- At the bar's own alpha, times its Faded Opacity while faded (Bar/BarFade.lua).

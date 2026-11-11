@@ -471,11 +471,15 @@ local function Held(entry)
     return false
 end
 
+-- Both corners shifted one way past any screen's right edge: the size still follows the frame, and the helper stays
+-- out from under the cursor, so /fstack does not list it (#283).
+local AWAY = 32768
+
 -- Retail refuses an anchor that would join two anchor families (FriendsFrame): that helper stays loose and hears nothing.
 local function PinHelper(entry)
     local helper = entry[1]
-    if Held(entry) or not (pcall(helper.SetPoint, helper, "TOPLEFT", entry[3], entry[2])
-        and pcall(helper.SetPoint, helper, "BOTTOMRIGHT", entry[5], entry[4])) then
+    if Held(entry) or not (pcall(helper.SetPoint, helper, "TOPLEFT", entry[3], entry[2], AWAY, 0)
+        and pcall(helper.SetPoint, helper, "BOTTOMRIGHT", entry[5], entry[4], AWAY, 0)) then
         helper:ClearAllPoints()
     end
 end
@@ -500,7 +504,8 @@ local function MoveHelper(pointA, relA, pointB, relB, fn)
 end
 
 -- OnMove(frame, fn): fn() in the layout pass that moves or resizes frame, before a draw. Two unseen helpers, each from one
--- of its corners to the screen's far corner, so any move or resize changes one helper's size. Not heard in edit mode.
+-- of its corners to the screen's far corner (both shifted off screen), so any move or resize changes one helper's size.
+-- Not heard in edit mode.
 function Sched.OnMove(frame, fn)
     if not fn then return end
     if not editHooked then
