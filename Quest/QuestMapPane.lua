@@ -477,7 +477,8 @@ local function Build()
     OldScrollBar(scroll and scroll.ScrollBar, QUEST_SCROLL)
     OldScrollBar(details and details.ScrollFrame and details.ScrollFrame.ScrollBar, QUEST_SCROLL)
     if details then
-        parchmentTex = ns.OwnTexture(details, "parchment", "BACKGROUND", -2)
+        -- Apart from the client's rewards drawer: art laid by the parchment's parent reaches the page's foot.
+        parchmentTex = ns.OwnSheetTexture(details, "parchment", "BACKGROUND", -2)
         -- Parchment is the top-left 300x336 of the 512 sheet; the rest is dark.
         parchmentTex:SetTexture(ns.TexPath("questParchment"))
         parchmentTex:SetTexCoord(PARCHMENT_U0, PARCHMENT_U1, PARCHMENT_V0, PARCHMENT_V1)

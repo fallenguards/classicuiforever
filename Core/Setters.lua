@@ -319,6 +319,18 @@ function ns.OwnTexture(frame, key, layer, sublevel)
     return Own(frame, key, NewTexture, layer, sublevel)
 end
 
+-- On a sheet of its own at the frame's level: under every child, its parent none of the frame's pieces.
+local function NewSheetTexture(frame, layer, sublevel)
+    local sheet = ns.NewFrame("Frame", nil, frame)
+    sheet:SetUsingParentLevel(true)
+    sheet:SetAllPoints(frame)
+    return NewTexture(sheet, layer, sublevel)
+end
+
+function ns.OwnSheetTexture(frame, key, layer, sublevel)
+    return Own(frame, key, NewSheetTexture, layer, sublevel)
+end
+
 function ns.OwnFontString(frame, key, layer, font)
     return Own(frame, key, NewFontString, layer, font)
 end
