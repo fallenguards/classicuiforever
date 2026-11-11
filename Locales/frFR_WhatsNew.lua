@@ -3,6 +3,12 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN78_1_TITLE"] = "Panneau de raid classique"
+L["WN78_1_TEXT"] = "Le panneau de raid et de groupe au bord gauche de l'écran a l'aspect et l'ordre classiques, et toutes les commandes du jeu y sont toujours. Son bouton de marqueurs au sol fait marquer le sol aux icônes de cible."
+L["WN78_2_TITLE"] = "Bord du panneau de raid"
+L["WN78_2_TEXT"] = "Fermé, le panneau ne montre que son onglet fléché. Bord du panneau de raid une fois fermé garde son cadre au bord de l'écran, comme dans Era. Désactivé par défaut ; activez-le dans les options (/fcui), sous Cadres d'unité."
+L["WN78_3_TITLE"] = "Petites corrections"
+L["WN78_3_TEXT"] = "La fenêtre de butin s'ouvre aussitôt et ne saute plus quand vous cliquez sur un objet avec les sacs pleins. Les boutons de l'onglet de guilde et de la fenêtre des communautés ne restent plus cliquables après la fermeture de leur fenêtre en combat."
 L["WN77_1_TITLE"] = "Recherche chez le maître"
 L["WN77_1_TEXT"] = "La fenêtre d'un maître a un champ de recherche à côté de son filtre. Il ne montre que les sorts et recettes dont le nom contient les mots. Champ de recherche, sous Fenêtre de maître dans les options (/fcui), le désactive."
 L["WN77_2_TITLE"] = "What's Training dans sa propre fenêtre"

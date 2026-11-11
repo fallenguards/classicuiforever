@@ -2,6 +2,12 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN78_1_TITLE"] = "Classic raid panel"
+L["WN78_1_TEXT"] = "The raid and party panel at the screen's left edge has the classic look and order, and every control of the game's is still in it. Its world marker button switches the target icons to marking the ground."
+L["WN78_2_TITLE"] = "Raid panel edge"
+L["WN78_2_TEXT"] = "Closed, the panel shows only its arrow tab. Raid panel edge when closed keeps its frame along the screen's edge, as Era's does. Off by default; turn it on in the options (/fcui), under Unit frames."
+L["WN78_3_TITLE"] = "Small fixes"
+L["WN78_3_TEXT"] = "The loot window opens at once and no longer jumps when you click an item with full bags. The guild tab's and the Communities window's buttons no longer stay clickable after their window closed in a fight."
 L["WN77_1_TITLE"] = "Trainer search"
 L["WN77_1_TEXT"] = "A trainer's window has a search box beside its filter. It lists only the spells and recipes whose name holds the words. Search box, under Trainer window in the options (/fcui), turns it off."
 L["WN77_2_TITLE"] = "What's Training in its own window"

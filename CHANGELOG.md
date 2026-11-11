@@ -2,6 +2,18 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.54.0] - 2026-11-11
+
+### Added
+- Raid panel edge when closed: the closed raid and party panel keeps its frame along the screen's edge, as Era's does. Off by default, so a closed panel shows only its arrow tab; turn it on in the options (/fcui), under Unit frames.
+
+### Changed
+- The raid and party panel at the screen's left edge has the classic look and order: the framed panel over stone with its Raid Members header, the gray buttons, and the target icons from star to skull. Every control of the game's is still there. The world marker button beside Ready Check switches the icons to marking the ground, and a new icon beside the X clears all markers.
+
+### Fixed
+- The loot window opens at once, as in Era, and no longer jumps when you click an item with full bags.
+- The guild tab's Guild Information and Add Member, and the Communities window's Friends and Raid tabs, no longer stay clickable where they were after their window closed in a fight. A quest giver's Continue there had opened the guild information box.
+
 ## [0.53.0] - 2026-11-11
 
 ### Added

@@ -3,6 +3,12 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN78_1_TITLE"] = "Panel de banda clásico"
+L["WN78_1_TEXT"] = "El panel de banda y grupo del borde izquierdo de la pantalla tiene el aspecto y el orden clásicos, y todos los controles del juego siguen en él. Su botón de marcadores de mundo hace que los iconos de objetivo marquen el suelo."
+L["WN78_2_TITLE"] = "Borde del panel de banda"
+L["WN78_2_TEXT"] = "Cerrado, el panel solo muestra su pestaña con la flecha. Borde del panel de banda al cerrarlo deja su marco en el borde de la pantalla, como en Era. Desactivado por defecto; actívalo en las opciones (/fcui), en Marcos de unidad."
+L["WN78_3_TITLE"] = "Pequeñas correcciones"
+L["WN78_3_TEXT"] = "La ventana de botín se abre al instante y ya no salta al hacer clic en un objeto con las bolsas llenas. Los botones de la pestaña de hermandad y de la ventana de Comunidades ya no siguen activos tras cerrarse su ventana en combate."
 L["WN77_1_TITLE"] = "Búsqueda en el instructor"
 L["WN77_1_TEXT"] = "La ventana de un instructor tiene un cuadro de búsqueda junto a su filtro. Solo muestra los hechizos y recetas cuyo nombre contiene las palabras. Cuadro de búsqueda, en Ventana de instructor en las opciones (/fcui), lo desactiva."
 L["WN77_2_TITLE"] = "What's Training en su propia ventana"

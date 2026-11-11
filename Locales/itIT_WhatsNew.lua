@@ -3,6 +3,12 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN78_1_TITLE"] = "Pannello incursione classico"
+L["WN78_1_TEXT"] = "Il pannello di incursione e gruppo sul bordo sinistro dello schermo ha l'aspetto e l'ordine classici, e tutti i comandi del gioco ci sono ancora. Il suo pulsante dei segnalini a terra fa segnare il terreno alle icone del bersaglio."
+L["WN78_2_TITLE"] = "Bordo del pannello incursione"
+L["WN78_2_TEXT"] = "Da chiuso, il pannello mostra solo la linguetta con la freccia. Bordo del pannello incursione da chiuso lascia la sua cornice sul bordo dello schermo, come in Era. Disattivato in modo predefinito; attivalo nelle opzioni (/fcui), sotto Riquadri delle unità."
+L["WN78_3_TITLE"] = "Piccole correzioni"
+L["WN78_3_TEXT"] = "La finestra del bottino si apre subito e non salta più quando clicchi un oggetto con le borse piene. I pulsanti della scheda di gilda e della finestra delle comunità non restano più cliccabili dopo la chiusura della loro finestra in combattimento."
 L["WN77_1_TITLE"] = "Ricerca dall'istruttore"
 L["WN77_1_TEXT"] = "La finestra di un istruttore ha una casella di ricerca accanto al filtro. Mostra solo gli incantesimi e le ricette il cui nome contiene le parole. Casella di ricerca, sotto Finestra dell'istruttore nelle opzioni (/fcui), la disattiva."
 L["WN77_2_TITLE"] = "What's Training in una finestra propria"

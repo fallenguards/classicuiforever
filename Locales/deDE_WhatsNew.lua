@@ -3,6 +3,12 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN78_1_TITLE"] = "Klassisches Schlachtzugsfenster"
+L["WN78_1_TEXT"] = "Das Schlachtzugs- und Gruppenfenster am linken Bildschirmrand hat das klassische Aussehen und die klassische Reihenfolge, und alle Bedienelemente des Spiels sind noch darin. Sein Weltmarkierungsknopf lässt die Zielsymbole den Boden markieren."
+L["WN78_2_TITLE"] = "Rand des Schlachtzugsfensters"
+L["WN78_2_TEXT"] = "Geschlossen zeigt das Fenster nur seinen Pfeilreiter. Rand des Schlachtzugsfensters, wenn geschlossen, lässt seinen Rahmen am Bildschirmrand stehen, wie in Era. Standardmäßig aus; schalte es in den Optionen (/fcui) unter Einheitenfenster ein."
+L["WN78_3_TITLE"] = "Kleine Korrekturen"
+L["WN78_3_TEXT"] = "Das Beutefenster öffnet sofort und springt nicht mehr, wenn du mit vollen Taschen einen Gegenstand anklickst. Die Knöpfe des Gildenreiters und des Communityfensters bleiben nicht mehr anklickbar, nachdem ihr Fenster im Kampf geschlossen wurde."
 L["WN77_1_TITLE"] = "Suche beim Lehrer"
 L["WN77_1_TEXT"] = "Das Lehrerfenster hat neben dem Filter ein Suchfeld. Es zeigt nur die Zauber und Rezepte, deren Name die Wörter enthält. Suchfeld unter Lehrerfenster in den Optionen (/fcui) schaltet es aus."
 L["WN77_2_TITLE"] = "What's Training in eigenem Fenster"
