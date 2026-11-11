@@ -3,6 +3,20 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN77_1_TITLE"] = "Búsqueda en el instructor"
+L["WN77_1_TEXT"] = "La ventana de un instructor tiene un cuadro de búsqueda junto a su filtro. Solo muestra los hechizos y recetas cuyo nombre contiene las palabras. Cuadro de búsqueda, en Ventana de instructor en las opciones (/fcui), lo desactiva."
+L["WN77_2_TITLE"] = "What's Training en su propia ventana"
+L["WN77_2_TEXT"] = "La pestaña de entrenamiento del libro de hechizos puede abrir la ventana propia de What's Training en lugar de una página del libro; la ventana se cierra con el libro. Desactivado por defecto; actívalo en las opciones (/fcui), en Libro de hechizos."
+L["WN77_3_TITLE"] = "Nombres de hermandad en color de clase"
+L["WN77_3_TEXT"] = "Los nombres de la lista de la hermandad pueden mostrarse en su color de clase. Desactivado por defecto; actívalo en las opciones (/fcui), en Lista de la hermandad."
+L["WN77_4_TITLE"] = "Banco clásico"
+L["WN77_4_TEXT"] = "El banco tiene las placas de casilla y los remaches clásicos, con su espaciado clásico, en una ventana más corta."
+L["WN77_5_TITLE"] = "Cuadros de búsqueda"
+L["WN77_5_TEXT"] = "Los cuadros de búsqueda del registro de misiones y de las profesiones tienen el aspecto de entrada clásico."
+L["WN77_6_TITLE"] = "Avisos sobre el chat"
+L["WN77_6_TEXT"] = "Los avisos de amigos y el aviso de actualización del mundo se colocan sobre las pestañas del chat. En un chat más alto tapaban su texto y sus pestañas."
+L["WN77_7_TITLE"] = "Pequeñas correcciones"
+L["WN77_7_TEXT"] = "Forever Quest Tint cubre toda la página de misión del mapa, no una franja bajo el título. Cerrar un banco o un vendedor ya no aparta un instante las bolsas abiertas, y /fstack ya no lista los marcos auxiliares ocultos del addon."
 L["WN76_1_TITLE"] = "Búsqueda en el registro de misiones"
 L["WN76_1_TEXT"] = "El registro de misiones de panel doble tiene un cuadro de búsqueda en su cabecera. Muestra las misiones cuyo nombre o zona contiene las palabras."
 L["WN76_2_TITLE"] = "Ordenar por dificultad"

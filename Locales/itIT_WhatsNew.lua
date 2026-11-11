@@ -3,6 +3,20 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN77_1_TITLE"] = "Ricerca dall'istruttore"
+L["WN77_1_TEXT"] = "La finestra di un istruttore ha una casella di ricerca accanto al filtro. Mostra solo gli incantesimi e le ricette il cui nome contiene le parole. Casella di ricerca, sotto Finestra dell'istruttore nelle opzioni (/fcui), la disattiva."
+L["WN77_2_TITLE"] = "What's Training in una finestra propria"
+L["WN77_2_TEXT"] = "La scheda di addestramento del libro degli incantesimi può aprire la finestra di What's Training invece di una pagina del libro; la finestra si chiude con il libro. Disattivato di default; attivalo nelle opzioni (/fcui), sotto Libro degli incantesimi."
+L["WN77_3_TITLE"] = "Nomi di gilda nel colore della classe"
+L["WN77_3_TEXT"] = "I nomi nell'elenco della gilda possono apparire nel colore della loro classe. Disattivato di default; attivalo nelle opzioni (/fcui), sotto Elenco della gilda."
+L["WN77_4_TITLE"] = "Banca classica"
+L["WN77_4_TEXT"] = "La banca ha le piastre degli slot e i rivetti classici, con la spaziatura classica, in una finestra più bassa."
+L["WN77_5_TITLE"] = "Caselle di ricerca"
+L["WN77_5_TEXT"] = "Le caselle di ricerca del registro delle missioni e delle professioni hanno l'aspetto classico dei campi di testo."
+L["WN77_6_TITLE"] = "Avvisi sopra la chat"
+L["WN77_6_TEXT"] = "Le notifiche degli amici e l'avviso di aggiornamento del mondo stanno sopra le schede della chat. Su una chat più alta coprivano il testo e le schede."
+L["WN77_7_TITLE"] = "Piccole correzioni"
+L["WN77_7_TEXT"] = "Forever Quest Tint copre tutta la pagina della missione sulla mappa, non una striscia sotto il titolo. Chiudere una banca o un mercante non sposta più per un attimo le borse aperte, e /fstack non elenca più i riquadri ausiliari nascosti dell'addon."
 L["WN76_1_TITLE"] = "Ricerca nel registro delle missioni"
 L["WN76_1_TEXT"] = "Il registro delle missioni a riquadro doppio ha una casella di ricerca nell'intestazione. Elenca le missioni il cui nome o la cui zona contiene le parole."
 L["WN76_2_TITLE"] = "Ordina per difficoltà"

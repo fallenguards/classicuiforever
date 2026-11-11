@@ -3,6 +3,20 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN77_1_TITLE"] = "Recherche chez le maître"
+L["WN77_1_TEXT"] = "La fenêtre d'un maître a un champ de recherche à côté de son filtre. Il ne montre que les sorts et recettes dont le nom contient les mots. Champ de recherche, sous Fenêtre de maître dans les options (/fcui), le désactive."
+L["WN77_2_TITLE"] = "What's Training dans sa propre fenêtre"
+L["WN77_2_TEXT"] = "L'onglet de formation du grimoire peut ouvrir la fenêtre de What's Training au lieu d'une page du livre ; la fenêtre se ferme avec le livre. Désactivé par défaut ; activez-le dans les options (/fcui), sous Grimoire."
+L["WN77_3_TITLE"] = "Noms de guilde en couleur de classe"
+L["WN77_3_TEXT"] = "Les noms de la liste de guilde peuvent s'afficher dans leur couleur de classe. Désactivé par défaut ; activez-le dans les options (/fcui), sous Liste de guilde."
+L["WN77_4_TITLE"] = "Banque classique"
+L["WN77_4_TEXT"] = "La banque a les plaques d'emplacement et les rivets classiques, avec leur espacement classique, dans une fenêtre plus courte."
+L["WN77_5_TITLE"] = "Champs de recherche"
+L["WN77_5_TEXT"] = "Les champs de recherche du journal de quêtes et des métiers ont l'aspect de saisie classique."
+L["WN77_6_TITLE"] = "Avis au-dessus de la discussion"
+L["WN77_6_TEXT"] = "Les notifications d'amis et l'avis d'actualisation du monde se placent au-dessus des onglets de la discussion. Sur une fenêtre de discussion plus haute, ils couvraient son texte et ses onglets."
+L["WN77_7_TITLE"] = "Petites corrections"
+L["WN77_7_TEXT"] = "Forever Quest Tint couvre toute la page de quête de la carte, et non une bande sous le titre. Fermer une banque ou un marchand ne décale plus un instant les sacs ouverts, et /fstack ne liste plus les cadres d'aide cachés de l'addon."
 L["WN76_1_TITLE"] = "Recherche dans le journal de quêtes"
 L["WN76_1_TEXT"] = "Le journal de quêtes à double volet a un champ de recherche dans son en-tête. Il liste les quêtes dont le nom ou la zone contient les mots."
 L["WN76_2_TITLE"] = "Trier par difficulté"

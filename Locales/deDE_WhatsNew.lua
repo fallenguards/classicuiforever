@@ -3,6 +3,20 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN77_1_TITLE"] = "Suche beim Lehrer"
+L["WN77_1_TEXT"] = "Das Lehrerfenster hat neben dem Filter ein Suchfeld. Es zeigt nur die Zauber und Rezepte, deren Name die Wörter enthält. Suchfeld unter Lehrerfenster in den Optionen (/fcui) schaltet es aus."
+L["WN77_2_TITLE"] = "What's Training in eigenem Fenster"
+L["WN77_2_TEXT"] = "Der Lern-Reiter des Zauberbuchs kann das eigene Fenster von What's Training statt einer Seite im Buch öffnen; das Fenster schließt sich mit dem Buch. Standardmäßig aus; schalte es in den Optionen (/fcui) unter Zauberbuch ein."
+L["WN77_3_TITLE"] = "Gildennamen in Klassenfarbe"
+L["WN77_3_TEXT"] = "Namen in der Gildenliste können in ihrer Klassenfarbe erscheinen. Standardmäßig aus; schalte es in den Optionen (/fcui) unter Gildenliste ein."
+L["WN77_4_TITLE"] = "Klassische Bank"
+L["WN77_4_TEXT"] = "Die Bank hat die klassischen Platzplatten und Nieten im klassischen Abstand, in einem kürzeren Fenster."
+L["WN77_5_TITLE"] = "Suchfelder"
+L["WN77_5_TEXT"] = "Die Suchfelder des Questlogs und der Berufe haben das klassische Aussehen der Eingabefelder."
+L["WN77_6_TITLE"] = "Hinweise über dem Chat"
+L["WN77_6_TEXT"] = "Freundesmeldungen und der Hinweis zur Weltaktualisierung stehen über den Reitern des Chats. Bei einem höheren Chat hatten sie seinen Text und seine Reiter verdeckt."
+L["WN77_7_TITLE"] = "Kleine Korrekturen"
+L["WN77_7_TEXT"] = "Forever Quest Tint deckt die ganze Questseite auf der Karte ab, nicht nur einen Streifen unter dem Titel. Das Schließen einer Bank oder eines Händlers schiebt offene Taschen nicht mehr kurz beiseite, und /fstack listet die versteckten Hilfsrahmen des Addons nicht mehr auf."
 L["WN76_1_TITLE"] = "Suche im Questlog"
 L["WN76_1_TEXT"] = "Das Questlog mit Doppelseite hat ein Suchfeld in der Kopfzeile. Es listet die Quests, deren Name oder Zone die Wörter enthält."
 L["WN76_2_TITLE"] = "Nach Schwierigkeit sortieren"

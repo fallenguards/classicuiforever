@@ -2,6 +2,20 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN77_1_TITLE"] = "Trainer search"
+L["WN77_1_TEXT"] = "A trainer's window has a search box beside its filter. It lists only the spells and recipes whose name holds the words. Search box, under Trainer window in the options (/fcui), turns it off."
+L["WN77_2_TITLE"] = "What's Training in its own window"
+L["WN77_2_TEXT"] = "The spellbook's training tab can open What's Training's own window instead of a page in the book; the window closes with the book. Off by default; turn it on in the options (/fcui), under Spellbook."
+L["WN77_3_TITLE"] = "Class colored guild names"
+L["WN77_3_TEXT"] = "Guild roster names can show in their class colors. Off by default; turn it on in the options (/fcui), under Guild roster."
+L["WN77_4_TITLE"] = "Classic bank"
+L["WN77_4_TEXT"] = "The bank has the classic slot plates and rivets at their classic spacing, in a shorter window."
+L["WN77_5_TITLE"] = "Search boxes"
+L["WN77_5_TEXT"] = "The quest log's and the professions' search boxes have the classic input look."
+L["WN77_6_TITLE"] = "Notices over the chat"
+L["WN77_6_TEXT"] = "Friend toasts and the world refresh notice stand above the chat's tabs. On a taller chat they had covered its text and tabs."
+L["WN77_7_TITLE"] = "Small fixes"
+L["WN77_7_TEXT"] = "Forever Quest Tint covers the whole quest page on the map, not a strip under the title. Closing a bank or vendor no longer flicks open bags aside for a moment, and /fstack no longer lists the addon's hidden helper frames."
 L["WN76_1_TITLE"] = "Quest log search"
 L["WN76_1_TEXT"] = "The double pane quest log has a search box in its header. It lists the quests whose name or zone holds the words."
 L["WN76_2_TITLE"] = "Sort by difficulty"

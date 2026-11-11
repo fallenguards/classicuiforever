@@ -2,6 +2,24 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.53.0] - 2026-11-11
+
+### Added
+- A trainer's window has a search box beside its filter. It lists only the spells and recipes whose name holds the words; Search box, under Trainer window in the options, turns it off.
+- What's Training in its own window: the spellbook's training tab opens What's Training's own window instead of a page in the book, and the window closes with the book. A profession window's training tab opens it on its professions page. Off by default; turn it on in the options (/fcui), under Spellbook.
+- Guild roster names in their class colors. Off by default; turn it on in the options (/fcui), under Guild roster.
+
+### Changed
+- The bank has the classic slot plates and rivets at their classic spacing, in a shorter window.
+- The quest log's and the professions' search boxes have the classic input look.
+- The quest log's and the profession window's list rows start a little lower, at the classic distance from the list's edge.
+
+### Fixed
+- Friend toasts and the world refresh notice stand above the chat's tabs. On a taller chat they had covered its text, and the notice covered the tabs.
+- Forever Quest Tint covers the whole quest page on the map. It had shown as a strip under the quest's title.
+- Closing a bank or a vendor no longer flicks your open bags aside for a moment.
+- /fstack no longer lists the addon's hidden helper frames under the mouse.
+
 ## [0.52.1] - 2026-11-10
 
 ### Fixed
