@@ -181,6 +181,7 @@ ns.DB_DEFAULTS = {
     barsTakenNote = true,
     threatNumber = true,
     threatNumberGrouped = false,
+    raidManagerEdge = false,
     druidMana = true,
     englishSettings = false,
     englishNews = false,

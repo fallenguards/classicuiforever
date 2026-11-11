@@ -285,6 +285,8 @@ ns.TOGGLES = {
     { "threatNumber", L["OPT_threatNumber"], L["OPT_threatNumber_TIP"], parent = "unitFrames", search = "aggro threat percent focus" },
     { "threatNumberGrouped", L["OPT_threatNumberGrouped"], L["OPT_threatNumberGrouped_TIP"], parent = "threatNumber",
         search = "party raid dungeon instance solo" },
+    { "raidManagerEdge", L["OPT_raidManagerEdge"], L["OPT_raidManagerEdge_TIP"], parent = "unitFrames",
+        search = "raid party manager panel sidebar left edge closed collapsed strip" },
     { "plainNumbers", L["OPT_plainNumbers"], L["OPT_plainNumbers_TIP"], search = "commas thousands separators digits large" },
     { "buffArrowShown", L["OPT_buffArrowShown"], L["OPT_buffArrow_TIP"], radio = "buffArrowShow", drop = true,
         dropTip = L["OPT_buffArrow_TIP"], search = "buff arrow collapse fold hover hide mouse" },

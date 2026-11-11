@@ -180,6 +180,7 @@ return {
     achievementsMinimapButton = "on for everyone, retail only: the achievements button's way in once it is off the micro menu; the author's call",
     journalMinimapButton = "on for everyone, retail only: the adventure guide button's way in once it is off the micro menu; the author's call",
     threatNumberGrouped = "same for everyone: opt-in, off by default; the threat percent shows solo too, as before",
+    raidManagerEdge = "same for everyone: off by default; the closed raid panel showed only its arrow tab before",
     themeIgnoreElite = "same for everyone: opt-in, off by default; dragons take the theme as before",
     plateDragons = "same for everyone: opt-in, off by default; nameplates show no dragon as before",
     themeIgnorePlateDragon = "same for everyone: opt-in, off by default; only seen with Elite dragons on",

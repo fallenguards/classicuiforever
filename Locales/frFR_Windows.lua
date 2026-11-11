@@ -233,3 +233,8 @@ L["OPT_hideSheetQuality"] = "Masquer les bordures de qualité"
 L["OPT_hideSheetQuality_TIP"] = "Les objets que vous portez s'affichent sans la bordure colorée de leur qualité."
 L["OPT_sheetEnchantGlow"] = "Lueur dorée à l'enchantement"
 L["OPT_sheetEnchantGlow_TIP"] = "L'éclat du jeu autour de votre équipement quand une pierre, une huile ou un enchantement est appliqué. Era n'en a pas."
+-- Units/RaidManager.lua
+L["RAIDMGR_MARK_GROUND"] = "Les icônes marquent le sol"
+L["RAIDMGR_MARK_TARGET"] = "Les icônes marquent votre cible"
+L["RAIDMGR_CLEAR_TARGETS"] = "Retirer toutes les marques de cible"
+L["RAIDMGR_CLEAR_GROUND"] = "Retirer tous les marqueurs au sol"

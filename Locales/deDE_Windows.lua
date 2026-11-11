@@ -233,3 +233,8 @@ L["OPT_hideSheetQuality"] = "Qualitätsrahmen ausblenden"
 L["OPT_hideSheetQuality_TIP"] = "Angelegte Gegenstände zeigen keinen farbigen Rahmen ihrer Qualität."
 L["OPT_sheetEnchantGlow"] = "Goldenes Leuchten beim Verzaubern"
 L["OPT_sheetEnchantGlow_TIP"] = "Das Aufleuchten des Spiels um deine Ausrüstung, wenn ein Stein, Öl oder eine Verzauberung angewendet wird. Era hat keines."
+-- Units/RaidManager.lua
+L["RAIDMGR_MARK_GROUND"] = "Symbole markieren den Boden"
+L["RAIDMGR_MARK_TARGET"] = "Symbole markieren dein Ziel"
+L["RAIDMGR_CLEAR_TARGETS"] = "Alle Zielmarkierungen entfernen"
+L["RAIDMGR_CLEAR_GROUND"] = "Alle Weltmarkierungen entfernen"

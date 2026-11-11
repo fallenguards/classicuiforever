@@ -295,3 +295,8 @@ L["OPT_hideSheetQuality"] = "Hide quality borders"
 L["OPT_hideSheetQuality_TIP"] = "Items you wear show without the colored border of their quality."
 L["OPT_sheetEnchantGlow"] = "Gold glow on enchant"
 L["OPT_sheetEnchantGlow_TIP"] = "The game's flash round your gear when a stone, oil or enchant is applied. Era has none."
+-- Units/RaidManager.lua
+L["RAIDMGR_MARK_GROUND"] = "Icons mark the ground"
+L["RAIDMGR_MARK_TARGET"] = "Icons mark your target"
+L["RAIDMGR_CLEAR_TARGETS"] = "Clear all target markers"
+L["RAIDMGR_CLEAR_GROUND"] = "Clear all world markers"

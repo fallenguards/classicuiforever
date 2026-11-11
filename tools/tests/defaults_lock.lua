@@ -385,6 +385,7 @@ return {
     questTextFontSize = 0,
     questTracker = true,
     questWatch = false,
+    raidManagerEdge = false,
     reagentBagCombined = false,
     reagentBagHidden = false,
     reagentBagHover = true,

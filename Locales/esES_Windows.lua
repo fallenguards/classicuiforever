@@ -233,3 +233,8 @@ L["OPT_hideSheetQuality"] = "Ocultar bordes de calidad"
 L["OPT_hideSheetQuality_TIP"] = "Los objetos que llevas equipados se muestran sin el borde de color de su calidad."
 L["OPT_sheetEnchantGlow"] = "Brillo dorado al encantar"
 L["OPT_sheetEnchantGlow_TIP"] = "El destello del juego alrededor de tu equipo al aplicar una piedra, un aceite o un encantamiento. Era no lo tiene."
+-- Units/RaidManager.lua
+L["RAIDMGR_MARK_GROUND"] = "Los iconos marcan el suelo"
+L["RAIDMGR_MARK_TARGET"] = "Los iconos marcan tu objetivo"
+L["RAIDMGR_CLEAR_TARGETS"] = "Quitar todas las marcas de objetivo"
+L["RAIDMGR_CLEAR_GROUND"] = "Quitar todas las marcas de mundo"

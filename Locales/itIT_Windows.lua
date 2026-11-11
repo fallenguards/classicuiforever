@@ -233,3 +233,8 @@ L["OPT_hideSheetQuality"] = "Nascondi bordi di qualità"
 L["OPT_hideSheetQuality_TIP"] = "Gli oggetti indossati appaiono senza il bordo colorato della loro qualità."
 L["OPT_sheetEnchantGlow"] = "Bagliore dorato all'incantamento"
 L["OPT_sheetEnchantGlow_TIP"] = "Il bagliore del gioco attorno al tuo equipaggiamento quando applichi una pietra, un olio o un incantamento. Era non lo ha."
+-- Units/RaidManager.lua
+L["RAIDMGR_MARK_GROUND"] = "Le icone segnano il terreno"
+L["RAIDMGR_MARK_TARGET"] = "Le icone segnano il tuo bersaglio"
+L["RAIDMGR_CLEAR_TARGETS"] = "Rimuovi tutti i segni sui bersagli"
+L["RAIDMGR_CLEAR_GROUND"] = "Rimuovi tutti i segnalini a terra"
