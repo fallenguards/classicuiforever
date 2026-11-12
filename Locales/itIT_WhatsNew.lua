@@ -3,6 +3,8 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN79_1_TITLE"] = "Pannello di incursione in combattimento"
+L["WN79_1_TEXT"] = "Il pannello di incursione e gruppo non causa più un errore quando il tuo gruppo cambia durante un combattimento, per esempio quando un membro sale di livello. Si aggiorna alla fine del combattimento."
 L["WN78_1_TITLE"] = "Pannello incursione classico"
 L["WN78_1_TEXT"] = "Il pannello di incursione e gruppo sul bordo sinistro dello schermo ha l'aspetto e l'ordine classici, e tutti i comandi del gioco ci sono ancora. Il suo pulsante dei segnalini a terra fa segnare il terreno alle icone del bersaglio."
 L["WN78_2_TITLE"] = "Bordo del pannello incursione"

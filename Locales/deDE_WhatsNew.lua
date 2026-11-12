@@ -3,6 +3,8 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN79_1_TITLE"] = "Schlachtzugsfenster im Kampf"
+L["WN79_1_TEXT"] = "Das Schlachtzugs- und Gruppenfenster verursacht keinen Fehler mehr, wenn sich deine Gruppe im Kampf ändert, etwa wenn ein Gruppenmitglied eine Stufe aufsteigt. Es zieht nach, sobald der Kampf endet."
 L["WN78_1_TITLE"] = "Klassisches Schlachtzugsfenster"
 L["WN78_1_TEXT"] = "Das Schlachtzugs- und Gruppenfenster am linken Bildschirmrand hat das klassische Aussehen und die klassische Reihenfolge, und alle Bedienelemente des Spiels sind noch darin. Sein Weltmarkierungsknopf lässt die Zielsymbole den Boden markieren."
 L["WN78_2_TITLE"] = "Rand des Schlachtzugsfensters"

@@ -2,6 +2,11 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.54.1] - 2026-11-11
+
+### Fixed
+- The raid and party panel no longer causes an error when your group changes during a fight, for example when a party member levels up. It catches up as the fight ends.
+
 ## [0.54.0] - 2026-11-11
 
 ### Added

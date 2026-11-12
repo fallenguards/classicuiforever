@@ -3,6 +3,8 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN79_1_TITLE"] = "Panel de banda en combate"
+L["WN79_1_TEXT"] = "El panel de banda y grupo ya no causa un error cuando tu grupo cambia durante un combate, por ejemplo cuando un miembro del grupo sube de nivel. Se pone al día al terminar el combate."
 L["WN78_1_TITLE"] = "Panel de banda clásico"
 L["WN78_1_TEXT"] = "El panel de banda y grupo del borde izquierdo de la pantalla tiene el aspecto y el orden clásicos, y todos los controles del juego siguen en él. Su botón de marcadores de mundo hace que los iconos de objetivo marquen el suelo."
 L["WN78_2_TITLE"] = "Borde del panel de banda"

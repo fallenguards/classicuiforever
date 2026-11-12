@@ -2,6 +2,8 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN79_1_TITLE"] = "Raid panel in fights"
+L["WN79_1_TEXT"] = "The raid and party panel no longer causes an error when your group changes during a fight, for example when a party member levels up. It catches up as the fight ends."
 L["WN78_1_TITLE"] = "Classic raid panel"
 L["WN78_1_TEXT"] = "The raid and party panel at the screen's left edge has the classic look and order, and every control of the game's is still in it. Its world marker button switches the target icons to marking the ground."
 L["WN78_2_TITLE"] = "Raid panel edge"

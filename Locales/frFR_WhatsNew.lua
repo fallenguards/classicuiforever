@@ -3,6 +3,8 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN79_1_TITLE"] = "Panneau de raid en combat"
+L["WN79_1_TEXT"] = "Le panneau de raid et de groupe ne provoque plus d'erreur quand votre groupe change pendant un combat, par exemple quand un membre monte de niveau. Il se met à jour à la fin du combat."
 L["WN78_1_TITLE"] = "Panneau de raid classique"
 L["WN78_1_TEXT"] = "Le panneau de raid et de groupe au bord gauche de l'écran a l'aspect et l'ordre classiques, et toutes les commandes du jeu y sont toujours. Son bouton de marqueurs au sol fait marquer le sol aux icônes de cible."
 L["WN78_2_TITLE"] = "Bord du panneau de raid"
