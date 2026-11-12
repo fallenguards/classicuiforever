@@ -515,8 +515,15 @@ local function Relay()
     local shut = manager.collapsed and true or false
     if manager.Background then SetAlphaIf(manager.Background, 0) end
     FadeDividers(manager, 0)
-    SetSizeIf(manager, PANEL_W, manager:GetHeight())
     local edge = not shut or ns.db.raidManagerEdge == true
+    -- In a fight the panel holds the game's secure buttons: its size, spot and rows wait for the fight's end.
+    if InCombatLockdown() and manager:IsProtected() then
+        for _, region in ipairs(era.header) do SetShownIf(region, not shut) end
+        for _, region in ipairs(era.edge) do SetShownIf(region, edge) end
+        SmallTab(manager.toggleButtonForward, shut and not edge)
+        return ns.WhenCalm("raidManager.relay", Relay)
+    end
+    SetSizeIf(manager, PANEL_W, manager:GetHeight())
     if not shut or edge then SetPointIf(manager, "TOPLEFT", UIParent, "TOPLEFT", shut and SHUT_X or OPEN_X, PANEL_Y) end
     for _, region in ipairs(era.header) do SetShownIf(region, not shut) end
     for _, region in ipairs(era.edge) do SetShownIf(region, edge) end
