@@ -251,7 +251,7 @@ local function FitDetail()
     local bottom = ICON_TOP + 37
     local rows = math.ceil((detail.shownReagents or 0) / 2)
     if rows > 0 then
-        bottom = LABEL_TOP + (detail.reagentLabel:GetStringHeight() or 10) + 3 + rows * REAGENT_PITCH - 2
+        bottom = LABEL_TOP + (detail.priceShift or 0) + (detail.reagentLabel:GetStringHeight() or 10) + 3 + rows * REAGENT_PITCH - 2
     end
     local room = scroll:GetHeight() or 0
     local height = math.max(room, bottom + 4)
@@ -345,6 +345,8 @@ UpdateDetail = function()
     for i = shown + 1, REAGENTS_MAX do detail.reagents[i]:Hide() end
     detail.reagentLabel:SetShown(shown > 0)
     detail.shownReagents = shown
+    ns.tradePrices.Lay(detail, LABEL_TOP, shown > 0 and R.Read(info.recipeID) or nil,
+        schematic and schematic.outputItemID, schematic and schematic.quantityMin)
     -- A new recipe opens at the top.
     if detail.recipeShown ~= info.recipeID then
         detail.recipeShown = info.recipeID
@@ -529,7 +531,8 @@ end
 
 local TRADE_EVENTS = { "TRADE_SKILL_SHOW", "TRADE_SKILL_LIST_UPDATE", "TRADE_SKILL_DATA_SOURCE_CHANGED",
     "TRADE_SKILL_DETAILS_UPDATE", "BAG_UPDATE_DELAYED", "GET_ITEM_INFO_RECEIVED", "SKILL_LINES_CHANGED",
-    "UPDATE_TRADESKILL_CAST_STOPPED", "TRADE_SKILL_ITEM_CRAFTED_RESULT", "TRACKED_RECIPE_UPDATE" }
+    "UPDATE_TRADESKILL_CAST_STOPPED", "TRADE_SKILL_ITEM_CRAFTED_RESULT", "TRACKED_RECIPE_UPDATE",
+    "AUCTION_HOUSE_SHOW", "AUCTION_HOUSE_CLOSED" }
 
 -- One pass per event burst, next frame; item data alone only touches the detail plates.
 local detailOnly = true
@@ -651,6 +654,7 @@ local function Build()
     detail.reagentLabel:SetPoint("TOPLEFT", detail, "TOPLEFT", 8, -LABEL_TOP)
     detail.reagents = {}
     for i = 1, REAGENTS_MAX do detail.reagents[i] = ReagentButton(detail, i) end
+    ns.tradePrices.Build(detail, LABEL_TOP)
 
     ns.TradeSkillFoot(panel, Craft, function(by)
         local most = math.max(1, Craftable(SelectedInfo()))

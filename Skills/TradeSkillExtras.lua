@@ -236,3 +236,108 @@ function ns.PlaceTradeSkillLink(link, title)
     ns.SetShownIf(link, linkable)
     if linkable then ns.SetPointOnce(link, "LEFT", title, "CENTER", math.floor((title:GetStringWidth() or 0) / 2) + 5, 0) end
 end
+
+------------------------------------------------------------------ Auctionator's prices, as its line on Era's window
+
+local P = {}
+ns.tradePrices = P
+local LINE_H, AH_CUT = 16, 0.95
+local CALLER = "ClassicUI Forever"
+
+local function PriceApi()
+    local addon = _G.Auctionator
+    local api = addon and addon.API and addon.API.v1
+    return api and api.GetAuctionPriceByItemID and api.GetVendorPriceByItemID and api or nil
+end
+
+-- Its own crafting info switches; on when unreadable.
+local function Wants(option)
+    local config = _G.Auctionator.Config
+    local key = config and config.Options and config.Options[option]
+    if not key or not config.Get then return true end
+    return config.Get(key) ~= false
+end
+
+local function AuctionOpen()
+    local house = _G.AuctionHouseFrame
+    return house ~= nil and house:IsShown()
+end
+
+-- Its note on a price that is missing, old or not this exact item.
+local function Warning(api, outputID, profit, sale)
+    local info = _G.Auctionator.CraftingInfo
+    if not info or not info.GetProfitWarning or not api.GetAuctionAgeByItemID or not api.IsAuctionDataExactByItemID then
+        return ""
+    end
+    return info.GetProfitWarning(profit, api.GetAuctionAgeByItemID(CALLER, outputID), sale ~= nil,
+        api.IsAuctionDataExactByItemID(CALLER, outputID))
+end
+
+-- The cost of one craft and what its result clears at auction; nil with nothing to show. needs: R.Read's list.
+local function PriceText(needs, outputID, made)
+    local api = PriceApi()
+    if not api or not needs or #needs == 0 or not Wants("CRAFTING_INFO_SHOW") then return nil, 0 end
+    local cost = 0
+    for _, need in ipairs(needs) do
+        local each = api.GetVendorPriceByItemID(CALLER, need[1]) or api.GetAuctionPriceByItemID(CALLER, need[1])
+        if each then cost = cost + each * need[2] end
+    end
+    local text, count = nil, 0
+    if Wants("CRAFTING_INFO_SHOW_COST") then
+        text, count = string.format("%s |cffffffff%s|r", _G.AUCTIONATOR_L_TO_CRAFT_COLON or "", ns.CoinText(cost)), 1
+    end
+    if outputID and Wants("CRAFTING_INFO_SHOW_PROFIT") then
+        -- No price yet reads as a loss with its warning, as on Era.
+        local sale = api.GetAuctionPriceByItemID(CALLER, outputID)
+        local profit = math.floor((sale or 0) * math.max(1, made or 1) * AH_CUT - cost)
+        local color, sign = "|cffffffff", ""
+        if profit < 0 then color, sign = "|cffff2020", "-" end
+        local line = string.format("%s %s%s%s|r%s", _G.AUCTIONATOR_L_PROFIT_COLON or "", color, sign,
+            ns.CoinText(math.abs(profit)), Warning(api, outputID, profit, sale))
+        if text then text = string.format("%s\n%s", text, line) else text = line end
+        count = count + 1
+    end
+    return text, count
+end
+
+-- The auction house searched for the result and each reagent, in the amounts one craft takes.
+local function SearchReagents(detail)
+    local api = PriceApi()
+    if not api or not api.MultiSearchAdvanced or not AuctionOpen() then return end
+    local terms = {}
+    local result = detail.priceOutput and C_Item.GetItemInfo(detail.priceOutput)
+    if result then terms[#terms + 1] = { searchString = result, isExact = true } end
+    for _, need in ipairs(detail.priceNeeds or ns.EMPTY) do
+        local name = C_Item.GetItemInfo(need[1])
+        if name then terms[#terms + 1] = { searchString = name, isExact = true, quantity = math.max(1, need[2]) } end
+    end
+    if #terms > 0 then api.MultiSearchAdvanced(CALLER, terms) end
+end
+
+-- Where Era's window has it: on the reagent label's line, Search at its right while the auction house is open.
+function P.Build(detail, top)
+    local line = detail:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    line:SetPoint("TOPLEFT", detail, "TOPLEFT", 8, -top)
+    line:SetJustifyH("LEFT")
+    line:SetSpacing(2)
+    local search = ns.PanelButton(detail, SEARCH or "Search", 70)
+    search:SetPoint("TOPRIGHT", detail, "TOPRIGHT", -14, 3 - top)
+    search:SetScript("OnClick", function() SearchReagents(detail) end)
+    search:Hide()
+    detail.price, detail.priceSearch = line, search
+end
+
+-- Fills the line and moves the reagents under it; returns how far they moved.
+function P.Lay(detail, top, needs, outputID, made)
+    local text, count = PriceText(needs, outputID, made)
+    detail.priceNeeds, detail.priceOutput = needs, outputID
+    detail.price:SetText(text or "")
+    ns.SetShownIf(detail.price, text ~= nil)
+    ns.SetShownIf(detail.priceSearch, text ~= nil and AuctionOpen())
+    local shift = count * LINE_H
+    if detail.priceShift ~= shift then
+        detail.priceShift = shift
+        ns.SetPointOnce(detail.reagentLabel, "TOPLEFT", detail, "TOPLEFT", 8, -top - shift)
+    end
+    return shift
+end
