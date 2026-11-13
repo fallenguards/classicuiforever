@@ -3,6 +3,14 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN81_1_TITLE"] = "Costo di creazione e profitto"
+L["WN81_1_TEXT"] = "Con Auctionator, la finestra classica delle professioni mostra sopra i reagenti quanto costa creare una ricetta e il suo profitto, e un pulsante Cerca per i reagenti mentre la casa d'aste è aperta."
+L["WN81_2_TITLE"] = "Colori di classe per amici o nemici"
+L["WN81_2_TEXT"] = "Giocatori amici e Giocatori nemici sono caselle separate sotto i colori di classe delle targhette, il riquadro del nome con colore di classe e la salute con colore di classe: possono valere per una sola parte. Le opzioni dei colori di classe sono disattivate per impostazione predefinita: attivale nelle opzioni (/fcui)."
+L["WN81_3_TITLE"] = "Corsa automatica con il controller"
+L["WN81_3_TEXT"] = "Sul layout classico, la corsa automatica è per impostazione predefinita sulla pressione della levetta sinistra, e un tasto scelto per corsa automatica o chat funziona anche su una levetta con cui il cursore fa clic."
+L["WN81_4_TITLE"] = "Correzioni"
+L["WN81_4_TEXT"] = "L'elenco di What's Training nella finestra delle professioni a doppio riquadro poggia su un solo sfondo, e le barre di salute e focus del riquadro del famiglio riempiono i loro spazi."
 L["WN80_1_TITLE"] = "Controller sul layout classico (in lavorazione)"
 L["WN80_1_TEXT"] = "Gioca con le barre classiche usando un controller mentre l'interfaccia gamepad del gioco è disattivata: la croce direzionale e i tasti frontali attivano la barra delle azioni 1, o le altre barre con un grilletto premuto. Disattivato per impostazione predefinita; la prima volta che usi un controller una finestra te lo chiede, ed è nelle opzioni (/fcui), sotto Gamepad. Ancora in lavorazione: borse, mappa e menu richiedono per ora il cursore del gioco."
 L["WN80_2_TITLE"] = "Pannello dell'incursione in combattimento"

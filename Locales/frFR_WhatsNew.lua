@@ -3,6 +3,14 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN81_1_TITLE"] = "Coût de fabrication et profit"
+L["WN81_1_TEXT"] = "Avec Auctionator, la fenêtre de métier classique affiche au-dessus des composants ce que coûte une recette et son profit, et un bouton Rechercher pour les composants quand l'hôtel des ventes est ouvert."
+L["WN81_2_TITLE"] = "Couleurs de classe pour alliés ou ennemis"
+L["WN81_2_TEXT"] = "Joueurs alliés et Joueurs ennemis sont des cases séparées sous les couleurs de classe des barres de nom, la case du nom en couleur de classe et la vie en couleur de classe : elles peuvent ne valoir que pour un camp. Les options de couleur de classe sont désactivées par défaut : activez-les dans les options (/fcui)."
+L["WN81_3_TITLE"] = "Course automatique à la manette"
+L["WN81_3_TEXT"] = "Sur la disposition classique, la course automatique est par défaut sur l'appui du stick gauche, et un bouton choisi pour la course automatique ou la discussion marche aussi sur un stick avec lequel le curseur clique."
+L["WN81_4_TITLE"] = "Corrections"
+L["WN81_4_TEXT"] = "La liste de What's Training dans la fenêtre de métier à deux volets repose sur un seul fond, et les barres de vie et de focalisation du cadre du familier remplissent leurs emplacements."
 L["WN80_1_TITLE"] = "Manette sur la disposition classique (en cours)"
 L["WN80_1_TEXT"] = "Jouez avec les barres classiques à la manette pendant que l'interface manette du jeu est désactivée : la croix directionnelle et les boutons de façade lancent la barre d'action 1, ou les autres barres avec une gâchette maintenue. Désactivé par défaut ; une fenêtre le demande à la première utilisation d'une manette, et l'option se trouve dans les options (/fcui), sous Manette. Encore en cours : les sacs, la carte et les menus demandent pour l'instant le curseur du jeu."
 L["WN80_2_TITLE"] = "Panneau de raid en combat"

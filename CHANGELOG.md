@@ -2,6 +2,19 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.56.0] - 2026-11-13
+
+### Added
+- With Auctionator, the classic trade skill window shows what a recipe costs to craft and its profit, above the reagents as on Era, and a Search button for the reagents while the auction house is open. Auctionator's own crafting info settings switch it.
+- Class colors can be for friendly players only, or enemies only: Friendly players and Enemy players are separate boxes under the nameplates' Class colors, under Class colored name box and under Class colored health.
+
+### Changed
+- Controller on the classic layout: autorun is on the left stick's press by default, as in the game's gamepad interface, and a button picked for autorun or chat works on a stick the cursor clicks with too.
+
+### Fixed
+- What's Training's list in the double pane trade skill window sits on one dark marble from edge to edge, without a second background under it or a mismatched corner by the portrait.
+- The pet frame's health and focus bars fill their slots.
+
 ## [0.55.0] - 2026-11-13
 
 ### Added

@@ -2,6 +2,14 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN81_1_TITLE"] = "Crafting cost and profit"
+L["WN81_1_TEXT"] = "With Auctionator, the classic trade skill window shows what a recipe costs to craft and its profit above the reagents, and a Search button for the reagents while the auction house is open."
+L["WN81_2_TITLE"] = "Class colors for friends or enemies"
+L["WN81_2_TEXT"] = "Friendly players and Enemy players are separate boxes under the nameplates' Class colors, Class colored name box and Class colored health, so class colors can be for one side only. The class color options themselves are off by default: turn them on in the options (/fcui)."
+L["WN81_3_TITLE"] = "Controller autorun"
+L["WN81_3_TEXT"] = "On the classic layout, autorun is on the left stick's press by default, and a button picked for autorun or chat also works on a stick the cursor clicks with."
+L["WN81_4_TITLE"] = "Fixes"
+L["WN81_4_TEXT"] = "What's Training's list in the double pane trade skill window sits on one background, and the pet frame's health and focus bars fill their slots."
 L["WN80_1_TITLE"] = "Controller on the classic layout (work in progress)"
 L["WN80_1_TEXT"] = "Play the classic bars with a controller while the game's gamepad interface is off: the d-pad and face buttons fire Action Bar 1, or the other bars with a trigger held. Off by default; a box asks the first time you use a controller, and it is in the options (/fcui), under Gamepad. Still in progress: bags, the map and menus need the game's cursor for now."
 L["WN80_2_TITLE"] = "Raid panel in fights"

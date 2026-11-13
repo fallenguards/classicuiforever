@@ -3,6 +3,14 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN81_1_TITLE"] = "Herstellungskosten und Gewinn"
+L["WN81_1_TEXT"] = "Mit Auctionator zeigt das klassische Berufsfenster über den Reagenzien, was ein Rezept kostet und einbringt, und bei offenem Auktionshaus eine Suchen-Schaltfläche für die Reagenzien."
+L["WN81_2_TITLE"] = "Klassenfarben für Freunde oder Gegner"
+L["WN81_2_TEXT"] = "Befreundete Spieler und Gegnerische Spieler sind eigene Kästchen unter den Klassenfarben der Namensplaketten, dem Namensfeld in Klassenfarbe und der Gesundheit in Klassenfarbe: Klassenfarben gehen so auch nur für eine Seite. Die Klassenfarben-Optionen selbst sind standardmäßig aus: schalte sie in den Optionen (/fcui) ein."
+L["WN81_3_TITLE"] = "Autolauf am Controller"
+L["WN81_3_TEXT"] = "Im klassischen Layout liegt Autolauf standardmäßig auf dem Druck des linken Sticks, und eine für Autolauf oder Chat gewählte Taste funktioniert auch auf einem Stick, mit dem der Cursor klickt."
+L["WN81_4_TITLE"] = "Korrekturen"
+L["WN81_4_TEXT"] = "Die Liste von What's Training im zweigeteilten Berufsfenster liegt auf einem einzigen Hintergrund, und die Gesundheits- und Fokusleiste des Begleiterfensters füllen ihre Fächer."
 L["WN80_1_TITLE"] = "Controller im klassischen Layout (in Arbeit)"
 L["WN80_1_TEXT"] = "Spiele die klassischen Leisten mit einem Controller, während die Gamepad-Oberfläche des Spiels aus ist: Steuerkreuz und Aktionstasten lösen Aktionsleiste 1 aus, mit gehaltenem Trigger die anderen Leisten. Standardmäßig aus; beim ersten Benutzen eines Controllers fragt ein Fenster, und es steht in den Optionen (/fcui) unter Gamepad. Noch in Arbeit: Taschen, Karte und Menüs brauchen vorerst den Cursor des Spiels."
 L["WN80_2_TITLE"] = "Schlachtzugsfenster im Kampf"

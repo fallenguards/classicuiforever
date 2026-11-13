@@ -3,6 +3,14 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN81_1_TITLE"] = "Coste de fabricación y beneficio"
+L["WN81_1_TEXT"] = "Con Auctionator, la ventana clásica de profesiones muestra sobre los componentes lo que cuesta fabricar una receta y su beneficio, y un botón Buscar para los componentes mientras la casa de subastas está abierta."
+L["WN81_2_TITLE"] = "Colores de clase para amigos o enemigos"
+L["WN81_2_TEXT"] = "Jugadores amistosos y Jugadores enemigos son casillas separadas en los colores de clase de las placas, el cuadro de nombre con color de clase y la salud con color de clase, así que pueden ser solo para un bando. Las opciones de color de clase están desactivadas por defecto: actívalas en las opciones (/fcui)."
+L["WN81_3_TITLE"] = "Carrera automática con mando"
+L["WN81_3_TEXT"] = "En el diseño clásico, la carrera automática está por defecto en la pulsación del stick izquierdo, y un botón elegido para carrera automática o chat funciona también en un stick con el que el cursor hace clic."
+L["WN81_4_TITLE"] = "Correcciones"
+L["WN81_4_TEXT"] = "La lista de What's Training en la ventana de profesiones de doble panel descansa sobre un solo fondo, y las barras de salud y enfoque del marco de la mascota llenan sus huecos."
 L["WN80_1_TITLE"] = "Mando en el diseño clásico (en desarrollo)"
 L["WN80_1_TEXT"] = "Juega con las barras clásicas usando un mando mientras la interfaz de mando del juego está desactivada: la cruceta y los botones frontales activan la barra de acción 1, o las otras barras con un gatillo pulsado. Desactivado por defecto; la primera vez que usas un mando un cuadro te lo pregunta, y está en las opciones (/fcui), en Mando. Aún en desarrollo: las bolsas, el mapa y los menús necesitan por ahora el cursor del juego."
 L["WN80_2_TITLE"] = "Panel de banda en combate"
