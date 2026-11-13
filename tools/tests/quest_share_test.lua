@@ -199,7 +199,7 @@ Check(PressPad() == true, "a pad stands over Share for a shareable quest")
 Check(#game.shared == 1 and Last() == 11, "the picked quest is shared with no row beforehand")
 Check(game.map == false and game.pane == false and game.cvars.questLogOpen == "0", "the map shuts, the pane and its wish as before")
 Check(Aimed() == 0 and #errors == 0, "nothing stays aimed, no error line")
-Check(#QL.ShareMacro() <= 1023, "the macro fits a secure button's macro text (" .. #QL.ShareMacro() .. ")")
+Check(#QL.ShareMacro() <= 255, "the macro fits the game's 255 characters of macro text (" .. #QL.ShareMacro() .. ")")
 
 -- Another quest picked: that one, not the last one's stale row.
 selected = 12
@@ -246,7 +246,7 @@ game.cleanRows, errors = true, {}
 
 -- No pad while Share is unlit, the map is open, or in a fight; a stale pad's macro presses nothing.
 shareLit = false
-Check(QL.ShareMacro() == nil and proxies.FCUIQS1.attrs.clickbutton == nil, "Share unlit: no pad, the map's click unaimed")
+Check(QL.ShareMacro() == nil and proxies.FCQa.attrs.clickbutton == nil, "Share unlit: no pad, the map's click unaimed")
 shareLit, game.map = true, true
 Check(QL.ShareMacro() == nil, "the world map open: no pad")
 QL.ShareClick()

@@ -132,7 +132,8 @@ local function Build()
     proxies = {}
     local lines = {}
     for i, step in ipairs(STEPS) do
-        proxies[step] = ns.ClickProxy("FCUIQS" .. i)
+        -- Lettered, short names: the game cuts macro text at 255 characters.
+        proxies[step] = ns.ClickProxy("FCQ" .. string.char(96 + i))
         if AIMS[step] then proxies[step]:SetScript("PreClick", AIMS[step]) end
         -- [nomod] on the map's open: shift on a map row toggles tracking and the chat-link modifier links it.
         lines[i] = string.format(step == "Open" and "/click [nomod] %s" or "/click %s", proxies[step]:GetName())
