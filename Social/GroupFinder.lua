@@ -55,12 +55,13 @@ local GROUP_ROW_PARTY_ICONS_RIGHT = -16
 local NAME_TAIL = { "Name", "Level", "ClassIcon", "NewPlayerFriendlyIcon" }
 local NAME_ROLES_GAP = 6
 local NAME_MIN_WIDTH = 40
-local CATEGORY_DROPDOWN_ARROW_X = -1
-local CATEGORY_DROPDOWN_ARROW_Y = -1
-local CATEGORY_DROPDOWN_LABEL_RIGHT = -24
-local ACTIVITY_DROPDOWN_ARROW_X = -1
-local ACTIVITY_DROPDOWN_ARROW_Y = -1
-local ACTIVITY_DROPDOWN_LABEL_RIGHT = -24
+-- Era's arrow sits inside the holder's right end, its border showing past it, on the holder's middle.
+local CATEGORY_DROPDOWN_ARROW_X = -4
+local CATEGORY_DROPDOWN_ARROW_Y = 0
+local CATEGORY_DROPDOWN_LABEL_RIGHT = -27
+local ACTIVITY_DROPDOWN_ARROW_X = -4
+local ACTIVITY_DROPDOWN_ARROW_Y = 0
+local ACTIVITY_DROPDOWN_LABEL_RIGHT = -27
 local FOOT_Y, FOOT_H, FOOT_LEFT, FOOT_RIGHT = 411, 22, { 19, 111 }, { 235, 109 }
 -- Create Listing is one sheet; the browser swaps the top for its own, rows 0 to 121.
 local LISTING_SHEETS = { { key = "eraLfgFrame", tc = { 0, 1, 0, 1 }, x = 0, y = 0, w = 512, h = 512 } }
@@ -172,6 +173,7 @@ end
 
 local function EraDropdown(dropdown, x, y, width, arrowX, arrowY, labelRight)
     if not dropdown then return end
+    if dropdown.Text and ns.Once(dropdown, "eraSmallText") then dropdown.Text:SetFontObject("GameFontHighlightSmall") end
     At(dropdown, x, y, width, 24)
     ns.EraDropdownArt(dropdown, arrowX, arrowY, labelRight)
 end
@@ -225,12 +227,41 @@ local STYLE_X, STYLE_Y, STYLE_GAP, RANGES_RIGHT = 10, -10, 14, -30
 local function PlaceStyleRow(activity, first)
     local style, ranges = activity.PlayStyleDropdown, activity.LevelRangesCheckbox
     if ranges then PointIf(ranges, "TOPRIGHT", activity, "TOPRIGHT", RANGES_RIGHT, STYLE_Y) end
+    local voice = activity.VoiceChatDropdown
+    if voice then ns.EraDropdownArt(voice, ACTIVITY_DROPDOWN_ARROW_X, ACTIVITY_DROPDOWN_ARROW_Y, ACTIVITY_DROPDOWN_LABEL_RIGHT) end
     if not style then return end
+    ns.EraDropdownArt(style, ACTIVITY_DROPDOWN_ARROW_X, ACTIVITY_DROPDOWN_ARROW_Y, ACTIVITY_DROPDOWN_LABEL_RIGHT)
     if first and style.Text then style.Text:SetFontObject("GameFontHighlightSmall") end
     PointIf(style, "TOPLEFT", activity, "TOPLEFT", STYLE_X, STYLE_Y)
     local text = ranges and ranges.Text
     local room = LIST_W + RANGES_RIGHT - (text and text:GetStringWidth() or 0) - STYLE_GAP - STYLE_X
     if not ns.Near(style:GetWidth(), room) then style:SetWidth(room) end
+end
+
+-- Era's role art on this client's buttons (its LFGListingRoleTemplate): the old icon sheet by role, drawn 48, on
+-- its faint 80 backing, the check at Era's 24 hanging 5 off the icon's corner. Sizes count in the button's own units.
+local ROLE_SHEET, ROLE_BACKS = "Interface\\LFGFrame\\UI-LFG-ICON-ROLES", "Interface\\LFGFrame\\UI-LFG-ICONS-ROLEBACKGROUNDS"
+local ERA_ROLE, ERA_BACK, ERA_BACK_ALPHA, ERA_CHECK_OFF = 48, 80, 0.3, -5
+local function EraRole(button, role, scale)
+    local icon, coords, backs = button and button:GetNormalTexture(), _G.GetTexCoordsForRole, _G.GetBackgroundTexCoordsForRole
+    if not (icon and coords) then return end
+    icon:SetTexture(ROLE_SHEET)
+    icon:SetTexCoord(coords(role))
+    icon:SetSize(ERA_ROLE / scale, ERA_ROLE / scale)
+    ns.SetPointOnce(icon, "CENTER", button, "CENTER", 0, 0)
+    local back = button.Background
+    if back and backs then
+        back:SetTexture(ROLE_BACKS)
+        back:SetTexCoord(backs(role))
+        back:SetSize(ERA_BACK / scale, ERA_BACK / scale)
+        back:SetAlpha(ERA_BACK_ALPHA)
+    end
+    local check = button.CheckButton
+    if check then
+        ns.SetScaleIf(check, 1 / scale)
+        local inset = (button:GetWidth() * scale - ERA_ROLE) / 2 + ERA_CHECK_OFF
+        ns.SetPointOnce(check, "BOTTOMLEFT", button, "BOTTOMLEFT", inset, inset)
+    end
 end
 
 local function DressListing(page, first)
@@ -247,6 +278,11 @@ local function DressListing(page, first)
         ns.SetScaleIf(solo, ROLE_SCALE)
         PointIf(solo, "TOPLEFT", Origin(), "TOPLEFT", ROLE_X / ROLE_SCALE, -ROLE_Y / ROLE_SCALE)
         if solo.Tank and solo.Healer and solo.DPS then
+            if first then
+                EraRole(solo.Tank, "TANK", ROLE_SCALE)
+                EraRole(solo.Healer, "HEALER", ROLE_SCALE)
+                EraRole(solo.DPS, "DAMAGER", ROLE_SCALE)
+            end
             local gap = ROLE_STEP / ROLE_SCALE - solo.Tank:GetWidth()
             PointIf(solo.Healer, "LEFT", solo.Tank, "RIGHT", gap, 0)
             PointIf(solo.DPS, "LEFT", solo.Healer, "RIGHT", gap, 0)
@@ -257,7 +293,7 @@ local function DressListing(page, first)
     if friendly then
         ns.SetScaleIf(friendly, FRIENDLY_SCALE)
         PointIf(friendly, "CENTER", Origin(), "TOPLEFT", FRIENDLY_CX / FRIENDLY_SCALE, -ROLE_CY / FRIENDLY_SCALE)
-        if first and friendly.CheckButton then ns.SkinCheckbox(friendly.CheckButton) end
+        if first then EraRole(friendly, "GUIDE", FRIENDLY_SCALE) end
     end
     local view = page.CategoryView
     if view then
@@ -389,13 +425,19 @@ local function DressRow(row)
     local display = row.DataDisplay
     if not display then return end
     row.fcuiRow = true
-    -- Era's rows are plain: no rounded plate.
-    if row.ResultBG then row.ResultBG:SetAlpha(0) end
+    -- Era's row plate: flat white at 4%, the list's dark showing between rows.
+    if row.ResultBG then row.ResultBG:SetColorTexture(1, 1, 1, 0.04) end
     -- Era's type and class icon: this client's are a size up, and a long name ran into the roles.
     EraFont(row.Name, "GameFontNormal")
     EraFont(row.Level, "GameFontDisableSmallLeft")
     EraFont(row.ActivityName, "GameFontDisableSmallLeft")
     EraFont(display.PlayerCount and display.PlayerCount.Count, "GameFontHighlightSmall")
+    -- The play style line (not Era's) at the activity's small size; the size alone, so the game's color stays.
+    if row.PlaystyleLabel then row.PlaystyleLabel:SetFont(_G.GameFontDisableSmallLeft:GetFont()) end
+    -- Era's role icons: a player's 16, a group's members 18, the count's dot 14 by 13.
+    for _, icon in ipairs(display.Solo and display.Solo.Roles or {}) do icon:SetSize(16, 16) end
+    for _, icon in ipairs(display.Enumerate and display.Enumerate.Icons or {}) do icon:SetSize(18, 18) end
+    if display.PlayerCount and display.PlayerCount.Icon then display.PlayerCount.Icon:SetSize(14, 13) end
     if row.ClassIcon and row.Level then
         row.ClassIcon:SetSize(18, 18)
         ns.SetPointOnce(row.ClassIcon, "BOTTOMLEFT", row.Level, "BOTTOMRIGHT", 3, -1)
