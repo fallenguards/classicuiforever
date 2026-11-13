@@ -81,11 +81,21 @@ local function AimHeader()
     Aim("Rebuild", BackButton())
 end
 
+-- The map's row for a quest: Forever has a finder, retail only the rows' pool.
+local function MapRow(questID)
+    local find = _G.QuestLogQuests_GetQuestButton
+    if find then return find(questID) end
+    local pool = QuestScrollFrame and QuestScrollFrame.titleFramePool
+    if not pool then return nil end
+    for row in pool:EnumerateActive() do
+        if row.questID == questID then return row end
+    end
+end
+
 -- The quest's row, with a questID only client code wrote; reads only.
 local function AimRow()
     if not PaneUp() then return end
-    local find = _G.QuestLogQuests_GetQuestButton
-    local row = find and find(armedID)
+    local row = MapRow(armedID)
     local details = QuestMapFrame.DetailsFrame
     if not (row and issecurevariable(row, "questID") and details and details.ShareButton) then return end
     shared = true

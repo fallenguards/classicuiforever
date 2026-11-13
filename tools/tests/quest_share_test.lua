@@ -261,6 +261,20 @@ game.grouped = false
 QL.ShareClick()
 Check(errors[1] == "QUEST_YOU_ARE_NOT_IN_A", "alone: our own click says so")
 
+-- Retail has no row finder: the row comes from the rows' pool.
+QuestLogQuests_GetQuestButton = nil
+QuestScrollFrame.titleFramePool = { EnumerateActive = function()
+    local id
+    return function()
+        id = next(game.rows, id)
+        return id and game.rows[id]
+    end
+end }
+game.grouped, game.map, game.pane, shareLit = true, false, false, true
+before = #game.shared
+PressPad()
+Check(#game.shared == before + 1 and game.map == false, "without the game's row finder the row is found in the rows' pool")
+
 if failures > 0 then
     print(string.format("quest share: %d failed", failures))
     os.exit(1)
