@@ -219,7 +219,7 @@ return {
     padFaceRight = "same for everyone: off by default, a pick of its radio",
     padFaceAbove = "same for everyone: off by default, a pick of its radio",
     padChatKey = "same for everyone: Menu opens chat",
-    padAutorunKey = "same for everyone: no button by default, picked on the Gamepad tab",
+    padAutorunKey = "same for everyone: the left stick's press, as the gamepad interface; dbVersion 37 (UI/PadBind.lua PadAutorunStick) gives it to a save that had none",
     padTrigSwap = "same for everyone: off by default, the triggers keep the default bars",
     padClassic = "same for everyone: off by default; a popup offers it the first time a controller is used",
     raidManagerEdge = "same for everyone: off by default; the closed raid panel showed only its arrow tab before",

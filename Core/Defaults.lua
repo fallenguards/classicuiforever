@@ -2,7 +2,7 @@ local _, ns = ...
 local L = ns.L
 
 ns.DB_DEFAULTS = {
-    dbVersion = 35,
+    dbVersion = 37,
     classicBar = true,
     oneBar = false,
     classicBarSize = false,
@@ -187,7 +187,7 @@ ns.DB_DEFAULTS = {
     raidManagerEdge = false,
     padClassic = false,
     padTrigSwap = false,
-    padFace = true, padFaceBar = true, padFaceLeft = false, padFaceRight = false, padFaceAbove = false, padAutorunKey = "",
+    padFace = true, padFaceBar = true, padFaceLeft = false, padFaceRight = false, padFaceAbove = false, padAutorunKey = "PADLSTICK",
     padChatKey = "PADFORWARD",
     padGroupsBars = false, padGroupsRun = true, padGroupsCustom = false,
     padBarNone = 1, padStartNone = 1, padBarLT = 2, padStartLT = 1, padBarRT = 3, padStartRT = 1,

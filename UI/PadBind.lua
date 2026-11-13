@@ -374,10 +374,10 @@ local function Bind()
             if Free(mod .. shoulder) then SetOverrideBinding(pad.owner, false, mod .. shoulder, command) end
         end
     end
-    -- Autorun and chat on their picked buttons, unless the cursor clicks with it or an earlier pick took it. The pick
-    -- wins over the game's binding on that button (Menu is its game menu by default); a pad key the player bound to
-    -- either keeps working beside it.
-    local taken = { [ns.GetCVar("GamePadCursorLeftClick") or ""] = true, [ns.GetCVar("GamePadCursorRightClick") or ""] = true }
+    -- Autorun and chat on their picked buttons, unless an earlier pick took it. The pick wins over the game's binding
+    -- on that button (Menu is its game menu by default). On a button the cursor clicks with too, the engine clicks
+    -- while the cursor shows and runs the pick while it does not, as the gamepad interface's left stick.
+    local taken = {}
     for _, pick in ipairs(PAD_COMMANDS) do
         local key = ns.db[pick[1]]
         if key and key ~= "" and not taken[key] then
@@ -675,6 +675,18 @@ end)
 function ns.PadPick(key, value)
     ns.db[key] = value
     ns.ToggleChanged(key)
+end
+
+-- dbVersion 37: autorun came to the left stick's press, as the gamepad interface has it; a save from before had none.
+function ns.PadAutorunStick()
+    local function Take(t)
+        if t.padAutorunKey == "" then t.padAutorunKey = "PADLSTICK" end
+    end
+    Take(ns.db)
+    for _, shot in pairs(type(ns.db.profiles) == "table" and ns.db.profiles or {}) do
+        if type(shot) == "table" then Take(shot) end
+    end
+    ns.db.dbVersion = 37
 end
 
 -- A placement drop-down's pick: Trigger groups turns Custom, and the binds follow.

@@ -559,6 +559,7 @@ local function Migrate(saved)
     if saved < 33 then ns.PaneOnPaper() end
     if saved < 34 then ns.ProfTabsHidden() end
     if saved < 35 then ns.HideFinderWhoNow() end
+    if saved < 37 then ns.PadAutorunStick() end
 end
 
 -- Our first frame: db loads and the post-combat pass runs before any other frame of ours sees the event.
