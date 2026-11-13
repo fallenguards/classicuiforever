@@ -110,6 +110,20 @@ local function StatusText()
     local zone = GetRealZoneText and GetRealZoneText() or ""
     Add(string.format("Character: %s %s, %s%s", tostring(class), tostring(UnitLevel("player")), zone,
         InCombatLockdown() and ", in combat" or ""))
+    -- Dual spec and the action slots in use per page (12 each), then the pet copies' pages: a bar found empty after
+    -- a login shows here.
+    local specs = GetNumSpecGroups and GetNumSpecGroups() or 1
+    local active = C_SpecializationInfo and C_SpecializationInfo.GetActiveSpecGroup and C_SpecializationInfo.GetActiveSpecGroup() or 1
+    local filled = {}
+    for page = 1, 10 do
+        local n = 0
+        for slot = (page - 1) * 12 + 1, page * 12 do
+            if HasAction(slot) then n = n + 1 end
+        end
+        filled[page] = n
+    end
+    Add(string.format("Talent specs: %s, active %s; action slots filled per page 1-10: %s", tostring(specs), tostring(active),
+        table.concat(filled, " ")))
     Add("Profile: " .. ns.ProfileName())
     local layout, unpinned = LayoutLine()
     Add(layout)
