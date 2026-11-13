@@ -381,8 +381,13 @@ local function Dress(manager)
     ToggleTab(manager.toggleButtonBack, 0.5)
 end
 
+-- In a fight a locked piece keeps the game's spot until the fight ends.
+local function Locked(frame)
+    return era.fight and frame.IsProtected ~= nil and (frame:IsProtected()) == true
+end
+
 local function At(frame, x, y, w, h)
-    if not frame then return end
+    if not frame or Locked(frame) then return end
     SetPointIf(frame, "TOPLEFT", CompactRaidFrameManager, "TOPLEFT", x, y)
     if w then SetSizeIf(frame, w, h) end
 end
@@ -516,26 +521,27 @@ local function Relay()
     if manager.Background then SetAlphaIf(manager.Background, 0) end
     FadeDividers(manager, 0)
     local edge = not shut or ns.db.raidManagerEdge == true
-    -- In a fight the panel holds the game's secure buttons: its size, spot and rows wait for the fight's end.
-    if InCombatLockdown() and manager:IsProtected() then
-        for _, region in ipairs(era.header) do SetShownIf(region, not shut) end
-        for _, region in ipairs(era.edge) do SetShownIf(region, edge) end
-        SmallTab(manager.toggleButtonForward, shut and not edge)
-        return ns.WhenCalm("raidManager.relay", Relay)
+    local small = shut and not edge
+    local spot = small and SMALL_SHUT_X or shut and SHUT_X or OPEN_X
+    -- In a fight the panel is locked: the game's toggle and its row layout still run, so its size and spot wait for
+    -- the fight's end while every piece that is not locked goes to its spot now, the tabs by where the panel sits.
+    era.fight = InCombatLockdown()
+    local held = Locked(manager)
+    local off = 0
+    if held then
+        local left = manager:GetLeft()
+        if left and not IsSecret(left) then off = spot - left end
+        ns.WhenCalm("raidManager.relay", Relay)
+    else
+        SetSizeIf(manager, PANEL_W, manager:GetHeight())
+        SetPointIf(manager, "TOPLEFT", UIParent, "TOPLEFT", spot, PANEL_Y)
     end
-    SetSizeIf(manager, PANEL_W, manager:GetHeight())
-    if not shut or edge then SetPointIf(manager, "TOPLEFT", UIParent, "TOPLEFT", shut and SHUT_X or OPEN_X, PANEL_Y) end
     for _, region in ipairs(era.header) do SetShownIf(region, not shut) end
     for _, region in ipairs(era.edge) do SetShownIf(region, edge) end
-    local small = shut and not edge
-    if small then SetPointIf(manager, "TOPLEFT", UIParent, "TOPLEFT", SMALL_SHUT_X, PANEL_Y) end
     for _, button in ipairs({ manager.toggleButtonForward, manager.toggleButtonBack }) do
-        if small then
-            SetPointIf(button, "RIGHT", manager, "RIGHT", SMALL_X, SMALL_Y)
-            SetSizeIf(button, SMALL_W, SMALL_H)
-        else
-            SetPointIf(button, "RIGHT", manager, "RIGHT", -9, 0)
-            SetSizeIf(button, 16, 64)
+        if not Locked(button) then
+            SetPointIf(button, "RIGHT", manager, "RIGHT", (small and SMALL_X or -9) + off, small and SMALL_Y or 0)
+            SetSizeIf(button, small and SMALL_W or 16, small and SMALL_H or 64)
         end
     end
     SmallTab(manager.toggleButtonForward, small)
@@ -543,9 +549,10 @@ local function Relay()
     local info = _G.CompactRaidFrameManagerDisplayFrameOptionsButton
     if info then SetPointIf(info, "TOPRIGHT", manager, "TOPRIGHT", -9, -7) end
     -- Shut too: the panel keeps its height, and the leave buttons (outside the part shutting hides) go with it.
-    SetSizeIf(manager, PANEL_W, -LayRows(manager, d) + FOOT)
+    local height = -LayRows(manager, d) + FOOT
+    if not held then SetSizeIf(manager, PANEL_W, height) end
     if shut then
-        SetShownIf(manager.BottomButtons, false)
+        if not Locked(manager.BottomButtons) then SetShownIf(manager.BottomButtons, false) end
         return
     end
     Mirror(d)
