@@ -71,8 +71,21 @@ local function Services()
     return order, groups
 end
 
+-- The trainer's rows and verdicts as one string. Its answer can change with no event after (pet training listed
+-- known ranks as learnable until asked again): the open window asks twice a second and redraws on a change.
+local seen, parts = "", {}
+local function Verdicts()
+    wipe(parts)
+    for index = 1, GetNumTrainerServices and GetNumTrainerServices() or 0 do
+        local name, kind = GetTrainerServiceInfo(index)
+        parts[#parts + 1] = (name or "") .. ":" .. (kind or "")
+    end
+    return table.concat(parts, "|")
+end
+
 local function Collect()
     wipe(lines)
+    seen = Verdicts()
     local order, groups = Services()
     for _, category in ipairs(order) do
         -- Pet training lists flat, as the game's own window does: its skills carry no category.
@@ -670,6 +683,11 @@ end
 local function Open()
     if not active or not ClassTrainerFrame then return end
     Build()
+    if ns.Once(panel, "fresh") then
+        ns.Sched.Attach(panel, { name = "trainer.fresh", every = 0.5, fn = function()
+            if active and Verdicts() ~= seen then panel.refresh() end
+        end })
+    end
     HideClientPieces(true)
     -- A Show that makes the page visible has run Refresh through OnShow.
     local wasShown = panel:IsShown()
