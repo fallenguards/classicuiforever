@@ -59,6 +59,9 @@ Check(Look("target") == "class", "an enemy player wears the class color")
 ns.db.classColorHealthEnemies = false
 Check(Look("target") == "green" and Look("focus") == "class", "Enemy players too off: the enemy goes green, a friend keeps it")
 ns.db.classColorHealthEnemies = nil
+ns.db.classColorHealthFriends = false
+Check(Look("target") == "class" and Look("focus") == "green", "Friendly players off: only the enemy wears it")
+ns.db.classColorHealthFriends = nil
 ns.db.classColorHealth = false
 Check(Look("focus") == "green", "the option off again: green, whatever is checked under it")
 

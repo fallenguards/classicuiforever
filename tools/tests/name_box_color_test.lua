@@ -35,6 +35,7 @@ local env = setmetatable({
     IsSecret = function() return false end,
     UnitIsPlayer = function(unit) return players[unit] == true end,
     UnitClass = function() return "Mage", "MAGE" end,
+    Hostile = function(unit) return unit == "focus" end,
 }, { __index = _G })
 assert(load(Cut("/UI/Colors.lua", "local NAME_FRAMES = ", "function ns.SetHealth"), "name box color", "t", env))()
 local function Wears(unit) return ns.NameBoxColor(unit) ~= nil end
@@ -42,6 +43,13 @@ local function Wears(unit) return ns.NameBoxColor(unit) ~= nil end
 Check(not Wears("player") and not Wears("target"), "the option off: no frame wears it")
 ns.db.classColorNames = true
 Check(Wears("player") and Wears("target") and Wears("focus"), "the option on, nothing unchecked: all three wear it")
+-- Each side under it: the focus here is an enemy player.
+ns.db.classColorNamesEnemies = false
+Check(Wears("target") and not Wears("focus"), "Enemy players off: an enemy's box keeps the game's color")
+ns.db.classColorNamesEnemies = nil
+ns.db.classColorNamesFriends = false
+Check(not Wears("target") and Wears("focus"), "Friendly players off: only an enemy's box wears it")
+ns.db.classColorNamesFriends = nil
 ns.db.classColorNamesPlayer = false
 Check(not Wears("player") and Wears("target") and Wears("focus"), "Player unchecked: target and focus alone")
 ns.db.classColorNamesPlayer, ns.db.classColorNamesFocus = true, false

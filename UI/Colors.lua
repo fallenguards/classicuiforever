@@ -222,12 +222,13 @@ local function Hostile(unit)
     return not IsSecret(hostile) and hostile == true
 end
 
--- A player's class color first, an enemy's too unless Enemy players too is off (theirs is then the enemy color or
--- green); then the enemy color.
+-- A player's class color first, unless their side (Friendly players, Enemy players) is off: an enemy's is then the
+-- enemy color or green; then the enemy color.
 function ns.HealthColor(unit)
     if ClassColored(unit) and UnitIsPlayer then
         local isPlayer = UnitIsPlayer(unit)
-        if not IsSecret(isPlayer) and isPlayer and (ns.db.classColorHealthEnemies ~= false or not Hostile(unit)) then
+        local side = Hostile(unit) and "classColorHealthEnemies" or "classColorHealthFriends"
+        if not IsSecret(isPlayer) and isPlayer and ns.db[side] ~= false then
             local _, class = UnitClass(unit)
             local r, g, b = ns.ClassRGB(class)
             if r then return r, g, b end
@@ -262,6 +263,8 @@ function ns.NameBoxColor(unit)
     if key and db[key] == false then return nil end
     local isPlayer = UnitIsPlayer(unit)
     if IsSecret(isPlayer) or not isPlayer then return nil end
+    local side = Hostile(unit) and "classColorNamesEnemies" or "classColorNamesFriends"
+    if db[side] == false then return nil end
     local _, class = UnitClass(unit)
     if IsSecret(class) then return nil end
     return ns.ClassRGB(class)

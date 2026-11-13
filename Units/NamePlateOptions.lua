@@ -86,9 +86,21 @@ local function WantedColor(unit, isPlayer)
     local dead = isDead and isDead(unit)
     if IsSecret(dead) then dead = false end
     if dead then return end
-    if ns.db.classColorPlates then return ClassRGB(unit) end
-    -- 1.x friendly players were plain blue (the client's pale blue looks lilac on the old fill); secret: client's colour.
+    local db = ns.db
     local friendly = UnitIsFriend and UnitIsFriend("player", unit)
+    if db.classColorPlates then
+        local friends, enemies = db.classColorPlatesFriends ~= false, db.classColorPlatesEnemies ~= false
+        if friends and enemies then return ClassRGB(unit) end
+        if IsSecret(friendly) then return KEEP end
+        if friendly and friends or not friendly and enemies then return ClassRGB(unit) end
+        -- An enemy left out: red when we can attack, else the client's colour. A friend left out: the 1.x colours below.
+        if not friendly then
+            local attackable = UnitCanAttack("player", unit)
+            if not IsSecret(attackable) and attackable then return 1, 0, 0 end
+            return
+        end
+    end
+    -- 1.x friendly players were plain blue (the client's pale blue looks lilac on the old fill); secret: client's colour.
     if IsSecret(friendly) then return KEEP end
     if not friendly then return end
     -- Attackable friend (duel): enemy colour, the class colour if the game's enemy class colours are on, else red.
@@ -146,6 +158,12 @@ local function ColorRestore()
 end
 
 ns.RegisterModule("classColorPlates", { apply = ColorApply, restore = ColorRestore })
+-- At once, in a fight too (the options pass waits one out).
+ns.OnToggle(function(key)
+    if (key == "classColorPlatesEnemies" or key == "classColorPlatesFriends") and NP.active and ns.db.classColorPlates then
+        ColorApply()
+    end
+end)
 
 -- 1.x had no simplified plates (friendlies, minions, minor mobs small until targeted): off, value saved.
 local function FullPlatesApply()
