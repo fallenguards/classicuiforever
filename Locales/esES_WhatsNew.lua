@@ -3,6 +3,12 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN80_1_TITLE"] = "Mando en el diseño clásico (en desarrollo)"
+L["WN80_1_TEXT"] = "Juega con las barras clásicas usando un mando mientras la interfaz de mando del juego está desactivada: la cruceta y los botones frontales activan la barra de acción 1, o las otras barras con un gatillo pulsado. Desactivado por defecto; la primera vez que usas un mando un cuadro te lo pregunta, y está en las opciones (/fcui), en Mando. Aún en desarrollo: las bolsas, el mapa y los menús necesitan por ahora el cursor del juego."
+L["WN80_2_TITLE"] = "Panel de banda en combate"
+L["WN80_2_TEXT"] = "El panel de banda y grupo mantiene sus filas en su sitio cuando el grupo cambia durante un combate, y su pestaña ya no desaparece al cerrar el panel en combate."
+L["WN80_3_TITLE"] = "Entrenamiento de mascotas"
+L["WN80_3_TEXT"] = "La ventana del instructor ya no conserva una lista antigua, así que las habilidades que tu mascota ya conoce no quedan como disponibles para aprender."
 L["WN79_1_TITLE"] = "Panel de banda en combate"
 L["WN79_1_TEXT"] = "El panel de banda y grupo ya no causa un error cuando tu grupo cambia durante un combate, por ejemplo cuando un miembro del grupo sube de nivel. Se pone al día al terminar el combate."
 L["WN78_1_TITLE"] = "Panel de banda clásico"

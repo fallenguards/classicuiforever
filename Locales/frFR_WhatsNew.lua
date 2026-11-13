@@ -3,6 +3,12 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN80_1_TITLE"] = "Manette sur la disposition classique (en cours)"
+L["WN80_1_TEXT"] = "Jouez avec les barres classiques à la manette pendant que l'interface manette du jeu est désactivée : la croix directionnelle et les boutons de façade lancent la barre d'action 1, ou les autres barres avec une gâchette maintenue. Désactivé par défaut ; une fenêtre le demande à la première utilisation d'une manette, et l'option se trouve dans les options (/fcui), sous Manette. Encore en cours : les sacs, la carte et les menus demandent pour l'instant le curseur du jeu."
+L["WN80_2_TITLE"] = "Panneau de raid en combat"
+L["WN80_2_TEXT"] = "Le panneau de raid et de groupe garde ses lignes en place quand le groupe change pendant un combat, et son onglet ne disparaît plus quand vous fermez le panneau en combat."
+L["WN80_3_TITLE"] = "Dressage du familier"
+L["WN80_3_TEXT"] = "La fenêtre de l'instructeur ne garde plus une ancienne liste : les compétences que votre familier connaît déjà ne restent plus affichées comme à apprendre."
 L["WN79_1_TITLE"] = "Panneau de raid en combat"
 L["WN79_1_TEXT"] = "Le panneau de raid et de groupe ne provoque plus d'erreur quand votre groupe change pendant un combat, par exemple quand un membre monte de niveau. Il se met à jour à la fin du combat."
 L["WN78_1_TITLE"] = "Panneau de raid classique"

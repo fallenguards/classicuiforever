@@ -3,6 +3,12 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN80_1_TITLE"] = "Controller im klassischen Layout (in Arbeit)"
+L["WN80_1_TEXT"] = "Spiele die klassischen Leisten mit einem Controller, während die Gamepad-Oberfläche des Spiels aus ist: Steuerkreuz und Aktionstasten lösen Aktionsleiste 1 aus, mit gehaltenem Trigger die anderen Leisten. Standardmäßig aus; beim ersten Benutzen eines Controllers fragt ein Fenster, und es steht in den Optionen (/fcui) unter Gamepad. Noch in Arbeit: Taschen, Karte und Menüs brauchen vorerst den Cursor des Spiels."
+L["WN80_2_TITLE"] = "Schlachtzugsfenster im Kampf"
+L["WN80_2_TEXT"] = "Das Schlachtzugs- und Gruppenfenster behält seine Zeilen an ihrem Platz, wenn sich die Gruppe im Kampf ändert, und sein Ausziehreiter verschwindet nicht mehr, wenn du das Fenster im Kampf schließt."
+L["WN80_3_TITLE"] = "Begleiterausbildung"
+L["WN80_3_TEXT"] = "Das Lehrerfenster behält keine alte Liste mehr, sodass Fähigkeiten, die dein Begleiter schon kennt, nicht als erlernbar stehen bleiben."
 L["WN79_1_TITLE"] = "Schlachtzugsfenster im Kampf"
 L["WN79_1_TEXT"] = "Das Schlachtzugs- und Gruppenfenster verursacht keinen Fehler mehr, wenn sich deine Gruppe im Kampf ändert, etwa wenn ein Gruppenmitglied eine Stufe aufsteigt. Es zieht nach, sobald der Kampf endet."
 L["WN78_1_TITLE"] = "Klassisches Schlachtzugsfenster"

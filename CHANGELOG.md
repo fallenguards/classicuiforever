@@ -2,6 +2,19 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.55.0] - 2026-11-13
+
+### Added
+- Controller on the classic layout (work in progress): play the classic bars with a controller while the game's gamepad interface is off. The d-pad and face buttons fire Action Bar 1, or the other bars with a trigger or both held, and the buttons show the controller's keys while you use it. With no trigger held, the face buttons interact, open the target's menu, go back and jump, shown on Bar 1's free buttons. The first time you use a controller a box asks which way you want to play. Off until you pick it there or in the options (/fcui), under Gamepad, which also holds its targeting, trigger group and button choices. Bags, the map and menus still need the game's cursor for now.
+
+### Changed
+- The group finder's Create Listing page has the classic role icons and check boxes at their classic size, and its play style and voice chat choices wear the classic drop-down. In the group browser, the play style line and the role icons are smaller, each player sits on a faint row as in Era, and the drop-downs' arrows sit inside their frames with the classic small text.
+
+### Fixed
+- The raid and party panel keeps its rows in place when the group changes during a fight, for example on a switch between raid and party, and its pull-out tab no longer vanishes when the panel is closed in a fight.
+- A trainer's window, pet training included, no longer keeps showing an old list: skills your pet already knows are not left listed as learnable.
+- The status report (/fcui status) lists your talent specs and how many action slots each bar holds.
+
 ## [0.54.1] - 2026-11-11
 
 ### Fixed

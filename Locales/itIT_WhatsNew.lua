@@ -3,6 +3,12 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN80_1_TITLE"] = "Controller sul layout classico (in lavorazione)"
+L["WN80_1_TEXT"] = "Gioca con le barre classiche usando un controller mentre l'interfaccia gamepad del gioco è disattivata: la croce direzionale e i tasti frontali attivano la barra delle azioni 1, o le altre barre con un grilletto premuto. Disattivato per impostazione predefinita; la prima volta che usi un controller una finestra te lo chiede, ed è nelle opzioni (/fcui), sotto Gamepad. Ancora in lavorazione: borse, mappa e menu richiedono per ora il cursore del gioco."
+L["WN80_2_TITLE"] = "Pannello dell'incursione in combattimento"
+L["WN80_2_TEXT"] = "Il pannello di incursione e gruppo mantiene le sue righe al loro posto quando il gruppo cambia durante un combattimento, e la sua linguetta non sparisce più quando chiudi il pannello in combattimento."
+L["WN80_3_TITLE"] = "Addestramento del famiglio"
+L["WN80_3_TEXT"] = "La finestra dell'istruttore non conserva più un vecchio elenco: le abilità che il tuo famiglio conosce già non restano indicate come apprendibili."
 L["WN79_1_TITLE"] = "Pannello di incursione in combattimento"
 L["WN79_1_TEXT"] = "Il pannello di incursione e gruppo non causa più un errore quando il tuo gruppo cambia durante un combattimento, per esempio quando un membro sale di livello. Si aggiorna alla fine del combattimento."
 L["WN78_1_TITLE"] = "Pannello incursione classico"

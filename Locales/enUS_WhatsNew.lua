@@ -2,6 +2,12 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN80_1_TITLE"] = "Controller on the classic layout (work in progress)"
+L["WN80_1_TEXT"] = "Play the classic bars with a controller while the game's gamepad interface is off: the d-pad and face buttons fire Action Bar 1, or the other bars with a trigger held. Off by default; a box asks the first time you use a controller, and it is in the options (/fcui), under Gamepad. Still in progress: bags, the map and menus need the game's cursor for now."
+L["WN80_2_TITLE"] = "Raid panel in fights"
+L["WN80_2_TEXT"] = "The raid and party panel keeps its rows in place when the group changes during a fight, and its pull-out tab no longer vanishes when you close the panel in one."
+L["WN80_3_TITLE"] = "Pet training"
+L["WN80_3_TEXT"] = "The trainer window no longer keeps an old list, so skills your pet already knows are not left listed as learnable."
 L["WN79_1_TITLE"] = "Raid panel in fights"
 L["WN79_1_TEXT"] = "The raid and party panel no longer causes an error when your group changes during a fight, for example when a party member levels up. It catches up as the fight ends."
 L["WN78_1_TITLE"] = "Classic raid panel"
