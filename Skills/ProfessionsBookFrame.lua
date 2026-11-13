@@ -24,6 +24,8 @@ local KINDS = {
     tradeDual = { x = -10, y = 13, pieces = function() return ns.tradeDual and ns.tradeDual.FRAME_ART end,
         ring = { key = "questLogDualLeft", layer = "OVERLAY", coords = { 0, 72 / 512, 0, 72 / 512 }, w = 72, h = 72,
             point = "TOPLEFT" },
+        -- The ring's disc alone (the art's, 65 across from 4, 3): its square's corners hold the frame's stone.
+        disc = { x = 2.5, y = -1.5, size = 68 },
         portrait = { x = -3, y = 10, size = 60 }, title = { x = 353, y = -11 }, close = { x = -12, y = -11 } },
 }
 
@@ -60,6 +62,13 @@ local function Holder(frame, kind)
     ring:SetAllPoints(holder)
     for _, tex in ipairs(ns.DressPieces(ring, { spec.ring }, nil, true)) do
         if spec.tint then ns.BronzeTint(tex) end
+        if spec.disc then
+            local mask = ring:CreateMaskTexture()
+            mask:SetTexture((ns.TexPath("portraitMask")), "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+            mask:SetSize(spec.disc.size, spec.disc.size)
+            mask:SetPoint("TOPLEFT", ring, "TOPLEFT", spec.disc.x, spec.disc.y)
+            ns.WearMask(tex, mask, true)
+        end
     end
     ring:SetAlpha(0)
     rings[kind] = ring

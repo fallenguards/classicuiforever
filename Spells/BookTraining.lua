@@ -30,10 +30,10 @@ local list, pieces
 local function HideRegion(region) region:Hide() end
 
 -- The marble on a frame wearing the spellbook's art (the book; the professions book's frame, Skills/ProfessionsTraining.lua).
-function ns.TrainingMarble(frame)
+function ns.TrainingMarble(frame, right, bottom)
     local marble = ns.MarbleFloor(frame, 1)
     ns.SetTwoPointsIf(marble, "TOPLEFT", frame, "TOPLEFT", TRAINING_MARBLE_LEFT, TRAINING_MARBLE_TOP,
-        "BOTTOMRIGHT", frame, "BOTTOMRIGHT", TRAINING_MARBLE_RIGHT, TRAINING_MARBLE_BOTTOM)
+        "BOTTOMRIGHT", frame, "BOTTOMRIGHT", right or TRAINING_MARBLE_RIGHT, bottom or TRAINING_MARBLE_BOTTOM)
     return marble
 end
 

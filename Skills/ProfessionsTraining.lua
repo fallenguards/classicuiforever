@@ -47,6 +47,11 @@ local function HideUnnamed(child)
     if not child:GetName() then Hide(child) end
 end
 
+-- Its fill under the list (a frame of the list's, two levels down): our marble is the page.
+local function HideBacking(child, level)
+    if not child:GetName() and child:GetFrameLevel() < level then Hide(child) end
+end
+
 local function HideSelf(self)
     if styled then self:Hide() end
 end
@@ -54,13 +59,19 @@ end
 -- The skill windows' black marble on the face's own art frame (the spellbook's on the book, Era's trade skill window on
 -- a profession), under its gray border and header as on the spellbook page; its own dark page goes.
 local marbles = {}
+-- The double pane's frame runs past its art holder: the marble's right and bottom from the holder's, to that frame's rim.
+local DUAL_MARBLE_RIGHT, DUAL_MARBLE_BOTTOM = 290, 81
 local function Marble()
     local kind = T.EraKind and T.EraKind()
     local holder = kind and T.EraHolder(kind)
     if not holder then return nil end
     local floor = marbles[holder]
     if not floor then
-        floor = ns.TrainingMarble(holder)
+        if kind == "tradeDual" then
+            floor = ns.TrainingMarble(holder, DUAL_MARBLE_RIGHT, DUAL_MARBLE_BOTTOM)
+        else
+            floor = ns.TrainingMarble(holder)
+        end
         floor:Hide()
         marbles[holder] = floor
     end
@@ -223,6 +234,7 @@ local function Style(page, view)
     styled = true
     -- The title stands down in ProfessionsFootTabs.
     ns.EachChild(page, HideUnnamed)
+    ns.EachChild(view, HideBacking, view:GetFrameLevel())
     undo[#undo + 1] = HideMarbles
     Hide(view.footer)
     local box = view.scrollBox
