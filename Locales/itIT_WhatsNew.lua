@@ -3,6 +3,10 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN82_1_TITLE"] = "Condividi missione con la mappa a schermo intero"
+L["WN82_1_TEXT"] = "Condividere una missione dal registro delle missioni non lascia più aperta la mappa del mondo quando usi la mappa a schermo intero."
+L["WN82_2_TITLE"] = "Condividi missione"
+L["WN82_2_TEXT"] = "Condividi missione nel registro delle missioni condivide la missione, invece di dire di condividerla dalla mappa del mondo."
 L["WN81_1_TITLE"] = "Costo di creazione e profitto"
 L["WN81_1_TEXT"] = "Con Auctionator, la finestra classica delle professioni mostra sopra i reagenti quanto costa creare una ricetta e il suo profitto, e un pulsante Cerca per i reagenti mentre la casa d'aste è aperta."
 L["WN81_2_TITLE"] = "Colori di classe per amici o nemici"

@@ -2,6 +2,10 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN82_1_TITLE"] = "Share Quest with a full screen map"
+L["WN82_1_TEXT"] = "Sharing a quest from the quest log no longer leaves the world map open when you keep the map full screen."
+L["WN82_2_TITLE"] = "Share Quest"
+L["WN82_2_TEXT"] = "Share Quest in the quest log shares the quest, instead of saying to share it from the world map."
 L["WN81_1_TITLE"] = "Crafting cost and profit"
 L["WN81_1_TEXT"] = "With Auctionator, the classic trade skill window shows what a recipe costs to craft and its profit above the reagents, and a Search button for the reagents while the auction house is open."
 L["WN81_2_TITLE"] = "Class colors for friends or enemies"

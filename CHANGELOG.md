@@ -2,6 +2,12 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.56.1] - 2026-11-13
+
+### Fixed
+- Share Quest in the quest log shuts the world map afterward for players who keep the map full screen too. It stayed open, full screen, after every share.
+- On retail, Share Quest in the quest log shares the quest. It said to share it from the world map for every quest.
+
 ## [0.56.0] - 2026-11-13
 
 ### Added

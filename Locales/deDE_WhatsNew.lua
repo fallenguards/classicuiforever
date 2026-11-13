@@ -3,6 +3,10 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN82_1_TITLE"] = "Quest teilen mit Karte im Vollbild"
+L["WN82_1_TEXT"] = "Wer die Weltkarte im Vollbild nutzt: Nach dem Teilen einer Quest aus dem Questlog bleibt die Karte nicht mehr offen."
+L["WN82_2_TITLE"] = "Quest teilen"
+L["WN82_2_TEXT"] = "Quest teilen im Questlog teilt die Quest, statt auf die Weltkarte zu verweisen."
 L["WN81_1_TITLE"] = "Herstellungskosten und Gewinn"
 L["WN81_1_TEXT"] = "Mit Auctionator zeigt das klassische Berufsfenster über den Reagenzien, was ein Rezept kostet und einbringt, und bei offenem Auktionshaus eine Suchen-Schaltfläche für die Reagenzien."
 L["WN81_2_TITLE"] = "Klassenfarben für Freunde oder Gegner"

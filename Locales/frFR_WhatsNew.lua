@@ -3,6 +3,10 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN82_1_TITLE"] = "Partager la quête avec la carte en plein écran"
+L["WN82_1_TEXT"] = "Partager une quête depuis le journal de quêtes ne laisse plus la carte du monde ouverte quand vous utilisez la carte en plein écran."
+L["WN82_2_TITLE"] = "Partager la quête"
+L["WN82_2_TEXT"] = "Partager la quête dans le journal de quêtes partage la quête, au lieu de dire de la partager depuis la carte du monde."
 L["WN81_1_TITLE"] = "Coût de fabrication et profit"
 L["WN81_1_TEXT"] = "Avec Auctionator, la fenêtre de métier classique affiche au-dessus des composants ce que coûte une recette et son profit, et un bouton Rechercher pour les composants quand l'hôtel des ventes est ouvert."
 L["WN81_2_TITLE"] = "Couleurs de classe pour alliés ou ennemis"

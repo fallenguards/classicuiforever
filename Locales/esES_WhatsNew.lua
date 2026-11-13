@@ -3,6 +3,10 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN82_1_TITLE"] = "Compartir misión con el mapa a pantalla completa"
+L["WN82_1_TEXT"] = "Compartir una misión desde el registro de misiones ya no deja abierto el mapa del mundo cuando usas el mapa a pantalla completa."
+L["WN82_2_TITLE"] = "Compartir misión"
+L["WN82_2_TEXT"] = "Compartir misión en el registro de misiones comparte la misión, en lugar de decir que la compartas desde el mapa del mundo."
 L["WN81_1_TITLE"] = "Coste de fabricación y beneficio"
 L["WN81_1_TEXT"] = "Con Auctionator, la ventana clásica de profesiones muestra sobre los componentes lo que cuesta fabricar una receta y su beneficio, y un botón Buscar para los componentes mientras la casa de subastas está abierta."
 L["WN81_2_TITLE"] = "Colores de clase para amigos o enemigos"
