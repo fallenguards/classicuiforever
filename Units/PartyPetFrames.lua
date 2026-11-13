@@ -74,7 +74,9 @@ local function SkinPet()
             ns.SetLevelIf(bar, base + 1)
             bar:SetSize(w, h)
             ns.SetPointOnce(bar, "TOPLEFT", frame, "TOPLEFT", x, y)
-            if mask then ns.Fade(mask) end
+            -- The client's mask cuts the fill to its own rounded slot, short of Era's at the left and the ends.
+            local fill = bar:GetStatusBarTexture()
+            if mask and fill and fill.RemoveMaskTexture then pcall(fill.RemoveMaskTexture, fill, mask) end
             local era = ns.ClassicFonts() and (b[8] and ERA_PET_POWER or ERA_PET_HEALTH)
             BarTexts(frame, nil, bar, texts, era or SMALL_TEXTS, bar, nil, "pet", b[8])
         end
