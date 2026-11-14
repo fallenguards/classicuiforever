@@ -77,6 +77,39 @@ c["Go"].press()
 Check(pressed == true, "whose press clicks the button")
 Check(c["Many"] == nil, "a drop-down of several boxes stays a plain row")
 
+-- The feed in EasyFind's login slices: the build pauses between rows, EasyFind's checkpoint lets frames go there,
+-- and opening the window mid-build finishes that same build at once.
+local O = ns.options
+local handle = assert(io.open(ROOT .. "/Options/OptionsRows.lua", "r"))
+local pauseCode = handle:read("a"):match("(function O%.BuildPause%(%).-\nend\n)")
+handle:close()
+assert(load("local O = ...\n" .. pauseCode, "pause", "t", _G))(O)
+local builds, shown = 0, false
+local window = { built = { rows = { { key = "band", label = "Show the band", page = "Band", keyLow = "band" } } },
+    Show = function() shown = true end }
+O.Window.Build = function()
+    builds = builds + 1
+    for _ = 1, 4 do O.BuildPause() end
+    return window
+end
+O.Window.OpenAt = function() end
+O.BuildPause()
+Check(true, "a pause outside the build goes straight on")
+env.EasyFind = { API = { SliceCheckpoint = function() coroutine.yield() end } }
+local feed = coroutine.create(ns.OptionsIndexRows)
+local ok, list = coroutine.resume(feed)
+Check(ok and coroutine.status(feed) == "suspended" and builds == 1, "the feed lets the frame go mid-build")
+ns.OpenOptionsAt("band")
+Check(shown and builds == 1 and O.building == nil, "an open mid-build finishes that build, no second one")
+local pauses = 0
+while ok and coroutine.status(feed) == "suspended" do
+    pauses = pauses + 1
+    ok, list = coroutine.resume(feed)
+end
+Check(ok and builds == 1 and type(list) == "table" and #list == 1 and list[1].name == "Show the band",
+    "the feed ends with the window's rows")
+Check(pauses >= 1, "the rows' walk lets frames go too")
+
 if failed > 0 then
     print(failed .. " check(s) failed")
     os.exit(1)

@@ -678,6 +678,11 @@ end
 
 local function ByLabel(a, b) return a[2] < b[2] end
 
+-- The options window's build (O.building, Options/OptionsWindow.lua) pauses here; any other run goes straight on.
+function O.BuildPause()
+    if O.building and coroutine.running() == O.building then coroutine.yield() end
+end
+
 -- Every row of ns.TOGGLES on child, in list order. Returns the rows and their tree: rows[i], kids[key] (rows under that
 -- key), parentOf[key], heads[page] (a page's title row for search results).
 function O.BuildRows(child, colW)
@@ -711,6 +716,7 @@ function O.BuildRows(child, colW)
         head.keyLow, head.tipLow = "", ""
     end
     for _, entry in ipairs(ns.TOGGLES) do
+        O.BuildPause()
         if entry.group then
             page = entry.group
             heads[page] = heads[page] or GroupHead(child, page, colW - 8)

@@ -561,6 +561,7 @@ local function Build()
     local function SetRange(h) frame.listBar:SetRange(math.max(0, h - frame.list:GetHeight()), ROW) end
     frame.panes = {}
     for _, spec in ipairs(PANES) do
+        O.BuildPause()
         frame.panes[L[spec[1]]] = O[spec[2]](frame.pageBox, frame.pageTop, frame.list, SetRange)
     end
     frame.page = pages[1]
@@ -617,8 +618,20 @@ end
 -- The window in use: this one, or a standalone piece's one page (Options/PieceWindow.lua puts its own here).
 O.Window = { Build = Build, Embed = Embed, StandAlone = StandAlone, ShowRow = ShowRow, OpenAt = OpenAt }
 
+-- The build runs in a coroutine of ours, pausing between rows: EasyFind's feed lets frames go at those pauses, and any
+-- other caller finishes it at once (never a second window beside a half-built one).
+local function BuildStep()
+    O.building = O.building or coroutine.create(O.Window.Build)
+    local ok, built = coroutine.resume(O.building)
+    if not ok then
+        O.building = nil
+        error(built, 0)
+    end
+    if coroutine.status(O.building) == "dead" then window, O.building = built, nil end
+end
+
 local function Window()
-    window = window or O.Window.Build()
+    while not window do BuildStep() end
     return window
 end
 
@@ -723,9 +736,10 @@ end
 
 -- The window's setting rows for EasyFind's search: label, page, the words our own search knows and the control it
 -- draws in the row; headings, a windows list's copies (their words blanked) and rows hidden on this client left out.
-function ns.OptionsIndexRowsOf(rows)
+function ns.OptionsIndexRowsOf(rows, pause)
     local out = {}
     for _, row in ipairs(rows) do
+        if pause then pause() end
         if row.label and row.page and row.keyLow ~= "" and not (row.hideIf and row.hideIf()) then
             local words = {}
             for word in row.keyLow:gmatch("%S+") do words[#words + 1] = word end
@@ -735,7 +749,16 @@ function ns.OptionsIndexRowsOf(rows)
     end
     return out
 end
-function ns.OptionsIndexRows() return ns.OptionsIndexRowsOf(Window().built.rows) end
+-- EasyFind's feed, run in its login slices: the window built and its rows walked a piece at a time (older EasyFind has
+-- no checkpoint and takes it whole).
+function ns.OptionsIndexRows()
+    local Checkpoint = EasyFind.API.SliceCheckpoint
+    while not window do
+        BuildStep()
+        if Checkpoint then Checkpoint() end
+    end
+    return ns.OptionsIndexRowsOf(window.built.rows, Checkpoint)
+end
 
 -- Open on one toggle (a chat link's "here"), its row lit.
 function ns.OpenOptionsAt(key) O.Window.OpenAt(ShowAlone(), key) end
