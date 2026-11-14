@@ -2,6 +2,14 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN84_1_TITLE"] = "Merchant and trainer windows"
+L["WN84_1_TEXT"] = "The merchant and trainer windows can now be moved and sized. Click the lock beside the close button, then drag the window or its corner. They share one place and size with the quest and gossip windows, and ClassicUI Forever Windows shows windows that share a place as one row and one box."
+L["WN84_2_TITLE"] = "Tracker and the map's quest settings"
+L["WN84_2_TEXT"] = "Quest titles in the classic tracker, the quest log and the map's quest lists follow the map's Quest Difficulty Color setting (plain when it is off), and that setting and Show Quest Levels show at once, with no reload."
+L["WN84_3_TITLE"] = "Fixes"
+L["WN84_3_TEXT"] = "A quest title in the classic tracker keeps its color after the mouse leaves it, the Classic combined map's scroll bars fit their places while the map is windowed, the map key shuts that map on every character, and the minimap button stays in MinimapButtonBag Reborn's bag."
+L["WN84_4_TITLE"] = "Skills tab"
+L["WN84_4_TEXT"] = "A skill going up during a fight no longer causes an error while the Skills tab shows a weapon skill."
 L["WN83_1_TITLE"] = "Skills tab and auction house"
 L["WN83_1_TEXT"] = "The Skills tab no longer causes an error for a character with a bonus to Defense, and the auction house's bid button no longer covers the end of the copper box."
 L["WN83_2_TITLE"] = "Raid panel and controller"

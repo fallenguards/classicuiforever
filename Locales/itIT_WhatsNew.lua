@@ -3,6 +3,14 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN84_1_TITLE"] = "Finestre di mercante e istruttore"
+L["WN84_1_TEXT"] = "Le finestre di mercanti e istruttori ora si possono spostare e ridimensionare. Fai clic sul lucchetto accanto al pulsante di chiusura, poi trascina la finestra o il suo angolo. Condividono posizione e dimensione con le finestre delle missioni e di dialogo, e in Finestre di ClassicUI Forever le finestre che condividono una posizione sono una sola riga e un solo riquadro."
+L["WN84_2_TITLE"] = "Tracciamento e impostazioni delle missioni della mappa"
+L["WN84_2_TEXT"] = "I titoli delle missioni nel tracciamento classico, nel registro delle missioni e negli elenchi di missioni della mappa seguono l'impostazione della mappa Quest Difficulty Color (semplici quando è disattivata), e questa impostazione e Show Quest Levels si applicano subito, senza ricaricare."
+L["WN84_3_TITLE"] = "Correzioni"
+L["WN84_3_TEXT"] = "Il titolo di una missione nel tracciamento classico mantiene il suo colore quando il mouse lo lascia, le barre di scorrimento della mappa classica combinata stanno al loro posto quando la mappa è in finestra, il tasto della mappa chiude quella mappa su tutti i personaggi, e il pulsante della minimappa resta nella borsa di MinimapButtonBag Reborn."
+L["WN84_4_TITLE"] = "Scheda Abilità"
+L["WN84_4_TEXT"] = "Un'abilità che aumenta in combattimento non causa più un errore mentre la scheda Abilità mostra un'abilità con le armi."
 L["WN83_1_TITLE"] = "Abilità e casa d'aste"
 L["WN83_1_TEXT"] = "La scheda Abilità non causa più un errore per un personaggio con un bonus a Difesa, e il pulsante dell'offerta della casa d'aste non copre più la fine della casella del rame."
 L["WN83_2_TITLE"] = "Pannello di incursione e controller"

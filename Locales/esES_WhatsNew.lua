@@ -3,6 +3,14 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN84_1_TITLE"] = "Ventanas de vendedor e instructor"
+L["WN84_1_TEXT"] = "Las ventanas de vendedores e instructores ya se pueden mover y cambiar de tamaño. Haz clic en el candado junto al botón de cerrar y arrastra la ventana o su esquina. Comparten un mismo lugar y tamaño con las ventanas de misiones y de diálogo, y en Ventanas de ClassicUI Forever las ventanas que comparten lugar son una sola fila y un solo recuadro."
+L["WN84_2_TITLE"] = "Seguimiento y ajustes de misiones del mapa"
+L["WN84_2_TEXT"] = "Los títulos de las misiones en el seguimiento clásico, el registro de misiones y las listas de misiones del mapa siguen el ajuste del mapa Color de dificultad de misión (lisos si está desactivado), y ese ajuste y Mostrar niveles de misión se aplican al instante, sin recargar."
+L["WN84_3_TITLE"] = "Correcciones"
+L["WN84_3_TEXT"] = "El título de una misión en el seguimiento clásico conserva su color cuando el ratón lo deja, las barras de desplazamiento del mapa clásico combinado encajan en su sitio con el mapa en ventana, la tecla del mapa cierra ese mapa en todos los personajes, y el botón del minimapa se queda en la bolsa de MinimapButtonBag Reborn."
+L["WN84_4_TITLE"] = "Pestaña Habilidades"
+L["WN84_4_TEXT"] = "Que una habilidad suba en combate ya no causa un error mientras la pestaña Habilidades muestra una habilidad de arma."
 L["WN83_1_TITLE"] = "Habilidades y casa de subastas"
 L["WN83_1_TEXT"] = "La pestaña Habilidades ya no causa un error en personajes con una bonificación a Defensa, y el botón de puja de la casa de subastas ya no tapa el final de la casilla de cobre."
 L["WN83_2_TITLE"] = "Panel de banda y mando"

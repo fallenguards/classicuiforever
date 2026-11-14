@@ -3,6 +3,14 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN84_1_TITLE"] = "Fenêtres de marchand et de maître"
+L["WN84_1_TEXT"] = "Les fenêtres des marchands et des maîtres peuvent maintenant être déplacées et redimensionnées. Cliquez sur le cadenas à côté du bouton de fermeture, puis faites glisser la fenêtre ou son coin. Elles partagent un même emplacement et une même taille avec les fenêtres de quête et de dialogue, et dans les fenêtres ClassicUI Forever (mode Édition), les fenêtres qui partagent un emplacement n'ont qu'une ligne et un cadre."
+L["WN84_2_TITLE"] = "Suivi et réglages de quêtes de la carte"
+L["WN84_2_TEXT"] = "Les titres des quêtes dans le suivi classique, le journal de quêtes et les listes de quêtes de la carte suivent le réglage de la carte Couleur de quête par difficulté (unis quand il est désactivé), et ce réglage ainsi que Afficher le niveau des quêtes s'appliquent aussitôt, sans rechargement."
+L["WN84_3_TITLE"] = "Corrections"
+L["WN84_3_TEXT"] = "Le titre d'une quête dans le suivi classique garde sa couleur quand la souris le quitte, les barres de défilement de la carte classique combinée tiennent à leur place quand la carte est en fenêtre, la touche de la carte ferme cette carte sur tous les personnages, et le bouton de la minicarte reste dans le sac de MinimapButtonBag Reborn."
+L["WN84_4_TITLE"] = "Onglet Compétences"
+L["WN84_4_TEXT"] = "Une compétence qui augmente en combat ne provoque plus d'erreur quand l'onglet Compétences affiche une compétence d'arme."
 L["WN83_1_TITLE"] = "Compétences et hôtel des ventes"
 L["WN83_1_TEXT"] = "L'onglet Compétences ne provoque plus d'erreur pour un personnage avec un bonus de Défense, et le bouton d'enchère de l'hôtel des ventes ne recouvre plus la fin de la case du cuivre."
 L["WN83_2_TITLE"] = "Panneau de raid et manette"

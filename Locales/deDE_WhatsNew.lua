@@ -3,6 +3,14 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN84_1_TITLE"] = "Händler- und Lehrerfenster"
+L["WN84_1_TEXT"] = "Die Fenster von Händlern und Lehrern lassen sich jetzt verschieben und in der Größe ändern. Klicke auf das Schloss neben der Schließen-Schaltfläche und ziehe dann das Fenster oder seine Ecke. Sie teilen Platz und Größe mit den Quest- und Gesprächsfenstern, und in ClassicUI Forever Fenster sind Fenster mit gemeinsamem Platz eine Zeile und ein Rahmen."
+L["WN84_2_TITLE"] = "Zielverfolgung und Questeinstellungen der Karte"
+L["WN84_2_TEXT"] = "Questtitel in der klassischen Zielverfolgung, im Questlog und in den Questlisten der Karte folgen der Karteneinstellung Einfärbung der Questschwierigkeit (schlicht, wenn sie aus ist), und diese Einstellung sowie Queststufen anzeigen wirken sofort, ohne Neuladen."
+L["WN84_3_TITLE"] = "Korrekturen"
+L["WN84_3_TEXT"] = "Ein Questtitel in der klassischen Zielverfolgung behält seine Farbe, nachdem die Maus ihn verlässt, die Bildlaufleisten der vereinten klassischen Karte sitzen an ihrem Platz, wenn die Karte im Fenster ist, die Kartentaste schließt diese Karte auf jedem Charakter, und die Minikartenschaltfläche bleibt in der Tasche von MinimapButtonBag Reborn."
+L["WN84_4_TITLE"] = "Reiter Fertigkeiten"
+L["WN84_4_TEXT"] = "Steigt im Kampf eine Fertigkeit, verursacht das keinen Fehler mehr, während der Reiter Fertigkeiten eine Waffenfertigkeit zeigt."
 L["WN83_1_TITLE"] = "Fertigkeiten und Auktionshaus"
 L["WN83_1_TEXT"] = "Der Reiter Fertigkeiten verursacht keinen Fehler mehr bei Charakteren mit einem Bonus auf Verteidigung, und die Gebotsschaltfläche im Auktionshaus verdeckt nicht mehr das Ende des Kupferfelds."
 L["WN83_2_TITLE"] = "Schlachtzugsfenster und Controller"

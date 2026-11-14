@@ -2,6 +2,24 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.57.0] - 2026-11-14
+
+### Added
+- The merchant and trainer windows can be moved and sized: unlock one with the lock beside its close button, then drag it or its corner. An NPC's quest, gossip, merchant and trainer windows share one place and size.
+
+### Changed
+- On Forever, quest titles follow the map's Quest Difficulty Color setting in the objective tracker's classic look, the classic quest log and the map's quest lists. With it off they are plain; they were colored by level either way.
+- The Quest levels option takes effect at once, without a reload.
+- In ClassicUI Forever Windows, windows that share one place and size have one row and one box named after all of them, such as an NPC's quest, gossip, merchant and trainer windows.
+
+### Fixed
+- The character window's Skills tab no longer causes an error when a skill goes up during a fight while a weapon skill is picked.
+- The objective tracker's classic look: a quest title and its objectives keep their own colors after the mouse leaves the title. They kept the game's until the tracker next updated.
+- On Forever, Quest Difficulty Color and Show Quest Levels, changed from the map, show at once in the tracker and the quest lists.
+- Classic combined map: the map key shuts the map on every character. On a character the option was not turned on with, the key opened the map and never shut it.
+- Classic combined map: while the map is windowed, the quest list's scroll bar fits its track and the rewards page's stays off the divider.
+- The minimap button stays in MinimapButtonBag Reborn's bag. It came back out of the bag at every loading screen.
+
 ## [0.56.2] - 2026-11-13
 
 ### Fixed
