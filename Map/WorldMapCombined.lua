@@ -219,6 +219,7 @@ function MC.Lay(map, boxes)
     footBox[1], footBox[2], footBox[3], footBox[4] = boxes.picture[1], boxes.list[4], boxes.list[3], bottom
     Place(h.foot, footBox, level)
     ns.QuestMapList.LayFoot()
+    ns.QuestMapList.LayBars(LM().Scale())
     local pic, div = boxes.picture, boxes.divider
     local on = drag.map ~= nil or Usable(map)
     ns.SetLevelIf(grip, level + 1)

@@ -31,11 +31,12 @@ local NATIVE_W, NATIVE_H = DIV_L - HOLE_L, BAND_T - HOLE_T
 local SHARE_MIN, SHARE_MAX = 0.5, 0.86
 -- The rims' plain run, repeated for a taller window; the rows under the band (the pages' edge) stay at the foot.
 local RIM_FILL_T, RIM_FILL_B = 300, 400
--- The list column's ends, kept as drawn (the scroll track's squares sit in them), and its right strip (the track):
--- the cover between them stretches to the column's height and width.
+-- The list column's ends, kept as drawn (the scroll track's squares sit in them), its right strip (the track) and
+-- the rim beside it: the cover between the ends stretches to the column's height and width. The header's and
+-- footer's border lines over the strip (their rivets end its rail) run from LINE_T and to LINE_B.
 local COL_TOP_B, COL_FOOT_T, COL_TRACK_W = 100, 700, 30
-local COL_ROWS = { { HOLE_T, COL_TOP_B }, { COL_TOP_B, COL_FOOT_T }, { COL_FOOT_T, HOLE_B } }
-local COL_COLS = { { LIST_L, LIST_R - COL_TRACK_W }, { LIST_R - COL_TRACK_W, LIST_R } }
+local COL_COLS = { { LIST_L, LIST_R - COL_TRACK_W }, { LIST_R - COL_TRACK_W, LIST_R }, { LIST_R, ART_W } }
+local LINE_T, LINE_B = 63, 744
 -- Era's header (Vanilla Blizzard_WorldMap.xml): Continent 130 wide, its top 80 left of the middle and 36 down, Zone
 -- 5 right of it, Zoom Out 110 x 22 another 5 on; the labels 12 over each. The title 12 down. Era's Zoom Out sits 3 up
 -- for its own button art; ours fills its frame, so centred on the drop downs.
@@ -147,18 +148,24 @@ local function VRun(x0, x1, dx, hgt)
     Slice(x0, BAND_T, x1, HOLE_B, dx, BAND_T + extra)
 end
 
--- The list column at listX, colW wide and inner tall: its ends and track strip as drawn, the cover between stretched.
+-- The list column at listX, colW wide and inner tall, and the rim after it. The track is drawn at the text's size
+-- (1/K, as the footer): the list's scroll bar keeps the frame's size and sits in its squares whatever the sheets
+-- wear. The rim's ends are as tall, so its joints meet the squares' lines; the cover takes the width left.
 local function LayColumn(listX, colW, inner)
-    local foot = HOLE_B - COL_FOOT_T
-    local kx = (colW - COL_TRACK_W) / (COL_COLS[1][2] - COL_COLS[1][1])
-    local ky = (inner - (COL_TOP_B - HOLE_T) - foot) / (COL_FOOT_T - COL_TOP_B)
-    for r, rows in ipairs(COL_ROWS) do
-        local dy = r == 1 and HOLE_T or r == 2 and COL_TOP_B or HOLE_T + inner - foot
-        for c, cols in ipairs(COL_COLS) do
-            local dx = c == 1 and listX or listX + colW - COL_TRACK_W
-            Slice(cols[1], rows[1], cols[2], rows[2], dx, dy, 0, c == 1 and kx or 1, r == 2 and ky or 1)
-        end
+    local t = 1 / K
+    local top, foot, trackW = COL_TOP_B - HOLE_T, HOLE_B - COL_FOOT_T, COL_TRACK_W * t
+    for c, cols in ipairs(COL_COLS) do
+        local ends = c == 1 and 1 or t
+        local kx = c == 1 and (colW - trackW) / (cols[2] - cols[1]) or c == 2 and t or 1
+        local dx = c == 1 and listX or c == 2 and listX + colW - trackW or listX + colW
+        Slice(cols[1], HOLE_T, cols[2], COL_TOP_B, dx, HOLE_T, 0, kx, ends)
+        Slice(cols[1], COL_TOP_B, cols[2], COL_FOOT_T, dx, HOLE_T + top * ends, 0, kx,
+            (inner - (top + foot) * ends) / (COL_FOOT_T - COL_TOP_B))
+        Slice(cols[1], COL_FOOT_T, cols[2], HOLE_B, dx, HOLE_T + inner - foot * ends, 0, kx, ends)
     end
+    local strip = COL_COLS[2]
+    Slice(strip[1], LINE_T, strip[2], HOLE_T, listX + colW - trackW, LINE_T, 1, t, 1)
+    Slice(strip[1], HOLE_B, strip[2], LINE_B, listX + colW - trackW, HOLE_T + inner, 1, t, t)
 end
 
 -- The sheets' quest layout for a shape: the header and footer run to the window's width, the rims to its height, the
@@ -171,7 +178,6 @@ local function LayCombined(shape)
     HRun(0, HOLE_T, 0, W)
     HRun(HOLE_B, ART_H, H - FootH(), W, 1 / K)
     VRun(0, HOLE_L, 0, inner)
-    VRun(HOLE_R, ART_W, W - (ART_W - HOLE_R), inner)
     local kx = w / NATIVE_W
     Slice(HOLE_L, HOLE_T, DIV_L, BAND_T, HOLE_L, HOLE_T, 0, kx, h / NATIVE_H)
     Slice(DIV_L, DIV_T, DIV_R, DIV_B, splitX, DIV_T, 1, 1, (H - DIV_T - (ART_H - DIV_B) / K) / (DIV_B - DIV_T))

@@ -13,13 +13,23 @@ local CHECK_MARK = ns.ART.CHECK .. "Check"
 local CHECK_BOX, CHECK_DOWN = "Interface\\Buttons\\UI-CheckBox-Up", "Interface\\Buttons\\UI-CheckBox-Down"
 local CHECK_GLOW, CHECK_OFF = "Interface\\Buttons\\UI-CheckBox-Highlight", "Interface\\Buttons\\UI-CheckBox-Check-Disabled"
 -- The list's room in the column (its rim and the book's spine at its left, the drawn scroll track at its right) and
--- the pages' in their parchment. Each bar's left from its host's right edge, its arrows' tops and feet from the host's:
--- the list's in the track's squares, the text's at its parchment's edge short of the spine, the rewards' on the binding.
+-- the pages' in their parchment; a page bar's arrows' tops and feet from its host's.
 local LIST_L, LIST_R, LIST_T, LIST_B = 14, 23, 8, 8
 local PAGE_L, PAGE_T, PAGE_B = 8, 8, 8
-local TEXT_R, REWARDS_R = 20, 4
-local LIST_BAR_X, LIST_BAR_TOP, LIST_BAR_FOOT = -16, 2, 1
-local TEXT_BAR_X, REWARDS_BAR_X, PAGE_BAR_TOP, PAGE_BAR_FOOT = -13, 0, 2, 2
+local PAGE_BAR_TOP, PAGE_BAR_FOOT = 2, 2
+-- The list's scroll bar in the drawn track, each piece by itself: from the column's right edge (+ right), an arrow's
+-- top from the column's top and the other's foot from its bottom (+ up), the knob's two ends the same way.
+local LIST_SCROLL_X = -16
+local LIST_SCROLL_UP_ARROW_Y = 0.5
+local LIST_SCROLL_DOWN_ARROW_Y = 0.75
+local LIST_SCROLL_KNOB_TOP = -12.5
+local LIST_SCROLL_KNOB_BOTTOM = 14.75
+-- A page's bar keeps the frame's size beside art that wears the sheets' scale: its right edge this far past the
+-- page's in the sheets' units (the text's 3 into the spine, the rewards' the binding's 15 to the divider's rim), and
+-- the page's text this short of the bar.
+local BAR_W = 16
+local TEXT_BAR_EDGE, REWARDS_BAR_EDGE = 3, 15
+local TEXT_GAP, REWARDS_GAP = 7, 4
 local HEADER_EXTRA, ROW_GAP = 2, 3
 local TITLE_X, HEADER_TITLE_X, LINE_X, CHECK_SIZE = 6, 22, 14, 16
 local MAX_LINES = 8
@@ -265,6 +275,30 @@ local function TrackCheck(foot)
     return button
 end
 
+-- The list's bar: the slider between the knob's two ends, each arrow in its square.
+local function LayListBar(host)
+    local bar = list.bar
+    bar:ClearAllPoints()
+    bar:SetPoint("TOPLEFT", host, "TOPRIGHT", LIST_SCROLL_X, LIST_SCROLL_KNOB_TOP)
+    bar:SetPoint("BOTTOMLEFT", host, "BOTTOMRIGHT", LIST_SCROLL_X, LIST_SCROLL_KNOB_BOTTOM)
+    ns.SetPointOnce(bar.up, "TOPLEFT", host, "TOPRIGHT", LIST_SCROLL_X, LIST_SCROLL_UP_ARROW_Y)
+    ns.SetPointOnce(bar.down, "BOTTOMLEFT", host, "BOTTOMRIGHT", LIST_SCROLL_X, LIST_SCROLL_DOWN_ARROW_Y)
+end
+
+local function LayPage(pane, edge, gap, k)
+    local host, x = pane:GetParent(), edge * k - BAR_W
+    ns.SetTwoPointsIf(pane, "TOPLEFT", host, "TOPLEFT", PAGE_L, -PAGE_T, "BOTTOMRIGHT", host, "BOTTOMRIGHT", x - gap, PAGE_B)
+    ns.SetTwoPointsIf(pane.bar, "TOPLEFT", host, "TOPRIGHT", x, PAGE_BAR_TOP - 16,
+        "BOTTOMLEFT", host, "BOTTOMRIGHT", x, PAGE_BAR_FOOT + 16)
+end
+
+-- The pages' bars and text for the sheets' scale k, at every lay of the map.
+function QM.LayBars(k)
+    if not detail then return end
+    LayPage(detail, TEXT_BAR_EDGE, TEXT_GAP, k)
+    LayPage(rewards, REWARDS_BAR_EDGE, REWARDS_GAP, k)
+end
+
 -- Track Quest's box left of Map Options' (its label runs on to the right), else at the foot's right.
 function QM.LayFoot()
     if not track then return end
@@ -289,15 +323,17 @@ local function OnEvent(_, event, name)
 end
 
 function QM.Attach(hosts)
-    list = Pane(hosts.list, LIST_L, LIST_R, LIST_T, LIST_B, LIST_BAR_X, LIST_BAR_TOP, LIST_BAR_FOOT)
+    list = Pane(hosts.list, LIST_L, LIST_R, LIST_T, LIST_B, 0, 0, 0)
+    LayListBar(hosts.list)
     list.empty = list:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
     list.empty:SetPoint("TOPLEFT", list, "TOPLEFT", 10, -20)
     list.empty:SetPoint("RIGHT", list, "RIGHT", -10, 0)
     list.empty:SetText(QUESTLOG_NO_QUESTS_TEXT or "You have no quests.")
     list.empty:Hide()
     ns.QuestPaper(list, "mapQuestCombinedPaper")
-    detail = Pane(hosts.pageL, PAGE_L, TEXT_R, PAGE_T, PAGE_B, TEXT_BAR_X, PAGE_BAR_TOP, PAGE_BAR_FOOT)
-    rewards = Pane(hosts.pageR, PAGE_L, REWARDS_R, PAGE_T, PAGE_B, REWARDS_BAR_X, PAGE_BAR_TOP, PAGE_BAR_FOOT)
+    detail = Pane(hosts.pageL, PAGE_L, 0, PAGE_T, PAGE_B, 0, PAGE_BAR_TOP, PAGE_BAR_FOOT)
+    rewards = Pane(hosts.pageR, PAGE_L, 0, PAGE_T, PAGE_B, 0, PAGE_BAR_TOP, PAGE_BAR_FOOT)
+    QM.LayBars(1)
     window = { detailChild = detail.child, detailBar = detail.bar, rewardChild = rewards.child, rewardBar = rewards.bar,
         sizedText = true }
     track = TrackCheck(hosts.foot)

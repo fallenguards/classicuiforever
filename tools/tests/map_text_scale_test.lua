@@ -1,6 +1,7 @@
 -- Offline test under Lua 5.4 for the classic map's sizes (Map/WorldMapEraLarge.lua): windowed, the sheets shrink to the
 -- game's own map height and nothing with text on it (the header, the zoom note, the pane's hole) wears that scale;
 -- maximized the sheets are Era's own. The map frame never wears a style scale of its own (UI/WindowHandles.lua).
+-- The combined layout's scroll track is drawn at the frame's size, so the list's bar (16 wide, never scaled) fits it.
 -- Run from the addon root: lua tools/tests/map_text_scale_test.lua (CI runs every tools/tests/*_test.lua).
 -- luacheck: std lua54
 -- luacheck: ignore 111 112 113 121 122 212
@@ -21,6 +22,7 @@ local function Near(a, b) return type(a) == "number" and math.abs(a - b) < 0.01 
 
 -- A frame or region: scale and size kept, the points as set, every other call a no-op; a field read answers nil.
 local Stub = {}
+local textures = {}
 local function NewStub() return setmetatable({ scale = 1, points = {} }, Stub) end
 Stub.__index = function(_, key)
     if key == "Text" or not key:match("^%u") then return nil end
@@ -34,7 +36,15 @@ Stub.__index = function(_, key)
     if key == "GetNumPoints" then return function(self) return #self.points end end
     if key == "GetPoint" then return function(self, i) return table.unpack(self.points[i] or {}) end end
     if key == "GetStringWidth" then return function() return 50 end end
-    if key == "CreateFontString" or key == "CreateTexture" then return function() return NewStub() end end
+    if key == "SetTexCoord" then return function(self, ...) self.coords = { ... } end end
+    if key == "CreateTexture" then
+        return function()
+            local tex = NewStub()
+            textures[#textures + 1] = tex
+            return tex
+        end
+    end
+    if key == "CreateFontString" then return function() return NewStub() end end
     return function() end
 end
 
@@ -113,6 +123,38 @@ w, h = LM.Size(nil)
 Check(w == 1024 and h == 768, "maximized, Era's own size")
 w = LM.Size(nil, WINDOWED)
 Check(Near(w, 1024 * WINDOWED), "the edit mode box asks the windowed size whatever the map wears")
+
+-- The combined layout: the list's scroll bar keeps the frame's size (16 wide in a 17 wide track, a rail of 3 and 10
+-- of cover left of it), so the track's strip is 30 of the map's units wide and its squares' ends 30 and 38 tall
+-- whatever the sheets wear, the rim beside it as tall at its ends.
+local STRIP_L, STRIP_R, RIM_R = (983 - 768) / 256, (1013 - 768) / 256, 1
+local function Pieces(left, right)
+    local found = {}
+    for _, tex in ipairs(textures) do
+        local c = tex.coords
+        if c and Near(c[1], left) and Near(c[2], right) then found[#found + 1] = tex end
+    end
+    return found
+end
+local shape = { share = LM.NATIVE_SHARE, listW = LM.NATIVE_LIST_W, pagesH = LM.NATIVE_PAGES_H }
+for _, k in ipairs({ WINDOWED, 0.8, 1 }) do
+    LM.Fit(k)
+    LM.Show(WorldMapFrame, nil, 7, shape)
+    local strip, wide, ends = Pieces(STRIP_L, STRIP_R), true, 0
+    for _, tex in ipairs(strip) do
+        wide = wide and Near(tex.w * k, 30)
+        if Near(tex.h * k, 30) or Near(tex.h * k, 38) then ends = ends + 1 end
+    end
+    Check(#strip >= 5 and wide, string.format("sheets at %.2f: the scroll track's strip is 30 wide in the map's units", k))
+    Check(ends >= 2, string.format("sheets at %.2f: the track's squares keep the frame's height", k))
+    local rimEnds = 0
+    for _, tex in ipairs(Pieces(STRIP_R, RIM_R)) do
+        if Near(tex.w, 11) and (Near(tex.h * k, 30) or Near(tex.h * k, 38)) then rimEnds = rimEnds + 1 end
+    end
+    Check(rimEnds >= 2, string.format("sheets at %.2f: the rim beside the track has ends as tall as its squares", k))
+end
+LM.Fit(1)
+LM.Show(WorldMapFrame, nil, 7, nil)
 
 -- The map frame never wears a style scale: the sheets shrink, the frame stays at the player's size.
 for _, file in ipairs({ "UI/WindowHandles.lua", "Map/WorldMapClassic.lua" }) do
