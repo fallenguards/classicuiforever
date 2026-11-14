@@ -519,6 +519,19 @@ local function DressLarge(map, close, sizer)
     ns.MapCombined.Lay(map, shape and LM.CombinedBoxes(shape) or nil)
 end
 
+-- The combined layout has its own list: the client's pane is put away (protected in a fight: shut after), and its
+-- saved wish with it. The client keeps that per character and shuts a map only while the pane agrees with it: with
+-- the wish at open, the map's key opened the map and never shut it again.
+local function ShutClientPane(map)
+    local pane = map.QuestLog
+    if not (Combined() and pane and pane:IsShown()) or InCombatLockdown() then return end
+    if QuestMapFrame_Close and ns.GetCVar("questLogOpen") == "1" then
+        QuestMapFrame_Close(true)
+    else
+        pane:Hide()
+    end
+end
+
 local function DressEra(style)
     local map = Map()
     local border = map.BorderFrame
@@ -528,9 +541,7 @@ local function DressEra(style)
     if border.fcui and border.fcui.titleStrip then ns.SetShownIf(border.fcui.titleStrip, false) end
     ns.SetAlphaIf(_G["WorldMapFrameBg"], 0)
     for _, key in ipairs(EXTRAS) do HoldHidden(ns.MapOverlay(map, key)) end
-    -- The combined layout has its own list: the client's pane, opened by its toggle or a tracker, is put away.
-    -- Protected in a fight (the fight layer's watcher under it): shut after.
-    if Combined() and map.QuestLog and map.QuestLog:IsShown() and not InCombatLockdown() then map.QuestLog:Hide() end
+    ShutClientPane(map)
     -- The quest pane toggle sits on the footer's border: over its line.
     if map.SidePanelToggle then
         ns.SetLevelIf(map.SidePanelToggle, map.ScrollContainer:GetFrameLevel() + FOOT_LINE_OVER_MAP + 1)
