@@ -55,8 +55,8 @@ for _, key in ipairs({ "gossip", "merchant", "trainer" }) do
     Check(entry.follows == "questGiver" and entry.followSize == true and entry.followIf == nil
         and entry.followX == 0 and entry.followY == 0, key .. ": shares the quest giver's place and size")
 end
--- The shop and the trainer are no rows of their own in ClassicUI Forever Windows: the quest giver's moves them.
-Check(byKey.merchant.page == true and byKey.trainer.page == true, "the shop and the trainer have no row or box of their own")
+-- No list entry carries the old page flag: sharing the size is what folds a window into its leader's row.
+for _, entry in ipairs(ns.WINDOW_LIST) do Check(entry.page == nil, entry.key .. ": no page flag") end
 
 if failed > 0 then
     print(failed .. " check(s) failed")

@@ -45,13 +45,35 @@ local saved
 
 local function Picked() return Clean("editWindowsShown", ValidFlag) end
 
--- A page following its leader's window (the spellbook's) has no row or box: its leader's places and sizes it.
-local function PageNow(entry) return entry.page == true and W.Leader(entry) ~= entry end
+-- Windows sharing a place and size (the spellbook's pages, the NPC's windows): one row and box, named as a list.
+local Leader, Worn = W.Leader, W.Worn
+-- Sharing its leader's place and size now: no row or box of its own.
+local function Folded(entry)
+    return entry.followSize == true and Leader(entry) ~= entry
+end
+-- Whether any window can share this one's place and size (its row takes the mode window's whole width).
+local function Leads(entry)
+    for _, other in ipairs(WINDOWS) do
+        if other.follows == entry.key and other.followSize then return true end
+    end
+    return false
+end
+-- Its name in edit mode: its own, then every window ours that shares its place and size now.
+local names = {}
+local function Label(entry)
+    wipe(names)
+    names[1] = entry.label
+    for _, other in ipairs(WINDOWS) do
+        if other ~= entry and Folded(other) and Leader(other) == entry and Worn(other) then names[#names + 1] = other.label end
+    end
+    return table.concat(names, L["UI_NAMES_JOIN"])
+end
+W.Folded, W.Leads, W.Label = Folded, Leads, Label
 
 local function ShowPicked(on)
     local picked = Picked()
     for _, entry in ipairs(WINDOWS) do
-        if not entry.gameEdit then ShowHandle(entry, on and picked[entry.key] == true and not PageNow(entry)) end
+        if not entry.gameEdit then ShowHandle(entry, on and picked[entry.key] == true and not Folded(entry)) end
     end
     if not on then W.HideDialog() end
 end
@@ -294,17 +316,44 @@ local function SyncToggle()
     end
 end
 
+-- Rows two to a line; a window others share takes a whole line after them, its list of names wrapped inside it.
+-- Returns each entry's column and line, and the lines used.
+local function Slots(entries)
+    local slots = {}
+    for _, entry in ipairs(entries) do
+        if not Leads(entry) then
+            slots[entry] = { #slots % 2, math.floor(#slots / 2) }
+            slots[#slots + 1] = entry
+        end
+    end
+    local line = math.ceil(#slots / 2)
+    for _, entry in ipairs(entries) do
+        if Leads(entry) then
+            slots[entry] = { 0, line, true }
+            line = line + 1
+        end
+    end
+    return slots, line
+end
+
 -- top: in the window's units; the row hangs in the list's scrolling content.
-local function ModeCheck(list, entry, index, top)
-    local col, row = (index - 1) % 2, math.floor((index - 1) / 2)
+local function ModeCheck(list, entry, slot, top)
+    local col, row, wide = slot[1], slot[2], slot[3]
+    local width = wide and 2 * ROW_W or ROW_W
     local check = ns.NewFrame("CheckButton", nil, list, "UICheckButtonTemplate")
     check:SetSize(ROW_H, ROW_H)
     check:SetPoint("TOPLEFT", list, "TOPLEFT", MODE_PAD + col * ROW_W, -(top - LIST_TOP + row * ROW_H))
-    check:SetHitRectInsets(0, -(ROW_W - ROW_H), 0, 0)
+    check:SetHitRectInsets(0, -(width - ROW_H), 0, 0)
     ns.EditModeCheck(check)
     local label = check:CreateFontString(nil, "ARTWORK", "GameFontHighlightMedium")
     label:SetPoint("LEFT", check, "RIGHT", 5, 0)
-    label:SetText(entry.label)
+    if wide then
+        label:SetWidth(width - ROW_H - 5)
+        label:SetJustifyH("LEFT")
+        label:SetWordWrap(true)
+    end
+    label:SetText(Label(entry))
+    check.label = label
     if entry.tipSpec then ns.AttachTip(check, entry.tipSpec) end
     check.entry = entry
     check:SetScript("OnClick", function(self)
@@ -352,8 +401,8 @@ local function Mode()
     -- The windows first, then each piece section (the minimap's) under its own heading; gameEdit pieces have no row.
     local windows, sections, byTitle = {}, {}, {}
     for _, entry in ipairs(WINDOWS) do
-        -- A page following its leader is folded into the leader's row.
-        local title, listed = entry.section, not entry.gameEdit and not PageNow(entry)
+        -- A window sharing its leader's place and size is named in the leader's row.
+        local title, listed = entry.section, not entry.gameEdit and not Folded(entry)
         if title and listed then
             local list = byTitle[title]
             if not list then
@@ -366,10 +415,12 @@ local function Mode()
             windows[#windows + 1] = entry
         end
     end
-    local tall = MODE_TOP + math.ceil(#windows / 2) * ROW_H
+    local windowSlots, lines = Slots(windows)
+    local tall = MODE_TOP + lines * ROW_H
     for _, list in ipairs(sections) do
         list.top = tall + SECTION_GAP
-        tall = list.top + math.ceil(#list / 2) * ROW_H
+        list.slots, lines = Slots(list)
+        tall = list.top + lines * ROW_H
     end
     local listH = tall - LIST_TOP
     local viewH = math.min(listH, LIST_MAX_H)
@@ -411,10 +462,14 @@ local function Mode()
     end
     Heading(L["UI_WINDOWS"], MODE_TOP)
     mode.checks = {}
-    for i, entry in ipairs(windows) do mode.checks[#mode.checks + 1] = ModeCheck(list, entry, i, MODE_TOP) end
+    for _, entry in ipairs(windows) do
+        mode.checks[#mode.checks + 1] = ModeCheck(list, entry, windowSlots[entry], MODE_TOP)
+    end
     for _, section in ipairs(sections) do
         Heading(section.title, section.top)
-        for i, entry in ipairs(section) do mode.checks[#mode.checks + 1] = ModeCheck(list, entry, i, section.top) end
+        for _, entry in ipairs(section) do
+            mode.checks[#mode.checks + 1] = ModeCheck(list, entry, section.slots[entry], section.top)
+        end
     end
     mode.revert = FootButton(HUD_EDIT_MODE_REVERT_ALL_CHANGES or "Revert All Changes", "BOTTOMLEFT", FOOT_X, RevertAll)
     mode.save = FootButton(HUD_EDIT_MODE_SAVE_LAYOUT or "Save", "BOTTOMRIGHT", -FOOT_X, Save)
@@ -422,7 +477,11 @@ local function Mode()
     mode:SetScript("OnShow", function(self)
         Save()
         local picked = Picked()
-        for _, check in ipairs(self.checks) do check:SetChecked(picked[check.entry.key] == true) end
+        for _, check in ipairs(self.checks) do
+            check:SetChecked(picked[check.entry.key] == true)
+            -- The windows sharing a row change with their restyles' boxes.
+            check.label:SetText(Label(check.entry))
+        end
         ShowPicked(true)
         SyncFoot()
     end)

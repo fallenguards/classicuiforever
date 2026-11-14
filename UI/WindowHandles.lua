@@ -7,6 +7,7 @@ local WINDOWS = ns.WINDOW_LIST
 -- The whole painted title bar, clear of the portrait on the left and the lock and close on the right.
 local STRIP_H, STRIP_LEFT, STRIP_RIGHT = 40, 60, 90
 local STRIP_LIFT = 20
+local BOX_TEXT_IN = 8   -- a window's box keeps its names this far in from its sides
 local Plain = ns.Safe
 
 local weak = { __mode = "k" }
@@ -376,6 +377,7 @@ local function DressHandles()
 end
 
 local DIALOG_H, VIEW_H, FREE_Y = 214, 34, -44
+local TITLE_ROOM = 64   -- the dialog's corners either side of its title
 local CONTROL_W = 200 -- floor: the size slider's width, which the choice dropdown matches (its longest row fits)
 -- The map's extra rows: its view switch over Movable anytime, Fade while moving under it.
 local MAP_ROWS = 2
@@ -384,7 +386,10 @@ local PIECE_ROWS = { "switch", "choice", "sizeLabel" }
 local function Refresh()
     if not (dialog and selected and dialog:IsShown()) then return end
     local views = selected.quests == true
-    dialog.title:SetText(selected.label)
+    -- A shared box's list of names takes the smaller font where the large one runs into the corners.
+    dialog.title:SetFontObject("GameFontHighlightLarge")
+    dialog.title:SetText(ns.windowEdit.Label(selected))
+    if dialog.title:GetStringWidth() > dialog:GetWidth() - TITLE_ROOM then dialog.title:SetFontObject("GameFontHighlight") end
     dialog:SetHeight(views and DIALOG_H + VIEW_H * MAP_ROWS or DIALOG_H)
     dialog.views:SetShown(views)
     dialog.wide:SetChecked(not mapOnly)
@@ -745,7 +750,14 @@ local function Handle(entry)
     handle:SetScript("OnMouseUp", HandleUp)
     if entry.tipSpec then ns.AttachTip(handle, entry.tipSpec) end
     -- Edit mode's selection box over it; the mouse stays the placeholder's.
-    local sel = ns.band.SelectionHandle(handle, entry.label)
+    local sel = ns.band.SelectionHandle(handle, ns.windowEdit.Label(entry))
+    -- A window's box wraps its names inside it: a shared one lists them all.
+    if not entry.piece and sel.label then
+        sel.label:ClearAllPoints()
+        sel.label:SetPoint("LEFT", handle, "LEFT", BOX_TEXT_IN, 0)
+        sel.label:SetPoint("RIGHT", handle, "RIGHT", -BOX_TEXT_IN, 0)
+        sel.label:SetWordWrap(true)
+    end
     sel:SetFrameStrata(strata)
     sel:SetFrameLevel(level + 1)
     sel:EnableMouse(false)
@@ -762,6 +774,8 @@ local function ShowHandle(entry, on)
     if on then
         Handle(entry)
         LayHandle(entry)
+        local label = handles[entry.key].sel.label
+        if label then label:SetText(ns.windowEdit.Label(entry)) end
         handles[entry.key]:Show()
         DressHandles()
     elseif handles[entry.key] then

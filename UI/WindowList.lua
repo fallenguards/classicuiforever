@@ -5,7 +5,7 @@ local L = ns.L
 
 -- w, h: box before made; cut: old frame's bare edges; stripRight, stripH: strip; toggle: unlock key; quests: the map; section;
 -- piece: laid by ns.LayPiece; ringKey: minimap angle (while ringIf, a ring icon's Stay on minimap switch); stays: fixed at its
--- minimap spot while its switch is on; fixedIf: no drag; choice; switch; client; follows (while followIf), followSize; gameEdit; row; page.
+-- minimap spot while its switch is on; fixedIf: no drag; choice; switch; client; follows (while followIf), followSize; gameEdit; row.
 local SNAP = L["MAP_EYE_SNAP"]
 ns.WINDOW_LIST = {
     -- Where every window that opens side by side starts (UI/Windows.lua RowStart, UI/GameSpot.lua for the game's own): one
@@ -20,12 +20,12 @@ ns.WINDOW_LIST = {
     { key = "professions", label = L["UI_PROFESSIONS"], name = ns.OnForever() and "ProfessionsFrame" or "ProfessionsBookFrame",
         w = 339, h = 425, client = true, zoom = function() return ns.ProfessionsZoom and ns.ProfessionsZoom() or 1 end,
         dressed = function() return ns.ModuleInForce("professionsBook") or ns.ModuleInForce("tradeSkill") end,
-        follows = "spellBook", followIf = "professionsBook", followX = 12, followY = -14, followSize = true, page = true },
+        follows = "spellBook", followIf = "professionsBook", followX = 12, followY = -14, followSize = true },
     { key = "talents", label = L["UI_TALENTS"], name = "ClassicUIForeverTalents", w = 354, h = 467, cut = { 30, 45 } },
     { key = "legacy", label = L["UI_LEGACY"], name = "ClassicUIForeverLegacy", w = 354, h = 467, cut = { 30, 45 } },
     -- A page of the spellbook: on its spot, at its size, moved with it; page: no box of its own while it follows.
     { key = "collections", label = L["UI_COLLECTIONS"], name = "ClassicUIForeverCollections", w = 350, h = 433, cut = { 34, 79 },
-        follows = "spellBook", followX = 0, followY = 0, followSize = true, page = true },
+        follows = "spellBook", followX = 0, followY = 0, followSize = true },
     { key = "questLog", label = L["UI_QUEST_LOG"], name = "ForeverClassicUIQuestLog", w = 349, h = 437, cut = { 35, 75 } },
     { key = "map", label = L["UI_WORLD_MAP"], name = "WorldMapFrame", w = 1035, h = 534, stripH = 24, toggle = "mapUnlocked",
         quests = true, dressed = function() return ns.db.worldMap ~= false end },
@@ -93,13 +93,12 @@ ns.WINDOW_LIST = {
     { key = "gossip", label = L["UI_GOSSIP"], name = "GossipFrame", w = 338, h = 427, client = true,
         follows = "questGiver", followX = 0, followY = 0, followSize = true,
         dressed = function() return ns.panels and ns.panels.Dressing("panelGossip") end },
-    -- The shop and the trainer have no row or box of their own: the quest giver's places and sizes them. The trainer's
-    -- Train pad is laid by measure (UI/SecurePad.lua), so it follows the window's size.
+    -- The trainer's Train pad is laid by measure (UI/SecurePad.lua), so it follows the window's size.
     { key = "merchant", label = L["UI_MERCHANT"], name = "MerchantFrame", w = 336, h = 444, client = true,
-        follows = "questGiver", followX = 0, followY = 0, followSize = true, page = true,
+        follows = "questGiver", followX = 0, followY = 0, followSize = true,
         dressed = function() return ns.panels and ns.panels.Dressing("panelMerchant") end },
     { key = "trainer", label = L["UI_TRAINER"], name = "ClassTrainerFrame", w = 338, h = 424, client = true,
-        follows = "questGiver", followX = 0, followY = 0, followSize = true, page = true,
+        follows = "questGiver", followX = 0, followY = 0, followSize = true,
         dressed = function() return ns.ModuleInForce("trainer") end },
 }
 
