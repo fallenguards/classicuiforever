@@ -28,6 +28,7 @@ local TRACK_GAP = 14        -- Track Quest's box left of Map Options
 local TRACK_ALONE_X = -140  -- its box's right from the foot's, with no Map Options box
 local DONE = { 0.6, 0.6, 0.6 }
 
+-- every item: heard only while the column shows; any item redraws the open quest's pages once a frame at most.
 local LOG_EVENTS = { "QUEST_LOG_UPDATE", "QUEST_WATCH_LIST_CHANGED", "UNIT_QUEST_LOG_CHANGED", "GROUP_ROSTER_UPDATE",
     "PLAYER_MONEY", "GET_ITEM_INFO_RECEIVED" }
 
@@ -277,11 +278,13 @@ function QM.LayFoot()
 end
 
 -- A reward item's data arriving late redraws the pages alone.
-local function OnEvent(_, event)
+local function OnEvent(_, event, name)
     if event == "GET_ITEM_INFO_RECEIVED" then
         if selectedID then ns.Sched.Soon("questMap.detail", UpdateDetail) end
         return
     end
+    -- The map's own filter for quest levels, changed with this list in view.
+    if event == "CVAR_UPDATE" and name ~= "showQuestLevel" then return end
     ns.Sched.Soon("questMap.update", Update)
 end
 
@@ -301,6 +304,7 @@ function QM.Attach(hosts)
     -- Log events while the column shows; one refill per frame however many arrive.
     hosts.list:SetScript("OnShow", function(self)
         ns.RegisterEvents(self, LOG_EVENTS, "player")
+        self:RegisterEvent("CVAR_UPDATE")
         Update()
     end)
     hosts.list:SetScript("OnHide", function(self) self:UnregisterAllEvents() end)
