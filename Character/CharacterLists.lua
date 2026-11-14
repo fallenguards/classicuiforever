@@ -98,6 +98,18 @@ local function FitAllFills()
     for bar in pairs(fillShare) do FitFill(bar) end
 end
 
+-- 1.x wrote the rank as 250/300. A rank with a bonus (Defense) is a secret string on Forever: searching it errors, so
+-- it is written again from the row's own numbers, in the game's words.
+local RANK_BONUS = "%d |cnPURE_GREEN_COLOR:(+%d)|r/%d"
+local function EraRank(bar, row, text)
+    if ns.IsSecret(text) then
+        local data = row.GetElementData and row:GetElementData()
+        if data then bar.Text:SetFormattedText(RANK_BONUS, data.rank, data.modifier, data.maxRank) end
+    elseif type(text) == "string" and text:find(" / ", 1, true) then
+        bar.Text:SetText((text:gsub(" / ", "/")))
+    end
+end
+
 -- Reputation: old plate over a standing-coloured fill. Skills: full-row blue bar, name and rank
 -- inside, old rounded border. Our name replaces the client's, above the art.
 local function SkinListEntry(row, barKey)
@@ -193,11 +205,9 @@ local function SkinListEntry(row, barKey)
                     if T.active then self.Fill:SetVertexColor(SKILL_BLUE[1], SKILL_BLUE[2], SKILL_BLUE[3]) end
                 end)
             end
-            -- 1.x wrote the rank as 250/300.
             if skills and bar.SetText then
                 hooksecurefunc(bar, "SetText", function(self, text)
-                    if not T.active then return end
-                    if type(text) == "string" and text:find(" / ", 1, true) then self.Text:SetText((text:gsub(" / ", "/"))) end
+                    if T.active then EraRank(self, row, text) end
                 end)
             end
         end
@@ -227,8 +237,8 @@ local function SkinListEntry(row, barKey)
             ns.SetPointOnce(bar.Text, "LEFT", name, "RIGHT", 10, -1)
             bar.Text:SetWidth(128)
             bar.Text:SetJustifyH("LEFT")
-            local text = bar.Text:GetText()
-            if type(text) == "string" and text:find(" / ", 1, true) then bar.Text:SetText((text:gsub(" / ", "/"))) end
+            -- The game's stored text, never the text read back: a font string that held a secret answers secret after.
+            EraRank(bar, row, bar.barProgressText)
         end
     else
         name:SetPoint("LEFT", bar, "LEFT", -119, 0)
