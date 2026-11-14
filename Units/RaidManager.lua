@@ -524,13 +524,14 @@ local function Relay()
     local small = shut and not edge
     local spot = small and SMALL_SHUT_X or shut and SHUT_X or OPEN_X
     -- In a fight the panel is locked: the game's toggle and its row layout still run, so its size and spot wait for
-    -- the fight's end while every piece that is not locked goes to its spot now, the tabs by where the panel sits.
+    -- the fight's end while every piece that is not locked goes to its spot now. The tabs hang on the panel's right
+    -- edge: measured from there, as a panel first shown in a fight is still the game's 222 wide.
     era.fight = InCombatLockdown()
     local held = Locked(manager)
     local off = 0
     if held then
-        local left = manager:GetLeft()
-        if left and not IsSecret(left) then off = spot - left end
+        local right = manager:GetRight()
+        if right and not IsSecret(right) then off = spot + PANEL_W - right end
         ns.WhenCalm("raidManager.relay", Relay)
     else
         SetSizeIf(manager, PANEL_W, manager:GetHeight())
