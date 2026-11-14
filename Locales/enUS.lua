@@ -623,8 +623,6 @@ L["CHAR_UNLEARN_THIS_PROFESSION"] = "Unlearn this profession"
 L["CORE_AND_N_MORE_THAT_A"] = "And %d more that a reload finishes."
 
 -- Core/Defaults.lua
-L["CORE_QUEST_LEVELS_SHOW_EVERYWHERE_ONCE"] = "Quest levels show everywhere once the interface reloads."
-L["CORE_QUEST_LEVELS_LEAVE_THE_MAP"] = "Quest levels leave the map and tracker once the interface reloads."
 L["CORE_RELOAD_WAITS_FOR_FIGHT"] = "The reload waits until this fight ends. Your change is saved."
 L["CORE_RELOAD_AFTER_FIGHT"] = "%s\n\nThe fight is over. Reload now to finish your change?"
 L["CORE_ENGLISH_TEXT_RELOAD"] = "The addon's text changes language once the interface reloads."

@@ -438,9 +438,6 @@ ns.MODULE_ORDER = {
 -- or client handlers our hand-back leaves tainted (blocked in combat). A child is off while its parent is, unless own = true.
 -- Off-only: owed on every turn-off. Both ways: owed while it differs from the session start (pins, spellbook key: once a session).
 ns.RELOAD_KEYS = {
-    -- The game reads showQuestLevel as its windows build; open ones keep the old titles.
-    questLevels = { own = true, on = L["CORE_QUEST_LEVELS_SHOW_EVERYWHERE_ONCE"],
-        off = L["CORE_QUEST_LEVELS_LEAVE_THE_MAP"] },
     -- The game redraws bar numbers only as they change, and ours cannot redraw them (the values are secret).
     plainNumbers = { own = true, on = L["CORE_NUMBERS_DROP_SEPARATORS_ONCE"], off = L["CORE_NUMBERS_TAKE_SEPARATORS_ONCE"] },
     classicBar = {
