@@ -108,13 +108,19 @@ function ns.StripQuestLevel(text, level)
     text:SetText(lead .. party .. tail)
 end
 
--- Headers: the client's header colour or grey; quests: the 1.x difficulty colour.
+-- Forever's map filter Quest Difficulty Color: off, quest titles are plain everywhere; a client without it colors.
+function ns.QuestTitlesColored()
+    return not ns.OnForever() or tostring(ns.GetCVar("showQuestDifficultyColor")) ~= "0"
+end
+
+-- Headers: the client's header colour or grey; quests: the 1.x difficulty colour, or the plain yellow with it off.
 function QL.LevelColor(info)
     if info.isHeader then
         local header = QuestDifficultyColors and QuestDifficultyColors["header"]
         if header then return header.r, header.g, header.b end
         return 0.7, 0.7, 0.7
     end
+    if not ns.QuestTitlesColored() then return ns.QuestYellow() end
     local level = info.difficultyLevel or info.level or 0
     return ns.QuestLevelColor(level)
 end

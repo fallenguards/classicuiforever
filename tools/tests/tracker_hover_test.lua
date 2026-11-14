@@ -46,6 +46,7 @@ local ns = {
     EMPTY = {},
     OnForever = function() return forever end,
     GetCVar = function(name) return cvars[name] end,
+    QuestTitlesColored = function() return not forever or cvars.showQuestDifficultyColor ~= "0" end,
     QuestLevelColor = function() return LEVEL_GREEN[1], LEVEL_GREEN[2], LEVEL_GREEN[3] end,
     StripQuestLevel = function() end,
     -- As the game's secure hook: ours runs after the method, with its arguments.

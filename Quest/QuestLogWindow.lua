@@ -792,6 +792,7 @@ ns.OnToggle(function(key)
     if (ns.ThemeKey(key) or key == "eraCoins") and frame and frame:IsShown() then UpdateDetail() end
 end)
 ns.EventFrame("CVAR_UPDATE", function(_, _, name)
+    if name == "showQuestDifficultyColor" then LevelsChanged() end   -- the map's filter: the titles again
     if name ~= "showQuestLevel" then return end
     ReadQuestLevels()
     LevelsChanged()

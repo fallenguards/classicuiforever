@@ -150,13 +150,13 @@ local function SkinHeader(button)
     GoldHeader(button)
 end
 
--- 1.x difficulty color; gold when the level is unknown.
+-- 1.x difficulty color; gold when the level is unknown or the map's Quest Difficulty Color is off.
 local function TitleColor(button)
     local level = button.info and button.info.difficultyLevel
     if not level and button.questID and C_QuestLog and C_QuestLog.GetQuestDifficultyLevel then
         level = C_QuestLog.GetQuestDifficultyLevel(button.questID)
     end
-    if level then return ns.QuestLevelColor(level) end
+    if level and ns.QuestTitlesColored() then return ns.QuestLevelColor(level) end
     return 1, 0.82, 0
 end
 
@@ -495,6 +495,10 @@ local function Build()
         ns.Sched.AfterShow(details, "questMap.shown", DetailsShown)
     end
     ns.HookGlobal("QuestLogQuests_Update", SkinRows)
+    -- The game rebuilds its list for its other filters, not for this one: the titles are colored again here.
+    ns.EventFrame("CVAR_UPDATE", function(_, _, name)
+        if name == "showQuestDifficultyColor" then SkinRows() end
+    end)
 end
 
 -- The list's bottom shade (the game's gradient): the game sets its alpha on every scroll, so hidden, not faded.

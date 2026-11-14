@@ -317,8 +317,8 @@ local function OnEvent(_, event, name)
         if selectedID then ns.Sched.Soon("questMap.detail", UpdateDetail) end
         return
     end
-    -- The map's own filter for quest levels, changed with this list in view.
-    if event == "CVAR_UPDATE" and name ~= "showQuestLevel" then return end
+    -- The map's own filters for quest levels and difficulty color, changed with this list in view.
+    if event == "CVAR_UPDATE" and name ~= "showQuestLevel" and name ~= "showQuestDifficultyColor" then return end
     ns.Sched.Soon("questMap.update", Update)
 end
 

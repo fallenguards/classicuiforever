@@ -114,11 +114,6 @@ local function QuestLevelAndColor(block)
     return level, ns.QuestLevelColor(level)
 end
 
--- Forever's map filter Quest Difficulty Color: on, the game writes the color into the title's text; off, titles stay gold.
-local function TitleColored()
-    return not ns.OnForever() or tostring(ns.GetCVar("showQuestDifficultyColor")) ~= "0"
-end
-
 -- Colour from the objective's own text, e.g. "3/5 Boars slain".
 local function ProgressColor(text, colorStyle)
     if colorStyle and colorStyle == OBJECTIVE_TRACKER_COLOR["Failed"] then return nil end
@@ -143,7 +138,8 @@ local function StyleString(block, fontString, text, _, colorStyle)
         ns.StripQuestLevel(fontString, level)
         SetFontIf(fontString, SIZE_TITLE + SizeStep())
         if lit then return end
-        if level and TitleColored() then
+        -- The map's Quest Difficulty Color: on, the game writes the color into the title's text; off, gold.
+        if level and ns.QuestTitlesColored() then
             -- The level prefix is the game's; Forever's comes off with Quest levels off (ns.StripQuestLevel).
             fontString:SetTextColor(r, g, b)
         else
