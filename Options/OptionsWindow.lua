@@ -683,6 +683,7 @@ function ns.OpenOptionsRow(row) O.Window.ShowRow(ShowAlone(), row) end
 
 local function Choices(row)
     local list = {}
+    if row.choices.relabel then row.choices.relabel() end
     for _, choice in ipairs(row.choices) do list[#list + 1] = { value = choice.key, label = choice.label } end
     return list
 end

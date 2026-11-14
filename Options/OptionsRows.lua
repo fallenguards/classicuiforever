@@ -429,6 +429,7 @@ local function ValueDropRow(parent, key, label, tooltip, choices, apply, preview
         shut:Wake()
     end
     row = DropShell(parent, label, function(root)
+        if choices.relabel then choices.relabel() end
         for _, choice in ipairs(choices) do
             local item = root:CreateRadio(choice.label, function(pick) return ns.db[key] == pick end,
                 function(pick) apply(key, pick) end, choice.key)
@@ -568,9 +569,12 @@ local function Extras(entry, child, colW, add)
     elseif key == "padCursorMenu" then
         -- The buttons for autorun and chat, after the cursor's clicks.
         local runs = { { key = "", label = L["PAD_KEY_NONE"] } }
-        for _, pad in ipairs({ "PADBACK", "PADFORWARD", "PADLSTICK", "PADRSTICK" }) do
-            runs[#runs + 1] = { key = pad, label = _G.GetBindingText and _G.GetBindingText(pad, 1) or pad }
+        for _, pad in ipairs({ "PADBACK", "PADFORWARD", "PADLSTICK", "PADRSTICK" }) do runs[#runs + 1] = { key = pad } end
+        -- Read as each list is drawn: the icons are the connected controller's.
+        function runs.relabel()
+            for i = 2, #runs do runs[i].label = ns.PadGlyph(runs[i].key) end
         end
+        runs.relabel()
         Drop("padClassic", "padAutorunKey", L["OPT_padAutorun"], L["OPT_padAutorun_TIP"], runs, ns.PadPick, "autorun run walk")
         Drop("padClassic", "padChatKey", L["OPT_padChat"], L["OPT_padChat_TIP"], runs, ns.PadPick, "chat open type talk")
     elseif key == "hoverAddonBag" then

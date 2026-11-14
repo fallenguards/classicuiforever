@@ -60,6 +60,27 @@ function ns.NewFrame(frameType, name, parent, template)
     return frame
 end
 
+-- The label style of the controller in use, else of a connected one, as the suffix of the game's key strings.
+local STYLE_KEYS = { Letters = "_LTR", Shapes = "_SHP", Reverse = "_REV" }
+local function PadStyle()
+    local pad = _G.C_GamePad
+    if not (pad and pad.GetDeviceMappedState) then return nil end
+    local active = pad.GetActiveDeviceID and pad.GetActiveDeviceID()
+    local state = active and pad.GetDeviceMappedState(active)
+    if not state and pad.GetAllDeviceIDs then
+        for _, id in ipairs(pad.GetAllDeviceIDs()) do
+            state = state or pad.GetDeviceMappedState(id)
+        end
+    end
+    return state and STYLE_KEYS[state.labelStyle]
+end
+
+-- A pad key's icon in that controller's style; the game's own text can come in its generic set (View and Menu as pills).
+function ns.PadGlyph(key)
+    local style = PadStyle()
+    return style and _G["KEY_ABBR_" .. key .. style] or _G.GetBindingText(key, 1)
+end
+
 -- Switching between the gamepad and mouse interfaces re-runs the pass: the classic bar stands down for the gamepad's.
 -- Our windows swap only on a reload: said in chat, as a popup would join the gamepad's focus in our name.
 local swapSaid = false

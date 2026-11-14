@@ -175,5 +175,29 @@ Test("GamepadHolds", function()
     style = GAMEPAD
 end)
 
+Test("PadGlyph", function()
+    local active, devices = nil, {}
+    C_GamePad = {
+        GetActiveDeviceID = function() return active end,
+        GetAllDeviceIDs = function()
+            local ids = {}
+            for id in pairs(devices) do ids[#ids + 1] = id end
+            return ids
+        end,
+        GetDeviceMappedState = function(id) return devices[id] end,
+    }
+    GetBindingText = function(key) return "generic " .. key end
+    KEY_ABBR_PADBACK_LTR, KEY_ABBR_PADBACK_SHP = "view", "touchpad"
+    Check(ns.PadGlyph("PADBACK") == "generic PADBACK", "no controller: the game's own text")
+    devices[1] = { labelStyle = "Letters" }
+    Check(ns.PadGlyph("PADBACK") == "view", "a connected controller not in use: its style")
+    Check(ns.PadGlyph("PADLSTICK") == "generic PADLSTICK", "a key with no icon in that style: the game's own text")
+    devices[2] = { labelStyle = "Shapes" }
+    active = 2
+    Check(ns.PadGlyph("PADBACK") == "touchpad", "the controller in use decides")
+    devices[2].labelStyle = "Generic"
+    Check(ns.PadGlyph("PADBACK") == "generic PADBACK", "a generic controller in use: the game's own text")
+end)
+
 print(string.format("%d passed, %d failed", passed, failed))
 if failed > 0 then os.exit(1) end
