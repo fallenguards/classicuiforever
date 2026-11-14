@@ -3,6 +3,10 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN83_1_TITLE"] = "Compétences et hôtel des ventes"
+L["WN83_1_TEXT"] = "L'onglet Compétences ne provoque plus d'erreur pour un personnage avec un bonus de Défense, et le bouton d'enchère de l'hôtel des ventes ne recouvre plus la fin de la case du cuivre."
+L["WN83_2_TITLE"] = "Panneau de raid et manette"
+L["WN83_2_TEXT"] = "L'onglet fermé du panneau de raid reste au bord de l'écran quand vous rejoignez un groupe en combat, et les options de manette affichent les icônes Vue et Menu de votre manette."
 L["WN82_1_TITLE"] = "Partager la quête avec la carte en plein écran"
 L["WN82_1_TEXT"] = "Partager une quête depuis le journal de quêtes ne laisse plus la carte du monde ouverte quand vous utilisez la carte en plein écran."
 L["WN82_2_TITLE"] = "Partager la quête"

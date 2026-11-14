@@ -2,6 +2,14 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.56.2] - 2026-11-13
+
+### Fixed
+- The character window's Skills tab no longer causes an error for a character with a bonus to Defense. It came up each time that row was drawn or hovered, and cut the window's dressing short.
+- The raid panel's closed tab sits at the screen's edge when a group forms during a fight. It stood off the edge until the fight ended.
+- Auction house: the Bid button no longer covers the end of the copper box, and sits beside Buyout.
+- Gamepad options: the Autorun and Open chat lists show the controller's own View and Menu icons.
+
 ## [0.56.1] - 2026-11-13
 
 ### Fixed

@@ -2,6 +2,10 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN83_1_TITLE"] = "Skills tab and auction house"
+L["WN83_1_TEXT"] = "The Skills tab no longer causes an error for a character with a bonus to Defense, and the auction house's bid button no longer covers the end of the copper box."
+L["WN83_2_TITLE"] = "Raid panel and controller"
+L["WN83_2_TEXT"] = "The raid panel's closed tab sits at the screen's edge when you join a group during a fight, and the Gamepad options show your controller's own View and Menu icons."
 L["WN82_1_TITLE"] = "Share Quest with a full screen map"
 L["WN82_1_TEXT"] = "Sharing a quest from the quest log no longer leaves the world map open when you keep the map full screen."
 L["WN82_2_TITLE"] = "Share Quest"

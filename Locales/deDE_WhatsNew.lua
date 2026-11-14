@@ -3,6 +3,10 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN83_1_TITLE"] = "Fertigkeiten und Auktionshaus"
+L["WN83_1_TEXT"] = "Der Reiter Fertigkeiten verursacht keinen Fehler mehr bei Charakteren mit einem Bonus auf Verteidigung, und die Gebotsschaltfläche im Auktionshaus verdeckt nicht mehr das Ende des Kupferfelds."
+L["WN83_2_TITLE"] = "Schlachtzugsfenster und Controller"
+L["WN83_2_TEXT"] = "Der geschlossene Reiter des Schlachtzugsfensters sitzt am Bildschirmrand, wenn du im Kampf einer Gruppe beitrittst, und die Gamepad-Optionen zeigen die Ansicht- und Menü-Symbole deines Controllers."
 L["WN82_1_TITLE"] = "Quest teilen mit Karte im Vollbild"
 L["WN82_1_TEXT"] = "Wer die Weltkarte im Vollbild nutzt: Nach dem Teilen einer Quest aus dem Questlog bleibt die Karte nicht mehr offen."
 L["WN82_2_TITLE"] = "Quest teilen"

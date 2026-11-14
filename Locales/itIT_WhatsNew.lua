@@ -3,6 +3,10 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN83_1_TITLE"] = "Abilità e casa d'aste"
+L["WN83_1_TEXT"] = "La scheda Abilità non causa più un errore per un personaggio con un bonus a Difesa, e il pulsante dell'offerta della casa d'aste non copre più la fine della casella del rame."
+L["WN83_2_TITLE"] = "Pannello di incursione e controller"
+L["WN83_2_TEXT"] = "La linguetta chiusa del pannello di incursione resta al bordo dello schermo quando entri in un gruppo in combattimento, e le opzioni del controller mostrano le icone Visualizza e Menu del tuo controller."
 L["WN82_1_TITLE"] = "Condividi missione con la mappa a schermo intero"
 L["WN82_1_TEXT"] = "Condividere una missione dal registro delle missioni non lascia più aperta la mappa del mondo quando usi la mappa a schermo intero."
 L["WN82_2_TITLE"] = "Condividi missione"

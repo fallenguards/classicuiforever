@@ -3,6 +3,10 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN83_1_TITLE"] = "Habilidades y casa de subastas"
+L["WN83_1_TEXT"] = "La pestaña Habilidades ya no causa un error en personajes con una bonificación a Defensa, y el botón de puja de la casa de subastas ya no tapa el final de la casilla de cobre."
+L["WN83_2_TITLE"] = "Panel de banda y mando"
+L["WN83_2_TEXT"] = "La pestaña cerrada del panel de banda queda en el borde de la pantalla cuando te unes a un grupo en combate, y las opciones de mando muestran los iconos Vista y Menú de tu mando."
 L["WN82_1_TITLE"] = "Compartir misión con el mapa a pantalla completa"
 L["WN82_1_TEXT"] = "Compartir una misión desde el registro de misiones ya no deja abierto el mapa del mundo cuando usas el mapa a pantalla completa."
 L["WN82_2_TITLE"] = "Compartir misión"
