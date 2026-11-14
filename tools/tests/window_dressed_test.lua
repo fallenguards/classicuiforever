@@ -30,7 +30,7 @@ for _, entry in ipairs(ns.WINDOW_LIST) do
         end
     end
 end
-Check(seen >= 7, "the game windows are listed (saw " .. seen .. ")")
+Check(seen >= 9, "the game windows are listed (saw " .. seen .. ")")
 
 -- Each turns ours with its own restyle.
 ns.ModuleInForce = function(key) return key == "characterSheet" end
@@ -42,6 +42,21 @@ ns.panels.Dressing = function(key) return key == "panelSocial" end
 Check(byKey.social.dressed() and not byKey.questGiver.dressed(), "Classic style windows' social box dresses social alone")
 ns.db.worldMap = true
 Check(byKey.map.dressed(), "the classic map dresses the map")
+-- The shop and the trainer: sized and placed by the player only while their own restyle is on.
+ns.panels.Dressing = function(key) return key == "panelMerchant" end
+Check(byKey.merchant and byKey.merchant.dressed() and not byKey.trainer.dressed(), "the shop's box dresses the shop alone")
+ns.panels.Dressing = function() return false end
+ns.ModuleInForce = function(key) return key == "trainer" end
+Check(byKey.trainer.dressed() and not byKey.merchant.dressed(), "the classic trainer dresses the trainer alone")
+Check(byKey.merchant.name == "MerchantFrame" and byKey.trainer.name == "ClassTrainerFrame", "each names the game's window")
+-- An NPC's windows open one at a time on one spot: the gossip, shop and trainer windows wear the quest giver's place and size.
+for _, key in ipairs({ "gossip", "merchant", "trainer" }) do
+    local entry = byKey[key]
+    Check(entry.follows == "questGiver" and entry.followSize == true and entry.followIf == nil
+        and entry.followX == 0 and entry.followY == 0, key .. ": shares the quest giver's place and size")
+end
+-- The shop and the trainer are no rows of their own in ClassicUI Forever Windows: the quest giver's moves them.
+Check(byKey.merchant.page == true and byKey.trainer.page == true, "the shop and the trainer have no row or box of their own")
 
 if failed > 0 then
     print(failed .. " check(s) failed")

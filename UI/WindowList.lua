@@ -87,12 +87,20 @@ ns.WINDOW_LIST = {
     { key = "groupFinder", label = L["OPT_groupFinder"], name = "LFGParentFrame", w = 338, h = 424, client = true,
         follows = "social", followIf = "groupFinder", followX = 0, followY = 0,
         dressed = function() return ns.ModuleInForce("groupFinder") or (ns.panels and ns.panels.Dressing("panelGroupFinder")) end },
-    -- The NPC's quest and gossip windows open on one spot: one place, lock and size.
+    -- An NPC's windows (quest, gossip, shop, trainer) open one at a time on one spot: one place, lock and size.
     { key = "questGiver", label = L["UI_QUEST_GIVER"], name = "QuestFrame", w = 338, h = 427, client = true,
         dressed = function() return ns.panels and ns.panels.Dressing("panelQuest") end },
     { key = "gossip", label = L["UI_GOSSIP"], name = "GossipFrame", w = 338, h = 427, client = true,
         follows = "questGiver", followX = 0, followY = 0, followSize = true,
         dressed = function() return ns.panels and ns.panels.Dressing("panelGossip") end },
+    -- The shop and the trainer have no row or box of their own: the quest giver's places and sizes them. The trainer's
+    -- Train pad is laid by measure (UI/SecurePad.lua), so it follows the window's size.
+    { key = "merchant", label = L["UI_MERCHANT"], name = "MerchantFrame", w = 336, h = 444, client = true,
+        follows = "questGiver", followX = 0, followY = 0, followSize = true, page = true,
+        dressed = function() return ns.panels and ns.panels.Dressing("panelMerchant") end },
+    { key = "trainer", label = L["UI_TRAINER"], name = "ClassTrainerFrame", w = 338, h = 424, client = true,
+        follows = "questGiver", followX = 0, followY = 0, followSize = true, page = true,
+        dressed = function() return ns.ModuleInForce("trainer") end },
 }
 
 -- The other micro buttons on the minimap ring: Map/MinimapMicro.lua names its frames and angles the same way.
