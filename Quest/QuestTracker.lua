@@ -114,6 +114,11 @@ local function QuestLevelAndColor(block)
     return level, ns.QuestLevelColor(level)
 end
 
+-- Forever's map filter Quest Difficulty Color: on, the game writes the color into the title's text; off, titles stay gold.
+local function TitleColored()
+    return not ns.OnForever() or tostring(ns.GetCVar("showQuestDifficultyColor")) ~= "0"
+end
+
 -- Colour from the objective's own text, e.g. "3/5 Boars slain".
 local function ProgressColor(text, colorStyle)
     if colorStyle and colorStyle == OBJECTIVE_TRACKER_COLOR["Failed"] then return nil end
@@ -128,15 +133,17 @@ local function ProgressColor(text, colorStyle)
     return GREY
 end
 
--- Runs after the client sets a block's title or line text.
+-- Runs after the client sets a block's title or line text; under the mouse the game's highlight colors stay.
 local function StyleString(block, fontString, text, _, colorStyle)
     if not active or not fontString then return end
     Shadow(fontString)
+    local lit = block.isHighlighted
     if fontString == block.HeaderText then
         local level, r, g, b = QuestLevelAndColor(block)
         ns.StripQuestLevel(fontString, level)
         SetFontIf(fontString, SIZE_TITLE + SizeStep())
-        if level then
+        if lit then return end
+        if level and TitleColored() then
             -- The level prefix is the game's; Forever's comes off with Quest levels off (ns.StripQuestLevel).
             fontString:SetTextColor(r, g, b)
         else
@@ -152,10 +159,19 @@ local function StyleString(block, fontString, text, _, colorStyle)
         SetFontIf(dash, lineSize)
         Shadow(dash)
     end
-    local color = ProgressColor(text, colorStyle)
+    local color = not lit and ProgressColor(text, colorStyle)
     if color then
         fontString:SetTextColor(color[1], color[2], color[3])
         if dash then dash:SetTextColor(color[1], color[2], color[3]) end
+    end
+end
+
+local function StyleBlock(block)
+    if block.HeaderText then StyleString(block, block.HeaderText, block.HeaderText:GetText()) end
+    if block.ForEachUsedLine then
+        block:ForEachUsedLine(function(line)
+            if line.Text then StyleString(block, line.Text, line.Text:GetText(), nil, line.Text.colorStyle) end
+        end)
     end
 end
 
@@ -166,11 +182,35 @@ local function SkinBlock(block)
     if styledBlocks[block] then return end
     styledBlocks[block] = true
     ns.HookMethod(block, "SetStringText", StyleString)
-    if block.HeaderText then StyleString(block, block.HeaderText, block.HeaderText:GetText()) end
-    if block.ForEachUsedLine then
-        block:ForEachUsedLine(function(line)
-            if line.Text then StyleString(block, line.Text, line.Text:GetText()) end
-        end)
+    -- The game's hover pass writes its own colors back as the mouse leaves.
+    ns.HookMethod(block, "UpdateHighlight", StyleBlock)
+    StyleBlock(block)
+end
+
+-- The map's filters for levels and difficulty color: the game writes a title again only at its next update, so each
+-- quest's title is written here at once, as the game builds it (its own functions), then dressed.
+local TITLE_FILTERS = { showQuestLevel = true, showQuestDifficultyColor = true }
+local filterEvents
+
+local function Retitle(block)
+    local module, id, header = block.parentModule, block.id, block.HeaderText
+    if not (header and module and module.GetQuestTagText and type(id) == "number") then return end
+    local title = QuestUtils_GetQuestName(id)
+    if type(title) ~= "string" or title == "" then return end
+    local tag = module:GetQuestTagText(id)
+    if tag then title = title .. " " .. tag end
+    title = SetQuestTitleLevelAndDifficultyColor(id, title)
+    header:SetText(title)
+    StyleString(block, header, title)
+end
+
+local function FilterChanged(_, _, name)
+    local tracker = ObjectiveTrackerFrame
+    if not (active and TITLE_FILTERS[name] and tracker and tracker.modules) then return end
+    for _, module in ipairs(tracker.modules) do
+        for _, blocks in pairs(module.usedBlocks or ns.EMPTY) do
+            for _, block in pairs(blocks) do Retitle(block) end
+        end
     end
 end
 
@@ -227,6 +267,11 @@ local function Apply()
     SkinMainHeader(ObjectiveTrackerFrame.Header)
     SkinModules()
     SkinQuestLog()
+    if filterEvents then
+        filterEvents:RegisterEvent("CVAR_UPDATE")
+    elseif ns.OnForever() then
+        filterEvents = ns.EventFrame("CVAR_UPDATE", FilterChanged)
+    end
     if not hooked then
         hooked = true
         if ObjectiveTrackerFrame.Header then
@@ -240,6 +285,7 @@ end
 local function Restore()
     if not active then return end
     active = false
+    if filterEvents then filterEvents:UnregisterAllEvents() end
     ns.WhenCalm("questTimer.look", PaintTimerBox)
     local header = ObjectiveTrackerFrame and ObjectiveTrackerFrame.Header
     if header then
