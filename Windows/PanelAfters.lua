@@ -226,6 +226,18 @@ function A.TradeFrame(frame)
     end
 end
 
+----------------------------------------------------------------- auction house
+
+-- The bid row is the game's, laid out for retail's two money boxes: with Forever's copper box the three stand 186
+-- wide in a 176 frame, and Bid, hung on that frame's end, stood on the copper box and 10 further from Buyout.
+local BID_BOXES_W = 186
+function A.AuctionHouseFrame(frame)
+    for _, page in ipairs({ frame.ItemBuyFrame, frame.AuctionsFrame }) do
+        local amount = page and page.BidFrame and page.BidFrame.BidAmount
+        if amount and amount.copper and amount.copper:IsShown() then amount:SetWidth(BID_BOXES_W) end
+    end
+end
+
 ----------------------------------------------------------------- guild charter
 
 -- Escape in the guild name box: the client only moves focus to chat, so the window never closed from it.
