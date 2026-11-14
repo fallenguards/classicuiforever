@@ -39,7 +39,7 @@ RULES = ["CVAR", "CVARREAD", "CVARLOGIN", "CVARREG", "REGISTRY", "HOOK", "ONUPDA
          "LOADADDON", "EDITMODE", "EDITQUERY", "SETTLE",
          "PANELMGR", "SECRET", "WALK", "REGEVENTS", "EVENTFRAME", "POINTONCE", "SETIF", "THEME", "ONCEFLAG",
          "FRAMEFIELD", "GAMEMENU", "SHAREDART", "PLATES", "FORBIDDEN", "SYSBASE", "LAYOUTFIELD", "LISTWRITE", "CLIENTKEY",
-         "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS", "DRAGPOINT", "STRETCHED", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "SNIPPETHIDE", "PVPINFOART", "CLUSTERSCALE", "DBRAW", "FLOORSIZE", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "LOADORDER", "TOC"]
+         "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS", "DRAGPOINT", "STRETCHED", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETTEXT", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "SNIPPETHIDE", "PVPINFOART", "CLUSTERSCALE", "DBRAW", "FLOORSIZE", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "LOADORDER", "TOC"]
 # A hit of these on a line the change adds fails even within the baseline, so swapping one call for another fails.
 # SINCE, DEADNS, FRAMEFIELD, CVARLOGIN and THROTTLEFRAME stay count-only, so a kept line can still be rewritten.
 LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", "EDITMODE", "PANELMGR", "SEARCHBOX", "ADDONCHAR",
@@ -49,7 +49,7 @@ LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", 
               "WALK", "GAMEMENU", "SHAREDART", "SYSBASE", "LAYOUTFIELD", "LISTWRITE", "CLIENTKEY", "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS",
               "DRAGPOINT", "STRETCHED", "ERASPOT", "WINDOWORIGIN", "CVARREG", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST",
               "POINTEXACT",
-              "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE",
+              "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETTEXT", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE",
               "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "SNIPPETHIDE", "PVPINFOART", "CLUSTERSCALE", "DBRAW", "FLOORSIZE")
 
 # The files allowed to hold each pattern, each with its reason; an entry ending in / is a folder.
@@ -180,6 +180,8 @@ FIX = {
     "SECRETBAR": "test it with ns.IsSecret / ns.AnySecret before any compare or math, and skip the work when secret",
     "SECRETALPHA": "read it into a local and test it with ns.IsSecret before the compare, and skip the work when secret",
     "SECRETATLAS": "test it with ns.IsSecret before a method call or table key on it, and skip that region when secret",
+    "SECRETTEXT": "test it with ns.IsSecret before any string method on it; a secret text is written again from its "
+                  "own numbers with SetFormattedText (EraRank in Character/CharacterLists.lua)",
     "NAMEDTEMPLATE": "give the frame a name of ours: retail's copy of the template anchors its pieces by $parent names",
     "CLIENTTEMPLATE": "run python tools/client_templates.py: it checks the name in Forever's and retail's XML "
                       "and lists it in tools/client_templates.txt; a name neither client has needs the bare "
@@ -537,6 +539,8 @@ MESSAGES = {
                    "2965 errors)",
     "SECRETATLAS": "an atlas read used as a table key or with a method on it, no secret test beside it (the nameplate "
                    "preview's spark answered secret: #139, 779 errors)",
+    "SECRETTEXT": "a text read back (GetText, or the text a hooked SetText was given) used with a string method, no "
+                  "secret test beside it (the Defense skill row's rank answered secret: #286)",
     "ERASPOT": "Era's old-frame shift on a window Era leaves on 16, -116 (the social window flush on the screen edge)",
     "DRAGPOINT": "anchor read after StopMovingOrSizing (it can be gone: the saved place came out empty)",
     "STRETCHED": "a frame anchored to another frame and to UIParent by opposite corners (that frame's drag ends with no anchor)",
@@ -1348,6 +1352,31 @@ def secret_atlas_hits(lx):
     return found
 
 
+SECRET_TEXT_LOCAL = re.compile(r"\blocal\s+(\w+)\s*=.*:\s*GetText\s*\(\s*\)")
+SECRET_TEXT_INLINE = re.compile(r":\s*GetText\s*\(\s*\)\s*:\s*\w+\s*\(")
+SECRET_TEXT_HOOK = re.compile(r"[\"']Set(?:Formatted)?Text[\"']\s*,\s*function\s*\(\s*\w+\s*,\s*(\w+)")
+STRING_METHODS = r"(?:find|match|gmatch|gsub|sub|lower|upper|len|format|rep|byte)"
+
+
+def secret_text_hits(lx):
+    """A text read back (a GetText result, or the text a hooked SetText was given) used with a string method, with no
+    IsSecret/AnySecret on its line or the next two."""
+    found = set()
+    lines = lx.blank
+    for i, line in enumerate(lines):
+        near = " ".join(lines[i:i + 3])
+        if SECRET_TEST.search(near):
+            continue
+        held = SECRET_TEXT_LOCAL.search(line) or SECRET_TEXT_HOOK.search(lx.keep[i])
+        if held:
+            name = re.escape(held.group(1))
+            if re.search(r"\b" + name + r"\s*:\s*" + STRING_METHODS + r"\s*\(", near):
+                found.add(("SECRETTEXT", i + 1))
+        elif SECRET_TEXT_INLINE.search(line):
+            found.add(("SECRETTEXT", i + 1))
+    return found
+
+
 SECRET_BAR_READ = re.compile(r":\s*(?:GetValue|GetMinMaxValues)\s*\(")
 # An alpha compared where it is read: a plate's or unit frame's piece can answer secret in an instance.
 SECRET_ALPHA_COMPARE = re.compile(r":\s*GetAlpha\s*\(\s*\)\s*(?:[<>]|[=~]=)|(?:[<>]|[=~]=)=?\s*[\w.:\[\]\"]+:\s*GetAlpha\s*\(")
@@ -1612,6 +1641,7 @@ def pattern_hits(path, lx, funcs):
     found |= pad_list_hits(path, lx)
     found |= secret_layer_hits(lx)
     found |= secret_atlas_hits(lx)
+    found |= secret_text_hits(lx)
     found |= secret_bar_hits(path, lx)
     found |= cvar_login_hits(lx, funcs)
     found |= held_cvar_hits(lx, funcs)

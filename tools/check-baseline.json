@@ -190,6 +190,10 @@
     "COMMENT": {
       "Social/GuildNoteBridge.lua": 3,
       "Spells/SpellBook.lua": 3
+    },
+    "SECRETTEXT": {
+      "Options/HelpPanes.lua": 2,
+      "Social/ContactPages.lua": 1
     }
   }
 }
