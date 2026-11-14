@@ -1,26 +1,26 @@
 local _, ns = ...
 local L = ns.L
 
--- Lower section of the old skills tab (bar, words, unlearn), moved from the dropped side pane.
+-- Lower section of the old skills tab (bar, words, unlearn), in a frame of ours under the list. The client's own detail
+-- pane stays as the client keeps it: showing or laying it from here ran its refresh in our name and marked what the
+-- client reads there, and a weapon skill rising in a fight then stopped the client's own sums (#295).
 
 local T = ns.sheet
-local Take, Own, Fade = T.Take, T.Own, T.Fade
-local SkinListEntry, KnobSeen, TakeThumb = T.SkinListEntry, T.KnobSeen, T.TakeThumb
+local Take, Own = T.Take, T.Own
+local SkinListEntry = T.SkinListEntry
 
 local DETAIL_H = 124
 T.DETAIL_H = DETAIL_H
 local FOOT_H = 26          -- the grey strip with the Close button
 local SCROLL_COLUMN = 22   -- the description's scroll bar column at the right
--- The description's bar in its column as the list's bar sits in its own art (column-relative; arrows bar-relative, our
--- arrow art stands 1 right of its button); the knob runs this far past the track's ends to meet the arrows.
-local DESC_BAR_X = 12
-local DESC_BAR_TOP = -9
-local DESC_BAR_FOOT = 8
-local DESC_UP_X = 2
-local DESC_UP_Y = 4
-local DESC_DOWN_X = 2
-local DESC_DOWN_Y = -4
-local DESC_KNOB_REACH = 7
+-- The words' scroll bar in its column, each piece by itself: from the column's left (+ right), the up arrow's top
+-- from the column's top and the down arrow's foot from its bottom (+ up), the knob's two ends the same way.
+local WORDS_SCROLL_X = 7
+local WORDS_SCROLL_UP_ARROW_Y = -5
+local WORDS_SCROLL_DOWN_ARROW_Y = 4
+local WORDS_SCROLL_KNOB_TOP = -18
+local WORDS_SCROLL_KNOB_BOTTOM = 17
+local WORDS_WHEEL = 24
 
 local CANCEL = "Interface\\Buttons\\CancelButton-"
 local CANCEL_UP, CANCEL_DOWN, CANCEL_HIGHLIGHT = CANCEL .. "Up", CANCEL .. "Down", CANCEL .. "Highlight"
@@ -129,15 +129,104 @@ local function CloseClick()
     if CharacterFrame then ns.HidePanel(CharacterFrame) end
 end
 
-local TakeAlpha = T.TakeAlpha
-local function TakeButton(button)
-    if not button then return end
-    Take(button, "size", "points")
-    Take(button.Texture, "alpha")
+-- The section's pieces, made once.
+local S
+
+-- The words' box and its scroll range; Era's text boxes kept the knob at the top with nothing to scroll.
+local function WordsRange()
+    local tall = S.words:GetStringHeight() or 0
+    S.child:SetSize(math.max(1, S.scroll:GetWidth()), math.max(1, tall))
+    S.wordsBar:SetRange(math.max(0, tall - S.scroll:GetHeight()), WORDS_WHEEL)
+    local knob = S.wordsBar:GetThumbTexture()
+    if knob then knob:Show() end
 end
-local function ShowArrow(button)
-    local arrow = button and button.fcui and button.fcui.arrow
-    if arrow then Own(arrow):Show() end
+
+local function Section()
+    if S then return S end
+    S = {}
+    local holder = Own(ns.NewFrame("Frame", nil, CharacterFrame))
+    holder:SetClipsChildren(true)
+    S.holder = holder
+    -- A stone bar between the list and the section.
+    S.divider = ns.StoneBar(CharacterFrame)
+    if S.divider then Own(S.divider) end
+    S.host = ns.NewFrame("Frame", nil, holder)
+
+    -- Measure only, never drawn: the words' box, clear of the scroll column and grey foot.
+    local box = holder:CreateTexture(nil, "BACKGROUND", nil, 1)
+    box:SetColorTexture(0, 0, 0, 0)
+    box:SetPoint("TOPLEFT", holder, "TOPLEFT", 2, -38)
+    box:SetPoint("BOTTOMRIGHT", holder, "BOTTOMRIGHT", -SCROLL_COLUMN, FOOT_H + 2)
+    box:Hide()
+    local scroll = ns.NewFrame("ScrollFrame", nil, holder)
+    scroll:SetPoint("TOPLEFT", box, "TOPLEFT", 6, -4)
+    scroll:SetPoint("BOTTOMRIGHT", box, "BOTTOMRIGHT", -6, 4)
+    local child = ns.NewFrame("Frame", nil, scroll)
+    child:SetSize(1, 1)
+    scroll:SetScrollChild(child)
+    local words = child:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+    words:SetJustifyH("LEFT")
+    words:SetJustifyV("TOP")
+    words:SetPoint("TOPLEFT", child, "TOPLEFT", 0, 0)
+    words:SetPoint("TOPRIGHT", child, "TOPRIGHT", 0, 0)
+    S.scroll, S.child, S.words = scroll, child, words
+
+    -- The list's scroll column continues down to the grey foot; on the window, as the section clips.
+    local column = Own(ns.NewFrame("Frame", nil, CharacterFrame))
+    column:SetWidth(31)
+    local top = column:CreateTexture(nil, "BACKGROUND", nil, 1)
+    ns.SetTex(top, "charScrollBar")
+    top:SetPoint("TOPLEFT", column, "TOPLEFT", 0, 0)
+    top:SetPoint("TOPRIGHT", column, "TOPRIGHT", 0, 0)
+    local bottom = column:CreateTexture(nil, "BACKGROUND", nil, 1)
+    ns.SetTex(bottom, "charScrollBar")
+    bottom:SetPoint("BOTTOMLEFT", column, "BOTTOMLEFT", 0, 0)
+    bottom:SetPoint("BOTTOMRIGHT", column, "BOTTOMRIGHT", 0, 0)
+    column.top, column.bottom = top, bottom
+    S.column = column
+    -- On the column, not the section: the section clips, and the up arrow stands above its top in the column's head.
+    local bar = ns.ClassicScrollBar(column, scroll, function(value) scroll:SetVerticalScroll(value) end)
+    bar:ClearAllPoints()
+    bar:SetPoint("TOPLEFT", column, "TOPLEFT", WORDS_SCROLL_X, WORDS_SCROLL_KNOB_TOP)
+    bar:SetPoint("BOTTOMLEFT", column, "BOTTOMLEFT", WORDS_SCROLL_X, WORDS_SCROLL_KNOB_BOTTOM)
+    ns.SetPointOnce(bar.up, "TOPLEFT", column, "TOPLEFT", WORDS_SCROLL_X, WORDS_SCROLL_UP_ARROW_Y)
+    ns.SetPointOnce(bar.down, "BOTTOMLEFT", column, "BOTTOMLEFT", WORDS_SCROLL_X, WORDS_SCROLL_DOWN_ARROW_Y)
+    S.wordsBar = bar
+    scroll:EnableMouseWheel(true)
+    scroll:SetScript("OnMouseWheel", function(_, delta) bar:SetValue(bar:GetValue() - delta * WORDS_WHEEL) end)
+    scroll:SetScript("OnSizeChanged", WordsRange)
+
+    -- The old skills window's foot: grey stone with Close at its right.
+    local foot = ns.NewFrame("Frame", nil, holder)
+    local stone = ns.TileTex(foot:CreateTexture(nil, "BACKGROUND", nil, 2), "rockBg", FOOT_STONE)
+    stone:SetAllPoints(foot)
+    local line = foot:CreateTexture(nil, "BORDER")
+    line:SetColorTexture(0.52, 0.48, 0.40, 1)
+    line:SetHeight(1)
+    line:SetPoint("TOPLEFT", foot, "TOPLEFT", 0, 0)
+    line:SetPoint("TOPRIGHT", foot, "TOPRIGHT", 0, 0)
+    local close = ns.PanelButton(foot, CLOSE or "Close", 80)
+    close:SetPoint("RIGHT", foot, "RIGHT", -2, 0)
+    close:SetScript("OnClick", CloseClick)
+    foot:SetPoint("BOTTOMLEFT", holder, "BOTTOMLEFT", 0, 0)
+    foot:SetPoint("BOTTOMRIGHT", holder, "BOTTOMRIGHT", 0, 0)
+    foot:SetHeight(FOOT_H)
+
+    local unlearn = ns.NewFrame("Button", nil, holder)
+    unlearn:SetSize(32, 32)
+    ns.DressStates(unlearn, CANCEL_UP, CANCEL_DOWN, nil, CANCEL_HIGHLIGHT, UNLEARN)
+    ns.AttachTip(unlearn, UNLEARN_TIP)
+    unlearn:SetScript("OnClick", UnlearnClick)
+    S.unlearn = unlearn
+    return S
+end
+
+-- With the tab: the section, its divider and its column.
+function T.HideSkillDetail()
+    if not S then return end
+    S.holder:Hide()
+    S.column:Hide()
+    if S.divider then S.divider:Hide() end
 end
 
 local function SkinSkillDetail()
@@ -147,209 +236,76 @@ local function SkinSkillDetail()
     local detail = skills and skills.SkillDetailFrame
     if not detail or not CharacterFrame then return end
     local onSkills = skills:IsShown() and true or false
-    -- Visibility is not taken: a Show from here would run the pane's refresh tainted.
-    Take(detail, "parent", "size", "points", "level", "clips")
-    detail:SetParent(CharacterFrame)
-    detail:ClearAllPoints()
+    local s = Section()
+    local holder = s.holder
     -- Full width inside the art; 2 taller so the grey foot meets the window's bottom edge.
-    detail:SetPoint("BOTTOMLEFT", CharacterFrame, "BOTTOMLEFT", 20, 84)
-    detail:SetPoint("BOTTOMRIGHT", CharacterFrame, "BOTTOMRIGHT", -44, 84)
-    detail:SetHeight(DETAIL_H + 2)
-    detail:SetFrameLevel(CharacterFrame:GetFrameLevel() + 6)
-    detail:SetClipsChildren(true)
+    ns.SetTwoPointsIf(holder, "BOTTOMLEFT", CharacterFrame, "BOTTOMLEFT", 20, 84,
+        "BOTTOMRIGHT", CharacterFrame, "BOTTOMRIGHT", -44, 84)
+    holder:SetHeight(DETAIL_H + 2)
+    holder:SetFrameLevel(CharacterFrame:GetFrameLevel() + 6)
 
-    -- No fill: the window's own textured background shows, as in 1.x.
-    local backing = ns.OwnTexture(detail, "backing", "BACKGROUND")
-    backing:SetAllPoints(detail)
-    backing:Hide()
-
-    -- A stone bar between the list and the section.
-    local divider = detail.fcuiDivider
-    if not divider then
-        divider = ns.StoneBar(CharacterFrame)
-        detail.fcuiDivider = divider
-    end
+    local divider = s.divider
     if divider then
-        Own(divider)
         divider:ClearAllPoints()
-        divider:SetPoint("BOTTOM", detail, "TOP", 0, 6)
-        divider:SetPoint("LEFT", detail, "LEFT", -2, 0)
-        divider:SetPoint("RIGHT", detail, "RIGHT", -SCROLL_COLUMN - 2, 0)
-        -- Up with the skills tab only; the pane's own shown state is set at the end.
+        divider:SetPoint("BOTTOM", holder, "TOP", 0, 6)
+        divider:SetPoint("LEFT", holder, "LEFT", -2, 0)
+        divider:SetPoint("RIGHT", holder, "RIGHT", -SCROLL_COLUMN - 2, 0)
         divider:SetShown(onSkills)
-        if ns.Once(divider, "follows") then
-            detail:HookScript("OnHide", function() divider:Hide() end)
-        end
     end
 
-    -- The name goes on the bar, as in the list above.
-    if detail.Title then Fade(detail.Title) end
-    if detail.Subtitle then Fade(detail.Subtitle) end
-
+    -- The client's rank bar, carried in: the client fills it wherever it hangs. The name goes on it, as in the list.
     local info = SelectedSkill()
-    if detail.RankBar then
-        local host = detail.fcuiBarHost
-        if not host then
-            host = ns.NewFrame("Frame", nil, detail)
-            host.Content = { SkillsBar = detail.RankBar }
-            detail.fcuiBarHost = host
-        end
-        SkinListEntry(host, "SkillsBar")
-        local name = detail.RankBar.fcui and detail.RankBar.fcui.name
+    local bar = detail.RankBar
+    if bar then
+        s.host.Content = s.host.Content or { SkillsBar = bar }
+        SkinListEntry(s.host, "SkillsBar")
+        local name = bar.fcui and bar.fcui.name
         if name then name:SetText(info and info.name or "") end
+        Take(bar, "parent")
+        if bar:GetParent() ~= holder then bar:SetParent(holder) end
         -- Narrower than the list's bars: the unlearn button stands at its end.
-        detail.RankBar:ClearAllPoints()
-        detail.RankBar:SetPoint("TOPLEFT", detail, "TOPLEFT", 46, -12)
-        detail.RankBar:SetPoint("RIGHT", detail, "RIGHT", -70, 0)
+        bar:ClearAllPoints()
+        bar:SetPoint("TOPLEFT", holder, "TOPLEFT", 46, -12)
+        bar:SetPoint("RIGHT", holder, "RIGHT", -70, 0)
         -- Its fill was sized for the width it had before this move.
-        T.FitFill(detail.RankBar)
+        T.FitFill(bar)
+        ns.SetPointOnce(s.unlearn, "LEFT", bar, "RIGHT", 0, 0)
+    else
+        ns.SetPointOnce(s.unlearn, "TOPRIGHT", holder, "TOPRIGHT", -8, -10)
     end
 
-    -- Measure only, never drawn: the words' box, clear of the scroll column and grey foot.
-    local box = ns.OwnTexture(detail, "descBox", "BACKGROUND", 1)
-    box:SetColorTexture(0, 0, 0, 0)
-    box:ClearAllPoints()
-    box:SetPoint("TOPLEFT", detail, "TOPLEFT", 2, -38)
-    box:SetPoint("BOTTOMRIGHT", detail, "BOTTOMRIGHT", -SCROLL_COLUMN, FOOT_H + 2)
-    box:Hide()
-    if detail.Description then
-        Take(detail.Description, "points", "font")
-        detail.Description:ClearAllPoints()
-        detail.Description:SetPoint("TOPLEFT", box, "TOPLEFT", 6, -4)
-        detail.Description:SetPoint("BOTTOMRIGHT", box, "BOTTOMRIGHT", -6, 4)
-        pcall(detail.Description.SetFontObject, detail.Description, "GameFontHighlightSmall")
-        -- Wrapped at the whole pane's width and moving does not rewrap: give them the box's.
-        local scroll = detail.Description.ScrollBox
-        local holder = scroll and scroll.FontStringContainer
-        local words = holder and holder.FontString
-        if words then
-            Take(words, "width")
-            Take(holder, "size")
-            -- The client's words again when the detail is off or the skill has none.
-            local words0 = info and info.description
-            if type(words0) == "string" and words0 ~= "" then
-                local extra = WeaponDetail(info)
-                words:SetText(extra and (words0 .. "\n\n" .. extra) or words0)
-            end
-            local width = (CharacterFrame:GetWidth() or 384) - 20 - 44 - 2 - SCROLL_COLUMN - 12
-            words:SetWidth(width)
-            holder:SetWidth(width)
-            local tall = words:GetStringHeight()
-            if tall and tall > 0 then holder:SetHeight(tall) end
-            if scroll.FullUpdate then pcall(scroll.FullUpdate, scroll, ScrollBoxConstants and ScrollBoxConstants.UpdateImmediately) end
-        end
+    -- The skill's words, a weapon's hit tables under them; back at the top for another skill.
+    local text = info and info.description
+    if type(text) ~= "string" then text = "" end
+    local extra = text ~= "" and WeaponDetail(info)
+    s.words:SetText(extra and (text .. "\n\n" .. extra) or text)
+    local id = info and info.skillID
+    if s.shown ~= id then
+        s.shown = id
+        s.wordsBar:SetValue(0)
     end
-    -- The list's scroll column continues down to the grey foot; on the window, as the pane clips.
-    local column = detail.fcuiColumn
-    if not column then
-        column = ns.NewFrame("Frame", nil, CharacterFrame)
-        column:SetWidth(31)
-        local top = column:CreateTexture(nil, "BACKGROUND", nil, 1)
-        ns.SetTex(top, "charScrollBar")
-        top:SetPoint("TOPLEFT", column, "TOPLEFT", 0, 0)
-        top:SetPoint("TOPRIGHT", column, "TOPRIGHT", 0, 0)
-        local bottom = column:CreateTexture(nil, "BACKGROUND", nil, 1)
-        ns.SetTex(bottom, "charScrollBar")
-        bottom:SetPoint("BOTTOMLEFT", column, "BOTTOMLEFT", 0, 0)
-        bottom:SetPoint("BOTTOMRIGHT", column, "BOTTOMRIGHT", 0, 0)
-        column.top, column.bottom = top, bottom
-        detail.fcuiColumn = column
-        detail:HookScript("OnShow", function() if T.active then column:Show() end end)
-        detail:HookScript("OnHide", function() column:Hide() end)
-    end
-    Own(column)
+
+    local column = s.column
     -- Grey foot up to the divider's top, meeting the list track's foot.
     local tall = DETAIL_H + 2 - FOOT_H + 10
     local half = math.floor(tall / 2)
-    column:SetFrameLevel(detail:GetFrameLevel() + 1)
-    column:ClearAllPoints()
+    column:SetFrameLevel(holder:GetFrameLevel() + 1)
     -- 8 left of the list's bar, measured: the list is a scaled frame.
     local x = -68
     local listBar = skills.ScrollBar
     local barLeft, right = listBar and listBar:GetLeft(), CharacterFrame:GetRight()
     if barLeft and right then x = barLeft - 8 - right end
-    column:SetPoint("BOTTOMLEFT", CharacterFrame, "BOTTOMRIGHT", x, 84 + FOOT_H)
+    ns.SetPointOnce(column, "BOTTOMLEFT", CharacterFrame, "BOTTOMRIGHT", x, 84 + FOOT_H)
     column:SetHeight(tall)
     column.top:SetHeight(half)
     column.top:SetTexCoord(0, 0.484375, 0, half / 256)
     column.bottom:SetHeight(tall - half)
     column.bottom:SetTexCoord(0.515625, 1, (108 - (tall - half)) / 256, 108 / 256)
     column:SetShown(onSkills)
-    local descBar = detail.DescriptionScrollBar
-    if descBar then
-        -- The shared thin bar dress, with what it takes kept first.
-        local track = descBar.Track
-        if track then
-            ns.EachKey(track, ns.KEYS.THUMB, TakeAlpha)
-            TakeThumb(track)
-        end
-        TakeButton(descBar.Back)
-        TakeButton(descBar.Forward)
-        T.descBar = descBar
-        ns.SkinMinimalScrollBar(descBar)
-        KnobSeen(descBar, true)
-        ShowArrow(descBar.Back)
-        ShowArrow(descBar.Forward)
-        -- On the column, not the pane: the pane clips, and the up arrow stands above its top in the column's head.
-        Take(descBar, "parent", "points", "level")
-        descBar:SetParent(column)
-        descBar:SetFrameLevel(column:GetFrameLevel() + 1)
-        descBar:ClearAllPoints()
-        descBar:SetPoint("TOP", column, "TOPLEFT", DESC_BAR_X, DESC_BAR_TOP)
-        descBar:SetPoint("BOTTOM", column, "BOTTOMLEFT", DESC_BAR_X, DESC_BAR_FOOT)
-        if descBar.Back then ns.SetPointOnce(descBar.Back, "TOP", descBar, "TOP", DESC_UP_X, DESC_UP_Y) end
-        if descBar.Forward then ns.SetPointOnce(descBar.Forward, "BOTTOM", descBar, "BOTTOM", DESC_DOWN_X, DESC_DOWN_Y) end
-        ns.KnobReach(descBar, DESC_KNOB_REACH)
-    end
 
-    -- The old skills window's foot: grey stone with Close at its right.
-    local foot = detail.fcuiFoot
-    if not foot then
-        foot = ns.NewFrame("Frame", nil, detail)
-        local stone = ns.TileTex(foot:CreateTexture(nil, "BACKGROUND", nil, 2), "rockBg", FOOT_STONE)
-        stone:SetAllPoints(foot)
-        local line = foot:CreateTexture(nil, "BORDER")
-        line:SetColorTexture(0.52, 0.48, 0.40, 1)
-        line:SetHeight(1)
-        line:SetPoint("TOPLEFT", foot, "TOPLEFT", 0, 0)
-        line:SetPoint("TOPRIGHT", foot, "TOPRIGHT", 0, 0)
-        local close = ns.PanelButton(foot, CLOSE or "Close", 80)
-        close:SetPoint("RIGHT", foot, "RIGHT", -2, 0)
-        close:SetScript("OnClick", CloseClick)
-        detail.fcuiFoot = foot
-    end
-    Own(foot):Show()
-    foot:ClearAllPoints()
-    foot:SetPoint("BOTTOMLEFT", detail, "BOTTOMLEFT", 0, 0)
-    foot:SetPoint("BOTTOMRIGHT", detail, "BOTTOMRIGHT", 0, 0)
-    foot:SetHeight(FOOT_H)
-    -- Weapon skill hit/crit tables: not in 1.x, and they overrun the window.
-    if detail.Content then
-        Take(detail.Content, "shown")
-        detail.Content:Hide()
-    end
-
-    local unlearn = detail.fcuiUnlearn
-    if not unlearn then
-        unlearn = ns.NewFrame("Button", nil, detail)
-        unlearn:SetSize(32, 32)
-        ns.DressStates(unlearn, CANCEL_UP, CANCEL_DOWN, nil, CANCEL_HIGHLIGHT, UNLEARN)
-        ns.AttachTip(unlearn, UNLEARN_TIP)
-        unlearn:SetScript("OnClick", UnlearnClick)
-        detail.fcuiUnlearn = unlearn
-    end
-    Own(unlearn)
-    unlearn:ClearAllPoints()
-    if detail.RankBar then
-        unlearn:SetPoint("LEFT", detail.RankBar, "RIGHT", 0, 0)
-    else
-        unlearn:SetPoint("TOPRIGHT", detail, "TOPRIGHT", -8, -10)
-    end
-    unlearn:SetShown(info ~= nil and info.isAbandonable == true)
-    detail:SetShown(onSkills)
-    -- The side pane sweep quiets it while the tab is shut and only runs again when the client reshows its pieces:
-    -- held open here, on every open and pick.
-    if onSkills then ns.KeepSidePane(detail) end
+    s.unlearn:SetShown(info ~= nil and info.isAbandonable == true)
+    holder:SetShown(onSkills)
+    WordsRange()
 end
 T.SkinSkillDetail = SkinSkillDetail
 ns.OnToggle(function(key)

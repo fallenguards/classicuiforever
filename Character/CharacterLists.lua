@@ -446,8 +446,8 @@ local function Look(frame, box, barKey)
     return look
 end
 
-local function HideDetail(frame)
-    if T.active and frame.SkillDetailFrame then frame.SkillDetailFrame:Hide() end
+local function HideDetail()
+    if T.HideSkillDetail then T.HideSkillDetail() end
 end
 
 -- Offsets are in the list's own scale; no scale leaves the box's as is.
@@ -512,7 +512,7 @@ local function SkinListFrame(frame, barKey)
             ns.HookMethod(detail, "Refresh", T.SkinSkillDetail)
             look.pick = true
             frame:HookScript("OnShow", T.SkinSkillDetail)
-            -- Reparented to the window, so it no longer hides with the tab.
+            -- Our section hangs on the window, so it goes with the tab from here.
             frame:HookScript("OnHide", HideDetail)
         end
     elseif barKey == "ReputationBar" then

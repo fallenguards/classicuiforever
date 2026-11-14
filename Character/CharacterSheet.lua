@@ -527,15 +527,22 @@ end
 -- Hide runs the pieces' close code tainted (health text then compares a secret).
 -- A faction or skill click expands the pane for good.
 local quieted = {}
+-- A piece's own yes or no. One the client sized from a secret (a weapon skill's lines, written in a fight) answers
+-- secret: taken as no, such a line takes no mouse.
+local function Says(frame, ask)
+    local answer = frame[ask] and frame[ask](frame)
+    if ns.IsSecret(answer) then return false end
+    return answer
+end
 local function QuietMouse(frame, depth)
-    -- Skip panes kept live (equipment manager, skill detail) and tabs taking our clicks.
+    -- Skip panes kept live (the equipment manager) and tabs taking our clicks.
     if frame.fcuiKept or catchers[frame] then return end
-    if frame.IsMouseEnabled and frame:IsMouseEnabled() then
+    if Says(frame, "IsMouseEnabled") then
         frame.fcuiMouseWas = true
         pcall(frame.EnableMouse, frame, false)
     end
     -- The wheel too: the unseen stats list under the side panel took the set list's scrolls.
-    if frame.IsMouseWheelEnabled and frame:IsMouseWheelEnabled() then
+    if Says(frame, "IsMouseWheelEnabled") then
         frame.fcuiWheelWas = true
         pcall(frame.EnableMouseWheel, frame, false)
     end
@@ -557,7 +564,7 @@ local function Quiet(frame)
     Take(frame, "alpha", "mouse")
     frame.fcuiKept = nil
     ns.SetAlphaIf(frame, 0, 0)
-    if not frame.fcuiQuiet or (frame.IsMouseEnabled and frame:IsMouseEnabled()) then
+    if not frame.fcuiQuiet or Says(frame, "IsMouseEnabled") then
         frame.fcuiQuiet = true
         quieted[frame] = true
         QuietMouse(frame, 0)
@@ -597,11 +604,8 @@ end
 
 local function HideSidePane(frame)
     Quiet(frame.RightPaneHost)
-    for _, pane in ipairs(frame.SidePanes or EMPTY) do
-        -- The skill detail is ours while the skills tab is up.
-        local keep = SkillsFrame and pane == SkillsFrame.SkillDetailFrame and SkillsFrame:IsShown()
-        if keep then Keep(pane) else Quiet(pane) end
-    end
+    -- The skill detail too: the skills tab's lower section is a frame of ours (Character/SkillDetail.lua).
+    for _, pane in ipairs(frame.SidePanes or EMPTY) do Quiet(pane) end
     for _, name in ipairs(SIDE_PIECES) do Quiet(_G[name]) end
     -- Retail's faction pane hangs on the reputation frame, not in the side panes: it opened beside our box.
     if ReputationFrame then Quiet(ReputationFrame.ReputationDetailFrame) end
@@ -689,10 +693,6 @@ local function GiveBack()
         end
     end
     T.ListsGiveBack()
-    if T.descBar then
-        T.KnobSeen(T.descBar, false)
-        T.descBar.fcuiSkinned = nil
-    end
     ns.UnwatchPortrait(T.portrait)
     T.UnfitModelCamera()
     T.HideRepDetail()
