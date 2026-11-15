@@ -727,9 +727,10 @@ local function StartWatch()
             end
         end
         self.dirty = true
-        -- The client's book refills on these (a craft's skill-up too), its spells back at its spots: our pass this
-        -- frame, before it draws, not up to a tenth later.
-        if event ~= "TRADE_SKILL_SHOW" and event ~= "PLAYER_REGEN_ENABLED" and self.bookShown
+        -- The client's book refills on these (a craft's skill-up too), its spells back at its spots; at a fight's end
+        -- another addon's window restore has the manager re-place it on the client's spot: our pass this frame, before
+        -- it draws, not up to a tenth later.
+        if event ~= "TRADE_SKILL_SHOW" and (self.bookShown or event == "PLAYER_REGEN_ENABLED")
             and ProfessionsFrame and ProfessionsFrame:IsVisible() then
             self.since = 1
         end
