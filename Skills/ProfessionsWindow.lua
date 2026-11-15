@@ -305,6 +305,36 @@ local function RefreshSize()
     sizeWrap:SetAttribute("scale", size * ns.ProfessionsZoom())
 end
 T.RefreshSize = RefreshSize
+
+-- The client lays a card's spells again as the book shows (Blizzard_ProfessionsBook FormatProfession), in a fight too,
+-- where they are protected: the openers' click puts them on our spots after that show (spellIJ refs, x and y).
+local spellSpots = {}
+local function KeepSpellSpots()
+    if not sizeWrap or InCombatLockdown() then return end
+    for i = 1, 2 do
+        local card = T.BookCard and T.BookCard("primary", i)
+        for j = 1, 2 do
+            local name = "spell" .. i .. j
+            local button = card and card["SpellButton" .. j]
+            local x, y
+            if button and button:IsShown() then
+                local point, rel, relPoint, px, py = button:GetPoint(1)
+                if point == "BOTTOMLEFT" and rel == card and relPoint == "BOTTOMLEFT" and not ns.AnySecret(px, py) then
+                    x, y = px, py
+                end
+            end
+            local was = spellSpots[name]
+            if not was or was.button ~= button or was.x ~= x or was.y ~= y then
+                spellSpots[name] = { button = button, x = x, y = y }
+                if button then sizeWrap:SetFrameRef(name, button) end
+                sizeWrap:SetAttribute(name .. "x", x)
+                sizeWrap:SetAttribute(name .. "y", y)
+            end
+        end
+    end
+end
+T.KeepSpellSpots = KeepSpellSpots
+
 -- Our book openers (key, micro button, spellbook tab): the window recasts the profession picked last as it shows, inside
 -- the click, so a trade skill opening in it is that recast (TRADE_SKILL_SHOW below).
 local function MarkBookAsked() T.bookAskedAt = GetTime() end
@@ -314,6 +344,13 @@ function ns.ProfessionsSizeWrap(button)
     sizeWrap = sizeWrap or CreateFrame("Frame", nil, UIParent, "SecureHandlerBaseTemplate")
     -- The client's top left kept through the size, as the windows pass keeps it (ScaleKept).
     SecureHandlerWrapScript(button, "OnClick", sizeWrap, [[ if not down then return nil, "size" end ]], [[
+        for i = 1, 2 do
+            for j = 1, 2 do
+                local name = "spell" .. i .. j
+                local b, x, y = control:GetFrameRef(name), control:GetAttribute(name .. "x"), control:GetAttribute(name .. "y")
+                if b and x and y and b:IsShown() then b:SetPoint("BOTTOMLEFT", "$parent", "BOTTOMLEFT", x, y) end
+            end
+        end
         local f = control:GetFrameRef("prof")
         local s = control:GetAttribute("scale")
         if not (f and s and f:IsShown()) then return end
@@ -645,6 +682,7 @@ local function WatchTick(self, elapsed)
         ShowOurs(placed)
         if placed then
             TightenSpells()
+            KeepSpellSpots()
             T.Preload()
         end
     end
