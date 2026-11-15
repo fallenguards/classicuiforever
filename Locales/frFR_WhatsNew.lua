@@ -3,6 +3,14 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN85_1_TITLE"] = "Fenêtre des options du jeu"
+L["WN85_1_TEXT"] = "La fenêtre des options du jeu ne fait plus baisser la fréquence d'images tant qu'elle est ouverte."
+L["WN85_2_TITLE"] = "Talents"
+L["WN85_2_TEXT"] = "Un talent bloqué tant que son arbre n'a pas assez de points indique en rouge combien il en faut, comme dans Era."
+L["WN85_3_TITLE"] = "Barre d'expérience"
+L["WN85_3_TEXT"] = "Les traits de segment du jeu ne s'affichent plus sur la barre d'expérience après une connexion en combat."
+L["WN85_4_TITLE"] = "Métiers"
+L["WN85_4_TEXT"] = "Le livre des métiers garde ensemble les sorts de chaque métier quand il est ouvert en combat, et avec TradeSkillMaster la fenêtre des métiers ne saute plus vers la droite à la fin d'un combat."
 L["WN84_1_TITLE"] = "Fenêtres de marchand et de maître"
 L["WN84_1_TEXT"] = "Les fenêtres des marchands et des maîtres peuvent maintenant être déplacées et redimensionnées. Cliquez sur le cadenas à côté du bouton de fermeture, puis faites glisser la fenêtre ou son coin. Elles partagent un même emplacement et une même taille avec les fenêtres de quête et de dialogue, et dans les fenêtres ClassicUI Forever (mode Édition), les fenêtres qui partagent un emplacement n'ont qu'une ligne et un cadre."
 L["WN84_2_TITLE"] = "Suivi et réglages de quêtes de la carte"

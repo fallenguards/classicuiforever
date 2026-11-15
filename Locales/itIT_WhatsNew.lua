@@ -3,6 +3,14 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN85_1_TITLE"] = "Finestra delle opzioni del gioco"
+L["WN85_1_TEXT"] = "La finestra delle opzioni del gioco non abbassa più la frequenza dei fotogrammi mentre è aperta."
+L["WN85_2_TITLE"] = "Talenti"
+L["WN85_2_TEXT"] = "Un talento bloccato finché il suo albero non ha abbastanza punti indica in rosso quanti ne servono, come in Era."
+L["WN85_3_TITLE"] = "Barra dell'esperienza"
+L["WN85_3_TEXT"] = "Le linee dei segmenti del gioco non compaiono più sulla barra dell'esperienza dopo un accesso in combattimento."
+L["WN85_4_TITLE"] = "Professioni"
+L["WN85_4_TEXT"] = "Il libro delle professioni tiene insieme gli incantesimi di ogni professione quando viene aperto in combattimento, e con TradeSkillMaster la finestra delle professioni non salta più a destra alla fine di un combattimento."
 L["WN84_1_TITLE"] = "Finestre di mercante e istruttore"
 L["WN84_1_TEXT"] = "Le finestre di mercanti e istruttori ora si possono spostare e ridimensionare. Fai clic sul lucchetto accanto al pulsante di chiusura, poi trascina la finestra o il suo angolo. Condividono posizione e dimensione con le finestre delle missioni e di dialogo, e in Finestre di ClassicUI Forever le finestre che condividono una posizione sono una sola riga e un solo riquadro."
 L["WN84_2_TITLE"] = "Tracciamento e impostazioni delle missioni della mappa"

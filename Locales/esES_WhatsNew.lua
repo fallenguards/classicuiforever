@@ -3,6 +3,14 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN85_1_TITLE"] = "Ventana de opciones del juego"
+L["WN85_1_TEXT"] = "La ventana de opciones del juego ya no baja la tasa de fotogramas mientras está abierta."
+L["WN85_2_TITLE"] = "Talentos"
+L["WN85_2_TEXT"] = "Un talento bloqueado hasta que su árbol tenga puntos suficientes indica en rojo cuántos necesita, como en Era."
+L["WN85_3_TITLE"] = "Barra de experiencia"
+L["WN85_3_TEXT"] = "Las líneas de segmento del juego ya no aparecen sobre la barra de experiencia al conectarte en combate."
+L["WN85_4_TITLE"] = "Profesiones"
+L["WN85_4_TEXT"] = "El libro de profesiones mantiene juntos los hechizos de cada profesión cuando se abre en combate, y con TradeSkillMaster la ventana de profesiones ya no salta a la derecha al terminar un combate."
 L["WN84_1_TITLE"] = "Ventanas de vendedor e instructor"
 L["WN84_1_TEXT"] = "Las ventanas de vendedores e instructores ya se pueden mover y cambiar de tamaño. Haz clic en el candado junto al botón de cerrar y arrastra la ventana o su esquina. Comparten un mismo lugar y tamaño con las ventanas de misiones y de diálogo, y en Ventanas de ClassicUI Forever las ventanas que comparten lugar son una sola fila y un solo recuadro."
 L["WN84_2_TITLE"] = "Seguimiento y ajustes de misiones del mapa"

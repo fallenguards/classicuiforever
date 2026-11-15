@@ -2,6 +2,14 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN85_1_TITLE"] = "Options window"
+L["WN85_1_TEXT"] = "The game's Options window no longer lowers the frame rate while it is open."
+L["WN85_2_TITLE"] = "Talents"
+L["WN85_2_TEXT"] = "A talent locked until its tree has enough points says in red how many it needs, as in Era."
+L["WN85_3_TITLE"] = "XP bar"
+L["WN85_3_TEXT"] = "The game's own segment lines no longer show over the XP bar after logging in during a fight."
+L["WN85_4_TITLE"] = "Professions"
+L["WN85_4_TEXT"] = "The professions book keeps each profession's spells together when opened during a fight, and with TradeSkillMaster on, the professions window no longer jumps right as a fight ends."
 L["WN84_1_TITLE"] = "Merchant and trainer windows"
 L["WN84_1_TEXT"] = "The merchant and trainer windows can now be moved and sized. Click the lock beside the close button, then drag the window or its corner. They share one place and size with the quest and gossip windows, and ClassicUI Forever Windows shows windows that share a place as one row and one box."
 L["WN84_2_TITLE"] = "Tracker and the map's quest settings"

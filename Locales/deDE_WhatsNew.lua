@@ -3,6 +3,14 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN85_1_TITLE"] = "Optionsfenster des Spiels"
+L["WN85_1_TEXT"] = "Das Optionsfenster des Spiels senkt die Bildrate nicht mehr, solange es offen ist."
+L["WN85_2_TITLE"] = "Talente"
+L["WN85_2_TEXT"] = "Ein Talent, das erst mit genug Punkten in seinem Baum frei wird, nennt wie in Era in Rot, wie viele es braucht."
+L["WN85_3_TITLE"] = "EP-Leiste"
+L["WN85_3_TEXT"] = "Die Segmentstriche des Spiels erscheinen nicht mehr über der EP-Leiste, wenn du dich im Kampf einloggst."
+L["WN85_4_TITLE"] = "Berufe"
+L["WN85_4_TEXT"] = "Das Berufebuch hält die Zauber jedes Berufs beieinander, wenn es im Kampf geöffnet wird, und mit TradeSkillMaster springt das Berufsfenster am Ende eines Kampfes nicht mehr nach rechts."
 L["WN84_1_TITLE"] = "Händler- und Lehrerfenster"
 L["WN84_1_TEXT"] = "Die Fenster von Händlern und Lehrern lassen sich jetzt verschieben und in der Größe ändern. Klicke auf das Schloss neben der Schließen-Schaltfläche und ziehe dann das Fenster oder seine Ecke. Sie teilen Platz und Größe mit den Quest- und Gesprächsfenstern, und in ClassicUI Forever Fenster sind Fenster mit gemeinsamem Platz eine Zeile und ein Rahmen."
 L["WN84_2_TITLE"] = "Zielverfolgung und Questeinstellungen der Karte"

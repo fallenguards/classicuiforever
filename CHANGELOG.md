@@ -2,6 +2,15 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.57.1] - 2026-11-15
+
+### Fixed
+- The game's Options window no longer lowers the frame rate while it is open, and turning its pages costs less.
+- On Forever, a talent locked until its tree has enough points says so in red in its tooltip, as Era's does: "Requires 25 points in Fury Talents". Only talents waiting on another talent showed what they needed.
+- The XP bar no longer shows the game's own segment lines over its classic ones after logging in during a fight. They stayed until the fight ended.
+- On Forever, the professions book opened during a fight keeps each profession's two spells together. They spread apart until the fight ended.
+- On Forever, with TradeSkillMaster on, the professions window no longer jumps to the right for a moment as a fight ends.
+
 ## [0.57.0] - 2026-11-14
 
 ### Added
