@@ -172,14 +172,18 @@ local function HearWords(on)
     end
 end
 
--- Unmet needs, in red: points in the tree first, then the talent it hangs from, which has to be full.
+-- Unmet needs, in red: points in the tree first, then the talent it hangs from, which has to be full. Forever's tree
+-- need is no gate condition (isGate false) and its amount is the points still missing; Era's line names the total.
 local function AddNeeds(talent, tree, tab)
+    local missing
     for _, condID in ipairs(talent.conditions) do
         local ok, cond = pcall(C_Traits.GetConditionInfo, tree.configID, condID)
-        if ok and cond and cond.isGate and not cond.isMet and cond.spentAmountRequired then
-            GameTooltip:AddLine(string.format(TOOLTIP_TALENT_TIER_POINTS or "Requires %d points in %s Talents",
-                cond.spentAmountRequired, tab and tab.name or ""), 1, 0.1, 0.1, true)
-        end
+        local need = ok and cond and not cond.isMet and cond.spentAmountRequired
+        if need and (not missing or need > missing) then missing = need end
+    end
+    if missing then
+        GameTooltip:AddLine(string.format(TOOLTIP_TALENT_TIER_POINTS or "Requires %d points in %s Talents",
+            missing + (tab and tab.spent or 0), tab and tab.name or ""), 1, 0.1, 0.1, true)
     end
     for _, other in pairs(tree.nodesByID) do
         for _, edge in ipairs(other.edges) do
