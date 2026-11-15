@@ -23,7 +23,8 @@ local function Child(host, name)
     if host.IsLayoutFrame and host:IsLayoutFrame() then
         local border = host.Border
         if not (border and border.ignoreInLayout and border.IsObjectType and border:IsObjectType("Frame")) then
-            ns.Persist("sched: " .. tostring(name) .. " refused on a layout frame, no watcher made")
+            ns.Persist(string.format("sched: %s refused on layout frame %s, no watcher made", tostring(name),
+                tostring(host.GetDebugName and host:GetDebugName() or host:GetName())))
             return nil
         end
         host = border
