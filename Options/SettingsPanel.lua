@@ -150,8 +150,18 @@ local TITLE_TEXT_Y = -5
 local CLOSE_X, CLOSE_Y = 4, 4
 local GAME_TAB_X, GAME_TAB_Y = 32, -27
 
+local SETTLE = 3     -- frames a move, press, scroll or search is followed for: the client may set art a frame later
+local BEAT = 0.25    -- the whole window walked at least this often: pages that change with no hand on the mouse
+
+local GetCursorPosition, IsMouseButtonDown = GetCursorPosition, IsMouseButtonDown
 local active = false
 local lookJob
+local drawn = setmetatable({}, { __mode = "k" })   -- textures re-pointed to Era's art
+local live, liveCount = {}, 0                      -- the ones in shown frames at the last walk
+local lowered = {}                                 -- atlas name -> ERA_ART key
+local offsets = setmetatable({}, { __mode = "k" }) -- list scroll box -> its offset last frame
+local walks, follow, sinceWalk = 0, 0, 0
+local cursorX, cursorY, wasDown, searchText
 
 local function SetArt(tex, art)
     if type(art[1]) == "string" then ns.SetTex(tex, art[1]) else tex:SetTexture(art[1]) end
@@ -182,12 +192,17 @@ local function ThumbPiece(region, art)
 end
 
 -- A texture whose atlas Era draws otherwise: Era's file and coords (the atlas name is gone until the client sets it).
-local function EraArt(region)
-    if not (region.IsObjectType and region:IsObjectType("Texture")) then return end
+local function Repoint(region)
     local atlas = region:GetAtlas()
     if ns.IsSecret(atlas) or atlas == nil then return end
-    local art = ERA_ART[atlas:lower()]
+    local key = lowered[atlas]
+    if not key then
+        key = atlas:lower()
+        lowered[atlas] = key
+    end
+    local art = ERA_ART[key]
     if not art then return end
+    drawn[region] = true
     if ThumbPiece(region, art) then return end
     SetArt(region, art)
     -- A tiled atlas ("_" and "!" slices) would repeat the whole sheet: stretched instead, its 1 px slice unchanged.
@@ -196,11 +211,33 @@ local function EraArt(region)
     region:SetTexCoord(art[2], art[3], art[4], art[5])
 end
 
+local function EraArt(region)
+    if not (region.IsObjectType and region:IsObjectType("Texture")) then return end
+    Repoint(region)
+    if drawn[region] then
+        liveCount = liveCount + 1
+        live[liveCount] = region
+    end
+end
+
+-- Hidden frames are left out: the pages' pooled rows (most of the window) are walked again as they show.
 -- The Nameplates page's preview plate is left out: plate art, and a fought plate's frame can bring secret art (#139).
 local function EraTree(frame, depth)
-    if depth > 9 or ns.IsForbidden(frame) or rawget(frame, "UnitFrame") then return end
+    if depth > 9 or ns.IsForbidden(frame) or not frame:IsShown() or rawget(frame, "UnitFrame") then return end
     ns.EachRegion(frame, EraArt)
     ns.EachChild(frame, EraTree, depth + 1)
+end
+
+local function EraWalk(panel)
+    local was = liveCount
+    liveCount = 0
+    EraTree(panel, 0)
+    for i = liveCount + 1, was do live[i] = nil end
+end
+
+-- The client set a hover, press or reused row's atlas again on a piece already in Era's art.
+local function Recheck()
+    for i = 1, liveCount do Repoint(live[i]) end
 end
 
 -- Our own themed art on the client's pieces, its metal masks with it (by file: the wraps go with the repaint). An
@@ -248,13 +285,51 @@ local function Place(panel)
     if panel.GameTab then ns.SetPointIf(panel.GameTab, "TOPLEFT", panel, "TOPLEFT", GAME_TAB_X, GAME_TAB_Y) end
 end
 
--- The client sets its atlas on a click, a hover state or a reused row: walked every frame while the window shows, so
--- Era's art is in before the frame draws (a 0.1 s beat flashed this client's art on each click).
-local function LookPass()
+local function Scrolled(list)
+    local box = list and list.ScrollBox
+    if not (box and box.GetDerivedScrollOffset) then return false end
+    local offset = box:GetDerivedScrollOffset()
+    if offsets[box] == offset then return false end
+    offsets[box] = offset
+    return true
+end
+
+-- A press or release, a scroll or a search can bring rows and pages that never drew.
+local function NewPieces(panel)
+    local down = IsMouseButtonDown("LeftButton") or IsMouseButtonDown("RightButton")
+    local changed = down ~= wasDown
+    wasDown = down
+    if Scrolled(panel.CategoryList) then changed = true end
+    if Scrolled(panel.Container and panel.Container.SettingsList) then changed = true end
+    local search = panel.SearchBox and panel.SearchBox:GetText()
+    if search ~= searchText then
+        searchText = search
+        changed = true
+    end
+    return changed
+end
+
+-- Era's art in before the frame draws (a 0.1 s beat flashed the client's on each click). Walking the whole window
+-- every frame cost the frame rate (#251): the walk follows new pieces, a moving mouse only rechecks the shown ones.
+local function LookPass(_, elapsed)
     if not active then return end
     local panel = SettingsPanel
-    EraTree(panel, 0)
-    Place(panel)
+    local x, y = GetCursorPosition()
+    if x ~= cursorX or y ~= cursorY then
+        cursorX, cursorY = x, y
+        follow = SETTLE
+    end
+    if NewPieces(panel) then walks = SETTLE end
+    sinceWalk = sinceWalk + (elapsed or 0)
+    if walks > 0 or sinceWalk >= BEAT then
+        walks = math.max(walks - 1, 0)
+        sinceWalk = 0
+        EraWalk(panel)
+        Place(panel)
+    elseif follow > 0 then
+        follow = follow - 1
+        Recheck()
+    end
 end
 
 local function SkinPanel()
@@ -265,6 +340,7 @@ local function SkinPanel()
         TitleStrip(panel)
         ns.SkinCloseButton(panel.ClosePanelButton, true)
     end
+    walks = SETTLE
     LookPass()
     if not lookJob then
         lookJob = ns.Sched.OnFrame(ns.NewFrame("Frame", nil, panel), { name = "settings.look", every = 0, fn = LookPass })

@@ -1,6 +1,7 @@
 -- Offline test under Lua 5.4 for the settings window's Era skin (Options/SettingsPanel.lua): the frame border is our
 -- own themed art on the client's pieces (no atlas left for the client-copy path), set by file with its wraps so
 -- the theme's repaint keeps them, and every Era sheet the window draws is a themed sheet (masks in Art/ThemeArt.lua).
+-- The frame pass never walks the whole window on a frame where nothing happened (#251: the frame rate dropped).
 -- Run from the addon root: lua tools/tests/settings_panel_theme_test.lua (CI runs every tools/tests/*_test.lua).
 -- luacheck: std lua54
 -- luacheck: ignore 111 112 113 121 122 212
@@ -46,7 +47,7 @@ function Tex:Show() end
 local Frame = {}
 Frame.__index = Frame
 local function NewFrame(name) return setmetatable({ name = name, regions = {}, children = {} }, Frame) end
-function Frame:IsShown() return true end
+function Frame:IsShown() return not self.hidden end
 function Frame:GetName() return self.name end
 function Frame:HookScript(_, fn) self.onShow = fn end
 function Frame:CreateTexture() return NewTex(nil, self) end
@@ -59,7 +60,20 @@ for _, name in ipairs(PIECES) do panel.NineSlice[name] = NewTex("UI-Frame-Metal-
 panel.ClosePanelButton = NewFrame("ClosePanelButton")
 local header = NewTex("Options_CategoryHeader_1", panel)
 panel.regions = { header }
+-- A pooled row of a page not shown: hidden, its art the client's.
+local row = NewFrame("PooledRow")
+row.hidden = true
+local rowArt = NewTex("Options_List_Hover", row)
+row.regions = { rowArt }
+panel.children = { row }
+local listOffset, search = 0, ""
+panel.CategoryList = { ScrollBox = { GetDerivedScrollOffset = function() return listOffset end } }
+panel.SearchBox = { GetText = function() return search end }
 SettingsPanel = panel
+
+local cursorX, mouseDown = 0, false
+GetCursorPosition = function() return cursorX, 0 end
+IsMouseButtonDown = function() return mouseDown end
 
 ------------------------------------------------------------------ the addon
 
@@ -107,8 +121,14 @@ ns.OwnTexture = function(frame, key)
     return frame[key]
 end
 ns.TileTex = function(tex) return tex end
-ns.Sched = { OnFrame = function(_, spec) return { Kick = spec.fn } end }
+local lookSpec
+ns.Sched = { OnFrame = function(_, spec)
+    lookSpec = spec
+    return { Kick = spec.fn }
+end }
+local regionWalks = 0
 ns.EachRegion = function(frame, fn, ...)
+    regionWalks = regionWalks + 1
     for _, region in ipairs(frame.regions) do fn(region, ...) end
 end
 ns.EachChild = function(frame, fn, ...)
@@ -148,6 +168,70 @@ for key in source:gmatch('= { "(era%w+)",') do
     end
 end
 Check(count >= 6, "the skin names its Era sheets (" .. count .. " found)")
+
+------------------------------------------------------------------ the frame pass
+
+local FRAME = 0.016
+local function Pass(times)
+    for _ = 1, times or 1 do lookSpec.fn({}, FRAME) end
+end
+local function Walked(what, want, fn)
+    regionWalks = 0
+    fn()
+    Check((regionWalks > 0) == want, what .. (want and " walks the window" or " walks nothing") .. " (" .. regionWalks .. ")")
+end
+
+Check(lookSpec ~= nil and lookSpec.every == 0, "the look runs as a frame job")
+Pass(5)
+Walked("a still frame with nothing new", false, function() Pass(10) end)
+Walked("a frame with the mouse moving", false, function()
+    header:SetAtlas("Options_CategoryHeader_1")
+    cursorX = cursorX + 5
+    Pass()
+end)
+Check(header.atlas == nil and keyed[header] == "eraOptions", "a hover's atlas on a piece in Era's art is caught as the mouse moves")
+Walked("a press", true, function()
+    mouseDown = true
+    Pass()
+end)
+Walked("a release", true, function()
+    mouseDown = false
+    Pass()
+end)
+Pass(5)
+Walked("a list scrolled", true, function()
+    listOffset = 20
+    Pass()
+end)
+Pass(5)
+Walked("the search typed in", true, function()
+    search = "sound"
+    Pass()
+end)
+Pass(5)
+Walked("a quarter second with nothing new", true, function() Pass(20) end)
+
+-- Hidden rows: never walked or rechecked while hidden; walked as they show (a page flip is a press).
+Check(rowArt.atlas == "Options_List_Hover", "a hidden row is left out of the walk")
+regionWalks = 0
+Pass(20)
+Check(regionWalks == 1, "the walk does not enter a hidden row (" .. regionWalks .. " frames walked)")
+row.hidden = false
+mouseDown = true
+Pass()
+mouseDown = false
+Pass(5)
+Check(rowArt.atlas == nil and keyed[rowArt] == "eraOptions", "a row is walked into Era's art as it shows")
+rowArt:SetAtlas("Options_List_Hover")
+cursorX = cursorX + 5
+Pass()
+Check(rowArt.atlas == nil, "a shown row's hover is caught as the mouse moves")
+row.hidden = true
+Pass(20)
+rowArt:SetAtlas("Options_List_Hover")
+cursorX = cursorX + 5
+Pass()
+Check(rowArt.atlas == "Options_List_Hover", "a row hidden since the last walk is not rechecked")
 
 if failed > 0 then
     print(failed .. " check(s) failed")
