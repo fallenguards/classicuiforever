@@ -6,6 +6,20 @@ local _, ns = ...
 local UF = ns.UF
 local IsSecret = ns.IsSecret
 
+local function RemoveUnitFrameHint(frame)
+    local tip = GameTooltip
+    if not tip or tip:GetOwner() ~= frame then return end
+    local last = tip:GetLeftLine(tip:NumLines())
+    if not last then return end
+    local text = last:GetText()
+    if IsSecret(text) or text ~= UNIT_POPUP_RIGHT_CLICK then return end
+    if tip:SetUnit(frame.unit, frame.hideStatusOnTooltip) then tip:Show() end
+end
+
+if type(UnitFrame_UpdateTooltip) == "function" and type(UNIT_POPUP_RIGHT_CLICK) == "string"
+    and GameTooltip and type(GameTooltip.GetLeftLine) == "function" then
+    hooksecurefunc("UnitFrame_UpdateTooltip", RemoveUnitFrameHint)
+end
 local hoverList, hoverCount, hoverShown, hoverDirty = {}, 0, 0, false
 local hoverByBar = {}
 -- The entries whose bar can be hovered, rebuilt on the driver's events, edit mode and new entries.
@@ -266,10 +280,6 @@ local function BarTip(e, over)
     GameTooltip_SetDefaultAnchor(GameTooltip, bar)
     if not GameTooltip:SetUnit(unit) then return end
     -- The portrait's own lines after the unit (UnitFrame_UpdateTooltip).
-    if UNIT_POPUP_RIGHT_CLICK then
-        GameTooltip_AddBlankLineToTooltip(GameTooltip)
-        GameTooltip_AddInstructionLine(GameTooltip, UNIT_POPUP_RIGHT_CLICK)
-    end
     GameTooltip:Show()
 end
 
