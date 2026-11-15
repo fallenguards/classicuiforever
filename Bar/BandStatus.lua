@@ -168,24 +168,7 @@ local function HookRestedState(bar, status)
     end)
 end
 
--- The client's segment posts on a holder (from its pool); the strip draws the 1.x ones.
-local function SetDividers(container, alpha)
-    local pool = container and container.HorizontalDividersPool
-    if not (pool and pool.EnumerateActive) then return end
-    for divider in pool:EnumerateActive() do divider:SetAlpha(alpha) end
-end
-B.SetDividers = SetDividers
-
--- Posts faded per holder (weak): a released post keeps alpha 0 (the pool's reset only hides), so only a grown pool is walked.
-local fadedCount = setmetatable({}, { __mode = "k" })
-function B.FadeNewDividers(container)
-    local pool = container and container.HorizontalDividersPool
-    if not (pool and pool.GetNumActive and pool.EnumerateActive) then return end
-    local count = pool:GetNumActive()
-    if count <= (fadedCount[container] or 0) then return end
-    for divider in pool:EnumerateActive() do SetAlphaIf(divider, 0) end
-    fadedCount[container] = count
-end
+local SetDividers, PostsBack = B.SetDividers, B.PostsBack
 
 -- The client rebuilds its posts on each layout: fade them as it does.
 local function OnDividers(self)
@@ -642,6 +625,7 @@ function B.hot.StatusTrip()
         -- The game's frame art comes back at full alpha as the world loads (no Lua call); a login mid-fight kept it.
         local art = frame.BarFrameTexture
         if art and art:GetAlpha() > 0.01 then return true end
+        if PostsBack(frame) then return true end
         local mark = statusMark[frame]
         if mark then
             if Drifted(frame, mark) then return true end
@@ -701,6 +685,7 @@ function B.StatusBack()
     for i = 1, #list do
         local art = list[i].BarFrameTexture
         if art then ns.SetAlphaIf(art, 0) end
+        if PostsBack(list[i]) then SetDividers(list[i], 0) end
     end
     ns.stripPasses = (ns.stripPasses or 0) + 1
     if OnlyCarried(list) then
@@ -793,6 +778,6 @@ end
 -- Band off: nothing stacked (loose before the hand-back re-anchors), no dimmed slider; posts walked afresh next time.
 function B.StatusRestore()
     Unstack()
-    wipe(fadedCount)
+    B.ForgetFadedPosts()
     B.FollowStatusDialog(false)
 end
