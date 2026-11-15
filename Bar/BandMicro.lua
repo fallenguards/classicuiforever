@@ -654,30 +654,49 @@ end
 
 local microBusy = false
 local offRow = setmetatable({}, { __mode = "k" })   -- buttons we took off the row, to give back
+
+-- Band down: the buttons faded off our row seen and clickable again, in the game's menu or a bar addon's (its bar
+-- showed gaps where they stood unseen).
+function B.MicroRowBack()
+    for button in pairs(offRow) do
+        button:SetAlpha(1)
+        button:EnableMouse(true)
+        offRow[button] = nil
+    end
+end
 function B.LayoutMicroButtons()
-    if microBusy then return end
+    if microBusy or ns.BarsTaken() then return end
     microBusy = true
     local art = B.art
     -- Every button leaves the client's menu, shown or not, so its layout never finds a lone child without a position.
+    -- One another addon moved onto its own bar stays there (B.TakenAway).
     local wanted, rowChanged = {}, false
     for _, button in ipairs(MicroButtonList()) do
-        Remember(button)
-        if button:GetParent() ~= art then button:SetParent(art) end
-        if MicroSkipped(button) then
-            button:ClearAllPoints()
-            button:SetAlpha(0)
-            if button:IsMouseEnabled() then button:EnableMouse(false) end
-            if not offRow[button] then rowChanged = true end
-            offRow[button] = true
-        elseif button:IsShown() then
-            -- Back from the option: seen and clickable again.
+        if B.TakenAway(button) then
             if offRow[button] then
-                rowChanged = true
-                offRow[button] = nil
                 button:SetAlpha(1)
                 button:EnableMouse(true)
+                offRow[button] = nil
             end
-            wanted[#wanted + 1] = button
+        else
+            Remember(button)
+            if button:GetParent() ~= art then button:SetParent(art) end
+            if MicroSkipped(button) then
+                button:ClearAllPoints()
+                button:SetAlpha(0)
+                if button:IsMouseEnabled() then button:EnableMouse(false) end
+                if not offRow[button] then rowChanged = true end
+                offRow[button] = true
+            elseif button:IsShown() then
+                -- Back from the option: seen and clickable again.
+                if offRow[button] then
+                    rowChanged = true
+                    offRow[button] = nil
+                    button:SetAlpha(1)
+                    button:EnableMouse(true)
+                end
+                wanted[#wanted + 1] = button
+            end
         end
     end
     microRow = wanted

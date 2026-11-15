@@ -248,6 +248,14 @@ local function Remember(frame, placeOnly)
 end
 B.Remember = Remember
 
+-- A remembered frame now on neither our art nor its own parent: another addon moved it onto its own bar, where it stays.
+function B.TakenAway(frame)
+    local state = saved[frame]
+    if not state then return false end
+    local parent = frame:GetParent()
+    return parent ~= B.art and parent ~= (state[2] or nil)
+end
+
 local function BarSetting(bar, key)
     if not bar or not bar.GetSettingValue or not Enum or not Enum.EditModeActionBarSetting then return nil end
     local setting = Enum.EditModeActionBarSetting[key]

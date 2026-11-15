@@ -281,7 +281,8 @@ end
 
 function B.LayoutBags()
     local backpack = MainMenuBarBackpackButton
-    if not backpack then return end
+    -- Taken by another addon since our last full pass: its bag buttons stay on its bar.
+    if not backpack or ns.BarsTaken() then return end
     local grow = Grow()
     local vertical = grow[4] ~= 0
     local art, shape = B.art, B.shape

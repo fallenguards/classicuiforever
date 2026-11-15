@@ -143,7 +143,9 @@ B.ReadShape = ReadShape
 
 local function Layout()
     local bar = ns.GetMainBar()
-    if not bar then return end
+    -- Taken by another addon since our last full pass: nothing of the client's is laid again (the band stands down at
+    -- the next pass).
+    if not bar or ns.BarsTaken() then return end
     local art = B.art
     ReadShape()
     -- Edit mode owns Action Bar 1's scale and, once dragged, its spot; the band takes the same scale and anchors so
@@ -265,11 +267,17 @@ function ns.ClassicBarActive() return B.active end
 -- Base calls only: the client's wrappers write a snap note its own passes read back in our name.
 local function PutBackSaved(art)
     local saved = B.saved
+    -- Another addon's now (B.TakenAway): its frames get their own size and scale back but keep the place it gave them.
+    -- Our old anchors stacked a bar addon's micro buttons on one spot.
+    local away = {}
+    for frame in pairs(saved) do
+        if B.TakenAway(frame) then away[frame] = true end
+    end
     -- State layout: Remember in Band.lua.
     for frame, state in pairs(saved) do
         local setScale = BaseSetters(frame)
         if state[1] then setScale(frame, state[1]) end
-        if frame:GetParent() == art and state[2] then
+        if not away[frame] and frame:GetParent() == art and state[2] then
             -- One pcall per button: the menu re-lays as each returns and a placeless one errored, cutting the hand-back short.
             pcall(frame.SetParent, frame, state[2])
         end
@@ -277,16 +285,18 @@ local function PutBackSaved(art)
     end
     -- All lifted before any goes back: a frame hung on another still on our anchors could loop.
     for frame, state in pairs(saved) do
-        if state[5] ~= nil then
+        if state[5] ~= nil and not away[frame] then
             local _, clearPoints = BaseSetters(frame)
             clearPoints(frame)
         end
     end
     -- Back on the client's own anchors, one pcall each: two saved at different times could loop and leave the rest unanchored.
     for frame, state in pairs(saved) do
-        local _, _, setPoint = BaseSetters(frame)
-        for i = 5, #state, 5 do
-            pcall(setPoint, frame, state[i], state[i + 1] or nil, state[i + 2], state[i + 3], state[i + 4])
+        if not away[frame] then
+            local _, _, setPoint = BaseSetters(frame)
+            for i = 5, #state, 5 do
+                pcall(setPoint, frame, state[i], state[i + 1] or nil, state[i + 2], state[i + 3], state[i + 4])
+            end
         end
     end
     wipe(saved)
@@ -418,6 +428,7 @@ local function Restore()
     end
     B.ButtonsHome()
     UnskinRows()
+    B.MicroRowBack()
     -- Nothing stacked before the anchors go back.
     B.StatusRestore()
     PutBackSaved(art)

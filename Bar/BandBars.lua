@@ -97,6 +97,9 @@ function B.HolderOf(bar) return bar and holderOf[bar] end
 -- The button's slot, the button moved into it first; out of combat only, as the layout runs. Explicitly protected:
 -- a snippet's SetParent takes no other frame as the new parent.
 local function Slot(button, bar)
+    -- Neither in our slot nor in its own container: another addon moved it onto its bar, and it stays there.
+    local parent = button:GetParent()
+    if parent ~= slotOf[button] and parent ~= button.container then return nil end
     local holder = Holder(bar)
     local slot = slotOf[button]
     if not slot then
@@ -117,18 +120,19 @@ local function Slot(button, bar)
     return slot
 end
 
--- Band off (out of combat): every button back in the client's container, where its own layout has it. Plain calls:
--- the containers are not explicitly protected, so a snippet cannot parent to them.
+-- Band off (out of combat): every button still in our slot back in the client's container, where its own layout has it.
+-- One another addon moved onto its own bar is that addon's: sent "home" under the client's bar it parked hidden, every
+-- such bar went blank. Plain calls: the containers are not explicitly protected, so a snippet cannot parent to them.
 function B.ButtonsHome()
-    for button in pairs(slotOf) do
+    for button, slot in pairs(slotOf) do
         local container = button.container
-        if container and button:GetParent() ~= container then
+        if container and button:GetParent() == slot then
             button:SetParent(container)
             button:SetFrameLevel(container:GetFrameLevel() + 1)
             ns.SetPointOnce(button, "CENTER", container, "CENTER", 0, 0)
+            local checked = button.GetCheckedTexture and button:GetCheckedTexture()
+            if checked then checked:SetDrawLayer("OVERLAY", 0) end
         end
-        local checked = button.GetCheckedTexture and button:GetCheckedTexture()
-        if checked then checked:SetDrawLayer("OVERLAY", 0) end
     end
     for bar in pairs(mouseOff) do bar:EnableMouse(true) end
     wipe(mouseOff)
@@ -151,7 +155,9 @@ end
 -- One bar's buttons in a 1.x row or column: containers on a scaled row frame, so buttons come out 36 px (30 on pet/stance),
 -- 6 apart and the bar's Icon Padding more.
 local function LayoutButtons(bar, rowIndex, point, relTo, relPoint, x, y, vertical, pitch, target, origin, rows)
-    if not bar or not bar.actionButtons then return end
+    -- Taken by another addon since our last full pass: its buttons are that addon's from now on (the band stands down
+    -- at the next pass; a watch pass in between pulled them back and the hand-back parked them hidden).
+    if not bar or not bar.actionButtons or ns.BarsTaken() then return end
     local art = B.art
     local first = bar.actionButtons[1]
     local size = first and first:GetWidth() or 45
@@ -192,13 +198,15 @@ local function LayoutButtons(bar, rowIndex, point, relTo, relPoint, x, y, vertic
     for i, button in ipairs(bar.actionButtons) do
         count = i
         local slot = Slot(button, bar)
-        ns.SetLevelIf(slot, level)
-        ns.SetScaleIf(slot, scale * icon)
-        local along, across = (i - 1) % per, math.floor((i - 1) / per)
-        if vertical then
-            ns.SetPointIf(slot, "TOPLEFT", row, "TOPLEFT", across * step, -along * step)
-        else
-            ns.SetPointIf(slot, "BOTTOMLEFT", row, "BOTTOMLEFT", along * step, across * step)
+        if slot then
+            ns.SetLevelIf(slot, level)
+            ns.SetScaleIf(slot, scale * icon)
+            local along, across = (i - 1) % per, math.floor((i - 1) / per)
+            if vertical then
+                ns.SetPointIf(slot, "TOPLEFT", row, "TOPLEFT", across * step, -along * step)
+            else
+                ns.SetPointIf(slot, "BOTTOMLEFT", row, "BOTTOMLEFT", along * step, across * step)
+            end
         end
     end
     -- Bar rectangle = its buttons, in whole pixels, set only on change: a size change makes the client
