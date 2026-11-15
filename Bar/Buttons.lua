@@ -342,11 +342,14 @@ local function ToCorner(tex)
     ns.SetPointOnce(tex, "TOPLEFT")
 end
 
-local function ToMouseover(tex)
+-- The client's frame art sizes (ActionButtonTemplate.xml; SmallActionButtonMixin_OnLoad for pet, stance and possess).
+local FRAME_W, FRAME_H, SMALL_W, SMALL_H = 46, 45, 31.6, 30.9
+
+local function ToMouseover(tex, _, w, h)
     tex:SetTexCoord(0, 1, 0, 1)
     tex:SetAtlas("UI-HUD-ActionBar-IconFrame-Mouseover")
     ns.SetPointOnce(tex, "TOPLEFT")
-    tex:SetSize(46, 45)
+    tex:SetSize(w, h)
 end
 
 local function Unskin(button)
@@ -372,27 +375,37 @@ local function Unskin(button)
         button.icon:AddMaskTexture(button.IconMask)
         button.fcuiMaskRemoved = nil
     end
+    -- Pet, stance and possess buttons are the client's small template: its own art sizes and cooldown insets.
+    local small = button.SmallActionButtonMixin_OnLoad ~= nil
+    local w, h = small and SMALL_W or FRAME_W, small and SMALL_H or FRAME_H
     if button.icon then
         for _, key in ipairs(COOLDOWNS) do
             local clock = button[key]
             if clock and clock.SetPoint then
                 clock:ClearAllPoints()
-                clock:SetPoint("TOPLEFT", button.icon, "TOPLEFT", COOLDOWN_INSET, -COOLDOWN_INSET)
-                clock:SetPoint("BOTTOMRIGHT", button.icon, "BOTTOMRIGHT", -COOLDOWN_INSET, COOLDOWN_INSET)
+                if small then
+                    clock:SetPoint("TOPLEFT", button.icon, "TOPLEFT", 1.7, -1.7)
+                    clock:SetPoint("BOTTOMRIGHT", button.icon, "BOTTOMRIGHT", -1, 1)
+                else
+                    clock:SetPoint("TOPLEFT", button.icon, "TOPLEFT", COOLDOWN_INSET, -COOLDOWN_INSET)
+                    clock:SetPoint("BOTTOMRIGHT", button.icon, "BOTTOMRIGHT", -COOLDOWN_INSET, COOLDOWN_INSET)
+                end
             end
         end
     end
     ns.EachState(button, NORMAL_PUSHED, ToCorner)
     if button.UpdateButtonArt then button:UpdateButtonArt() end
-    ns.EachState(button, HIGHLIGHT_CHECKED, ToMouseover)
+    ns.EachState(button, HIGHLIGHT_CHECKED, ToMouseover, w, h)
     if button.Flash then
         button.Flash:SetTexCoord(0, 1, 0, 1)
-        button.Flash:SetAtlas("UI-HUD-ActionBar-IconFrame-Flash", true)
+        button.Flash:SetAtlas("UI-HUD-ActionBar-IconFrame-Flash", not small)
+        if small then button.Flash:SetSize(w, h) end
         ns.SetPointOnce(button.Flash, "TOPLEFT")
     end
     if button.Border then
         button.Border:SetTexCoord(0, 1, 0, 1)
-        button.Border:SetAtlas("UI-HUD-ActionBar-IconFrame-Border", true)
+        button.Border:SetAtlas("UI-HUD-ActionBar-IconFrame-Border", not small)
+        if small then button.Border:SetSize(w, h) end
         button.Border:SetBlendMode("BLEND")
         ns.SetPointOnce(button.Border, "TOPLEFT")
     end
