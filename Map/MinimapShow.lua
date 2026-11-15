@@ -78,8 +78,12 @@ function ns.MinimapShowAs(frame, state, client)
     if not frame then return end
     if client then
         Stash(frame, state == "hide")
-    else
-        ns.SetShownIf(frame, state ~= "hide")
+    elseif state == "hide" then
+        frame:Hide()
+    elseif not frame:IsShown() then
+        -- Show, never SetShown: a button gatherer keeping a ring button on the map swaps Show for its own while its bag
+        -- is shut, and SetShown would go round it (#298).
+        frame:Show()
     end
     hovering[frame] = state == "hover" or nil
     if state == nil then ns.FadeTo(frame, 1, nil, true) end
