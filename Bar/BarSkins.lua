@@ -218,6 +218,7 @@ function ns.SkinMicroButton(button)
             state.downKey = "micro" .. art .. "Down"
             state.disabledKey = "micro" .. art .. "Disabled"
         end
+        ns.KeepClientMicro(button, state)
         micro[button] = state
         microButtons[#microButtons + 1] = button
         microStates[#microStates + 1] = state
@@ -259,6 +260,7 @@ function ns.UnskinMicroButton(button)
         button.Portrait:SetTexCoord(0, 1, 0, 1)
         button.Portrait:SetDrawLayer("ARTWORK", 0)
     end
+    ns.ClientMicroBack(button, state)
     -- The client's own state setter puts the background and portrait back.
     if button:GetButtonState() == "PUSHED" then
         if button.SetPushed then button:SetPushed() end

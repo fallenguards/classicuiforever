@@ -66,6 +66,51 @@ for path in listing:lines() do
 end
 listing:close()
 
+-- A button with no state textures of its own and a portrait (Forever's character button): what the client gave it is
+-- kept before our first dress and put back after, our 1.x textures cleared and the portrait at its own size and place.
+local cleared = {}
+local portrait = {
+    w = 32, h = 40, points = { { "TOPLEFT", "button", "TOPLEFT", 0, 0 }, { "BOTTOMRIGHT", "button", "BOTTOMRIGHT", 0, 0 } },
+}
+function portrait:GetSize() return self.w, self.h end
+function portrait:SetSize(w, h) self.w, self.h = w, h end
+function portrait:GetNumPoints() return #self.points end
+function portrait:GetPoint(i) return table.unpack(self.points[i]) end
+function portrait:ClearAllPoints() self.points = {} end
+function portrait:SetPoint(...) self.points[#self.points + 1] = { ... } end
+local char = { Portrait = portrait, normal = nil }
+function char:GetNormalTexture() return self.normal end
+char.ClearNormalTexture = function() cleared[#cleared + 1] = "Normal" end
+char.ClearPushedTexture = function() cleared[#cleared + 1] = "Pushed" end
+char.ClearDisabledTexture = function() cleared[#cleared + 1] = "Disabled" end
+local state = {}
+ns.KeepClientMicro(char, state)
+-- Our dress: textures of ours, the portrait shrunk and hung by its top.
+char.normal = {}
+portrait:SetSize(18, 25)
+portrait:ClearAllPoints()
+portrait:SetPoint("TOP", "button", "TOP", 0, -7)
+ns.ClientMicroBack(char, state)
+Check(#cleared == 3, "our state textures on a bare button are cleared (" .. #cleared .. ")")
+Check(portrait.w == 32 and portrait.h == 40, "the portrait gets its own size back (" .. portrait.w .. ")")
+Check(#portrait.points == 2 and portrait.points[1][1] == "TOPLEFT" and portrait.points[2][1] == "BOTTOMRIGHT",
+    "the portrait gets its own anchors back")
+-- Texture objects with nothing set on them (Forever's character button): bare too.
+local empty = { GetTexture = function() return nil end, GetAtlas = function() return nil end }
+local hollow = { normal = empty }
+function hollow:GetNormalTexture() return self.normal end
+local hollowState = {}
+ns.KeepClientMicro(hollow, hollowState)
+Check(hollowState.bare == true, "texture objects with nothing set count as bare")
+local own = { GetTexture = function() return 123 end, GetAtlas = function() return nil end }
+local dressed = { Portrait = nil, normal = own }
+function dressed:GetNormalTexture() return self.normal end
+dressed.ClearNormalTexture = function() cleared[#cleared + 1] = "dressed" end
+local dressedState = {}
+ns.KeepClientMicro(dressed, dressedState)
+ns.ClientMicroBack(dressed, dressedState)
+Check(cleared[4] == nil, "a button with its own textures keeps them")
+
 if failed > 0 then
     print(failed .. " check(s) failed")
     os.exit(1)

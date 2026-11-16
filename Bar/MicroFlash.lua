@@ -56,3 +56,34 @@ function ns.ClientMicroArt(button)
         if tex then tex:SetVertexColor(color.r, color.g, color.b) end
     end
 end
+
+-- What the client gave a micro button before our first dress, put back as it was: Forever's character button has no
+-- state textures of its own (ours drew the 1.x art over its portrait after the hand-back) and its portrait's size and
+-- anchors (ours stayed, squashed).
+function ns.KeepClientMicro(button, state)
+    -- Forever's character button has the texture objects but nothing set on them.
+    local normal = button:GetNormalTexture()
+    state.bare = normal == nil or (normal:GetTexture() == nil and normal:GetAtlas() == nil)
+    local portrait = button.Portrait
+    if not portrait then return end
+    state.portraitW, state.portraitH = portrait:GetSize()
+    local points = {}
+    for i = 1, portrait:GetNumPoints() or 0 do points[i] = { portrait:GetPoint(i) } end
+    state.portraitPoints = points
+end
+
+local STATE_KINDS = { "Normal", "Pushed", "Disabled" }
+function ns.ClientMicroBack(button, state)
+    if state.bare then
+        for _, kind in ipairs(STATE_KINDS) do
+            local clear = button["Clear" .. kind .. "Texture"]
+            local tex = not clear and button["Get" .. kind .. "Texture"](button)
+            if clear then clear(button) elseif tex then tex:SetTexture(nil) end
+        end
+    end
+    local portrait, points = button.Portrait, state.portraitPoints
+    if not (portrait and points and state.portraitW) then return end
+    portrait:SetSize(state.portraitW, state.portraitH)
+    portrait:ClearAllPoints()
+    for _, p in ipairs(points) do portrait:SetPoint(p[1], p[2], p[3], p[4], p[5]) end
+end
