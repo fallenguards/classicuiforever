@@ -42,11 +42,13 @@ local function Put(row, label, text, value)
     row.numericValue = value
 end
 
--- Melee, ranged and spell, the way the client's own lines work them out.
+-- Melee, ranged and spell, the way the client's own lines work them out; hits add the off hand.
 local function Hits()
-    return _G.GetCombatRatingBonus(_G.CR_HIT_MELEE) + _G.GetHitModifier(),
+    local meleeRating = _G.GetCombatRatingBonus(_G.CR_HIT_MELEE)
+    local offhand = _G.GetOffhandHitModifier and meleeRating + _G.GetOffhandHitModifier()
+    return meleeRating + _G.GetHitModifier(),
         _G.GetCombatRatingBonus(_G.CR_HIT_RANGED) + _G.GetRangedHitModifier(),
-        _G.GetCombatRatingBonus(_G.CR_HIT_SPELL) + _G.GetSpellHitModifier()
+        _G.GetCombatRatingBonus(_G.CR_HIT_SPELL) + _G.GetSpellHitModifier(), offhand
 end
 local function Crits()
     return _G.GetCritChance(), _G.GetRangedCritChance(), _G.GetSpellCritChance()
@@ -71,9 +73,10 @@ local function RetailTip(row, set)
     _G.PaperDollStatTooltip(row)
 end
 
--- Forever's tooltips for these name all three schools.
+-- Forever's tooltips for these name all three schools. Hit's takes the off hand too and fails on a nil one (#307).
 local function HitTip(row)
-    _G.CharacterHitFrame_OnEnter(row, row.fcuiMelee, row.fcuiRanged, row.fcuiSpell, _G.STAT_HIT_CHANCE)
+    _G.CharacterHitFrame_OnEnter(row, row.fcuiMelee, row.fcuiRanged, row.fcuiSpell, _G.STAT_HIT_CHANCE,
+        row.fcuiOffhand or row.fcuiMelee)
 end
 local function CritTip(row)
     if ns.OnForever() then
@@ -92,8 +95,8 @@ end
 
 local function School(read, index, label, format, tip)
     return function(row)
-        local melee, ranged, spell = read()
-        row.fcuiMelee, row.fcuiRanged, row.fcuiSpell = melee, ranged, spell
+        local melee, ranged, spell, offhand = read()
+        row.fcuiMelee, row.fcuiRanged, row.fcuiSpell, row.fcuiOffhand = melee, ranged, spell, offhand
         local value = (index == 1 and melee) or (index == 2 and ranged) or spell
         Put(row, label, string.format(format, value), value)
         row.onEnterFunc = tip
