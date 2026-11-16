@@ -21,7 +21,7 @@ body:
         - "ClassicUI Forever: Standalone Nameplates"
         - "ClassicUI Forever: Standalone Chat"
         - "ClassicUI Forever: Standalone Minimap & World Map"
-        - "ClassicUI Forever: Standalone Quests"
+        - "ClassicUI Forever: Standalone Windows and Menus"
         - "ClassicUI Forever: Standalone Damage Meter Skins"
       default: 0
     validations:

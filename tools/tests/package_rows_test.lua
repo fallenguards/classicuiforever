@@ -1,8 +1,8 @@
 -- Offline test under Lua 5.4: the standalone packages over the real options list (Options/Toggles.lua), the real
 -- package specs (tools/standalone.py) and Core/Package.lua, on both clients. No package keeps a row needing a setting
 -- it lacks; the classic bar's rows on other pages go with Action Bars; the look modules go with every package that
--- shows their work; chat notes keep their default; every module runs in some package or is listed as unplaced or
--- as carried by an addon of its own.
+-- shows their work; chat notes keep their default; every module runs in some package or is carried by an addon of
+-- its own.
 -- Run from the addon root: lua tools/tests/package_rows_test.lua (CI runs every tools/tests/*_test.lua).
 -- luacheck: std lua54
 -- luacheck: ignore 111 112 113 121 122 212
@@ -28,15 +28,19 @@ end
 -- Global looks: the module, and the packages whose pieces show its work.
 local LOOKS = {
     classicFonts = { "ActionBars", "UnitFrames", "Nameplates" },   -- key labels and counts, pet bar numbers, plate names
-    eraCoins = { "Bags", "Quests", "Maps" },                       -- bag money, quest rewards, the map's quest list
+    eraCoins = { "Bags", "WindowsAndMenus", "Maps" },              -- bag money, quest rewards, the map's quest list
 }
 -- Game windows a piece opens, and settings two pieces share: kept by each package listed.
 local SHARED = {
     panelBank = { "Bags" }, panelCalendar = { "Maps" }, panelTaxi = { "Maps" }, panelChannels = { "Chat" },
-    panelQuest = { "Quests" }, panelGossip = { "Quests" }, hideLastNames = { "UnitFrames", "Nameplates" },
+    panelQuest = { "WindowsAndMenus" }, panelGossip = { "WindowsAndMenus" }, hideLastNames = { "UnitFrames", "Nameplates" },
 }
--- Modules no package carries yet: the next wave places them.
-local UNPLACED = { hideHelpButtons = true, hideZoneText = true, lootToast = true, zoneTerritory = true }
+-- Switches a package keeps, so each piece in it still turns off on its own.
+local SWITCHES = {
+    Maps = { "minimap", "worldMap" },
+    WindowsAndMenus = { "characterSheet", "spellBook", "talents", "collectionsWindow", "questLog", "professionsBook",
+        "tradeSkill", "trainer", "whoList", "guildRoster", "groupFinder", "gameMenu", "settingsPanel", "lootWindow" },
+}
 -- Modules an addon of their own carries: the theme is Fallen's UI Color Picker.
 local OWN_ADDON = { bronzeTheme = true }
 
@@ -125,6 +129,9 @@ for _, forever in ipairs({ true, false }) do
             if spec.id == "ActionBars" then
                 for _, key in ipairs(barRows) do Check(kept[key], name .. ": the classic bar's row " .. key .. " goes with the bars") end
             end
+            for _, key in ipairs(SWITCHES[spec.id] or {}) do
+                Check(kept[key], name .. ": keeps its own switch " .. key)
+            end
             for _, list in ipairs({ LOOKS, SHARED }) do
                 for key, owners in pairs(list) do
                     for _, owner in ipairs(owners) do
@@ -146,7 +153,7 @@ for _, forever in ipairs({ true, false }) do
     end
     for _, module in ipairs(modules) do
         local foreverOnly = module == "legacyWindow" and not forever
-        Check(ran[module] or UNPLACED[module] or OWN_ADDON[module] or foreverOnly,
+        Check(ran[module] or OWN_ADDON[module] or foreverOnly,
             client .. ": module " .. module .. " runs in no package")
     end
 end

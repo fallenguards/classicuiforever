@@ -43,37 +43,21 @@ PACKAGES = [
     dict(id="Chat", name="Chat", pages=["GROUP_CHAT"], roots=["panelChannels"], modules=["panels"],
          icon="Interface\\Icons\\INV_Misc_Note_01", notes="The 1.x chat frame look."),
     dict(id="Maps", name="Minimap & World Map", pages=["GROUP_MINIMAP", "GROUP_MAP"],
-         roots=["eraCoins", "panelCalendar", "panelTaxi"], modules=["mapCoords", "panels"],
+         roots=["eraCoins", "panelCalendar", "panelTaxi", "hideZoneText", "zoneTerritory"], modules=["mapCoords", "panels"],
          icon="Interface\\Icons\\INV_Misc_Map_01", notes="The 1.x minimap and its ring buttons, and Era's world map."),
-    dict(id="Quests", name="Quests", pages=["GROUP_QUESTS"], roots=["panelQuest", "panelGossip", "eraCoins"],
-         modules=["questListFont", "panels"], icon="Interface\\Icons\\INV_Scroll_03",
-         notes="The 1.x quest log, quest tracker look and quest giver windows."),
-    dict(id="CharacterSheet", wave=2, name="Character Sheet", pages=[], roots=["characterSheet"], modules=[],
-         icon="Interface\\Icons\\INV_Chest_Plate06", notes="The 1.x character sheet and its stat panes."),
-    dict(id="Spellbook", wave=2, name="Spellbook", pages=[], roots=["spellBook"], modules=[],
-         icon="Interface\\Icons\\INV_Misc_Book_09", notes="The 1.x spellbook."),
-    dict(id="Talents", wave=2, name="Talents", pages=[], roots=["talents"], modules=[],
-         icon="Interface\\Icons\\Ability_Marksmanship", notes="The 1.x talents window."),
-    dict(id="LegacyWindow", wave=2, name="Legacy Window", pages=[], roots=["legacyWindow"], modules=[], forever=True,
-         icon="Interface\\Icons\\INV_Misc_Book_11", notes="Forever's Legacy trees, challenges and rewards in the 1.x look."),
-    dict(id="Professions", wave=2, name="Professions", pages=["GROUP_PROFESSIONS"], roots=[], modules=[],
-         icon="Interface\\Icons\\Trade_BlackSmithing", notes="The 1.x professions book, trade skill window and trainer."),
-    dict(id="Collections", wave=2, name="Collections", pages=[], roots=["collectionsWindow"], modules=[],
-         icon="Interface\\Icons\\Ability_Mount_RidingHorse", notes="Mounts, pets, toys, heirlooms and looks in a 1.x window."),
-    dict(id="Social", wave=2, name="Social", pages=["GROUP_SOCIAL"],
-         roots=["groupFinder", "panelSocial", "panelCommunities", "panelGuildControl", "panelGroupFinder",
-                        "panelChannels"],
-         modules=["panels"], icon="Interface\\Icons\\INV_Misc_Note_02",
-         notes="The 1.x social window, Who list, guild roster and group finder."),
+    # Every window in one piece (one piece runs at a time): the quest log and tracker, character, spellbook, talents,
+    # Legacy and collections, professions, social, the game's own windows, menus and tooltips.
+    dict(id="WindowsAndMenus", name="Windows and Menus",
+         pages=["GROUP_ALL_WINDOWS", "GROUP_QUESTS", "GROUP_CHARACTER_AND_SPELLS", "GROUP_PROFESSIONS", "GROUP_SOCIAL"],
+         roots=["classicFonts", "windowLocksAlways", "eraCoins", "dressUpLarge", "lootToast", "hideHelpButtons",
+                "groupFinder"],
+         modules=["panels", "clientMenus", "tooltips", "questListFont"], project=1813615,
+         icon="Interface\\Icons\\INV_Misc_Book_08",
+         notes="The 1.x character sheet, spellbook, talents, quest log, professions and social windows, and the game's "
+               "own windows and menus in 1.x frames."),
     dict(id="DamageMeterSkins", name="Damage Meter Skins", pages=[], roots=["damageMeter"], modules=[], project=1773557,
          version="1.0.4",
          icon="Interface\\Icons\\INV_Misc_PocketWatch_01", notes="The game's damage meter in the classic look."),
-    dict(id="Tooltips", wave=2, name="Tooltips", pages=[], roots=["eraCoins"], modules=["tooltips"],
-         icon="Interface\\Icons\\INV_Misc_QuestionMark", notes="1.x tooltips."),
-    dict(id="WindowsAndMenus", wave=2, name="Windows and Menus", pages=["GROUP_ALL_WINDOWS"],
-         roots=["classicFonts", "windowLocksAlways"], modules=["panels", "clientMenus"],
-         icon="Interface\\Icons\\INV_Misc_Book_08",
-         notes="The game's own windows, game menu, settings and menus in 1.x frames."),
 ]
 for pkg in PACKAGES:
     pkg.setdefault("forever", False)
@@ -84,7 +68,6 @@ for pkg in PACKAGES:
     pkg.setdefault("folder", PREFIX + pkg["id"])
     pkg.setdefault("title", "ClassicUI Forever: Standalone %s" % pkg["name"])
     pkg.setdefault("issues", ISSUES + urllib.parse.quote(pkg["title"]))
-    pkg.setdefault("wave", 1)
     # Each piece's own version, apart from the full addon's and from the other pieces': raise it in its entry.
     pkg.setdefault("version", "1.0.0")
 # Every package's folder: the guard's list of copies of our code.

@@ -236,7 +236,7 @@ end
 local function Released()
     local cmd = 'cd "%s" && %s -c "import sys; sys.path.insert(0, \'tools\'); import standalone; '
         .. '[print(p[\'title\'] + chr(9) + p[\'issues\']) for p in standalone.PACKAGES '
-        .. 'if p[\'wave\'] == 1 and p[\'folder\'].startswith(standalone.PREFIX)]"'
+        .. 'if p[\'folder\'].startswith(standalone.PREFIX)]"'
     for _, py in ipairs({ "python3", "python" }) do
         local pipe = io.popen(string.format(cmd, ROOT, py) .. " 2>&1")
         local text = pipe and pipe:read("a")
