@@ -135,6 +135,32 @@ local BUYBACK_X = 44
 -- Buyback name's left from the slot's: client 64 wide slot art at -13, name anchored 5 back into it.
 local BUYBACK_NAME_X = -13 + 64 - 5
 
+-- Era's repair icons by cell (Vanilla MerchantFrame.xml; the guild one Forever's copy only).
+local REPAIR_CELLS = {
+    MerchantRepairItemButton = { 0, 0.28125, 0, 0.5625 },
+    MerchantRepairAllButton = { 0.28125, 0.5625, 0, 0.5625 },
+    MerchantGuildBankRepairButton = { 0.5625, 0.84375, 0, 0.5625 },
+}
+
+-- The client's empty slot behind each one: Era's icons sit on the stone, their frame drawn in.
+local function HideSocket(region)
+    if not region:IsObjectType("Texture") then return end
+    local layer = region:GetDrawLayer()
+    if not ns.AnySecret(layer) and layer == "BACKGROUND" then region:Hide() end
+end
+
+local function EraRepairIcons()
+    for name, cell in pairs(REPAIR_CELLS) do
+        local button = _G[name]
+        local icon = button and button.Icon
+        if icon then
+            ns.SetTex(icon, "merchantRepair")
+            icon:SetTexCoord(cell[1], cell[2], cell[3], cell[4])
+            ns.EachRegion(button, HideSocket)
+        end
+    end
+end
+
 -- Every texture down the tree.
 local function FadeTree(frame)
     if not frame then return end
@@ -177,6 +203,7 @@ function A.MerchantFrame(frame)
     end
     PlaceBottomButtons()
     ns.HookGlobal("MerchantFrame_UpdateRepairButtons", PlaceBottomButtons)
+    EraRepairIcons()
     for i = 1, 12 do ns.Dress(_G["MerchantItem" .. i .. "NameFrame"], "merchantLabelSlots", MERCHANT_SLOT) end
     local buyback = _G["MerchantBuyBackItemNameFrame"]
     if buyback then ns.SetTex(buyback, "merchantLabelSlots") end

@@ -192,6 +192,8 @@ ns.TEX = {
     uiFrameTilesV = "!theme-base\\UIFrame-VTile-Atlas.tga",
     merchantBottom = "!UI-Merchant-BottomBorder",
     merchantLabelSlots = "!UI-Merchant-LabelSlots",
+    -- Era's repair icons, frames drawn in; Forever's copy adds a guild repair icon in Era's empty third cell.
+    merchantRepair = "=MerchantFrame\\UI-Merchant-RepairIcons",
     -- Old bag sheets: the shared bag pieces and the backpack's own.
     bagComponents = "!UI-Bag-Components",
     bagComponentsKeyring = "!UI-Bag-Components-KeyRing",
