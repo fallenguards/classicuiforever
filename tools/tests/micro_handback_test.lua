@@ -51,20 +51,24 @@ Check(textures.Normal.color and textures.Normal.color[3] == 0.6 and textures.Hig
     "the tabard tint on every state")
 Check(#writes == 0, "no field written on the button (" .. table.concat(writes, ", ") .. ")")
 
--- No file of ours calls the client's loader (a hook on it by name is fine).
-local listing = io.popen(package.config:sub(1, 1) == "\\" and ('dir /s /b "' .. ROOT .. '\\*.lua"') or ('find "' .. ROOT .. '" -name "*.lua"'))
-for path in listing:lines() do
-    if not path:find("[\\/]tools[\\/]") and not path:find("[\\/]dev[\\/]") then
-        local text = assert(io.open(path)):read("a")
+-- No file the toc loads calls the client's loader (a hook on it by name is fine). The toc, not a folder walk: CI keeps
+-- its Lua in a .lua folder inside the checkout.
+local toc, scanned = assert(io.open(ROOT .. "/ClassicUIForever.toc")), 0
+for entry in toc:lines() do
+    local file = entry:match("^([^#%s].-%.lua)%s*$")
+    if file then
+        scanned = scanned + 1
+        local text = assert(assert(io.open(ROOT .. "/" .. file:gsub("\\", "/"))):read("a"))
         for line in text:gmatch("[^\n]+") do
             local code = line:gsub("%-%-.*", "")
             if code:find("LoadMicroButtonTextures%s*%(") then
-                Check(false, path .. " calls LoadMicroButtonTextures: " .. line)
+                Check(false, file .. " calls LoadMicroButtonTextures: " .. line)
             end
         end
     end
 end
-listing:close()
+toc:close()
+Check(scanned > 100, "the toc's files scanned (" .. scanned .. ")")
 
 -- A button with no state textures of its own and a portrait (Forever's character button): what the client gave it is
 -- kept before our first dress and put back after, our 1.x textures cleared and the portrait at its own size and place.

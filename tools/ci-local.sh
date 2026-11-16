@@ -94,6 +94,11 @@ step_tests() {
         echo "lua not found (set LUA or put it on PATH)"
         return 1
     fi
+    # A folder walk takes Windows' dir branch here and find on CI, where the Lua install is a .lua folder (0.57.2).
+    if grep -nE 'popen\(.*(find "|dir /s)' tools/tests/*.lua; then
+        echo "a test walks the checkout; read the toc's file list instead (tools/tests/micro_handback_test.lua)"
+        status=1
+    fi
     for t in tools/tests/*_test.lua; do
         echo "== $t"
         "$bin" "$t" || status=1
