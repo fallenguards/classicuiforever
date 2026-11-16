@@ -173,12 +173,13 @@ local function ModuleOn(key)
 end
 
 -- A module whose pieces the gamepad interface (padOff) or another addon's action bars (barPiece, Bar/BarsTaken.lua)
--- replace stands down while that holds; toggles and reload debts stay.
--- A window the gamepad cannot navigate (padLogin) is never taken with the gamepad on at login: its hand-back stays tainted.
+-- replace stands down while that holds; toggles and reload debts stay. A padLogin window is never taken with the gamepad
+-- on at login (its hand-back stays tainted).
+ns.worldEntered = false   -- bar pieces first run at world entry: a bar addon after us takes the bars at login
 local function Runs(mod)
     if not ModuleOn(mod.key) then return false end
     if mod.padLogin and ns.padSession then return false end
-    if mod.barPiece and ns.BarsTaken() then return false end
+    if mod.barPiece and (not ns.worldEntered or ns.BarsTaken()) then return false end
     return not (mod.padOff and ns.GamepadUI and ns.GamepadUI())
 end
 
@@ -644,6 +645,11 @@ frame:SetScript("OnEvent", function(_, event, arg1)
         ns.ApplyAll()
         ns.OnEditMode(function() ns.QueueApply() end)
     else
+        -- The bar pieces' first run, in the event itself: a reload in a fight is not yet in one here.
+        if event == "PLAYER_ENTERING_WORLD" and not ns.worldEntered then
+            ns.worldEntered = true
+            ns.ApplyAll()
+        end
         ns.QueueApply()
         if event == "PLAYER_ENTERING_WORLD" and not ns.layoutChecked and ns.FirstRun then
             ns.layoutChecked = true
