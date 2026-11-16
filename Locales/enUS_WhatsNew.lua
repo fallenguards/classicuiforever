@@ -2,6 +2,16 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN87_1_TITLE"] = "Unit frame tooltips"
+L["WN87_1_TEXT"] = "The line saying to right-click for frame settings is gone from unit frame tooltips, as in Era. To see it again, turn off Hide right-click hint in the options (/fcui), under Unit frames."
+L["WN87_2_TITLE"] = "Bags"
+L["WN87_2_TEXT"] = "The backpack keeps its classic picture when bags change."
+L["WN87_3_TITLE"] = "Character window"
+L["WN87_3_TEXT"] = "The Hit Chance rows show their tooltip again."
+L["WN87_4_TITLE"] = "Vendors"
+L["WN87_4_TEXT"] = "The repair buttons show Era's icons."
+L["WN87_5_TITLE"] = "XP bar"
+L["WN87_5_TEXT"] = "The XP bar sits where Era's does and is just as tall."
 L["WN86_1_TITLE"] = "Action bar addons"
 L["WN86_1_TEXT"] = "With an action bar addon that takes over the game's bars, its bars keep their buttons and their look, Masque skins included, and the game menu's Log Out and Exit Game work again."
 L["WN86_2_TITLE"] = "Classic bar turned off"

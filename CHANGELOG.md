@@ -2,6 +2,17 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.58.0] - 2026-11-16
+
+### Added
+- Unit frame tooltips leave off the game's "Right click for Frame Settings" line and the blank line above it, as Era's have neither, and the health and power bar tooltips leave it off too. Turn off Hide right-click hint under Unit frames to see it again. Thanks to DAOWAce for the idea.
+
+### Fixed
+- The backpack keeps its classic picture when bags change. Since 0.57.2 a bag change could bring the game's own picture back.
+- On Forever, the Hit Chance rows in the character window's stats show their tooltip again.
+- The vendor window's repair buttons show Era's icons, and the guild repair button matches them.
+- The XP bar sits where Era's does on the classic bar and is just as tall. It sat one point lower, which made it look thinner than Era's.
+
 ## [0.57.2] - 2026-11-15
 
 ### Fixed

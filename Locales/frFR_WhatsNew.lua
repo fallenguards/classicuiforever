@@ -3,6 +3,16 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN87_1_TITLE"] = "Infobulles d'unité"
+L["WN87_1_TEXT"] = "La ligne qui invite au clic droit pour les options du cadre n'apparaît plus dans les infobulles des cadres d'unité, comme dans Era. Pour la revoir, désactivez Masquer l'indication du clic droit dans les options (/fcui), sous Cadres d'unité."
+L["WN87_2_TITLE"] = "Sacs"
+L["WN87_2_TEXT"] = "Le sac à dos garde son image classique quand les sacs changent."
+L["WN87_3_TITLE"] = "Fenêtre du personnage"
+L["WN87_3_TEXT"] = "Les lignes de chances de toucher affichent de nouveau leur infobulle."
+L["WN87_4_TITLE"] = "Marchands"
+L["WN87_4_TEXT"] = "Les boutons de réparation affichent les icônes d'Era."
+L["WN87_5_TITLE"] = "Barre d'expérience"
+L["WN87_5_TEXT"] = "La barre d'expérience est placée comme dans Era et aussi haute."
 L["WN86_1_TITLE"] = "Addons de barres d'action"
 L["WN86_1_TEXT"] = "Avec un addon de barres d'action qui remplace les barres du jeu, ses barres gardent leurs boutons et leur apparence, skins de Masque compris, et Déconnexion et Quitter le jeu du menu du jeu fonctionnent de nouveau."
 L["WN86_2_TITLE"] = "Barre classique désactivée"

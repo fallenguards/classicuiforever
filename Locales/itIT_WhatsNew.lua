@@ -3,6 +3,16 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN87_1_TITLE"] = "Descrizioni delle unità"
+L["WN87_1_TEXT"] = "La riga che invita al clic destro per le opzioni del riquadro non compare più nelle descrizioni dei riquadri delle unità, come in Era. Per rivederla, disattiva Nascondi il suggerimento del clic destro nelle opzioni (/fcui), sotto Riquadri delle unità."
+L["WN87_2_TITLE"] = "Borse"
+L["WN87_2_TEXT"] = "Lo zaino mantiene la sua immagine classica quando cambiano le borse."
+L["WN87_3_TITLE"] = "Finestra del personaggio"
+L["WN87_3_TEXT"] = "Le righe della probabilità di colpire mostrano di nuovo la loro descrizione."
+L["WN87_4_TITLE"] = "Mercanti"
+L["WN87_4_TEXT"] = "I pulsanti di riparazione mostrano le icone di Era."
+L["WN87_5_TITLE"] = "Barra dell'esperienza"
+L["WN87_5_TEXT"] = "La barra dell'esperienza sta dove in Era ed è alta uguale."
 L["WN86_1_TITLE"] = "Addon delle barre delle azioni"
 L["WN86_1_TEXT"] = "Con un addon delle barre delle azioni che sostituisce le barre del gioco, le sue barre mantengono i loro pulsanti e il loro aspetto, skin di Masque comprese, ed Esci e Esci dal gioco del menu di gioco funzionano di nuovo."
 L["WN86_2_TITLE"] = "Barra classica disattivata"

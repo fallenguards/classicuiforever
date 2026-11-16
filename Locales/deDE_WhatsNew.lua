@@ -3,6 +3,16 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN87_1_TITLE"] = "Einheiten-Tooltips"
+L["WN87_1_TEXT"] = "Die Zeile mit dem Hinweis auf Rechtsklick für die Rahmeneinstellungen fehlt in den Tooltips der Einheitenfenster, wie in Era. Um sie wieder zu sehen, schalte in den Optionen (/fcui) unter Einheitenfenster „Rechtsklick-Hinweis ausblenden“ aus."
+L["WN87_2_TITLE"] = "Taschen"
+L["WN87_2_TEXT"] = "Der Rucksack behält sein klassisches Bild, wenn sich Taschen ändern."
+L["WN87_3_TITLE"] = "Charakterfenster"
+L["WN87_3_TEXT"] = "Die Zeilen für Trefferchance zeigen wieder ihren Tooltip."
+L["WN87_4_TITLE"] = "Händler"
+L["WN87_4_TEXT"] = "Die Reparaturknöpfe zeigen die Symbole aus Era."
+L["WN87_5_TITLE"] = "EP-Leiste"
+L["WN87_5_TEXT"] = "Die EP-Leiste sitzt wie in Era und ist genauso hoch."
 L["WN86_1_TITLE"] = "Aktionsleisten-Addons"
 L["WN86_1_TEXT"] = "Mit einem Aktionsleisten-Addon, das die Leisten des Spiels übernimmt, behalten seine Leisten ihre Tasten und ihr Aussehen, Masque-Skins eingeschlossen, und Ausloggen und Spiel verlassen im Spielmenü funktionieren wieder."
 L["WN86_2_TITLE"] = "Klassische Leiste ausgeschaltet"

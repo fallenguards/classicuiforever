@@ -3,6 +3,16 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN87_1_TITLE"] = "Descripciones de unidad"
+L["WN87_1_TEXT"] = "La línea que indica hacer clic derecho para las opciones del marco ya no aparece en las descripciones de los marcos de unidad, como en Era. Para verla de nuevo, desactiva Ocultar el aviso de clic derecho en las opciones (/fcui), en Marcos de unidad."
+L["WN87_2_TITLE"] = "Bolsas"
+L["WN87_2_TEXT"] = "La mochila conserva su imagen clásica cuando cambian las bolsas."
+L["WN87_3_TITLE"] = "Ventana de personaje"
+L["WN87_3_TEXT"] = "Las filas de probabilidad de golpe vuelven a mostrar su descripción."
+L["WN87_4_TITLE"] = "Vendedores"
+L["WN87_4_TEXT"] = "Los botones de reparar muestran los iconos de Era."
+L["WN87_5_TITLE"] = "Barra de experiencia"
+L["WN87_5_TEXT"] = "La barra de experiencia está donde en Era y es igual de alta."
 L["WN86_1_TITLE"] = "Addons de barras de acción"
 L["WN86_1_TEXT"] = "Con un addon de barras de acción que sustituye las barras del juego, sus barras conservan sus botones y su aspecto, incluidos los aspectos de Masque, y Desconectar y Salir del juego del menú del juego vuelven a funcionar."
 L["WN86_2_TITLE"] = "Barra clásica desactivada"
