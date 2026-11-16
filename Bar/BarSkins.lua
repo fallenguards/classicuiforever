@@ -692,8 +692,10 @@ function ns.SkinBagButton(button, size, isBackpack, round, width)
     if not state then
         state = { backpack = isBackpack }
         bags[button] = state
-        HookBag(button)
     end
+    -- Also when the bar's hand-back made the backpack's record first (bar down until world entry): unhooked, every
+    -- bag change left the game's backpack art.
+    HookBag(button)
     state.bagSlot = IsBagSlot(button)
     state.size, state.width = size, width
     state.round = round and true or false
