@@ -3,6 +3,10 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN86_1_TITLE"] = "Addons de barres d'action"
+L["WN86_1_TEXT"] = "Avec un addon de barres d'action qui remplace les barres du jeu, ses barres gardent leurs boutons et leur apparence, skins de Masque compris, et Déconnexion et Quitter le jeu du menu du jeu fonctionnent de nouveau."
+L["WN86_2_TITLE"] = "Barre classique désactivée"
+L["WN86_2_TEXT"] = "Les boutons de familier et de posture et le bouton du personnage retrouvent leur propre apparence."
 L["WN85_1_TITLE"] = "Fenêtre des options du jeu"
 L["WN85_1_TEXT"] = "La fenêtre des options du jeu ne fait plus baisser la fréquence d'images tant qu'elle est ouverte."
 L["WN85_2_TITLE"] = "Talents"

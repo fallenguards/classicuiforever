@@ -2,6 +2,13 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.57.2] - 2026-11-15
+
+### Fixed
+- With an action bar addon that takes over the game's bars, its action bars, pet bar, menu bar and bag bar keep their buttons and their look, Masque skins included. The classic bar took them back as that addon took over: every bar showed empty, the micro buttons sat stacked in one spot and the pet buttons lost their frames.
+- With such a bar addon on, the game menu's Log Out and Exit Game buttons work again, and opening the character window no longer brings errors about the health bar. Both also happened after turning the classic bar off.
+- Turning the classic bar off gives the pet and stance buttons and the character button their own look back.
+
 ## [0.57.1] - 2026-11-15
 
 ### Fixed

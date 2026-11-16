@@ -2,6 +2,10 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN86_1_TITLE"] = "Action bar addons"
+L["WN86_1_TEXT"] = "With an action bar addon that takes over the game's bars, its bars keep their buttons and their look, Masque skins included, and the game menu's Log Out and Exit Game work again."
+L["WN86_2_TITLE"] = "Classic bar turned off"
+L["WN86_2_TEXT"] = "Pet and stance buttons and the character button get their own look back."
 L["WN85_1_TITLE"] = "Options window"
 L["WN85_1_TEXT"] = "The game's Options window no longer lowers the frame rate while it is open."
 L["WN85_2_TITLE"] = "Talents"

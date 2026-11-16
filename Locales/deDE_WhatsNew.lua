@@ -3,6 +3,10 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN86_1_TITLE"] = "Aktionsleisten-Addons"
+L["WN86_1_TEXT"] = "Mit einem Aktionsleisten-Addon, das die Leisten des Spiels übernimmt, behalten seine Leisten ihre Tasten und ihr Aussehen, Masque-Skins eingeschlossen, und Ausloggen und Spiel verlassen im Spielmenü funktionieren wieder."
+L["WN86_2_TITLE"] = "Klassische Leiste ausgeschaltet"
+L["WN86_2_TEXT"] = "Begleiter- und Haltungstasten sowie die Charaktertaste bekommen ihr eigenes Aussehen zurück."
 L["WN85_1_TITLE"] = "Optionsfenster des Spiels"
 L["WN85_1_TEXT"] = "Das Optionsfenster des Spiels senkt die Bildrate nicht mehr, solange es offen ist."
 L["WN85_2_TITLE"] = "Talente"

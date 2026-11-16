@@ -3,6 +3,10 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN86_1_TITLE"] = "Addons de barras de acción"
+L["WN86_1_TEXT"] = "Con un addon de barras de acción que sustituye las barras del juego, sus barras conservan sus botones y su aspecto, incluidos los aspectos de Masque, y Desconectar y Salir del juego del menú del juego vuelven a funcionar."
+L["WN86_2_TITLE"] = "Barra clásica desactivada"
+L["WN86_2_TEXT"] = "Los botones de mascota y de actitud y el botón del personaje recuperan su propio aspecto."
 L["WN85_1_TITLE"] = "Ventana de opciones del juego"
 L["WN85_1_TEXT"] = "La ventana de opciones del juego ya no baja la tasa de fotogramas mientras está abierta."
 L["WN85_2_TITLE"] = "Talentos"
