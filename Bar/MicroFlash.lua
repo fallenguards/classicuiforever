@@ -32,3 +32,27 @@ function ns.ClientMicroFlash(button)
     border:ClearAllPoints()
     border:SetAllPoints(button)
 end
+
+-- The tabard colour the client tints its guild sheet with, while it shows the emblem.
+local function ClientTint(button)
+    local emblem = button.Emblem
+    if not (emblem and emblem:IsShown()) then return nil end
+    local info = C_GuildInfo and C_GuildInfo.GetGuildTabardInfo and C_GuildInfo.GetGuildTabardInfo("player")
+    return info and info.backgroundColor
+end
+
+-- The client's own micro art back as its LoadMicroButtonTextures draws it, tabard tint too, never through it: that writes
+-- textureName, and written by us the client's next micro pass ran as ours (the character window's health text and the
+-- game menu's Log Out and Exit refused).
+local CLIENT_MICRO_ART = { { "SetNormalAtlas", "GetNormalTexture", "-Up" }, { "SetPushedAtlas", "GetPushedTexture", "-Down" },
+    { "SetDisabledAtlas", "GetDisabledTexture", "-Disabled" }, { "SetHighlightAtlas", "GetHighlightTexture", "-Mouseover" } }
+function ns.ClientMicroArt(button)
+    local name = button.textureName
+    if type(name) ~= "string" then return end
+    local color = ClientTint(button)
+    for _, art in ipairs(CLIENT_MICRO_ART) do
+        button[art[1]](button, "UI-HUD-MicroMenu-" .. name .. art[3])
+        local tex = color and button[art[2]](button)
+        if tex then tex:SetVertexColor(color.r, color.g, color.b) end
+    end
+end

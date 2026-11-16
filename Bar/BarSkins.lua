@@ -61,14 +61,6 @@ local function WhiteTex(tex) ns.SetVertexColorIf(tex, 1, 1, 1) end
 local function Drained(tex) ns.KeepDrained(tex) end
 local function Undrained(tex) ns.UndrainBronze(tex) end
 
--- The tabard colour the client tints its guild sheet with, while it shows the emblem.
-local function ClientTint(button)
-    local emblem = button.Emblem
-    if not (emblem and emblem:IsShown()) then return nil end
-    local info = C_GuildInfo and C_GuildInfo.GetGuildTabardInfo and C_GuildInfo.GetGuildTabardInfo("player")
-    return info and info.backgroundColor
-end
-
 -- Forever greys every other micro button while the game menu or settings are open; Era leaves them as they are (#72).
 local function MenuOpen()
     return (GameMenuFrame ~= nil and GameMenuFrame:IsShown()) or (SettingsPanel ~= nil and SettingsPanel:IsShown())
@@ -244,7 +236,7 @@ end
 function ns.UnskinMicroButton(button)
     local state = micro[button]
     if not state or not state.active then return end
-    -- Off first: LoadMicroButtonTextures below would re-skin it through the hook.
+    -- Off first, before any client art goes back.
     state.active = false
     if not state.art then
         Undrained(button.Background)
@@ -258,10 +250,7 @@ function ns.UnskinMicroButton(button)
     state.clientDisabled = nil
     MenuDim(button, state, false)
     ShowPerfBar(button, true)
-    if button.textureName and type(LoadMicroButtonTextures) == "function" then
-        -- Ours cleared the tabard tint; the client's GuildColor sheet needs it back.
-        LoadMicroButtonTextures(button, button.textureName, ClientTint(button))
-    end
+    ns.ClientMicroArt(button)
     ns.FadeKeys(button, EMBLEMS, 1, CHANGED)
     if state.art then ns.ClientMicroFlash(button) end
     if button.PortraitMask then button.PortraitMask:Show() end
