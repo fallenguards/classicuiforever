@@ -318,3 +318,7 @@ L["OPT_padChat_TIP"] = "Die Taste, die das Chatfeld zum Schreiben öffnet. Eine 
 L["SUB_PAD_BARS"] = "Leisten"
 L["SUB_PAD_BUTTONS"] = "Tasten"
 L["SUB_PAD_TARGETING"] = "Zielauswahl"
+
+-- Unit frame tooltips (UI/Tooltips.lua)
+L["OPT_hideFrameHint"] = "Rechtsklick-Hinweis ausblenden"
+L["OPT_hideFrameHint_TIP"] = "Die Zeile unter dem Tooltip eines Einheitenfensters, die zum Rechtsklick für seine Einstellungen auffordert. 1.x hatte keine."

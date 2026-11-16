@@ -364,4 +364,5 @@ return {
     guildClassColors = "same for everyone: off by default, the roster's gold names as before",
     trainingOwnWindow = "same for everyone: off by default, What's Training's list on the book's page as before",
     trainerSearch = "same for everyone: on by default, a search box on the trainer's window where nothing stood; Search box off hides it",
+    hideFrameHint = "same for everyone: on by default, unit frame tooltips without the right-click line, as Era's; Hide right-click hint off brings it back",
 }

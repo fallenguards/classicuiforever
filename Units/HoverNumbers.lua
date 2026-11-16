@@ -265,8 +265,8 @@ local function BarTip(e, over)
     if IsSecret(exists) or not exists then return end
     GameTooltip_SetDefaultAnchor(GameTooltip, bar)
     if not GameTooltip:SetUnit(unit) then return end
-    -- The portrait's own lines after the unit (UnitFrame_UpdateTooltip).
-    if UNIT_POPUP_RIGHT_CLICK then
+    -- The portrait's own lines after the unit (UnitFrame_UpdateTooltip), unless Hide right-click hint is on.
+    if UNIT_POPUP_RIGHT_CLICK and not ns.db.hideFrameHint then
         GameTooltip_AddBlankLineToTooltip(GameTooltip)
         GameTooltip_AddInstructionLine(GameTooltip, UNIT_POPUP_RIGHT_CLICK)
     end

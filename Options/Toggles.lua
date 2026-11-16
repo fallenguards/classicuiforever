@@ -294,6 +294,8 @@ ns.TOGGLES = {
     { "raidManagerEdge", L["OPT_raidManagerEdge"], L["OPT_raidManagerEdge_TIP"], parent = "unitFrames",
         search = "raid party manager panel sidebar left edge closed collapsed strip" },
     { "plainNumbers", L["OPT_plainNumbers"], L["OPT_plainNumbers_TIP"], search = "commas thousands separators digits large" },
+    { "hideFrameHint", L["OPT_hideFrameHint"], L["OPT_hideFrameHint_TIP"],
+        search = "right click frame settings tooltip line hint instruction portrait" },
     { "buffArrowShown", L["OPT_buffArrowShown"], L["OPT_buffArrow_TIP"], radio = "buffArrowShow", drop = true,
         dropTip = L["OPT_buffArrow_TIP"], search = "buff arrow collapse fold hover hide mouse" },
     { "buffArrowHover", L["OPT_buffArrowHover"], L["OPT_buffArrow_TIP"], radio = "buffArrowShow", drop = true },

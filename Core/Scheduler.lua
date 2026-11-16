@@ -504,18 +504,29 @@ local function MoveHelper(pointA, relA, pointB, relB, fn)
     helper:SetScript("OnSizeChanged", fn)
 end
 
+local function HookEditMode()
+    if editHooked then return end
+    editHooked = true
+    ns.OnEditMode(SyncHelpers)
+    helpersLoose = ns.EditMode.Live() and true or false
+end
+
 -- OnMove(frame, fn): fn() in the layout pass that moves or resizes frame, before a draw. Two unseen helpers, each from one
 -- of its corners to the screen's far corner (both shifted off screen), so any move or resize changes one helper's size.
 -- Not heard in edit mode.
 function Sched.OnMove(frame, fn)
     if not fn then return end
-    if not editHooked then
-        editHooked = true
-        ns.OnEditMode(SyncHelpers)
-        helpersLoose = ns.EditMode.Live() and true or false
-    end
+    HookEditMode()
     MoveHelper("TOPLEFT", frame, "BOTTOMRIGHT", UIParent, fn)
     MoveHelper("TOPLEFT", UIParent, "BOTTOMRIGHT", frame, fn)
+end
+
+-- OnResize(frame, fn): fn() in the layout pass that resizes frame, before a draw; a move alone is not heard. One unseen
+-- helper of frame's size, off screen. Not heard in edit mode.
+function Sched.OnResize(frame, fn)
+    if not fn then return end
+    HookEditMode()
+    MoveHelper("TOPLEFT", frame, "BOTTOMRIGHT", frame, fn)
 end
 
 -- LetGo(frame, loose): the helpers hung on frame or anything in it (a pad's button) let go for a drag of ours

@@ -318,3 +318,7 @@ L["OPT_padChat_TIP"] = "Il tasto che apre la casella della chat per scrivere. Un
 L["SUB_PAD_BARS"] = "Barre"
 L["SUB_PAD_BUTTONS"] = "Pulsanti"
 L["SUB_PAD_TARGETING"] = "Selezione del bersaglio"
+
+-- Unit frame tooltips (UI/Tooltips.lua)
+L["OPT_hideFrameHint"] = "Nascondi il suggerimento del clic destro"
+L["OPT_hideFrameHint_TIP"] = "La riga sotto la descrizione di un riquadro unità che invita al clic destro per le sue opzioni. La 1.x non l'aveva."

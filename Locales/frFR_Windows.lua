@@ -318,3 +318,7 @@ L["OPT_padChat_TIP"] = "Le bouton qui ouvre la zone de discussion pour écrire. 
 L["SUB_PAD_BARS"] = "Barres"
 L["SUB_PAD_BUTTONS"] = "Boutons"
 L["SUB_PAD_TARGETING"] = "Ciblage"
+
+-- Unit frame tooltips (UI/Tooltips.lua)
+L["OPT_hideFrameHint"] = "Masquer l'indication du clic droit"
+L["OPT_hideFrameHint_TIP"] = "La ligne sous l'infobulle d'un cadre d'unité qui invite au clic droit pour ses options. La 1.x n'en avait pas."

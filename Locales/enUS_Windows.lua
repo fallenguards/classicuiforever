@@ -383,3 +383,7 @@ L["OPT_padChat_TIP"] = "The button that opens the chat box to type. A controller
 L["SUB_PAD_BARS"] = "Bars"
 L["SUB_PAD_BUTTONS"] = "Buttons"
 L["SUB_PAD_TARGETING"] = "Targeting"
+
+-- Unit frame tooltips (UI/Tooltips.lua)
+L["OPT_hideFrameHint"] = "Hide right-click hint"
+L["OPT_hideFrameHint_TIP"] = "The line under a unit frame's tooltip that says to right-click for its settings. 1.x had none."

@@ -158,6 +158,7 @@ return {
     hideCollReset = false,
     hideCombatGlow = false,
     hideFinderWho = true,
+    hideFrameHint = true,
     hideGryphonLeft = false,
     hideGryphonRight = false,
     hideHelpButtons = true,

@@ -349,6 +349,7 @@ ns.DB_DEFAULTS = {
     meterPanPreview = true,
     unitNameSize = 10,
     barUnitTips = true,
+    hideFrameHint = true,
     questLevels = false,
     windowLocksAlways = false,
     hideChatButtons = false,

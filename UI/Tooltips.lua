@@ -206,3 +206,32 @@ local function OwnerGone()
     if okVisible and visible == false then GameTooltip:Hide() end
 end
 if GameTooltip then ns.Sched.Attach(GameTooltip, { name = "tooltip.owner", every = 0, fn = OwnerGone }) end
+
+-- A unit frame's "right click for frame settings" line and the blank above it (Era has neither), hidden in the layout
+-- pass that sizes the tooltip, before it draws: no hook, nothing written on the client's tooltip. Turned off, the
+-- client's next rebuild (every 0.2 s) shows them again.
+local hintWatched = false
+local function TrimHint()
+    if not (ns.db and ns.db.hideFrameHint) then return end
+    local tip = GameTooltip
+    local n = tip:NumLines()
+    if ns.IsSecret(n) or n < 2 then return end
+    local last = _G["GameTooltipTextLeft" .. n]
+    local text = last and last:IsShown() and last:GetText()
+    if ns.IsSecret(text) or text ~= UNIT_POPUP_RIGHT_CLICK then return end
+    last:Hide()
+    local blank = _G["GameTooltipTextLeft" .. (n - 1)]
+    local above = blank and blank:GetText()
+    if not ns.IsSecret(above) and above == " " then blank:Hide() end
+    if tip:IsShown() then tip:Show() end
+end
+
+local function WatchHint()
+    if hintWatched or not (GameTooltip and ns.db and ns.db.hideFrameHint) then return end
+    hintWatched = true
+    ns.Sched.OnResize(GameTooltip, TrimHint)
+end
+ns.EventFrame("PLAYER_LOGIN", WatchHint)
+ns.OnToggle(function(key)
+    if key == "hideFrameHint" then WatchHint() end
+end)

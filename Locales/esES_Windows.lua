@@ -318,3 +318,7 @@ L["OPT_padChat_TIP"] = "El botón que abre el cuadro de chat para escribir. Un b
 L["SUB_PAD_BARS"] = "Barras"
 L["SUB_PAD_BUTTONS"] = "Botones"
 L["SUB_PAD_TARGETING"] = "Selección de objetivo"
+
+-- Unit frame tooltips (UI/Tooltips.lua)
+L["OPT_hideFrameHint"] = "Ocultar el aviso de clic derecho"
+L["OPT_hideFrameHint_TIP"] = "La línea bajo la descripción de un marco de unidad que indica hacer clic derecho para sus opciones. La 1.x no la tenía."
