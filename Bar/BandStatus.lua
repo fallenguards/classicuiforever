@@ -8,9 +8,10 @@ local PIECES = B.PIECES
 local STRIP_H = 10
 -- How far the XP strip is held in from each band end.
 local STATUS_INSET = 2
--- Band top to the XP bar's top and the rep bar's foot; at -1 the rep art's 2-row overhang lies under the XP rail.
-local LOWER_Y = -1
-local UPPER_Y = -1
+-- Band top to the XP bar's top and the rep bar's foot. Era's spot: the XP rail fills the band's top 10, just above the
+-- body's top edge line; 1 lower, its fill hid that line (#303). The rep art's 2-row overhang lies under the XP rail.
+local LOWER_Y = 0
+local UPPER_Y = 0
 -- Reputation bar art when two bars show (rows of UI-ReputationWatchBar).
 local REP_ROWS = { { 0, 0.171875 }, { 0.1875, 0.359375 }, { 0.375, 0.546875 }, { 0.5625, 0.734375 } }
 local Remember, BandNow, Record, Differs, StatusPair = B.Remember, B.BandNow, B.Record, B.Differs, B.StatusPair
