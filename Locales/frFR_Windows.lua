@@ -324,3 +324,11 @@ L["SUB_PAD_TARGETING"] = "Ciblage"
 -- Unit frame tooltips (UI/Tooltips.lua)
 L["OPT_hideFrameHint"] = "Masquer l'indication du clic droit"
 L["OPT_hideFrameHint_TIP"] = "La ligne sous l'infobulle d'un cadre d'unité qui invite au clic droit pour ses options. La 1.x n'en avait pas."
+
+-- The game's toasts 1.x had none of (UI/LootToast.lua)
+L["OPT_lootToast"] = "Avis de butin"
+L["OPT_lootToast_TIP"] = "La boîte « Vous avez reçu » du jeu qui surgit pour un butin rare, un jet gagné ou une amélioration. 1.x n'en avait pas."
+L["OPT_skillToast"] = "Avis de compétence"
+L["OPT_skillToast_TIP"] = "La boîte « Nouvelle recette apprise » du jeu qui surgit quand un métier vous enseigne quelque chose. 1.x n'en avait pas."
+L["OPT_achievementToast"] = "Avis de haut fait"
+L["OPT_achievementToast_TIP"] = "La boîte du jeu qui surgit quand vous accomplissez un haut fait (un défi d'Héritage sur Forever) ou l'une de ses étapes. 1.x n'en avait pas."

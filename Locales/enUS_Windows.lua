@@ -389,3 +389,11 @@ L["SUB_PAD_TARGETING"] = "Targeting"
 -- Unit frame tooltips (UI/Tooltips.lua)
 L["OPT_hideFrameHint"] = "Hide right-click hint"
 L["OPT_hideFrameHint_TIP"] = "The line under a unit frame's tooltip that says to right-click for its settings. 1.x had none."
+
+-- The game's toasts 1.x had none of (UI/LootToast.lua)
+L["OPT_lootToast"] = "Loot toast"
+L["OPT_lootToast_TIP"] = "The game's \"You received\" box that pops up for a rare drop, a roll won or an upgrade. 1.x had none."
+L["OPT_skillToast"] = "Skill toast"
+L["OPT_skillToast_TIP"] = "The game's \"New Recipe Learned\" box that pops up as a profession teaches you something. 1.x had none."
+L["OPT_achievementToast"] = "Achievement toast"
+L["OPT_achievementToast_TIP"] = "The game's box that pops up as you complete an achievement (a Legacy challenge on Forever) or a step of one. 1.x had none."

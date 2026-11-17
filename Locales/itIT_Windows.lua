@@ -324,3 +324,11 @@ L["SUB_PAD_TARGETING"] = "Selezione del bersaglio"
 -- Unit frame tooltips (UI/Tooltips.lua)
 L["OPT_hideFrameHint"] = "Nascondi il suggerimento del clic destro"
 L["OPT_hideFrameHint_TIP"] = "La riga sotto la descrizione di un riquadro unità che invita al clic destro per le sue opzioni. La 1.x non l'aveva."
+
+-- The game's toasts 1.x had none of (UI/LootToast.lua)
+L["OPT_lootToast"] = "Avviso di bottino"
+L["OPT_lootToast_TIP"] = "Il riquadro \"Hai ricevuto\" del gioco che compare per un bottino raro, un tiro vinto o un potenziamento. 1.x non ne aveva."
+L["OPT_skillToast"] = "Avviso di abilità"
+L["OPT_skillToast_TIP"] = "Il riquadro \"Nuova ricetta appresa\" del gioco che compare quando una professione ti insegna qualcosa. 1.x non ne aveva."
+L["OPT_achievementToast"] = "Avviso di impresa"
+L["OPT_achievementToast_TIP"] = "Il riquadro del gioco che compare quando completi un'impresa (una sfida dell'Eredità su Forever) o uno dei suoi passi. 1.x non ne aveva."

@@ -1,13 +1,13 @@
 local _, ns = ...
 
--- The game's toasts 1.x had none of: the loot ones ("You received" for a rare drop, a roll won, an upgrade) and the
--- skill ones ("New Recipe Learned" as a profession teaches something). The alert frame stops hearing their events
--- unless the row is ticked; ticked, it hears them again.
+-- The game's toasts 1.x had none of: loot ("You received", a roll won), skill ("New Recipe Learned") and achievement
+-- ones (a Legacy challenge done, or a step of one). The alert frame hears their events only while the row is checked.
 
 local TOASTS = {
     lootToast = { "SHOW_LOOT_TOAST", "SHOW_LOOT_TOAST_UPGRADE", "SHOW_LOOT_TOAST_LEGENDARY_LOOTED",
         "SHOW_PVP_FACTION_LOOT_TOAST", "SHOW_RATED_PVP_REWARD_TOAST", "LOOT_ITEM_ROLL_WON" },
     skillToast = { "NEW_RECIPE_LEARNED", "SKILL_LINE_SPECS_UNLOCKED" },
+    achievementToast = { "ACHIEVEMENT_EARNED", "CRITERIA_EARNED" },
 }
 local deaf = {}
 

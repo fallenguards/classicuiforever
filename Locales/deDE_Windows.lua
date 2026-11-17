@@ -324,3 +324,11 @@ L["SUB_PAD_TARGETING"] = "Zielauswahl"
 -- Unit frame tooltips (UI/Tooltips.lua)
 L["OPT_hideFrameHint"] = "Rechtsklick-Hinweis ausblenden"
 L["OPT_hideFrameHint_TIP"] = "Die Zeile unter dem Tooltip eines Einheitenfensters, die zum Rechtsklick für seine Einstellungen auffordert. 1.x hatte keine."
+
+-- The game's toasts 1.x had none of (UI/LootToast.lua)
+L["OPT_lootToast"] = "Beute-Hinweis"
+L["OPT_lootToast_TIP"] = "Das Kästchen \"Ihr habt erhalten\" des Spiels, das bei einem seltenen Fund, einem gewonnenen Wurf oder einer Aufwertung aufspringt. 1.x hatte keines."
+L["OPT_skillToast"] = "Fertigkeitsmeldung"
+L["OPT_skillToast_TIP"] = "Das Kästchen \"Neues Rezept erlernt\" des Spiels, das aufspringt, wenn ein Beruf euch etwas beibringt. 1.x hatte keines."
+L["OPT_achievementToast"] = "Erfolgsmeldung"
+L["OPT_achievementToast_TIP"] = "Das Kästchen des Spiels, das bei einem abgeschlossenen Erfolg (auf Forever einer Vermächtnisherausforderung) oder einem Schritt dazu aufspringt. 1.x hatte keines."

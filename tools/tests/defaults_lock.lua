@@ -1,5 +1,6 @@
 -- Written by: lua tools/tests/defaults_test.lua --write. Never edit by hand.
 return {
+    achievementToast = false,
     achievementsMinimapButton = true,
     addonMessages = true,
     bagWindowsFollow = false,

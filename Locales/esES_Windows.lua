@@ -324,3 +324,11 @@ L["SUB_PAD_TARGETING"] = "Selección de objetivo"
 -- Unit frame tooltips (UI/Tooltips.lua)
 L["OPT_hideFrameHint"] = "Ocultar el aviso de clic derecho"
 L["OPT_hideFrameHint_TIP"] = "La línea bajo la descripción de un marco de unidad que indica hacer clic derecho para sus opciones. La 1.x no la tenía."
+
+-- The game's toasts 1.x had none of (UI/LootToast.lua)
+L["OPT_lootToast"] = "Aviso de botín"
+L["OPT_lootToast_TIP"] = "El recuadro \"Has recibido\" del juego que aparece con un botín raro, una tirada ganada o una mejora. 1.x no tenía ninguno."
+L["OPT_skillToast"] = "Aviso de habilidad"
+L["OPT_skillToast_TIP"] = "El recuadro \"Nueva receta aprendida\" del juego que aparece cuando una profesión te enseña algo. 1.x no tenía ninguno."
+L["OPT_achievementToast"] = "Aviso de logro"
+L["OPT_achievementToast_TIP"] = "El recuadro del juego que aparece al completar un logro (un desafío de Legado en Forever) o uno de sus pasos. 1.x no tenía ninguno."

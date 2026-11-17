@@ -595,6 +595,8 @@ ns.TOGGLES = {
         group = L["GROUP_OTHER"], sub = L["SUB_COMBAT"] },
     { "lootToast", L["OPT_lootToast"], L["OPT_lootToast_TIP"], search = "loot toast popup you received alert won drop" },
     { "skillToast", L["OPT_skillToast"], L["OPT_skillToast_TIP"], search = "new recipe learned profession skill toast popup alert" },
+    { "achievementToast", L["OPT_achievementToast"], L["OPT_achievementToast_TIP"],
+        search = "achievement legacy challenge complete earned criteria progress toast popup alert" },
     { "levelUpBanner", L["OPT_levelUpBanner"], L["OPT_levelUpBanner_TIP"], search = "level up ding banner toast popup reached",
         sub = L["SUB_MESSAGES"] },
     { "hideZoneText", L["OPT_hideZoneText"], L["OPT_hideZoneText_TIP"],
