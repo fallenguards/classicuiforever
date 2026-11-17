@@ -235,7 +235,8 @@ local function SkinSkillDetail()
     local skills = SkillsFrame
     local detail = skills and skills.SkillDetailFrame
     if not detail or not CharacterFrame then return end
-    local onSkills = skills:IsShown() and true or false
+    -- Seen, not the tab's flag: closed on Skills the flag stays on, and C switches tabs before the window shows (#301).
+    local onSkills = skills:IsVisible() and true or false
     local s = Section()
     local holder = s.holder
     -- Full width inside the art; 2 taller so the grey foot meets the window's bottom edge.
