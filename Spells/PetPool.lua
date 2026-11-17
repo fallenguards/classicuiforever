@@ -1,19 +1,19 @@
 local _, ns = ...
 
--- A pet's book entries (commands, stances, spells) drag to the bars in a fight from real copies of their own, up to five
--- each on the bonus pages' action slots (73 to 120, never shown by a class with a pet); the secure drag takes the first
--- copy still there (SpellBook.lua DRAG_BODY). Copies live on the server: only a missing one is placed, out of combat.
+-- A pet's book entries drag to the bars in a fight from copies on the bonus pages' slots (73 to 120, never shown with
+-- a pet); the secure drag takes the first copy still there (SpellBook.lua DRAG_BODY). A placed copy costs the game
+-- about 11 ms, so copies stay put: the commands all pets share never move, another pet's spells wait for its return.
 
 local IsSecret = ns.IsSecret
-local POOL_FIRST, POOL_LAST, POOL_MAX = 73, 120, 5
+local POOL_FIRST, POOL_LAST, COPIES = 73, 120, 2
 local BANK_PET = Enum.SpellBookSpellBank and Enum.SpellBookSpellBank.Pet or 1
 -- An earlier build dragged through macros; the tag finds any still in the list.
 local PET_MACRO_TAG = "#fcuipet"
 
-local pool = {}   -- pet book index -> its copies' slots, in order
--- slot -> the entry id placed there and not yet seen to hold: a copy the game will not keep is tried once, never again
--- (a warlock's pet swap re-placed such entries on every pass: icons on the cursor and a stall).
-local tried = {}
+local pool = {}       -- pet book index -> its copies' slots
+local seen = {}       -- copy key -> when its pet was last out; another pet's copies make room, the oldest first
+local lastPlaced = {} -- slot -> key placed there by the last pass
+local refused = {}    -- key -> true: the game did not keep its copy, never placed again this session
 local macrosCleared = false
 
 local function ClearOldMacros()
@@ -33,85 +33,92 @@ local function ActionIcon(slot)
     return get and get(slot)
 end
 
--- The pet book's entries worth a copy: commands, stances and spells, never passives. A command's id is its pet action id.
+-- The pet book's entries worth a copy: commands, stances and spells, never passives. A spell is keyed by its id, a
+-- command by its icon (its copy reads back with id 0).
 local function Entries()
-    local out, icons = {}, {}
+    local out = {}
     local ok, count = pcall(C_SpellBook.HasPetSpells)
-    if not ok or not count or IsSecret(count) then return out, icons end
+    if not ok or not count or IsSecret(count) then return out end
     for i = 1, count do
         local info = C_SpellBook.GetSpellBookItemInfo(i, BANK_PET)
         local id = info and not info.isPassive and (info.spellID or info.actionID)
         if id and not IsSecret(id) then
             local icon = C_SpellBook.GetSpellBookItemTexture(i, BANK_PET) or info.iconID
-            out[#out + 1] = { index = i, spellID = info.spellID, actionID = info.actionID, icon = icon }
-            if icon then icons[icon] = true end
+            out[#out + 1] = { index = i, spellID = info.spellID, actionID = info.actionID, icon = icon,
+                key = info.spellID and ("s" .. info.spellID) or ("i" .. tostring(icon)) }
         end
     end
-    return out, icons
+    return out
 end
 
--- A slot ours to use: empty, or holding a pet action (nothing else lands on the bonus pages of a class without forms).
-local function Free(slot, icons)
-    if not HasAction(slot) then return true end
-    local kind, _, sub = GetActionInfo(slot)
-    return sub == "pet" or kind == "petaction" or icons[ActionIcon(slot) or 0] == true
+-- A pool slot's copy as a key, nil when empty, false when it is no pet's (a player's own action stays).
+local function SlotKey(slot, icons)
+    if not HasAction(slot) then return nil end
+    local kind, id, sub = GetActionInfo(slot)
+    local icon = ActionIcon(slot)
+    if sub ~= "pet" and kind ~= "petaction" and not icons[icon or 0] then return false end
+    if id ~= nil and not IsSecret(id) and id ~= 0 then return "s" .. id end
+    return "i" .. tostring(icon)
 end
 
--- The slot holds this entry's copy: by id (a spell's, a command's pet action id), else by icon. A copy missed here is
--- placed again on every pass, which showed as icons cycling under the cursor after each load.
-local function Holds(slot, e)
-    if not HasAction(slot) then return false end
-    local _, id = GetActionInfo(slot)
-    if id ~= nil and not IsSecret(id) and (id == e.spellID or id == e.actionID) then return true end
-    return ActionIcon(slot) == e.icon
-end
-
--- The free slots shared out in book order, POOL_MAX each at most; the same pet gets the same plan every time.
-local function Plan(entries, icons)
-    local free, want = {}, {}
-    for slot = POOL_FIRST, POOL_LAST do
-        if Free(slot, icons) then free[#free + 1] = slot end
-    end
-    local copies = math.min(POOL_MAX, math.floor(#free / #entries))
-    local n = 0
-    wipe(pool)
-    for _, e in ipairs(entries) do
-        local list = {}
-        for i = 1, copies do
-            list[i] = free[n + i]
-            want[free[n + i]] = e
-        end
-        n = n + copies
-        pool[e.index] = list
-    end
-    return free, want
-end
-
--- Out of combat with nothing on the cursor: the plan laid, missing copies placed, stale pet actions cleared. Returns
--- how many copies were placed, nil when nothing could be done (a fight, forms, no pet out, the cursor busy).
+-- Out of combat with nothing on the cursor: the pet's copies found, the missing ones placed on empty slots, then on its
+-- own spare copies, then on other pets' copies. Returns how many were placed, nil when nothing could be done (a fight,
+-- forms, no pet out, the cursor busy).
 function ns.SyncPetPool()
     if InCombatLockdown() or GetNumShapeshiftForms() > 0 then return nil end
     ClearOldMacros()
-    local entries, icons = Entries()
+    local entries = Entries()
     -- No pet out: the copies stay for the next one.
     if #entries == 0 then return nil end
-    local free, want = Plan(entries, icons)
+    local byKey, icons, now = {}, {}, GetTime()
+    for _, e in ipairs(entries) do
+        seen[e.key] = now
+        byKey[e.key] = e
+        if e.actionID then byKey["s" .. e.actionID] = byKey["s" .. e.actionID] or e end
+        if e.icon then
+            byKey["i" .. e.icon] = byKey["i" .. e.icon] or e
+            icons[e.icon] = true
+        end
+    end
+    wipe(pool)
+    local room, spare, others, owner = {}, {}, {}, {}
+    for slot = POOL_FIRST, POOL_LAST do
+        local key = SlotKey(slot, icons)
+        local e = key and byKey[key]
+        if key == nil then
+            room[#room + 1] = slot
+        elseif e then
+            owner[slot] = e.key
+            local list = pool[e.index] or {}
+            pool[e.index] = list
+            if #list < COPIES then list[#list + 1] = slot else spare[#spare + 1] = slot end
+        elseif key then
+            others[#others + 1] = { slot = slot, at = seen[key] or 0 }
+        end
+    end
+    for slot, key in pairs(lastPlaced) do
+        if owner[slot] ~= key then refused[key] = true end
+    end
+    wipe(lastPlaced)
     if GetCursorInfo() then return nil end
-    local placed = 0
-    for _, slot in ipairs(free) do
-        local e = want[slot]
-        if not e then
-            if HasAction(slot) then
-                PickupAction(slot)
-                ClearCursor()
-            end
-        elseif Holds(slot, e) then
-            tried[slot] = nil
-        elseif tried[slot] ~= (e.spellID or e.actionID) then
-            tried[slot] = e.spellID or e.actionID
+    table.sort(others, function(a, b)
+        if a.at ~= b.at then return a.at < b.at end
+        return a.slot < b.slot
+    end)
+    for _, slot in ipairs(spare) do room[#room + 1] = slot end
+    for _, other in ipairs(others) do room[#room + 1] = other.slot end
+    local placed, taken = 0, 0
+    for _, e in ipairs(entries) do
+        local list = pool[e.index] or {}
+        pool[e.index] = list
+        while #list < COPIES and not refused[e.key] and room[taken + 1] do
+            taken = taken + 1
+            local slot = room[taken]
             C_SpellBook.PickupSpellBookItem(e.index, BANK_PET)
             PlaceAction(slot)
             ClearCursor()
+            list[#list + 1] = slot
+            lastPlaced[slot] = e.key
             placed = placed + 1
         end
     end

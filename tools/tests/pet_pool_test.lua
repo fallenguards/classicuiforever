@@ -1,7 +1,7 @@
--- Offline test under Lua 5.4 for the pet copy pool (Spells/PetPool.lua): a pet's book entries get real copies on the
--- bonus pages' slots, shared out in book order; a pass places only the copies missing. A copy of a command was not
--- recognised by its pet action id before, so every pass placed every copy again: icons cycled under the cursor at
--- each load. Run from the addon root: lua tools/tests/pet_pool_test.lua (CI runs every tools/tests/*_test.lua).
+-- Offline test under Lua 5.4 for the pet copy pool (Spells/PetPool.lua): a pet's book entries get two real copies each
+-- on the bonus pages' slots; a pass places only the copies missing, and a copy stays where it is. A pet swap used to
+-- re-place every copy (each one a stall in the game), so commands shared by pets must never move and another pet's
+-- copies must wait for its return. Run from the addon root: lua tools/tests/pet_pool_test.lua (CI runs every test).
 -- luacheck: std lua54
 -- luacheck: ignore 111 112 113 121 122 212
 
@@ -16,21 +16,24 @@ local function Check(ok, what)
     end
 end
 
--- The pet book: Attack and Follow are commands (a pet action id, no spell), Growl a spell, one passive.
-local BOOK = {
-    { name = "Attack", actionID = 117440514, icon = 1001 },
-    { name = "Follow", actionID = 117440513, icon = 1002 },
-    { name = "Growl", spellID = 2649, actionID = 2649, icon = 1003 },
-    { name = "Faster Attack", spellID = 100, actionID = 100, icon = 1004, isPassive = true },
-}
+-- Pet books. Attack's copy reads back under its pet action id, Follow's with id 0 (as the game does); one passive.
+local ATTACK = { name = "Attack", actionID = 117440514, icon = 1001 }
+local FOLLOW = { name = "Follow", actionID = 117440513, icon = 1002, readsZero = true }
+local HOUND = { ATTACK, FOLLOW, { name = "Growl", spellID = 2649, actionID = 2649, icon = 1003 },
+    { name = "Faster Attack", spellID = 100, actionID = 100, icon = 1004, isPassive = true } }
+local CAT = { ATTACK, FOLLOW, { name = "Bite", spellID = 17253, actionID = 17253, icon = 1005 } }
+local BEAR = { ATTACK, FOLLOW, { name = "Claw", spellID = 16827, actionID = 16827, icon = 1006 } }
+local GHOST = { ATTACK, FOLLOW, { name = "Fade", spellID = 555, actionID = 555, icon = 1007, vanishes = true } }
+local BOOK = HOUND
 -- Action slots as the server keeps them: slot -> { kind, id, sub, icon }.
 local slots = {}
 local cursor
 local picked, placed = 0, 0
-local combat, forms = false, 0
+local combat, forms, clock = false, 0, 0
 
 function InCombatLockdown() return combat end
 function GetNumShapeshiftForms() return forms end
+function GetTime() clock = clock + 1 return clock end
 function GetNumMacros() return 0, 0 end
 function GetMacroInfo() return nil end
 function DeleteMacro() end
@@ -40,14 +43,19 @@ function GetActionInfo(slot)
     if a then return a.kind, a.id, a.sub end
 end
 function GetActionTexture(slot) return slots[slot] and slots[slot].icon end
-function GetCursorInfo() return cursor end
+function GetCursorInfo() return cursor and cursor.kind end
 function ClearCursor() cursor = nil end
 function PickupAction(slot)
     picked = picked + 1
     cursor, slots[slot] = slots[slot], cursor
 end
+-- A copy the game will not keep is dropped; the slot keeps what it had.
 function PlaceAction(slot)
     placed = placed + 1
+    if cursor and cursor.vanishes then
+        cursor = nil
+        return
+    end
     slots[slot], cursor = cursor, slots[slot]
 end
 function wipe(t)
@@ -59,50 +67,81 @@ C_SpellBook = {
     HasPetSpells = function() return #BOOK end,
     GetSpellBookItemInfo = function(i) return BOOK[i] end,
     GetSpellBookItemTexture = function(i) return BOOK[i].icon end,
-    -- A command's copy reads back as a "pet" spell action under its pet action id.
     PickupSpellBookItem = function(i)
         local e = BOOK[i]
-        cursor = { kind = "spell", id = e.spellID or e.actionID, sub = "pet", icon = e.icon }
+        cursor = { kind = "spell", id = e.readsZero and 0 or (e.spellID or e.actionID), sub = "pet", icon = e.icon,
+            vanishes = e.vanishes }
     end,
 }
 
 local ns = { IsSecret = function() return false end }
 assert(loadfile(ROOT .. "/Spells/PetPool.lua"))("ClassicUIForever", ns)
 
--- First pass: five copies each of the three entries, in book order from slot 73; the passive gets none.
-local n = ns.SyncPetPool()
-Check(n == 15 and placed == 15, "the first pass places five copies of each of three entries (" .. tostring(n) .. ")")
-local attack, growl = ns.PetPoolSlots(1), ns.PetPoolSlots(3)
-Check(attack and attack[1] == 73 and attack[5] == 77, "Attack's copies on slots 73 to 77")
-Check(growl and growl[1] == 83 and growl[5] == 87, "Growl's copies on slots 83 to 87")
-Check(ns.PetPoolSlots(4) == nil, "no copies for a passive")
-Check(slots[73].id == 117440514 and slots[83].id == 2649, "copies hold the entries' ids")
+local function Pass()
+    placed, picked = 0, 0
+    return ns.SyncPetPool()
+end
 
--- A second pass finds every copy in place by its id: nothing placed, nothing picked up (the old cycling).
-placed, picked = 0, 0
-n = ns.SyncPetPool()
+-- First pass: two copies each of the three entries, in book order from slot 73; the passive gets none.
+local n = Pass()
+Check(n == 6 and placed == 6, "the first pass places two copies of each of three entries (" .. tostring(n) .. ")")
+local attack, growl = ns.PetPoolSlots(1), ns.PetPoolSlots(3)
+Check(attack and attack[1] == 73 and attack[2] == 74, "Attack's copies on slots 73 and 74")
+Check(growl and growl[1] == 77 and growl[2] == 78, "Growl's copies on slots 77 and 78")
+Check(ns.PetPoolSlots(4) == nil, "no copies for a passive")
+
+-- A second pass finds every copy in place: nothing placed, nothing picked up.
+n = Pass()
 Check(n == 0 and placed == 0 and picked == 0, "a pass with every copy in place places nothing (" .. tostring(n) .. ")")
 
--- A fight's drags took two of Attack's copies: only those two come back, on the same slots.
-slots[73], slots[75] = nil, nil
-placed = 0
-n = ns.SyncPetPool()
-Check(n == 2 and placed == 2 and slots[73] and slots[75], "only the two copies taken are placed again")
-Check(ns.PetPoolSlots(1)[1] == 73, "the plan stays the same")
+-- A fight's drag took one of Attack's copies: only that one comes back, on the same slot.
+slots[73] = nil
+n = Pass()
+Check(n == 1 and slots[73] and slots[73].icon == 1001, "only the copy taken is placed again, on its slot")
 
 -- A copy the game reads back another way (no id, the icon alone) still counts.
 slots[74] = { kind = "petaction", icon = 1001 }
-placed = 0
-Check(ns.SyncPetPool() == 0 and placed == 0, "a copy known by its icon alone is not placed again")
+Check(Pass() == 0 and placed == 0, "a copy known by its icon alone is not placed again")
+
+-- A pet swap: the shared commands stay, only the new pet's own spell is placed; the old pet's copies wait.
+BOOK = CAT
+n = Pass()
+Check(n == 2 and placed == 2 and picked == 0, "a swap places only the new pet's own spell (" .. tostring(n) .. ")")
+Check(slots[77].id == 2649 and slots[78].id == 2649, "the old pet's copies stay")
+Check(slots[79].id == 17253 and slots[80].id == 17253, "the new spell goes on empty slots")
+BOOK = HOUND
+Check(Pass() == 0 and placed == 0, "swapping back places nothing")
+
+-- A full pool: an extra copy of the pet's own goes first, then the copies of a pet not out this session, never the
+-- copies of pets out lately, never a player's own action.
+for slot = 81, 120 do slots[slot] = { kind = "spell", id = 999, sub = "pet", icon = 2000 } end
+slots[100] = { kind = "spell", id = 117440514, sub = "pet", icon = 1001 }
+slots[101] = { kind = "spell", id = 133, icon = 3000 }
+BOOK = CAT
+Pass()
+BOOK = BEAR
+n = Pass()
+Check(n == 2, "the new pet's spell finds room (" .. tostring(n) .. ")")
+Check(slots[100].id == 16827 and slots[81].id == 16827, "the extra copy first, then the oldest pet's")
+Check(slots[77].id == 2649 and slots[79].id == 17253, "pets out this session keep their copies")
+Check(slots[101].id == 133, "a player's own action is left alone")
+
+-- A copy the game will not keep is tried once, never again (it used to be placed on every pass).
+BOOK = GHOST
+n = Pass()
+Check(n == 2, "the first try places its copies (" .. tostring(n) .. ")")
+n = Pass()
+Check(n == 0 and placed == 0, "a copy the game did not keep is not tried again (" .. tostring(n) .. ")")
 
 -- Never in a fight, never with forms, never over something on the cursor.
+BOOK = HOUND
 combat = true
-Check(ns.SyncPetPool() == nil, "no pass in a fight")
+Check(Pass() == nil, "no pass in a fight")
 combat, forms = false, 2
-Check(ns.SyncPetPool() == nil, "no pass with forms (their pages hold the bonus bars)")
+Check(Pass() == nil, "no pass with forms (their pages hold the bonus bars)")
 forms = 0
 cursor = { kind = "item" }
-Check(ns.SyncPetPool() == nil and cursor ~= nil, "a busy cursor is left alone")
+Check(Pass() == nil and cursor ~= nil, "a busy cursor is left alone")
 cursor = nil
 
 if failed > 0 then
