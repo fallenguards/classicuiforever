@@ -2,6 +2,12 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN88_1_TITLE"] = "Pets"
+L["WN88_1_TEXT"] = "Summoning another pet no longer freezes the game for a moment."
+L["WN88_2_TITLE"] = "Quest log"
+L["WN88_2_TEXT"] = "Abandoning a quest plays its sound only once you pick Yes."
+L["WN88_3_TITLE"] = "Professions"
+L["WN88_3_TEXT"] = "The professions book counts gear such as a fishing pole in each skill's bonus."
 L["WN87_1_TITLE"] = "Unit frame tooltips"
 L["WN87_1_TEXT"] = "The line saying to right-click for frame settings is gone from unit frame tooltips, as in Era. To see it again, turn off Hide right-click hint in the options (/fcui), under Unit frames."
 L["WN87_2_TITLE"] = "Bags"

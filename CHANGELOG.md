@@ -2,6 +2,14 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.58.1] - 2026-11-17
+
+### Fixed
+- Summoning another pet no longer freezes the game for a second or two. A warlock swapping demons saw the pet's spell icons flash on the cursor during the freeze.
+- Abandoning a quest from the classic quest log plays the abandon sound only when you pick Yes. It also played on the Abandon click, before you chose.
+- On Forever, the professions book counts gear such as a fishing pole in a skill's bonus, as the Skills tab does. It left gear out.
+- Small alignment fix: the character window opened by a weapon enchant from the bags appears on its classic spot at once instead of jumping there.
+
 ## [0.58.0] - 2026-11-16
 
 ### Added

@@ -3,6 +3,12 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN88_1_TITLE"] = "Familiers"
+L["WN88_1_TEXT"] = "Invoquer un autre familier ne fige plus le jeu un instant."
+L["WN88_2_TITLE"] = "Journal de quêtes"
+L["WN88_2_TEXT"] = "Le son d'abandon d'une quête ne se joue que lorsque vous choisissez Oui."
+L["WN88_3_TITLE"] = "Métiers"
+L["WN88_3_TEXT"] = "Le livre des métiers compte l'équipement, comme une canne à pêche, dans le bonus de chaque compétence."
 L["WN87_1_TITLE"] = "Infobulles d'unité"
 L["WN87_1_TEXT"] = "La ligne qui invite au clic droit pour les options du cadre n'apparaît plus dans les infobulles des cadres d'unité, comme dans Era. Pour la revoir, désactivez Masquer l'indication du clic droit dans les options (/fcui), sous Cadres d'unité."
 L["WN87_2_TITLE"] = "Sacs"

@@ -3,6 +3,12 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN88_1_TITLE"] = "Begleiter"
+L["WN88_1_TEXT"] = "Einen anderen Begleiter zu beschwören, lässt das Spiel nicht mehr kurz einfrieren."
+L["WN88_2_TITLE"] = "Questlog"
+L["WN88_2_TEXT"] = "Der Klang beim Abbrechen einer Quest ertönt erst, wenn du Ja wählst."
+L["WN88_3_TITLE"] = "Berufe"
+L["WN88_3_TEXT"] = "Das Berufebuch rechnet Ausrüstung wie eine Angelrute in den Bonus jeder Fertigkeit ein."
 L["WN87_1_TITLE"] = "Einheiten-Tooltips"
 L["WN87_1_TEXT"] = "Die Zeile mit dem Hinweis auf Rechtsklick für die Rahmeneinstellungen fehlt in den Tooltips der Einheitenfenster, wie in Era. Um sie wieder zu sehen, schalte in den Optionen (/fcui) unter Einheitenfenster „Rechtsklick-Hinweis ausblenden“ aus."
 L["WN87_2_TITLE"] = "Taschen"

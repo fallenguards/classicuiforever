@@ -3,6 +3,12 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN88_1_TITLE"] = "Famigli"
+L["WN88_1_TEXT"] = "Evocare un altro famiglio non blocca più il gioco per un momento."
+L["WN88_2_TITLE"] = "Registro delle missioni"
+L["WN88_2_TEXT"] = "Abbandonare una missione riproduce il suono solo quando scegli Sì."
+L["WN88_3_TITLE"] = "Professioni"
+L["WN88_3_TEXT"] = "Il libro delle professioni conta l'equipaggiamento, come una canna da pesca, nel bonus di ogni abilità."
 L["WN87_1_TITLE"] = "Descrizioni delle unità"
 L["WN87_1_TEXT"] = "La riga che invita al clic destro per le opzioni del riquadro non compare più nelle descrizioni dei riquadri delle unità, come in Era. Per rivederla, disattiva Nascondi il suggerimento del clic destro nelle opzioni (/fcui), sotto Riquadri delle unità."
 L["WN87_2_TITLE"] = "Borse"

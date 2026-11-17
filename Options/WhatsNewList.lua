@@ -5,6 +5,11 @@ local L = ns.L
 -- line once per new version, and the box shows only the versions since the one they saw last. An entry marked
 -- on = "forever" or on = "retail" is that client's alone; unmarked is both.
 ns.WHATSNEW = {
+    { id = 88, version = "0.58.1",
+        { L["WN88_1_TITLE"], L["WN88_1_TEXT"] },
+        { L["WN88_2_TITLE"], L["WN88_2_TEXT"] },
+        { L["WN88_3_TITLE"], L["WN88_3_TEXT"], on = "forever" },
+    },
     { id = 87, version = "0.58.0",
         { L["WN87_1_TITLE"], L["WN87_1_TEXT"] },
         { L["WN87_2_TITLE"], L["WN87_2_TEXT"] },

@@ -3,6 +3,12 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN88_1_TITLE"] = "Mascotas"
+L["WN88_1_TEXT"] = "Invocar otra mascota ya no congela el juego por un momento."
+L["WN88_2_TITLE"] = "Registro de misiones"
+L["WN88_2_TEXT"] = "Abandonar una misión reproduce su sonido solo cuando eliges Sí."
+L["WN88_3_TITLE"] = "Profesiones"
+L["WN88_3_TEXT"] = "El libro de profesiones incluye el equipo, como una caña de pescar, en la bonificación de cada habilidad."
 L["WN87_1_TITLE"] = "Descripciones de unidad"
 L["WN87_1_TEXT"] = "La línea que indica hacer clic derecho para las opciones del marco ya no aparece en las descripciones de los marcos de unidad, como en Era. Para verla de nuevo, desactiva Ocultar el aviso de clic derecho en las opciones (/fcui), en Marcos de unidad."
 L["WN87_2_TITLE"] = "Bolsas"
