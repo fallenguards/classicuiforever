@@ -750,8 +750,10 @@ local function SheetPass()
     if gapMoved then gapMoved = false PlaceClassicWindows() end
 end
 
+-- A weapon enchant opens the sheet from the game's event, after this frame's pass: ours lays it before the draw.
 if CharacterFrame then
     ns.Sched.OnFrame(ns.NewFrame("Frame", nil, CharacterFrame), { name = "windows.sheetGap", every = 0, fn = SheetPass })
+    ns.EventFrame("ENCHANT_SPELL_SELECTED", SheetPass)
 end
 
 -- pushable: Era's number for the window it stands for (its panel rule, Pushable above); 0 when none.
