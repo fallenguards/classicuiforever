@@ -279,10 +279,20 @@ local MISSING = {
         text = FOREVER and "PROFESSIONS_FIRST_AID_MISSING" or "PROFESSIONS_ARCHAEOLOGY_MISSING" },
 }
 
+-- The bonus as the Skills tab shows it: GetProfessionInfo's leaves out gear (a fishing pole's +5).
+local function SkillBonus(skillLine, fallback)
+    local get = C_SkillInfo and C_SkillInfo.GetSkillLineInfoByID
+    local info = get and skillLine and get(skillLine)
+    local bonus = info and info.modifier
+    if bonus == nil or ns.IsSecret(bonus) then return fallback end
+    return bonus
+end
+
 local function FillRow(row, index, slot)
-    local name, texture, rank, maxRank, rankModifier, _
+    local name, texture, rank, maxRank, rankModifier, skillLine, _
     if index and GetProfessionInfo then
-        name, texture, rank, maxRank, _, _, _, rankModifier = GetProfessionInfo(index)
+        name, texture, rank, maxRank, _, _, skillLine, rankModifier = GetProfessionInfo(index)
+        rankModifier = SkillBonus(skillLine, rankModifier)
     end
     local known = name ~= nil
     row.name:SetShown(known)
