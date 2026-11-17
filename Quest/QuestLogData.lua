@@ -157,7 +157,6 @@ function QL.AbandonPrompt(questID)
         StaticPopup_Hide("ABANDON_QUEST_WITH_ITEMS")
         StaticPopup_Show("ABANDON_QUEST", name)
     end
-    PlaySound(SOUNDKIT.IG_QUEST_LOG_ABANDON_QUEST)
 end
 
 -- Party members on the quest; solo returns the shared ns.EMPTY, no allocation.
