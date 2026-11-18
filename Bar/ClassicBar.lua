@@ -64,13 +64,27 @@ local function AfterLayout()
     if ns.OnBarLaid then ns.OnBarLaid() end
 end
 
+-- Our record of bags dropped on the band, let go only once edit mode has set the bag bar up (at login every bar reads
+-- as default before). A bag bar held at a band spot with no record (a fresh save) was dropped there.
+local function ReadBagsHeld(moved)
+    if not moved then
+        if ns.InDefaultPosition(BagsBar, true) ~= nil then ns.db.bagsHeld = false end
+        return
+    end
+    if ns.db.bagsHeld or ns.EditMode.Live() or InCombatLockdown() or B.BagsTurned() then return end
+    local place = DropPlace("bags", BagsBar, ns.db.bagsFirst)
+    if place == nil then return end
+    ns.db.bagsHeld, ns.db.bagsFirst = true, place
+    ns.db.bagsSnapScale = BagsBar:GetScale() or 1
+end
+
 -- What is still on the band, read at the head of every pass.
 local function ReadShape()
     local shape, dragPreview = B.shape, B.dragPreview
     shape.micro = not MicroOut()
     -- On the band when the layout has them at default, or dropped on the band and held there by our record.
     local bagsMoved = BagsBar and SystemMoved(BagsBar)
-    if not bagsMoved and ns.db.bagsHeld then ns.db.bagsHeld = false end
+    if BagsBar then ReadBagsHeld(bagsMoved) end
     shape.bags = ((not bagsMoved) or ns.db.bagsHeld == true) and not B.BagsTurned()
     local count, sized, seen = B.MicroCounts()
     local _, region = MicroPlan(count, MicroUserScale(), sized, B.MicroUserWidth(), seen)
