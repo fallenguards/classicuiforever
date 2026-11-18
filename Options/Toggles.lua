@@ -483,6 +483,8 @@ ns.TOGGLES = {
     { "questLogSearch", L["OPT_questLogSearch"], L["OPT_questLogSearch_TIP"], parent = "questLogDual",
         search = "quest log search find filter box" },
     { "questLevels", L["OPT_questLevels"], L["OPT_questLevels_TIP"], search = "level map filter" },
+    { "questColors", L["OPT_questColors"], L["OPT_questColors_TIP"], hideIf = OnRetail,
+        search = "quest difficulty color colour colors yellow level gray green orange red map filter" },
     { "questTracker", L["OPT_questTracker"], L["OPT_questTracker_TIP"], radio = "objectiveTracker", drop = true,
         dropTip = L["OPT_objectiveTracker_TIP"], search = "quest tracker headers stone" },
     { "questWatch", L["OPT_questWatch"], L["OPT_questWatch_TIP"], radio = "objectiveTracker", drop = true,
@@ -609,6 +611,8 @@ ns.TOGGLES = {
         search = "welcome forever login chat bug report message" },
     { "barsTakenNote", L["OPT_barsTakenNote"], L["OPT_barsTakenNote_TIP"], parent = "addonMessages",
         search = "warning message chat login another addon action bars takeover" },
+    { "questColorsNote", L["OPT_questColorsNote"], L["OPT_questColorsNote_TIP"], parent = "addonMessages",
+        hideIf = OnRetail, search = "quest yellow color difficulty message chat" },
     { "leaveGameWindows", L["OPT_leaveGameWindows"], L["OPT_leaveGameWindows_TIP"],
         search = "moveany window mover move windows scale size lock conflict", sub = L["SUB_OTHER_ADDONS"] },
 }

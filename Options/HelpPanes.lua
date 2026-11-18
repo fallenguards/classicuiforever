@@ -59,6 +59,9 @@ local LOCKED = { "characterSheet", "professionsBook", "tradeSkill", "talents", "
 local FAQ = {
     { "FAQ_SUITE_Q", "FAQ_SUITE_A", only = "piece" },
     { "FAQ_SUITE_Q", "FAQ_SUITE_PICKER_A", only = "picker" },
+    { "FAQ_QUESTCOLORS_Q", "FAQ_QUESTCOLORS_A", on = "forever", needs = { "questColors" }, function()
+        return _G.MAP_QUEST_DIFFICULTY_TEXT or "Quest Difficulty Color", Page("GROUP_QUESTS"), L["OPT_questColors"]
+    end },
     { "FAQ_LFG_Q", "FAQ_LFG_A", on = "forever", needs = { "hideMicroGroupFinder", "microMinimapButtons", "groupFinder" },
         function() return KeyOf("TOGGLEGROUPFINDER"), L["OPT_hideMicroGroupFinder"], L["OPT_hideMicroButtons"] end },
     -- Retail has no finder tabs on the Who tab.

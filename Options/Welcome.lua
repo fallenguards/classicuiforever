@@ -132,6 +132,8 @@ local function OnItemRef(link)
         CopyLink("EasyFind on CurseForge", O.EASYFIND_URL)
     elseif target == "barsnote" then
         ns.OpenOptionsAt("barsTakenNote")
+    elseif target == "questcolors" then
+        ns.OpenOptionsAt("questColors")
     end
 end
 

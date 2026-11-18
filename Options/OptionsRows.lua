@@ -70,7 +70,7 @@ O.OPTION_TIP = OPTION_TIP
 -- Not part of the classic look, so Toggle none leaves them (the minimap button leads back here), nor the radio picks.
 -- A parent's picked boxes (its windows, its frames) go off with it: none is none.
 local NOT_IN_NONE = { minimapButton = true, welcomeNote = true, foreverWelcome = true, barsTakenNote = true,
-    questLevels = true, mapPlayerCoords = true, mapCursorCoords = true }
+    questLevels = true, questColors = true, questColorsNote = true, mapPlayerCoords = true, mapCursorCoords = true }
 function O.InNone(key)
     return not NOT_IN_NONE[key] and not ns.TOGGLE_RADIO[key]
 end

@@ -113,6 +113,33 @@ function ns.QuestTitlesColored()
     return not ns.OnForever() or tostring(ns.GetCVar("showQuestDifficultyColor")) ~= "0"
 end
 
+-- questLevels and questColors mirror the map's two quest filters (ns.ToggleChanged writes them); its menu changes them too.
+function QL.ReadFilters()
+    if not ns.db then return end
+    local levels, colors = ns.GetCVar("showQuestLevel"), ns.GetCVar("showQuestDifficultyColor")
+    if levels ~= nil then ns.db.questLevels = tostring(levels) == "1" end
+    if colors ~= nil then ns.db.questColors = tostring(colors) ~= "0" end
+end
+
+-- Once a session, the first log opened with the game's quest colors off: the row that brings them back.
+local colorsSaid
+function QL.SayColorsOff()
+    if colorsSaid or ns.QuestTitlesColored() then return end
+    colorsSaid = true
+    if ns.db.addonMessages == false or ns.db.questColorsNote == false then return end
+    ns.Print(string.format(ns.L["QUEST_COLORS_OFF"], _G.MAP_QUEST_DIFFICULTY_TEXT or "Quest Difficulty Color",
+        ns.ChatLink("questcolors", ns.L["OPT_questColors"])))
+end
+
+-- Reward items the detail pane drew before their data came: only their arrival redraws it.
+local waitingItems = {}
+function QL.WaitForItem(itemID) waitingItems[itemID] = true end
+function QL.ItemArrived(itemID)
+    if not (itemID and waitingItems[itemID]) then return false end
+    waitingItems[itemID] = nil
+    return true
+end
+
 -- Headers: the client's header colour or grey; quests: the 1.x difficulty colour, or the plain yellow with it off.
 function QL.LevelColor(info)
     if info.isHeader then

@@ -143,6 +143,7 @@ local function RewardGrid(child, questID, last, kind, count, header, coins)
         button.icon:SetTexture(texture)
         button.count:SetText((count2 or 0) > 1 and count2 or "")
         button.name:SetText(name or (itemID and ("item " .. itemID)) or "")
+        if itemID and (name == nil or name == "" or texture == nil) then QL.WaitForItem(itemID) end
         -- 1.x showed reward names in white regardless of quality.
         button.name:SetTextColor(1, 1, 1)
         button:ClearAllPoints()

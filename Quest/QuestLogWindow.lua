@@ -624,7 +624,8 @@ local function OnLogEvent(self, event, unit)
         return
     end
     if not self:IsShown() then return end
-    -- A reward item's data arriving late redraws the page alone; one rebuild per frame, however many events arrive.
+    -- A drawn reward's data arriving late redraws the page alone (any other item, none); one rebuild per frame.
+    if event == "GET_ITEM_INFO_RECEIVED" and not QL.ItemArrived(unit) then return end
     if event == "GET_ITEM_INFO_RECEIVED" then ns.Sched.Soon("questlog.detail", UpdateDetail) else ns.Sched.Soon("questlog.update", UpdateAll) end
 end
 
@@ -632,6 +633,7 @@ local function LogShown()
     PlaySound(SOUNDKIT.IG_QUEST_LOG_OPEN)
     UpdateAll()
     ns.RefreshMicroButtons()
+    QL.SayColorsOff()
 end
 
 local function LogHidden()
@@ -776,25 +778,18 @@ function QL.Frame() return frame end
 -- The quest the detail pane shows; its reward buttons read it live.
 function QL.SelectedID() return selectedID end
 
--- questLevels mirrors the game's showQuestLevel CVar (ns.ToggleChanged writes it); the map's filter changes it too.
-local function ReadQuestLevels()
-    if not ns.db then return end
-    local value = ns.GetCVar("showQuestLevel")
-    if value ~= nil then ns.db.questLevels = tostring(value) == "1" end
-end
-ns.RegisterModule("questLevels", { apply = ReadQuestLevels, restore = ReadQuestLevels })
+ns.RegisterModule("questLevels", { apply = QL.ReadFilters, restore = QL.ReadFilters })
 
 local function LevelsChanged()
     if frame and frame:IsShown() then UpdateList() end
 end
 ns.OnToggle(function(key)
-    if key == "questLevels" then LevelsChanged() end
+    if key == "questLevels" or key == "questColors" then LevelsChanged() end
     if (ns.ThemeKey(key) or key == "eraCoins") and frame and frame:IsShown() then UpdateDetail() end
 end)
 ns.EventFrame("CVAR_UPDATE", function(_, _, name)
-    if name == "showQuestDifficultyColor" then LevelsChanged() end   -- the map's filter: the titles again
-    if name ~= "showQuestLevel" then return end
-    ReadQuestLevels()
+    if name ~= "showQuestLevel" and name ~= "showQuestDifficultyColor" then return end
+    QL.ReadFilters()
     LevelsChanged()
     if ns.RefreshOptionsWindow then ns.RefreshOptionsWindow() end
 end)

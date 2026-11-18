@@ -498,6 +498,9 @@ end
 local function KeyEffects(key)
     if key == "oneBag" then ns.SetCVarOrHold("combinedBags", ns.db.oneBag == true and "1" or "0") end
     if key == "questLevels" then ns.SetCVarOrHold("showQuestLevel", ns.db.questLevels == true and "1" or "0") end
+    if key == "questColors" and ns.OnForever() then
+        ns.SetCVarOrHold("showQuestDifficultyColor", ns.db.questColors == true and "1" or "0")
+    end
     if key == "plainNumbers" then ns.SetCVarOrHold("breakUpLargeNumbers", ns.db.plainNumbers == true and "0" or "1") end
     if key == "platesOneSize" and ns.WritePlatesOneSize then ns.WritePlatesOneSize() end
     local coordCVar = ns.COORD_CVARS and ns.COORD_CVARS[key]

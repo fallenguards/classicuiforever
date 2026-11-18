@@ -366,4 +366,6 @@ return {
     trainingOwnWindow = "same for everyone: off by default, What's Training's list on the book's page as before",
     trainerSearch = "same for everyone: on by default, a search box on the trainer's window where nothing stood; Search box off hides it",
     hideFrameHint = "same for everyone: on by default, unit frame tooltips without the right-click line, as Era's; Hide right-click hint off brings it back",
+    questColors = "same for everyone: read from the game's own map filter (showQuestDifficultyColor) on every pass, never decided by us",
+    questColorsNote = "same for everyone: on by default, a chat line only while the game's quest colors are off (Forever); nothing else on screen",
 }
