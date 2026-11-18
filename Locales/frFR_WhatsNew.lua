@@ -3,6 +3,10 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN89_1_TITLE"] = "Plus de boîte de haut fait"
+L["WN89_1_TEXT"] = "La boîte du jeu qui surgit quand vous accomplissez un haut fait (sur Forever, un défi d'Héritage) ou l'une de ses étapes a disparu, car 1.x n'en avait pas. Pour la retrouver, activez-la dans les options (/fcui) : cochez Avis de haut fait sous Autre."
+L["WN89_2_TITLE"] = "Onglet Compétences"
+L["WN89_2_TEXT"] = "Son volet inférieur ne reste plus affiché quand la fenêtre du personnage s'ouvre sur un autre onglet."
 L["WN88_1_TITLE"] = "Familiers"
 L["WN88_1_TEXT"] = "Invoquer un autre familier ne fige plus le jeu un instant."
 L["WN88_2_TITLE"] = "Journal de quêtes"

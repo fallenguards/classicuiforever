@@ -3,6 +3,10 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN89_1_TITLE"] = "Kein Erfolgskästchen mehr"
+L["WN89_1_TEXT"] = "Das Kästchen des Spiels, das bei einem abgeschlossenen Erfolg (auf Forever einer Vermächtnisherausforderung) oder einem Schritt dazu aufspringt, ist weg, denn 1.x hatte keines. Um es zurückzuholen, schalte es in den Optionen (/fcui) ein: hak unter Sonstiges Erfolgsmeldung an."
+L["WN89_2_TITLE"] = "Reiter Fertigkeiten"
+L["WN89_2_TEXT"] = "Sein unterer Bereich bleibt nicht mehr stehen, wenn das Charakterfenster auf einem anderen Reiter öffnet."
 L["WN88_1_TITLE"] = "Begleiter"
 L["WN88_1_TEXT"] = "Einen anderen Begleiter zu beschwören, lässt das Spiel nicht mehr kurz einfrieren."
 L["WN88_2_TITLE"] = "Questlog"

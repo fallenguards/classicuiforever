@@ -2,6 +2,14 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.59.0] - 2026-11-17
+
+### Added
+- Achievement toast, under Other: the game's box that pops up as you complete an achievement (on Forever, a Legacy challenge) or a step of one. Off by default, as 1.x had none; check it to have the box back.
+
+### Fixed
+- The Skills tab's lower pane no longer shows on the Character tab. It could after the character window was last closed on its Skills tab.
+
 ## [0.58.1] - 2026-11-17
 
 ### Fixed

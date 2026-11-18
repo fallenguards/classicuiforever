@@ -3,6 +3,10 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN89_1_TITLE"] = "Sin recuadro de logros"
+L["WN89_1_TEXT"] = "El recuadro del juego que aparece al completar un logro (en Forever, un desafío de Legado) o uno de sus pasos ha desaparecido, pues 1.x no tenía ninguno. Para recuperarlo, actívalo en las opciones (/fcui): marca Aviso de logro en Otros."
+L["WN89_2_TITLE"] = "Pestaña Habilidades"
+L["WN89_2_TEXT"] = "Su panel inferior ya no se queda a la vista cuando la ventana de personaje se abre en otra pestaña."
 L["WN88_1_TITLE"] = "Mascotas"
 L["WN88_1_TEXT"] = "Invocar otra mascota ya no congela el juego por un momento."
 L["WN88_2_TITLE"] = "Registro de misiones"

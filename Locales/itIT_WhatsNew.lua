@@ -3,6 +3,10 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN89_1_TITLE"] = "Niente più riquadro delle imprese"
+L["WN89_1_TEXT"] = "Il riquadro del gioco che compare quando completi un'impresa (su Forever, una sfida dell'Eredità) o uno dei suoi passi è sparito, perché 1.x non ne aveva. Per riaverlo, attivalo nelle opzioni (/fcui): spunta Avviso di impresa sotto Altro."
+L["WN89_2_TITLE"] = "Scheda Abilità"
+L["WN89_2_TEXT"] = "Il suo riquadro inferiore non resta più visibile quando la finestra del personaggio si apre su un'altra scheda."
 L["WN88_1_TITLE"] = "Famigli"
 L["WN88_1_TEXT"] = "Evocare un altro famiglio non blocca più il gioco per un momento."
 L["WN88_2_TITLE"] = "Registro delle missioni"

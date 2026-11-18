@@ -2,6 +2,10 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN89_1_TITLE"] = "No achievement box"
+L["WN89_1_TEXT"] = "The game's box that pops up as you complete an achievement (on Forever, a Legacy challenge) or a step of one is gone, as 1.x had none. To have it back, turn it on in the options (/fcui): check Achievement toast under Other."
+L["WN89_2_TITLE"] = "Skills tab"
+L["WN89_2_TEXT"] = "Its lower pane no longer stays up when the character window opens on another tab."
 L["WN88_1_TITLE"] = "Pets"
 L["WN88_1_TEXT"] = "Summoning another pet no longer freezes the game for a moment."
 L["WN88_2_TITLE"] = "Quest log"
