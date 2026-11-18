@@ -634,8 +634,8 @@ local function Skin(frame, part)
     if part == nil then PlaceSearch(frame) end
 end
 
--- The game's layout steps and the part of the skin each undoes (ContainerFrame.lua; a bag opening runs all four
--- after its show, and the whole skin after each cost five skins a bag).
+-- The game's layout steps and the part of the skin each undoes (ContainerFrame.lua; a bag opening runs all four after
+-- its show; a whole skin after each cost five a bag). Shown bags only: an outside Update walks a hidden one's unmade slots.
 local LAYOUT_PARTS = { UpdateFrameSize = "size", UpdateItemLayout = "items", UpdateSearchBox = "search",
     UpdateMiscellaneousFrames = "trim" }
 
@@ -654,7 +654,7 @@ local function Hook(frame)
     hooked[frame] = true
     for method, part in pairs(LAYOUT_PARTS) do
         if type(rawget(frame, method)) == "function" then
-            ns.HookMethod(frame, method, function(self) Skin(self, part) end)
+            ns.HookMethod(frame, method, function(self) if self:IsShown() then Skin(self, part) end end)
         end
     end
     frame:HookScript("OnShow", function(self) Skin(self) end)
