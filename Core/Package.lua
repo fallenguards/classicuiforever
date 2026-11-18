@@ -5,13 +5,37 @@ local _, ns = ...
 -- setting reads off, whatever a profile or old save says. The full addon has no ns.PACKAGE and none of this runs.
 
 -- Inert ("full": the full addon is enabled; "other": another standalone is): every other file of ours returned at its
--- first line. All that is left is a line at login saying why.
+-- first line. All that is left is a line at login and a popup saying why.
 if ns.INERT then
+    -- One popup for every copy left off: the first copy at login shows it, the others add their titles to it.
+    local POPUP = "FCUI_COPIES_OFF"
     local notice = CreateFrame("Frame")
     notice:RegisterEvent("PLAYER_LOGIN")
-    notice:SetScript("OnEvent", function()
-        local text = ns.INERT == "full" and ns.L["PKG_OFF_FULL"] or ns.L["PKG_OFF_OTHER"]
-        DEFAULT_CHAT_FRAME:AddMessage(string.format(text, ns.PACKAGE.title))
+    notice:SetScript("OnEvent", function(self, event)
+        local L, title = ns.L, ns.PACKAGE.title
+        local popup = StaticPopupDialogs[POPUP]
+        if event == "PLAYER_LOGIN" then
+            DEFAULT_CHAT_FRAME:AddMessage(string.format(ns.INERT == "full" and L["PKG_OFF_FULL"] or L["PKG_OFF_OTHER"],
+                title))
+            if popup then
+                table.insert(popup.copies, title)
+                return
+            end
+            StaticPopupDialogs[POPUP] = { copies = { title }, button1 = OKAY, timeout = 0, whileDead = 1,
+                hideOnEscape = 1, preferredIndex = 3 }
+            self:RegisterEvent("PLAYER_ENTERING_WORLD")
+            return
+        end
+        self:UnregisterEvent(event)
+        local list = table.concat(popup.copies, "\n")
+        if ns.INERT == "other" then
+            popup.text = string.format(L["PKG_POPUP_OTHER"], list)
+        elseif #popup.copies > 1 then
+            popup.text = string.format(L["PKG_POPUP_FULL_MANY"], list)
+        else
+            popup.text = string.format(L["PKG_OFF_FULL"], list)
+        end
+        StaticPopup_Show(POPUP)
     end)
     return
 end
