@@ -133,6 +133,12 @@ function CW.ShowGift(box)
     box.bigIcon:Show()
 end
 
+-- A look on the character: the camera back by the page's room, easing to none at full zoom (the head close up).
+function CW.LookRoom(model)
+    local room = W.current and W.current.room
+    if room then model:SetCamDistanceScale(room - (room - 1) * (W.zoom or 0) / ZOOM_MAX) end
+end
+
 -- A creature (a mount, a pet) in the box's model, which frames it itself; its camera pulled back a step for room round
 -- it, turned a little to show its side.
 local function FrameCreature(model)
@@ -210,11 +216,14 @@ local function DrawBox()
     -- jumped back to its first pose and turn each time). The window's show draws afresh.
     local key = entry and (W.current.key .. ":" .. tostring(entry.id) .. (entry.wrapped and ":gift" or "")) or nil
     local same = key ~= nil and key == W.drawn
-    W.drawn = key
+    -- Another look in the same slot keeps the camera, as a dressing room: only the look changes.
+    local view = entry and W.current.View and (W.current.key .. ":" .. tostring(W.current.View(entry))) or nil
+    local keep = not same and view ~= nil and view == W.view and box.model:IsShown()
+    W.drawn, W.view = key, view
     box.name:SetText(entry and entry.name or "")
-    if not same then
+    if not same then box.source:SetText("") end
+    if not same and not keep then
         W.creature = false
-        box.source:SetText("")
         box.model:Hide()
         box.model:ClearModel()
         -- A model keeps its place and camera through a clear: a right drag or a creature's pulled-back camera stayed.
@@ -230,7 +239,7 @@ local function DrawBox()
     if not entry then return end
     if W.current.Fill then W.current.Fill(entry) end
     box.name:SetText(entry.name)
-    if not same then W.current.Show(entry, box) end
+    if not same then W.current.Show(entry, box, keep) end
     local label, enabled = W.current.Action(entry)
     if label then
         box.action:SetText(label)
@@ -243,7 +252,7 @@ end
 -- collzoom read it): drawn afresh a frame later, as the reset button does.
 local function Reframe()
     if not (W.box and W.box:IsVisible()) then return end
-    W.drawn = nil
+    W.drawn, W.view = nil, nil
     DrawBox()
 end
 
@@ -413,7 +422,9 @@ local function BuildBox(frame)
     box.model:SetPoint("TOPLEFT", box, "TOPLEFT", 4, -4)
     box.model:SetPoint("BOTTOMRIGHT", box, "BOTTOMRIGHT", -4, 4)
     box.model:Hide()
-    box.model:SetScript("OnModelLoaded", function(self) if W.creature then FrameCreature(self) end end)
+    box.model:SetScript("OnModelLoaded", function(self)
+        if W.creature then FrameCreature(self) else CW.LookRoom(self) end
+    end)
     -- The wheel over the model zooms it, not the page.
     box.model:EnableMouseWheel(true)
     box.model:SetScript("OnMouseWheel", function(self, delta)
@@ -423,6 +434,7 @@ local function BuildBox(frame)
         else
             W.zoom = math.max(0, math.min(ZOOM_MAX, (W.zoom or 0) + delta * ZOOM_STEP))
             self:SetPortraitZoom(W.zoom)
+            CW.LookRoom(self)
         end
     end)
     local over = ns.NewFrame("Frame", nil, box)
@@ -473,7 +485,7 @@ local function BuildBox(frame)
     icon:SetSize(14, 14)
     icon:SetPoint("CENTER", 0, 0)
     reset:SetScript("OnClick", function()
-        W.drawn = nil
+        W.drawn, W.view = nil, nil
         DrawBox()
     end)
     ns.AttachTip(reset, { text = function() return _G.RESET end })
@@ -712,7 +724,7 @@ local function Build()
     -- A change is a burst of events: one refresh, next frame.
     W.watch = ns.EventFrame({}, RefreshSoon)
     frame:SetScript("OnShow", function()
-        W.drawn = nil
+        W.drawn, W.view = nil, nil
         CW.FootShown()
         Listen(true)
         PlaySound(SOUNDKIT.IG_CHARACTER_INFO_OPEN)

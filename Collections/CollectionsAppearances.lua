@@ -116,14 +116,23 @@ local function Fill(entry)
     entry.icon = pick.itemID and C_Item.GetItemIconByID(pick.itemID) or nil
 end
 
-local function Show(entry, box)
+-- keep: another look in the slot already shown, tried on over it with the camera as the player left it.
+local function Show(entry, box, keep)
     local source = entry.sourceType and _G["TRANSMOG_SOURCE_" .. entry.sourceType]
     if type(source) == "string" then box.source:SetText(source) end
-    if not entry.sourceID then return end
+    if not entry.sourceID then
+        box.model:Hide()
+        return
+    end
+    if keep then
+        box.model:TryOn(entry.sourceID)
+        return
+    end
     box.model:Show()
     box.model:SetUnit("player")
     box.model:TryOn(entry.sourceID)
     box.model:SetFacing(0)
+    CW.LookRoom(box.model)
 end
 
 local function Action() end
@@ -233,6 +242,11 @@ CW.AddPage({
     events = { "TRANSMOG_COLLECTION_UPDATED", "TRANSMOG_COLLECTION_SOURCE_ADDED", "TRANSMOG_COLLECTION_SOURCE_REMOVED" },
     List = List, Fill = Fill, Show = Show, Action = Action, Tip = Tip, Shown = Shown, FilterEntries = FilterEntries,
     Picker = Picker,
+    -- The camera stays while looks of one slot are picked; a new slot starts it over.
+    View = function(entry) return entry.category end,
+    -- The game's framing draws the character 1.1 times the box's height; 1.3 back fits it, clear of the name
+    -- (/fcuidev lookshot, 2026-11-17).
+    room = 1.3,
     -- An addon asks by source: its look, in its category.
     Want = function(sourceID)
         local info = TC.GetSourceInfo(sourceID)
