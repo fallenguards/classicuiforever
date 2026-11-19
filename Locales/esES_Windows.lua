@@ -249,6 +249,8 @@ L["RAIDMGR_CLEAR_GROUND"] = "Quitar todas las marcas de mundo"
 -- Units/RaidManager.lua, UI/PadBind.lua: options and the controller choice
 L["OPT_raidManagerEdge"] = "Borde del panel de banda al cerrarlo"
 L["OPT_raidManagerEdge_TIP"] = "El panel de banda y grupo del borde izquierdo de la pantalla sigue mostrando su marco cerrado, como en Era. Desactivado, solo se ve su pestaña con la flecha."
+L["OPT_raidManagerHover"] = "Panel de banda al pasar el ratón"
+L["OPT_raidManagerHover_TIP"] = "El panel de grupo del borde izquierdo de la pantalla (marcadores de banda, abandonar grupo) queda difuminado hasta que pasas el ratón por encima."
 L["OPT_padClassic"] = "Mando en el diseño clásico"
 L["OPT_padClassic_TIP"] = "Con la interfaz de mando del juego desactivada, tu mando usa estas barras como las barras de mando: la cruceta y los botones frontales activan la barra de acción 1, o la 2, 3 o 4 manteniendo un gatillo o ambos, y los botones muestran las teclas del mando mientras lo usas. RB selecciona al siguiente enemigo, LB al siguiente aliado."
 L["PAD_CHOICE_TITLE"] = "Mando"

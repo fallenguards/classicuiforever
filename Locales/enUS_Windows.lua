@@ -314,6 +314,8 @@ L["RAIDMGR_CLEAR_GROUND"] = "Clear all world markers"
 -- Units/RaidManager.lua, UI/PadBind.lua: options and the controller choice
 L["OPT_raidManagerEdge"] = "Raid panel edge when closed"
 L["OPT_raidManagerEdge_TIP"] = "The raid and party panel at the screen's left edge keeps its frame showing while closed, as Era's does. Off, only its arrow tab shows."
+L["OPT_raidManagerHover"] = "Raid panel on hover"
+L["OPT_raidManagerHover_TIP"] = "The group panel at the screen's left edge (raid markers, leave group) stays faded out until the mouse is over it."
 L["OPT_padClassic"] = "Controller on the classic layout"
 L["OPT_padClassic_TIP"] = "With the game's gamepad interface off, your controller plays these bars as the gamepad bars do: the d-pad and face buttons fire Action Bar 1, or Bar 2, 3 or 4 with a trigger or both held, and the buttons show the controller's keys while you use it. RB targets the next enemy, LB the next friend."
 L["PAD_CHOICE_TITLE"] = "Controller"

@@ -293,6 +293,8 @@ ns.TOGGLES = {
         search = "party raid dungeon instance solo" },
     { "raidManagerEdge", L["OPT_raidManagerEdge"], L["OPT_raidManagerEdge_TIP"], parent = "unitFrames",
         search = "raid party manager panel sidebar left edge closed collapsed strip" },
+    { "raidManagerHover", L["OPT_raidManagerHover"], L["OPT_raidManagerHover_TIP"],
+        search = "raid party group manager panel sidebar left edge markers skull leave hide hover mouseover fade invisible" },
     { "plainNumbers", L["OPT_plainNumbers"], L["OPT_plainNumbers_TIP"], search = "commas thousands separators digits large" },
     { "hideFrameHint", L["OPT_hideFrameHint"], L["OPT_hideFrameHint_TIP"],
         search = "right click frame settings tooltip line hint instruction portrait" },

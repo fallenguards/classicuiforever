@@ -660,7 +660,26 @@ end
 
 UF.LayoutRaidManager, UF.WatchRaidManager, UF.SkinRaidManager = LayoutRaidManager, WatchRaidManager, LayoutRaidManager
 
--- The options pass waits out a fight: the closed panel's edge answers at once.
+-- Raid panel on hover (an option, off by default; Era had no such panel): faded out until the mouse is over it, in a
+-- fight too, our unit frames on or off. Polled while the panel shows: an enter/leave sensor lost the mouse to its buttons.
+local hoverJob
+local function HoverTick()
+    local manager = CompactRaidFrameManager
+    local on = ns.db and ns.db.raidManagerHover == true
+    local over = manager:IsMouseOver()
+    ns.FadeTo(manager, (not on or (not IsSecret(over) and over)) and 1 or 0)
+    if not on then hoverJob:Sleep() end
+end
+local function HoverWatch()
+    local manager = CompactRaidFrameManager
+    if not (manager and ns.db and ns.db.raidManagerHover == true) and not hoverJob then return end
+    hoverJob = hoverJob or ns.Sched.Attach(manager, { name = "raidManager.hover", every = 0.1, fn = HoverTick })
+    if hoverJob then hoverJob:Wake() end
+end
+ns.EventFrame("PLAYER_LOGIN", HoverWatch)
+
+-- The options pass waits out a fight: the closed panel's edge and the hover answer at once.
 ns.OnToggle(function(key)
     if key == "raidManagerEdge" then Relay() end
+    if key == "raidManagerHover" then HoverWatch() end
 end)

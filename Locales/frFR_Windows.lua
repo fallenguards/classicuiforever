@@ -249,6 +249,8 @@ L["RAIDMGR_CLEAR_GROUND"] = "Retirer tous les marqueurs au sol"
 -- Units/RaidManager.lua, UI/PadBind.lua: options and the controller choice
 L["OPT_raidManagerEdge"] = "Bord du panneau de raid une fois fermé"
 L["OPT_raidManagerEdge_TIP"] = "Le panneau de raid et de groupe au bord gauche de l'écran garde son cadre visible une fois fermé, comme dans Era. Désactivé, seul son onglet fléché reste visible."
+L["OPT_raidManagerHover"] = "Panneau de raid au survol"
+L["OPT_raidManagerHover_TIP"] = "Le panneau de groupe au bord gauche de l'écran (marqueurs de raid, quitter le groupe) reste estompé tant que la souris n'est pas dessus."
 L["OPT_padClassic"] = "Manette sur la disposition classique"
 L["OPT_padClassic_TIP"] = "Avec l'interface manette du jeu désactivée, votre manette joue ces barres comme les barres manette : la croix et les boutons de façade déclenchent la barre d'action 1, ou la 2, 3 ou 4 en maintenant une gâchette ou les deux, et les boutons montrent les touches de la manette pendant que vous l'utilisez. RB cible l'ennemi suivant, LB l'allié suivant."
 L["PAD_CHOICE_TITLE"] = "Manette"

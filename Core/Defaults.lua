@@ -187,6 +187,7 @@ ns.DB_DEFAULTS = {
     threatNumber = true,
     threatNumberGrouped = false,
     raidManagerEdge = false,
+    raidManagerHover = false,
     padClassic = false,
     padTrigSwap = false,
     padFace = true, padFaceBar = true, padFaceLeft = false, padFaceRight = false, padFaceAbove = false, padAutorunKey = "PADLSTICK",

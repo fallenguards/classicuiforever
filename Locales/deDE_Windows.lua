@@ -249,6 +249,8 @@ L["RAIDMGR_CLEAR_GROUND"] = "Alle Weltmarkierungen entfernen"
 -- Units/RaidManager.lua, UI/PadBind.lua: options and the controller choice
 L["OPT_raidManagerEdge"] = "Rand des Schlachtzugsfensters, wenn geschlossen"
 L["OPT_raidManagerEdge_TIP"] = "Das Schlachtzugs- und Gruppenfenster am linken Bildschirmrand zeigt geschlossen weiter seinen Rahmen, wie in Era. Aus zeigt es nur seinen Pfeilreiter."
+L["OPT_raidManagerHover"] = "Schlachtzugsfenster bei Mausberührung"
+L["OPT_raidManagerHover_TIP"] = "Das Gruppenfenster am linken Bildschirmrand (Schlachtzugsmarkierungen, Gruppe verlassen) bleibt ausgeblendet, bis die Maus darüber ist."
 L["OPT_padClassic"] = "Controller im klassischen Layout"
 L["OPT_padClassic_TIP"] = "Bei ausgeschalteter Gamepad-Oberfläche des Spiels spielt dein Controller diese Leisten wie die Gamepad-Leisten: Steuerkreuz und Aktionstasten lösen Aktionsleiste 1 aus, mit einem oder beiden gehaltenen Triggern Leiste 2, 3 oder 4, und die Knöpfe zeigen die Controllertasten, solange du ihn benutzt. RB nimmt den nächsten Feind ins Ziel, LB den nächsten Freund."
 L["PAD_CHOICE_TITLE"] = "Controller"

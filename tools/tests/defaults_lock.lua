@@ -432,6 +432,7 @@ return {
     questTracker = true,
     questWatch = false,
     raidManagerEdge = false,
+    raidManagerHover = false,
     reagentBagCombined = false,
     reagentBagHidden = false,
     reagentBagHover = true,
