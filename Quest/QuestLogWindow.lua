@@ -788,8 +788,8 @@ ns.OnToggle(function(key)
     if (ns.ThemeKey(key) or key == "eraCoins") and frame and frame:IsShown() then UpdateDetail() end
 end)
 ns.EventFrame("CVAR_UPDATE", function(_, _, name)
-    if name ~= "showQuestLevel" and name ~= "showQuestDifficultyColor" then return end
+    if name ~= "showQuestLevel" and name ~= "showQuestDifficultyColor" and name ~= "autoQuestWatch" then return end
     QL.ReadFilters()
-    LevelsChanged()
+    if name ~= "autoQuestWatch" then LevelsChanged() end
     if ns.RefreshOptionsWindow then ns.RefreshOptionsWindow() end
 end)

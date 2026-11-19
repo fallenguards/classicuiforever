@@ -43,6 +43,14 @@ cvars.showQuestDifficultyColor = "1"
 QL.ReadFilters()
 Check(ns.db.questColors == true, "the row follows the filter turned on from the map")
 
+-- Automatic quest tracking: the game's own setting (Era's options had it, Forever's do not), read back the same way.
+cvars.autoQuestWatch = "1"
+QL.ReadFilters()
+Check(ns.db.questAutoTrack == true, "Automatic quest tracking reads the game's setting: on")
+cvars.autoQuestWatch = "0"
+QL.ReadFilters()
+Check(ns.db.questAutoTrack == false, "Automatic quest tracking reads the game's setting: off")
+
 -- Off: one line on the first open, naming the game's filter and linking our row.
 cvars.showQuestDifficultyColor = "0"
 QL.SayColorsOff()
@@ -84,6 +92,12 @@ for _, word in ipairs({ "yellow", "color", "difficulty" }) do
 end
 Check(Source("Core/Core.lua"):find('if key == "questColors" and ns.OnForever() then', 1, true) ~= nil,
     "a click on the row writes the game's filter, on Forever only")
+Check(Source("Core/Core.lua"):find('if key == "questAutoTrack" then ns.SetCVarOrHold("autoQuestWatch",', 1, true) ~= nil,
+    "a click on Automatic quest tracking writes the game's setting")
+Check(Source("Quest/QuestLogWindow.lua"):find('name ~= "autoQuestWatch" then return end', 1, true) ~= nil,
+    "Automatic quest tracking follows the setting changed elsewhere")
+Check(toggles:find('{ "questAutoTrack", L["OPT_questAutoTrack"], L["OPT_questAutoTrack_TIP"],', 1, true) ~= nil,
+    "the Quests page has the Automatic quest tracking row")
 Check(Source("Options/Welcome.lua"):find('target == "questcolors" then\n%s*ns.OpenOptionsAt%("questColors"%)') ~= nil,
     "the chat line's link opens the options at the row")
 Check(Source("Quest/QuestLogWindow.lua"):find("QL.SayColorsOff()", 1, true) ~= nil, "the quest log's open says it")

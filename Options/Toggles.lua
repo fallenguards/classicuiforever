@@ -487,6 +487,8 @@ ns.TOGGLES = {
     { "questLevels", L["OPT_questLevels"], L["OPT_questLevels_TIP"], search = "level map filter" },
     { "questColors", L["OPT_questColors"], L["OPT_questColors_TIP"], hideIf = OnRetail,
         search = "quest difficulty color colour colors yellow level gray green orange red map filter" },
+    { "questAutoTrack", L["OPT_questAutoTrack"], L["OPT_questAutoTrack_TIP"],
+        search = "automatic auto quest tracking track tracker watch untrack untracked comes back again objective progress" },
     { "questTracker", L["OPT_questTracker"], L["OPT_questTracker_TIP"], radio = "objectiveTracker", drop = true,
         dropTip = L["OPT_objectiveTracker_TIP"], search = "quest tracker headers stone" },
     { "questWatch", L["OPT_questWatch"], L["OPT_questWatch_TIP"], radio = "objectiveTracker", drop = true,

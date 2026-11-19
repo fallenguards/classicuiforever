@@ -418,6 +418,7 @@ return {
     professionTabsHover = false,
     professionsBook = true,
     professionsMinimapButton = false,
+    questAutoTrack = true,
     questColors = true,
     questColorsNote = true,
     questLevels = false,

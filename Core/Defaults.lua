@@ -355,6 +355,7 @@ ns.DB_DEFAULTS = {
     hideFrameHint = true,
     questLevels = false,
     questColors = true,
+    questAutoTrack = true,
     windowLocksAlways = false,
     hideChatButtons = false,
     hideChatFriends = true, hideChatChannels = true, hideChatMenu = true, hideChatScroll = true,

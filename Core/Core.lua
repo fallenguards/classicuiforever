@@ -498,6 +498,7 @@ end
 local function KeyEffects(key)
     if key == "oneBag" then ns.SetCVarOrHold("combinedBags", ns.db.oneBag == true and "1" or "0") end
     if key == "questLevels" then ns.SetCVarOrHold("showQuestLevel", ns.db.questLevels == true and "1" or "0") end
+    if key == "questAutoTrack" then ns.SetCVarOrHold("autoQuestWatch", ns.db.questAutoTrack == true and "1" or "0") end
     if key == "questColors" and ns.OnForever() then
         ns.SetCVarOrHold("showQuestDifficultyColor", ns.db.questColors == true and "1" or "0")
     end

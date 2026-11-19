@@ -369,4 +369,5 @@ return {
     questColors = "same for everyone: read from the game's own map filter (showQuestDifficultyColor) on every pass, never decided by us",
     questColorsNote = "same for everyone: on by default, a chat line only while the game's quest colors are off (Forever); nothing else on screen",
     raidManagerHover = "same for everyone: opt-in, off by default",
+    questAutoTrack = "same for everyone: read from the game's own setting (autoQuestWatch) on every pass, never decided by us",
 }

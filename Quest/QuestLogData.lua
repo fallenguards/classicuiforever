@@ -113,12 +113,15 @@ function ns.QuestTitlesColored()
     return not ns.OnForever() or tostring(ns.GetCVar("showQuestDifficultyColor")) ~= "0"
 end
 
--- questLevels and questColors mirror the map's two quest filters (ns.ToggleChanged writes them); its menu changes them too.
+-- questLevels and questColors mirror the map's two quest filters, questAutoTrack the game's Automatic Quest Tracking
+-- (Era's options had it, Forever's do not); ns.ToggleChanged writes them, the map's menu changes the filters too.
 function QL.ReadFilters()
     if not ns.db then return end
     local levels, colors = ns.GetCVar("showQuestLevel"), ns.GetCVar("showQuestDifficultyColor")
+    local track = ns.GetCVar("autoQuestWatch")
     if levels ~= nil then ns.db.questLevels = tostring(levels) == "1" end
     if colors ~= nil then ns.db.questColors = tostring(colors) ~= "0" end
+    if track ~= nil then ns.db.questAutoTrack = tostring(track) ~= "0" end
 end
 
 -- Once a session, the first log opened with the game's quest colors off: the row that brings them back.
