@@ -3,6 +3,10 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN91_1_TITLE"] = "Suivi des quêtes"
+L["WN91_1_TEXT"] = "Des quêtes retirées du suivi y reviennent ? C'est le suivi automatique des quêtes du jeu. Décochez Suivi automatique des quêtes sous Quêtes (/fcui) et elles n'y reviennent plus."
+L["WN91_2_TITLE"] = "Panneau de raid"
+L["WN91_2_TEXT"] = "Le panneau de groupe au bord gauche de l'écran peut rester caché jusqu'à ce que la souris passe dessus. Activez-le dans les options (/fcui) : Panneau de raid au survol, sous Cadres d'unité."
 L["WN90_1_TITLE"] = "Couleurs des quêtes"
 L["WN90_1_TEXT"] = "Toutes vos quêtes en jaune ? C'est le réglage du jeu des couleurs de difficulté des quêtes, désactivé. Il est désormais aussi dans les options (/fcui) : cochez Couleurs de difficulté des quêtes sous Quêtes."
 L["WN90_2_TITLE"] = "Onglet familier"

@@ -3,6 +3,10 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN91_1_TITLE"] = "Seguimiento de misiones"
+L["WN91_1_TEXT"] = "¿Las misiones que dejaste de seguir vuelven al seguimiento? Es el seguimiento automático de misiones del juego. Desmarca Seguimiento automático de misiones en Misiones (/fcui) y no volverán."
+L["WN91_2_TITLE"] = "Panel de banda"
+L["WN91_2_TEXT"] = "El panel de grupo del borde izquierdo de la pantalla puede quedar oculto hasta que pases el ratón por encima. Actívalo en las opciones (/fcui): Panel de banda al pasar el ratón, en Marcos de unidad."
 L["WN90_1_TITLE"] = "Colores de misión"
 L["WN90_1_TEXT"] = "¿Todas tus misiones en amarillo? Es el ajuste del juego de colores de dificultad de misión, desactivado. Ahora también está en las opciones (/fcui): marca Colores de dificultad de misión en Misiones."
 L["WN90_2_TITLE"] = "Pestaña de mascota"

@@ -2,6 +2,12 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.61.0] - 2026-11-19
+
+### Added
+- Automatic quest tracking, under Quests: the game's own setting that adds a quest to the tracker as you make progress on it, even one you untracked. The game's options do not show it; uncheck it and an untracked quest stays off the tracker.
+- Raid panel on hover, under Unit frames: the group panel at the left edge of the screen (raid markers, leave group and the rest) stays hidden until you move the mouse over it. Off by default.
+
 ## [0.60.0] - 2026-11-19
 
 ### Added

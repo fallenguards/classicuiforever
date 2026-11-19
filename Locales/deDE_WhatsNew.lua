@@ -3,6 +3,10 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN91_1_TITLE"] = "Questverfolgung"
+L["WN91_1_TEXT"] = "Kommen entfernte Quests zurück in die Questverfolgung? Das ist die automatische Questverfolgung des Spiels. Hak unter Quests (/fcui) Automatische Questverfolgung ab, dann bleiben sie draußen."
+L["WN91_2_TITLE"] = "Schlachtzugsfenster"
+L["WN91_2_TEXT"] = "Das Gruppenfenster am linken Bildschirmrand kann verborgen bleiben, bis du mit der Maus darüberfährst. Schalte es in den Optionen (/fcui) ein: Schlachtzugsfenster bei Mausberührung, unter Einheitenfenster."
 L["WN90_1_TITLE"] = "Questfarben"
 L["WN90_1_TEXT"] = "Alle Quests gelb? Dann ist die Spieleinstellung für Questschwierigkeitsfarben aus. Sie steht jetzt auch in den Optionen (/fcui): hak unter Quests Questschwierigkeitsfarben an."
 L["WN90_2_TITLE"] = "Reiter Begleiter"

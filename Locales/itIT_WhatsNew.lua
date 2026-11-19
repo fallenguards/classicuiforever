@@ -3,6 +3,10 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN91_1_TITLE"] = "Tracciamento delle missioni"
+L["WN91_1_TEXT"] = "Le missioni che hai tolto dal tracciamento ci tornano? È il tracciamento automatico delle missioni del gioco. Disattiva Tracciamento automatico delle missioni in Missioni (/fcui) e non torneranno."
+L["WN91_2_TITLE"] = "Pannello incursione"
+L["WN91_2_TEXT"] = "Il pannello del gruppo sul bordo sinistro dello schermo può restare nascosto finché non ci passi sopra con il mouse. Attivalo nelle opzioni (/fcui): Pannello incursione al passaggio del mouse, in Riquadri delle unità."
 L["WN90_1_TITLE"] = "Colori delle missioni"
 L["WN90_1_TEXT"] = "Tutte le missioni in giallo? È l'impostazione del gioco dei colori di difficoltà delle missioni, disattivata. Ora è anche nelle opzioni (/fcui): attiva Colori di difficoltà delle missioni in Missioni."
 L["WN90_2_TITLE"] = "Scheda famiglio"

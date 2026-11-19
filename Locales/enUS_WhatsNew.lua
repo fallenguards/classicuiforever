@@ -2,6 +2,10 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN91_1_TITLE"] = "Quest tracking"
+L["WN91_1_TEXT"] = "Untracked quests coming back to the tracker? That is the game's Automatic Quest Tracking. Uncheck Automatic quest tracking under Quests (/fcui) and they stay off."
+L["WN91_2_TITLE"] = "Raid panel"
+L["WN91_2_TEXT"] = "The group panel at the screen's left edge can stay hidden until you move the mouse over it. Turn it on in the options (/fcui): Raid panel on hover, under Unit frames."
 L["WN90_1_TITLE"] = "Quest colors"
 L["WN90_1_TEXT"] = "All your quests in yellow? That is the game's Quest Difficulty Color setting, turned off. It is now in the options (/fcui) too: check Quest difficulty colors under Quests."
 L["WN90_2_TITLE"] = "Pet tab"
