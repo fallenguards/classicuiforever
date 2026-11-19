@@ -322,7 +322,8 @@ local function BarFade(job, elapsed)
     if want == 0 and alpha == 0 then job:Sleep() end
 end
 
--- One row per line: scrolling only moves rows, so it reads no stat and works in combat.
+-- One row per line: scrolling only moves rows, so it reads no stat and works in combat. The panes' own lay
+-- (ns.StatScroll's lay for them).
 local function Place(pane)
     local count, offset = pane.lineCount or 0, pane.offset
     for k, row in ipairs(pane.lines) do
@@ -346,7 +347,7 @@ local function BarChanged(bar, value)
     if value ~= pane.offset then
         pane.offset = value
         pane.barHold = GetTime() + BAR_HOLD
-        Place(pane)
+        pane.lay(pane)
     end
 end
 
@@ -354,26 +355,42 @@ local function BarEnter(bar) WakeBar(bar:GetParent()) end
 
 -- Range and thumb for the lines the pane holds; hidden when all fit.
 local function SetBar(pane)
-    local bar = pane.bar
-    local over = math.max(0, (pane.lineCount or 0) - ROWS)
+    local bar, shown = pane.bar, pane.rowsShown
+    local over = math.max(0, (pane.lineCount or 0) - shown)
     if over == 0 then
         bar:Hide()
         return
     end
     pane.barSetting = true
-    bar.thumb:SetHeight(math.max(6, math.floor(ROWS * PANE_ROW * ROWS / pane.lineCount + 0.5)))
+    bar.thumb:SetHeight(math.max(6, math.floor(shown * pane.rowPitch * shown / pane.lineCount + 0.5)))
     bar:SetMinMaxValues(0, over)
     bar:SetValue(pane.offset)
     pane.barSetting = false
     bar:Show()
 end
 
-local function ScrollBar(pane)
+-- A box with more lines than it shows is wheeled through.
+local function Wheel(self, delta)
+    local over = math.max(0, (self.lineCount or 0) - self.rowsShown)
+    local offset = math.max(0, math.min(over, self.offset - delta))
+    if offset ~= self.offset then
+        self.offset = offset
+        self.barHold = GetTime() + BAR_HOLD
+        WakeBar(self)
+        self.lay(self)
+        SetBar(self)
+    end
+end
+
+-- A box of stat lines that scrolls: shown lines, their pitch, the first one's drop from the top, and lay(box) placing
+-- the lines from box.offset (box.lineCount of them). The pet's boxes take it too (Character/CharacterStats.lua).
+local function ScrollBar(pane, shown, pitch, top, lay)
+    pane.rowsShown, pane.rowPitch, pane.lay, pane.offset = shown, pitch, lay, pane.offset or 0
     local bar = ns.NewFrame("Slider", nil, pane)
     bar:SetOrientation("VERTICAL")
     bar:SetWidth(BAR_W)
-    bar:SetPoint("TOPRIGHT", pane, "TOPRIGHT", -2, -ROWS_TOP)
-    bar:SetPoint("BOTTOMRIGHT", pane, "TOPRIGHT", -2, -(ROWS_TOP + ROWS * PANE_ROW))
+    bar:SetPoint("TOPRIGHT", pane, "TOPRIGHT", -2, -top)
+    bar:SetPoint("BOTTOMRIGHT", pane, "TOPRIGHT", -2, -(top + shown * pitch))
     bar:SetValueStep(1)
     bar:SetObeyStepOnDrag(true)
     local track = bar:CreateTexture(nil, "BACKGROUND")
@@ -383,7 +400,7 @@ local function ScrollBar(pane)
     track:SetPoint("BOTTOM", bar, "BOTTOM", 0, 0)
     local thumb = bar:CreateTexture(nil, "ARTWORK")
     thumb:SetColorTexture(0.75, 0.75, 0.75, 1)
-    thumb:SetSize(2, ROWS * PANE_ROW)
+    thumb:SetSize(2, shown * pitch)
     bar:SetThumbTexture(thumb)
     bar.thumb = thumb
     bar:SetAlpha(0)
@@ -393,7 +410,10 @@ local function ScrollBar(pane)
     pane.bar = bar
     pane.barHold = 0
     pane.barFade = ns.Sched.OnFrame(ns.NewFrame("Frame", nil, pane), { name = "statPanes.bar", every = 0, fn = BarFade, awake = false })
+    pane:EnableMouseWheel(true)
+    pane:SetScript("OnMouseWheel", Wheel)
 end
+ns.StatScroll = { Build = ScrollBar, Set = SetBar, Wake = WakeBar }
 
 local function PaneRowEnter(row)
     LineTip(row)
@@ -465,20 +485,7 @@ local function Pane(parent, side, fallback)
         pane.list:Toggle(self)
     end)
 
-    -- A section with more lines than the box holds is wheeled through.
-    pane:EnableMouseWheel(true)
-    pane:SetScript("OnMouseWheel", function(self, delta)
-        local over = math.max(0, (self.lineCount or 0) - ROWS)
-        local offset = math.max(0, math.min(over, self.offset - delta))
-        if offset ~= self.offset then
-            self.offset = offset
-            self.barHold = GetTime() + BAR_HOLD
-            WakeBar(self)
-            Place(self)
-            SetBar(self)
-        end
-    end)
-    ScrollBar(pane)
+    ScrollBar(pane, ROWS, PANE_ROW, ROWS_TOP, Place)
     -- Hover only: clicks still pass to the doll under the box.
     pane:SetMouseMotionEnabled(true)
     pane:SetScript("OnEnter", WakeBar)

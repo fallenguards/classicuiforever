@@ -17,6 +17,27 @@ local RESISTANCES = {
 local GREEN, RED, WHITE = "|cff20ff20", "|cffff2020", "|cffffffff"
 local ARMOR_NAME = ARMOR or "Armor"
 
+-- The larger of two plain numbers; nil when the first is missing or either is secret (a fight).
+local function Larger(a, b)
+    if type(a) ~= "number" or ns.AnySecret(a, b) then return nil end
+    return type(b) == "number" and math.max(a, b) or a
+end
+-- The game gives pets no attributes (Forever's PaperDollFrame.lua: "Pets no longer have primary attributes"; all 0 in
+-- game): the pet's left box holds what its own pet pane lists instead, labels as our stat panes'.
+local PET_STATS = {
+    { label = _G.HEALTH or "Health", format = "%d", read = function() return Larger(UnitHealthMax("pet")) end },
+    { label = _G.SPEED or "Speed", tip = _G.STAT_MOVEMENT_SPEED or "Movement Speed", format = "%d%%", read = function()
+        local _, run = _G.GetUnitSpeed("pet")
+        run = Larger(run)
+        return run and math.floor(run / (_G.BASE_MOVEMENT_SPEED or 7) * 100 + 0.5)
+    end },
+    { label = _G.CRIT_CHANCE or "Crit Chance", format = "%.1f%%",
+        read = function() return _G.GetPetCritChance and Larger(_G.GetPetCritChance()) end },
+    { label = _G.STAT_HASTE or "Haste", format = "%.1f%%", read = function()
+        return _G.GetPetMeleeHaste and Larger(_G.GetPetMeleeHaste(), _G.UnitSpellHaste and _G.UnitSpellHaste("pet"))
+    end },
+}
+
 -- Old three-piece box: caps and a stretched middle.
 local BOX_TOP = { layer = "BACKGROUND", sublevel = 1, w = 115, h = 16, coords = { 0, 0.8984375, 0, 0.125 }, point = "TOPLEFT" }
 local BOX_MID = { layer = "BACKGROUND", sublevel = 1, w = 115, coords = { 0, 0.8984375, 0.125, 0.1953125 }, point = "TOPLEFT", relPoint = "BOTTOMLEFT" }
@@ -135,6 +156,7 @@ local function Dashes()
     for _, row in ipairs({ T.armor, T.attack, T.attackPower, T.damage, T.rangedAttack, T.rangedPower, T.rangedDamage, T.defense }) do
         row.value:SetText("--")
     end
+    for _, row in ipairs(T.petRows) do row.value:SetText("--") end
     hands.main.speed, hands.off.speed = nil, nil
     T.armor.tip, T.armor.tip2 = ARMOR_NAME, nil
     for _, res in ipairs(T.resistances) do res.value:SetText("--") end
@@ -162,6 +184,12 @@ local function UpdateStats(opening)
         row.value:SetText(text)
         row.tip = statLabels[i] .. " " .. Number(effective)
         row.tip2 = detail
+    end
+    if unit == "pet" then
+        for _, row in ipairs(T.petRows) do
+            local value = row.stat.read()
+            row.value:SetText(value and string.format(row.stat.format, value) or "--")
+        end
     end
     do
         local _, effective, _, pos, neg = UnitArmor(unit)
@@ -244,18 +272,50 @@ local function UpdateStats(opening)
 end
 T.UpdateStats = UpdateStats
 
+-- Era's pet sheet: each box's rows from 5 down, the left ones touching, the right ones 1 apart (122 in); five shown, the
+-- rest wheeled through with the stat panes' bar (ns.StatScroll). The character's first attribute row stands 3 down.
+local PET_ROWS_X, PET_ROWS_Y, PET_SHOWN = 122, -5, 5
+-- Era's box is caps of 16 round a 53 tall middle. The pet's two step their rows alike, 14 apart, and fit them with the
+-- same 5 above and below; past five they hold five and wheel. nil: Era's box (the character's).
+local BOX_MIDDLE, BOX_CAPS, PET_PITCH, ROW_H = 53, 32, 14, 13
+local function FitPetBoxes(rows)
+    local middle = BOX_MIDDLE
+    if rows then
+        rows = math.max(1, math.min(rows, PET_SHOWN))
+        middle = -2 * PET_ROWS_Y + (rows - 1) * PET_PITCH + ROW_H - BOX_CAPS
+    end
+    for _, pieces in ipairs({ T.leftBox, T.petBox }) do
+        if math.abs((pieces[2]:GetHeight() or 0) - middle) > 0.01 then pieces[2]:SetHeight(middle) end
+    end
+    -- The scroll hosts with them: past the box they took the XP bar's mouse.
+    for _, host in ipairs(T.petScroll or ns.EMPTY) do
+        if math.abs((host:GetHeight() or 0) - (middle + BOX_CAPS)) > 0.01 then host:SetHeight(middle + BOX_CAPS) end
+    end
+    return BOX_MIDDLE - middle
+end
+local CHAR_ROWS_Y = -3
+local function LayPetBox(box)
+    for k, row in ipairs(box.list) do
+        local seen = k > box.offset and k <= box.offset + PET_SHOWN
+        if seen then
+            ns.SetPointOnce(row, "TOPLEFT", box, "TOPLEFT", box.rowX, PET_ROWS_Y - (k - box.offset - 1) * box.rowPitch)
+        end
+        ns.SetShownIf(row, seen)
+    end
+end
+
 -- Boxes at (67, -291) and the resistance column, 32x29 a row.
 function T.BuildStats(doll)
     forever = ns.OnForever()
     local attrs = ns.NewFrame("Frame", nil, doll)
     attrs:SetSize(230, 78)
     attrs:SetPoint("TOPLEFT", doll, "TOPLEFT", 67, -291)
-    StatBox(attrs, 0, 0, 53)
+    local _, leftBox = StatBox(attrs, 0, 0, BOX_MIDDLE)
     local meleeBottom, meleeBox = StatBox(attrs, 115, 0, 12)
     local _, rangedBox = StatBox(attrs, 115, -46, 11)
     -- 1.x's pet sheet: one right box as tall as the left, no melee and ranged heads.
-    local _, petBox = StatBox(attrs, 115, 0, 53)
-    T.charBoxes, T.petBox = { meleeBox, rangedBox }, petBox
+    local _, petBox = StatBox(attrs, 115, 0, BOX_MIDDLE)
+    T.charBoxes, T.petBox, T.leftBox = { meleeBox, rangedBox }, petBox, leftBox
     BoxShown(petBox, false)
     T.attrs = attrs
     T.attributes = {}
@@ -266,6 +326,33 @@ function T.BuildStats(doll)
         local row = StatRow(attrs, label, prev or attrs, prev and "BOTTOMLEFT" or "TOPLEFT", prev and 0 or 6, prev and 0 or -3)
         T.attributes[i] = row
         prev = row
+    end
+    T.petRows = {}
+    for i, stat in ipairs(PET_STATS) do
+        local row = StatRow(attrs, stat.label, attrs, "TOPLEFT", 6, 0)
+        -- A long name in another language is cut before the number, never over it.
+        row.label:SetPoint("RIGHT", row.value, "LEFT", -2, 0)
+        row.label:SetJustifyH("LEFT")
+        row.label:SetWordWrap(false)
+        row.stat, row.tip = stat, stat.tip or stat.label
+        row:Hide()
+        T.petRows[i] = row
+    end
+    -- Each box's scroll host, under its rows (their tooltips keep the mouse).
+    T.petScroll = {}
+    for side = 1, 2 do
+        local box = ns.NewFrame("Frame", nil, attrs)
+        box:SetSize(115, 85)
+        box:SetPoint("TOPLEFT", attrs, "TOPLEFT", (side - 1) * 115, 0)
+        box:SetFrameLevel(attrs:GetFrameLevel())
+        box.list, box.rowX = {}, side == 1 and 6 or PET_ROWS_X - 115
+        ns.StatScroll.Build(box, PET_SHOWN, PET_PITCH, -PET_ROWS_Y, LayPetBox)
+        box.bar:SetFrameLevel(attrs:GetFrameLevel() + 3)
+        box:EnableMouseWheel(false)
+        -- Hover only, as the stat panes: clicks pass to the doll.
+        box:SetMouseMotionEnabled(true)
+        box:SetScript("OnEnter", ns.StatScroll.Wake)
+        T.petScroll[side] = box
     end
     T.armor = StatRow(attrs, ARMOR_NAME, prev, "BOTTOMLEFT", 0, 0)
     T.attack = StatRow(attrs, MELEE_ATTACK or "Melee Attack", attrs, "TOPLEFT", 122, -2)
@@ -352,34 +439,51 @@ function T.WatchStats(doll)
     ns.Sched.AfterShow(doll, "character.statsSeen", DollSeen)
 end
 
--- Era's pet sheet: Attack, Attack Power, Damage, Defense and Armor in the right box from 122 in and 5 down, one under
--- the next; the attributes start level with them. The character's first attribute row stands 3 down.
-local PET_ROWS_X, PET_ROWS_Y, PET_ROW_GAP = 122, -5, -1
-local CHAR_ROWS_Y = -3
-
--- Rows for the view up: the pet's one right box, no heads; the character's melee and ranged boxes, armor under the
--- attributes.
+-- Rows for the view up: the character's melee and ranged boxes, armor under the attributes; the pet's one right box,
+-- no heads, only what the game fills: its pet pane's stats on the left, Era's right box but Attack (a weapon skill
+-- neither Forever nor retail has); a box past five wheels through. Returns how much shorter the pet's boxes stand.
 function T.PetStatRows(pet)
     if not T.attrs then return end
     local attrs = T.attrs
     for _, pieces in ipairs(T.charBoxes) do BoxShown(pieces, not pet) end
     BoxShown(T.petBox, pet)
     for _, row in ipairs({ T.rangedAttack, T.rangedPower, T.rangedDamage }) do ns.SetShownIf(row, not pet) end
-    local defense = pet and (UnitDefenseSkill or UnitDefense) ~= nil
-    ns.SetShownIf(T.defense, defense)
-    local attack = pet and (ATTACK or "Attack") or (MELEE_ATTACK or "Melee Attack")
-    T.attack.label:SetText(attack)
-    T.attack.tip = attack
-    ns.SetPointOnce(T.attributes[1], "TOPLEFT", attrs, "TOPLEFT", 6, pet and PET_ROWS_Y or CHAR_ROWS_Y)
+    local label = pet and (ATTACK or "Attack") or (MELEE_ATTACK or "Melee Attack")
+    T.attack.label:SetText(label)
+    T.attack.tip = label
+    local left, right = T.petScroll[1], T.petScroll[2]
+    wipe(left.list)
+    wipe(right.list)
     if pet then
-        ns.SetPointOnce(T.attack, "TOPLEFT", attrs, "TOPLEFT", PET_ROWS_X, PET_ROWS_Y)
-        ns.SetPointOnce(T.attackPower, "TOPLEFT", T.attack, "BOTTOMLEFT", 0, PET_ROW_GAP)
-        ns.SetPointOnce(T.damage, "TOPLEFT", T.attackPower, "BOTTOMLEFT", 0, PET_ROW_GAP)
-        ns.SetPointOnce(T.armor, "TOPLEFT", defense and T.defense or T.damage, "BOTTOMLEFT", 0, PET_ROW_GAP)
-    else
-        ns.SetPointOnce(T.attack, "TOPLEFT", attrs, "TOPLEFT", 122, -2)
-        ns.SetPointOnce(T.attackPower, "TOPLEFT", T.attack, "BOTTOMLEFT", 0, 1)
-        ns.SetPointOnce(T.damage, "TOPLEFT", T.attackPower, "BOTTOMLEFT", 0, 1)
-        ns.SetPointOnce(T.armor, "TOPLEFT", T.attributes[#T.attributes], "BOTTOMLEFT", 0, 0)
+        for _, row in ipairs(T.petRows) do left.list[#left.list + 1] = row end
+        local defense, attack = (UnitDefenseSkill or UnitDefense) ~= nil, UnitAttackBothHands ~= nil
+        for _, row in ipairs({ attack and T.attack, T.attackPower, T.damage, defense and T.defense, T.armor }) do
+            if row then right.list[#right.list + 1] = row end
+        end
+        ns.SetShownIf(T.defense, defense)
+        ns.SetShownIf(T.attack, attack)
+        for _, row in ipairs(T.attributes) do row:Hide() end
     end
+    local shrink = FitPetBoxes(pet and math.max(#left.list, #right.list) or nil)
+    for _, box in ipairs(T.petScroll) do
+        box.lineCount = #box.list
+        box.offset = math.min(box.offset, math.max(0, box.lineCount - PET_SHOWN))
+        box:EnableMouseWheel(pet)
+        if pet then LayPetBox(box) end
+        ns.StatScroll.Set(box)
+    end
+    if pet then return shrink end
+    for _, row in ipairs(T.petRows) do row:Hide() end
+    ns.SetShownIf(T.defense, false)
+    for i, row in ipairs(T.attributes) do
+        ns.SetPointOnce(row, "TOPLEFT", T.attributes[i - 1] or attrs, i > 1 and "BOTTOMLEFT" or "TOPLEFT", i > 1 and 0 or 6,
+            i > 1 and 0 or CHAR_ROWS_Y)
+        row:Show()
+    end
+    for _, row in ipairs({ T.attack, T.attackPower, T.damage, T.armor }) do row:Show() end
+    ns.SetPointOnce(T.attack, "TOPLEFT", attrs, "TOPLEFT", 122, -2)
+    ns.SetPointOnce(T.attackPower, "TOPLEFT", T.attack, "BOTTOMLEFT", 0, 1)
+    ns.SetPointOnce(T.damage, "TOPLEFT", T.attackPower, "BOTTOMLEFT", 0, 1)
+    ns.SetPointOnce(T.armor, "TOPLEFT", T.attributes[#T.attributes], "BOTTOMLEFT", 0, 0)
+    return 0
 end

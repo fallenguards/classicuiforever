@@ -81,6 +81,60 @@ tpEnv._G = tpEnv
 local TrainingPoints = assert(load(source:sub(tpFrom or 1, (tpTo or 0) + 4) .. "\nreturn TrainingPoints", "tp", "t", tpEnv))()
 Check(TrainingPoints() == 15, "Forever's training points: 23 earned, 8 used, 15 to spend")
 
+-- The XP bar: the client's fill track is inset 6 a side and its fill 15 tall for its own art; Era's fill is the bar.
+local dress = source:match("local function DressXP%(bar, doll%)(.-)\nend\n") or ""
+Check(dress:find("area:SetAllPoints(bar)", 1, true) ~= nil, "the fill's track is the whole bar, not the client's inset")
+Check(dress:find("fill:SetHeight(PET_XP_H)", 1, true) ~= nil, "the fill is the bar's height, not the client's 15")
+
+-- The pet's stat boxes hold only what the game fills: it gives pets no attributes (all 0) and no weapon skill, so the
+-- left box lists its own pet pane's stats; five shown a box, the rest wheeled through with the stat panes' bar.
+handle = assert(io.open(ROOT .. "/Character/CharacterStats.lua", "r"))
+local stats = handle:read("a")
+handle:close()
+for _, name in ipairs({ "UnitHealthMax", "GetUnitSpeed", "GetPetCritChance", "GetPetMeleeHaste" }) do
+    Check(stats:find(name .. '("pet")', 1, true) or stats:find(name .. "()", 1, true), "the pet box reads " .. name)
+end
+local rows = stats:match("function T%.PetStatRows%(pet%)(.-)\nend\n") or ""
+Check(rows:find("for _, row in ipairs(T.petRows) do left.list[#left.list + 1] = row end", 1, true) ~= nil,
+    "the left box lists the pet's health, speed, crit and haste")
+Check(rows:find("for _, row in ipairs(T.attributes) do row:Hide() end", 1, true) ~= nil,
+    "no attribute rows for a pet (the game gives it none: always 0)")
+Check(rows:find("{ attack and T.attack, T.attackPower, T.damage, defense and T.defense, T.armor }", 1, true) ~= nil,
+    "the right box keeps Era's rows the game fills, Attack only where it has a weapon skill")
+Check(stats:find("ns.StatScroll.Build(box, PET_SHOWN", 1, true) ~= nil, "the pet boxes scroll with the stat panes' bar")
+
+local layFrom = stats:find("local function LayPetBox(box)", 1, true)
+local layTo = layFrom and stats:find("\nend\n", layFrom, true)
+local layEnv = { ipairs = ipairs, ns = {
+    SetPointOnce = function(row, _, _, _, _, y) row.y = y end,
+    SetShownIf = function(row, shown) row.shown = shown end,
+} }
+local LayPetBox = assert(load("local PET_ROWS_Y, PET_SHOWN = -5, 5\n" .. stats:sub(layFrom or 1, (layTo or 0) + 4)
+    .. "\nreturn LayPetBox", "lay", "t", layEnv))()
+Check(stats:find("ns.StatScroll.Build(box, PET_SHOWN, PET_PITCH,", 1, true) ~= nil, "both pet boxes step their rows alike")
+local box = { list = {}, offset = 0, rowX = 6, rowPitch = 14 }
+for i = 1, 7 do box.list[i] = {} end
+LayPetBox(box)
+Check(box.list[1].shown and box.list[5].shown and not box.list[6].shown, "five rows shown, the rest below the fold")
+Check(box.list[1].y == -5 and box.list[5].y == -61, "5 down, 14 a row")
+box.offset = 2
+LayPetBox(box)
+Check(not box.list[2].shown and box.list[3].y == -5 and box.list[7].shown, "wheeled down two, the seventh comes in")
+
+-- The boxes fit their rows (no empty foot), and stand lower by as much, so their foot stays over the XP bar.
+local fitFrom = stats:find("local function FitPetBoxes(rows)", 1, true)
+local fitTo = fitFrom and stats:find("\nend\n", fitFrom, true)
+local heights = {}
+local function Piece(key) return { GetHeight = function() return heights[key] end, SetHeight = function(_, h) heights[key] = h end } end
+local fitEnv = { ipairs = ipairs, math = math, ns = { EMPTY = {} }, T = { leftBox = { {}, Piece("left") }, petBox = { {}, Piece("right") } } }
+local FitPetBoxes = assert(load("local PET_SHOWN, PET_ROWS_Y, BOX_MIDDLE, BOX_CAPS, PET_PITCH, ROW_H = 5, -5, 53, 32, 14, 13\n"
+    .. stats:sub(fitFrom or 1, (fitTo or 0) + 4) .. "\nreturn FitPetBoxes", "fit", "t", fitEnv))()
+Check(FitPetBoxes(4) == 20 and heights.left == 33 and heights.right == 33,
+    "four rows 14 apart: 5 above the first and 5 under the last (65 tall)")
+Check(FitPetBoxes(nil) == 0 and heights.left == 53, "the character's view: Era's box")
+Check(FitPetBoxes(9) == 6 and heights.left == 47, "more than five: five rows fit, the rest scroll")
+Check(source:find("pet and PET_ATTRS_Y - shrink or CHAR_ATTRS_Y", 1, true) ~= nil, "the shorter boxes keep their foot")
+
 if failed > 0 then
     print(failed .. " check(s) failed")
     os.exit(1)

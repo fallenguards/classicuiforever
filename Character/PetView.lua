@@ -57,12 +57,19 @@ local function DressXP(bar, doll)
     ns.EachTexture(bar, function(region)
         if region ~= bar.Fill and not ns.IsOwnRegion(bar, region) then Fade(region) end
     end)
-    local fill = bar.Fill
+    -- The client's track is inset 6 a side and its fill 15 tall, for its own art: Era's fill is the whole bar.
+    local area, fill = bar.FillArea, bar.Fill
+    if area and not ns.IsAt(area, "TOPLEFT", bar, "TOPLEFT", 0, 0) then
+        Take(area, "points")
+        area:ClearAllPoints()
+        area:SetAllPoints(bar)
+    end
     if fill then
-        Take(fill, "art", "masks")
+        Take(fill, "art", "masks", "size")
         if bar.Mask and fill.RemoveMaskTexture then pcall(fill.RemoveMaskTexture, fill, bar.Mask) end
         ns.SetTex(fill, "statusBar")
         fill:SetVertexColor(XP_PURPLE[1], XP_PURPLE[2], XP_PURPLE[3])
+        if math.abs((fill:GetHeight() or 0) - PET_XP_H) > 0.01 then fill:SetHeight(PET_XP_H) end
     end
     local left = XPEdge(bar, "xpEdgeLeft", 160)
     ns.SetPointOnce(left, "TOPLEFT", bar, "TOPLEFT", 0, 0)
@@ -191,15 +198,17 @@ function T.PlaceModel(doll, pet)
     if T.rotateRight then
         ns.SetPointOnce(T.rotateRight, "TOPLEFT", scene, "TOPLEFT", pet and PET_ROTATE_X or 0, pet and PET_ROTATE_Y or 0)
     end
+    -- The pet's boxes fit their rows: their foot stays on Era's, over the XP bar.
+    local shrink = T.PetStatRows(pet) or 0
     if T.attrs then
-        ns.SetPointOnce(T.attrs, "TOPLEFT", doll, "TOPLEFT", pet and PET_ATTRS_X or 67, pet and PET_ATTRS_Y or CHAR_ATTRS_Y)
+        ns.SetPointOnce(T.attrs, "TOPLEFT", doll, "TOPLEFT", pet and PET_ATTRS_X or 67,
+            pet and PET_ATTRS_Y - shrink or CHAR_ATTRS_Y)
     end
     local column = T.resistances and T.resistances[1] and T.resistances[1]:GetParent()
     if column then
         ns.SetPointOnce(column, "TOPRIGHT", doll, "TOPLEFT", pet and PET_RES_X or 297, pet and PET_RES_Y or -77)
     end
     PlaceFooter(doll, pet)
-    T.PetStatRows(pet)
     -- The client leaves its happiness face up on the character view too.
     local happy = _G["PetPaperDollPetHappinessInfo"]
     if happy then
