@@ -2,6 +2,16 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN90_1_TITLE"] = "Quest colors"
+L["WN90_1_TEXT"] = "All your quests in yellow? That is the game's Quest Difficulty Color setting, turned off. It is now in the options (/fcui) too: check Quest difficulty colors under Quests."
+L["WN90_2_TITLE"] = "Pet tab"
+L["WN90_2_TEXT"] = "It lists the stats pets actually have: health, speed, crit chance, haste, power, damage, defense and armor."
+L["WN90_3_TITLE"] = "Bags"
+L["WN90_3_TEXT"] = "Bags you drop onto the classic bar in edit mode stay there after you log out, and a Lua error some addons caused when refreshing the bags is gone."
+L["WN90_4_TITLE"] = "Collections"
+L["WN90_4_TEXT"] = "In Appearances, the preview fits your whole character, and trying another look in the same slot keeps the camera where you left it."
+L["WN90_5_TITLE"] = "Quest log"
+L["WN90_5_TEXT"] = "It no longer slows down while another addon loads item data."
 L["WN89_1_TITLE"] = "No achievement box"
 L["WN89_1_TEXT"] = "The game's box that pops up as you complete an achievement (on Forever, a Legacy challenge) or a step of one is gone, as 1.x had none. To have it back, turn it on in the options (/fcui): check Achievement toast under Other."
 L["WN89_2_TITLE"] = "Skills tab"

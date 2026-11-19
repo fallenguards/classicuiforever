@@ -3,6 +3,16 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN90_1_TITLE"] = "Colori delle missioni"
+L["WN90_1_TEXT"] = "Tutte le missioni in giallo? È l'impostazione del gioco dei colori di difficoltà delle missioni, disattivata. Ora è anche nelle opzioni (/fcui): attiva Colori di difficoltà delle missioni in Missioni."
+L["WN90_2_TITLE"] = "Scheda famiglio"
+L["WN90_2_TEXT"] = "Mostra le statistiche che i famigli hanno davvero: salute, velocità, probabilità di critico, celerità, potere d'attacco, danni, difesa e armatura."
+L["WN90_3_TITLE"] = "Borse"
+L["WN90_3_TEXT"] = "Le borse trascinate sulla barra classica in modalità modifica restano lì dopo un nuovo accesso, ed è sparito un errore Lua che alcuni addon causavano aggiornando le borse."
+L["WN90_4_TITLE"] = "Collezioni"
+L["WN90_4_TEXT"] = "In Aspetti l'anteprima inquadra tutto il personaggio, e provare un altro aspetto nello stesso slot lascia la telecamera dove l'avevi messa."
+L["WN90_5_TITLE"] = "Registro delle missioni"
+L["WN90_5_TEXT"] = "Non rallenta più mentre un altro addon carica dati degli oggetti."
 L["WN89_1_TITLE"] = "Niente più riquadro delle imprese"
 L["WN89_1_TEXT"] = "Il riquadro del gioco che compare quando completi un'impresa (su Forever, una sfida dell'Eredità) o uno dei suoi passi è sparito, perché 1.x non ne aveva. Per riaverlo, attivalo nelle opzioni (/fcui): spunta Avviso di impresa sotto Altro."
 L["WN89_2_TITLE"] = "Scheda Abilità"

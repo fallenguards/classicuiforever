@@ -2,6 +2,21 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.60.0] - 2026-11-19
+
+### Added
+- Quest difficulty colors, under Quests (Forever): the game's own setting that colors quest titles by how hard they are for you, now in the options too. With it off every quest shows in yellow, which the FAQ now explains.
+
+### Changed
+- The pet tab shows the stats pets have: health, speed, crit chance and haste on the left, power, damage, defense and armor on the right. Pets have no strength, agility, stamina, intellect or spirit, so those rows, which only ever read 0, are gone.
+
+### Fixed
+- Bags dropped onto the classic bar in edit mode stay there after you log out and back in, and on a fresh install.
+- No more Lua error from the bags when another addon refreshes them while a bag is closed, as EasyFind's currency button did.
+- Collections, Appearances: the preview fits your whole character in its box, and trying another look in the same slot keeps the camera where you left it.
+- The quest log no longer redraws for item data it never asked for, which slowed it while another addon loaded items.
+- Small alignment fix: the pet tab's XP bar fills inside its border.
+
 ## [0.59.0] - 2026-11-17
 
 ### Added

@@ -3,6 +3,16 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN90_1_TITLE"] = "Questfarben"
+L["WN90_1_TEXT"] = "Alle Quests gelb? Dann ist die Spieleinstellung für Questschwierigkeitsfarben aus. Sie steht jetzt auch in den Optionen (/fcui): hak unter Quests Questschwierigkeitsfarben an."
+L["WN90_2_TITLE"] = "Reiter Begleiter"
+L["WN90_2_TEXT"] = "Er zeigt die Werte, die Begleiter wirklich haben: Gesundheit, Geschwindigkeit, kritische Trefferchance, Tempo, Angriffskraft, Schaden, Verteidigung und Rüstung."
+L["WN90_3_TITLE"] = "Taschen"
+L["WN90_3_TEXT"] = "Taschen, die du im Bearbeitungsmodus auf die klassische Leiste ziehst, bleiben nach dem Ausloggen dort, und ein Lua-Fehler, den manche Addons beim Auffrischen der Taschen auslösten, ist behoben."
+L["WN90_4_TITLE"] = "Sammlungen"
+L["WN90_4_TEXT"] = "Unter Vorlagen passt die Vorschau deinen ganzen Charakter ein, und eine andere Vorlage am selben Platz behält die Kamera, wo du sie gelassen hast."
+L["WN90_5_TITLE"] = "Questlog"
+L["WN90_5_TEXT"] = "Es wird nicht mehr langsam, während ein anderes Addon Gegenstandsdaten lädt."
 L["WN89_1_TITLE"] = "Kein Erfolgskästchen mehr"
 L["WN89_1_TEXT"] = "Das Kästchen des Spiels, das bei einem abgeschlossenen Erfolg (auf Forever einer Vermächtnisherausforderung) oder einem Schritt dazu aufspringt, ist weg, denn 1.x hatte keines. Um es zurückzuholen, schalte es in den Optionen (/fcui) ein: hak unter Sonstiges Erfolgsmeldung an."
 L["WN89_2_TITLE"] = "Reiter Fertigkeiten"

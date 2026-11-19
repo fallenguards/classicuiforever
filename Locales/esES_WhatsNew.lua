@@ -3,6 +3,16 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN90_1_TITLE"] = "Colores de misión"
+L["WN90_1_TEXT"] = "¿Todas tus misiones en amarillo? Es el ajuste del juego de colores de dificultad de misión, desactivado. Ahora también está en las opciones (/fcui): marca Colores de dificultad de misión en Misiones."
+L["WN90_2_TITLE"] = "Pestaña de mascota"
+L["WN90_2_TEXT"] = "Muestra las estadísticas que tienen de verdad las mascotas: salud, velocidad, probabilidad de crítico, celeridad, poder de ataque, daño, defensa y armadura."
+L["WN90_3_TITLE"] = "Bolsas"
+L["WN90_3_TEXT"] = "Las bolsas que sueltas en la barra clásica en el modo de edición se quedan ahí al volver a conectarte, y se acabó un error de Lua que algunos addons causaban al refrescar las bolsas."
+L["WN90_4_TITLE"] = "Colecciones"
+L["WN90_4_TEXT"] = "En Apariencias, la vista previa encaja a todo tu personaje, y probar otra apariencia en la misma ranura deja la cámara donde la dejaste."
+L["WN90_5_TITLE"] = "Registro de misiones"
+L["WN90_5_TEXT"] = "Ya no se ralentiza mientras otro addon carga datos de objetos."
 L["WN89_1_TITLE"] = "Sin recuadro de logros"
 L["WN89_1_TEXT"] = "El recuadro del juego que aparece al completar un logro (en Forever, un desafío de Legado) o uno de sus pasos ha desaparecido, pues 1.x no tenía ninguno. Para recuperarlo, actívalo en las opciones (/fcui): marca Aviso de logro en Otros."
 L["WN89_2_TITLE"] = "Pestaña Habilidades"

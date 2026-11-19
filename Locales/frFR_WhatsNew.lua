@@ -3,6 +3,16 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN90_1_TITLE"] = "Couleurs des quêtes"
+L["WN90_1_TEXT"] = "Toutes vos quêtes en jaune ? C'est le réglage du jeu des couleurs de difficulté des quêtes, désactivé. Il est désormais aussi dans les options (/fcui) : cochez Couleurs de difficulté des quêtes sous Quêtes."
+L["WN90_2_TITLE"] = "Onglet familier"
+L["WN90_2_TEXT"] = "Il affiche les caractéristiques qu'ont vraiment les familiers : points de vie, vitesse, chances de coup critique, hâte, puissance d'attaque, dégâts, défense et armure."
+L["WN90_3_TITLE"] = "Sacs"
+L["WN90_3_TEXT"] = "Les sacs déposés sur la barre classique en mode édition y restent après une reconnexion, et une erreur Lua que certains addons provoquaient en rafraîchissant les sacs a disparu."
+L["WN90_4_TITLE"] = "Collections"
+L["WN90_4_TEXT"] = "Dans Apparences, l'aperçu cadre tout votre personnage, et essayer une autre apparence du même emplacement garde la caméra là où vous l'aviez laissée."
+L["WN90_5_TITLE"] = "Journal de quêtes"
+L["WN90_5_TEXT"] = "Il ne ralentit plus pendant qu'un autre addon charge des données d'objets."
 L["WN89_1_TITLE"] = "Plus de boîte de haut fait"
 L["WN89_1_TEXT"] = "La boîte du jeu qui surgit quand vous accomplissez un haut fait (sur Forever, un défi d'Héritage) ou l'une de ses étapes a disparu, car 1.x n'en avait pas. Pour la retrouver, activez-la dans les options (/fcui) : cochez Avis de haut fait sous Autre."
 L["WN89_2_TITLE"] = "Onglet Compétences"
