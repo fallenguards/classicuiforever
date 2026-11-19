@@ -37,9 +37,11 @@ local ourSlot1, ourSlot2 = Frame("our slot 1"), Frame("our slot 2")
 local stillOurs = Button("ActionButton1", clientContainer, ourSlot1)
 local taken = Button("MultiBarRightButton1", clientContainer, otherBar)
 
+local backing = { shown = true, Hide = function(self) self.shown = false end }
 local env = setmetatable({
     slotOf = { [stillOurs] = ourSlot1, [taken] = ourSlot2 },
     mouseOff = {},
+    backingOf = { stance = backing },
     wipe = function(t) for k in pairs(t) do t[k] = nil end end,
     ns = { SetPointOnce = function() end },
 }, { __index = _G })
@@ -50,6 +52,7 @@ Check(stillOurs.parent == clientContainer, "a button in our slot goes back to th
 Check(stillOurs.checked.sub == 0, "its checked border goes back to the client's layer")
 Check(taken.parent == otherBar, "a button another addon moved onto its bar stays on that bar")
 Check(taken.checked.sub == 1, "that addon's button is left untouched")
+Check(backing.shown == false, "Era's stance and pet backing goes with the band")
 
 -- The layout's slot: a button another addon moved onto its own bar is never pulled back into ours.
 local slotBody = source:match("local function Slot%(button, bar%)\n(.-)\nend\n")

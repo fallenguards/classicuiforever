@@ -14,6 +14,10 @@ ns.TEX = {
     endCap = "MainMenuBar\\UI-MainMenuBar-EndCap-Dwarf",
     barBody = "MainMenuBar\\UI-MainMenuBar-Dwarf",
     barKeyring = "MainMenuBar\\UI-MainMenuBar-KeyRing",
+    -- Era's backings under the stance, possess and pet buttons; Forever ships the same files.
+    stanceBar = "=ShapeshiftBar\\ShapeshiftBar",
+    stanceBarMiddle = "=ShapeshiftBar\\ShapeshiftBarMiddle",
+    petBar = "=PetActionBar\\UI-PetBar",
     statusBar = "TargetingFrame\\UI-StatusBar",
     -- Vertical shading only: the XP fill tiles, so a horizontal gradient shows as blocks. Ours only.
     statusBarFlat = "!UI-StatusBar-Flat.tga",

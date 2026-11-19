@@ -3,10 +3,11 @@ local B = ns.band
 
 -- Action bars on the band: button rows at their 1.x spots, page arrows, pet and stance row, right columns, bars 6-8.
 
-local ART_W, BUTTON_PITCH, PET_ROW_Y, PAGE_ROOM = B.ART_W, B.BUTTON_PITCH, B.PET_ROW_Y, B.PAGE_ROOM
+local ART_W, BUTTON_PITCH, PAGE_ROOM = B.ART_W, B.BUTTON_PITCH, B.PAGE_ROOM
 local BUTTON_SIZE = 36
-local STANCE_X, PET_X = 30, 36
-local SMALL_PITCH, SMALL_BUTTON = 33, 30    -- 30 px buttons on the pet and stance bars
+-- Era's small bars (EditModePresetLayouts): 30 px buttons, stance and possess at 41.5 and 7 apart, pet at 71 and 8 apart.
+local STANCE_X, PET_X, SMALL_BUTTON = 41.5, 71, 30
+local STANCE_PITCH, PET_PITCH = 37, 38
 local SIDE_BAR_X, SIDE_BAR_Y, SIDE_BAR_GAP = -2, 98, 6   -- right bars hang from the bottom right corner
 local PAGE_X, PAGE_UP_Y, PAGE_DOWN_Y = 522, -22, -42
 local PAGE_OVER_BUTTONS = 2
@@ -44,6 +45,8 @@ end
 -- Each bar's slots hang on a holder of ours on the screen, never on the bar: the client rescales, moves and hides its
 -- bar frames (edit mode re-lays them on every grid show, in fights too). The holder copies the bar's show rules.
 local holderOf, driverOf = {}, {}
+-- Era's backing under the stance, possess and pet rows: a child of the bar's holder, shown and faded with it.
+local backingOf = {}
 local VISIBILITY = { InCombat = "[combat] show; hide", OutOfCombat = "[combat] hide; show" }
 
 local function Driver(bar)
@@ -136,6 +139,7 @@ function B.ButtonsHome()
     end
     for bar in pairs(mouseOff) do bar:EnableMouse(true) end
     wipe(mouseOff)
+    for _, back in pairs(backingOf) do back:Hide() end
 end
 
 -- A row hangs on the band while its buttons stand on it, else on the screen (a column at the screen edge, scaled by bar 1's size).
@@ -377,12 +381,16 @@ function B.LayoutPageArrows(bar)
         pageX + 20, midY + 0.5)
 end
 
+-- A bar the band lays on its 1.x row: at its default place, across, one row.
+local function OnBandSpot(bar)
+    return not (B.SystemMoved(bar) or BarVertical(bar) == true or BarRows(bar) > 1)
+end
+
 -- A default-placed bar gets its 1.x row; one the player moved, turned or folded is laid out on itself.
 local function BandRow(bar, rowIndex, x, y, pitch, target)
     if not bar then return false end
-    local vertical, rows = BarVertical(bar) == true, BarRows(bar)
-    if B.SystemMoved(bar) or vertical or rows > 1 then
-        LayoutOnOwnBar(bar, rowIndex, vertical, rows, pitch, target)
+    if not OnBandSpot(bar) then
+        LayoutOnOwnBar(bar, rowIndex, BarVertical(bar) == true, BarRows(bar), pitch, target)
         return false
     end
     local band = BandNow()
@@ -392,7 +400,10 @@ local function BandRow(bar, rowIndex, x, y, pitch, target)
 end
 B.BandRow = BandRow
 
--- The pet and stance row's top on the band (UIParent units), shown or not: the classic chat stands over it.
+-- The stance and pet row's lift to its spot over bar 2 when it sits lower (band px).
+local rowRaise = 0
+
+-- The pet and stance row's top on the band (UIParent units), shown or not and as over bar 2: the classic chat stands over it.
 function B.PetRowTop()
     local top
     for _, bar in ipairs({ StanceBar, PetActionBar, PossessActionBar }) do
@@ -400,29 +411,136 @@ function B.PetRowTop()
         local slot = first and hung and not hung.onBar and slotOf[first]
         local t = slot and slot:GetTop()
         if t then
-            t = t * slot:GetEffectiveScale() / UIParent:GetEffectiveScale()
+            t = (t * slot:GetEffectiveScale() + rowRaise * B.art:GetEffectiveScale()) / UIParent:GetEffectiveScale()
             if not top or t > top then top = t end
         end
     end
     return top
 end
 
--- Stance (or possess) bar at the left, pet bar beside it, both over bars 2 and 3 as in 1.x.
-function B.LayoutPetRow(lift)
-    local x = STANCE_X
-    local y = PET_ROW_Y + (lift or 0)
-    for _, bar in ipairs({ StanceBar, PossessActionBar }) do
-        if bar then
-            local pinned = BandRow(bar, bar == StanceBar and 4 or 5, x, y, SMALL_PITCH, SMALL_BUTTON)
-            if pinned and bar:IsShown() and bar.actionButtons then
-                -- A bar larger than the band pushes the next one out by its growth.
-                local grown = math.max(1, IconScale(bar) / BandScale())
-                x = x + (#bar.actionButtons * (SMALL_PITCH + B.PadGap(bar, SMALL_BUTTON)) + 8) * grown
-            end
+-- Era's sheets (StanceBar, PossessActionBar and PetActionBar.xml), in a 30 px button's units from the first one's corner.
+local STANCE_LEFT = { 0, 0.734375, 0, 0.296875 }
+local STANCE_RIGHT = { 0.328125, 1, 0.3125, 0.6015625 }
+local STANCE_MIDDLE = { 0, 1, 0, 1 }
+local PET_LEFT = { 0, 1, 0.015625, 0.359375 }
+local PET_RIGHT = { 0, 0.71875, 0.375, 0.71875 }
+
+local function Backing(bar)
+    local back = backingOf[bar]
+    if back or InCombatLockdown() then return back end
+    local holder = holderOf[bar]
+    if not holder then return nil end
+    back = CreateFrame("Frame", nil, holder)
+    back:SetSize(1, 1)
+    back.left = back:CreateTexture(nil, "BACKGROUND")
+    -- Over the left piece, which a single form's right end overlaps.
+    back.right = back:CreateTexture(nil, "BORDER")
+    back.middles = {}
+    backingOf[bar] = back
+    return back
+end
+
+-- The stance bar's runs as Era sets them by its form count: the right end 12 in for one, 1 past the left for two, else
+-- past a 37 px middle per form after the second.
+local function DressStance(back, forms, possess)
+    local run = B.BAND_RUN
+    ns.Dress(back.left, "stanceBar", run, back, -11, -3, 47, 38, STANCE_LEFT)
+    local rightX = 36 + 37 * math.max(0, forms - 2)
+    if possess then rightX = 36 elseif forms <= 1 then rightX = 1 elseif forms == 2 then rightX = 37 end
+    ns.Dress(back.right, "stanceBar", run, back, rightX, -3, 43, 38, STANCE_RIGHT)
+    local middles = possess and 0 or math.max(0, forms - 2)
+    for i = 1, middles do
+        local tex = back.middles[i] or back:CreateTexture(nil, "BACKGROUND")
+        back.middles[i] = tex
+        ns.Dress(tex, "stanceBarMiddle", run, back, 36 + 37 * (i - 1), -3, 37, 38, STANCE_MIDDLE)
+    end
+    return middles
+end
+
+-- Drawn while its bar stands at its own spot on a free band top at its default size and spacing, bar 1's art up.
+local function DrawBacking(bar, show)
+    local back = backingOf[bar]
+    local hung = rowOf[bar]
+    if show and hung and not hung.onBar then back = Backing(bar) end
+    if not (show and back and hung and not hung.onBar) then
+        if back then back:Hide() end
+        return
+    end
+    local forms = bar == StanceBar and GetNumShapeshiftForms() or 0
+    ns.SetScaleIf(back, IconScale(bar))
+    ns.SetPointIf(back, "BOTTOMLEFT", hung.row, "BOTTOMLEFT", 0, 0)
+    ns.SetLevelIf(back, math.max(1, B.ButtonLevel() - 1))
+    if back.forms ~= forms then
+        back.forms = forms
+        local middles = 0
+        if bar == PetActionBar then
+            ns.Dress(back.left, "petBar", B.BAND_RUN, back, -35, -3, 256, 44, PET_LEFT)
+            ns.Dress(back.right, "petBar", B.BAND_RUN, back, 221, -3, 184, 44, PET_RIGHT)
+        else
+            middles = DressStance(back, forms, bar == PossessActionBar)
+        end
+        for i = middles + 1, #back.middles do back.middles[i]:Hide() end
+    end
+    back:Show()
+end
+
+-- Its own spot and Era's look: what the client checks before it shows the art (ShouldShowBackgroundArt).
+local function BackingFits(bar)
+    local size = BarSetting(bar, "IconSize")
+    return (size == nil or size == 100) and B.PadGap(bar, SMALL_BUTTON) == 0 and not B.BarBare(ns.GetMainBar())
+end
+
+-- A form learned or lost: the stance bar's backing takes the new count.
+ns.EventFrame("UPDATE_SHAPESHIFT_FORMS", function()
+    local back = backingOf[StanceBar]
+    if back and back:IsShown() then DrawBacking(StanceBar, true) end
+end)
+
+local LEADS
+-- Stance, then possess, from Era's spot; the pet bar at its own or past them. A bar larger than the band pushes the next
+-- one out by its growth. Returns the pet bar's x and the row's right end (band px), or lays it at y when given.
+local function PetRun(y, free)
+    LEADS = LEADS or { StanceBar, PossessActionBar }
+    local x, ends = STANCE_X, STANCE_X
+    for _, bar in ipairs(LEADS) do
+        local pinned = OnBandSpot(bar)
+        if y then
+            pinned = BandRow(bar, bar == StanceBar and 4 or 5, x, y, STANCE_PITCH, SMALL_BUTTON)
+            DrawBacking(bar, pinned and free and x == STANCE_X and BackingFits(bar))
+        end
+        if pinned and bar:IsShown() and bar.actionButtons then
+            local grown = math.max(1, IconScale(bar) / BandScale())
+            local step = (STANCE_PITCH + B.PadGap(bar, SMALL_BUTTON)) * grown
+            local shown = bar == StanceBar and GetNumShapeshiftForms() or #bar.actionButtons
+            ends = x + shown * step
+            x = x + #bar.actionButtons * step + 8 * grown
         end
     end
+    local petX = math.max(PET_X, x)
+    local pet = PetActionBar
+    if pet and pet:IsShown() and pet.actionButtons and OnBandSpot(pet) then
+        local grown = math.max(1, IconScale(pet) / BandScale())
+        ends = petX + #pet.actionButtons * (PET_PITCH + B.PadGap(pet, SMALL_BUTTON)) * grown
+    end
+    return petX, ends
+end
+
+-- Where the row's shown buttons end on the band (band px): bar 3 lifts the row only where it runs under them.
+function B.PetRowEnd()
+    local _, ends = PetRun()
+    return ends
+end
+
+-- Stance (or possess) bar at the left, pet bar beside it. y: its foot (band px); high: its foot over bar 2; free: bar 2's
+-- spot open, the row down on the band with Era's backing.
+function B.LayoutPetRow(y, high, free)
+    rowRaise = math.max(0, (high or y) - y)
+    local petX = PetRun(y, free)
     if PetActionBar then
-        BandRow(PetActionBar, 6, math.max(PET_X, x), y, SMALL_PITCH, SMALL_BUTTON)
+        -- Era's pet bar stands 1 under the stance bar, on its own only.
+        local own = petX == PET_X
+        local pinned = BandRow(PetActionBar, 6, petX, own and y - 1 or y, PET_PITCH, SMALL_BUTTON)
+        DrawBacking(PetActionBar, pinned and free and own and BackingFits(PetActionBar))
     end
 end
 

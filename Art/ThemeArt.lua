@@ -246,6 +246,8 @@ Common-Input-Border
 EraSearchBox
 HelpFrameTab-Active
 HelpFrameTab-Inactive
+ShapeshiftBar
+ShapeshiftBarMiddle
 SkillFrame-BotLeft
 SkillFrame-BotRight
 SpellBook-SkillLineTab
@@ -271,6 +273,7 @@ UI-MainMenuBar-KeyRing
 UI-MainMenuBar-KeyRing-Classic
 UI-Merchant-BottomBorder
 UI-Merchant-LabelSlots
+UI-PetBar
 UI-PetPaperDollFrame-BotLeft
 UI-PetPaperDollFrame-BotRight
 UI-QuestLog-BotLeft

@@ -3,13 +3,15 @@ local B = ns.band
 
 -- The band's pass and module: what is still on the band, the layout, and the hand-back when turned off.
 
-local BUTTON_PITCH, ROW_X, ROW_Y, PET_ROW_Y = B.BUTTON_PITCH, B.ROW_X, B.ROW_Y, B.PET_ROW_Y
+local BUTTON_PITCH, ROW_X, ROW_Y = B.BUTTON_PITCH, B.ROW_X, B.ROW_Y
 local MICRO_END_GAP, MICRO_LEAD = B.MICRO_END_GAP, B.MICRO_LEAD
 local OWNED_SYSTEMS, EXTRA_BARS = B.OWNED_SYSTEMS, B.EXTRA_BARS
 local MICRO_BUTTONS, BAG_BUTTONS, CAP_KEYS = B.MICRO_BUTTONS, B.BAG_BUTTONS, B.CAP_KEYS
 local UPPER_ROW_Y = 55 -- bars 2 and 3: 3 px over the XP strip, inside the band's top
 local TWO_BAR_LIFT = 9 -- lift for everything over the band while a second bar sits over XP
 local HALF_ROW_X = 8   -- bar 3's 1.x spot: 8 in from the band's half
+-- Era's stance row (UIParentManageFramePositions): 7 over the bar under it, or 56 up with XP, its backing on the band's top.
+local SMALL_GAP, SMALL_ROW_Y = 7, 56
 local SLOT_SPACE = 6   -- the band's 36 px slots, 6 apart (BUTTON_PITCH 42)
 local BarSetting, BarVertical, BarRows, IconScale = B.BarSetting, B.BarVertical, B.BarRows, B.IconScale
 local BandScale, BandNow, StatusPair = B.BandScale, B.BandNow, B.StatusPair
@@ -228,19 +230,22 @@ local function Layout()
     if OneBar() then
         upperY = UPPER_ROW_Y + BUTTON_PITCH + barLift
         if lowerOn then upperY = math.max(upperY, lowerY + BUTTON_PITCH * lowerRatio) end
-        upperOn = BandRow(upper, 3, linePlan.bar1X, upperY)
+        upperX = linePlan.bar1X
     else
         upperY = lowerY
-        upperOn = BandRow(upper, 3, upperX, upperY)
     end
-    -- The stance and pet row keeps its 1.x distance over the taller row under it.
-    local petLift = (OneBar() and BUTTON_PITCH or 0) + barLift
-    local rise = PET_ROW_Y - UPPER_ROW_Y
-    if lowerOn and not onLine then petLift = math.max(petLift, lowerY + rise * lowerRatio - PET_ROW_Y) end
-    if upperOn and upper:IsShown() then
-        petLift = math.max(petLift, upperY + rise * IconScale(upper) / band - PET_ROW_Y)
-    end
-    LayoutPetRow(petLift)
+    upperOn = BandRow(upper, 3, upperX, upperY)
+    -- The stance and pet row as Era stacks it: 7 over bar 2, or over bar 3 where that runs under the row, else down on the
+    -- band's top with its backing. Its foot over the bars it can stand on is where the classic chat stands.
+    local size = BUTTON_PITCH - SLOT_SPACE
+    local overLower = lowerY + size * lowerRatio + SMALL_GAP
+    local overUpper = upperY + size * IconScale(upper) / band + SMALL_GAP
+    local underRow = upperX < B.PetRowEnd()
+    local rowY, free = SMALL_ROW_Y + barLift, true
+    if lowerOn and not onLine then rowY, free = overLower, false end
+    if upperOn and upper:IsShown() and underRow then rowY, free = math.max(rowY, overUpper), false end
+    local high = math.max(rowY, onLine and rowY or overLower, underRow and overUpper or rowY)
+    LayoutPetRow(rowY, high, free)
     LayoutSideBars()
     -- Bars 6-8 have no band spot. Left to the client the 1.x rings (drawn for 6 between 36) overlapped at its spacing: laid
     -- out on their own frames like a placed bar, at their own size, 1.x spacing and Icon Padding.

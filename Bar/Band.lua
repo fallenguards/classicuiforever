@@ -10,7 +10,6 @@ ns.band = B
 B.ART_W, B.BAND_H, B.CAP_SIZE = 1024, 43, 128
 B.BUTTON_PITCH = 42              -- 36 px buttons, 6 apart
 B.ROW_X, B.ROW_Y = 8, 4          -- first button from the band's corner
-B.PET_ROW_Y = 104                -- stance, pet and possess bars, over bars 2 and 3
 -- Past slot 12: the page arrows and the number slot through its post's right border (u 0-37 of the third sheet).
 B.PAGE_ROOM = 38
 -- The post under the number box ends at u 34; the box juts on to 38 (sheet rows 99-113), over dark stone either side of it.
