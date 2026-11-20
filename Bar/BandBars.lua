@@ -402,6 +402,8 @@ B.BandRow = BandRow
 
 -- The stance and pet row's lift to its spot over bar 2 when it sits lower (band px).
 local rowRaise = 0
+-- The totem bar stands on the stance row (LayTotem): the classic chat stands over it too.
+local totemHeld = false
 
 -- The pet and stance row's top on the band (UIParent units), shown or not and as over bar 2: the classic chat stands over it.
 function B.PetRowTop()
@@ -414,6 +416,12 @@ function B.PetRowTop()
             t = (t * slot:GetEffectiveScale() + rowRaise * B.art:GetEffectiveScale()) / UIParent:GetEffectiveScale()
             if not top or t > top then top = t end
         end
+    end
+    local totem = _G.MultiCastActionBarFrame
+    local t = totemHeld and totem and totem:IsShown() and totem:GetTop()
+    if t then
+        t = t * totem:GetEffectiveScale() / UIParent:GetEffectiveScale()
+        if not top or t > top then top = t end
     end
     return top
 end
@@ -498,7 +506,8 @@ end)
 
 local LEADS
 -- Stance, then possess, from Era's spot; the pet bar at its own or past them. A bar larger than the band pushes the next
--- one out by its growth. Returns the pet bar's x and the row's right end (band px), or lays it at y when given.
+-- one out by its growth. Returns the pet bar's x, the row's right end and the first free x past the leads (band px), or
+-- lays it at y when given.
 local function PetRun(y, free)
     LEADS = LEADS or { StanceBar, PossessActionBar }
     local x, ends = STANCE_X, STANCE_X
@@ -522,7 +531,7 @@ local function PetRun(y, free)
         local grown = math.max(1, IconScale(pet) / BandScale())
         ends = petX + #pet.actionButtons * (PET_PITCH + B.PadGap(pet, SMALL_BUTTON)) * grown
     end
-    return petX, ends
+    return petX, ends, x
 end
 
 -- Where the row's shown buttons end on the band (band px): bar 3 lifts the row only where it runs under them.
@@ -531,11 +540,29 @@ function B.PetRowEnd()
     return ends
 end
 
+-- The totem bar on the stance row, where Wrath kept it: the game anchors it to bar 1's frame, which the band leaves to the
+-- game while bar 1's buttons stand in our slots, so it landed somewhere new on each load and never at its edit mode box
+-- (2026-11-20). Its frame's corner sits 3 under and left of its first button. One placed in edit mode keeps its spot.
+local TOTEM_X, TOTEM_INSET = 30, 3
+local function LayTotem(y, x)
+    local totem = _G.MultiCastActionBarFrame
+    totemHeld = false
+    if not totem or B.SystemMoved(totem) then return end
+    if InCombatLockdown() and totem:IsProtected() then return end
+    local band = BandNow()
+    Remember(totem)
+    -- After a shown stance or possess bar, else at Era's stance spot.
+    local left = x and x > STANCE_X and x - TOTEM_INSET or TOTEM_X
+    ns.SetPointIf(totem, "BOTTOMLEFT", B.art, "BOTTOMLEFT", left * band, (y - TOTEM_INSET) * band)
+    totemHeld = true
+end
+
 -- Stance (or possess) bar at the left, pet bar beside it. y: its foot (band px); high: its foot over bar 2; free: bar 2's
 -- spot open, the row down on the band with Era's backing.
 function B.LayoutPetRow(y, high, free)
     rowRaise = math.max(0, (high or y) - y)
-    local petX = PetRun(y, free)
+    local petX, _, leadsEnd = PetRun(y, free)
+    LayTotem(y, leadsEnd)
     if PetActionBar then
         -- Era's pet bar stands 1 under the stance bar, on its own only.
         local own = petX == PET_X
