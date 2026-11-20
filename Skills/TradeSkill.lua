@@ -660,6 +660,9 @@ local function Build()
         local most = math.max(1, Craftable(SelectedInfo()))
         panel.count:SetNumber(math.max(1, math.min(most, (panel.count:GetNumber() or 1) + by)))
     end)
+    -- The game's page's names too: a craft macro clicks ClassicUIForeverTradeSkill.CreateButton, as it did
+    -- ProfessionsFrame.CraftingPage.CreateButton, whose page is parked with its own pick, not ours (GH #325).
+    panel.CreateButton, panel.CreateAllButton = panel.create, panel.createAll
 
     if ns.TradeSkillRetailParts then ns.TradeSkillRetailParts(panel, Refresh, SelectedInfo) end
     if ns.OnForever() then panel.singleSize = { WINDOW_W, WINDOW_H } end
