@@ -38,15 +38,22 @@ local function RowSlots(bar)
     return count
 end
 
--- A shown bar the band lays as one row across: not moved off, not vertical, not folded.
-local function OnBandRow(bar)
-    return bar ~= nil and bar:IsShown() and not SystemMoved(bar) and BarVertical(bar) ~= true and BarRows(bar) == 1
+-- A bar the band lays as one row across once shown: not moved off, not vertical, not folded.
+local function BandRowShape(bar)
+    return bar ~= nil and not SystemMoved(bar) and BarVertical(bar) ~= true and BarRows(bar) == 1
 end
 
--- Bars 2 and 3 side by side on the band: bar 2's width and the pair's, in band px; nil unless both stand on it.
+-- A shown bar the band lays as one row across.
+local function OnBandRow(bar)
+    return bar ~= nil and bar:IsShown() and BandRowShape(bar)
+end
+
+-- Bars 2 and 3 side by side on the band: bar 2's width and the pair's, in band px; nil unless both have the band's
+-- shape. A bar turned off keeps its room, so the other stays where it stood: Era's bars never move when one is
+-- turned off (the one left jumped to its old spot, 2026-11-20).
 local function PairWidths()
     local lower, upper, bar = MultiBarBottomLeft, MultiBarBottomRight, ns.GetMainBar()
-    if OneBar() or not bar or (B.shape.bar2W or 0) > 0 or not (OnBandRow(lower) and OnBandRow(upper)) then return nil end
+    if OneBar() or not bar or (B.shape.bar2W or 0) > 0 or not (BandRowShape(lower) and BandRowShape(upper)) then return nil end
     local band = BandScale(bar)
     local lowerGap, upperGap = B.PadGap(lower), B.PadGap(upper)
     local lowerW = RowSlots(lower) * (BUTTON_PITCH + lowerGap) * IconScale(lower) / band
