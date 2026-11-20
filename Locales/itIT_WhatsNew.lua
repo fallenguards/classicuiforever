@@ -3,6 +3,14 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN92_1_TITLE"] = "Barre delle posizioni e del famiglio"
+L["WN92_1_TEXT"] = "Le barre delle posizioni, del famiglio e della possessione stanno dove le mette Era: sopra la barra principale sullo sfondo di Era, o appena sopra la barra 2 quando è attiva. Trascinane una in modalità modifica per posizionarla tu."
+L["WN92_2_TITLE"] = "Barra dei totem"
+L["WN92_2_TEXT"] = "La barra dei totem dello sciamano sta al posto della barra delle posizioni, sopra la barra principale, e ci resta dopo ogni caricamento."
+L["WN92_3_TITLE"] = "Barre delle azioni"
+L["WN92_3_TEXT"] = "Disattivando la barra 2 o la barra 3, l'altra resta dov'era."
+L["WN92_4_TITLE"] = "Macro delle professioni"
+L["WN92_4_TEXT"] = "Una macro può premere Crea nella finestra delle professioni classica, come una macro di incantamento rapido: /run ClassicUIForeverTradeSkill.CreateButton:Click()"
 L["WN91_1_TITLE"] = "Tracciamento delle missioni"
 L["WN91_1_TEXT"] = "Le missioni che hai tolto dal tracciamento ci tornano? È il tracciamento automatico delle missioni del gioco. Disattiva Tracciamento automatico delle missioni in Missioni (/fcui) e non torneranno."
 L["WN91_2_TITLE"] = "Pannello incursione"

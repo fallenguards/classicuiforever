@@ -2,6 +2,14 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN92_1_TITLE"] = "Stance and pet bars"
+L["WN92_1_TEXT"] = "The stance, pet and possess bars sit where Era puts them: on top of the main bar on Era's own backing, or just above bar 2 when it is on. Drag one in edit mode to place it yourself."
+L["WN92_2_TITLE"] = "Totem bar"
+L["WN92_2_TEXT"] = "The shaman's totem bar sits at the stance bar's spot on top of the main bar and stays there after every load."
+L["WN92_3_TITLE"] = "Action bars"
+L["WN92_3_TEXT"] = "Turning off bar 2 or bar 3 leaves the other where it was."
+L["WN92_4_TITLE"] = "Profession macros"
+L["WN92_4_TEXT"] = "A macro can press Create in the classic trade skill window, such as a quick enchant macro: /run ClassicUIForeverTradeSkill.CreateButton:Click()"
 L["WN91_1_TITLE"] = "Quest tracking"
 L["WN91_1_TEXT"] = "Untracked quests coming back to the tracker? That is the game's Automatic Quest Tracking. Uncheck Automatic quest tracking under Quests (/fcui) and they stay off."
 L["WN91_2_TITLE"] = "Raid panel"

@@ -3,6 +3,14 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN92_1_TITLE"] = "Barres de posture et de familier"
+L["WN92_1_TEXT"] = "Les barres de posture, de familier et de possession se placent là où Era les met : au-dessus de la barre principale sur le fond d'Era, ou juste au-dessus de la barre 2 quand elle est affichée. Faites-en glisser une en mode Édition pour la placer vous-même."
+L["WN92_2_TITLE"] = "Barre des totems"
+L["WN92_2_TEXT"] = "La barre des totems du chaman se place à l'emplacement de la barre de posture, au-dessus de la barre principale, et y reste après chaque chargement."
+L["WN92_3_TITLE"] = "Barres d'action"
+L["WN92_3_TEXT"] = "Désactiver la barre 2 ou la barre 3 laisse l'autre là où elle était."
+L["WN92_4_TITLE"] = "Macros de métier"
+L["WN92_4_TEXT"] = "Une macro peut appuyer sur Créer dans la fenêtre de métier classique, comme une macro d'enchantement rapide : /run ClassicUIForeverTradeSkill.CreateButton:Click()"
 L["WN91_1_TITLE"] = "Suivi des quêtes"
 L["WN91_1_TEXT"] = "Des quêtes retirées du suivi y reviennent ? C'est le suivi automatique des quêtes du jeu. Décochez Suivi automatique des quêtes sous Quêtes (/fcui) et elles n'y reviennent plus."
 L["WN91_2_TITLE"] = "Panneau de raid"

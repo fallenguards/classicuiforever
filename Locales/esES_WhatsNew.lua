@@ -3,6 +3,14 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN92_1_TITLE"] = "Barras de actitud y de mascota"
+L["WN92_1_TEXT"] = "Las barras de actitud, de mascota y de posesión se colocan donde las pone Era: encima de la barra principal sobre el fondo propio de Era, o justo encima de la barra 2 cuando está activa. Arrastra una en el modo edición para colocarla tú."
+L["WN92_2_TITLE"] = "Barra de tótems"
+L["WN92_2_TEXT"] = "La barra de tótems del chamán se coloca en el sitio de la barra de actitud, encima de la barra principal, y se queda ahí tras cada carga."
+L["WN92_3_TITLE"] = "Barras de acción"
+L["WN92_3_TEXT"] = "Al desactivar la barra 2 o la barra 3, la otra se queda donde estaba."
+L["WN92_4_TITLE"] = "Macros de profesión"
+L["WN92_4_TEXT"] = "Una macro puede pulsar Crear en la ventana clásica de profesiones, como una macro de encantamiento rápido: /run ClassicUIForeverTradeSkill.CreateButton:Click()"
 L["WN91_1_TITLE"] = "Seguimiento de misiones"
 L["WN91_1_TEXT"] = "¿Las misiones que dejaste de seguir vuelven al seguimiento? Es el seguimiento automático de misiones del juego. Desmarca Seguimiento automático de misiones en Misiones (/fcui) y no volverán."
 L["WN91_2_TITLE"] = "Panel de banda"

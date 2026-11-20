@@ -2,6 +2,16 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.62.0] - 2026-11-20
+
+### Changed
+- The stance, pet and possess bars sit where Era puts them on the classic bar: on top of the main bar on Era's own backing when bar 2 is off, and just above bar 2 when it is on, with Era's spacing between the buttons. A bar you drag in edit mode stays where you put it, and Reset To Default Position brings it back.
+
+### Fixed
+- The shaman's totem bar stays in one place: it sits at the stance bar's spot on top of the main bar, as in Wrath. It could land somewhere new after each load, away from its box in edit mode.
+- Turning off bar 2 or bar 3 leaves the other where it was. The one left on jumped to another spot.
+- A macro can press Create in the classic trade skill window, such as a quick enchant macro: /run ClassicUIForeverTradeSkill.CreateButton:Click(). A macro clicking the game's own Create button did nothing while our window was up.
+
 ## [0.61.0] - 2026-11-19
 
 ### Added

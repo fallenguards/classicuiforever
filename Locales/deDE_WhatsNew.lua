@@ -3,6 +3,14 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN92_1_TITLE"] = "Haltungs- und Begleiterleiste"
+L["WN92_1_TEXT"] = "Haltungs-, Begleiter- und Besessenheitsleiste sitzen, wo Era sie hinsetzt: oben auf der Hauptleiste auf Eras eigenem Hintergrund oder knapp über Leiste 2, wenn sie an ist. Zieh eine im Bearbeitungsmodus, um sie selbst zu platzieren."
+L["WN92_2_TITLE"] = "Totemleiste"
+L["WN92_2_TEXT"] = "Die Totemleiste des Schamanen sitzt am Platz der Haltungsleiste oben auf der Hauptleiste und bleibt nach jedem Laden dort."
+L["WN92_3_TITLE"] = "Aktionsleisten"
+L["WN92_3_TEXT"] = "Schaltest du Leiste 2 oder Leiste 3 aus, bleibt die andere, wo sie war."
+L["WN92_4_TITLE"] = "Berufsmakros"
+L["WN92_4_TEXT"] = "Ein Makro kann im klassischen Berufsfenster auf Herstellen drücken, etwa ein Schnellverzauberungsmakro: /run ClassicUIForeverTradeSkill.CreateButton:Click()"
 L["WN91_1_TITLE"] = "Questverfolgung"
 L["WN91_1_TEXT"] = "Kommen entfernte Quests zurück in die Questverfolgung? Das ist die automatische Questverfolgung des Spiels. Hak unter Quests (/fcui) Automatische Questverfolgung ab, dann bleiben sie draußen."
 L["WN91_2_TITLE"] = "Schlachtzugsfenster"
