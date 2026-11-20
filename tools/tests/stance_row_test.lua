@@ -54,9 +54,11 @@ Check(bars:find("return (size == nil or size == 100) and B.PadGap(bar, SMALL_BUT
 local body = bars:match("local function DressStance%(back, forms, possess%)\n(.-)\nend\n")
 Check(body ~= nil, "DressStance is found")
 local placed
+local partOf = {}
 local env = setmetatable({
     B = { BAND_RUN = {} },
-    ns = { Dress = function(tex, key, _, _, x, y, w, h) placed[tex] = { key = key, x = x, y = y, w = w, h = h } end },
+    ns = { Dress = function(tex, key, _, _, x, y, w, h) placed[tex] = { key = key, x = x, y = y, w = w, h = h } end,
+        PinThemePart = function(tex, part) partOf[tex] = part end },
 }, { __index = _G })
 local DressStance = assert(load("local back, forms, possess = ...\n" .. (body or ""), "DressStance", "t", env))
 
@@ -80,6 +82,23 @@ Check(placed[back.middles[1]].x == 36 and placed[back.middles[3]].x == 110 and p
 Check(placed[back.right].x == 147 and placed[back.right].key == "stanceBar", "the right end past the last middle")
 back, middles = Run(0, true)
 Check(placed[back.right].x == 36 and middles == 0, "possess: the two ends side by side")
+
+------------------------------------------------------------------ themes: painted as the band's art
+
+-- The backing hangs on our holder, which the theme's part walk reads as Other windows: each piece is pinned to Action
+-- bars, or leaving either part out of a theme painted it apart from the band (2026-11-20).
+Check(bars:find('ns.PinThemePart(back.left, "themePartBars")', 1, true) ~= nil
+    and bars:find('ns.PinThemePart(back.right, "themePartBars")', 1, true) ~= nil, "both ends in the Action bars part")
+back = Run(5)
+Check(partOf[back.middles[1]] == "themePartBars" and partOf[back.middles[3]] == "themePartBars",
+    "every middle in the Action bars part")
+-- The one color look inks the sheets it lists as chrome, as the band's own: dev/tools/bronze_variants.py writes the list,
+-- so a run that leaves these out fails here.
+local chrome = Source("Art/ThemeArt.lua"):match("ns%.CHROME_ART = %[%[\n(.-)%]%]")
+Check(chrome ~= nil, "the chrome list is found")
+for _, sheet in ipairs({ "ShapeshiftBar", "ShapeshiftBarMiddle", "UI-PetBar", "UI-MainMenuBar-Dwarf" }) do
+    Check(chrome ~= nil and ("\n" .. chrome):find("\n" .. sheet .. "\n", 1, true) ~= nil, sheet .. " is chrome, as the band's art")
+end
 
 if failed > 0 then
     print(string.format("stance row: %d failed", failed))

@@ -443,6 +443,9 @@ local function Backing(bar)
     back.left = back:CreateTexture(nil, "BACKGROUND")
     -- Over the left piece, which a single form's right end overlaps.
     back.right = back:CreateTexture(nil, "BORDER")
+    -- The theme's Action bars part, as the band's own art: it hangs on our holder, which the part walk reads as Other windows.
+    ns.PinThemePart(back.left, "themePartBars")
+    ns.PinThemePart(back.right, "themePartBars")
     back.middles = {}
     backingOf[bar] = back
     return back
@@ -458,7 +461,11 @@ local function DressStance(back, forms, possess)
     ns.Dress(back.right, "stanceBar", run, back, rightX, -3, 43, 38, STANCE_RIGHT)
     local middles = possess and 0 or math.max(0, forms - 2)
     for i = 1, middles do
-        local tex = back.middles[i] or back:CreateTexture(nil, "BACKGROUND")
+        local tex = back.middles[i]
+        if not tex then
+            tex = back:CreateTexture(nil, "BACKGROUND")
+            ns.PinThemePart(tex, "themePartBars")
+        end
         back.middles[i] = tex
         ns.Dress(tex, "stanceBarMiddle", run, back, 36 + 37 * (i - 1), -3, 37, 38, STANCE_MIDDLE)
     end
