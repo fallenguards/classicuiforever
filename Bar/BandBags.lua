@@ -293,7 +293,7 @@ function B.LayoutBags()
     if (out or OneBar()) and B.BagsTight() then gap = -TIGHT_GAP end
     local lift = (KEYRING_H - size) / 2
     local home, homePoint, homeY = art, "BOTTOMRIGHT", bag.y
-    local homeX
+    local homeX, onBand
     -- Backpack only (BandBagsShow): the bags fold away, the backpack and the reagent bag left (#195).
     local folded = B.BagsFolded()
     local square = B.ReagentSlot()
@@ -318,7 +318,12 @@ function B.LayoutBags()
         end
         -- The row hangs from the client's bags piece, laid over it first, so edit mode's box sits on the bags
         -- and a drag carries them. A piece mid-drag stays in the player's hand.
-        if piece then
+        if piece and locked and not piece.isDragging and grow == GROW.left then
+            -- In a fight the client may lay its piece again (a level-up's edit mode pass puts it by the micro menu) and
+            -- only it may move it: the row hangs from the band where the piece's end stands, back on it after the fight.
+            home, onBand = relativeTo or art, true
+            homeY = homeY - lift * buttonScale + boxH * buttonScale / 2
+        elseif piece then
             if not piece.isDragging and not locked then
                 -- Its own anchor kept: the hand-back puts it back without running edit mode's anchor pass.
                 B.Remember(piece, true)
@@ -344,6 +349,8 @@ function B.LayoutBags()
                 Chain(button, prev, grow, gap)
             elseif home == piece then
                 button:SetPoint(grow[1], piece, grow[1], 0, 0)
+            elseif onBand then
+                button:SetPoint(grow[1], home, homePoint, homeX / buttonScale, homeY / buttonScale)
             else
                 button:SetPoint("BOTTOMRIGHT", home, homePoint, homeX / buttonScale, homeY / buttonScale)
             end
