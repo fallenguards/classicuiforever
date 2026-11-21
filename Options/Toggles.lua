@@ -34,7 +34,7 @@ local ALL_WINDOWS = { "characterSheet", "spellBook", "talents", "professionsBook
     "whoList", "guildRoster", "groupFinder", "panelSocial", "panelCommunities", "panelGuildControl", "panelGroupFinder",
     "panelChannels", "panelInspect", "panelTrade", "panelAuction", "panelBank", "panelBooks", "panelTaxi", "panelGossip",
     "panelGuildBank", "panelCharter", "panelMail", "panelQuest", "panelStable", "panelTabard", "panelMerchant", "trainer",
-    "lootWindow", "lootRoll", "gameMenu", "settingsPanel", "panelAddons", "panelHelp", "panelClock", "damageMeter" }
+    "lootWindow", "lootRoll", "panelLootHistory", "gameMenu", "settingsPanel", "panelAddons", "panelHelp", "panelClock", "damageMeter" }
 -- Pages by kind, not name (same in every language): Look; on screen; finding the way; game windows; Other last.
 ns.TOGGLES = {
     -- The page's list rides its first row; each window is its own switch.
@@ -72,6 +72,8 @@ ns.TOGGLES = {
     { "panelLegacy", L["OPT_panelLegacy"], L["OPT_panelLegacy_TIP"], checks = "panelWindows",
         hideIf = OursOn("legacyWindow") },
     { "lootWindow", L["OPT_lootWindow"], L["OPT_lootWindow_TIP"], search = "loot frame" },
+    { "panelLootHistory", L["OPT_panelLootHistory"], L["OPT_panelLootHistory_TIP"], checks = "panelWindows",
+        search = "loot rolls history /loot" },
     { "panelMacros", L["OPT_panelMacros"], L["OPT_panelMacros_TIP"], checks = "panelWindows" },
     { "settingsPanel", L["OPT_settingsPanel"], L["OPT_settingsPanel_TIP"] },
     { "panelSocial", L["OPT_panelSocial"], L["OPT_panelSocial_TIP"], checks = "panelWindows" },

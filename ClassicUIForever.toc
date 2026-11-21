@@ -201,6 +201,7 @@ Windows\Loot.lua
 Windows\LootRoll.lua
 Windows\NpcWindows.lua
 Windows\PanelAfters.lua
+Windows\LootHistory.lua
 Windows\PageInk.lua
 Windows\EraCoins.lua
 Windows\Panels.lua
