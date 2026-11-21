@@ -2,6 +2,16 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.63.0] - 2026-11-21
+
+### Added
+- Classic in the game's nameplate Style list (Options, Nameplates): our 1.x plate is one of the styles. The game's styles did nothing on the plates while ours drew over them; picking Thin, Modern, Block or Cast Focus now turns our Nameplates option off so that style shows, and Classic turns it back on. The Style row has no arrows beside it now.
+- The loot history window (/loot) wears the classic frame with your theme, on the Windows page of the options as Loot history. Drag its corner to size it both ways (the game's handle sized its height alone); right-click the corner for its own size.
+
+### Fixed
+- The backing behind the stance and pet bars on the classic bar follows the Action bars theme (dark, bronze or custom), as the bar's own art does. It kept the default look.
+- Clicking the quantity box in the classic trade skill window selects its number, as in Era, so typing replaces it. Typing added digits to the old number.
+
 ## [0.62.0] - 2026-11-20
 
 ### Changed

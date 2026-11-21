@@ -3,6 +3,14 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN93_1_TITLE"] = "Stili delle targhette"
+L["WN93_1_TEXT"] = "Classico è ora nella lista degli stili delle targhette del gioco (Opzioni, Targhette). Scegliere uno degli stili del gioco disattiva le nostre targhette perché si veda quello stile; Classico riporta le nostre."
+L["WN93_2_TITLE"] = "Cronologia bottino"
+L["WN93_2_TEXT"] = "La finestra della cronologia del bottino (/loot) ha la vecchia cornice con il tuo tema. Trascina il suo angolo per ridimensionarla in entrambi i sensi; clic destro sull'angolo per la sua dimensione originale."
+L["WN93_3_TITLE"] = "Sfondo della barra delle posizioni"
+L["WN93_3_TEXT"] = "Lo sfondo dietro le barre delle posizioni e del famiglio segue il tema delle barre delle azioni, come la grafica della barra stessa."
+L["WN93_4_TITLE"] = "Quantità delle professioni"
+L["WN93_4_TEXT"] = "Un clic nella casella della quantità della finestra delle professioni classica seleziona il numero, così scrivendo lo sostituisci, come in Era."
 L["WN92_1_TITLE"] = "Barre delle posizioni e del famiglio"
 L["WN92_1_TEXT"] = "Le barre delle posizioni, del famiglio e della possessione stanno dove le mette Era: sopra la barra principale sullo sfondo di Era, o appena sopra la barra 2 quando è attiva. Trascinane una in modalità modifica per posizionarla tu."
 L["WN92_2_TITLE"] = "Barra dei totem"

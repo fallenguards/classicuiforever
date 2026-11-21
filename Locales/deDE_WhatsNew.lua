@@ -3,6 +3,14 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN93_1_TITLE"] = "Namensplaketten-Stile"
+L["WN93_1_TEXT"] = "Klassisch steht jetzt in der Stilliste der Namensplaketten des Spiels (Optionen, Namensplaketten). Wählst du einen Stil des Spiels, schalten sich unsere Namensplaketten aus und dieser Stil erscheint; Klassisch holt unsere zurück."
+L["WN93_2_TITLE"] = "Beuteverlauf"
+L["WN93_2_TEXT"] = "Das Beuteverlaufsfenster (/loot) trägt den klassischen Rahmen in deinem Thema. Zieh an seiner Ecke, um es in beide Richtungen zu ändern; ein Rechtsklick auf die Ecke gibt ihm seine eigene Größe zurück."
+L["WN93_3_TITLE"] = "Hintergrund der Haltungsleiste"
+L["WN93_3_TEXT"] = "Der Hintergrund hinter der Haltungs- und Begleiterleiste folgt dem Thema der Aktionsleisten, wie die eigene Grafik der Leiste."
+L["WN93_4_TITLE"] = "Herstellungsanzahl"
+L["WN93_4_TEXT"] = "Ein Klick in das Anzahlfeld des klassischen Berufsfensters markiert die Zahl, sodass Tippen sie ersetzt, wie in Era."
 L["WN92_1_TITLE"] = "Haltungs- und Begleiterleiste"
 L["WN92_1_TEXT"] = "Haltungs-, Begleiter- und Besessenheitsleiste sitzen, wo Era sie hinsetzt: oben auf der Hauptleiste auf Eras eigenem Hintergrund oder knapp über Leiste 2, wenn sie an ist. Zieh eine im Bearbeitungsmodus, um sie selbst zu platzieren."
 L["WN92_2_TITLE"] = "Totemleiste"

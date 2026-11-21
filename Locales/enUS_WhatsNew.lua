@@ -2,6 +2,14 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN93_1_TITLE"] = "Nameplate styles"
+L["WN93_1_TEXT"] = "Classic is now in the game's nameplate Style list (Options, Nameplates). Picking one of the game's styles turns our nameplates off so that style shows; Classic brings ours back."
+L["WN93_2_TITLE"] = "Loot history"
+L["WN93_2_TEXT"] = "The loot history window (/loot) wears the classic frame with your theme. Drag its corner to size it both ways; right-click the corner for its own size."
+L["WN93_3_TITLE"] = "Stance and pet backing"
+L["WN93_3_TEXT"] = "The backing behind the stance and pet bars follows the Action bars theme, as the bar's own art does."
+L["WN93_4_TITLE"] = "Trade skill quantity"
+L["WN93_4_TEXT"] = "Clicking the quantity box in the classic trade skill window selects the number, so typing replaces it, as in Era."
 L["WN92_1_TITLE"] = "Stance and pet bars"
 L["WN92_1_TEXT"] = "The stance, pet and possess bars sit where Era puts them: on top of the main bar on Era's own backing, or just above bar 2 when it is on. Drag one in edit mode to place it yourself."
 L["WN92_2_TITLE"] = "Totem bar"

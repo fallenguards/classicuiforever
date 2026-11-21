@@ -3,6 +3,14 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN93_1_TITLE"] = "Styles des barres de nom"
+L["WN93_1_TEXT"] = "Classique figure désormais dans la liste des styles des barres de nom du jeu (Options, Barres de nom). Choisir l'un des styles du jeu désactive nos barres de nom pour afficher ce style ; Classique ramène les nôtres."
+L["WN93_2_TITLE"] = "Historique du butin"
+L["WN93_2_TEXT"] = "La fenêtre d'historique du butin (/loot) porte l'ancien cadre avec votre thème. Faites glisser son coin pour la redimensionner dans les deux sens ; un clic droit sur le coin lui rend sa propre taille."
+L["WN93_3_TITLE"] = "Fond de la barre de posture"
+L["WN93_3_TEXT"] = "Le fond derrière les barres de posture et de familier suit le thème des barres d'action, comme l'art de la barre elle-même."
+L["WN93_4_TITLE"] = "Quantité des métiers"
+L["WN93_4_TEXT"] = "Cliquer dans la case de quantité de la fenêtre de métier classique sélectionne le nombre, si bien que la saisie le remplace, comme dans Era."
 L["WN92_1_TITLE"] = "Barres de posture et de familier"
 L["WN92_1_TEXT"] = "Les barres de posture, de familier et de possession se placent là où Era les met : au-dessus de la barre principale sur le fond d'Era, ou juste au-dessus de la barre 2 quand elle est affichée. Faites-en glisser une en mode Édition pour la placer vous-même."
 L["WN92_2_TITLE"] = "Barre des totems"

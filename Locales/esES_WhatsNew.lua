@@ -3,6 +3,14 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN93_1_TITLE"] = "Estilos de placas de nombre"
+L["WN93_1_TEXT"] = "Clásico está ahora en la lista de estilos de placas de nombre del juego (Opciones, Placas de nombre). Elegir uno de los estilos del juego desactiva nuestras placas para que se vea ese estilo; Clásico trae las nuestras de vuelta."
+L["WN93_2_TITLE"] = "Historial de botín"
+L["WN93_2_TEXT"] = "La ventana del historial de botín (/loot) lleva el marco clásico con tu tema. Arrastra su esquina para cambiar su tamaño en ambos sentidos; clic derecho en la esquina para su propio tamaño."
+L["WN93_3_TITLE"] = "Fondo de la barra de actitud"
+L["WN93_3_TEXT"] = "El fondo tras las barras de actitud y de mascota sigue el tema de las barras de acción, como el arte de la propia barra."
+L["WN93_4_TITLE"] = "Cantidad en profesiones"
+L["WN93_4_TEXT"] = "Hacer clic en la casilla de cantidad de la ventana clásica de profesiones selecciona el número, así que al escribir lo reemplazas, como en Era."
 L["WN92_1_TITLE"] = "Barras de actitud y de mascota"
 L["WN92_1_TEXT"] = "Las barras de actitud, de mascota y de posesión se colocan donde las pone Era: encima de la barra principal sobre el fondo propio de Era, o justo encima de la barra 2 cuando está activa. Arrastra una en el modo edición para colocarla tú."
 L["WN92_2_TITLE"] = "Barra de tótems"
