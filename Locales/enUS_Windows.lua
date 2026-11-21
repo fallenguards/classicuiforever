@@ -142,6 +142,9 @@ L["OPT_druidManaGlowOver"] = "Glow: over the mana bar"
 L["OPT_druidManaGlowOver_TIP"] = "The frame's glow across the top of the mana bar."
 L["OPT_druidManaGlow_TIP"] = "How the frame's threat and combat glow meets the mana bar."
 
+-- Units/NamePlateOptions.lua: our plate in the game's nameplate Style list
+L["PLATE_STYLE_CLASSIC"] = "Classic"
+
 -- Options/OptionsWindow.lua: the game's settings' ClassicUI Forever entry
 L["OPTWIN_SETTINGS_HOME"] = "Search every option above, or pick a page under ClassicUI Forever on the left."
 L["OPT_themeIgnoreElitePlayer"] = "Frames: Player"

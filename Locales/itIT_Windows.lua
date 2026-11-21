@@ -77,6 +77,9 @@ L["OPT_druidManaGlowOver"] = "Bagliore: sopra la barra del mana"
 L["OPT_druidManaGlowOver_TIP"] = "Il bagliore del riquadro attraversa la parte alta della barra del mana."
 L["OPT_druidManaGlow_TIP"] = "Come il bagliore di minaccia e di combattimento del riquadro incontra la barra del mana."
 
+-- Units/NamePlateOptions.lua: our plate in the game's nameplate Style list
+L["PLATE_STYLE_CLASSIC"] = "Classico"
+
 -- Options/OptionsWindow.lua: the game's settings' ClassicUI Forever entry
 L["OPTWIN_SETTINGS_HOME"] = "Cerca tra tutte le opzioni qui sopra, o scegli una pagina sotto ClassicUI Forever a sinistra."
 L["OPT_themeIgnoreElitePlayer"] = "Riquadri: Giocatore"

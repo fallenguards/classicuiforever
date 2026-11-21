@@ -77,6 +77,9 @@ L["OPT_druidManaGlowOver"] = "Leuchten: über der Manaleiste"
 L["OPT_druidManaGlowOver_TIP"] = "Das Leuchten des Fensters quer über den oberen Rand der Manaleiste."
 L["OPT_druidManaGlow_TIP"] = "Wie das Bedrohungs- und Kampfleuchten des Fensters auf die Manaleiste trifft."
 
+-- Units/NamePlateOptions.lua: our plate in the game's nameplate Style list
+L["PLATE_STYLE_CLASSIC"] = "Klassisch"
+
 -- Options/OptionsWindow.lua: the game's settings' ClassicUI Forever entry
 L["OPTWIN_SETTINGS_HOME"] = "Oben alle Optionen durchsuchen oder links unter ClassicUI Forever eine Seite wählen."
 L["OPT_themeIgnoreElitePlayer"] = "Fenster: Spieler"

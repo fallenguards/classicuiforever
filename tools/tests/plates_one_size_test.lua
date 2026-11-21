@@ -39,6 +39,7 @@ assert(loadfile(ROOT .. "/Core/Settings.lua"))("ClassicUIForever", ns)
 function ns.GetCVar(name) ns.NoteCVarRead(name) return cvars[name] end
 function ns.GetCVarDefault(name) return DEFAULTS[name] end
 function ns.PackageRuns() return true end
+function ns.EventFrame() return { UnregisterAllEvents = function() end } end
 ns.RELOAD_KEYS = {}
 assert(loadfile(ROOT .. "/Units/NamePlateOptions.lua"))("ClassicUIForever", ns)
 

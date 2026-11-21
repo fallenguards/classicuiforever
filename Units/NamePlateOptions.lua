@@ -144,6 +144,81 @@ function ns.GiveBackPlateStyle()
     if was ~= nil then ns.WriteCVar(STYLE_CVAR, tostring(was)) end
 end
 
+-- Our plate as Classic in the game's nameplate Style list (ours draws over every game style): Classic turns ours on,
+-- a game style off. Only the menu's own hooks, run in the game's protected calls: the game's rows still write the CVar,
+-- ours never does (a CVar write runs its listeners as ours).
+local function ClassicStyleOn()
+    return ns.db ~= nil and ns.db.namePlates == true
+end
+
+local function SetClassicPlates(on)
+    if not ns.db or ClassicStyleOn() == on then return end
+    ns.db.namePlates = on
+    ns.ToggleChanged("namePlates")
+end
+
+local function GameStylePicked() SetClassicPlates(false) end
+local function ClassicPicked() SetClassicPlates(true) end
+
+-- With ours on, the game's rows show unpicked: the list and its box name Classic alone.
+local function AddClassicStyle(root)
+    for _, row in root:EnumerateElementDescriptions() do
+        if row:IsRadio() then
+            local picked = row.isSelected
+            if type(picked) == "function" then
+                row:SetIsSelected(function(data) return not ClassicStyleOn() and picked(data) end)
+            end
+            row:HookResponder(GameStylePicked)
+        end
+    end
+    root:CreateHighlightRadio(ns.L["PLATE_STYLE_CLASSIC"], ClassicStyleOn, ClassicPicked)
+end
+
+-- The Style row's initializer: the settings pages are built after the world loads.
+local function StyleInitializer()
+    local panel = _G.SettingsPanel
+    if not (panel and panel.GetAllCategories and panel.GetLayout) then return end
+    local function Search(categories, depth)
+        if type(categories) ~= "table" or depth > 3 then return end
+        for _, category in ipairs(categories) do
+            local layout = panel:GetLayout(category)
+            if layout and layout.GetInitializers then
+                for _, init in ipairs(layout:GetInitializers() or ns.EMPTY) do
+                    local setting = init.GetSetting and init:GetSetting()
+                    if setting and setting.GetVariable and setting:GetVariable() == STYLE_CVAR then return init end
+                end
+            end
+            local found = category.GetSubcategories and Search(category:GetSubcategories(), depth + 1)
+            if found then return found end
+        end
+    end
+    return Search(panel:GetAllCategories(), 0)
+end
+
+local styleListed = false
+local function ListClassicStyle()
+    if styleListed or not ns.PackageRuns("namePlates") then return end
+    local ok, init = pcall(StyleInitializer)
+    if not (ok and init) then return end
+    styleListed = true
+    -- Its arrows find the pick by asking our rows outside the game's protected calls, then write the CVar as ours.
+    local data = init.GetData and init:GetData()
+    if type(data) == "table" then data.forceSteppersHidden = true end
+    local prior = init.customOptionHandler
+    init.customOptionHandler = function(root)
+        if prior then prior(root) end
+        local fine, err = pcall(AddClassicStyle, root)
+        if not fine then ns.MissingPiece("nameplate Style list: " .. tostring(err)) end
+    end
+end
+NP.ListClassicStyle = ListClassicStyle
+
+ns.EventFrame("PLAYER_ENTERING_WORLD", function(self)
+    self:UnregisterAllEvents()
+    ns.Sched.NextFrame("namePlates.styleList", ListClassicStyle)
+end)
+if _G.SettingsPanel then _G.SettingsPanel:HookScript("OnShow", ListClassicStyle) end
+
 local function RestoreColor(unitFrame)
     if type(unitFrame.UpdateHealthColor) == "function" then pcall(unitFrame.UpdateHealthColor, unitFrame) end
 end

@@ -77,6 +77,9 @@ L["OPT_druidManaGlowOver"] = "Lueur : sur la barre de mana"
 L["OPT_druidManaGlowOver_TIP"] = "La lueur du cadre en travers du haut de la barre de mana."
 L["OPT_druidManaGlow_TIP"] = "Comment la lueur de menace et de combat du cadre rencontre la barre de mana."
 
+-- Units/NamePlateOptions.lua: our plate in the game's nameplate Style list
+L["PLATE_STYLE_CLASSIC"] = "Classique"
+
 -- Options/OptionsWindow.lua: the game's settings' ClassicUI Forever entry
 L["OPTWIN_SETTINGS_HOME"] = "Cherchez parmi toutes les options ci-dessus, ou choisissez une page sous ClassicUI Forever à gauche."
 L["OPT_themeIgnoreElitePlayer"] = "Cadres : Joueur"
