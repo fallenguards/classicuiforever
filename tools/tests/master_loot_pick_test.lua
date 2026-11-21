@@ -105,6 +105,19 @@ local guard = skin:find("if assign then keep[assign] = true end", 1, true)
 local fade = skin:find("FadeBlizzardArt(frame, keep)", 1, true)
 Check(kept and guard and fade and kept < guard and guard < fade, "the loot skin keeps the Assign Loot window out of its fade")
 
+-- Era's Assign Loot window (LootFrame.xml): a tooltip box, no title, the item 13 down, the first name 53 down, under
+-- the clicked row; Forever's titled panel showed over it (2026-11-21).
+local era = loot:match("local function EraAssignLoot%(%)\n(.-)\nend\n") or ""
+Check(loot:find("local ASSIGN_ITEM_X, ASSIGN_ITEM_Y, ASSIGN_ITEM_RIGHT = -9, -13, -30", 1, true) ~= nil
+    and loot:find("local ASSIGN_FIRST_X, ASSIGN_FIRST_Y = 8, -53", 1, true) ~= nil, "the item and first name at Era's spots")
+Check(era:find("ns.TipRim(assign, 0, 0, 0, 0)", 1, true) ~= nil, "the window is Era's tooltip box, with the theme")
+Check(loot:find('local ASSIGN_PANEL = { "NineSlice", "Bg", "TopTileStreaks", "TitleContainer" }', 1, true) ~= nil,
+    "Forever's panel art and title are faded")
+Check(era:find('ns.HookGlobal("MasterLooterFrame_Show", AssignUnderRow)', 1, true) ~= nil
+    and loot:find('ns.SetPointIf(assign, "TOPLEFT", row, "BOTTOMLEFT", 0, 0)', 1, true) ~= nil,
+    "the window opens under the clicked row")
+Check(skin:find("EraAssignLoot()", 1, true) ~= nil, "the loot skin dresses it")
+
 if failed > 0 then
     print(failed .. " check(s) failed")
     os.exit(1)

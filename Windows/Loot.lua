@@ -291,8 +291,37 @@ local function StillOpen(frame)
     end
 end
 
+-- The master looter's Assign Loot window as Era's (LootFrame.xml): a tooltip box with no title, the item 13 down, the
+-- first name 53 down, under the clicked row. Forever's is a titled panel over the row.
+local ASSIGN_ITEM_X, ASSIGN_ITEM_Y, ASSIGN_ITEM_RIGHT = -9, -13, -30
+local ASSIGN_FIRST_X, ASSIGN_FIRST_Y = 8, -53
+local ASSIGN_PANEL = { "NineSlice", "Bg", "TopTileStreaks", "TitleContainer" }
+
+local function AssignUnderRow()
+    local assign, row = _G.MasterLooterFrame, LootFrame and LootFrame.selectedLootFrame
+    if not (assign and row) or (InputUtil and InputUtil.IsGamepadUIEnabled and InputUtil.IsGamepadUIEnabled()) then return end
+    ns.SetPointIf(assign, "TOPLEFT", row, "BOTTOMLEFT", 0, 0)
+end
+
+local function EraAssignLoot()
+    local assign = _G.MasterLooterFrame
+    if not (assign and ns.Once(assign, "eraAssignLoot")) then return end
+    for _, key in ipairs(ASSIGN_PANEL) do
+        if assign[key] then assign[key]:SetAlpha(0) end
+    end
+    ns.TipRim(assign, 0, 0, 0, 0)
+    if assign.Item then
+        ns.SetTwoPointsIf(assign.Item, "TOPLEFT", assign, "TOPLEFT", ASSIGN_ITEM_X, ASSIGN_ITEM_Y, "RIGHT", assign, "RIGHT",
+            ASSIGN_ITEM_RIGHT, 0)
+    end
+    if assign.player1 then ns.SetPointIf(assign.player1, "TOPLEFT", assign, "TOPLEFT", ASSIGN_FIRST_X, ASSIGN_FIRST_Y) end
+    ns.SkinCloseButton(assign.CloseButton, true)
+    ns.HookGlobal("MasterLooterFrame_Show", AssignUnderRow)
+end
+
 local function SkinLoot(frame)
     StillOpen(frame)
+    EraAssignLoot()
     ns.HookMethod(GameTooltip, "SetLootItem", TipOnIcon)
     ns.HookMethod(GameTooltip, "SetLootCurrency", TipOnIcon)
     local close = frame.ClosePanelButton or frame.CloseButton
