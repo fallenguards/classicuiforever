@@ -231,19 +231,23 @@ local function SkinSystemTab(tab, lift)
 end
 
 -- Title between the ring (or plain corner) and the X, stone strip under it; left: just inside a plain corner's line.
--- span: { left, right } of the title line, where Era's window has its own.
+-- span: { left, right } of the title line, where Era's window has its own. A plain window's title centres in its strip,
+-- which ends at the X; a maximize button beside the X keeps a ring window's 58.
+local TITLE_SIDE, STRIP_RIGHT = 58, 25
 local function PlaceTitle(frame, plain, left, span)
     local title = frame.TitleContainer
     if title then
+        local right = -TITLE_SIDE
+        if plain and not frame.MaximizeMinimizeButton then right = -STRIP_RIGHT end
         title:ClearAllPoints()
-        title:SetPoint("TOPLEFT", frame, "TOPLEFT", span and span[1] or plain and left or 58, 0)
-        title:SetPoint("TOPRIGHT", frame, "TOPRIGHT", span and span[2] or -58, 0)
+        title:SetPoint("TOPLEFT", frame, "TOPLEFT", span and span[1] or plain and left or TITLE_SIDE, 0)
+        title:SetPoint("TOPRIGHT", frame, "TOPRIGHT", span and span[2] or right, 0)
     end
     local strip = frame.fcui and frame.fcui.titleStrip
     if strip then
         strip:ClearAllPoints()
         strip:SetPoint("TOPLEFT", frame, "TOPLEFT", plain and left or 2, -3)
-        strip:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -25, -3)
+        strip:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -STRIP_RIGHT, -3)
     end
 end
 
