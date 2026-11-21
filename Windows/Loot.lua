@@ -301,6 +301,9 @@ local function SkinLoot(frame)
     if frame.ScrollBox then keep[frame.ScrollBox] = true end
     if close then keep[close] = true end
     if title then keep[title] = true end
+    -- The master looter's Assign Loot window hangs on this one (GroupLootFrame.xml): faded, it opened unseen.
+    local assign = _G.MasterLooterFrame
+    if assign then keep[assign] = true end
     FadeBlizzardArt(frame, keep)
     if frame.fcui and frame.fcui.titleStrip then frame.fcui.titleStrip:Hide() end
     ns.DressNew(frame, "lootPanel", SHEET)

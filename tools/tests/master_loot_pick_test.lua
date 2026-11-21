@@ -96,6 +96,15 @@ made[1].scripts.OnClick(made[1], "LeftButton")
 Check(table.concat(calls, "|") == "modified link1", "a modified click links the item, nothing looted")
 Check(LootFrame.selectedSlot == 2, "a modified click leaves the last pick")
 
+-- The Assign Loot window hangs on the loot window (GroupLootFrame.xml parent="LootFrame"): our skin's fade of the
+-- game's art on that window and its children kept it unseen, the first name blank (the probe's empty click, 2026-11-21).
+local loot = assert(io.open(ROOT .. "/Windows/Loot.lua")):read("a")
+local skin = loot:match("local function SkinLoot%(frame%)\n(.-)\nend\n") or ""
+local kept = skin:find("local assign = _G.MasterLooterFrame", 1, true)
+local guard = skin:find("if assign then keep[assign] = true end", 1, true)
+local fade = skin:find("FadeBlizzardArt(frame, keep)", 1, true)
+Check(kept and guard and fade and kept < guard and guard < fade, "the loot skin keeps the Assign Loot window out of its fade")
+
 if failed > 0 then
     print(failed .. " check(s) failed")
     os.exit(1)
