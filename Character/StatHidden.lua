@@ -92,3 +92,24 @@ function ns.StatKeep(row, entry, had)
     kept[entry] = last
 end
 function ns.StatKept(entry) return hadLine[entry], kept[entry] end
+
+-- The game's scroll wiring reads the range back, which it can hand back hidden once a line shows a hidden number: the
+-- same wiring on a plain scroll frame, the range from extent(), our own lay's height (the side list).
+function ns.StatOwnRange(scroll, bar, extent)
+    local function Range(self) return math.max(0, extent() - self:GetHeight()) end
+    local function Track(self, offset)
+        local range = Range(self)
+        bar:SetScrollPercentage(range > 0 and offset / range or 0, _G.ScrollBoxConstants.NoScrollInterpolation)
+    end
+    scroll:SetScript("OnVerticalScroll", Track)
+    scroll:SetScript("OnScrollRangeChanged", function(self)
+        local offset = self:GetVerticalScroll()
+        if not ns.IsSecret(offset) then Track(self, offset) end
+        local height, range = self:GetHeight(), Range(self)
+        bar:SetVisibleExtentPercentage(height > 0 and height / (range + height) or 0)
+        bar:SetPanExtentPercentage(range > 0 and math.min(1, self:GetPanExtent() / range) or 0)
+    end)
+    bar:RegisterCallback(_G.BaseScrollBoxEvents.OnScroll, function(_, percent)
+        scroll:SetVerticalScroll(percent * Range(scroll))
+    end, scroll)
+end

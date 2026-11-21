@@ -72,6 +72,10 @@ local function Frame(parent)
     function f.GetVerticalScroll() return 0 end
     function f.SetScript(self, k, fn) self.scripts[k] = fn end
     function f.GetScript(self, k) return self.scripts[k] end
+    function f.RegisterCallback(self, event, fn, owner) self.callbacks = self.callbacks or {} self.callbacks[event] = fn end
+    -- A scroll frame: the game hands its range back hidden once a line shows a hidden number.
+    function f.GetVerticalScrollRange() return hidden and SECRET or 50 end
+    function f.SetVerticalScroll(self, v) self.scrolledTo = v end
     return f
 end
 
@@ -138,7 +142,7 @@ PAPERDOLL_STATINFO = {
     BLOCK = Client("Block", "0%"),
 }
 
-local module
+local module, scrollBar
 local ns = Loose({
     BACKDROP = { TIP12 = {} }, ART = {}, db = {},
     IsSecret = issecretvalue,
@@ -147,7 +151,11 @@ local ns = Loose({
         return false
     end,
     OnForever = function() return true end,
-    NewFrame = function(_, _, parent) return Frame(parent) end,
+    NewFrame = function(_, _, parent, template)
+        local f = Frame(parent)
+        if template == "MinimalScrollBar" then scrollBar = f end
+        return f
+    end,
     DressDropdown = function(head) return Frame(head) end,
     Sched = Loose({ OnFrame = function() return Loose({}) end }),
     RegisterModule = function(_, def) module = def end,
@@ -156,6 +164,19 @@ assert(loadfile(ROOT .. "/Character/StatHidden.lua"))("ClassicUIForever", ns)
 assert(loadfile(ROOT .. "/Character/StatPanes.lua"))("ClassicUIForever", ns)
 Check(module and type(module.apply) == "function", "the stat panes register as a module")
 
+-- The game's wiring, as Blizzard_SharedXML's ScrollUtil: it compares the range it reads back.
+BaseScrollBoxEvents, ScrollBoxConstants = { OnScroll = "OnScroll" }, { NoScrollInterpolation = true }
+ScrollUtil = { InitScrollFrameWithScrollBar = function(scroll, bar)
+    local function OnVertical(self, offset)
+        local range = self:GetVerticalScrollRange()
+        if range > 0 then bar:SetScrollPercentage(offset / range) end
+    end
+    scroll:SetScript("OnVerticalScroll", OnVertical)
+    function scroll.GetPanExtent(self) return self.panExtent end
+    function scroll.SetPanExtent(self, v) self.panExtent = v end
+    scroll:SetScript("OnScrollRangeChanged", function(self) OnVertical(self, 0) end)
+    bar:RegisterCallback("OnScroll", function(_, percent) scroll:SetVerticalScroll(percent * scroll:GetVerticalScrollRange()) end, scroll)
+end }
 ns.StatList(Frame())
 
 local function Rows(pane)
@@ -231,6 +252,15 @@ Check(mainHand.fcuiHas and mainHand.Value.shown and mainHand.Value:GetText() == 
 Check(mainHand.tooltip == "Main Hand 10 - 20", "and its tooltip")
 Check(BoxLabels(defense):find("Parry:", 1, true) == nil, "parry stays out though the game has a number for it")
 Check(BoxLabels(defense):find("Dodge:", 1, true) ~= nil, "dodge live")
+
+-- The side list's scroll wiring in the fight: no compare on the hidden range, the bar scrolls by our own lay.
+local scroll = list.scroll
+local ok, err = pcall(scroll.scripts.OnScrollRangeChanged, scroll, 0, SECRET)
+Check(ok, "the list's range change runs in a fight (" .. tostring(err) .. ")")
+ok, err = pcall(scroll.scripts.OnVerticalScroll, scroll, 0)
+Check(ok, "and its scroll (" .. tostring(err) .. ")")
+ok, err = pcall(scrollBar.callbacks.OnScroll, nil, 0.5)
+Check(ok and type(scroll.scrolledTo) == "number", "dragging its bar scrolls by our own lay (" .. tostring(err) .. ")")
 
 -- The fight ends again: back in the Value.
 hidden = false

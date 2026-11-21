@@ -296,10 +296,11 @@ local function FillHidden(row, entry, resistances)
         local label = live[1]
         if type(label) == "function" then label = label() end
         row.Label:SetText(last and last[1] or string.format(STAT_FORMAT or "%s:", label or ""))
-        row.Value:SetText("")
+        -- The last number, unseen, keeps the label its room: nothing hangs on a hidden number's width.
+        row.Value:SetText(last and last[2] or "")
         row.Value:Hide()
         row.Live:Show()
-        Dress(row, entry, resistances, row.Live)
+        Dress(row, entry, resistances, row.Value)
         return true
     end
     if not last then return false end
@@ -678,10 +679,12 @@ local function LayoutList()
         box:SetPoint("TOPRIGHT", list.child, "TOPRIGHT", 0, -y)
         y = y + tall + LIST_GAP
     end
+    list.extent = y
     list.child:SetHeight(math.max(1, y))
     -- A fold can leave the view past the new end.
     local over = math.max(0, y - (list.scroll:GetHeight() or 0))
-    if list.scroll:GetVerticalScroll() > over then list.scroll:SetVerticalScroll(over) end
+    local at = list.scroll:GetVerticalScroll()
+    if not ns.IsSecret(at) and at > over then list.scroll:SetVerticalScroll(over) end
     list.laid = true
 end
 
@@ -746,6 +749,7 @@ function ns.StatList(parent)
     if ok and bar and bar.Track and util and util.InitScrollFrameWithScrollBar then
         ns.PlaceSidePanelScroll(bar, frame)
         util.InitScrollFrameWithScrollBar(scroll, bar)
+        ns.StatOwnRange(scroll, bar, function() return list and list.extent or 0 end)
         scroll:SetPanExtent(LIST_ROW * 3)
     else
         if ok and bar then bar:Hide() end

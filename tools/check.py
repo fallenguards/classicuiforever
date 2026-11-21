@@ -98,7 +98,10 @@ ALLOWED = {
                   "Spells/SpellBook.lua": "its search, X built in, Escape keeps the text"},
     # Another addon's list, not the game's: its own code wrote these, and under the gamepad it takes its page out of
     # the window the navigator walks.
-    "LISTWRITE": {"Skills/ProfessionsTraining.lua": "What's Training's recipe list, folded to the spellbook list's lines"},
+    # The side stat list's own scroll frame and bar: the game's ScrollUtil wiring made this call in our name already;
+    # ours only takes the range from our lay, the game's comes back hidden in a fight (#330).
+    "LISTWRITE": {"Skills/ProfessionsTraining.lua": "What's Training's recipe list, folded to the spellbook list's lines",
+                  "Character/StatHidden.lua": "the side stat list's own bar, ScrollUtil's wiring with our range"},
 }
 # Frames allowed a pattern by file and variable: plan 4.2 keeps their own frames and registrations untouched.
 ALLOWED_SITES = {
