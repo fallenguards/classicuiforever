@@ -22,6 +22,8 @@ ns.DB_DEFAULTS = { a = true, b = false, barScale = 1, microScale = 1, oneBagColu
 ns.TOGGLES = { { "a" }, { "b" }, { "englishSettings" } }
 local changedLog
 function ns.TogglesChanged(changed) changedLog = table.concat(changed, ",") end
+-- Core/Util.lua's helper (loaded after Profiles.lua; the profile load runs once every file is in).
+function ns.EventFrame() return {} end
 ns.db = { a = false, b = false, barScale = 1.2, microScale = 1, oneBagColumns = 8, englishSettings = false,
     whatsNewSeen = 3 }
 

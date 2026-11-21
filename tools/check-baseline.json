@@ -6,6 +6,7 @@
     },
     "CVARLOGIN": {
       "Character/CharacterSheet.lua": 1,
+      "Core/Core.lua": 1,
       "Map/MapFade.lua": 1,
       "Units/LastNames.lua": 2,
       "Units/NamePlateOptions.lua": 1

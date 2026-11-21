@@ -77,13 +77,23 @@ function ns.StoreProfile()
     if list and ns.char and list[ns.char.profile] then list[ns.char.profile] = Snapshot() end
 end
 
--- ADDON_LOADED: the first run keeps the current settings as Default; a renamed profile is followed.
+-- A change in the game's own bag menu or settings goes into the profile in use: One Bag mirrors Combined Bags.
+local oneBagWatch
+local function OneBagChanged(_, _, name)
+    if name ~= "combinedBags" or not ns.db or not ns.PackageRuns("oneBag") then return end
+    ns.db.oneBag = tostring(ns.GetCVar("combinedBags")) == "1"
+    if ns.RefreshOptionsWindow then ns.RefreshOptionsWindow() end
+end
+
+-- ADDON_LOADED: the first run keeps the current settings as Default; a renamed profile is followed. True when the
+-- profiles were made just now (nothing in them was picked yet).
 function ns.LoadProfile()
     ForeverClassicUICharDB = ForeverClassicUICharDB or {}
     local char = ForeverClassicUICharDB
     ns.char = char
     local db = ns.db
-    if type(db.profiles) ~= "table" then db.profiles = { [DEFAULT] = Snapshot() } end
+    local made = type(db.profiles) ~= "table"
+    if made then db.profiles = { [DEFAULT] = Snapshot() } end
     local list = db.profiles
     -- A damaged entry is dropped, not filled in (settings outlive sessions; one bad value erred every login).
     for name, shot in pairs(list) do
@@ -99,6 +109,23 @@ function ns.LoadProfile()
     if name == nil or not list[name] then name = DEFAULT end
     char.profile = name
     Fill(list[name])
+    oneBagWatch = oneBagWatch or ns.EventFrame("CVAR_UPDATE", OneBagChanged)
+    return made
+end
+
+-- One Bag is the game's Combined Bags, which the game keeps once per account: the value to write at a load so this
+-- character has its profile's pick, or nil. Profiles made this load take the game's setting as their first pick; a
+-- package without our bags never touches it.
+function ns.ProfileOneBagWant(made)
+    if not ns.PackageRuns("oneBag") then return nil end
+    local combined = ns.GetCVar("combinedBags")
+    if made then
+        if combined ~= nil then ns.db.oneBag = tostring(combined) == "1" end
+        ns.StoreProfile()
+        return nil
+    end
+    if combined == nil or (tostring(combined) == "1") == (ns.db.oneBag == true) then return nil end
+    return ns.db.oneBag == true and "1" or "0"
 end
 
 -- Default first, the rest by name.

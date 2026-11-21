@@ -629,7 +629,10 @@ frame:SetScript("OnEvent", function(_, event, arg1)
         ns.db.capHeldLeft, ns.db.capHeldRight = nil, nil
         ns.KeepGameMicroButtons(saved)
         ns.ApplyPackage()
-        ns.LoadProfile()
+        -- The profile's One Bag, before the game reads Combined Bags at VARIABLES_LOADED: its bag code read clean after
+        -- this write (dev bagmode probe, 2026-11-21).
+        local oneBag = ns.ProfileOneBagWant(ns.LoadProfile())
+        if oneBag then ns.SetCVar("combinedBags", oneBag) end
         -- The old default sat on the tracking spell; a dragged angle is never exactly 160.
         if ns.db.minimapCollectorAngle == 160 then ns.db.minimapCollectorAngle = nil end
         ns.MigrateMinimapShow(ns.db)
