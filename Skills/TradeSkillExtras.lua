@@ -190,6 +190,12 @@ function ns.TradeSkillFoot(panel, craft, step)
     count:SetNumber(1)
     count:SetScript("OnEnterPressed", function(self) self:ClearFocus() end)
     count:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
+    -- As Era's TradeSkillInputBox: a click selects the number to type over, and 0 reads as 1.
+    count:SetScript("OnEditFocusGained", function(self) self:HighlightText() end)
+    count:SetScript("OnEditFocusLost", function(self) self:HighlightText(0, 0) end)
+    count:SetScript("OnTextChanged", function(self)
+        if self:GetText() == "0" then self:SetText("1") end
+    end)
 
     local exit = ns.ShellExitButton(foot, "ProfessionsFrame", 80)
     exit:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -5, 4)
