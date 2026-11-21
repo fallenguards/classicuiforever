@@ -214,7 +214,7 @@ local function SectionByKey(key, fallback)
     return list[fallback] or list[1]
 end
 
--- Secret in combat and the client's line functions stop on them; keep the last shown.
+-- Secret in combat and the client's line functions stop on them: the hidden pass (FillHidden) instead.
 local function NumbersWithheld()
     if not UnitStat then return false end
     local _, probe = UnitStat("player", 1)
@@ -243,6 +243,12 @@ local function Line(parent, height)
     row.Value:SetPoint("RIGHT", row, "RIGHT", 0, 0)
     row.Value:SetJustifyH("RIGHT")
     row.Value:SetWordWrap(false)
+    -- A number the game hides from addons, shown in its place and never read back (#330).
+    row.Live = row:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+    row.Live:SetPoint("RIGHT", row, "RIGHT", 0, 0)
+    row.Live:SetJustifyH("RIGHT")
+    row.Live:SetWordWrap(false)
+    row.Live:Hide()
     row.Label = row:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
     row.Label:SetPoint("LEFT", row, "LEFT", 0, 0)
     row.Label:SetPoint("RIGHT", row.Value, "LEFT", -2, 0)
@@ -261,30 +267,11 @@ local function ClearLine(row)
     row.tooltipLabel = nil
 end
 
--- False when the client has no such line or this character has none.
-local function FillLine(row, entry, resistances)
-    if entry.retail and ns.OnForever() then return false end
-    local fill = entry.own and OWN[entry.own]
-    if not fill then
-        local info = type(PAPERDOLL_STATINFO) == "table" and PAPERDOLL_STATINFO[entry.stat]
-        fill = info and info.updateFunc
-    end
-    if type(fill) ~= "function" then return false end
-    ClearLine(row)
-    -- Some line functions mean "none" by hiding the row (empty off hand); no value is none too.
-    row:Show()
-    row.Value:SetText("")
-    local ok, result = pcall(fill, row, "player")
-    if not ok or result == false or not row:IsShown() then return false end
-    local text = row.Value:GetText()
-    if text == nil or text == "" then
-        if not entry.na then return false end
-        row.Value:SetText(NA)
-    end
+-- The label against the number shown: the school alone for a resistance ("Arcane Resistance:" does not fit the box).
+local function Dress(row, entry, resistances, number)
     if entry.label then row.Label:SetText(string.format(STAT_FORMAT or "%s:", entry.label)) end
     row.Label:ClearAllPoints()
     if resistances then
-        -- The school alone: "Arcane Resistance:" does not fit the box.
         local school = _G["DAMAGE_SCHOOL" .. (entry.school + 1)]
         if school then row.Label:SetText(string.format(STAT_FORMAT or "%s:", school)) end
         ns.SetTex(row.Icon, "charResistIcons")
@@ -295,7 +282,67 @@ local function FillLine(row, entry, resistances)
         row.Icon:Hide()
         row.Label:SetPoint("LEFT", row, "LEFT", 0, 0)
     end
-    row.Label:SetPoint("RIGHT", row.Value, "LEFT", -2, 0)
+    row.Label:SetPoint("RIGHT", number, "LEFT", -2, 0)
+end
+
+-- While the game hides the numbers (Character/StatHidden.lua): live, the last text, or out for a line the character lacks.
+local function FillHidden(row, entry, resistances)
+    local had, last = ns.StatKept(entry)
+    if had == false then return false end
+    local live = ns.StatLive(entry, resistances)
+    ClearLine(row)
+    row:Show()
+    if live and pcall(live[2], row.Live) then
+        local label = live[1]
+        if type(label) == "function" then label = label() end
+        row.Label:SetText(last and last[1] or string.format(STAT_FORMAT or "%s:", label or ""))
+        row.Value:SetText("")
+        row.Value:Hide()
+        row.Live:Show()
+        Dress(row, entry, resistances, row.Live)
+        return true
+    end
+    if not last then return false end
+    row.Live:Hide()
+    row.Value:Show()
+    row.Label:SetText(last[1])
+    row.Value:SetText(last[2])
+    row.tooltip, row.tooltip2, row.tooltip3 = last[3], last[4], last[5]
+    Dress(row, entry, resistances, row.Value)
+    return true
+end
+
+-- False when the client has no such line or this character has none. Hidden: the game hides stat numbers now.
+local function FillLine(row, entry, resistances, hidden)
+    if entry.retail and ns.OnForever() then return false end
+    if hidden then return FillHidden(row, entry, resistances) end
+    local fill = entry.own and OWN[entry.own]
+    if not fill then
+        local info = type(PAPERDOLL_STATINFO) == "table" and PAPERDOLL_STATINFO[entry.stat]
+        fill = info and info.updateFunc
+    end
+    if type(fill) ~= "function" then return false end
+    ClearLine(row)
+    row.Live:Hide()
+    row.Value:Show()
+    -- Some line functions mean "none" by hiding the row (empty off hand); no value is none too.
+    row:Show()
+    row.Value:SetText("")
+    local ok, result = pcall(fill, row, "player")
+    if not ok or result == false or not row:IsShown() then
+        ns.StatKeep(row, entry, false)
+        return false
+    end
+    local text = row.Value:GetText()
+    if not ns.IsSecret(text) and (text == nil or text == "") then
+        if not entry.na then
+            ns.StatKeep(row, entry, false)
+            return false
+        end
+        row.Value:SetText(NA)
+    end
+    Dress(row, entry, resistances, row.Value)
+    ns.StatKeep(row, entry, true)
     return true
 end
 
@@ -506,7 +553,7 @@ local function Build()
     return panes
 end
 
-local function UpdatePane(pane)
+local function UpdatePane(pane, hidden)
     local section = SectionByKey(Picked(pane), pane.fallback)
     pane.head.text:SetText(section.label)
     local shown, lines = pane.shown, pane.lines
@@ -520,7 +567,7 @@ local function UpdatePane(pane)
                 lines[#shown + 1] = row
             end
             -- The row that tested the line keeps it; a failed one is reused for the next.
-            if FillLine(row, entry, section.resistances) then shown[#shown + 1] = entry else row:Hide() end
+            if FillLine(row, entry, section.resistances, hidden) then shown[#shown + 1] = entry else row:Hide() end
         end
     end
     pane.lineCount = #shown
@@ -532,9 +579,9 @@ end
 function ns.UpdateStatPanes()
     if not active or not panes then return end
     Raise()
-    if NumbersWithheld() then return end
-    UpdatePane(panes.left)
-    UpdatePane(panes.right)
+    local hidden = NumbersWithheld()
+    UpdatePane(panes.left, hidden)
+    UpdatePane(panes.right, hidden)
 end
 
 -- The sheet names the frame its stats live on.
@@ -666,19 +713,15 @@ local function ListBox(section)
     return box
 end
 
--- Filled while seen, and unseen on sheet open or before first show, so a combat first show has
--- the last numbers; while withheld nothing changes, so lay out once.
+-- Filled while seen, and unseen on sheet open or before first show; while the game hides numbers, what it lets show.
 function ns.UpdateStatList(opening)
     if not list then return end
     local seen = list.frame:IsVisible()
-    if NumbersWithheld() then
-        if seen and not list.laid then LayoutList() end
-        return
-    end
     if not seen and not opening and list.filled then return end
+    local hidden = NumbersWithheld()
     for _, box in ipairs(list.boxes) do
         for i, entry in ipairs(box.section.stats) do
-            box.rows[i].fcuiHas = FillLine(box.rows[i], entry)
+            box.rows[i].fcuiHas = FillLine(box.rows[i], entry, nil, hidden)
         end
     end
     list.filled = true

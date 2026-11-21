@@ -162,6 +162,18 @@ local function Dashes()
     for _, res in ipairs(T.resistances) do res.value:SetText("--") end
 end
 
+-- Numbers the game hides may be shown, never worked out or read back.
+local function LiveStats(unit)
+    for i, row in ipairs(T.attributes) do
+        local _, effective = UnitStat(unit, i)
+        row.value:SetText(BreakUpLargeNumbers(effective))
+        row.tip, row.tip2 = statLabels[i], nil
+    end
+    local _, effective = UnitArmor(unit)
+    T.armor.value:SetText(BreakUpLargeNumbers(effective))
+    T.armor.tip, T.armor.tip2 = ARMOR_NAME, nil
+end
+
 -- IsShown, not IsVisible: the doll stays shown while shut, so a combat open has pre-combat numbers.
 -- Returns true when the stat panes were updated.
 local function UpdateStats(opening)
@@ -170,11 +182,13 @@ local function UpdateStats(opening)
     if ns.UpdateStatList then ns.UpdateStatList(opening) end
     -- The client's pet view shows the pet's numbers.
     local unit = T.PetView and T.PetView() and "pet" or "player"
-    -- Secret in combat: keep the last numbers rather than zeros.
+    -- Secret in combat: the attributes and armor shown as they are (white: a buff's color needs a compare), the rest
+    -- keeps its last numbers rather than zeros (#330).
     local _, probe = UnitStat(unit, 1)
     if ns.IsSecret(probe) then
         if filledFor ~= unit then Dashes() end
         filledFor = unit
+        pcall(LiveStats, unit)
         return true
     end
     filledFor = unit
