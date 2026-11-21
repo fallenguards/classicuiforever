@@ -3,6 +3,8 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN94_1_TITLE"] = "Beute verteilen"
+L["WN94_1_TEXT"] = "Das Verteilen von Beute an die Gruppe klappt wieder mit dem klassischen Beutefenster: Ein Klick auf einen Gegenstand zeigt die Liste der Spieler, im Stil von Era unter dem Gegenstand."
 L["WN93_1_TITLE"] = "Namensplaketten-Stile"
 L["WN93_1_TEXT"] = "Klassisch steht jetzt in der Stilliste der Namensplaketten des Spiels (Optionen, Namensplaketten). Wählst du einen Stil des Spiels, schalten sich unsere Namensplaketten aus und dieser Stil erscheint; Klassisch holt unsere zurück."
 L["WN93_2_TITLE"] = "Beuteverlauf"

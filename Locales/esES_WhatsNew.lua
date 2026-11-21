@@ -3,6 +3,8 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN94_1_TITLE"] = "Repartir botín"
+L["WN94_1_TEXT"] = "Repartir el botín al grupo vuelve a funcionar con la ventana de botín clásica: al hacer clic en un objeto aparece la lista de jugadores, al estilo de Era debajo del objeto."
 L["WN93_1_TITLE"] = "Estilos de placas de nombre"
 L["WN93_1_TEXT"] = "Clásico está ahora en la lista de estilos de placas de nombre del juego (Opciones, Placas de nombre). Elegir uno de los estilos del juego desactiva nuestras placas para que se vea ese estilo; Clásico trae las nuestras de vuelta."
 L["WN93_2_TITLE"] = "Historial de botín"

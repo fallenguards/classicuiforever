@@ -3,6 +3,8 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN94_1_TITLE"] = "Distribution du butin"
+L["WN94_1_TEXT"] = "La distribution du butin au groupe fonctionne de nouveau avec la fenêtre de butin classique : un clic sur un objet affiche la liste des joueurs, à la manière d'Era sous l'objet."
 L["WN93_1_TITLE"] = "Styles des barres de nom"
 L["WN93_1_TEXT"] = "Classique figure désormais dans la liste des styles des barres de nom du jeu (Options, Barres de nom). Choisir l'un des styles du jeu désactive nos barres de nom pour afficher ce style ; Classique ramène les nôtres."
 L["WN93_2_TITLE"] = "Historique du butin"

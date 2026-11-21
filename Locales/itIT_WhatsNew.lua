@@ -3,6 +3,8 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN94_1_TITLE"] = "Distribuzione del bottino"
+L["WN94_1_TEXT"] = "La distribuzione del bottino al gruppo funziona di nuovo con la finestra del bottino classica: un clic su un oggetto mostra l'elenco dei giocatori, nello stile di Era sotto l'oggetto."
 L["WN93_1_TITLE"] = "Stili delle targhette"
 L["WN93_1_TEXT"] = "Classico è ora nella lista degli stili delle targhette del gioco (Opzioni, Targhette). Scegliere uno degli stili del gioco disattiva le nostre targhette perché si veda quello stile; Classico riporta le nostre."
 L["WN93_2_TITLE"] = "Cronologia bottino"

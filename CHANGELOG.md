@@ -2,6 +2,12 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.63.1] - 2026-11-21
+
+### Fixed
+- Master loot works with the classic loot window: as master looter, clicking an item lists your group under Assign Loot, and Request Roll starts a roll on that item. The names never showed and the Assign Loot window opened unseen, so loot could only be handed out with the addon off.
+- The Assign Loot window looks as in Era: a tooltip box under the clicked item, with your theme, in place of the game's titled panel over the loot window.
+
 ## [0.63.0] - 2026-11-21
 
 ### Added

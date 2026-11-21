@@ -2,6 +2,8 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN94_1_TITLE"] = "Master loot"
+L["WN94_1_TEXT"] = "As master looter, clicking an item in the classic loot window lists your group under Assign Loot again, in Era's look under the item, and Request Roll starts a roll on it."
 L["WN93_1_TITLE"] = "Nameplate styles"
 L["WN93_1_TEXT"] = "Classic is now in the game's nameplate Style list (Options, Nameplates). Picking one of the game's styles turns our nameplates off so that style shows; Classic brings ours back."
 L["WN93_2_TITLE"] = "Loot history"
