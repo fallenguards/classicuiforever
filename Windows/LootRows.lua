@@ -35,14 +35,31 @@ end
 -- A looted slot answers no icon.
 function ns.LootSlotFilled(slot) return (GetLootSlotInfo(slot)) ~= nil end
 
+-- The game's master loot list reads the clicked slot, item and row off its loot window, set by its own rows' click
+-- (GroupLootFrame.lua); ours set none, so a master looter's list of names came up empty.
+local function Pick(row, slot)
+    local frame = LootFrame
+    if not frame then return end
+    local texture, name, _, _, quality = GetLootSlotInfo(slot)
+    frame.selectedLootFrame, frame.selectedSlot, frame.selectedItemLink = row, slot, GetLootSlotLink(slot)
+    frame.selectedQuality, frame.selectedItemName, frame.selectedTexture = quality, name, texture
+end
+
+-- As the game's own row: a loot click closes a pending hand-out's confirm box and its Assign Loot window, whose
+-- names would hand out the item clicked now while it still showed the last one. Closed here, not by the game's
+-- looted signal: its listeners would run as ours.
 local function Click(row)
     local slot = row.slot
     if not slot then return end
     if IsModifiedClick() then
         HandleModifiedItemClick(GetLootSlotLink(slot))
-    else
-        LootSlot(slot)
+        return
     end
+    Pick(row, slot)
+    StaticPopup_Hide("CONFIRM_LOOT_DISTRIBUTION")
+    LootSlot(slot)
+    local assign = _G.MasterLooterFrame
+    if assign and assign:IsShown() then assign:Hide() end
 end
 
 -- Era's tooltip: beside the icon, over the window. Coins have none.
