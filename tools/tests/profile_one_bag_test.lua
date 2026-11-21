@@ -74,7 +74,7 @@ made = ns.LoadProfile()
 Check(ns.ProfileOneBagWant(made) == nil, "a package without our bags leaves Combined Bags alone")
 runs = true
 ns = Load({ oneBag = true, bags = true, profiles = { Default = { oneBag = true }, Single = {} } }, { profile = "Default" })
-made = ns.LoadProfile()
+ns.LoadProfile()
 
 -- The game's own bag menu or settings: the change goes into the profile in use, and is stored with it.
 combined = "0"
