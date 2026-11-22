@@ -156,8 +156,8 @@ local WINDOWS = {
     { "TimeManagerFrame", key = "panelClock", addon = "Blizzard_TimeManager", scrollBars = false, after = A.TimeManagerFrame },
     { "ClickBindingFrame", key = "panelClickBinding", addon = "Blizzard_ClickBindingUI", lift = 5, scrollBars = false, after = A.ClickBindingFrame },
     { "CooldownViewerSettings", key = "panelCooldowns", lift = 5, scrollBars = false, after = A.CooldownViewerSettings },
-    -- /loot. Half lift, as the support window: its list runs to 4 off the bottom edge (Windows/LootHistory.lua).
-    { "GroupLootHistoryFrame", key = "panelLootHistory", portrait = false, lift = 5, after = A.GroupLootHistoryFrame },
+    -- /loot: Era's Loot Rolls window stands in for it (Windows/LootHistory.lua).
+    { "GroupLootHistoryFrame", key = "panelLootHistory", replaced = true, after = A.GroupLootHistoryFrame },
 }
 -- Retail's talents are the game's spells window; Forever's are our own (Skills/Talents.lua), its row either way.
 -- The client's foot line: its pages run to it, and its tab row's layout puts a lifted tab back.

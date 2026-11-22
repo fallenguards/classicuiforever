@@ -304,6 +304,12 @@ function ns.SkinWindow(frame, opts)
         SkinLater(frame, opts)
         return
     end
+    -- replaced: a window of ours stands in for this one (the loot history's Era window); its after alone runs.
+    if opts.replaced then
+        if opts.after then opts.after(frame) end
+        P.skinned[frame] = true
+        return
+    end
     -- closeOnly: the game's own look kept, the X alone dressed (the old basic frame: guild bank, flight master).
     if opts.closeOnly then
         P.SkinCloseInPlace(frame.CloseButton or (name and _G[name .. "CloseButton"]), opts.closeX)
