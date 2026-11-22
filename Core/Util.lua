@@ -17,6 +17,13 @@ function ns.Safe(v, fallback)
     return v
 end
 
+-- The cursor in UIParent's units (a window's own, at scale 1).
+function ns.UICursor()
+    local x, y = GetCursorPosition()
+    local s = UIParent:GetEffectiveScale()
+    return x / s, y / s
+end
+
 -- Classic Era's wording where Forever rewrote a global string (Era 1.15.9 GlobalStrings); other languages keep the client's.
 local ERA_TEXT = {
     NEWBIE_TOOLTIP_CHARACTER = "Information about your character, including equipment, statistics, skills, and reputation.",

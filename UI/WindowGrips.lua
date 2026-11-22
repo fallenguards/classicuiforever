@@ -35,11 +35,7 @@ function ns.WindowGripRoom(key)
     return 0
 end
 
-local function Cursor()
-    local x, y = GetCursorPosition()
-    local s = UIParent:GetEffectiveScale()
-    return x / s, y / s
-end
+local Cursor = ns.UICursor
 
 local job
 

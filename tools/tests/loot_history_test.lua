@@ -66,6 +66,20 @@ local function Region(kind)
     function r.SetResizeBounds(self, ...) self.bounds = { ... } end
     function r.StartSizing(self, point) self.sizing = point end
     function r.StopMovingOrSizing(self) self.sizing = nil end
+    function r.SetNormalTexture(self, t) self.normal = t end
+    -- Placed at 500, 200 from the screen's bottom left, or by a TOP point (top and middle kept as it sizes).
+    function r.GetCenter(self)
+        local p = self.points[1]
+        if p and p[1] == "TOP" then return p[4], p[5] - (self.h or 0) / 2 end
+        return 500 + (self.w or 0) / 2, 200 + (self.h or 0) / 2
+    end
+    function r.GetTop(self)
+        local p = self.points[1]
+        if p and p[1] == "TOP" then return p[5] end
+        return 200 + (self.h or 0)
+    end
+    function r.GetRight(self) return (self:GetCenter()) + (self.w or 0) / 2 end
+    function r.GetBottom(self) return self:GetTop() - (self.h or 0) end
     -- Methods not modelled are no-ops; a missing data field (lower case) stays nil.
     return setmetatable(r, { __index = function(_, k)
         if type(k) == "string" and k:match("^%u") then return function() end end
@@ -84,6 +98,10 @@ RETRIEVING_DATA, UNKNOWNOBJECT = "Retrieving item information", "Unknown"
 RAID_CLASS_COLORS = { MAGE = { r = 0.2, g = 0.8, b = 1 }, WARRIOR = { r = 0.8, g = 0.6, b = 0.4 } }
 ITEM_QUALITY_COLORS = { [4] = { r = 0.6, g = 0.2, b = 0.9 }, [1] = { r = 1, g = 1, b = 1 } }
 UIParent = Frame("Frame", "UIParent")
+UIParent.w, UIParent.GetEffectiveScale = 1920, function() return 1 end
+local cursorX, cursorY, mouseDown = 0, 0, false
+function GetCursorPosition() return cursorX, cursorY end
+function IsMouseButtonDown() return mouseDown end
 GameTooltip = Region("GameTooltip")
 IsModifiedClick = function() return false end
 
@@ -120,7 +138,12 @@ C_Item = { GetItemInfo = function(link)
 end }
 
 local dressing = true
-local hooks, grip = {}, nil
+local hooks, grip, jobs = {}, nil, {}
+-- A job's pass, as the scheduler runs it: awake, and an attached one only while its window shows.
+local function Tick(name)
+    local job = jobs[name]
+    if job and job.awake and (not job.host or job.host:IsVisible()) then job.spec.fn(job) end
+end
 local db = { lootHistoryW = 0, lootHistoryH = 0 }
 local P = { after = {}, Dressing = function(key) return key == "panelLootHistory" and dressing end }
 local ns = {
@@ -145,7 +168,22 @@ local ns = {
     AttachTip = function() end,
     EventFrame = function() return Frame() end,
     CloseOnEscape = function(frame) frame.escape = true end,
-    Sched = { NextFrame = function(_, fn) fn() end },
+    Sched = {
+        NextFrame = function(_, fn) fn() end,
+        Job = function(spec)
+            local job = { spec = spec, awake = spec.awake ~= false }
+            function job.Wake(j) j.awake = true end
+            function job.Sleep(j) j.awake = false end
+            jobs[spec.name] = job
+            return job
+        end,
+        Attach = function(host, spec)
+            jobs[spec.name] = { spec = spec, host = host, awake = true }
+            return jobs[spec.name], true
+        end,
+    },
+    SetShownIf = function(region, on) region:SetShown(on) end,
+    UICursor = function() return GetCursorPosition() end,
     HookGlobal = function(name, fn)
         hooks[name] = fn
         return true
@@ -242,13 +280,59 @@ lines = Lines()
 Check(#lines == 1 and lines[1].name.text == "All Passed", "an all passed drop opens on one All Passed line")
 cloth.toggle.scripts.OnClick(cloth.toggle)
 
--- The corner: a drag keeps its size, a right click gives Era's back.
-Check(grip and grip.parent == win, "our corner grip is on the window")
+-- Era's tab under the foot: up and down the height, sideways the width evenly both sides; kept for next time.
+local tab = win.sizeTab
+Check(tab and tab.normal == "Interface\\RaidFrame\\Raid-Move-Down" and tab.w == 32 and tab.h == 16, "Era's resize tab")
+local tp = tab and tab.points[1] or {}
+Check(tp[1] == "TOP" and tp[2] == win and tp[3] == "BOTTOM" and tp[4] == 0 and tp[5] == 7, "under the foot, 7 over the edge")
+local top0, mid0 = win:GetTop(), (win:GetCenter())
+cursorX, cursorY, mouseDown = 600, 300, true
+tab.scripts.OnMouseDown(tab, "LeftButton")
+Check(jobs["lootRolls.tabDrag"].awake, "a press on the tab starts the drag")
+cursorX, cursorY = 620, 250
+Tick("lootRolls.tabDrag")
+Check(win.w == 250 and win.h == 225, "50 down is 50 taller, 20 right is 40 wider (20 each side)")
+Check(win:GetTop() == top0 and win:GetCenter() == mid0, "its top and middle stay put")
+cursorX, cursorY = 400, 900
+Tick("lootRolls.tabDrag")
+Check(win.w == 210 and win.h == 103, "never under Era's least")
+cursorX, cursorY = 640, 260
+Tick("lootRolls.tabDrag")
+mouseDown = false
+tab.scripts.OnMouseUp(tab, "LeftButton")
+Check(db.lootHistoryW == 290 and db.lootHistoryH == 215 and not jobs["lootRolls.tabDrag"].awake, "the size is kept for next time")
+tab.scripts.OnClick(tab, "RightButton")
+Check(win.w == 210 and win.h == 175 and db.lootHistoryW == 0, "a right click on the tab gives Era's size back")
+-- A button let go off the tab (no mouse up to it) still ends the drag and keeps the size.
+mouseDown = true
+tab.scripts.OnMouseDown(tab, "LeftButton")
+cursorY = cursorY - 30
+Tick("lootRolls.tabDrag")
+mouseDown = false
+Tick("lootRolls.tabDrag")
+Check(db.lootHistoryH == 205 and not jobs["lootRolls.tabDrag"].awake, "let go anywhere, the drag ends")
+tab.scripts.OnClick(tab, "RightButton")
+
+-- The corner grip: unseen till the cursor nears the corner (Era's window has none); a drag sizes from it.
+Check(grip and grip.parent == win and not grip:IsShown(), "the corner grip waits unseen")
+cursorX, cursorY = win:GetRight() - 10, win:GetBottom() + 10
+Tick("lootRolls.grip")
+Check(grip:IsShown(), "it shows with the cursor near the corner")
+cursorX, cursorY = win:GetRight() - 100, win:GetBottom() + 60
+Tick("lootRolls.grip")
+Check(not grip:IsShown(), "and goes with the cursor elsewhere on the window")
+cursorX, cursorY = win:GetRight() - 10, win:GetBottom() + 10
+Tick("lootRolls.grip")
 grip.scripts.OnMouseDown(grip, "LeftButton")
 Check(win.sizing == "BOTTOMRIGHT", "a drag sizes from the corner")
+cursorX, cursorY = 0, 0
+Tick("lootRolls.grip")
+Check(grip:IsShown(), "it stays while it sizes")
 win.w, win.h = 300, 400
 grip.scripts.OnMouseUp(grip, "LeftButton")
 Check(db.lootHistoryW == 300 and db.lootHistoryH == 400, "the size is kept for next time")
+Tick("lootRolls.grip")
+Check(not grip:IsShown(), "unseen again once let go away from it")
 grip.scripts.OnClick(grip, "RightButton")
 Check(win.w == 210 and win.h == 175 and db.lootHistoryW == 0, "a right click gives Era's size back")
 

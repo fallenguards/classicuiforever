@@ -20,6 +20,8 @@ local handle = assert(io.open(ROOT .. "/UI/WindowGrips.lua", "r"))
 local source = handle:read("a"):gsub("\r\n", "\n")
 handle:close()
 
+Check(source:find("\nlocal Cursor = ns.UICursor\n", 1, true) ~= nil, "the grips read the cursor through ns.UICursor")
+
 local function Piece(name)
     local from = source:find("local function " .. name .. "(", 1, true)
     local to = from and source:find("\nend\n", from, true)
@@ -62,7 +64,8 @@ local env = setmetatable({
     W = W, drag = {}, grips = { character = grip }, job = job, MIN_SCALE = 0.5, MAX_SCALE = 1.5,
     Plain = function(v) return v end,
     ns = { WindowFrame = function() return frame end, WindowLocked = function() return false end,
-        MoverHolds = function() return false end },
+        MoverHolds = function() return false end,
+        UICursor = function() return cursorX, cursorY end },
     UIParent = { GetEffectiveScale = function() return 1 end, GetWidth = function() return 1000 end },
     GetCursorPosition = function() return cursorX, cursorY end,
     IsMouseButtonDown = function() return down end,
@@ -72,7 +75,7 @@ local env = setmetatable({
 }, { __index = _G })
 env._G = env
 local Start, Step, DefaultSize = assert(load("local W, drag, grips, job, MIN_SCALE, MAX_SCALE, Plain = W, drag, grips, job, "
-    .. "MIN_SCALE, MAX_SCALE, Plain\n" .. Piece("Usable") .. Piece("Cursor") .. Piece("Stop") .. Piece("Step")
+    .. "MIN_SCALE, MAX_SCALE, Plain\n" .. Piece("Usable") .. "local Cursor = ns.UICursor\n" .. Piece("Stop") .. Piece("Step")
     .. Piece("Start") .. Piece("DefaultSize") .. "\nreturn Start, Step, DefaultSize", "grips", "t", env))()
 
 -- Grabbed 3 in and 2 up from the corner (400, 300).

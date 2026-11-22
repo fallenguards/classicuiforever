@@ -3,7 +3,7 @@ local L = ns.L
 
 -- Era's Loot Rolls window (Classic LootHistory.xml) in place of the game's /loot window: a tooltip box with the bag icon
 -- and its title, every drop a row (its icon in the small loot frame; winner, roll type and roll once done), + on a row
--- lists each player's roll. Fed by the game's loot history, newest encounter first; sized both ways from its corner.
+-- lists each player's roll. Fed by the game's loot history, newest encounter first; sized both ways from Era's tab.
 
 local P = ns.panels
 local A = P.after
@@ -16,6 +16,11 @@ local LIST_RIGHT, LIST_FOOT = 28, 7
 -- Rows: an item 36 tall, 5 between items, its players 16 tall from 2 under it, 1 between.
 local ITEM_H, ITEM_GAP, PLAYER_H, PLAYER_TOP, PLAYER_GAP, FIRST_TOP = 36, 5, 16, 2, 1, 2
 local GRIP_X, GRIP_Y = -3, 3
+-- Era's resize tab: 32 x 16 under the foot, 7 of it over the edge.
+local SIZE_TAB = "Interface\\RaidFrame\\Raid-Move-Down"
+local TAB_W, TAB_H, TAB_UP = 32, 16, 7
+-- The corner grip shows only with the cursor this close to the corner (inside), or this far past it (outside).
+local NEAR_IN, NEAR_OUT = 24, 4
 
 local TOAST = "Interface\\LootFrame\\LootToast"
 local DIVIDER_COORDS = { 0.00097656, 0.17773438, 0.74218750, 0.89062500 }
@@ -389,23 +394,85 @@ local function List(frame)
     frame.scroll, frame.child, frame.bar = scroll, child, bar
 end
 
+local Cursor = ns.UICursor
+
+local function SaveSize(frame) ns.db.lootHistoryW, ns.db.lootHistoryH = frame:GetSize() end
+local function EraSize(frame)
+    ns.db.lootHistoryW, ns.db.lootHistoryH = 0, 0
+    frame:SetSize(ERA_W, ERA_H)
+end
+
+-- The tab's drag: up and down the height, as Era's; sideways the width, evenly both sides (top and middle kept).
+local tabDrag   -- cursor, size and top at the press
+local tabJob
+local function TabStop()
+    if not tabDrag then return end
+    tabDrag = nil
+    tabJob:Sleep()
+    SaveSize(win)
+end
+local function TabStep()
+    if not tabDrag then return tabJob:Sleep() end
+    if not IsMouseButtonDown("LeftButton") then return TabStop() end
+    local x, y = Cursor()
+    local w = Clamp(tabDrag.w + 2 * (x - tabDrag.x), ERA_W, math.min(MAX_W, UIParent:GetWidth()))
+    local h = Clamp(tabDrag.h + tabDrag.y - y, MIN_H, math.min(MAX_H, tabDrag.top))
+    win:SetSize(w, h)
+end
+tabJob = ns.Sched.Job({ name = "lootRolls.tabDrag", every = 0, awake = false, fn = TabStep })
+
+local function SizeTab(frame)
+    local tab = ns.NewFrame("Button", nil, frame)
+    tab:SetSize(TAB_W, TAB_H)
+    tab:SetPoint("TOP", frame, "BOTTOM", 0, TAB_UP)
+    tab:SetNormalTexture(SIZE_TAB)
+    tab:RegisterForClicks("RightButtonUp")
+    tab:SetScript("OnMouseDown", function(_, button)
+        if button ~= "LeftButton" or tabDrag then return end
+        local x, y = Cursor()
+        local w, h = frame:GetSize()
+        local middle, top = frame:GetCenter(), frame:GetTop()
+        tabDrag = { x = x, y = y, w = w, h = h, top = top }
+        ns.SetPointOnce(frame, "TOP", UIParent, "BOTTOMLEFT", middle, top)
+        GameTooltip:Hide()
+        tabJob:Wake()
+    end)
+    tab:SetScript("OnMouseUp", function(_, button) if button == "LeftButton" then TabStop() end end)
+    tab:SetScript("OnClick", function() EraSize(frame) end)
+    ns.AttachTip(tab, TIP)
+    frame.sizeTab = tab
+end
+
+-- Near the corner only (or while it sizes): Era's window has none.
+local function GripNear(frame)
+    if frame.gripHeld then return true end
+    local right, bottom = frame:GetRight(), frame:GetBottom()
+    if not (right and bottom) then return false end
+    local x, y = Cursor()
+    return x > right - NEAR_IN and x < right + NEAR_OUT and y < bottom + NEAR_IN and y > bottom - NEAR_OUT
+end
+
 local function Grip(frame)
     local grip = ns.GripButton(frame)
     grip:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", GRIP_X, GRIP_Y)
     grip:SetScript("OnMouseDown", function(_, button)
-        if button == "LeftButton" then frame:StartSizing("BOTTOMRIGHT", true) end
+        if button ~= "LeftButton" then return end
+        frame.gripHeld = true
+        frame:StartSizing("BOTTOMRIGHT", true)
     end)
     grip:SetScript("OnMouseUp", function(_, button)
         if button ~= "LeftButton" then return end
+        frame.gripHeld = nil
         frame:StopMovingOrSizing()
-        ns.db.lootHistoryW, ns.db.lootHistoryH = frame:GetSize()
+        SaveSize(frame)
     end)
-    grip:SetScript("OnClick", function()
-        ns.db.lootHistoryW, ns.db.lootHistoryH = 0, 0
-        frame:SetSize(ERA_W, ERA_H)
-    end)
+    grip:SetScript("OnClick", function() EraSize(frame) end)
     ns.AttachTip(grip, TIP)
+    grip:Hide()
     frame.grip = grip
+    ns.Sched.Attach(frame, { name = "lootRolls.grip", every = 0.05, fn = function()
+        ns.SetShownIf(grip, GripNear(frame))
+    end })
 end
 
 local function Make()
@@ -422,6 +489,7 @@ local function Make()
     ns.TipRim(frame, 0, 0, 0, 0)
     Header(frame)
     List(frame)
+    SizeTab(frame)
     Grip(frame)
     frame.items, frame.players = {}, {}
     ns.EventFrame(LOOT_EVENTS, function() if frame:IsShown() then LaySoon() end end)
