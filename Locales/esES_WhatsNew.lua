@@ -3,6 +3,10 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN95_1_TITLE"] = "Una bolsa por perfil"
+L["WN95_1_TEXT"] = "Los perfiles ahora guardan la opción Una bolsa, así que los personajes con perfiles distintos conservan su propio modo de bolsas. Antes, un cambio en un personaje se aplicaba a todos. Actívala en las opciones (/fcui) en cada perfil que la quiera: Una bolsa, en Bolsas."
+L["WN95_2_TITLE"] = "Estadísticas en combate"
+L["WN95_2_TEXT"] = "Las estadísticas de la ventana de personaje ya no aparecen vacías al abrirla por primera vez en combate, y los atributos, la salud, la armadura, el crítico, la celeridad y el esquivar siguen a los beneficios durante el combate."
 L["WN94_1_TITLE"] = "Repartir botín"
 L["WN94_1_TEXT"] = "Repartir el botín al grupo vuelve a funcionar con la ventana de botín clásica: al hacer clic en un objeto aparece la lista de jugadores, al estilo de Era debajo del objeto."
 L["WN93_1_TITLE"] = "Estilos de placas de nombre"

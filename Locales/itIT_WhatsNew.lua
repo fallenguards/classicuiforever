@@ -3,6 +3,10 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN95_1_TITLE"] = "Una borsa per profilo"
+L["WN95_1_TEXT"] = "I profili ora ricordano l'opzione Una borsa: i personaggi con profili diversi mantengono la propria modalità delle borse. Prima, una modifica su un personaggio valeva per tutti. Attivala nelle opzioni (/fcui) in ogni profilo che la vuole: Una borsa, in Borse."
+L["WN95_2_TITLE"] = "Statistiche in combattimento"
+L["WN95_2_TEXT"] = "Le statistiche della finestra del personaggio non sono più vuote alla prima apertura in combattimento, e attributi, salute, armatura, critico, celerità e schivata seguono i potenziamenti durante il combattimento."
 L["WN94_1_TITLE"] = "Distribuzione del bottino"
 L["WN94_1_TEXT"] = "La distribuzione del bottino al gruppo funziona di nuovo con la finestra del bottino classica: un clic su un oggetto mostra l'elenco dei giocatori, nello stile di Era sotto l'oggetto."
 L["WN93_1_TITLE"] = "Stili delle targhette"

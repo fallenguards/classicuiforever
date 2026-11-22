@@ -2,6 +2,12 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.63.2] - 2026-11-22
+
+### Fixed
+- Profiles now keep One bag: characters on different profiles keep their own bag mode. One bag is the game's own combined bags choice, which the game keeps for the whole account, so a change on one character applied to every character.
+- The character window's stats no longer stand empty when it is first opened in a fight, and attributes, health, armor, crit, haste and dodge follow buffs during a fight. Damage, attack power, hit and spell power keep their pre-fight numbers until the fight ends.
+
 ## [0.63.1] - 2026-11-21
 
 ### Fixed

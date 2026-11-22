@@ -3,6 +3,10 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN95_1_TITLE"] = "Eine Tasche je Profil"
+L["WN95_1_TEXT"] = "Profile merken sich jetzt die Option Eine Tasche: Charaktere mit verschiedenen Profilen behalten ihre eigene Taschenansicht. Bisher galt eine Änderung an einem Charakter für alle. Schalte sie in jedem Profil, das sie nutzen soll, in den Optionen (/fcui) ein: Eine Tasche, unter Taschen."
+L["WN95_2_TITLE"] = "Werte im Kampf"
+L["WN95_2_TEXT"] = "Die Werte im Charakterfenster sind nicht mehr leer, wenn es zum ersten Mal im Kampf geöffnet wird, und Attribute, Gesundheit, Rüstung, kritische Trefferchance, Tempo und Ausweichen folgen im Kampf den Stärkungszaubern."
 L["WN94_1_TITLE"] = "Beute verteilen"
 L["WN94_1_TEXT"] = "Das Verteilen von Beute an die Gruppe klappt wieder mit dem klassischen Beutefenster: Ein Klick auf einen Gegenstand zeigt die Liste der Spieler, im Stil von Era unter dem Gegenstand."
 L["WN93_1_TITLE"] = "Namensplaketten-Stile"

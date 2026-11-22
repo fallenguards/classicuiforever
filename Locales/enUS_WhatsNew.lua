@@ -2,6 +2,10 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN95_1_TITLE"] = "One bag per profile"
+L["WN95_1_TEXT"] = "Profiles now keep One bag, so characters on different profiles keep their own bag mode. Before, a change on one character applied to all of them. Turn it on in the options (/fcui) on each profile that wants it: One bag, under Bags."
+L["WN95_2_TITLE"] = "Stats in a fight"
+L["WN95_2_TEXT"] = "The character window's stats no longer stand empty when first opened in a fight, and attributes, health, armor, crit, haste and dodge follow buffs during a fight."
 L["WN94_1_TITLE"] = "Master loot"
 L["WN94_1_TEXT"] = "As master looter, clicking an item in the classic loot window lists your group under Assign Loot again, in Era's look under the item, and Request Roll starts a roll on it."
 L["WN93_1_TITLE"] = "Nameplate styles"

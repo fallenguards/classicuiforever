@@ -3,6 +3,10 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN95_1_TITLE"] = "Un seul sac par profil"
+L["WN95_1_TEXT"] = "Les profils retiennent désormais l'option Un seul sac : les personnages sur des profils différents gardent leur propre mode de sacs. Avant, un changement sur un personnage s'appliquait à tous. Activez-la dans les options (/fcui) sur chaque profil qui la veut : Un seul sac, sous Sacs."
+L["WN95_2_TITLE"] = "Caractéristiques en combat"
+L["WN95_2_TEXT"] = "Les caractéristiques de la fenêtre du personnage ne sont plus vides à sa première ouverture en combat, et les attributs, la vie, l'armure, le critique, la hâte et l'esquive suivent les améliorations pendant le combat."
 L["WN94_1_TITLE"] = "Distribution du butin"
 L["WN94_1_TEXT"] = "La distribution du butin au groupe fonctionne de nouveau avec la fenêtre de butin classique : un clic sur un objet affiche la liste des joueurs, à la manière d'Era sous l'objet."
 L["WN93_1_TITLE"] = "Styles des barres de nom"
