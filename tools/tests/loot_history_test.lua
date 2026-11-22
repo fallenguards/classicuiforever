@@ -280,38 +280,20 @@ lines = Lines()
 Check(#lines == 1 and lines[1].name.text == "All Passed", "an all passed drop opens on one All Passed line")
 cloth.toggle.scripts.OnClick(cloth.toggle)
 
--- Era's tab under the foot: up and down the height, sideways the width evenly both sides; kept for next time.
+-- Era's tab under the foot sizes the height only, as Era's (from the foot, the top kept); the width is the corner's.
 local tab = win.sizeTab
 Check(tab and tab.normal == "Interface\\RaidFrame\\Raid-Move-Down" and tab.w == 32 and tab.h == 16, "Era's resize tab")
 local tp = tab and tab.points[1] or {}
 Check(tp[1] == "TOP" and tp[2] == win and tp[3] == "BOTTOM" and tp[4] == 0 and tp[5] == 7, "under the foot, 7 over the edge")
-local top0, mid0 = win:GetTop(), (win:GetCenter())
-cursorX, cursorY, mouseDown = 600, 300, true
 tab.scripts.OnMouseDown(tab, "LeftButton")
-Check(jobs["lootRolls.tabDrag"].awake, "a press on the tab starts the drag")
-cursorX, cursorY = 620, 250
-Tick("lootRolls.tabDrag")
-Check(win.w == 250 and win.h == 225, "50 down is 50 taller, 20 right is 40 wider (20 each side)")
-Check(win:GetTop() == top0 and win:GetCenter() == mid0, "its top and middle stay put")
-cursorX, cursorY = 400, 900
-Tick("lootRolls.tabDrag")
-Check(win.w == 210 and win.h == 103, "never under Era's least")
-cursorX, cursorY = 640, 260
-Tick("lootRolls.tabDrag")
-mouseDown = false
+Check(win.sizing == "BOTTOM", "a drag on the tab sizes from the foot only: the height, never the width")
+win.h = 260
 tab.scripts.OnMouseUp(tab, "LeftButton")
-Check(db.lootHistoryW == 290 and db.lootHistoryH == 215 and not jobs["lootRolls.tabDrag"].awake, "the size is kept for next time")
+Check(win.sizing == nil and win.w == 210 and db.lootHistoryW == 210 and db.lootHistoryH == 260, "the height is kept for next time")
+tab.scripts.OnMouseDown(tab, "RightButton")
+Check(win.sizing == nil, "a right press starts no drag")
 tab.scripts.OnClick(tab, "RightButton")
 Check(win.w == 210 and win.h == 175 and db.lootHistoryW == 0, "a right click on the tab gives Era's size back")
--- A button let go off the tab (no mouse up to it) still ends the drag and keeps the size.
-mouseDown = true
-tab.scripts.OnMouseDown(tab, "LeftButton")
-cursorY = cursorY - 30
-Tick("lootRolls.tabDrag")
-mouseDown = false
-Tick("lootRolls.tabDrag")
-Check(db.lootHistoryH == 205 and not jobs["lootRolls.tabDrag"].awake, "let go anywhere, the drag ends")
-tab.scripts.OnClick(tab, "RightButton")
 
 -- The corner grip: unseen till the cursor nears the corner (Era's window has none); a drag sizes from it.
 Check(grip and grip.parent == win and not grip:IsShown(), "the corner grip waits unseen")
