@@ -2,6 +2,15 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.64.0] - 2026-11-22
+
+### Added
+- /loot opens Era's Loot Rolls window in place of the game's loot history: every drop with its winner and roll, and + on a drop lists everyone's rolls. A loot link in chat opens it on that boss's drops. The tab under it sizes its height, as on Era, and its corner, shown when you point at it, sizes it both ways. Loot history on the All windows page of the options turns it off.
+- Appear Offline in the classic social window's status menu, beside Available, Away and Busy.
+
+### Fixed
+- Unchecking Social on the All windows page now gives you the game's own social window, with none of our tabs in it. Who list and Guild roster live in the classic social window, so they are grayed out while Social is off.
+
 ## [0.63.2] - 2026-11-22
 
 ### Fixed

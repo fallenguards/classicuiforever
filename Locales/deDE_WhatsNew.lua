@@ -3,6 +3,12 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN96_1_TITLE"] = "Beutewürfe wie in Era"
+L["WN96_1_TEXT"] = "/loot öffnet das Fenster für Beutewürfe aus Era: jeder Gegenstand mit Gewinner und Wurf, und + bei einem Gegenstand zeigt alle Würfe. Der Reiter darunter ändert die Höhe, die Ecke die Größe in beide Richtungen."
+L["WN96_2_TITLE"] = "Offline erscheinen"
+L["WN96_2_TEXT"] = "Das Statusmenü im klassischen Kontaktfenster bietet jetzt Offline erscheinen, neben Verfügbar, Abwesend und Beschäftigt."
+L["WN96_3_TITLE"] = "Soziales abgewählt"
+L["WN96_3_TEXT"] = "Wer Soziales auf der Seite Alle Fenster abwählt, bekommt jetzt das Kontaktfenster des Spiels, ohne unsere Reiter."
 L["WN95_1_TITLE"] = "Eine Tasche je Profil"
 L["WN95_1_TEXT"] = "Profile merken sich jetzt die Option Eine Tasche: Charaktere mit verschiedenen Profilen behalten ihre eigene Taschenansicht. Bisher galt eine Änderung an einem Charakter für alle. Schalte sie in jedem Profil, das sie nutzen soll, in den Optionen (/fcui) ein: Eine Tasche, unter Taschen."
 L["WN95_2_TITLE"] = "Werte im Kampf"

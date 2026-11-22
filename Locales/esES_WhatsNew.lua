@@ -3,6 +3,12 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN96_1_TITLE"] = "Tiradas de botín de Era"
+L["WN96_1_TEXT"] = "/loot abre la ventana de tiradas de botín de Era: cada objeto con su ganador y su tirada, y + en un objeto muestra todas las tiradas. Arrastra la pestaña de debajo para la altura, o su esquina para ambos sentidos."
+L["WN96_2_TITLE"] = "Aparecer desconectado"
+L["WN96_2_TEXT"] = "El menú de estado de la ventana social clásica ahora incluye aparecer desconectado, junto a Disponible, Ausente y Ocupado."
+L["WN96_3_TITLE"] = "Social desmarcado"
+L["WN96_3_TEXT"] = "Al desmarcar Social en la página Todas las ventanas ahora tienes la ventana social del juego, sin ninguna de nuestras pestañas."
 L["WN95_1_TITLE"] = "Una bolsa por perfil"
 L["WN95_1_TEXT"] = "Los perfiles ahora guardan la opción Una bolsa, así que los personajes con perfiles distintos conservan su propio modo de bolsas. Antes, un cambio en un personaje se aplicaba a todos. Actívala en las opciones (/fcui) en cada perfil que la quiera: Una bolsa, en Bolsas."
 L["WN95_2_TITLE"] = "Estadísticas en combate"

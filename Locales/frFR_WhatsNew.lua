@@ -3,6 +3,12 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN96_1_TITLE"] = "Jets de butin d'Era"
+L["WN96_1_TEXT"] = "/loot ouvre la fenêtre des jets de butin d'Era : chaque objet avec son gagnant et son jet, et + sur un objet affiche tous les jets. Faites glisser l'onglet du dessous pour la hauteur, ou son coin pour les deux sens."
+L["WN96_2_TITLE"] = "Apparaître hors ligne"
+L["WN96_2_TEXT"] = "Le menu de statut de la fenêtre sociale classique propose désormais d'apparaître hors ligne, à côté de Disponible, Absent et Occupé."
+L["WN96_3_TITLE"] = "Social décoché"
+L["WN96_3_TEXT"] = "Décocher Social sur la page Toutes les fenêtres vous donne désormais la fenêtre sociale du jeu, sans aucun de nos onglets."
 L["WN95_1_TITLE"] = "Un seul sac par profil"
 L["WN95_1_TEXT"] = "Les profils retiennent désormais l'option Un seul sac : les personnages sur des profils différents gardent leur propre mode de sacs. Avant, un changement sur un personnage s'appliquait à tous. Activez-la dans les options (/fcui) sur chaque profil qui la veut : Un seul sac, sous Sacs."
 L["WN95_2_TITLE"] = "Caractéristiques en combat"

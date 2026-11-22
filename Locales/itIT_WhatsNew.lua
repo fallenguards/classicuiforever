@@ -3,6 +3,12 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN96_1_TITLE"] = "Tiri del bottino di Era"
+L["WN96_1_TEXT"] = "/loot apre la finestra dei tiri del bottino di Era: ogni oggetto con vincitore e tiro, e + su un oggetto mostra tutti i tiri. Trascina la linguetta sotto per l'altezza, o il suo angolo per entrambi i sensi."
+L["WN96_2_TITLE"] = "Apparire offline"
+L["WN96_2_TEXT"] = "Il menu dello stato della finestra social classica ora permette di apparire offline, accanto a Disponibile, Assente e Occupato."
+L["WN96_3_TITLE"] = "Social deselezionato"
+L["WN96_3_TEXT"] = "Deselezionando Social nella pagina Tutte le finestre ora hai la finestra social del gioco, senza nessuna delle nostre linguette."
 L["WN95_1_TITLE"] = "Una borsa per profilo"
 L["WN95_1_TEXT"] = "I profili ora ricordano l'opzione Una borsa: i personaggi con profili diversi mantengono la propria modalità delle borse. Prima, una modifica su un personaggio valeva per tutti. Attivala nelle opzioni (/fcui) in ogni profilo che la vuole: Una borsa, in Borse."
 L["WN95_2_TITLE"] = "Statistiche in combattimento"

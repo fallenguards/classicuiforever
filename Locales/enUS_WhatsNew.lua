@@ -2,6 +2,12 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN96_1_TITLE"] = "Era's Loot Rolls"
+L["WN96_1_TEXT"] = "/loot opens Era's Loot Rolls window: every drop with its winner and roll, and + on a drop lists everyone's rolls. Drag the tab under it for the height, or its corner for both ways."
+L["WN96_2_TITLE"] = "Appear Offline"
+L["WN96_2_TEXT"] = "The classic social window's status menu now has Appear Offline, beside Available, Away and Busy."
+L["WN96_3_TITLE"] = "Social unchecked"
+L["WN96_3_TEXT"] = "Unchecking Social on the All windows page now gives you the game's own social window, with none of our tabs in it."
 L["WN95_1_TITLE"] = "One bag per profile"
 L["WN95_1_TEXT"] = "Profiles now keep One bag, so characters on different profiles keep their own bag mode. Before, a change on one character applied to all of them. Turn it on in the options (/fcui) on each profile that wants it: One bag, under Bags."
 L["WN95_2_TITLE"] = "Stats in a fight"
