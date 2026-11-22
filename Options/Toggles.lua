@@ -544,13 +544,14 @@ ns.TOGGLES = {
     { "trainerSearch", L["OPT_trainerSearch"], L["OPT_trainerSearch_TIP"], parent = "trainer",
         search = "search find filter spells skills recipes trainer list" },
 
-    { "whoList", L["OPT_whoList"], L["OPT_whoList_TIP"], group = L["GROUP_SOCIAL"] },
+    -- Both lists live in our social window: with Social off the window is the game's, with none of our tabs (#333).
+    { "whoList", L["OPT_whoList"], L["OPT_whoList_TIP"], group = L["GROUP_SOCIAL"], needs = "panelSocial" },
     { "hideWhoTab", L["OPT_hideWhoTab"], L["OPT_hideWhoTab_TIP"], search = "who tab hide remove social group finder" },
     { "hideFinderWho", L["OPT_hideFinderWho"], L["OPT_hideFinderWho_TIP"], hideIf = OnRetail,
         search = "who side tab group finder hide remove confusing" },
     { "socialTitleDrag", L["OPT_socialTitleDrag"], L["OPT_socialTitleDrag_TIP"],
         search = "social window drag move title bar status online away busy" },
-    { "guildRoster", L["OPT_guildRoster"], L["OPT_guildRoster_TIP"] },
+    { "guildRoster", L["OPT_guildRoster"], L["OPT_guildRoster_TIP"], needs = "panelSocial" },
     { "guildClassColors", L["OPT_guildClassColors"], L["OPT_guildClassColors_TIP"], parent = "guildRoster",
         search = "guild roster names class color colored colour" },
     { "communitiesButton", L["OPT_communitiesButton"], L["OPT_communitiesButton_TIP"], parent = "guildRoster",

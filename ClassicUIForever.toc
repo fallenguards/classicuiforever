@@ -209,6 +209,7 @@ Windows\Bank.lua
 Social\SocialWindow.lua
 Social\SocialOpener.lua
 Social\ContactPages.lua
+Social\StatusMenu.lua
 Social\GuildData.lua
 Social\GuildRoster.lua
 Social\GuildMemberCard.lua
