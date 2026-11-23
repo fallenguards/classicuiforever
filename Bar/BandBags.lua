@@ -259,10 +259,15 @@ end
 -- A fold changes a moved row's width: the piece is hung again by its backpack end before it is sized, so the bags come
 -- and go beside a backpack that stays where it is (edit mode's own anchor is kept for the hand-back).
 local END_CORNER = { cw = "BOTTOMLEFT", ccw = "TOPLEFT", mirror = "BOTTOMLEFT" }
-local function HoldBackpackEnd(piece, grow, boxW, boxH)
+local function Near(a, b) return type(a) == "number" and math.abs(a - b) < 0.5 end
+local function HoldBackpackEnd(piece, grow, boxW, boxH, fullW, fullH)
     if piece.isDragging then return end
     local w, h = piece:GetSize()
-    if math.abs((w or 0) - boxW) < 0.5 and math.abs((h or 0) - boxH) < 0.5 then return end
+    if Near(w, boxW) and Near(h, boxH) then return end
+    -- Edit mode keeps the spot at the unfolded row's size and lays the piece again at the game's own, larger: back to
+    -- ours around its anchor first, or the game's size held by its corner put the bags 21 right and 6 down.
+    if not (Near(w, fullW) and Near(h, fullH)) then piece:SetSize(fullW, fullH) end
+    if Near(fullW, boxW) and Near(fullH, boxH) then return end
     local corner = END_CORNER[grow.turn or ""] or "BOTTOMRIGHT"
     local x = corner == "BOTTOMRIGHT" and piece:GetRight() or piece:GetLeft()
     local y = corner == "TOPLEFT" and piece:GetTop() or piece:GetBottom()
@@ -302,12 +307,16 @@ function B.LayoutBags()
     -- The piece's box: a column swaps its sides, as the client's does.
     local boxW, boxH = rowW, KEYRING_H
     if vertical then boxW, boxH = KEYRING_H, rowW end
+    -- Edit mode shows the row unfolded (BandBagsShow): the box it keeps a moved piece's spot at.
+    local fullRow = size + 4 * (size - gap) + (square and size - gap or 0)
+    local fullW, fullH = fullRow, KEYRING_H
+    if vertical then fullW, fullH = KEYRING_H, fullRow end
     local buttonScale = ButtonScale(piece, out)
     -- The client's piece is protected in a fight (its buttons are): left as it stands, hung and sized again after.
     local locked = InCombatLockdown()
     if out then
         home, homeX, homeY = piece, 0, lift
-        if not locked then HoldBackpackEnd(piece, grow, boxW, boxH) end
+        if not locked then HoldBackpackEnd(piece, grow, boxW, boxH, fullW, fullH) end
     else
         local relativeTo
         if OneBar() then
