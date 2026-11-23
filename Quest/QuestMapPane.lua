@@ -167,6 +167,13 @@ local function ColorTitle(button)
     if button.TagText then button.TagText:SetTextColor(r, g, b) end
 end
 
+-- Era's hover: the title white, as the headers here. The client's paints its modern difficulty (a gray quest green).
+local function WhiteTitle(button)
+    if not active then return end
+    if button.Text then button.Text:SetTextColor(1, 1, 1) end
+    if button.TagText then button.TagText:SetTextColor(1, 1, 1) end
+end
+
 -- Retexture the client's check box regions with the 1.x check.
 local function DressCheckRegion(region, box)
     if region == box.CheckMark then
@@ -247,7 +254,8 @@ local function SkinTitle(button)
             button.Text:SetFontObject(ns.QuestListFont)
             Grow(button.questID, button.Text:GetHeight() - was)
         end
-        -- The client restores its own color on leave.
+        -- The client paints its own colors on hover and on leave.
+        button:HookScript("OnEnter", WhiteTitle)
         button:HookScript("OnLeave", ColorTitle)
     end
     local info = button.questLogIndex and C_QuestLog.GetInfo(button.questLogIndex)
