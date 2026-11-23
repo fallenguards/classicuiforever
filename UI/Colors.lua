@@ -163,9 +163,21 @@ local function FillBar(bar, value, max)
     end
 end
 
--- A class file's colour; nothing for a missing, secret or unknown class.
+-- A class file's color, or nothing. A class the game hides (battlegrounds, dungeons) gets the game's class color as
+-- hidden values, which only a color call reads: test the answer with IsSecret(r) or r, never r alone.
 function ns.ClassRGB(classFile)
-    if IsSecret(classFile) or not classFile then return end
+    if IsSecret(classFile) then
+        local classColor = _G.C_ClassColor
+        local getColor = classColor and classColor.GetClassColor
+        if not getColor then return end
+        local ok, r, g, b = pcall(function()
+            local color = getColor(classFile)
+            return color.r, color.g, color.b
+        end)
+        if ok then return r, g, b end
+        return
+    end
+    if not classFile then return end
     local color = RAID_CLASS_COLORS and RAID_CLASS_COLORS[classFile]
     if color then return color.r, color.g, color.b end
 end
@@ -231,7 +243,7 @@ function ns.HealthColor(unit)
         if not IsSecret(isPlayer) and isPlayer and ns.db[side] ~= false then
             local _, class = UnitClass(unit)
             local r, g, b = ns.ClassRGB(class)
-            if r then return r, g, b end
+            if IsSecret(r) or r then return r, g, b end
         end
     end
     local enemy = unit and EnemyColor(unit)
@@ -266,7 +278,6 @@ function ns.NameBoxColor(unit)
     local side = Hostile(unit) and "classColorNamesEnemies" or "classColorNamesFriends"
     if db[side] == false then return nil end
     local _, class = UnitClass(unit)
-    if IsSecret(class) then return nil end
     return ns.ClassRGB(class)
 end
 

@@ -68,6 +68,7 @@ ns.SetVertexColorIf = function(region, r, g, b) region.r, region.g, region.b = r
 local env2 = setmetatable({
     ns = ns,
     SetShownIf = function(region, shown) region.shown = shown end,
+    IsSecret = function() return false end,
     UnitPlayerControlled = function() return controlled end,
     UnitIsTapDenied = function() return tapped end,
     UnitSelectionColor = function() return 0, 0, 1, 1 end,

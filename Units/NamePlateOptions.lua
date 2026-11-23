@@ -66,27 +66,10 @@ function NP.UnpinFill(health)
     pin.tex = nil
 end
 
--- The game's class color for a class it hides (dungeons, battlegrounds: every enemy player's plate in Arathi Basin,
--- /fcuidev platecc bg, 2026-11-23). Its color call takes the hidden class from addon code and hands back hidden
--- values only a texture's color call reads (both AllowedWhenTainted); ours never reads them.
-local function HiddenClassRGB(class)
-    local classColor = _G.C_ClassColor
-    local getColor = classColor and classColor.GetClassColor
-    if not getColor then return end
-    local ok, r, g, b = pcall(function()
-        local color = getColor(class)
-        return color.r, color.g, color.b
-    end)
-    if ok then return r, g, b end
-end
-
--- Class color, hidden values while the class is secret, or nothing.
+-- Class color, hidden values where the game hides the class (ns.ClassRGB, UI/Colors.lua), or nothing.
 local function ClassRGB(unit)
     local _, class = UnitClass(unit)
-    if IsSecret(class) then return HiddenClassRGB(class) end
-    if not class then return end
-    local color = RAID_CLASS_COLORS and RAID_CLASS_COLORS[class]
-    if color then return color.r, color.g, color.b end
+    return ns.ClassRGB(class)
 end
 
 -- Our colour for a player plate, nothing to keep the client's, or KEEP while an answer is secret (the plate stays as it

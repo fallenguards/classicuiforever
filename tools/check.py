@@ -39,14 +39,14 @@ RULES = ["CVAR", "CVARREAD", "CVARLOGIN", "CVARREG", "REGISTRY", "HOOK", "ONUPDA
          "LOADADDON", "EDITMODE", "EDITQUERY", "SETTLE",
          "PANELMGR", "SECRET", "WALK", "REGEVENTS", "EVENTFRAME", "POINTONCE", "SETIF", "THEME", "ONCEFLAG",
          "FRAMEFIELD", "GAMEMENU", "SHAREDART", "PLATES", "FORBIDDEN", "SYSBASE", "LAYOUTFIELD", "LISTWRITE", "CLIENTKEY",
-         "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS", "DRAGPOINT", "STRETCHED", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETTEXT", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "SNIPPETHIDE", "PVPINFOART", "CLUSTERSCALE", "DBRAW", "FLOORSIZE", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "LOADORDER", "TOC"]
+         "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "CLASSCOLOR", "UNITEVENTS", "DRAGPOINT", "STRETCHED", "ERASPOT", "WINDOWORIGIN", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST", "POINTEXACT", "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETTEXT", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE", "CLIENTTEMPLATE", "COMBATMOUSE", "MASKPATH", "MASKWEAR", "EDITDRAG", "PAGEINK", "SNIPPETHIDE", "PVPINFOART", "CLUSTERSCALE", "DBRAW", "FLOORSIZE", "FRAMEWALK", "OTHERADDON", "FILESIZE", "FUNCSIZE", "COMMENT", "DUP", "DUPFN", "DEADNS", "UNDEFNS", "LOADORDER", "TOC"]
 # A hit of these on a line the change adds fails even within the baseline, so swapping one call for another fails.
 # SINCE, DEADNS, FRAMEFIELD, CVARLOGIN and THROTTLEFRAME stay count-only, so a kept line can still be rewritten.
 LINE_RULES = ("CVAR", "REGISTRY", "HOOK", "ONUPDATE", "LOADADDON", "FRAMEWALK", "EDITMODE", "PANELMGR", "SEARCHBOX", "ADDONCHAR",
               "ADDONSELF", "KEYONLY",
               "CVARREAD", "THEME", "POINTONCE", "SECRET", "SETIF", "REGEVENTS", "ONCEFLAG", "TIMER", "EDITQUERY",
               "PLATES", "FORBIDDEN", "EVENTFRAME",
-              "WALK", "GAMEMENU", "SHAREDART", "SYSBASE", "LAYOUTFIELD", "LISTWRITE", "CLIENTKEY", "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "UNITEVENTS",
+              "WALK", "GAMEMENU", "SHAREDART", "SYSBASE", "LAYOUTFIELD", "LISTWRITE", "CLIENTKEY", "PADART", "SECRETMOUSE", "BARCLICK", "AURAREAD", "CLASSCOLOR", "UNITEVENTS",
               "DRAGPOINT", "STRETCHED", "ERASPOT", "WINDOWORIGIN", "CVARREG", "CHECKLABEL", "LUA51", "EDITSAVE", "KEYUP", "MOUSEORDER", "SELFBOX", "PADLIST",
               "POINTEXACT",
               "FADEDPIECE", "PCALLMANY", "PLATESHIELD", "PASSWRITE", "ADDONFORBID", "SECRETLAYER", "SECRETATLAS", "SECRETTEXT", "SECRETBAR", "SECRETALPHA", "LOCALE", "OWNRELOAD", "HELDCVAR", "NAVFRAME", "NAMEDTEMPLATE",
@@ -82,6 +82,7 @@ ALLOWED = {
     "GAMEMENU": {"UI/Escape.lua": "ns.CloseWithGameMenu", "Options/GameMenu.lua": "the game menu look"},
     "OWNRELOAD": {"Options/Layout.lua": "ns.ReloadForLayout and the turn-off popup's own press"},
     "PLATES": {"Units/NamePlates.lua": "ns.NP.EachPlate"},
+    "CLASSCOLOR": {"UI/Colors.lua": "ns.ClassRGB"},
     # Frames that never stand inside a window the gamepad navigates.
     "NAVFRAME": {"Core/": "ns.NewFrame itself, and the core's own frames", "Art/": "no windows",
                  "Bar/": "the band stands on UIParent", "Units/": "unit frames and plates are no windows",
@@ -282,6 +283,8 @@ FIX = {
                  "PAGE_NEXT (UI/Dress.lua) or ns.PanelToggleFace",
     "POINTONCE": "use ns.SetPointOnce(X, ...) (Core/Setters.lua); keep two-point anchors as they are",
     "PLATES": "use ns.NP.EachPlate(fn, withForbidden) (Units/NamePlates.lua)",
+    "CLASSCOLOR": "use ns.ClassRGB(classFile) (UI/Colors.lua) and test its answer with IsSecret(r) or r: where the game "
+                  "hides the class it hands back the game's class color as hidden values a color call still takes",
     "NAVFRAME": "make it with ns.NewFrame (Core/Gamepad.lua): the gamepad's CreateFrame hook re-reads an open window's "
                 "controls in our name, and every later close of it is refused (ADDON_ACTION_FORBIDDEN)",
     "FORBIDDEN": "use ns.IsForbidden(object) (Core/Util.lua)",
@@ -377,6 +380,7 @@ LINE_PATTERNS = {
     "FRAMEFIELD": re.compile(r"\.\s*fcui[A-Z]\w*\s*=(?!=)"),
     "SECRETMOUSE": re.compile(r"(?:\bif\b|\band\b|\bor\b|\bnot\b|\breturn\b)[^\n]*:\s*IsMouseOver\s*\(\s*\)"),
     "BARCLICK": re.compile(r"\b(?:client\w*|\w*(?:Health|Mana|Power)Bar\w*)\s*[.:]\s*EnableMouse\b"),
+    "CLASSCOLOR": re.compile(r"\bRAID_CLASS_COLORS\b|\bC_ClassColor\b"),
     "AURAREAD": re.compile(r"\bGetAuraDataBy\w+\s*\(|\b(?:UnitAura|UnitBuff|UnitDebuff)\s*\(|\bAuraUtil\s*\.\s*\w+\s*\("),
     "LAYOUTFIELD": re.compile(r"\.\s*(?:ignoreInLayout|includeInLayout|layoutIndex|includeAsLayoutChildWhenHidden"
                               r"|ignoreAllChildren|expand|align|topPadding|bottomPadding|leftPadding|rightPadding)\s*=(?!=)"),
@@ -595,6 +599,8 @@ MESSAGES = {
     "SYSBASE": "anchor or scale of a bar or edit mode system through the client's wrapper (its snap note taints the next drag)",
     "SHAREDART": "shared control art copied (clear icon, red button coords or page arrow paths)",
     "PLATES": "nameplate loop by hand outside Units/NamePlates.lua",
+    "CLASSCOLOR": "a class color looked up outside ns.ClassRGB (one that dropped a class the game hides left every enemy "
+                  "player's plate red in battlegrounds, 2026-11-23)",
     "NAVFRAME": "a frame made with a parent in window code by raw CreateFrame",
     "FORBIDDEN": "ns.IsForbidden written out by hand",
 }

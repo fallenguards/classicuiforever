@@ -176,10 +176,12 @@ local function ApplyClassification(frame)
     if main then UF.NameFont(main.Name) end
     local box = main and main.ReputationColor
     local r, g, b = ns.NameBoxColor(entry.unit)
+    -- A class the game hides gives hidden values: they count as a color and are never tested.
+    local classed = IsSecret(r) or r ~= nil
     -- Unchecked under Name box color: plain, as the player frame's is, unless a class color of ours stands in it.
-    local plain = not r and ns.db[NAME_BOX[entry.unit]] == false
+    local plain = not classed and ns.db[NAME_BOX[entry.unit]] == false
     if box then SetShownIf(box, not minus and style ~= "name" and not plain) end
-    if box and r then
+    if box and classed then
         ns.SetVertexColorIf(box, r, g, b, 1)
         classBoxed[frame] = true
     elseif box and classBoxed[frame] then

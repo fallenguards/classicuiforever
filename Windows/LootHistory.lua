@@ -82,8 +82,8 @@ local function Shown(info, roll)
 end
 
 local function ClassRGB(class)
-    local color = class and RAID_CLASS_COLORS and RAID_CLASS_COLORS[class]
-    if color then return color.r, color.g, color.b end
+    local r, g, b = ns.ClassRGB(class)
+    if ns.IsSecret(r) or r then return r, g, b end
     return 1, 1, 1
 end
 

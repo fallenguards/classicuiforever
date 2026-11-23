@@ -148,6 +148,11 @@ local db = { lootHistoryW = 0, lootHistoryH = 0 }
 local P = { after = {}, Dressing = function(key) return key == "panelLootHistory" and dressing end }
 local ns = {
     db = db, panels = P, EMPTY = {}, L = setmetatable({}, { __index = function(_, k) return k end }),
+    IsSecret = function() return false end,
+    ClassRGB = function(class)
+        local color = class and RAID_CLASS_COLORS[class]
+        if color then return color.r, color.g, color.b end
+    end,
     NewFrame = function(kind, name) return Frame(kind, name) end,
     TipRim = function(host) host.rim = true end,
     SetTwoPointsIf = function(region, p1, r1, rp1, x1, y1, p2, r2, rp2, x2, y2)

@@ -492,11 +492,11 @@ function S.ShowRow(row, entry, zone, level, class, classFile, selected, dim, nam
         row.Class:SetTextColor(0.5, 0.5, 0.5)
     else
         local nr, ng, nb = ns.ClassRGB(nameClass)
-        if nr then row.Name:SetTextColor(nr, ng, nb) else row.Name:SetTextColor(1, 0.82, 0) end
+        if ns.IsSecret(nr) or nr then row.Name:SetTextColor(nr, ng, nb) else row.Name:SetTextColor(1, 0.82, 0) end
         row.Zone:SetTextColor(1, 1, 1)
         row.Level:SetTextColor(1, 1, 1)
         local r, g, b = ns.ClassRGB(classFile)
-        if r then row.Class:SetTextColor(r, g, b) else row.Class:SetTextColor(1, 1, 1) end
+        if ns.IsSecret(r) or r then row.Class:SetTextColor(r, g, b) else row.Class:SetTextColor(1, 1, 1) end
     end
     row.Selected:SetShown(selected)
     row:Show()
