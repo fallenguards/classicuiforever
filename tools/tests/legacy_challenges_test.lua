@@ -21,27 +21,32 @@ local function Stub(fields)
     return setmetatable(fields or {}, { __index = function() return NOOP end })
 end
 
--- The client's categories (Achievement_Category: name, parent) and challenges (name, completed). GetCategoryList
--- names the sections holding challenges, a child before its parent; Classes and Tradeskills hold none of their own.
+-- The client's categories (Achievement_Category: name, parent) and challenges (name, completed, words, steps).
+-- GetCategoryList names the sections holding challenges, a child before its parent; Classes and Tradeskills hold none.
 local CATS = {
     [15568] = { "Classes", -1 }, [15577] = { "Druid", 15568 }, [15579] = { "Mage", 15568 },
     [15593] = { "Dungeons", -1 }, [15586] = { "Tradeskills", -1 }, [15587] = { "Alchemy", 15586 },
 }
 local LIST = { 15577, 15579, 15593, 15587 }
 local CHALLENGES = {
-    [15577] = { { 1, "Shapeshifter", false } },
-    [15579] = { { 2, "Polymorph Master", true }, { 3, "Dungeon Delver", false } },
-    [15593] = { { 4, "Ragefire Chasm", false }, { 5, "The Deadmines", true } },
-    [15587] = { { 6, "Potion Brewer", false } },
+    [15577] = { { 1, "Shapeshifter", false, "Shift forms.", {} } },
+    [15579] = { { 2, "Polymorph Master", true, "Turn foes into sheep.", { "Polymorph a beast" } },
+        { 3, "Dungeon Delver", false, "Enter a dungeon.", {} } },
+    [15593] = { { 4, "Ragefire Chasm", false, "Clear the caves under Orgrimmar.", { "Taragaman", "Bazzalan" } },
+        { 5, "The Deadmines", true, "Defeat Van Cleef.", {} } },
+    [15587] = { { 6, "Potion Brewer", false, "Brew potions.", {} } },
 }
+local BY_ID = {}
+for _, list in pairs(CHALLENGES) do for _, c in ipairs(list) do BY_ID[c[1]] = c end end
 function GetCategoryList() return LIST end
 function GetCategoryInfo(id) local c = CATS[id] if c then return c[1], c[2] end end
 function GetCategoryNumAchievements(id) return #(CHALLENGES[id] or {}) end
 function GetAchievementInfo(id, index)
     local c = CHALLENGES[id][index]
-    return c[1], c[2], 10, c[3], 1, 1, 26, "words", 0, 0
+    return c[1], c[2], 10, c[3], 11, 22, 26, c[4], 0, 0
 end
-function GetAchievementNumCriteria() return 0 end
+function GetAchievementNumCriteria(id) return #BY_ID[id][5] end
+function GetAchievementCriteriaInfo(id, index) return BY_ID[id][5][index], 0, false, 0, 1 end
 wipe = function(t) for k in pairs(t) do t[k] = nil end end
 PlaySound, SOUNDKIT = NOOP, {}
 InCombatLockdown = function() return false end
@@ -60,7 +65,8 @@ end
 local tabs, page, owner, box, apply = {}, nil, nil, nil, nil
 local ns
 ns = {
-    L = setmetatable({}, { __index = function(_, key) return key end }), EMPTY = {}, SIDE_TAB_SLOT = 0,
+    L = setmetatable({ LEGACY_COMPLETED_ON = "Completed %s" }, { __index = function(_, key) return key end }),
+    EMPTY = {}, SIDE_TAB_SLOT = 0,
     db = {},
     OnForever = function() return true end,
     IsSecret = function() return false end,
@@ -142,6 +148,16 @@ Search("mage poly")
 Expect("#Classes/0, #Mage/1, Polymorph Master", "two words: the section's name and the challenge's")
 Search("rage")
 Expect("#Dungeons/0, Ragefire Chasm", "a challenge's name alone")
+Search("orgrimmar")
+Expect("#Dungeons/0, Ragefire Chasm", "a word of its description")
+Search("bazzalan")
+Expect("#Dungeons/0, Ragefire Chasm", "a step of several")
+Search("beast")
+Expect("#Classes/0, #Mage/1, Polymorph Master", "its one step")
+Search("sheep mage")
+Expect("#Classes/0, #Mage/1, Polymorph Master", "words from its description and its section")
+Search("11/22/26")
+Expect("#Classes/0, #Mage/1, Polymorph Master, #Dungeons/0, The Deadmines", "the date it was completed")
 Search("nothing here")
 Expect("", "no match: an empty list")
 Search("")

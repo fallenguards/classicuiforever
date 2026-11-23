@@ -50,13 +50,51 @@ local function Progress(id, completed)
     return done, count
 end
 
--- Each word of the search in the challenge's name or in its sections' (path): "dungeons" keeps all of Dungeons.
-local function Wanted(name, completed, path)
-    if completed and not show.completed then return false end
-    if not completed and not show.incomplete then return false end
-    local low = name:lower()
+local function DoneText(line)
+    local date = FormatShortDate and line.day and FormatShortDate(line.day, line.month, line.year)
+        or (line.month and string.format("%d/%d/%02d", line.month, line.day, line.year)) or ""
+    return string.format(L["LEGACY_COMPLETED_ON"], date)
+end
+
+-- The detail's words: the description, then each step in green once done.
+local function Words(line)
+    local parts = { line.description or "" }
+    local count = GetAchievementNumCriteria and GetAchievementNumCriteria(line.id) or 0
+    if count > 1 then
+        parts[#parts + 1] = ""
+        for index = 1, count do
+            local text, _, done = GetAchievementCriteriaInfo(line.id, index)
+            if type(text) == "string" and text ~= "" then parts[#parts + 1] = (done and STEP_DONE or STEP_OPEN) .. text .. "|r" end
+        end
+    end
+    if line.completed then
+        parts[#parts + 1] = ""
+        parts[#parts + 1] = STEP_DONE .. DoneText(line) .. "|r"
+    end
+    return table.concat(parts, "\n")
+end
+
+-- The detail's points line; nil when the client cannot say.
+local function Cost(line)
+    return line.points and string.format(L["LEGACY_POINTS"], "|cffffffff" .. line.points .. "|r") or nil
+end
+
+-- All a challenge shows, lowered, for the search: its sections (path), name, points, words, every step and its date.
+local function SearchText(item, path)
+    local parts = { path, item.name, Cost(item) or "", Words(item) }
+    for index = 1, GetAchievementNumCriteria and GetAchievementNumCriteria(item.id) or 0 do
+        local step = GetAchievementCriteriaInfo(item.id, index)
+        if type(step) == "string" and not ns.IsSecret(step) then parts[#parts + 1] = step end
+    end
+    return (table.concat(parts, "\n"):gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""):lower())
+end
+
+-- Each word of the search somewhere in what the challenge shows: "dungeons" keeps all of Dungeons.
+local function Found(item, path)
+    if #words == 0 then return true end
+    local text = SearchText(item, path)
     for _, word in ipairs(words) do
-        if not (low:find(word, 1, true) or path:find(word, 1, true)) then return false end
+        if not text:find(word, 1, true) then return false end
     end
     return true
 end
@@ -65,11 +103,14 @@ local function ReadCategory(category, path)
     local items = {}
     for index = 1, GetCategoryNumAchievements(category) or 0 do
         local id, name, _, completed, month, day, year, description, _, icon = GetAchievementInfo(category, index)
-        if id and Wanted(name or "", completed, path) then
-            local value, most = Progress(id, completed)
-            items[#items + 1] = { id = id, name = name or "", completed = completed and true or false,
+        if id and (completed and show.completed or not completed and show.incomplete) then
+            local item = { id = id, name = name or "", completed = completed and true or false,
                 description = description, icon = icon, month = month, day = day, year = year, points = PointsFor(id),
-                rank = value, most = most, count = true }
+                count = true }
+            if Found(item, path) then
+                item.rank, item.most = Progress(id, completed)
+                items[#items + 1] = item
+            end
         end
     end
     return items
@@ -135,35 +176,10 @@ local function Collect()
     for _, line in ipairs(lines) do line.selected = not line.header and line.id == selected end
 end
 
-local function DoneText(line)
-    local date = FormatShortDate and line.day and FormatShortDate(line.day, line.month, line.year)
-        or (line.month and string.format("%d/%d/%02d", line.month, line.day, line.year)) or ""
-    return string.format(L["LEGACY_COMPLETED_ON"], date)
-end
-
--- The detail's words: the description, then each step in green once done.
-local function Words(line)
-    local parts = { line.description or "" }
-    local count = GetAchievementNumCriteria and GetAchievementNumCriteria(line.id) or 0
-    if count > 1 then
-        parts[#parts + 1] = ""
-        for index = 1, count do
-            local text, _, done = GetAchievementCriteriaInfo(line.id, index)
-            if type(text) == "string" and text ~= "" then parts[#parts + 1] = (done and STEP_DONE or STEP_OPEN) .. text .. "|r" end
-        end
-    end
-    if line.completed then
-        parts[#parts + 1] = ""
-        parts[#parts + 1] = STEP_DONE .. DoneText(line) .. "|r"
-    end
-    return table.concat(parts, "\n")
-end
-
 local function Detail()
     for _, line in ipairs(lines) do
         if not line.header and line.id == selected then
-            local cost = line.points and string.format(L["LEGACY_POINTS"], "|cffffffff" .. line.points .. "|r") or nil
-            return { name = line.name, rank = line.rank, most = line.most, count = true, cost = cost, words = Words(line) }
+            return { name = line.name, rank = line.rank, most = line.most, count = true, cost = Cost(line), words = Words(line) }
         end
     end
 end
