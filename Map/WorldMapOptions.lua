@@ -89,7 +89,15 @@ local function Points(frame)
     return points
 end
 
--- The game's button over the whole box, its own art unseen (its reset X stays).
+-- The game's reset X (filters off their defaults): Era's drop down has none, and it stood on the box's corner (#332).
+local function ResetX(track, on)
+    local reset = track.ResetButton
+    if not reset then return end
+    ns.SetAlphaIf(reset, on and 1 or 0)
+    if reset:IsMouseEnabled() ~= on then reset:EnableMouse(on) end
+end
+
+-- The game's button over the whole box, its own art unseen.
 local function Take(track, scale)
     if not took[track] then
         took[track] = { points = Points(track), w = track:GetWidth(), h = track:GetHeight() }
@@ -102,6 +110,7 @@ local function Take(track, scale)
     if track.Icon then ns.SetAlphaIf(track.Icon, 0) end
     local hl = track:GetHighlightTexture()
     if hl then ns.SetAlphaIf(hl, 0) end
+    ResetX(track, false)
 end
 
 -- spot: the frame, x and y the box's bottom right sits at from its top left, and the scale the box is drawn at.
@@ -152,6 +161,7 @@ function MO.Release(map)
     if track.Icon then track.Icon:SetAlpha(1) end
     local hl = track:GetHighlightTexture()
     if hl then hl:SetAlpha(1) end
+    ResetX(track, true)
 end
 
 -- Ours and the button laid on it, kept when a fight's fade walks the map.
