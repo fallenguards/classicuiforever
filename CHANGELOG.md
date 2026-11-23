@@ -2,6 +2,11 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.64.2] - 2026-11-23
+
+### Changed
+- Groundwork for ClassicUI Forever: LFG Forever, a companion addon that puts LFG Forever's window in the classic look beside the Looking For Group window. Nothing changes without it.
+
 ## [0.64.1] - 2026-11-23
 
 ### Changed
