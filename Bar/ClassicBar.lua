@@ -8,7 +8,6 @@ local MICRO_END_GAP, MICRO_LEAD = B.MICRO_END_GAP, B.MICRO_LEAD
 local OWNED_SYSTEMS, EXTRA_BARS = B.OWNED_SYSTEMS, B.EXTRA_BARS
 local MICRO_BUTTONS, BAG_BUTTONS, CAP_KEYS = B.MICRO_BUTTONS, B.BAG_BUTTONS, B.CAP_KEYS
 local UPPER_ROW_Y = 55 -- bars 2 and 3: 3 px over the XP strip, inside the band's top
-local TWO_BAR_LIFT = 9 -- lift for everything over the band while a second bar sits over XP
 local HALF_ROW_X = 8   -- bar 3's 1.x spot: 8 in from the band's half
 -- Era's stance row (UIParentManageFramePositions): 7 over the bar under it, or 56 up with XP, its backing on the band's top.
 local SMALL_GAP, SMALL_ROW_Y = 7, 56
@@ -24,7 +23,7 @@ local LayoutSideBars, LayoutPageArrows = B.LayoutSideBars, B.LayoutPageArrows
 local RestoreSelections, PlacePageArrows = B.RestoreSelections, B.PlacePageArrows
 local Remember, BaseSetters = B.Remember, ns.BaseSetters
 local LayoutBags, MicroButtonList, MicroPlan, LayoutMicroButtons = B.LayoutBags, B.MicroButtonList, B.MicroPlan, B.LayoutMicroButtons
-local HasVisibleBar, LayoutStatusBars, SetDividers, RecolorExpBars = B.HasVisibleBar, B.LayoutStatusBars, B.SetDividers, B.RecolorExpBars
+local RowsLift, LayoutStatusBars, SetDividers, RecolorExpBars = B.RowsLift, B.LayoutStatusBars, B.SetDividers, B.RecolorExpBars
 local SystemMoved, Snapshot, StartWatch, SetLane = B.SystemMoved, B.Snapshot, B.StartWatch, B.SetLane
 
 -- Whether the bags were off the bar at the last pass; nil before the first.
@@ -204,10 +203,9 @@ local function Layout()
     LayoutPageArrows(bar)
 
     local lower, upper = MultiBarBottomLeft, MultiBarBottomRight
-    -- A faction bar over XP lifts everything over the band by 9, as 1.x did; only while both stand on the band.
-    local twoBars = HasVisibleBar(MainStatusTrackingBarContainer) and HasVisibleBar(SecondaryStatusTrackingBarContainer)
-        and not SystemMoved(MainStatusTrackingBarContainer) and not SystemMoved(SecondaryStatusTrackingBarContainer)
-    local barLift = twoBars and TWO_BAR_LIFT or 0
+    -- Everything over the band rises over a faction bar and drops to the thin strip with none (B.RowsLift).
+    local barLift = RowsLift()
+    B.rowsLaid = barLift
     -- 1.x spots are band px; a row larger than the band pushes the next out by its growth, as the client stacks by
     -- real sizes. Band size comes from the setting like the rows', so equal compares equal.
     local band = BandScale(bar)

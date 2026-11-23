@@ -384,6 +384,19 @@ function B.OnBand(frame)
     return not stacked[frame] and not B.SystemMoved(frame)
 end
 
+-- The rows over the band: 9 up for a faction bar over XP (1.x); with no bar on the band (max level), 5 down to the thin
+-- strip, as Era's (UIParentManageFramePositions: 5 for a shown holder at its spot, edit mode's empty one too).
+local TWO_BAR_LIFT, STRIP_DROP = 9, 5
+local function Standing(container)
+    return container ~= nil and not B.SystemMoved(container) and container:IsShown() and not StatusHidden(container)
+end
+function B.RowsLift()
+    local main, second = MainStatusTrackingBarContainer, SecondaryStatusTrackingBarContainer
+    if Standing(main) and Standing(second) and HasVisibleBar(main) and HasVisibleBar(second) then return TWO_BAR_LIFT end
+    if StackPlan(main, second) or not (Standing(main) or Standing(second)) then return -STRIP_DROP end
+    return 0
+end
+
 local function IsHolder(frame)
     return frame ~= nil and (frame == MainStatusTrackingBarContainer or frame == SecondaryStatusTrackingBarContainer)
 end
@@ -536,8 +549,8 @@ function B.BarsTick()
     if state ~= watch.state then
         watch.state = state
         pcall(LayoutStatusBars)
-        -- The rows over the band rise and fall with the second bar.
-        if two ~= watch.two then
+        -- The rows over the band rise and fall with the bars (B.RowsLift, against the last laid); a stack re-lays them too.
+        if two ~= watch.two or B.RowsLift() ~= B.rowsLaid then
             watch.two = two
             ns.QueueApply()
         end
