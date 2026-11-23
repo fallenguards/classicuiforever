@@ -260,13 +260,38 @@ end
 -- and go beside a backpack that stays where it is (edit mode's own anchor is kept for the hand-back).
 local END_CORNER = { cw = "BOTTOMLEFT", ccw = "TOPLEFT", mirror = "BOTTOMLEFT" }
 local function Near(a, b) return type(a) == "number" and math.abs(a - b) < 0.5 end
+
+-- Bags moved before the update (ns.KeepBagsSpot) are drawn the old way while edit mode's record of their spot in the
+-- active layout is the one first seen after it: a drop or an arrow nudge changes the record, a revert brings it back.
+local function KeptOldSpot()
+    local kept = ns.db.bagsOldSpot
+    if type(kept) ~= "table" then return false end
+    local layout = ns.ActiveLayoutInfo()
+    local want = Enum and Enum.EditModeSystem and Enum.EditModeSystem.Bags
+    local info
+    for _, sys in ipairs(type(layout) == "table" and type(layout.systems) == "table" and layout.systems or {}) do
+        if sys.system == want then info = sys.anchorInfo end
+    end
+    -- Layouts not loaded yet: drawn as before the update, nothing recorded.
+    if type(info) ~= "table" then return true end
+    local character = Enum.EditModeLayoutType and layout.layoutType == Enum.EditModeLayoutType.Character
+    local key = (character and UnitGUID("player") or "account") .. ":" .. tostring(layout.layoutName)
+    local spot = string.format("%s %s %s %.1f %.1f", tostring(info.point), tostring(info.relativeTo),
+        tostring(info.relativePoint), tonumber(info.offsetX) or 0, tonumber(info.offsetY) or 0)
+    if kept[key] == nil then kept[key] = spot end
+    if kept[key] == spot then return true end
+    -- Moved, and edit mode shut on the new spot (saved): the fix for this layout for good.
+    if kept[key] ~= false and not ns.EditMode.Live() then kept[key] = false end
+    return false
+end
+
 local function HoldBackpackEnd(piece, grow, boxW, boxH, fullW, fullH)
     if piece.isDragging then return end
     local w, h = piece:GetSize()
     if Near(w, boxW) and Near(h, boxH) then return end
     -- Edit mode keeps the spot at the unfolded row's size and lays the piece again at the game's own, larger: back to
     -- ours around its anchor first, or the game's size held by its corner put the bags 21 right and 6 down.
-    if not ns.db.bagsOldSpot then
+    if not KeptOldSpot() then
         if not (Near(w, fullW) and Near(h, fullH)) then piece:SetSize(fullW, fullH) end
         if Near(fullW, boxW) and Near(fullH, boxH) then return end
     end
@@ -278,9 +303,9 @@ local function HoldBackpackEnd(piece, grow, boxW, boxH, fullW, fullH)
     ns.SetPointIf(piece, corner, UIParent, "BOTTOMLEFT", x, y)
 end
 
--- dbVersion 38: bags already moved stay where the player sees them (the old hold above) until next picked up.
+-- dbVersion 38: bags already moved stay where the player sees them (the old hold above) until moved in edit mode.
 function ns.KeepBagsSpot()
-    ns.db.bagsOldSpot = true
+    ns.db.bagsOldSpot = {}
     ns.db.dbVersion = 38
 end
 

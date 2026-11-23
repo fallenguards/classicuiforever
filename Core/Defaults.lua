@@ -40,7 +40,7 @@ ns.DB_DEFAULTS = {
     -- Band snaps are our own record (a snap writes nothing to the layout), plus the snapped bag scale.
     bagsHeld = false,
     bagsSnapScale = 0,
-    -- Moved bags drawn where they stood before the fix that keeps them where left, until next picked up.
+    -- Updating players: per edit mode layout, the bags' spot first seen after the update (drawn as before while kept).
     bagsOldSpot = false,
     barScale = 1,
     buttons = true,

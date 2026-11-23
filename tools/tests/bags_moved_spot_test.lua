@@ -47,9 +47,12 @@ local function Piece(point, x, y, w, h)
 end
 
 local B = { Remember = function() end }
-local ns = { db = { bagsOldSpot = false },
+local layout, live = nil, false
+local ns = { db = { bagsOldSpot = false }, ActiveLayoutInfo = function() return layout end,
+    EditMode = { Live = function() return live end },
     SetPointIf = function(f, point, rel, relPoint, x, y) f:SetPoint(point, rel, relPoint, x, y) end }
-local env = setmetatable({ B = B, ns = ns, UIParent = UIParent }, { __index = _G })
+local env = setmetatable({ B = B, ns = ns, UIParent = UIParent, UnitGUID = function() return "Player-1" end,
+    Enum = { EditModeSystem = { Bags = 9 }, EditModeLayoutType = { Account = 0, Character = 1 } } }, { __index = _G })
 local Hold = assert(load(Cut("/Bar/BandBags.lua", "local END_CORNER = ", "-- One bar: on the micro group box")
     .. "\nreturn HoldBackpackEnd", "hold backpack end", "t", env))()
 local LEFT = { turn = nil }
@@ -85,27 +88,46 @@ end
 piece.w, piece.h = 205, 39
 Check(math.abs(piece:GetLeft() - 1212) < 0.5 and math.abs(piece:GetBottom() - 366) < 0.5, "three closes: still where left")
 
--- Bags moved before the update (dbVersion 38 marks them): drawn where the player has been seeing them, the old way,
--- at every close and load, so the update moves nobody's bags.
+-- Bags moved before the update (dbVersion 38): drawn where the player has been seeing them, the old way, while edit
+-- mode's record of their spot in the active layout is the one first seen after the update. A drop or an arrow nudge
+-- changes the record (a quick one too: the earlier pickup watch missed one, 2026-11-23); a revert brings it back.
 assert(load(Cut("/Bar/BandBags.lua", "function ns.KeepBagsSpot()", "-- One bar: on the micro group box"), "keep spot", "t", env))()
 ns.KeepBagsSpot()
-Check(ns.db.bagsOldSpot == true and ns.db.dbVersion == 38, "the update step marks the bags moved before it")
-for _ = 1, 3 do
-    piece = Piece("TOP", 1314.5, 405, 247, 45)
-    Hold(piece, LEFT, 205, 39, 205, 39)
-    piece:SetSize(205, 39)
+Check(type(ns.db.bagsOldSpot) == "table" and ns.db.dbVersion == 38, "the update step marks the bags moved before it")
+local Old = function()
+    local p = Piece("TOP", 1314.5, 405, 247, 45)
+    Hold(p, LEFT, 205, 39, 205, 39)
+    p:SetSize(205, 39)
+    return math.abs(p:GetLeft() - 1233) < 0.5 and math.abs(p:GetBottom() - 360) < 0.5
 end
-Check(math.abs(piece:GetLeft() - 1233) < 0.5 and math.abs(piece:GetBottom() - 360) < 0.5,
-    string.format("marked: the spot the player saw before the update (1233, 360) (now %.1f, %.1f)", piece:GetLeft(), piece:GetBottom()))
-
--- Picked up in edit mode (Bar/BandWatch.lua clears the mark): from that drop on, where left.
-local watch = Cut("/Bar/BandWatch.lua", "        B.bagsInHand = true\n", "    end\n")
-Check(watch:find("ns.db.bagsOldSpot = false", 1, true) ~= nil, "a pickup of the bags clears the mark")
+Check(Old(), "layouts not loaded yet: drawn as before the update")
+Check(next(ns.db.bagsOldSpot) == nil, "and nothing recorded until they are")
+local saved = { point = "TOP", relativeTo = "UIParent", relativePoint = "TOP", offsetX = 556, offsetY = -449 }
+layout = { layoutName = "Mine", layoutType = 0, systems = { { system = 9, anchorInfo = saved } } }
+for _ = 1, 3 do Check(Old(), "the spot first seen after the update: drawn as before, at every close and load") end
+-- A drop (or a nudge) in edit mode rewrites the record: the fix from there, in edit mode too.
+live = true
+saved.offsetX = 600
+Check(not Old(), "moved in edit mode: the bags stand where dropped")
+-- Exit without saving: the record goes back, and so does the old view.
+saved.offsetX = 556
+live = false
+Check(Old(), "a revert: drawn as before again")
+-- Moved and saved: edit mode shut on the new spot, the fix for this layout for good.
+live = true
+saved.offsetX = 600
+Check(not Old(), "moved again")
+live = false
+Check(not Old(), "saved and shut: where left")
+saved.offsetX = 556
+Check(not Old(), "and for good, even back on the old spot")
+-- Another layout first seen now keeps its own old view.
+layout = { layoutName = "Other", layoutType = 0, systems = { { system = 9, anchorInfo = { point = "TOPLEFT",
+    relativeTo = "UIParent", relativePoint = "TOPLEFT", offsetX = 1312, offsetY = -769 } } } }
+Check(Old(), "another layout: its own spot kept as before")
+-- A player who never had the update step: the fix from the start.
 ns.db.bagsOldSpot = false
-piece = Piece("TOP", 1314.5, 405, 247, 45)
-Hold(piece, LEFT, 205, 39, 205, 39)
-piece:SetSize(205, 39)
-Check(math.abs(piece:GetLeft() - 1212) < 0.5 and math.abs(piece:GetBottom() - 366) < 0.5, "cleared: where left")
+Check(not Old(), "never marked: where left")
 
 if failed > 0 then
     print(failed .. " check(s) failed")
