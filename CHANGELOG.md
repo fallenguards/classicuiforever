@@ -2,6 +2,17 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.64.1] - 2026-11-23
+
+### Changed
+- The Legacy window's Challenges list nests its sections as the game's own window does, each class under Classes. Its search matches any word a challenge shows: its sections, name, description and steps, so searching a section's name keeps the whole section.
+- Side tabs that other addons add to the group finder, like LFG Forever's, now take the classic look and size of ours and line up under them.
+
+### Fixed
+- At max level, with no experience or reputation bar showing, bars 2 and 3 and the stance and pet bars sit down on the thin bar where experience was, as on Era, with no gap. Hide this bar on the experience bar does the same.
+- In the map's quest list, a quest title under the mouse turns white as in Era's quest log. A gray quest used to turn green.
+- The classic map's Map Options box no longer shows a red reset button on its corner. Era's dropdown has none; set the filters back in its menu.
+
 ## [0.64.0] - 2026-11-22
 
 ### Added

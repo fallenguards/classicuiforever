@@ -3,6 +3,12 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN97_1_TITLE"] = "Plus d'espace au niveau maximum"
+L["WN97_1_TEXT"] = "Au niveau maximum, sans barre d'expérience ni de réputation, les barres au-dessus de la barre principale reposent maintenant sur la fine barre où se trouvait l'expérience, comme dans Era."
+L["WN97_2_TITLE"] = "Défis d'Héritage"
+L["WN97_2_TEXT"] = "La liste des Défis range ses sections comme la fenêtre du jeu, et sa recherche trouve tout mot qu'un défi affiche, de ses sections à ses étapes."
+L["WN97_3_TITLE"] = "Onglets latéraux d'autres addons"
+L["WN97_3_TEXT"] = "Les onglets latéraux que d'autres addons ajoutent à la recherche de groupe, comme celui de LFG Forever, ressemblent maintenant aux nôtres et s'alignent dessous."
 L["WN96_1_TITLE"] = "Jets de butin d'Era"
 L["WN96_1_TEXT"] = "/loot ouvre la fenêtre des jets de butin d'Era : chaque objet avec son gagnant et son jet, et + sur un objet affiche tous les jets. Faites glisser l'onglet du dessous pour la hauteur, ou son coin pour les deux sens."
 L["WN96_2_TITLE"] = "Apparaître hors ligne"

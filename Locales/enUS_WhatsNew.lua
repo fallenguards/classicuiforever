@@ -2,6 +2,12 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN97_1_TITLE"] = "No gap at max level"
+L["WN97_1_TEXT"] = "At max level, with no experience or reputation bar showing, the bars above the main bar now sit down on the thin bar where experience was, as on Era."
+L["WN97_2_TITLE"] = "Legacy challenges"
+L["WN97_2_TEXT"] = "The Challenges list nests its sections as the game's own window does, and its search finds any word a challenge shows, from its sections to its steps."
+L["WN97_3_TITLE"] = "Other addons' side tabs"
+L["WN97_3_TEXT"] = "Side tabs that other addons add to the group finder, like LFG Forever's, now look like ours and line up under them."
 L["WN96_1_TITLE"] = "Era's Loot Rolls"
 L["WN96_1_TEXT"] = "/loot opens Era's Loot Rolls window: every drop with its winner and roll, and + on a drop lists everyone's rolls. Drag the tab under it for the height, or its corner for both ways."
 L["WN96_2_TITLE"] = "Appear Offline"

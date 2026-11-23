@@ -3,6 +3,12 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN97_1_TITLE"] = "Sin hueco al nivel máximo"
+L["WN97_1_TEXT"] = "Al nivel máximo, sin barra de experiencia ni de reputación, las barras sobre la barra principal ahora se apoyan en la barra fina donde estaba la experiencia, como en Era."
+L["WN97_2_TITLE"] = "Desafíos de Legado"
+L["WN97_2_TEXT"] = "La lista de Desafíos anida sus secciones como la ventana del juego, y su búsqueda encuentra cualquier palabra que muestre un desafío, desde sus secciones hasta sus pasos."
+L["WN97_3_TITLE"] = "Pestañas laterales de otros addons"
+L["WN97_3_TEXT"] = "Las pestañas laterales que otros addons añaden al buscador de grupos, como la de LFG Forever, ahora se ven como las nuestras y se colocan debajo de ellas."
 L["WN96_1_TITLE"] = "Tiradas de botín de Era"
 L["WN96_1_TEXT"] = "/loot abre la ventana de tiradas de botín de Era: cada objeto con su ganador y su tirada, y + en un objeto muestra todas las tiradas. Arrastra la pestaña de debajo para la altura, o su esquina para ambos sentidos."
 L["WN96_2_TITLE"] = "Aparecer desconectado"

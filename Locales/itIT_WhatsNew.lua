@@ -3,6 +3,12 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN97_1_TITLE"] = "Nessuno spazio al livello massimo"
+L["WN97_1_TEXT"] = "Al livello massimo, senza barra dell'esperienza o della reputazione, le barre sopra la barra principale ora poggiano sulla barra sottile dove c'era l'esperienza, come in Era."
+L["WN97_2_TITLE"] = "Sfide dell'Eredità"
+L["WN97_2_TEXT"] = "L'elenco delle Sfide annida le sue sezioni come la finestra del gioco, e la ricerca trova qualsiasi parola mostrata da una sfida, dalle sezioni ai passaggi."
+L["WN97_3_TITLE"] = "Schede laterali di altri addon"
+L["WN97_3_TEXT"] = "Le schede laterali che altri addon aggiungono alla ricerca gruppo, come quella di LFG Forever, ora hanno l'aspetto delle nostre e si allineano sotto di esse."
 L["WN96_1_TITLE"] = "Tiri del bottino di Era"
 L["WN96_1_TEXT"] = "/loot apre la finestra dei tiri del bottino di Era: ogni oggetto con vincitore e tiro, e + su un oggetto mostra tutti i tiri. Trascina la linguetta sotto per l'altezza, o il suo angolo per entrambi i sensi."
 L["WN96_2_TITLE"] = "Apparire offline"

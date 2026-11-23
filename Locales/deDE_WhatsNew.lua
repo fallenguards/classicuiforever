@@ -3,6 +3,12 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN97_1_TITLE"] = "Keine Lücke auf Höchststufe"
+L["WN97_1_TEXT"] = "Auf Höchststufe, ohne Erfahrungs- oder Rufleiste, sitzen die Leisten über der Hauptleiste jetzt auf der schmalen Leiste, wo die Erfahrung war, wie in Era."
+L["WN97_2_TITLE"] = "Vermächtnisherausforderungen"
+L["WN97_2_TEXT"] = "Die Liste der Herausforderungen ordnet ihre Abschnitte jetzt wie das Fenster des Spiels, und die Suche findet jedes Wort, das eine Herausforderung zeigt, von ihren Abschnitten bis zu ihren Schritten."
+L["WN97_3_TITLE"] = "Seitenreiter anderer Addons"
+L["WN97_3_TEXT"] = "Seitenreiter, die andere Addons der Gruppensuche hinzufügen, etwa der von LFG Forever, sehen jetzt wie unsere aus und reihen sich darunter ein."
 L["WN96_1_TITLE"] = "Beutewürfe wie in Era"
 L["WN96_1_TEXT"] = "/loot öffnet das Fenster für Beutewürfe aus Era: jeder Gegenstand mit Gewinner und Wurf, und + bei einem Gegenstand zeigt alle Würfe. Der Reiter darunter ändert die Höhe, die Ecke die Größe in beide Richtungen."
 L["WN96_2_TITLE"] = "Offline erscheinen"
