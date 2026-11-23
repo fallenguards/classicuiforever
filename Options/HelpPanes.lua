@@ -138,6 +138,11 @@ local FAQ = {
         function() return Page("GROUP_QUESTS"), Before(L["OPT_questTracker"]) end },
     { "FAQ_PLATES_Q", "FAQ_PLATES_A", needs = { "namePlates" },
         function() return G("NAMEPLATE_OPTIONS_LABEL"), L["OPTWIN_NAME_TEXT_SIZE"], Page("GROUP_NAMEPLATES") end },
+    -- Friends' plates in dungeons are locked to addons; Forever's Options alone has a setting for their class colors.
+    { "FAQ_LOCKEDPLATES_Q", "FAQ_LOCKEDPLATES_A", on = "forever", needs = { "namePlates" }, function()
+        return G("UNIT_NAMEPLATES_CLASS_COLOR_FRIENDLY"), G("UNIT_NAMEPLATES_CLASS_COLOR"), G("NAMEPLATE_OPTIONS_LABEL")
+    end },
+    { "FAQ_LOCKEDPLATES_Q", "FAQ_LOCKEDPLATES_RETAIL_A", on = "retail", needs = { "namePlates" } },
     { "FAQ_OTHER_ADDON_Q", "FAQ_OTHER_ADDON_A" },
 }
 

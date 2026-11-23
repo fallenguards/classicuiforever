@@ -61,6 +61,10 @@ The addon also loads on retail, for the pieces retail has.
 - `/fcui textures builtin|bundled` reads the art from the game client or from the copies in `media/`.
 - `/fcui reset` puts every setting back to its default.
 
+## Known limitations
+
+- **Friendly players' nameplates in dungeons and raids.** The game locks them there, so no addon can change them: they keep the game's own look and color. On Forever, the game's own setting can still give them class colors: Options > Nameplates > Nameplate Class Color > Friendly Players.
+
 ## Feedback
 
 Bug reports and ideas are always welcome.
