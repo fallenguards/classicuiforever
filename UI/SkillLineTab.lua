@@ -144,9 +144,10 @@ local function GiveBack(tab)
     ns.PutPoints(tab, was.points)
 end
 
--- AdoptSideTabs(window, under, own), from the window's own pass while it shows. under: our last shown tab, or nil to give
--- the others back; own(frame): true for the game's own tabs there, left alone. Children are read again on a count change.
-function ns.AdoptSideTabs(window, under, own)
+-- AdoptSideTabs(window, under, own, first), from the window's own pass while it shows. under: our last shown tab; first:
+-- { frame, x, y } on a window with none of ours, the first at x, y off frame's top right; neither gives the others back.
+-- own(frame): true for the game's own tabs there, left alone. Children are read again on a count change.
+function ns.AdoptSideTabs(window, under, own, first)
     local state = held[window]
     if not state then
         state = { count = -1, list = {} }
@@ -164,12 +165,16 @@ function ns.AdoptSideTabs(window, under, own)
     end
     local prev = under
     for _, tab in ipairs(state.list) do
-        if not under then
+        if not (under or first) then
             GiveBack(tab)
         else
             if not adopted[tab] then Adopt(tab) end
             if tab:IsShown() then
-                ns.SetPointIf(tab, "TOPLEFT", prev, "BOTTOMLEFT", 0, GAP)
+                if prev then
+                    ns.SetPointIf(tab, "TOPLEFT", prev, "BOTTOMLEFT", 0, GAP)
+                else
+                    ns.SetPointIf(tab, "TOPLEFT", first[1], "TOPRIGHT", first[2], first[3])
+                end
                 ns.SetSizeIf(tab, SIZE, SIZE)
                 FitIcon(tab)
                 Mirror(tab)

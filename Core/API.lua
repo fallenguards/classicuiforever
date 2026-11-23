@@ -253,3 +253,68 @@ function API.Windows()
     end
     return list
 end
+
+-- Our own companion addons (ClassicUI Forever: LFG Forever) dress another addon's window with our pieces: fn(kit), kit
+-- a table of our look and window calls under stable names. kit.version rises only when a call changes in a way that
+-- breaks callers.
+local kit
+local function Kit()
+    if kit then return kit end
+    local S = ns.social
+    kit = {
+        version = 1,
+        IsOn = function(name) return API.IsOn(name) end,
+        OnToggle = function(fn) ns.OnToggle(fn) end,
+        -- Art by our keys, following the theme; tiled floors; the dark shade our panes wear.
+        SetTex = function(tex, key, ...) return ns.SetTex(tex, key, ...) end,
+        TileTex = function(tex, key, how, shade) return ns.TileTex(tex, key, how, shade) end,
+        PANE_SHADE = ns.PANE_SHADE,
+        -- Old skins on the client's controls.
+        SkinRedButton = function(button) ns.SkinRedButton(button) end,
+        SkinCheckbox = function(check) ns.SkinCheckbox(check) end,
+        SkinDropdown = function(dropdown) ns.SkinDropdown(dropdown) end,
+        EraDropdownArt = function(dropdown, arrowX, arrowY, labelRight)
+            return ns.EraDropdownArt(dropdown, arrowX, arrowY, labelRight)
+        end,
+        SkinScrollBarsUnder = function(frame, depth) ns.SkinScrollBarsUnder(frame, depth) end,
+        -- One thin client bar in the old knob and arrows; column: our track column behind it too.
+        SkinScrollBar = function(bar, column)
+            ns.SkinMinimalScrollBar(bar)
+            if column then ns.ScrollTrackArt(bar) end
+        end,
+        SkinCloseButton = function(button) ns.SkinCloseButton(button, true) end,
+        SkinTopTab = function(tab, padding, widest, level) ns.SkinTopTab(tab, padding, widest, level) end,
+        ClassicScrollBar = function(parent, anchorTo, onValue) return ns.ClassicScrollBar(parent, anchorTo, onValue) end,
+        -- Side tabs: another addon's game side tabs as ours (AdoptSideTabs(window, under, own, first)).
+        AdoptSideTabs = function(window, under, own, first) ns.AdoptSideTabs(window, under, own, first) end,
+        -- Our window row: register(frame, Era's pushable), open and close, room for side tabs past the art.
+        RegisterWindow = function(frame, pushable) ns.RegisterClassicWindow(frame, pushable) end,
+        ShowPanel = function(frame) return ns.ShowPanel(frame) end,
+        HidePanel = function(frame) return ns.HidePanel(frame) end,
+        SetSlotWidth = function(frame, width) ns.SetSlotWidth(frame, width) end,
+        SIDE_TAB_SLOT = ns.SIDE_TAB_SLOT,
+        -- The group finder: its pages turned by the client's own tabs over another window's (S.LendFinderTabs).
+        LendFinderTabs = function(window, hosts, onLit) S.LendFinderTabs(window, hosts, onLit) end,
+        -- Our finder tabs by page (1 Create Listing, 2 Group Browser, 3 Who): { icon, text } each.
+        FinderTabs = function() return S.FinderTabEntries() end,
+        FinderWhoOwn = function() return S.FinderWhoOwn() end,
+        FinderWhoHidden = function() return ns.db ~= nil and ns.db.hideFinderWho == true end,
+        WarmGroupFinder = function() if ns.WarmGroupFinder then ns.WarmGroupFinder() end end,
+        OpenWhoList = function() return ns.OpenWhoList() end,
+        SayNotInCombat = function() ns.SayNotInCombat() end,
+        -- Era's eye: frame n of its sheet on tex; its frame count and beat.
+        EraEyeFrame = function(tex, n, first) ns.EraEyeFrame(tex, n, first) end,
+        ERA_EYE_FRAMES = ns.ERA_EYE_FRAMES,
+        ERA_EYE_TIME = ns.ERA_EYE_TIME,
+        -- The scheduler: a watch while host shows, a show or hide heard, once next frame.
+        Attach = function(host, spec) return ns.Sched.Attach(host, spec) end,
+        OnVisible = function(host, name, fn) ns.Sched.OnVisible(host, name, fn) end,
+        NextFrame = function(key, fn) ns.Sched.NextFrame(key, fn) end,
+        NewFrame = function(kind, name, parent, template) return ns.NewFrame(kind, name, parent, template) end,
+    }
+    return kit
+end
+
+function ForeverClassicUI_AttachSkin(fn)
+    fn(Kit())
+end

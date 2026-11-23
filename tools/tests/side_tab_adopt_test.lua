@@ -387,6 +387,24 @@ finder.selectedTab = 2
 S.AdoptFinderOthers(finder)
 Check(select(2, lfg:GetPoint(1)) == two and Near(lfg:GetWidth(), 32), "the next page: taken again")
 
+-- A window with none of ours (LFG Forever's own): its tabs from the first spot down, in order, a hidden one skipped.
+local lone = CreateFrame("Frame", "LoneWindow", nil)
+local anchor = CreateFrame("Frame", nil, lone)
+local mine = {}
+for i = 1, 3 do
+    mine[i] = CreateFrame("Frame", nil, lone, "LargeSideTabButtonTemplate")
+    mine[i]:SetPoint("TOPLEFT", lone, "TOPRIGHT", 0, -60 * i)
+end
+mine[2]:Hide()
+ns.AdoptSideTabs(lone, nil, nil, { anchor, -3, -58 })
+local fp, frel, frp, fx, fy = mine[1]:GetPoint(1)
+Check(fp == "TOPLEFT" and frel == anchor and frp == "TOPRIGHT" and Near(fx, -3) and Near(fy, -58)
+    and Near(mine[1]:GetWidth(), 32), "first spot: the first tab at the given spot, at our 32")
+Check(select(2, mine[3]:GetPoint(1)) == mine[1] and Near(select(5, mine[3]:GetPoint(1)), -17),
+    "first spot: the next shown tab 17 under it, the hidden one skipped")
+ns.AdoptSideTabs(lone, nil, nil, nil)
+Check(select(2, mine[1]:GetPoint(1)) == lone, "neither under nor first: the tabs go back to their own spots")
+
 -- The finder's pass calls it on both of its paths.
 local handle = assert(io.open(ROOT .. "/Social/GroupFinder.lua", "r"))
 local fit = handle:read("a")

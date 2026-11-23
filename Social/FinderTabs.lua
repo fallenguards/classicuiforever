@@ -23,6 +23,9 @@ local function Entries()
     }
 end
 
+-- Our tabs' icons and tooltips for another window's finder tabs, by page (3: Who).
+function S.FinderTabEntries() return Entries() end
+
 -- ns.NewSideTab lives in SpellBook.lua, which loads later: looked up per call. The first tab hangs off anchor.
 local function NewFinderTab(parent, i, prev, entry, anchor)
     local side = ns.NewSideTab(parent, i, prev)
@@ -51,6 +54,19 @@ local finderTabs = {}
 
 -- index -> our tab the client's lies over, and whether ours is lit for it; the client tab's own parent and point.
 local lent, lit, home = {}, {}, {}
+-- Another addon's window with finder side tabs of its own (LFG Forever's): { window, hosts = { [index] = tab }, lit }.
+local outer = {}
+local outerHost = setmetatable({}, { __mode = "k" })
+
+-- A host's hover mark: ours lock their highlight, another addon's tab says it through its window's lit(tab, on).
+local function Light(host, on)
+    local paint = outerHost[host]
+    if paint then
+        if paint.lit then paint.lit(host, on) end
+    elseif host.LockHighlight then
+        if on then host:LockHighlight() else host:UnlockHighlight() end
+    end
+end
 
 local function Catcher(index)
     local finder = _G["LFGParentFrame"]
@@ -62,7 +78,7 @@ local function Lend(index, host)
     local catcher = Catcher(index)
     if not catcher or lent[index] == host then return end
     if not home[index] then home[index] = { parent = catcher:GetParent(), point = { catcher:GetPoint(1) } } end
-    if lent[index] and lit[index] then lent[index]:UnlockHighlight() end
+    if lent[index] and lit[index] then Light(lent[index], false) end
     lent[index], lit[index] = host, false
     catcher:SetParent(host)
     catcher:ClearAllPoints()
@@ -76,7 +92,7 @@ end
 local function GiveBack(index, finder)
     local catcher, mine = Catcher(index), lent[index]
     if not catcher or not mine then return end
-    if lit[index] then mine:UnlockHighlight() end
+    if lit[index] then Light(mine, false) end
     lent[index], lit[index] = nil, false
     local was = home[index]
     catcher:SetParent(was and was.parent or finder)
@@ -95,6 +111,15 @@ end
 
 local RunCatchers
 local onFinder = false
+
+-- The other window's tab for this page while that window shows and the finder is shut.
+local function OuterHost(index, up)
+    if up then return nil end
+    for _, o in ipairs(outer) do
+        local host = o.hosts[index]
+        if host and o.window:IsVisible() and host:IsVisible() then return host end
+    end
+end
 
 -- The finder's micro button, hovered while the finder is shut on another page (the Who list after a /who): the first
 -- page's tab lies over it, so the press turns the page in the client's name and the finder opens there.
@@ -128,12 +153,12 @@ local function SyncCatchers()
             if S.FinderWhoOwn() then
                 local social = S.whoTab
                 local onSocial = social and social:IsVisible() and (not up or social:IsMouseOver())
-                host = onSocial and social or finderTabs[index]
+                host = onSocial and social or OuterHost(index, up) or finderTabs[index]
             end
         else
             local who = whoTabs[index]
             local onWho = who and who:IsVisible() and (not up or who:IsMouseOver())
-            host = onWho and who or finderTabs[index]
+            host = onWho and who or OuterHost(index, up) or finderTabs[index]
             if index == 1 and micro then host = micro end
         end
         if own then host = nil end
@@ -143,7 +168,7 @@ local function SyncCatchers()
             local over = catcher:IsVisible() and catcher:IsMouseOver() and true or false
             if over ~= lit[index] then
                 lit[index] = over
-                if over then mine:LockHighlight() else mine:UnlockHighlight() end
+                Light(mine, over)
             end
         end
     end
@@ -169,6 +194,9 @@ local function OpenOnPage()
         return
     end
     if FriendsFrame and FriendsFrame:IsShown() then ns.HidePanel(FriendsFrame) end
+    for _, o in ipairs(outer) do
+        if o.window:IsShown() then o.window:Hide() end
+    end
 end
 
 -- Nothing else runs the catchers while no finder or Who tab shows: the hover does.
@@ -190,7 +218,7 @@ local function WatchClicks()
         if button ~= "LeftButton" then return end
         for index = 1, #CATCH_KEYS do
             local host, catcher = lent[index], Catcher(index)
-            local opens = host and (host.onWho or host == _G["LFDMicroButton"] or host == S.whoTab)
+            local opens = host and (host.onWho or host == _G["LFDMicroButton"] or host == S.whoTab or outerHost[host])
             if opens and catcher and catcher:IsVisible() and catcher:IsMouseOver() then
                 -- Next frame: the client's own mouse-up turns the page first.
                 pending = index
@@ -283,6 +311,22 @@ function S.BuildWhoFinderTabs(host, panel)
             S.SyncWhoFinderTabs()
         end, TOGGLE_TIP)
     S.SyncWhoFinderTabs()
+end
+
+---------------------------------------------------------------- another addon's window
+
+-- LendFinderTabs(window, hosts, lit): while window shows with the finder shut, the client's tab for page i lies over
+-- hosts[i] (3: only with our who list off), so a click turns the page in the client's name; the finder then opens in
+-- its place and window hides. lit(host, on): the hover mark, as the client's tab takes the mouse.
+function S.LendFinderTabs(window, hosts, onLit)
+    for _, o in ipairs(outer) do
+        if o.window == window then return end
+    end
+    local entry = { window = window, hosts = hosts, lit = onLit }
+    outer[#outer + 1] = entry
+    for _, host in pairs(hosts) do outerHost[host] = entry end
+    RunCatchers(window, "finder.outerCatchers")
+    WatchClicks()
 end
 
 ---------------------------------------------------------------- on the finder
