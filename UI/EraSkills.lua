@@ -11,6 +11,8 @@ local ROWS = 12
 local ROW_PITCH = 18
 local MINUS, PLUS = "Interface\\Buttons\\UI-MinusButton-Up", "Interface\\Buttons\\UI-PlusButton-Up"
 local LABEL_HILITE = "Interface\\Buttons\\UI-PlusButton-Hilight"
+-- A fold button's icon and word in from its left; a section under another sits a step further in.
+local ICON_X, TEXT_X, SUB_INDENT = 3, 25, 12
 local CANCEL = "Interface\\Buttons\\CancelButton-"
 -- Era's scroll arrows and knob as its scroll bar template crops them.
 local ARROW_COORDS = { 0.2, 0.8, 0.25, 0.75 }
@@ -185,15 +187,26 @@ local function Label(parent)
     label:SetSize(285, 14)
     label.icon = label:CreateTexture(nil, "ARTWORK")
     label.icon:SetSize(16, 16)
-    label.icon:SetPoint("LEFT", label, "LEFT", 3, 0)
-    local glow = label:CreateTexture(nil, "HIGHLIGHT")
-    glow:SetTexture(LABEL_HILITE)
-    glow:SetBlendMode("ADD")
-    glow:SetSize(16, 16)
-    glow:SetPoint("LEFT", label, "LEFT", 3, 0)
+    label.icon:SetPoint("LEFT", label, "LEFT", ICON_X, 0)
+    label.glow = label:CreateTexture(nil, "HIGHLIGHT")
+    label.glow:SetTexture(LABEL_HILITE)
+    label.glow:SetBlendMode("ADD")
+    label.glow:SetSize(16, 16)
+    label.glow:SetPoint("LEFT", label, "LEFT", ICON_X, 0)
     label.text = label:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-    label.text:SetPoint("LEFT", label, "LEFT", 25, 0)
+    label.text:SetPoint("LEFT", label, "LEFT", TEXT_X, 0)
+    label.depth = 0
     return label
+end
+
+-- A section line's depth: 0 at the list's edge, 1 under another section (the challenges' classes under Classes).
+local function Indent(label, depth)
+    if label.depth == depth then return end
+    label.depth = depth
+    local x = depth * SUB_INDENT
+    ns.SetPointOnce(label.icon, "LEFT", label, "LEFT", ICON_X + x, 0)
+    ns.SetPointOnce(label.glow, "LEFT", label, "LEFT", ICON_X + x, 0)
+    ns.SetPointOnce(label.text, "LEFT", label, "LEFT", TEXT_X + x, 0)
 end
 
 -- The All tab over the list's top left: the quest log's sort tab round a fold button and its word.
@@ -328,7 +341,7 @@ local function Detail(page, owner)
     page.detail = detail
 end
 
--- page:Draw(): page.lines, each { header = true, name, expanded } or a bar line { name, rank, most, modifier, selected }.
+-- page:Draw(): page.lines, each { header = true, name, expanded, depth } or a bar line { name, rank, most, modifier, selected }.
 local function Draw(page)
     local offset = math.floor((page.scroll:GetValue() or 0) + 0.5)
     local allOpen = true
@@ -346,6 +359,7 @@ local function Draw(page)
             label.line = line
             label.text:SetText(line.name or "")
             label.icon:SetTexture(line.expanded and MINUS or PLUS)
+            Indent(label, line.depth or 0)
             label:Show()
         elseif line then
             bar.line = line

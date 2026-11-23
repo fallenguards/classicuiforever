@@ -2,8 +2,8 @@ local _, ns = ...
 local L = ns.L
 
 -- The Legacy window's challenges page as Era's Skills tab (UI/EraSkills.lua): the challenge categories as its folding
--- sections, each challenge a skill bar of its progress, the picked one in the detail pane with its points and steps;
--- a search line and a filter beside the All tab. Read from the client's achievement data, which holds the challenges.
+-- sections, nested as the game's own window nests them, each challenge a skill bar of its progress, the picked one in
+-- the detail pane; a search line and a filter beside the All tab. Read from the client's achievement data.
 
 local LG = ns.legacy
 
@@ -12,11 +12,16 @@ local POINTS_CURRENCY = LG.POINTS_CURRENCY
 local SEARCH_X, SEARCH_Y, SEARCH_W = 142, -50, 110
 local FILTER_X, FILTER_Y, FILTER_W = 258, -47, 82
 local STEP_DONE, STEP_OPEN = "|cff1aff1a", "|cff808080"
+-- Sections under sections, as deep as read: the client's run two (Classes over each class).
+local MAX_DEPTH = 4
 
 local page
 local lines, collapsed = {}, {}
+-- Every section header with a challenge left, shown or folded away under another (the All tab folds them all).
+local sections = {}
 local selected
 local query = ""
+local words = {}
 local show = { completed = true, incomplete = true }
 
 -- Legacy Points a challenge gives; nil when the client cannot say.
@@ -45,17 +50,22 @@ local function Progress(id, completed)
     return done, count
 end
 
-local function Wanted(name, completed)
+-- Each word of the search in the challenge's name or in its sections' (path): "dungeons" keeps all of Dungeons.
+local function Wanted(name, completed, path)
     if completed and not show.completed then return false end
     if not completed and not show.incomplete then return false end
-    return query == "" or name:lower():find(query, 1, true) ~= nil
+    local low = name:lower()
+    for _, word in ipairs(words) do
+        if not (low:find(word, 1, true) or path:find(word, 1, true)) then return false end
+    end
+    return true
 end
 
-local function ReadCategory(category)
+local function ReadCategory(category, path)
     local items = {}
     for index = 1, GetCategoryNumAchievements(category) or 0 do
         local id, name, _, completed, month, day, year, description, _, icon = GetAchievementInfo(category, index)
-        if id and Wanted(name or "", completed) then
+        if id and Wanted(name or "", completed, path) then
             local value, most = Progress(id, completed)
             items[#items + 1] = { id = id, name = name or "", completed = completed and true or false,
                 description = description, icon = icon, month = month, day = day, year = year, points = PointsFor(id),
@@ -65,22 +75,60 @@ local function ReadCategory(category)
     return items
 end
 
--- Era's list: a section per category, its challenges under it unless folded; the first shown is picked by default.
+-- The client's categories as a tree by their parents, in its order, as the game's own window builds it.
+local function Tree()
+    local nodes, roots = {}, {}
+    local function Node(category, depth)
+        local node = nodes[category]
+        if node then return node end
+        local name, parent = GetCategoryInfo(category)
+        node = { id = category, name = name or "", low = (name or ""):lower(), kids = {} }
+        nodes[category] = node
+        local up = depth < MAX_DEPTH and type(parent) == "number" and parent ~= -1 and Node(parent, depth + 1)
+        if up then up.kids[#up.kids + 1] = node else roots[#roots + 1] = node end
+        return node
+    end
+    for _, category in ipairs(GetCategoryList and GetCategoryList() or ns.EMPTY) do Node(category, 0) end
+    return roots
+end
+
+-- A section's challenges left by the search and filter; true when it or one under it keeps any.
+local function Gather(node, path, depth)
+    path = path .. "\n" .. node.low
+    node.items = ReadCategory(node.id, path)
+    node.any = #node.items > 0
+    for _, kid in ipairs(depth < MAX_DEPTH and node.kids or ns.EMPTY) do
+        if Gather(kid, path, depth + 1) then node.any = true end
+    end
+    return node.any
+end
+
+-- Era's list: a section, its challenges, then the sections under it, all hidden while it is folded.
+local function Emit(node, depth, shown)
+    if not node.any or depth > MAX_DEPTH then return end
+    local header = { header = true, id = node.id, name = node.name, depth = depth, expanded = not collapsed[node.id] }
+    sections[#sections + 1] = header
+    if shown then lines[#lines + 1] = header end
+    local open = shown and header.expanded
+    if open then
+        for _, item in ipairs(node.items) do lines[#lines + 1] = item end
+    end
+    for _, kid in ipairs(node.kids) do Emit(kid, depth + 1, open) end
+end
+
+-- The first challenge shown is picked by default.
 local function Collect()
     wipe(lines)
+    wipe(sections)
+    for _, root in ipairs(Tree()) do
+        Gather(root, "", 0)
+        Emit(root, 0, true)
+    end
     local first, still
-    for _, category in ipairs(GetCategoryList and GetCategoryList() or ns.EMPTY) do
-        local items = ReadCategory(category)
-        if #items > 0 then
-            lines[#lines + 1] = { header = true, id = category, name = GetCategoryInfo(category) or "",
-                expanded = not collapsed[category] }
-            if not collapsed[category] then
-                for _, item in ipairs(items) do
-                    lines[#lines + 1] = item
-                    first = first or item.id
-                    if item.id == selected then still = true end
-                end
-            end
+    for _, line in ipairs(lines) do
+        if not line.header then
+            first = first or line.id
+            if line.id == selected then still = true end
         end
     end
     if not still then selected = first end
@@ -123,7 +171,7 @@ end
 local function Refresh()
     if not page then return end
     Collect()
-    page.lines = lines
+    page.lines, page.sections = lines, sections
     page:Draw()
     page:DrawDetail(Detail())
     LG.DrawEarned(page)
@@ -144,6 +192,8 @@ local function SearchBox()
         self.clear:SetShown(text ~= "")
         if text == query then return end
         query = text
+        wipe(words)
+        for word in text:gmatch("%S+") do words[#words + 1] = word end
         page.scroll:SetValue(0)
         LG.Refresh()
     end)

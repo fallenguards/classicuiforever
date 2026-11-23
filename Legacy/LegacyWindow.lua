@@ -32,7 +32,8 @@ local function FoldAll(page, collapsed)
     for _, line in ipairs(page.lines) do
         if line.header and line.expanded then fold = true end
     end
-    for _, line in ipairs(page.lines) do
+    -- page.sections: every section, those folded away under another too.
+    for _, line in ipairs(page.sections or page.lines) do
         if line.header then collapsed[line.id] = fold or nil end
     end
     LG.Refresh()
