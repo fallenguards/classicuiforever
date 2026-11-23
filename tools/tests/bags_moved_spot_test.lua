@@ -47,7 +47,8 @@ local function Piece(point, x, y, w, h)
 end
 
 local B = { Remember = function() end }
-local ns = { SetPointIf = function(f, point, rel, relPoint, x, y) f:SetPoint(point, rel, relPoint, x, y) end }
+local ns = { db = { bagsOldSpot = false },
+    SetPointIf = function(f, point, rel, relPoint, x, y) f:SetPoint(point, rel, relPoint, x, y) end }
 local env = setmetatable({ B = B, ns = ns, UIParent = UIParent }, { __index = _G })
 local Hold = assert(load(Cut("/Bar/BandBags.lua", "local END_CORNER = ", "-- One bar: on the micro group box")
     .. "\nreturn HoldBackpackEnd", "hold backpack end", "t", env))()
@@ -83,6 +84,28 @@ for _ = 1, 3 do
 end
 piece.w, piece.h = 205, 39
 Check(math.abs(piece:GetLeft() - 1212) < 0.5 and math.abs(piece:GetBottom() - 366) < 0.5, "three closes: still where left")
+
+-- Bags moved before the update (dbVersion 38 marks them): drawn where the player has been seeing them, the old way,
+-- at every close and load, so the update moves nobody's bags.
+assert(load(Cut("/Bar/BandBags.lua", "function ns.KeepBagsSpot()", "-- One bar: on the micro group box"), "keep spot", "t", env))()
+ns.KeepBagsSpot()
+Check(ns.db.bagsOldSpot == true and ns.db.dbVersion == 38, "the update step marks the bags moved before it")
+for _ = 1, 3 do
+    piece = Piece("TOP", 1314.5, 405, 247, 45)
+    Hold(piece, LEFT, 205, 39, 205, 39)
+    piece:SetSize(205, 39)
+end
+Check(math.abs(piece:GetLeft() - 1233) < 0.5 and math.abs(piece:GetBottom() - 360) < 0.5,
+    string.format("marked: the spot the player saw before the update (1233, 360) (now %.1f, %.1f)", piece:GetLeft(), piece:GetBottom()))
+
+-- Picked up in edit mode (Bar/BandWatch.lua clears the mark): from that drop on, where left.
+local watch = Cut("/Bar/BandWatch.lua", "        B.bagsInHand = true\n", "    end\n")
+Check(watch:find("ns.db.bagsOldSpot = false", 1, true) ~= nil, "a pickup of the bags clears the mark")
+ns.db.bagsOldSpot = false
+piece = Piece("TOP", 1314.5, 405, 247, 45)
+Hold(piece, LEFT, 205, 39, 205, 39)
+piece:SetSize(205, 39)
+Check(math.abs(piece:GetLeft() - 1212) < 0.5 and math.abs(piece:GetBottom() - 366) < 0.5, "cleared: where left")
 
 if failed > 0 then
     print(failed .. " check(s) failed")

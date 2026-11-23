@@ -2,7 +2,7 @@ local _, ns = ...
 local L = ns.L
 
 ns.DB_DEFAULTS = {
-    dbVersion = 37,
+    dbVersion = 38,
     classicBar = true,
     oneBar = false,
     classicBarSize = false,
@@ -40,6 +40,8 @@ ns.DB_DEFAULTS = {
     -- Band snaps are our own record (a snap writes nothing to the layout), plus the snapped bag scale.
     bagsHeld = false,
     bagsSnapScale = 0,
+    -- Moved bags drawn where they stood before the fix that keeps them where left, until next picked up.
+    bagsOldSpot = false,
     barScale = 1,
     buttons = true,
     squareIcons = true,

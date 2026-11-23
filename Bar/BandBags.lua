@@ -266,14 +266,22 @@ local function HoldBackpackEnd(piece, grow, boxW, boxH, fullW, fullH)
     if Near(w, boxW) and Near(h, boxH) then return end
     -- Edit mode keeps the spot at the unfolded row's size and lays the piece again at the game's own, larger: back to
     -- ours around its anchor first, or the game's size held by its corner put the bags 21 right and 6 down.
-    if not (Near(w, fullW) and Near(h, fullH)) then piece:SetSize(fullW, fullH) end
-    if Near(fullW, boxW) and Near(fullH, boxH) then return end
+    if not ns.db.bagsOldSpot then
+        if not (Near(w, fullW) and Near(h, fullH)) then piece:SetSize(fullW, fullH) end
+        if Near(fullW, boxW) and Near(fullH, boxH) then return end
+    end
     local corner = END_CORNER[grow.turn or ""] or "BOTTOMRIGHT"
     local x = corner == "BOTTOMRIGHT" and piece:GetRight() or piece:GetLeft()
     local y = corner == "TOPLEFT" and piece:GetTop() or piece:GetBottom()
     if not (x and y) then return end
     B.Remember(piece, true)
     ns.SetPointIf(piece, corner, UIParent, "BOTTOMLEFT", x, y)
+end
+
+-- dbVersion 38: bags already moved stay where the player sees them (the old hold above) until next picked up.
+function ns.KeepBagsSpot()
+    ns.db.bagsOldSpot = true
+    ns.db.dbVersion = 38
 end
 
 -- One bar: on the micro group box while it stands in the corner (flush with no bag art, 6 up with it), else on the floor.

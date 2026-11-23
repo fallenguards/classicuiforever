@@ -620,7 +620,11 @@ end
 -- The bags are dragged by the client's own box; the same preview runs while it is held.
 local function PreviewBags()
     local bagsPiece = BagsBar
-    if bagsPiece and bagsPiece.isDragging then B.bagsInHand = true end
+    if bagsPiece and bagsPiece.isDragging then
+        B.bagsInHand = true
+        -- Picked up: the spot kept from before the fix gives way for good (Bar/BandBags.lua HoldBackpackEnd).
+        ns.db.bagsOldSpot = false
+    end
     if bagsPiece and bagsPiece.isDragging and not OneBar() then
         B.PreviewDrop("bags", bagsPiece)
     elseif B.dragPreview.bags ~= nil then

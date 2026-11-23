@@ -374,4 +374,5 @@ return {
     questColorsNote = "same for everyone: on by default, a chat line only while the game's quest colors are off (Forever); nothing else on screen",
     raidManagerHover = "same for everyone: opt-in, off by default",
     questAutoTrack = "same for everyone: read from the game's own setting (autoQuestWatch) on every pass, never decided by us",
+    bagsOldSpot = "kept as before: dbVersion 38 (ns.KeepBagsSpot) marks an updating player, whose moved bags stay drawn where they were seen until next picked up; new players never have it",
 }
