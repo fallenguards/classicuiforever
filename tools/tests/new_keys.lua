@@ -90,6 +90,7 @@ return {
     oneBagSplitBag = "same for everyone: opt-in, off by default",
     oneBagKeyring = "same for everyone: opt-in, off by default",
     oneBagBagSlots = "same for everyone: opt-in, off by default",
+    oneBagPlainSlots = "same for everyone: opt-in, off by default; unchecked, the one bag's empty slots show their bag's faded icon as the game's combined bag does (#334)",
     focusBuffsOnTop = "same for everyone: opt-in, off by default",
     petBuffsOnTop = "same for everyone: opt-in, off by default",
     totemOrientation = "same for everyone: the game's own totem bar layout until changed under its edit mode dialog",

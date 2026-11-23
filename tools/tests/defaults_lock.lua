@@ -322,6 +322,7 @@ return {
     oneBagBagSlots = false,
     oneBagColumns = 8,
     oneBagKeyring = false,
+    oneBagPlainSlots = false,
     oneBagSplitBag = false,
     oneBagSplitNone = true,
     oneBagSplitType = false,

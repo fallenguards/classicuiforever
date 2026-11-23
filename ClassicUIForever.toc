@@ -230,6 +230,7 @@ Map\WorldMapCombined.lua
 Map\WorldMapMarkers.lua
 Windows\BagBand.lua
 Windows\BagGamepad.lua
+Windows\BagEmptySlots.lua
 Windows\Bags.lua
 Windows\BagHeader.lua
 Windows\BagReagent.lua

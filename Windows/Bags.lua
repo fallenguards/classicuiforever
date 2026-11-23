@@ -291,12 +291,6 @@ local function TokenRow(frame)
     if row and row:GetParent() == frame and row:IsShown() then return row end
 end
 
--- Forever 70790 lays the bag's own icon over the combined bag's empty slots on each update (EmptyBagIcon): hidden, never faded.
-local function EmptyLook(button)
-    if button.icon then button.icon:SetAlpha(button.hasItem and 1 or 0) end
-    if button.EmptyBagIcon and button.EmptyBagIcon:IsShown() then button.EmptyBagIcon:Hide() end
-end
-
 -- A slot's marks, each off by its option (quest border, quality border, a vendor's junk coin); the game only shows them.
 local function Mark(region, off)
     if region then ns.SetAlphaIf(region, off and 0 or 1) end
@@ -307,6 +301,9 @@ function ns.QuestItemLook(button)
     Mark(button.IconBorder, db.hideItemQuality == true)
     Mark(button.JunkIcon, db.hideJunkCoin == true)
 end
+
+-- The empty slot's look, the bag's icon or plain (Windows/BagEmptySlots.lua).
+local EmptyLook = ns.BagEmptyLook
 
 local function SlotArt(button)
     ns.QuestItemLook(button)
@@ -758,7 +755,7 @@ end
 -- The options pass waits out a fight; these may change in one, so open bags turn at once.
 local RESKIN = { hideLockedSlots = true, reagentBagCombined = true, reagentBagTint = true, reagentSlotsFirst = true,
     reagentSlotsLast = true, oneBagSplitNone = true, oneBagSplitType = true, oneBagSplitBag = true, oneBagKeyring = true,
-    oneBagBagSlots = true }
+    oneBagBagSlots = true, oneBagPlainSlots = true }
 local MARKS = { plainQuestItems = true, hideItemQuality = true, hideJunkCoin = true }
 ns.OnToggle(function(key)
     if (not MARKS[key] and not RESKIN[key]) or not active then return end

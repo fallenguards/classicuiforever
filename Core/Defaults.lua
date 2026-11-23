@@ -155,6 +155,7 @@ ns.DB_DEFAULTS = {
     reagentSlotsFirst = true,
     reagentSlotsLast = false,
     oneBagSplitNone = true, oneBagSplitType = false, oneBagSplitBag = false, oneBagKeyring = false, oneBagBagSlots = false,
+    oneBagPlainSlots = false,
     hideKeyText = false,
     keyTextSize = 12,
     -- Each bar's Faded Opacity (Bar/BarFade.lua), 100: no fade.
