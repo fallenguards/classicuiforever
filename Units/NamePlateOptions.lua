@@ -66,10 +66,25 @@ function NP.UnpinFill(health)
     pin.tex = nil
 end
 
--- Class colour, or nothing while the class is secret (dungeons).
+-- The game's class color for a class it hides (dungeons, battlegrounds: every enemy player's plate in Arathi Basin,
+-- /fcuidev platecc bg, 2026-11-23). Its color call takes the hidden class from addon code and hands back hidden
+-- values only a texture's color call reads (both AllowedWhenTainted); ours never reads them.
+local function HiddenClassRGB(class)
+    local classColor = _G.C_ClassColor
+    local getColor = classColor and classColor.GetClassColor
+    if not getColor then return end
+    local ok, r, g, b = pcall(function()
+        local color = getColor(class)
+        return color.r, color.g, color.b
+    end)
+    if ok then return r, g, b end
+end
+
+-- Class color, hidden values while the class is secret, or nothing.
 local function ClassRGB(unit)
     local _, class = UnitClass(unit)
-    if not class or IsSecret(class) then return end
+    if IsSecret(class) then return HiddenClassRGB(class) end
+    if not class then return end
     local color = RAID_CLASS_COLORS and RAID_CLASS_COLORS[class]
     if color then return color.r, color.g, color.b end
 end
@@ -111,7 +126,7 @@ local function WantedColor(unit, isPlayer)
         if ns.GetCVarBool(ENEMY_CLASS_CVAR) then
             r, g, b = ClassRGB(unit)
         end
-        if r then return r, g, b end
+        if IsSecret(r) or r then return r, g, b end
         return 1, 0, 0
     end
     -- 1.x selection colour: blue, green when PvP flagged (like a flagged friendly guard).
@@ -128,6 +143,8 @@ function NP.ClassColor(unitFrame, isPlayer)
     local unit = unitFrame.unit or (unitFrame.displayedUnit)
     local r, g, b
     if unit then r, g, b = WantedColor(unit, isPlayer) end
+    -- A hidden class color (secret values) paints like any other; it is never compared or tested.
+    if IsSecret(r) then return Paint(health, r, g, b) end
     if r == KEEP then return end
     if r then Paint(health, r, g, b) else NP.Unpaint(health) end
 end
