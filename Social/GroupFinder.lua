@@ -544,6 +544,7 @@ local function Fit()
     end
     if S.FinderOnOwnWho() then
         StandDown(parent)
+        S.AdoptFinderOthers(parent)
         return
     end
     ns.SetShownIf(Origin(), true)
@@ -561,6 +562,7 @@ local function Fit()
     -- Lent over our Who tab while our who list is off (Social/FinderTabs.lua).
     if not S.FinderWhoOwn() then ns.FadeKeys(parent, CLIENT_TABS, 0, QUIET) end
     S.SyncFinderSideTabs(parent)
+    S.AdoptFinderOthers(parent)
     FitCategories()
     DressRows(_G["LFGBrowseFrame"])
 end

@@ -107,16 +107,7 @@ local function OnPane(manager)
         and p2 == "BOTTOMRIGHT" and r2 == pane and rp2 == "TOPLEFT" and Near(x2, INNER_W, 1) and Near(y2, INNER_BOTTOM, 1)
 end
 
-local function PointsOf(region)
-    local points = {}
-    for i = 1, region:GetNumPoints() do points[i] = { region:GetPoint(i) } end
-    return points
-end
-
-local function PutPoints(region, points)
-    region:ClearAllPoints()
-    for _, p in ipairs(points) do region:SetPoint(unpack(p)) end
-end
+local PointsOf, PutPoints = ns.PointsOf, ns.PutPoints
 
 ------------------------------------------------------------ the set list
 

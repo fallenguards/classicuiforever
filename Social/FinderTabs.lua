@@ -321,6 +321,25 @@ function S.SyncFinderSideTabs(parent)
     end
 end
 
+local function IsCatcher(frame)
+    for index = 1, #CATCH_KEYS do
+        if Catcher(index) == frame then return true end
+    end
+    return false
+end
+
+-- Other addons' side tabs on the finder (LFG Forever's, #335) under our last shown one; theirs again on its own Who page.
+function S.AdoptFinderOthers(parent)
+    if not ns.AdoptSideTabs then return end
+    local last
+    if not S.FinderOnOwnWho() then
+        for _, side in ipairs(finderTabs) do
+            if side:IsShown() then last = side end
+        end
+    end
+    ns.AdoptSideTabs(parent, last, IsCatcher)
+end
+
 -- In a fight too: only a widget's shown state (the client's tab over it hides with it).
 ns.OnToggle(function(key)
     if key ~= "hideFinderWho" then return end

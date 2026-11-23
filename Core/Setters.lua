@@ -273,6 +273,18 @@ function ns.SetPointOnce(region, ...)
     setPoint(region, ...)
 end
 
+-- A region's points, to put back whole with ns.PutPoints.
+function ns.PointsOf(region)
+    local points = {}
+    for i = 1, region:GetNumPoints() do points[i] = { region:GetPoint(i) } end
+    return points
+end
+
+function ns.PutPoints(region, points)
+    region:ClearAllPoints()
+    for _, p in ipairs(points) do region:SetPoint(p[1], p[2], p[3], p[4], p[5]) end
+end
+
 -- Created once per frame and key, kept in frame.fcui for re-applies.
 local function Own(frame, key, create, a, b)
     frame.fcui = frame.fcui or {}
