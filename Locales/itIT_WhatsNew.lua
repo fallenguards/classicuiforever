@@ -5,6 +5,8 @@ local L = ns.L
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
 L["WN99_1_TITLE"] = "Condividere missioni"
 L["WN99_1_TEXT"] = "La condivisione delle missioni dal registro delle missioni funziona di nuovo con il tuo gruppo."
+L["WN99_2_TITLE"] = "Menu a tendina delle Opzioni"
+L["WN99_2_TEXT"] = "I menu a tendina delle Opzioni del gioco non mostrano più un pulsante allungato al loro interno con un tema personalizzato con trama."
 L["WN98_1_TITLE"] = "Icone delle borse sugli spazi vuoti"
 L["WN98_1_TEXT"] = "In Una borsa, ogni spazio vuoto mostra ora un'icona sbiadita della borsa a cui appartiene, così gli spazi di una faretra si notano subito. Attivala nelle opzioni (/fcui): Una borsa, sotto Borse. Spazi vuoti semplici, subito sotto, li rende di nuovo tutti uguali."
 L["WN98_2_TITLE"] = "Colori di classe nei campi di battaglia"

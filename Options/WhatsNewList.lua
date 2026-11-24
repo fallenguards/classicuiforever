@@ -7,6 +7,7 @@ local L = ns.L
 ns.WHATSNEW = {
     { id = 99, version = "0.65.1",
         { L["WN99_1_TITLE"], L["WN99_1_TEXT"] },
+        { L["WN99_2_TITLE"], L["WN99_2_TEXT"] },
     },
     { id = 98, version = "0.65.0",
         { L["WN98_1_TITLE"], L["WN98_1_TEXT"] },

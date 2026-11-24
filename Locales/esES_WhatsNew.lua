@@ -5,6 +5,8 @@ local L = ns.L
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
 L["WN99_1_TITLE"] = "Compartir misiones"
 L["WN99_1_TEXT"] = "Compartir misiones desde el registro de misiones vuelve a funcionar con tu grupo."
+L["WN99_2_TITLE"] = "Menús desplegables de Opciones"
+L["WN99_2_TEXT"] = "Los menús desplegables de las Opciones del juego ya no muestran un botón estirado dentro con un tema personalizado texturizado."
 L["WN98_1_TITLE"] = "Iconos de bolsa en ranuras vacías"
 L["WN98_1_TEXT"] = "En Una bolsa, cada ranura vacía muestra ahora un icono atenuado de la bolsa a la que pertenece, así las ranuras de un carcaj se ven al instante. Actívala en las opciones (/fcui): Una bolsa, en Bolsas. Ranuras vacías lisas, justo debajo, las vuelve a dejar todas iguales."
 L["WN98_2_TITLE"] = "Colores de clase en campos de batalla"

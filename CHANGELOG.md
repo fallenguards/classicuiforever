@@ -6,6 +6,7 @@ All notable changes to ClassicUI Forever are documented here.
 
 ### Fixed
 - Share Quest in the quest log shares your quest with your group again.
+- With a custom theme and Textured color, the drop downs in the game's Options no longer show a stretched button inside them.
 
 ## [0.65.0] - 2026-11-24
 
