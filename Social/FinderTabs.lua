@@ -394,10 +394,9 @@ end
 -- Other addons' side tabs on the finder (LFG Forever's, #335) under our last shown one; theirs again on its own Who page.
 ---------------------------------------------------------------- the window another addon's finder tab opens
 
--- Another addon's side tab on the finder opens that addon's own window in the finder's place, one at a time. It stood
--- where its addon kept it, so the switch jumped (2026-11-24): the two share one spot, which a drag of either moves.
--- Found as the one window that came up with the tab's press, never by a name; that name is kept for the next session.
--- finderFresh: the finder comes up next with the shared spot, after a mover put it on its own saved one.
+-- Another addon's finder tab opens its own window in the finder's place: the two share one spot, a drag of either moves
+-- it (its own spot made the switch jump). Found as the window that came up with the press, never by name; finderFresh:
+-- the finder's next show goes on the shared spot, after a mover put it on its own.
 local partner, finderSpot, shownAtPress
 local finderFresh, sessionRead = false, false
 
@@ -443,7 +442,7 @@ local function TakePartner(frame)
     partner = frame
     ns.db.finderPartner = frame:GetName()
     frame:HookScript("OnShow", OnFinderSpot)
-    hooksecurefunc(frame, "StopMovingOrSizing", PartnerDropped)
+    ns.HookMethod(frame, "StopMovingOrSizing", PartnerDropped)
 end
 
 -- A locked game window among them (the communities add dialog) errors on any question from our code: passed over.
