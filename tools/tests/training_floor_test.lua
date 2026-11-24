@@ -97,6 +97,13 @@ Check(floor and floor.path == "media\\marbleBg", "the floor is the spellbook pag
 Check(floor and floor.layer == "BACKGROUND" and floor.sublevel > 2,
     "the floor is drawn over the page's quarters and their theme layers (sublevel " .. tostring(floor and floor.sublevel) .. ")")
 
+-- The spellbook's own What's Training page: the same floor (ns.TrainingMarble), over its page art's layers too.
+local book = Any()
+rawset(book, "CreateTexture", rawget(holder, "CreateTexture"))
+local bookFloor = ns.TrainingMarble(book)
+Check(bookFloor and bookFloor.path == "media\\marbleBg" and bookFloor.sublevel > 2,
+    "the spellbook's page wears the same marble over its art's layers (sublevel " .. tostring(bookFloor and bookFloor.sublevel) .. ")")
+
 if failed > 0 then
     print(failed .. " check(s) failed")
     os.exit(1)

@@ -19,10 +19,12 @@ local TRAINING_MARBLE_LEFT = 19
 local TRAINING_MARBLE_TOP = -35
 local TRAINING_MARBLE_RIGHT = -41
 local TRAINING_MARBLE_BOTTOM = 82
+-- Over the page art's Textured color layers (one and two over its sublevel 0), whose parchment drew over the marble.
+local TRAINING_MARBLE_SUBLEVEL = 4
 -- The ring's corner lies on the marble: the ring alone and the icon in its hole drawn again over it.
 local RING_PIECES = {
-    { key = "sbIcon", layer = "BACKGROUND", sublevel = 2, w = 58, h = 58, point = "TOPLEFT", x = 10, y = -8 },
-    { key = "sbRing", layer = "BACKGROUND", sublevel = 3, w = 96, h = 96, point = "TOPLEFT" },
+    { key = "sbIcon", layer = "BACKGROUND", sublevel = 5, w = 58, h = 58, point = "TOPLEFT", x = 10, y = -8 },
+    { key = "sbRing", layer = "BACKGROUND", sublevel = 6, w = 96, h = 96, point = "TOPLEFT" },
 }
 
 local list, pieces
@@ -31,7 +33,7 @@ local function HideRegion(region) region:Hide() end
 
 -- The marble on a frame wearing the spellbook's art (the book; the professions book's frame, Skills/ProfessionsTraining.lua).
 function ns.TrainingMarble(frame, right, bottom)
-    local marble = ns.MarbleFloor(frame, 1)
+    local marble = ns.MarbleFloor(frame, TRAINING_MARBLE_SUBLEVEL)
     ns.SetTwoPointsIf(marble, "TOPLEFT", frame, "TOPLEFT", TRAINING_MARBLE_LEFT, TRAINING_MARBLE_TOP,
         "BOTTOMRIGHT", frame, "BOTTOMRIGHT", right or TRAINING_MARBLE_RIGHT, bottom or TRAINING_MARBLE_BOTTOM)
     return marble

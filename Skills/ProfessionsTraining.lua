@@ -58,7 +58,6 @@ end
 
 -- The spellbook's What's Training marble on the face's own art frame (the spellbook's on the book, Era's trade skill
 -- window on a profession), over the page's theme layers (their seams drew lines through it), under its border and header.
-local FLOOR_SUBLEVEL = 5
 local floors = {}
 -- The double pane's frame runs past its art holder: the floor's right and bottom from the holder's, to that frame's rim.
 local DUAL_FLOOR_RIGHT, DUAL_FLOOR_BOTTOM = 290, 81
@@ -73,7 +72,6 @@ local function Floor()
         else
             floor = ns.TrainingMarble(holder)
         end
-        floor:SetDrawLayer("BACKGROUND", FLOOR_SUBLEVEL)
         floor:Hide()
         floors[holder] = floor
     end
