@@ -20,7 +20,9 @@ import check  # noqa: E402
 
 REPO = "https://github.com/Gethe/wow-ui-source.git"
 BRANCHES = (("forever", "Forever"), ("live", "retail"))
-CACHE = os.path.join(ROOT, "dev", "client-xml")
+# Outside the addon: the game walks every file under its AddOns folder each time the UI loads, and the live
+# worktree is linked there (3,377 cached files, 2026-11-24).
+CACHE = os.path.join(os.path.expanduser("~"), ".cache", "cuif-client-xml")
 LIST = os.path.join(HERE, "client_templates.txt")
 TAG_RX = re.compile(r"<\w+\s[^>]*>", re.S)
 NAME_RX = re.compile(r'\bname="([^"$]+)"')
