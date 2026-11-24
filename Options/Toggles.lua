@@ -64,7 +64,9 @@ ns.TOGGLES = {
         hideIf = OursOn("collectionsWindow") },
     { "panelCooldowns", L["OPT_panelCooldowns"], L["OPT_panelCooldowns_TIP"], checks = "panelWindows" },
     { "panelDressUp", L["OPT_panelDressUp"], L["OPT_panelDressUp_TIP"], checks = "panelWindows" },
-    { "panelGroupFinder", L["OPT_panelGroupFinder"], L["OPT_panelGroupFinder_TIP"], checks = "panelWindows" },
+    -- Social's Group finder dresses the whole window while on (Windows/Panels.lua yields to it): this row would do nothing.
+    { "panelGroupFinder", L["OPT_panelGroupFinder"], L["OPT_panelGroupFinder_TIP"], checks = "panelWindows",
+        hideIf = OursOn("groupFinder") },
     { "panelCommunities", L["OPT_panelCommunities"], L["OPT_panelCommunities_TIP"], checks = "panelWindows" },
     { "panelGuildControl", L["OPT_panelGuildControl"], L["OPT_panelGuildControl_TIP"], checks = "panelWindows" },
     { "panelHelp", L["OPT_panelHelp"], L["OPT_panelHelp_TIP"], checks = "panelWindows" },
