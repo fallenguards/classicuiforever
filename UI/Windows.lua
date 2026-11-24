@@ -159,7 +159,7 @@ local function ClientSpan(name, panel)
             end
         end
     end
-    return left, right
+    return left, ns.SideTabsRight and ns.SideTabsRight(panel, right) or right
 end
 
 -- Ours stand round the sheet and talents (in a fight, round whatever stayed up); centre and full-screen ones float.

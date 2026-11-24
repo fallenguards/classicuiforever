@@ -66,6 +66,22 @@ local function LargeSideTab(frame)
     return frame.SetCustomOnMouseUpHandler == mixin.SetCustomOnMouseUpHandler
 end
 
+-- A window's right edge (UIParent units) out to the side tabs off it, shown and not faded (another addon's: LFG
+-- Forever's on the group finder); UI/Windows.lua's row stands ours past them.
+local farRight, screenScale = 0, 1
+local function FarTab(child)
+    if not LargeSideTab(child) or not child:IsVisible() or ns.Safe(child:GetEffectiveAlpha(), 1) <= 0 then return end
+    local edge, scale = ns.Safe(child:GetRight()), ns.Safe(child:GetEffectiveScale())
+    if edge and scale and edge * scale / screenScale > farRight then farRight = edge * scale / screenScale end
+end
+function ns.SideTabsRight(window, right)
+    local screen = ns.Safe(UIParent:GetEffectiveScale())
+    if not screen or screen <= 0 then return right end
+    farRight, screenScale = right, screen
+    ns.EachChild(window, FarTab)
+    return farRight
+end
+
 local function Gather(child, list, own)
     if LargeSideTab(child) and not (own and own(child)) then list[#list + 1] = child end
 end
