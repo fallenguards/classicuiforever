@@ -517,18 +517,54 @@ window:Show()
 window:Fire("OnShow")
 wx, wy = select(4, window:GetPoint(1))
 Check(wx == 500 and wy == 400, "held: its window opens on the finder's spot")
--- A drag of the window ends as it starts, and a drop is not taken as the finder's spot.
+-- No mover's handlers (left to other addons by the setting alone): a drag of the window stays on the finder's spot,
+-- and a drop is not taken as the finder's spot.
 window:StartMoving()
 wx, wy = select(4, window:GetPoint(1))
-Check(wx == 500 and wy == 400, "held: a drag of its window stays on the finder's spot")
+Check(wx == 500 and wy == 400, "held, no mover's handlers: a drag of its window stays on the finder's spot")
 window:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", 900, 700)
 window:StopMovingOrSizing()
-Check(ns.db.finderSpot[1] == 500, "held: a drop of its window does not move the shared spot")
+Check(ns.db.finderSpot[1] == 500, "held, no mover's handlers: a drop does not move the shared spot")
+
+-- A mover's handlers on the finder, as MoveAny's: the press lays its drag box on the finder and starts the drag; the
+-- release ends it and the mover keeps the spot. A drag of the window is handed to them, the window riding the box.
+local box = CreateFrame("Frame", nil, UIParent)
+_G.LFGParentFrameMove = box
+local moverSaved
+finder.MA_OnMouseDown = function(self, sel, btn)
+    box:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self:GetLeft(), self:GetTop())
+    box.dragging = btn == "LeftButton"
+end
+finder.MA_OnMouseUp = function(self)
+    box.dragging = false
+    moverSaved = { box:GetLeft(), box:GetTop() }
+    self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", moverSaved[1], moverSaved[2])
+end
 window:Hide()
 window:Show()
 window:Fire("OnShow")
+window:StartMoving()
+Check(box.dragging and select(2, window:GetPoint(1)) == box, "held: a drag of its window starts the mover's drag, the window on its box")
+-- The cursor carries the box to 650, 300; the release.
+box:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", 650, 300)
+window:StopMovingOrSizing()
 wx, wy = select(4, window:GetPoint(1))
-Check(wx == 500 and wy == 400, "held: it opens on the finder's spot again")
+Check(not box.dragging and moverSaved and moverSaved[1] == 650 and moverSaved[2] == 300,
+    "held: the release ends the mover's drag and the mover keeps the new spot")
+Check(select(2, window:GetPoint(1)) == UIParent and wx == 650 and wy == 300, "held: the window stays where it was dropped")
+Check(ns.db.finderSpot[1] == 650 and ns.db.finderSpot[2] == 300, "held: the shared spot is the drop")
+-- Back to the finder: the mover puts it on its kept spot, the drop; our pass leaves it; the window opens there next.
+window:Hide()
+finder:Show()
+finder:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", moverSaved[1], moverSaved[2])
+S.AdoptFinderOthers(finder)
+Check(finder:GetLeft() == 650 and finder:GetTop() == 300, "held: the finder opens where its window was dropped")
+finder:Hide()
+window:Show()
+window:Fire("OnShow")
+wx, wy = select(4, window:GetPoint(1))
+Check(wx == 650 and wy == 300, "held: and its window opens there again")
+_G.LFGParentFrameMove, finder.MA_OnMouseDown, finder.MA_OnMouseUp = nil, nil, nil
 heldByMover = false
 
 ------------------------------------------------------------------ a /who, then our minimap group finder icon

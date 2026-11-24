@@ -439,15 +439,45 @@ local function FinderHeld()
     return finder ~= nil and ns.MoverHolds(finder) and true or false
 end
 
-local function PartnerDropped()
-    if partner and not FinderHeld() then Keep(Spot(partner)) end
+-- A mover drags a window it holds by its own press handlers on that window, keeping the spot itself. A drag of the
+-- partner is handed to them while one holds the finder: the mover moves and keeps the finder's spot, the partner rides
+-- its drag box (its own drop was forgotten at the switch back).
+local handing, stoppingOwn = false, false
+local function MoverBox(finder)
+    local name = finder:GetName()
+    return name and _G[name .. "Move"]
 end
 
--- While held, a drag of the partner ends as it starts and the partner stays on the finder's spot.
+local function PartnerDropped()
+    if stoppingOwn or not partner then return end
+    if handing then
+        handing = false
+        local finder = _G["LFGParentFrame"]
+        local up = finder and finder.MA_OnMouseUp
+        if type(up) == "function" then pcall(up, finder, finder, "LeftButton") end
+        local box = finder and MoverBox(finder)
+        local spot = type(box) == "table" and Spot(box) or nil
+        Keep(spot)
+        PutOn(partner, spot or finderSpot)
+        return
+    end
+    if not FinderHeld() then Keep(Spot(partner)) end
+end
+
 local function PartnerDragStart()
     if not (partner and FinderHeld()) then return end
+    stoppingOwn = true
     partner:StopMovingOrSizing()
-    OnFinderSpot(partner)
+    stoppingOwn = false
+    local finder = _G["LFGParentFrame"]
+    local down, box = finder.MA_OnMouseDown, MoverBox(finder)
+    -- No such handlers (left to other addons by the setting alone): the partner stays on the finder's spot.
+    if type(down) ~= "function" or type(box) ~= "table" or not pcall(down, finder, finder, "LeftButton") then
+        OnFinderSpot(partner)
+        return
+    end
+    handing = true
+    ns.SetPointOnce(partner, "TOPLEFT", box, "TOPLEFT", 0, 0)
 end
 
 local function TakePartner(frame)
