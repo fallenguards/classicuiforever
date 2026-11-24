@@ -735,6 +735,16 @@ local function Book_OnMouseWheel(_, delta)
     Page_OnClick({ step = delta > 0 and -1 or 1 })
 end
 
+-- The options arrow beside the search box, or at its right end while the search is hidden (it floated mid-page there).
+local OPTIONS_GAP = -9
+function ns.SpellBookOptionsSpot(options, search)
+    if search:IsShown() then
+        ns.SetPointOnce(options, "RIGHT", search, "LEFT", OPTIONS_GAP, 0)
+    else
+        ns.SetPointOnce(options, "RIGHT", search, "RIGHT", 0, 0)
+    end
+end
+
 local function CreateBook()
     local f = CreateFrame("Frame", "ForeverClassicUISpellBook", UIParent)
     f:SetSize(BOOK_W, BOOK_H)
@@ -835,7 +845,9 @@ local function CreateBook()
     -- listeners are never written to. A search shows passives and every rank, as the game's book does.
     local options = ns.NewFrame("DropdownButton", nil, f, "WowStyle1DropdownTemplate")
     options:SetSize(22, 22)
-    options:SetPoint("RIGHT", search, "LEFT", -9, 0)
+    ns.SpellBookOptionsSpot(options, search)
+    search:HookScript("OnShow", function() ns.SpellBookOptionsSpot(options, search) end)
+    search:HookScript("OnHide", function() ns.SpellBookOptionsSpot(options, search) end)
     for _, key in ipairs({ "Background", "Arrow", "Text" }) do
         if options[key] then options[key]:Hide() end
     end
