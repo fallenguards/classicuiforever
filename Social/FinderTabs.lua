@@ -422,7 +422,9 @@ local function TakePartner(frame)
     frame:HookScript("OnShow", OnFinderSpot)
 end
 
+-- A locked game window among them (the communities add dialog) errors on any question from our code: passed over.
 local function NoteShown(child, set)
+    if ns.IsForbidden(child) then return end
     if child:IsShown() then set[child] = true end
 end
 

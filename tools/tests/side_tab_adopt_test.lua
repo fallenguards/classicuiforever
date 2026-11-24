@@ -426,6 +426,10 @@ finder.selectedTab = 2
 finder._left, finder._top = 700, 600
 local window = CreateFrame("Frame", "PartnerWindow", UIParent)
 window:Hide()
+-- A locked game window among UIParent's children (CommunitiesAddDialog): asking it anything errors from our code.
+local locked = CreateFrame("Frame", "LockedDialog", UIParent)
+function locked:IsForbidden() return true end
+function locked:IsShown() error("calling 'IsShown' on bad self (Attempt to access forbidden object)") end
 window:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
 S.AdoptFinderOthers(finder)
 -- The press: its own handler opens its window and shuts the finder on the release.
