@@ -1,6 +1,6 @@
 local _, ns = ...
 
--- Window around the book (ProfessionsBook.lua): size per face (in a fight the book is drawn past a trade skill sized window),
+-- Window around the book (ProfessionsBook.lua): size per face (shut at the book's size, the face a fight opens),
 -- side tabs behind an arrow, the spellbook's foot tabs, book/crafting turns, and the one watcher for book and trade skill.
 
 local T = ns.prof
@@ -240,9 +240,9 @@ local function BackToBook()
     return true
 end
 
--- In a fight the window can't be resized (secure spell buttons), and one written on then can't close till it ends. So a shut
--- window waits at trade skill size and a book opened in a fight is drawn past it: border, title and tabs hang from our shape,
--- which alone is resized, with the chrome's stone copied under the part it adds.
+-- In a fight the window can't be resized (secure spell buttons), and one written on then can't close till it ends. A book
+-- opened in a fight past a smaller window is drawn past it: border, title and tabs hang from our shape, which alone is
+-- resized, with the chrome's stone copied under the part it adds.
 local shape
 -- Windows/WindowChrome.lua's cuts for its backing, streaks and title strip.
 local GROW_CUTS = {
@@ -412,18 +412,16 @@ local function Grow(on)
 end
 
 -- Shut: sized for how it may open in a fight, where it can't be resized.
-local function SizeShut(watcher, tradeOn)
-    if active and tradeOn and GrowReady() then
-        -- The manager keeps the book's size: in a fight others stand past a grown book,
-        -- and a book's extra width off a trade skill till it ends (a gap, never a cover).
-        local width, height = ns.TradeSkillWindowSize()
-        FitWindow(width, height, math.max(width, BookW()), math.max(height, BookH()))
-    elseif watcher.bookWhenShut then
-        if active then FitWindow(BookW(), BookH()) end
+-- Shut, the book's size with ours on: a fight cannot resize it and the book is what opens in one (his pick, 2026-11-24:
+-- at trade skill size the book stood in an empty double pane); a trade skill opened in a fight overhangs till it ends.
+local function SizeShut(_, tradeOn)
+    if active then
+        FitWindow(BookW(), BookH())
     elseif tradeOn then
         FitWindow(ns.TradeSkillWindowSize())
     end
 end
+T.SizeShut = SizeShut
 
 -- The portrait as the page up: the professions icon on the book, the open profession's on its page. Held each pass
 -- of the watch: the client paints its own on its events, which left the last profession's or the book's up a while.
@@ -485,7 +483,7 @@ function ns.OpenProfessionsBook()
     end
     local frame = ProfessionsFrame
     if not frame then return false end
-    -- Book size before it shows: a shut window waits at trade skill size.
+    -- Book size before it shows.
     if active then FitWindow(BookW(), BookH()) end
     BackToBook()
     if not frame:IsShown() then
