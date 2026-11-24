@@ -264,6 +264,7 @@ Skills\ProfessionsBook.lua
 Skills\ProfessionsBookFrame.lua
 Skills\ProfessionsFootTabs.lua
 Skills\ProfessionsTraining.lua
+Skills\ProfessionsSideTabs.lua
 Skills\ProfessionsWindow.lua
 Skills\ProfessionsBookRetail.lua
 Skills\TradeSkillExtras.lua

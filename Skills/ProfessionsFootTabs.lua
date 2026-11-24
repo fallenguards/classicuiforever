@@ -132,19 +132,20 @@ local function CloseTraining()
     CheckSideTabs()
 end
 
--- Under the profession side tabs while they are up (hover or always), else at the column's top, past the face's
--- width (the book's, our trade skill window's, or the game's own page); the list's tab hangs under the face's.
+-- The game's side tabs up (always or on hover; Skills/ProfessionsSideTabs.lua): What's Training's tab under the last
+-- of them and the face tab gone, as they turn to the book and each profession themselves. Hidden: the face tab at the
+-- column's top, past the face's width (the book's, our trade skill window's, or the game's page), the list's under it.
+local function SideTabsUp() return T.TabsMode ~= nil and T.TabsMode() ~= "hidden" end
 local function PlaceSideTabs(frame, page)
     local last
-    if not (ns.db and ns.db.professionTabsHidden == true) then
-        for _, tab in ipairs(frame.rightProfessionTabs or ns.EMPTY) do
-            if tab:IsShown() then last = tab end
-        end
+    if SideTabsUp() then
+        for _, tab in ipairs(T.ShownSideTabs and T.ShownSideTabs() or ns.EMPTY) do last = tab end
     end
     if last then
-        ns.SetPointOnce(faceTab, "TOPLEFT", last, "BOTTOMLEFT", 0, TRAIN_GAP)
+        ns.SetPointOnce(trainTab, "TOPLEFT", last, "BOTTOMLEFT", 0, TRAIN_GAP)
         return
     end
+    ns.SetPointOnce(trainTab, "TOPLEFT", faceTab, "BOTTOMLEFT", 0, TRAIN_GAP)
     local width = T.BookW()
     if CraftFace(frame, page) then
         local ours = ns.TradeSkillActive and ns.TradeSkillActive()
@@ -152,6 +153,12 @@ local function PlaceSideTabs(frame, page)
     end
     ns.SetPointOnce(faceTab, "TOPLEFT", frame, "TOPLEFT", width + TRAIN_X, TRAIN_Y)
 end
+
+-- Ours for the side tabs' pass: the face tab and What's Training's, nil before they are made; the list's state and its
+-- close (a side tab pressed while the list is up turns back to its face).
+function T.TrainingSideTabs() return faceTab, trainTab end
+T.TrainingListUp = TrainingListUp
+T.CloseTraining = CloseTraining
 
 local function TrainingStandsDown(frame, page)
     for _, name in ipairs(TRAINING_TABS) do
@@ -193,7 +200,7 @@ local function TrainingStandsDown(frame, page)
     ns.SetLevelIf(faceTab, level)
     ns.SetLevelIf(trainTab, level)
     local up = page:IsShown() or CraftFace(frame, page)
-    SetShownIf(faceTab, up)
+    SetShownIf(faceTab, up and not SideTabsUp())
     SetShownIf(trainTab, up)
 end
 
