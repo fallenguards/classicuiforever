@@ -582,8 +582,17 @@ function ns.InkChrome(piece, path)
     end
 end
 
+-- A sliced piece keeps its ends and stretches its middle; a layer's mask over its box cannot follow the slices, so it
+-- showed the piece's shape stretched inside it (the Options drop downs, #339): the piece takes the color whole.
+local function Sliced(piece)
+    if not piece.GetTextureSliceMargins then return false end
+    local ok, l, t, r, b = pcall(piece.GetTextureSliceMargins, piece)
+    if not ok or ns.AnySecret(l, t, r, b) then return false end
+    return (l or 0) + (t or 0) + (r or 0) + (b or 0) > 0
+end
+
 local function Inks(piece, copy)
-    return ns.FlatOn(piece) and ns.ChromeArt(copy)
+    return (ns.FlatOn(piece) and ns.ChromeArt(copy)) or Sliced(piece)
 end
 
 local function Shape(piece, layer)
@@ -594,7 +603,7 @@ local function Shape(piece, layer)
     if theme and Inks(piece, layer.copy) then
         Ink(piece, theme, layer.copy)
         -- The sheet one color; what keeps its own look over it (parchment with its row off, a picture), the layer alone.
-        if not over or tinted then return end
+        if not over or tinted or Sliced(piece) then return end
         layer.metal, layer.parched = nil, true
     else
         layer.metal, layer.parched = theme and true or nil, over and true or nil
