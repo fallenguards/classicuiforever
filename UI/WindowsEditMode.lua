@@ -336,6 +336,35 @@ local function Slots(entries)
     return slots, line
 end
 
+-- Why another addon has a window, or nil while it is ours: its box never comes here (#336 offered the row and said
+-- nothing).
+local function HeldBy(entry)
+    local frame = ns.WindowFrame(entry)
+    if not (frame and ns.MoverHolds(frame)) then return nil end
+    return ns.MoverTakes(frame) and L["UI_WINDOW_HELD_MOVER"] or L["UI_WINDOW_HELD_LEFT"]
+end
+
+-- A row's tip: why it is grayed while held, else the entry's own tip.
+local function RowTip(entry)
+    local base = entry.tipSpec
+    local baseLine = base and base.lines and base.lines[1] and base.lines[1][1]
+    return { r = 1, g = 1, b = 1,
+        text = function(self)
+            if HeldBy(self.entry) then return Label(self.entry) end
+            return base and base.text or nil
+        end,
+        lines = { { function(self) return HeldBy(self.entry) or baseLine end, nil, nil, nil, true } } }
+end
+
+-- Grayed and unticked while another addon holds its window.
+local function SyncHeld(check, picked)
+    local held = HeldBy(check.entry) ~= nil
+    check:SetEnabled(not held)
+    check:SetChecked(not held and picked[check.entry.key] == true)
+    local shade = held and 0.5 or 1
+    check.label:SetTextColor(shade, shade, shade)
+end
+
 -- top: in the window's units; the row hangs in the list's scrolling content.
 local function ModeCheck(list, entry, slot, top)
     local col, row, wide = slot[1], slot[2], slot[3]
@@ -354,7 +383,7 @@ local function ModeCheck(list, entry, slot, top)
     end
     label:SetText(Label(entry))
     check.label = label
-    if entry.tipSpec then ns.AttachTip(check, entry.tipSpec) end
+    ns.AttachTip(check, RowTip(entry))
     check.entry = entry
     check:SetScript("OnClick", function(self)
         local on = self:GetChecked() and true or false
@@ -478,7 +507,8 @@ local function Mode()
         Save()
         local picked = Picked()
         for _, check in ipairs(self.checks) do
-            check:SetChecked(picked[check.entry.key] == true)
+            -- A mover takes a window the first time it shows: read each time this opens.
+            SyncHeld(check, picked)
             -- The windows sharing a row change with their restyles' boxes.
             check.label:SetText(Label(check.entry))
         end

@@ -5,6 +5,8 @@ local L = ns.L
 -- UI/WindowHandles.lua
 L["OPT_leaveGameWindows"] = "Leave game windows to other addons"
 L["OPT_leaveGameWindows_TIP"] = "Stops placing, sizing and locking the game's own windows, so an addon that moves windows can have them. Our own windows keep their lock."
+L["UI_WINDOW_HELD_MOVER"] = "Another addon moves this window, so it is placed there, not here."
+L["UI_WINDOW_HELD_LEFT"] = "Left to other addons by Leave game windows to other addons. Turn that off to place it here."
 L["UI_CHARACTER"] = "Character"
 L["UI_PROFESSIONS"] = "Professions"
 L["UI_TALENTS"] = "Talents"
