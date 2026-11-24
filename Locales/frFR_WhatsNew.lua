@@ -3,6 +3,8 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN99_1_TITLE"] = "Partager une quête"
+L["WN99_1_TEXT"] = "Le partage de quêtes depuis le journal de quêtes fonctionne de nouveau avec votre groupe."
 L["WN98_1_TITLE"] = "Icônes de sac sur les emplacements vides"
 L["WN98_1_TEXT"] = "Dans Un seul sac, chaque emplacement vide montre désormais une icône pâle du sac auquel il appartient, pour repérer d'un coup d'oeil les emplacements d'un carquois. Activez-la dans les options (/fcui) : Un seul sac, sous Sacs. Emplacements vides unis, juste en dessous, les rend de nouveau tous pareils."
 L["WN98_2_TITLE"] = "Couleurs de classe en champ de bataille"

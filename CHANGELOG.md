@@ -2,6 +2,11 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.65.1] - 2026-11-24
+
+### Fixed
+- Share Quest in the quest log shares your quest with your group again.
+
 ## [0.65.0] - 2026-11-24
 
 ### Added

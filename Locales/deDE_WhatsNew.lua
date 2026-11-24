@@ -3,6 +3,8 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN99_1_TITLE"] = "Quests teilen"
+L["WN99_1_TEXT"] = "Das Teilen von Quests im Questlog funktioniert wieder: deine Gruppe bekommt die Quest."
 L["WN98_1_TITLE"] = "Taschensymbole auf leeren Plätzen"
 L["WN98_1_TEXT"] = "In Eine Tasche zeigt jeder leere Platz jetzt ein blasses Symbol der Tasche, zu der er gehört, so sind die Plätze eines Köchers leicht zu finden. Schalte sie in den Optionen (/fcui) ein: Eine Tasche, unter Taschen. Schlichte leere Plätze, direkt darunter, macht sie wieder alle gleich."
 L["WN98_2_TITLE"] = "Klassenfarben im Schlachtfeld"

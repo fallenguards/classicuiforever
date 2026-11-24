@@ -2,6 +2,8 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN99_1_TITLE"] = "Share Quest"
+L["WN99_1_TEXT"] = "Share Quest in the quest log shares your quest with your group again."
 L["WN98_1_TITLE"] = "Bag icons on empty slots"
 L["WN98_1_TEXT"] = "In One bag, each empty slot now shows a faded icon of the bag it belongs to, so a quiver's slots are easy to spot. Turn it on in the options (/fcui): One bag, under Bags. Plain empty slots, just under it, makes them all alike again."
 L["WN98_2_TITLE"] = "Class colors in battlegrounds"
