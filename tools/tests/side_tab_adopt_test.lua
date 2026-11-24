@@ -73,6 +73,7 @@ end
 function Region:GetLeft() local x = Corner(self) return x or self._left end
 function Region:GetTop() local _, y = Corner(self) return y or self._top end
 function Region:StopMovingOrSizing() end
+function Region:StartMoving() end
 function Region:GetEffectiveScale() return self._scale or 1 end
 function Region:IsProtected() return false end
 function Region:GetPoint(i) local p = self._points[i or 1] if p then return p[1], p[2], p[3], p[4], p[5] end end
@@ -254,6 +255,9 @@ end
 ------------------------------------------------------------------ the addon's own pieces
 
 local ns = { social = {}, db = { hideFinderWho = true }, PassReads = function(fn) return fn end }
+-- Whether a mover (MoveAny) holds the finder (UI/GameSpot.lua ns.MoverHolds).
+local heldByMover = false
+function ns.MoverHolds() return heldByMover end
 local inForce = { whoList = true, groupFinder = true }
 function ns.ModuleInForce(key) return inForce[key] == true end
 function ns.OnToggle() end
@@ -495,6 +499,37 @@ finder:Show()
 S.AdoptFinderOthers(finder)
 S.AdoptFinderOthers(finder)
 Check(finder:GetLeft() == 400, "after its first pass the finder is placed by whoever moves it, not by this")
+
+-- MoveAny holds the finder: it puts the finder back the instant anything else moves it and takes no spot from us, so
+-- the window follows the finder and does not drag on its own (his pick, 2026-11-24).
+heldByMover = true
+finder:Hide()
+window:Show()
+window:Fire("OnShow")
+window:Hide()
+-- The finder shows; MoveAny puts it on its own saved spot, 500, 400: our pass leaves it there and takes that spot.
+finder:Show()
+finder:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", 500, 400)
+S.AdoptFinderOthers(finder)
+Check(finder:GetLeft() == 500 and finder:GetTop() == 400, "held: the finder is never put anywhere by us")
+finder:Hide()
+window:Show()
+window:Fire("OnShow")
+wx, wy = select(4, window:GetPoint(1))
+Check(wx == 500 and wy == 400, "held: its window opens on the finder's spot")
+-- A drag of the window ends as it starts, and a drop is not taken as the finder's spot.
+window:StartMoving()
+wx, wy = select(4, window:GetPoint(1))
+Check(wx == 500 and wy == 400, "held: a drag of its window stays on the finder's spot")
+window:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", 900, 700)
+window:StopMovingOrSizing()
+Check(ns.db.finderSpot[1] == 500, "held: a drop of its window does not move the shared spot")
+window:Hide()
+window:Show()
+window:Fire("OnShow")
+wx, wy = select(4, window:GetPoint(1))
+Check(wx == 500 and wy == 400, "held: it opens on the finder's spot again")
+heldByMover = false
 
 ------------------------------------------------------------------ a /who, then our minimap group finder icon
 

@@ -433,8 +433,21 @@ local function OnFinderSpot(frame)
 end
 
 -- Dropped: its spot is the finder's from now.
+-- A mover holding the finder takes no spot from us (it puts the finder back at once): the partner follows the finder.
+local function FinderHeld()
+    local finder = _G["LFGParentFrame"]
+    return finder ~= nil and ns.MoverHolds(finder) and true or false
+end
+
 local function PartnerDropped()
-    if partner then Keep(Spot(partner)) end
+    if partner and not FinderHeld() then Keep(Spot(partner)) end
+end
+
+-- While held, a drag of the partner ends as it starts and the partner stays on the finder's spot.
+local function PartnerDragStart()
+    if not (partner and FinderHeld()) then return end
+    partner:StopMovingOrSizing()
+    OnFinderSpot(partner)
 end
 
 local function TakePartner(frame)
@@ -442,6 +455,7 @@ local function TakePartner(frame)
     partner = frame
     ns.db.finderPartner = frame:GetName()
     frame:HookScript("OnShow", OnFinderSpot)
+    ns.HookMethod(frame, "StartMoving", PartnerDragStart)
     ns.HookMethod(frame, "StopMovingOrSizing", PartnerDropped)
 end
 
@@ -489,7 +503,7 @@ local function KeepPartner(parent)
     end
     if finderFresh then
         finderFresh = false
-        if partner then PutOn(parent, finderSpot) end
+        if partner and not FinderHeld() then PutOn(parent, finderSpot) end
     end
     Keep(Spot(parent))
     for _, tab in ipairs(ns.AdoptedSideTabs and ns.AdoptedSideTabs(parent) or {}) do
