@@ -123,9 +123,9 @@ end
 
 -- The finder's micro button, and the secure pad our minimap's group finder icon presses it through (that press never
 -- reached the micro button's tab: a /who, then the icon, opened the Who list, 2026-11-24).
-local MINIMAP_ICON = "ForeverClassicUIMinimapGroupFinderButton"
 local function MicroHosts()
-    local icon = _G[MINIMAP_ICON]
+    -- Its owner's lookup (Map/MinimapMicro.lua), never a typed name: a guessed one found no pad (2026-11-24).
+    local icon = ns.GroupFinderIcon and ns.GroupFinderIcon()
     return _G["LFDMicroButton"], icon and ns.PadOf and ns.PadOf(icon)
 end
 local function IsMicroHost(host)

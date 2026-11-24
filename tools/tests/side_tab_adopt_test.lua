@@ -416,10 +416,10 @@ Check(select(2, fit:gsub("S%.AdoptFinderOthers%(parent%)", "")) == 2, "the finde
 -- A /who leaves the finder shut on its own Who page. Our minimap icon presses the micro button through a secure pad, a
 -- press the micro button's tab never caught, so the Who list opened in the finder's place (/fcuidev finderopen,
 -- 2026-11-24). Hovering the pad lays the first page's tab over it; its press turns the page in the client's name.
-local icon = CreateFrame("Button", "ForeverClassicUIMinimapGroupFinderButton", UIParent)
+local icon = CreateFrame("Button", "ForeverClassicUIGroupFinderButton", UIParent)
 local pad = CreateFrame("Button", "ClassicUIForeverMapPad19", UIParent)
--- The game names its globals by CreateFrame's name; this stub does not.
-_G[icon:GetName()] = icon
+-- Found by its owner's lookup (Map/MinimapMicro.lua ns.GroupFinderIcon), as the game finds it, never by a name.
+ns.GroupFinderIcon = function() return icon end
 ns.PadOf = function(button) return button == icon and pad or nil end
 finder:Hide()
 finder.selectedTab = 3
