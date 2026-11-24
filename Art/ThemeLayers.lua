@@ -171,9 +171,13 @@ local function Index(piece, layer)
         frames[frame] = set
         local root = RootOf(frame)
         if root then Group(root)[frame], rootOf[frame] = set, root end
-        if frame:IsObjectType("Button") and not ns.Safe(frame:IsProtected(), true) then
-            ns.HookScriptOnce(frame, "OnEnable", StateTurned, "themeLayers")
-            ns.HookScriptOnce(frame, "OnDisable", StateTurned, "themeLayers")
+        if not ns.Safe(frame:IsProtected(), true) then
+            -- Its pieces' size follows it: their masks are fitted to the new size.
+            ns.HookScriptOnce(frame, "OnSizeChanged", StateTurned, "themeLayers")
+            if frame:IsObjectType("Button") then
+                ns.HookScriptOnce(frame, "OnEnable", StateTurned, "themeLayers")
+                ns.HookScriptOnce(frame, "OnDisable", StateTurned, "themeLayers")
+            end
         end
     end
     set[layer] = piece
@@ -291,7 +295,10 @@ local function FitMasks(piece, layer)
     local w, h = piece:GetSize()
     local across, down = false, false
     if piece.GetHorizTile then across, down = piece:GetHorizTile(), piece:GetVertTile() end
-    if ns.AnySecret(w, h, across, down) or not (w and h) or w <= 0 or h <= 0 then return false end
+    if ns.AnySecret(w, h, across, down) then return false end
+    -- Not laid out yet (a row made before its window places it): tried again on a later frame.
+    if not (w and h) or w <= 0 or h <= 0 then return false, true end
+    layer.fitTries = nil
     local f = layer.fit
     if f and f[1] == w and f[2] == h and f[3] == across and f[4] == down and f[5] == c[1] and f[6] == c[2]
         and f[7] == c[4] and f[8] == c[5] and f[9] == c[3] and f[10] == c[6] then
@@ -363,6 +370,24 @@ local function PieceColor(piece, layer)
     return true
 end
 
+-- A piece with no size yet kept the whole sheet's mask squeezed over its own box (each piece of our Options drop
+-- downs drew a box of its own until a press): its masks are fitted again a frame later, up to FIT_TRIES frames.
+local FIT_TRIES = 30
+local unfit = setmetatable({}, weak)
+local function RetryFits()
+    for layer, piece in pairs(unfit) do
+        unfit[layer] = nil
+        Kick(piece, layer)
+    end
+end
+local function FitLater(piece, layer)
+    local tries = (layer.fitTries or 0) + 1
+    layer.fitTries = tries
+    if tries > FIT_TRIES then return end
+    unfit[layer] = piece
+    ns.Sched.NextFrame("theme.fitLater", RetryFits)
+end
+
 -- seen: the piece's frame is known to be visible (the pass asks each frame once). True when a layer had to change.
 local function Follow(piece, layer, seen)
     local shown = ns.Safe(piece:IsShown(), false) and (seen or ns.Safe(piece:IsVisible(), false))
@@ -374,7 +399,9 @@ local function Follow(piece, layer, seen)
     if FollowOne(layer.parch, layer.parched, shown, alpha) then moved = true end
     if not shown then return moved end
     if Crop(layer, piece:GetTexCoord()) then moved = true end
-    if FitMasks(piece, layer) then moved = true end
+    local fitted, unsized = FitMasks(piece, layer)
+    if fitted then moved = true end
+    if unsized then FitLater(piece, layer) end
     if PieceColor(piece, layer) then moved = true end
     local drawLayer, sub = piece:GetDrawLayer()
     if ns.AnySecret(drawLayer, sub) then return moved end
