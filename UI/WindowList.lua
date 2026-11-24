@@ -86,7 +86,7 @@ ns.WINDOW_LIST = {
     -- Dressed as the social window, the group finder stands in its place at its size.
     { key = "groupFinder", label = L["OPT_groupFinder"], name = "LFGParentFrame", w = 338, h = 424, client = true,
         follows = "social", followIf = "groupFinder", followX = 0, followY = 0,
-        dressed = function() return ns.ModuleInForce("groupFinder") or (ns.panels and ns.panels.Dressing("panelGroupFinder")) end },
+        dressed = function() return ns.ModuleInForce("groupFinder") end },
     -- An NPC's windows (quest, gossip, shop, trainer) open one at a time on one spot: one place, lock and size.
     { key = "questGiver", label = L["UI_QUEST_GIVER"], name = "QuestFrame", w = 338, h = 427, client = true,
         dressed = function() return ns.panels and ns.panels.Dressing("panelQuest") end },

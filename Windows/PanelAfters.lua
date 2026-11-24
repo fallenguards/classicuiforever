@@ -680,13 +680,6 @@ function A.PlayerSpellsFrame(frame)
     ns.Sched.NextFrame("spells.bookTab", ns.GameBookTab)
 end
 
-------------------------------------------------------------- collections
-
-function A.CollectionsJournal(frame)
-    local floor = frame.fcui and frame.fcui.insetFloor
-    if floor then floor:SetVertexColor(0.45, 0.42, 0.38) end
-end
-
 ------------------------------------------------------------------ addons
 
 local ADDON_BUTTONS = { "EnableAllButton", "DisableAllButton", "OkayButton", "CancelButton" }
@@ -727,14 +720,6 @@ function A.HelpFrame(frame)
         ns.SkinRedButton(report.reportButton)
         ns.SkinRedButton(_G.ReportCheatingDialogCancelButton)
     end
-end
-
-------------------------------------------------------------------- legacy
-
--- Its emblem stood over the top left corner, under the metal: hidden beside the plain corner.
-function A.LegacySystemFrame(frame)
-    local portrait = frame.PortraitContainer and frame.PortraitContainer.portrait
-    if portrait then portrait:SetAlpha(0) end
 end
 
 ------------------------------------------------------------- time manager

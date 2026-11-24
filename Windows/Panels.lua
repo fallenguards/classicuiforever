@@ -122,8 +122,6 @@ local WINDOWS = {
     -- No scroll bar skin: the classic loot window turns pages, its bar is faded away (Windows/Loot.lua).
     { "LootFrame", toggle = "lootWindow", backing = false, scrollBars = false, after = A.LootFrame },
     -- Social window's lift, so the two read as one window when they swap.
-    -- The finder's Who page: plain while our classic finder holds the window (its Who page is the game's, #210).
-    { "LFGWhoListFrame", key = "panelGroupFinder", addon = "Blizzard_GroupFinder_VanillaStyle", lift = 5, off = "groupFinder" },
     { "InspectFrame", key = "panelInspect", addon = "Blizzard_InspectUI", lift = 5, tabLift = 3, after = A.InspectFrame },
     { "MacroFrame", key = "panelMacros", addon = "Blizzard_MacroUI", topTabs = true, lift = 4, scrollBars = false,
         after = A.MacroFrame },
@@ -131,9 +129,6 @@ local WINDOWS = {
     { "AuctionHouseFrame", key = "panelAuction", addon = "Blizzard_AuctionHouseUI", lift = 9, after = A.AuctionHouseFrame },
     -- The social window's lift: its foot tabs hang on this window too (Social/CommunitiesTabs.lua).
     { "CommunitiesFrame", key = "panelCommunities", addon = "Blizzard_Communities", lift = 5, after = A.CommunitiesFrame },
-    -- Half lift: the Mount button sits on the foot. The tabs' tops on the metal line, as the vendor's.
-    { "CollectionsJournal", key = "panelCollections", addon = "Blizzard_Collections", lift = 5, tabLift = MERCHANT_TAB_LIFT,
-        after = A.CollectionsJournal },
     { "EncounterJournal", key = "panelJournal", addon = "Blizzard_EncounterJournal" },
     { "AchievementFrame", key = "panelAchievements", addon = "Blizzard_AchievementUI" },
     -- Retail's has a tab row: the client's foot line, tabs unlifted.
@@ -149,9 +144,6 @@ local WINDOWS = {
     { "AddonList", key = "panelAddons", portrait = false, lift = 5, scrollBars = false, after = A.AddonList },
     -- Support window. Half lift: the browser runs to 4 off the bottom edge.
     { "HelpFrame", key = "panelHelp", portrait = false, lift = 5, scrollBars = false, after = A.HelpFrame },
-    -- Half lift, as the map: its pages run to the bottom edge.
-    { "LegacySystemFrame", key = "panelLegacy", addon = "Blizzard_LegacySystem", portrait = false, lift = 5, scrollBars = false,
-        after = A.LegacySystemFrame },
     -- Its globe stands in the portrait ring.
     { "TimeManagerFrame", key = "panelClock", addon = "Blizzard_TimeManager", scrollBars = false, after = A.TimeManagerFrame },
     { "ClickBindingFrame", key = "panelClickBinding", addon = "Blizzard_ClickBindingUI", lift = 5, scrollBars = false, after = A.ClickBindingFrame },

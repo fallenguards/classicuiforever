@@ -16,8 +16,6 @@ O.PAGE_NOTES = { [L["GROUP_ALL_WINDOWS"]] = L["OPTWIN_ALL_WINDOWS_NOTE"] }
 local SHOW_TIP = L["OPT_TIP_SHOW_HOVER_HIDE"]
 local GRYPHON_TIP = L["OPT_TIP_GRYPHON"]
 local function MinimapRotates() return ns.GetCVarBool("rotateMinimap") == true end
--- A list window left out while our own window of it takes its place: its box would do nothing.
-local function OursOn(key) return function() return ns.db[key] ~= false end end
 -- Windows Forever never opens: its Adventure Guide is held off and its items have no sockets (#210).
 local NotOnForever = ns.OnForever
 local function OnRetail() return not ns.OnForever() end
@@ -30,8 +28,8 @@ local function NotBroad() return not (ns.PACKAGE and ns.PACKAGE.broad) end
 -- Every window, one list sorted by name; a window whose box is on a page of its own shows here too, as the same setting.
 local ALL_WINDOWS = { "characterSheet", "spellBook", "talents", "professionsBook", "tradeSkill", "questLog", "worldMap",
     "bags", "collectionsWindow", "legacyWindow", "panelAchievements", "panelJournal", "panelCalendar", "panelMacros",
-    "panelClickBinding", "panelCooldowns", "panelDressUp", "panelSocketing", "panelCollections", "panelLegacy",
-    "whoList", "guildRoster", "groupFinder", "panelSocial", "panelCommunities", "panelGuildControl", "panelGroupFinder",
+    "panelClickBinding", "panelCooldowns", "panelDressUp", "panelSocketing",
+    "whoList", "guildRoster", "groupFinder", "panelSocial", "panelCommunities", "panelGuildControl",
     "panelChannels", "panelInspect", "panelTrade", "panelAuction", "panelBank", "panelBooks", "panelTaxi", "panelGossip",
     "panelGuildBank", "panelCharter", "panelMail", "panelQuest", "panelStable", "panelTabard", "panelMerchant", "trainer",
     "lootWindow", "lootRoll", "panelLootHistory", "gameMenu", "settingsPanel", "panelAddons", "panelHelp", "panelClock", "damageMeter" }
@@ -60,19 +58,12 @@ ns.TOGGLES = {
     { "panelChannels", L["OPT_panelChannels"], L["OPT_panelChannels_TIP"], checks = "panelWindows" },
     { "panelClickBinding", L["OPT_panelClickBinding"], L["OPT_panelClickBinding_TIP"], checks = "panelWindows" },
     { "panelClock", L["OPT_panelClock"], L["OPT_panelClock_TIP"], checks = "panelWindows" },
-    { "panelCollections", L["OPT_panelCollections"], L["OPT_panelCollections_TIP"], checks = "panelWindows",
-        hideIf = OursOn("collectionsWindow") },
     { "panelCooldowns", L["OPT_panelCooldowns"], L["OPT_panelCooldowns_TIP"], checks = "panelWindows" },
     { "panelDressUp", L["OPT_panelDressUp"], L["OPT_panelDressUp_TIP"], checks = "panelWindows" },
-    -- Social's Group finder dresses the whole window while on (Windows/Panels.lua yields to it): this row would do nothing.
-    { "panelGroupFinder", L["OPT_panelGroupFinder"], L["OPT_panelGroupFinder_TIP"], checks = "panelWindows",
-        hideIf = OursOn("groupFinder") },
     { "panelCommunities", L["OPT_panelCommunities"], L["OPT_panelCommunities_TIP"], checks = "panelWindows" },
     { "panelGuildControl", L["OPT_panelGuildControl"], L["OPT_panelGuildControl_TIP"], checks = "panelWindows" },
     { "panelHelp", L["OPT_panelHelp"], L["OPT_panelHelp_TIP"], checks = "panelWindows" },
     { "panelInspect", L["OPT_panelInspect"], L["OPT_panelInspect_TIP"], checks = "panelWindows" },
-    { "panelLegacy", L["OPT_panelLegacy"], L["OPT_panelLegacy_TIP"], checks = "panelWindows",
-        hideIf = OursOn("legacyWindow") },
     { "lootWindow", L["OPT_lootWindow"], L["OPT_lootWindow_TIP"], search = "loot frame" },
     { "panelLootHistory", L["OPT_panelLootHistory"], L["OPT_panelLootHistory_TIP"], checks = "panelWindows",
         search = "loot rolls history /loot" },
