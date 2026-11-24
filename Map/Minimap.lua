@@ -382,6 +382,30 @@ local function RefreshAddonButton(ldbi, name, button)
     if hidden and button:IsShown() then button:Hide() end
 end
 
+-- An addon's own ring button (not LibDBIcon's) hung on the map's middle past our rim, placed for the game's larger map
+-- before our pass made it smaller (LFG Forever's, 29 out, 2026-11-23): onto our rim at its angle, LibDBIcon's 5 out.
+local RIM_OUT = 5
+local function OntoOurRim(button)
+    local name = button:GetName()
+    if (name and name:find("^LibDBIcon10_")) or button:GetNumPoints() ~= 1 then return end
+    local point, rel, relPoint, x, y = button:GetPoint(1)
+    if rel ~= Minimap or point ~= "CENTER" or relPoint ~= "CENTER" or ns.AnySecret(x, y) then return end
+    if type(x) ~= "number" or type(y) ~= "number" then return end
+    local k = ns.Safe(button:GetEffectiveScale()) and button:GetEffectiveScale() / Minimap:GetEffectiveScale() or 1
+    local radius = Minimap:GetWidth() / 2 + RIM_OUT
+    local degrees = math.deg(math.atan2(y, x))
+    -- Where our rim puts that angle (a square map's edge included), against where the button stands, both map units.
+    local a = math.rad(degrees)
+    local ux, uy = math.cos(a), math.sin(a)
+    if MM.Square() then
+        local out = 1 / math.max(math.abs(ux), math.abs(uy))
+        ux, uy = ux * out, uy * out
+    end
+    local rim = math.sqrt(ux * ux + uy * uy) * radius
+    if math.sqrt(x * x + y * y) * k <= rim + 1 then return end
+    ns.RingPoint(button, degrees, radius, k)
+end
+
 local function Layout()
     local cluster = MinimapCluster
     local backdrop = MinimapBackdrop
@@ -595,6 +619,7 @@ local function Layout()
         end
     end
     if ns.ShowAddonRingButtons then ns.ShowAddonRingButtons() end
+    if ns.EachAddonRingButton then ns.EachAddonRingButton(OntoOurRim) end
     ns.EachChild(map, RingOfChild)
     if ns.OnMinimapLaid then ns.OnMinimapLaid(ldbi) end
 end
