@@ -121,6 +121,7 @@ return {
     fadePet = 100,
     fadeStance = 100,
     finderPartner = "",
+    finderSpot = false,
     focusBuffsOnTop = false,
     foreverWelcome = true,
     fullPlates = true,

@@ -65,8 +65,14 @@ function Region:SetPoint(point, rel, relPoint, x, y)
 end
 function Region:SetAllPoints(rel) self._points = { { "TOPLEFT", rel, "TOPLEFT", 0, 0 }, { "BOTTOMRIGHT", rel, "BOTTOMRIGHT", 0, 0 } } end
 function Region:GetNumPoints() return #self._points end
-function Region:GetLeft() return self._left end
-function Region:GetTop() return self._top end
+-- A top left set on the screen's corner is where the frame then stands (the game's rect follows its anchor).
+local function Corner(self)
+    local p = self._points[1]
+    if p and p[1] == "TOPLEFT" and p[2] == UIParent and p[3] == "BOTTOMLEFT" then return p[4], p[5] end
+end
+function Region:GetLeft() local x = Corner(self) return x or self._left end
+function Region:GetTop() local _, y = Corner(self) return y or self._top end
+function Region:StopMovingOrSizing() end
 function Region:GetEffectiveScale() return self._scale or 1 end
 function Region:IsProtected() return false end
 function Region:GetPoint(i) local p = self._points[i or 1] if p then return p[1], p[2], p[3], p[4], p[5] end end
@@ -421,9 +427,13 @@ Check(select(2, fit:gsub("S%.AdoptFinderOthers%(parent%)", "")) == 2, "the finde
 -- kept it, so the switch jumped (2026-11-24). It must open on the finder's spot, found by what came up with the tab's
 -- press, its name kept for the next session; a standalone open takes the finder's last spot.
 ns.db.finderPartner = ""
+ns.db.finderSpot = { 111, 222 }
 finder:Show()
 finder.selectedTab = 2
 finder._left, finder._top = 700, 600
+-- No partner yet: the finder is never put anywhere by this, whatever was saved.
+S.AdoptFinderOthers(finder)
+Check(Corner(finder) == nil, "no other addon's window: the finder stays where its own placement put it")
 local window = CreateFrame("Frame", "PartnerWindow", UIParent)
 window:Hide()
 -- A locked game window among UIParent's children (CommunitiesAddDialog): asking it anything errors from our code.
@@ -444,7 +454,8 @@ Check(ns.db.finderPartner == "PartnerWindow", "its name kept for the next sessio
 -- The finder moved (MoveAny), then the window opened on its own (its minimap button): the finder's last spot.
 window:Hide()
 finder:Show()
-finder._left, finder._top = 300, 500
+S.AdoptFinderOthers(finder)
+finder:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", 300, 500)
 S.AdoptFinderOthers(finder)
 finder:Hide()
 window:Show()
@@ -457,6 +468,33 @@ window:Fire("OnShow")
 wx, wy = select(4, window:GetPoint(1))
 Check(wx == 150 and wy == 250, "at another scale: the same spot on screen")
 window._scale = 1
+
+-- Move both: its window dragged and dropped at 900, 700; back to the finder, which MoveAny puts on its own saved spot
+-- (300, 500) as it shows: our pass puts it on the drop.
+window:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", 900, 700)
+window:StopMovingOrSizing()
+window:Hide()
+finder:ClearAllPoints()
+finder._left, finder._top = 300, 500
+finder:Show()
+S.AdoptFinderOthers(finder)
+Check(finder:GetLeft() == 900 and finder:GetTop() == 700, string.format(
+    "its window dropped elsewhere: the finder opens on the drop (now %s, %s)", tostring(finder:GetLeft()), tostring(finder:GetTop())))
+Check(type(ns.db.finderSpot) == "table" and ns.db.finderSpot[1] == 900, "the shared spot kept for the next session")
+-- The finder dragged (MoveAny) to 400, 650 while up: its window opens there next.
+finder:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", 400, 650)
+S.AdoptFinderOthers(finder)
+finder:Hide()
+window:Show()
+window:Fire("OnShow")
+wx, wy = select(4, window:GetPoint(1))
+Check(wx == 400 and wy == 650, "the finder dragged: its window opens on the finder's new spot")
+-- A later pass while the finder is up, not just shown, leaves it where it is.
+window:Hide()
+finder:Show()
+S.AdoptFinderOthers(finder)
+S.AdoptFinderOthers(finder)
+Check(finder:GetLeft() == 400, "after its first pass the finder is placed by whoever moves it, not by this")
 
 ------------------------------------------------------------------ a /who, then our minimap group finder icon
 

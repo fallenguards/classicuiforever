@@ -395,9 +395,11 @@ end
 ---------------------------------------------------------------- the window another addon's finder tab opens
 
 -- Another addon's side tab on the finder opens that addon's own window in the finder's place, one at a time. It stood
--- where its addon kept it, so the switch jumped (2026-11-24): it opens on the finder's spot, or the finder's last one.
+-- where its addon kept it, so the switch jumped (2026-11-24): the two share one spot, which a drag of either moves.
 -- Found as the one window that came up with the tab's press, never by a name; that name is kept for the next session.
+-- finderFresh: the finder comes up next with the shared spot, after a mover put it on its own saved one.
 local partner, finderSpot, shownAtPress
+local finderFresh, sessionRead = false, false
 
 -- A frame's top left in screen pixels, nil while unreadable.
 local function Spot(frame)
@@ -407,12 +409,33 @@ local function Spot(frame)
     return { left * k, top * k }
 end
 
-local function OnFinderSpot(frame)
-    local finder = _G["LFGParentFrame"]
-    local spot = (finder and finder:IsVisible() and Spot(finder)) or finderSpot
+local function PutOn(frame, spot)
     if not spot or (InCombatLockdown() and frame:IsProtected()) then return end
     local k = frame:GetEffectiveScale()
     ns.SetPointIf(frame, "TOPLEFT", UIParent, "BOTTOMLEFT", spot[1] / k, spot[2] / k)
+end
+
+-- The shared spot; saved only while a partner shares it, and only when it changed (the finder's pass runs 10 a second).
+local function Keep(spot)
+    if not spot then return end
+    finderSpot = spot
+    if not partner then return end
+    local saved = ns.db.finderSpot
+    if type(saved) ~= "table" or math.abs((saved[1] or 0) - spot[1]) > 0.5 or math.abs((saved[2] or 0) - spot[2]) > 0.5 then
+        ns.db.finderSpot = { spot[1], spot[2] }
+    end
+end
+
+local function OnFinderSpot(frame)
+    local finder = _G["LFGParentFrame"]
+    PutOn(frame, (finder and finder:IsVisible() and Spot(finder)) or finderSpot)
+    -- It came up in the finder's place: the finder's next show starts from the shared spot again.
+    finderFresh = true
+end
+
+-- Dropped: its spot is the finder's from now.
+local function PartnerDropped()
+    if partner then Keep(Spot(partner)) end
 end
 
 local function TakePartner(frame)
@@ -420,6 +443,7 @@ local function TakePartner(frame)
     partner = frame
     ns.db.finderPartner = frame:GetName()
     frame:HookScript("OnShow", OnFinderSpot)
+    hooksecurefunc(frame, "StopMovingOrSizing", PartnerDropped)
 end
 
 -- A locked game window among them (the communities add dialog) errors on any question from our code: passed over.
@@ -451,11 +475,24 @@ local function PressEnd()
     OnFinderSpot(found)
 end
 
--- Each pass while the finder shows: its spot kept, the partner of an earlier session found again, other tabs heard.
+-- Each pass while the finder shows: just up, back on the shared spot (a mover puts it on its own saved one as it shows);
+-- after that its own spot, so a drag of it moves the shared one; the partner of an earlier session found again.
 local function KeepPartner(parent)
-    finderSpot = Spot(parent) or finderSpot
-    local saved = ns.db.finderPartner
-    if not partner and type(saved) == "string" and saved ~= "" and type(_G[saved]) == "table" then TakePartner(_G[saved]) end
+    local name = ns.db.finderPartner
+    if not partner and type(name) == "string" and name ~= "" and type(_G[name]) == "table" then TakePartner(_G[name]) end
+    -- A partner's last session: its shared spot stands for a mover's saved one at the first show.
+    if not sessionRead then
+        sessionRead = true
+        local saved = ns.db.finderSpot
+        if partner and type(saved) == "table" and type(saved[1]) == "number" and type(saved[2]) == "number" then
+            finderSpot, finderFresh = { saved[1], saved[2] }, true
+        end
+    end
+    if finderFresh then
+        finderFresh = false
+        if partner then PutOn(parent, finderSpot) end
+    end
+    Keep(Spot(parent))
     for _, tab in ipairs(ns.AdoptedSideTabs and ns.AdoptedSideTabs(parent) or {}) do
         if ns.Once(tab, "finderPartnerPress") then
             tab:HookScript("OnMouseDown", PressStart)
