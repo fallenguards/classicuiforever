@@ -1,8 +1,9 @@
 -- Offline test under Lua 5.4 for What's Training's page on the professions book (Skills/ProfessionsTraining.lua, the
 -- floor from Spells/BookTraining.lua). Under Textured color the book page's quarters carry theme layers one and two
 -- sublevels over them; the floor laid at sublevel 1 lost to them, and the quarters' seam and tiles drew lines through the
--- list (look339 v1: a seam 111 down the list, 10 pieces). His pick (2026-11-24): one plain parchment, no marble, no seams.
--- Run from the addon root: lua tools/tests/training_parchment_test.lua (CI runs every tools/tests/*_test.lua).
+-- list (look339 v1: a seam 111 down the list, 10 pieces). His pick (2026-11-24): the spellbook's What's Training marble,
+-- the same floor, drawn over all of them.
+-- Run from the addon root: lua tools/tests/training_floor_test.lua (CI runs every tools/tests/*_test.lua).
 -- luacheck: std lua54
 -- luacheck: ignore 111 112 113 121 122 212 431 432
 
@@ -33,6 +34,7 @@ rawset(holder, "CreateTexture", function(_, _, layer, _, sublevel)
     local tex = { layer = layer, sublevel = sublevel or 0, shown = true }
     function tex:SetTexture(path) self.path = path end
     function tex:SetTexCoord(...) self.crop = { ... } end
+    function tex:SetDrawLayer(drawLayer, sub) self.layer, self.sublevel = drawLayer, sub end
     function tex:Hide() self.shown = false end
     function tex:Show() self.shown = true end
     function tex:SetShown(on) self.shown = on end
@@ -90,14 +92,13 @@ for _, tex in ipairs(made) do
 end
 Check(#shown == 1, "one floor shows behind the list (" .. #shown .. ")")
 local floor = shown[1]
-Check(floor and floor.path == "media\\questParchment", "the floor is the plain parchment (" .. tostring(floor and floor.path) .. ")")
+Check(floor and floor.path == "media\\marbleBg", "the floor is the spellbook page's marble (" .. tostring(floor and floor.path) .. ")")
 -- The book page's quarters at sublevel 0 carry Textured color layers at 1 and 2: the floor must be over all of them.
 Check(floor and floor.layer == "BACKGROUND" and floor.sublevel > 2,
     "the floor is drawn over the page's quarters and their theme layers (sublevel " .. tostring(floor and floor.sublevel) .. ")")
-Check(floor and floor.crop and floor.crop[1] > 0 and floor.crop[2] < 1, "cut to the parchment part of its sheet")
 
 if failed > 0 then
     print(failed .. " check(s) failed")
     os.exit(1)
 end
-print("training_parchment_test: ok")
+print("training_floor_test: ok")

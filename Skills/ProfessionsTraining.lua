@@ -2,7 +2,7 @@ local _, ns = ...
 
 -- What's Training's professions list (its page over the professions window) laid as the spellbook's trainer list: a
 -- line a recipe (icon, name, its profession, the skill at the right) under its category bar, profession headers
--- folded away, on one plain parchment (his pick), the book's page faded under it. Its list runs as it did.
+-- folded away, on the spellbook page's black marble, the book's page faded under it. Its list runs as it did.
 
 local T = ns.prof
 -- The spellbook list's lines: 16 apart; a heading its own bar (28, the band's art), 8 under the lines before it.
@@ -47,7 +47,7 @@ local function HideUnnamed(child)
     if not child:GetName() then Hide(child) end
 end
 
--- Its fill under the list (a frame of the list's, two levels down): our parchment is the page.
+-- Its fill under the list (a frame of the list's, two levels down): our marble is the page.
 local function HideBacking(child, level)
     if not child:GetName() and child:GetFrameLevel() < level then Hide(child) end
 end
@@ -56,8 +56,9 @@ local function HideSelf(self)
     if styled then self:Hide() end
 end
 
--- One plain parchment on the face's own art frame (the spellbook's on the book, Era's trade skill window on a
--- profession), under its gray border and header as on the spellbook page; its own dark page goes.
+-- The spellbook's What's Training marble on the face's own art frame (the spellbook's on the book, Era's trade skill
+-- window on a profession), over the page's theme layers (their seams drew lines through it), under its border and header.
+local FLOOR_SUBLEVEL = 5
 local floors = {}
 -- The double pane's frame runs past its art holder: the floor's right and bottom from the holder's, to that frame's rim.
 local DUAL_FLOOR_RIGHT, DUAL_FLOOR_BOTTOM = 290, 81
@@ -68,10 +69,11 @@ local function Floor()
     local floor = floors[holder]
     if not floor then
         if kind == "tradeDual" then
-            floor = ns.TrainingParchment(holder, DUAL_FLOOR_RIGHT, DUAL_FLOOR_BOTTOM)
+            floor = ns.TrainingMarble(holder, DUAL_FLOOR_RIGHT, DUAL_FLOOR_BOTTOM)
         else
-            floor = ns.TrainingParchment(holder)
+            floor = ns.TrainingMarble(holder)
         end
+        floor:SetDrawLayer("BACKGROUND", FLOOR_SUBLEVEL)
         floor:Hide()
         floors[holder] = floor
     end
@@ -217,8 +219,8 @@ local function Relist(box)
     if box.FullUpdate then box:FullUpdate(ScrollBoxConstants and ScrollBoxConstants.UpdateImmediately) end
 end
 
--- The page up: the book's page faded and our trade skill page hidden under it, the face's parchment shown; its art
--- frame is made out of a fight, so the parchment may come at a later show.
+-- The page up: the book's page faded and our trade skill page hidden under it, the face's marble shown; its art
+-- frame is made out of a fight, so the marble may come at a later show.
 local function Fade(on)
     if not styled then return end
     T.FadePage(on)

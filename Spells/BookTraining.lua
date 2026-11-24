@@ -37,20 +37,6 @@ function ns.TrainingMarble(frame, right, bottom)
     return marble
 end
 
--- One plain parchment on the professions book's training page (his pick, 2026-11-24): one stretched piece over the
--- page's art and its theme layers, whose quarter seams and tiles drew lines through it; under the border and ring.
-local PARCH_SUBLEVEL = 7
-local PARCH_U0, PARCH_U1, PARCH_V0, PARCH_V1 = 8 / 512, 300 / 512, 4 / 512, 336 / 512
-function ns.TrainingParchment(frame, right, bottom)
-    local floor = frame:CreateTexture(nil, "BACKGROUND", nil, PARCH_SUBLEVEL)
-    floor:SetTexture((ns.TexPath("questParchment")))
-    floor:SetTexCoord(PARCH_U0, PARCH_U1, PARCH_V0, PARCH_V1)
-    ns.InkPage(floor)
-    ns.SetTwoPointsIf(floor, "TOPLEFT", frame, "TOPLEFT", TRAINING_MARBLE_LEFT, TRAINING_MARBLE_TOP,
-        "BOTTOMRIGHT", frame, "BOTTOMRIGHT", right or TRAINING_MARBLE_RIGHT, bottom or TRAINING_MARBLE_BOTTOM)
-    return floor
-end
-
 local function Pieces(book)
     if pieces then return pieces end
     pieces = ns.DressPieces(book, RING_PIECES, nil, true)
