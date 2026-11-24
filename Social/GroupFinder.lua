@@ -533,6 +533,13 @@ local function StandDown(parent)
     if origin then ns.SetShownIf(origin, false) end
 end
 
+-- A mover holding the window drags it by the window's own mouse press, which our art's frame over it took (#338: neither
+-- ours nor the mover moved it); while ours, the frame takes clicks so its strip past the window's edge is not the world.
+local function YieldToMover(frame, parent)
+    local held = ns.MoverHolds(parent) and true or false
+    if frame:IsMouseEnabled() == held then frame:EnableMouse(not held) end
+end
+
 local watcher
 local function Fit()
     local parent = _G["LFGParentFrame"]
@@ -548,6 +555,7 @@ local function Fit()
         return
     end
     ns.SetShownIf(Origin(), true)
+    YieldToMover(Origin(), parent)
     local width, height = Size()
     FitSize(parent, width, height)
     local first = not dressed
