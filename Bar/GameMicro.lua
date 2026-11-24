@@ -14,6 +14,11 @@ local GAME_HIDE = {
     HousingMicroButton = "hideMicroHousing", EJMicroButton = "hideMicroJournal",
 }
 local hidden = setmetatable({}, { __mode = "k" })   -- buttons we hid, shown again on hand-back
+local homes = setmetatable({}, { __mode = "k" })    -- a parked button -> the frame it came from (the menu)
+-- A pick is parked hidden under a hidden frame of ours, off the menu: the game shows the shop button again on every
+-- micro button update (a window opening), and a show the menu counts in a fight widened it 27 px, moving the bottom row
+-- 14 px, until our hide after the fight (combatbars v4, 2026-11-24). Off the menu it is never counted or visible.
+local park
 
 local function Picked(button)
     local key = GAME_HIDE[button:GetName() or ""]
@@ -28,9 +33,17 @@ local function HideOne(button)
         ns.WhenCalm("gameMicro." .. button:GetName(), function() HideOne(button) end)
         return
     end
-    if not (Picked(button) and button:IsShown()) then return end
+    if not Picked(button) then return end
+    if not park then
+        park = ns.NewFrame("Frame", nil, UIParent)
+        park:Hide()
+    end
     hidden[button] = true
     button:Hide()
+    if button:GetParent() ~= park then
+        homes[button] = button:GetParent()
+        button:SetParent(park)
+    end
 end
 
 local function Sync()
@@ -42,6 +55,8 @@ local function Sync()
                 HideOne(button)
             elseif hidden[button] then
                 hidden[button] = nil
+                if park and button:GetParent() == park then button:SetParent(homes[button] or _G.MicroMenu) end
+                homes[button] = nil
                 button:Show()
             end
         end
