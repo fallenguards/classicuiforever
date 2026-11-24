@@ -106,7 +106,7 @@ function ns.WindowScale(key) return Scales()[byKey[key] and SizeKey(byKey[key]) 
 -- Mid drag by its title bar: the window placing passes leave it to the mouse.
 function ns.WindowMoving(frame) return moving[frame] == true end
 function ns.WindowPlaced(key)
-    if byKey[key] then return Worn(byKey[key]) and PlaceOf(byKey[key]) ~= nil end
+    if byKey[key] then local x, y = PlaceOf(byKey[key]) return Worn(byKey[key]) and x ~= nil, x, y end
     return Places()[key] ~= nil
 end
 -- A place carried over from an older record (the gryphons' old handle); a ring icon snapped to the minimap again drops its.

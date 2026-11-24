@@ -303,6 +303,10 @@ local function RefreshSize()
     -- The player's size (none while a mover holds it) times the full size book's.
     local size = not ns.MoverHolds(frame) and ns.WindowScale and ns.WindowScale("professions") or 1
     sizeWrap:SetAttribute("scale", size * ns.ProfessionsZoom())
+    -- The spellbook's spot (its follower's place): the click stands the window there, as one window with the book.
+    local placed, left, top = ns.WindowPlaced("professions")
+    sizeWrap:SetAttribute("placeL", placed and not ns.MoverHolds(frame) and left or nil)
+    sizeWrap:SetAttribute("placeT", placed and not ns.MoverHolds(frame) and top or nil)
 end
 T.RefreshSize = RefreshSize
 
@@ -342,7 +346,7 @@ function ns.ProfessionsSizeWrap(button)
     if not button then return end
     button:HookScript("PreClick", MarkBookAsked)
     sizeWrap = sizeWrap or CreateFrame("Frame", nil, UIParent, "SecureHandlerBaseTemplate")
-    -- The client's top left kept through the size, as the windows pass keeps it (ScaleKept).
+    -- The client's top left kept through the size, as the windows pass keeps it (ScaleKept); then the spellbook's spot.
     SecureHandlerWrapScript(button, "OnClick", sizeWrap, [[ if not down then return nil, "size" end ]], [[
         for i = 1, 2 do
             for j = 1, 2 do
@@ -355,8 +359,10 @@ function ns.ProfessionsSizeWrap(button)
         local s = control:GetAttribute("scale")
         if not (f and s and f:IsShown()) then return end
         local old, l, b, w, h = f:GetScale(), f:GetRect()
-        if old == s then return end
+        local pl, pt = control:GetAttribute("placeL"), control:GetAttribute("placeT")
+        if old == s and not pl then return end
         f:SetScale(s)
+        if pl and pt then l, b, h, old = pl, pt, 0, 1 end
         if l then
             f:ClearAllPoints()
             f:SetPoint("TOPLEFT", "$parent", "BOTTOMLEFT", l * old / s, (b + h) * old / s)
