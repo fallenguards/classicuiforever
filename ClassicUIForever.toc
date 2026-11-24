@@ -256,6 +256,7 @@ Spells\BookLines.lua
 Spells\PetPool.lua
 Spells\BookFlyouts.lua
 Spells\BookGrid.lua
+Spells\BookStack.lua
 Spells\SpellBook.lua
 Spells\BookTraining.lua
 Skills\SkillShell.lua

@@ -871,7 +871,7 @@ local function CreateBook()
     -- Anchored to UIParent: anchoring to the book would protect the book.
     clicks:SetSize(BOOK_W, BOOK_H)
     clicks:SetPoint("TOPLEFT", UIParent, "TOPLEFT", ns.ClassicSlot())
-    clicks:SetFrameStrata("HIGH")
+    ns.StackBookLayer(f, clicks)
     clicks:Hide()
     f.Clicks = clicks
     -- Follows the book's place and size (slot or edit mode); moved out of combat only, re-placed at combat end.
