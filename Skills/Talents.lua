@@ -244,6 +244,48 @@ function TakeMenuInspect()
     end)
 end
 
+-- The unit menu's Inspect Talents opens ours alone: the game's window it opened showed beside ours in a fight, its show
+-- run tainted from the game's event registry (an action failed, our watcher's handle refused). Asked here, shown when
+-- the inspect is ready.
+local asked = {}
+local readyFrame
+local function OnInspectReady(_, _, guid)
+    if not (asked.unit and (ns.IsSecret(guid) or guid == asked.guid)) then return end
+    readyFrame:UnregisterEvent("INSPECT_READY")
+    local unit = asked.unit
+    asked.unit, asked.guid = nil, nil
+    if not active then return end
+    ShowInspect(unit)
+    frame:SetAttribute("inspecting", 1)
+    inspectAlone = true
+end
+local function AskInspect(unit)
+    asked.unit, asked.guid = unit, UnitGUID(unit)
+    readyFrame = readyFrame or ns.EventFrame({}, OnInspectReady)
+    readyFrame:RegisterEvent("INSPECT_READY")
+    NotifyInspect(unit)
+end
+-- The entry by its words, in a submenu too (Interact).
+local function InspectEntry(description)
+    for _, entry in description:EnumerateElementDescriptions() do
+        if MenuUtil.GetElementText(entry) == INSPECT_TALENTS then return entry end
+        local inner = InspectEntry(entry)
+        if inner then return inner end
+    end
+end
+local function TakeTalentsEntry(_, root, context)
+    local unit = context and context.unit
+    if not (active and unit) or Hosted() then return end
+    local entry = InspectEntry(root)
+    if entry then entry:SetResponder(function() AskInspect(unit) end) end
+end
+if Menu and Menu.ModifyMenu and MenuUtil and MenuUtil.GetElementText then
+    for _, which in ipairs({ "PARTY", "PLAYER", "RAID_PLAYER", "RAID", "TARGET", "FOCUS", "FRIEND", "GUILD", "CHAT_ROSTER",
+        "COMMUNITIES_WOW_MEMBER", "COMMUNITIES_GUILD_MEMBER" }) do
+        Menu.ModifyMenu("MENU_UNIT_" .. which, TakeTalentsEntry)
+    end
+end
+
 -- Talents micro button and key open this window while on. Both client buttons:
 -- this client shows TalentMicroButton; taking only PlayerSpellsMicroButton
 -- (never shown) left the visible one opening the client's window.
