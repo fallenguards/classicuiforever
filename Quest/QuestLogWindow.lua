@@ -368,7 +368,7 @@ local function ShowMapButton(parent)
     glow:SetAllPoints(icon)
     button:SetScript("OnClick", ShowMapClick)
     -- A secure pad clicks the client's map button (ours would taint its pins, the map key in combat).
-    ns.MapPad(button, nil, CloseLog)
+    ns.MapPad(button, parent, CloseLog)
     return button
 end
 
@@ -659,7 +659,7 @@ local function Build()
     frame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", ns.ClassicSlot())
     frame:SetToplevel(true)
     frame:EnableMouse(true)
-    -- The game windows' strata: one dragged over the log goes over it, and its pads stay under that window.
+    -- The game windows' strata: one dragged over the log goes over it; its pads ride over the log (ns.StackOver).
     frame:SetFrameStrata("MEDIUM")
     TakeOldPlace()
     -- OnShow order: RegisterClassicWindow, CloseOnEscape, then ours; Era's pushable 0 (the book and social replace it).
@@ -680,7 +680,7 @@ local function Build()
     frame.close = ns.DialogClose(frame, CloseLog, QUEST_LOG_CLOSE_X, QUEST_LOG_CLOSE_Y)
     frame.close:SetSize(QUEST_LOG_CLOSE_SIZE, QUEST_LOG_CLOSE_SIZE)
     -- A secure pad over each close: a fight's Escape binding (UI/Escape.lua) is let go in the same click.
-    if ns.EscDisarmOnClick then ns.EscDisarmOnClick(ns.MapPad(frame.close, nil, CloseLog, "")) end
+    if ns.EscDisarmOnClick then ns.EscDisarmOnClick(ns.MapPad(frame.close, frame, CloseLog, "")) end
 
     frame.count, frame.countMiddle, frame.countRight = CountBox(frame)
     frame.allTab = AllTab(frame)
@@ -727,7 +727,7 @@ local function Build()
     frame.abandon:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 17, 54)
     frame.abandon:SetScript("OnClick", AbandonClick)
     frame.exit = ns.PanelButton(frame, EXIT or "Exit", 77)
-    if ns.EscDisarmOnClick then ns.EscDisarmOnClick(ns.MapPad(frame.exit, nil, CloseLog, "")) end
+    if ns.EscDisarmOnClick then ns.EscDisarmOnClick(ns.MapPad(frame.exit, frame, CloseLog, "")) end
     frame.exit:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -43, 54)
     frame.exit:SetScript("OnClick", CloseLog)
     frame.share = ns.PanelButton(frame, SHARE_QUEST or "Share Quest", 123)
@@ -736,7 +736,7 @@ local function Build()
     frame.trackButton = ns.PanelButton(frame, TRACK_QUEST_ABBREV or "Track", 76)
     frame.trackButton:SetScript("OnClick", TrackButtonClick)
     frame.share:SetScript("OnClick", ShareClick)
-    if ns.MapPad then ns.MapPad(frame.share, nil, SharePadAfter, ShareMacro) end
+    if ns.MapPad then ns.MapPad(frame.share, frame, SharePadAfter, ShareMacro) end
 
     ns.RegisterEvents(frame, LOG_EVENTS)
     -- Party members going on or offline change who counts as on a quest.

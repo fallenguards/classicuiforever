@@ -53,9 +53,9 @@ local function PressLook(mapPad, button, after, target)
     end)
 end
 
--- target: the button pressed instead of the zone name, a macro text, or a function giving the macro text now (nil: no pad).
--- when(): whether the pad is wanted now. editMode: wanted only while edit mode is open (else never then).
--- before(): ours right before the press (a window shown for the client button the macro clicks).
+-- strata: a strata, or the button's toplevel window for the pad to ride over (ns.StackOver). target: the button pressed
+-- instead of the zone name, a macro text, or a function giving it now (nil: no pad). when(): the pad wanted now.
+-- editMode: wanted only while edit mode is open. before(): ours right before the press (a window the macro's button needs).
 MapPad = function(button, strata, after, target, when, editMode, before)
     local zone = target or (MinimapCluster and MinimapCluster.ZoneTextButton)
     local macroFn = type(target) == "function" and target
@@ -83,7 +83,11 @@ MapPad = function(button, strata, after, target, when, editMode, before)
     -- Fire on release regardless of cast-on-key-down.
     mapPad:SetAttribute("useOnKeyDown", false)
     mapPad:RegisterForClicks("AnyUp", "AnyDown")
-    mapPad:SetFrameStrata(strata or "MEDIUM")
+    if type(strata) == "table" then
+        ns.StackOver(strata, mapPad)
+    else
+        mapPad:SetFrameStrata(strata or "MEDIUM")
+    end
     mapPad:Hide()
     PressLook(mapPad, button, after, target)
     local Place

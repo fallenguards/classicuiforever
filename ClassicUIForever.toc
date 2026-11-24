@@ -110,6 +110,7 @@ UI\Escape.lua
 UI\HelpButtons.lua
 UI\LevelBanner.lua
 UI\LootToast.lua
+UI\StackOver.lua
 UI\SecurePad.lua
 UI\PadNav.lua
 UI\PadBind.lua
@@ -256,7 +257,6 @@ Spells\BookLines.lua
 Spells\PetPool.lua
 Spells\BookFlyouts.lua
 Spells\BookGrid.lua
-Spells\BookStack.lua
 Spells\SpellBook.lua
 Spells\BookTraining.lua
 Skills\SkillShell.lua

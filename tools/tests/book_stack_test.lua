@@ -1,9 +1,9 @@
--- Offline test under Lua 5.4 for how our spellbook and its casting layer stack with other windows (Spells/BookStack.lua,
+-- Offline test under Lua 5.4 for how our spellbook and its casting layer stack with other windows (UI/StackOver.lua,
 -- the layer's creation in Spells/SpellBook.lua). The layer was on strata HIGH, so its spell icons showed and took the
 -- mouse through a window moved over the book (his winstack log 2026-11-24, the macro window). The stand-in client
 -- stacks as his client measured (/fcuidev stacktest v1 to v4): higher strata wins, then raise order; frame level
 -- does not count; only a toplevel frame is raised, by Raise, by a show, or by the client on a press; a fight locks the
--- secure layer. The layer's creation lines are cut from the file and run with the real BookStack.lua.
+-- secure layer. The layer's creation lines are cut from the file and run with the real UI/StackOver.lua.
 -- Run from the addon root: lua tools/tests/book_stack_test.lua (CI runs every tools/tests/*_test.lua).
 -- luacheck: std lua54
 -- luacheck: ignore 111 112 113 121 122 212 432
@@ -57,10 +57,19 @@ function Frame:SetFrameStrata(s) Blocked(self, "SetFrameStrata") self.strata = s
 function Frame:GetFrameStrata() return self.strata end
 function Frame:SetToplevel(on) Blocked(self, "SetToplevel") self.toplevel = on end
 function Frame:Raise() Blocked(self, "Raise") if self.toplevel then Lift(self) end end
+function Frame:HookScript(script, fn)
+    self.scripts = self.scripts or {}
+    table.insert(self.scripts, { script, fn })
+end
 function Frame:Show()
     Blocked(self, "Show")
-    if not self.shown and self.toplevel then Lift(self) end
+    local was = self.shown
+    if not was and self.toplevel then Lift(self) end
     self.shown = true
+    if was then return end
+    for _, s in ipairs(self.scripts or {}) do
+        if s[1] == "OnShow" then s[2](self) end
+    end
 end
 function Frame:Hide() Blocked(self, "Hide") self.shown = false end
 function Frame:SetShown(on) if on then self:Show() else self:Hide() end end
@@ -146,7 +155,7 @@ local env = setmetatable({
 
 ------------------------------------------------------------------ our book, its layer, and the macro window
 
-assert(load(Read("/Spells/BookStack.lua"), "@Spells/BookStack.lua", "t", env))("ClassicUIForever", ns)
+assert(load(Read("/UI/StackOver.lua"), "@UI/StackOver.lua", "t", env))("ClassicUIForever", ns)
 local book = NewFrame("ForeverClassicUISpellBook", UIParent)
 book:SetToplevel(true)
 book.shown = false
@@ -162,6 +171,7 @@ macro.shown = false
 local function OpenBook()
     book:Show()
     layer:Show()
+    RunNextFrame()
 end
 
 local function Name(f) return f and f.name or "nothing" end
@@ -172,6 +182,7 @@ end
 OpenBook()
 Expect(layer, "the book opened: its spell icons over it")
 macro:Show()
+RunNextFrame()
 Expect(macro, "the macro window opened over the book: it covers the spell icons")
 Press(macro)
 Expect(macro, "a press on the macro window keeps it over the book")
@@ -192,6 +203,7 @@ macro:Raise()
 Expect(macro, "in a fight, a window raised after the book covers it")
 book:Hide()
 book:Show()
+RunNextFrame()
 Expect(macro, "in a fight, the book reopened stays under that window, its icons too")
 ok, err = pcall(Fight, false)
 Check(ok, "the fight ends without a blocked call (" .. tostring(err) .. ")")
