@@ -501,6 +501,8 @@ function O.RefreshRows(built)
         row:SetChecked(doneBy or ns.db[row.setting or row.key] ~= false)
         -- Disabled and grayed under any parent that is off.
         local on, up = not (row.needs and ns.db[row.needs] == false), row.parent
+        -- parentOff: under its parent for when that is unchecked (its grayWhen grays it while checked).
+        if row.parentOff then up = parentOf[up] end
         while up do
             if ns.db[up] == false then on = false break end
             up = parentOf[up]

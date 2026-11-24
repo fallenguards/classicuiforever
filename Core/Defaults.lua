@@ -422,6 +422,8 @@ ns.DB_DEFAULTS = {
     whoList = true,
     hideWhoTab = false,
     hideFinderWho = true,
+    -- Our group finder off: Who in the social window instead of the game's finder (Social/SocialWindow.lua).
+    finderWhoInSocial = false,
     socialTitleDrag = false,
     statsSearch = false,
     groupFinder = true,

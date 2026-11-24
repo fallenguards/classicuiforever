@@ -38,11 +38,44 @@ local function NewFinderTab(parent, i, prev, entry, anchor)
 end
 
 local whoTabs, whoToggle = {}, nil
--- Hide Who side tab: the finder without it, so Who is only reached from the social window.
-local function FinderWhoHidden() return ns.db ~= nil and ns.db.hideFinderWho == true end
+-- Hide Who side tab: the finder without it, so Who is only reached from the social window. With our finder off, the
+-- finder's Who tab goes only when Who lives in the social window (Social/SocialWindow.lua S.WhoInSocialOnly).
+local function FinderWhoHidden()
+    if S.WhoInSocialOnly() then return true end
+    if S.WhoInFinder() then return false end
+    return ns.db ~= nil and ns.db.hideFinderWho == true
+end
 
--- Our who list off: the finder's own Who page stands for it.
-function S.FinderWhoOwn() return not (ns.ModuleInForce and ns.ModuleInForce("whoList")) end
+-- Our who list off, or Who left in the game's finder: the finder's own Who page stands for it.
+function S.FinderWhoOwn() return S.WhoInFinder() or not (ns.ModuleInForce and ns.ModuleInForce("whoList")) end
+
+-- Who in the social window with our finder off: the game's finder shows no Who tab, side or top (its old style's);
+-- held through its own tab passes, given back when Who goes home. Only tabs we hid are shown again.
+local hidTabs = {}
+local function KeepFinderWhoOff()
+    local finder = _G["LFGParentFrame"]
+    if not finder then return end
+    local off = S.WhoInSocialOnly ~= nil and S.WhoInSocialOnly()
+    for _, key in ipairs({ "WhoListingTab", "Tab3" }) do
+        local tab = finder[key]
+        if tab and off and tab:IsShown() then
+            hidTabs[key] = true
+            tab:Hide()
+        elseif tab and not off and hidTabs[key] then
+            hidTabs[key] = nil
+            tab:Show()
+        end
+    end
+end
+S.KeepFinderWhoOff = KeepFinderWhoOff
+ns.AttachWhenLoaded(function()
+    local finder = _G["LFGParentFrame"]
+    if not finder then return false end
+    finder:HookScript("OnShow", KeepFinderWhoOff)
+    if finder.UpdateTabs then ns.HookMethod(finder, "UpdateTabs", KeepFinderWhoOff) end
+    KeepFinderWhoOff()
+    return true
+end)
 -- On it now: the window is the game's there (Social/GroupFinder.lua stands down), its own tabs at home.
 function S.FinderOnOwnWho()
     local finder = _G["LFGParentFrame"]
@@ -558,7 +591,8 @@ end
 
 -- In a fight too: only a widget's shown state (the client's tab over it hides with it).
 ns.OnToggle(function(key)
-    if key ~= "hideFinderWho" then return end
+    if key == "finderWhoInSocial" then KeepFinderWhoOff() end
+    if key ~= "hideFinderWho" and key ~= "finderWhoInSocial" then return end
     for _, side in ipairs(finderTabs) do
         if not side.index then side:SetShown(not FinderWhoHidden()) end
     end

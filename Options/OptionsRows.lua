@@ -733,7 +733,7 @@ function O.BuildRows(child, colW)
                 row.text:SetWidth(colW - 14 - DROP_W - row.depth * INDENT)
             elseif not entry.drop then
                 local box = Checkbox(child, entry[1], entry[2], entry[3], entry.radio)
-                box.needs, box.offBy, box.grayWhen = entry.needs, entry.offBy, entry.grayWhen
+                box.needs, box.offBy, box.grayWhen, box.parentOff = entry.needs, entry.offBy, entry.grayWhen, entry.parentOff
                 box.grayIf, box.grayTip, box.hideIf = entry.grayIf, entry.grayTip, entry.hideIf
                 if entry.search then box.keyLow = box.keyLow .. " " .. entry.search:lower() end
                 Add(box, entry.parent)

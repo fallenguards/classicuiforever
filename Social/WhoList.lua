@@ -331,7 +331,8 @@ local function Build()
     end)
 
     ns.EventFrame("WHO_LIST_UPDATE", function()
-        if not active then return end
+        -- Who left in the game's finder (our finder off): its own page answers.
+        if not active or S.WhoInFinder() then return end
         ns.OpenWhoList()
         HideBlizzardPanels()
         DressWindow()
@@ -345,7 +346,7 @@ local function Build()
         if not who then return false end
         clientWho = who
         whoShown = ns.Sched.AfterShow(who, "who.sendAway", function()
-            if not active then return end
+            if not active or S.WhoInFinder() then return end
             ns.OpenWhoList()
             HideBlizzardPanels()
         end)
@@ -470,7 +471,7 @@ end
 
 -- In a fight too: only widget calls (the game's tab takes its mouse back after it).
 ns.OnToggle(function(key)
-    if key ~= "hideWhoTab" then return end
+    if key ~= "hideWhoTab" and key ~= "finderWhoInSocial" then return end
     local hidden = S.WhoTabHidden()
     if active or StandsIn() then
         if not tab then return end

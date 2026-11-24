@@ -109,8 +109,21 @@ local function ClientWhoMouse()
     local tab = ClientWho()
     if tab then tab:EnableMouse(not clientWhoOff) end
 end
+-- Where Who lives with our group finder off (Forever): the game's finder, its own tabs working, the social window with
+-- no Who tab; or, with "Who tab in the social window" and our who list on, the social window alone, the finder with no
+-- Who tab. With our finder on, both and the two Hide picks, as before (his ask, 2026-11-24).
+local function OurFinderOff()
+    return ns.db ~= nil and ns.OnForever() and not (ns.ModuleInForce and ns.ModuleInForce("groupFinder"))
+end
+local function WhoMoved() return ns.db.finderWhoInSocial == true and ns.ModuleInForce("whoList") end
+function S.WhoInFinder() return OurFinderOff() and not WhoMoved() end
+function S.WhoInSocialOnly() return OurFinderOff() and WhoMoved() end
 -- Hide Who tab: no Who tab at the social window's foot (ours or the game's); the finder keeps its side tab.
-function S.WhoTabHidden() return ns.db ~= nil and ns.db.hideWhoTab == true end
+function S.WhoTabHidden()
+    if ns.db == nil then return false end
+    if OurFinderOff() then return not WhoMoved() end
+    return ns.db.hideWhoTab == true
+end
 
 -- True when the tab changed hands.
 function S.ClientWhoTab(off)

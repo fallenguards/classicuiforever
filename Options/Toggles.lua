@@ -10,15 +10,16 @@ O.TITLE = ns.PACKAGE and ns.PACKAGE.title or "ClassicUI Forever"
 O.MASTER_PAGE = L["GROUP_ALL_WINDOWS"]
 O.PAGE_NOTES = { [L["GROUP_ALL_WINDOWS"]] = L["OPTWIN_ALL_WINDOWS_NOTE"] }
 
--- key, label, tooltip; parent: indented, grayed while it (or needs) is off or offBy in force; hideIf: left out while true;
--- group: a page; radio: one on (drop: a drop down); checks with drop: boxes in a drop down; windows: All windows' sections.
--- Order drives the options list, /fcui help and the reload prompt (Core ToggleTree); Status reads it. Kids follow their parent.
+-- key, label, tooltip; parent: indented, grayed while it (or needs) is off or offBy in force (parentOff: usable when off);
+-- hideIf: left out while true; group: a page; radio: one on (drop: a drop down); checks with drop: drop down boxes;
+-- windows: All windows' sections. Order drives the list, /fcui help, the reload prompt (Core ToggleTree) and Status.
 local SHOW_TIP = L["OPT_TIP_SHOW_HOVER_HIDE"]
 local GRYPHON_TIP = L["OPT_TIP_GRYPHON"]
 local function MinimapRotates() return ns.GetCVarBool("rotateMinimap") == true end
 -- Windows Forever never opens: its Adventure Guide is held off and its items have no sockets (#210).
 local NotOnForever = ns.OnForever
 local function OnRetail() return not ns.OnForever() end
+local function OurFinderOff() return ns.OnForever() and ns.db.groupFinder == false end
 -- Forever's own bag bar keeps a socket per bag: a fold or hide there leaves empty ones (#205).
 local function ForeverGameBags() return ns.OnForever() and ns.db.classicBar == false end
 local function RetailGameBags() return not ns.OnForever() and ns.db.classicBar == false end
@@ -541,8 +542,10 @@ ns.TOGGLES = {
 
     -- Both lists live in our social window: with Social off the window is the game's, with none of our tabs (#333).
     { "whoList", L["OPT_whoList"], L["OPT_whoList_TIP"], group = L["GROUP_SOCIAL"], needs = "panelSocial" },
-    { "hideWhoTab", L["OPT_hideWhoTab"], L["OPT_hideWhoTab_TIP"], search = "who tab hide remove social group finder" },
-    { "hideFinderWho", L["OPT_hideFinderWho"], L["OPT_hideFinderWho_TIP"], hideIf = OnRetail,
+    -- With our finder off these have nothing to act on: Who in the social window or the finder is the pick under it.
+    { "hideWhoTab", L["OPT_hideWhoTab"], L["OPT_hideWhoTab_TIP"], search = "who tab hide remove social group finder",
+        hideIf = OurFinderOff },
+    { "hideFinderWho", L["OPT_hideFinderWho"], L["OPT_hideFinderWho_TIP"], hideIf = function() return OnRetail() or OurFinderOff() end,
         search = "who side tab group finder hide remove confusing" },
     { "socialTitleDrag", L["OPT_socialTitleDrag"], L["OPT_socialTitleDrag_TIP"],
         search = "social window drag move title bar status online away busy" },
@@ -673,6 +676,9 @@ local FOREVER_ROWS = {
     },
     communitiesNoGuildTab = {
         { "groupFinder", L["OPT_groupFinder"], L["OPT_groupFinder_TIP"] },
+        -- Only with Group finder unchecked: Who in the social window, none in the game's finder (Social/SocialWindow.lua).
+        { "finderWhoInSocial", L["OPT_finderWhoInSocial"], L["OPT_finderWhoInSocial_TIP"], parent = "groupFinder",
+            parentOff = true, grayWhen = "groupFinder", needs = "whoList", search = "who tab social window group finder" },
     },
 }
 

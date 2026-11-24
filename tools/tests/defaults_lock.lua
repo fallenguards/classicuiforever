@@ -162,6 +162,7 @@ return {
     hideCollReset = false,
     hideCombatGlow = false,
     hideFinderWho = true,
+    finderWhoInSocial = false,
     hideFrameHint = true,
     hideGryphonLeft = false,
     hideGryphonRight = false,

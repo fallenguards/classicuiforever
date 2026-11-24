@@ -284,6 +284,9 @@ ns.NewSideTab = function(parent, i, prev)
     tab:SetID(i)
     return tab
 end
+-- Where Who lives (Social/SocialWindow.lua): our finder on here, so neither of its off-finder homes.
+ns.social.WhoInFinder = function() return false end
+ns.social.WhoInSocialOnly = function() return false end
 Load("Social/FinderTabs.lua")
 local S = ns.social
 
