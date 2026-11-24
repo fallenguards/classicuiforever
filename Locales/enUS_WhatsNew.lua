@@ -2,6 +2,16 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN98_1_TITLE"] = "Bag icons on empty slots"
+L["WN98_1_TEXT"] = "In One bag, each empty slot now shows a faded icon of the bag it belongs to, so a quiver's slots are easy to spot. Turn it on in the options (/fcui): One bag, under Bags. Plain empty slots, just under it, makes them all alike again."
+L["WN98_2_TITLE"] = "Class colors in battlegrounds"
+L["WN98_2_TEXT"] = "Enemy players' nameplates now show their class color in battlegrounds and dungeons, where the game hides their class and they showed red."
+L["WN98_3_TITLE"] = "Bags stay put"
+L["WN98_3_TEXT"] = "Bags moved in Edit Mode now stay where you leave them. Bags you placed before this version stay where they are."
+L["WN98_4_TITLE"] = "Windows on top"
+L["WN98_4_TEXT"] = "A window you drag over the quest log or the spellbook now goes over it, and the spellbook's icons no longer show through."
+L["WN98_5_TITLE"] = "Group finder tabs"
+L["WN98_5_TEXT"] = "The group finder and a window another addon opens from its side tabs now share one spot, so switching tabs no longer jumps, and dragging either moves both."
 L["WN97_1_TITLE"] = "No gap at max level"
 L["WN97_1_TEXT"] = "At max level, with no experience or reputation bar showing, the bars above the main bar now sit down on the thin bar where experience was, as on Era."
 L["WN97_2_TITLE"] = "Legacy challenges"

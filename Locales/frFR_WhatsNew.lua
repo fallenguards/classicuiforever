@@ -3,6 +3,16 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN98_1_TITLE"] = "Icônes de sac sur les emplacements vides"
+L["WN98_1_TEXT"] = "Dans Un seul sac, chaque emplacement vide montre désormais une icône pâle du sac auquel il appartient, pour repérer d'un coup d'oeil les emplacements d'un carquois. Activez-la dans les options (/fcui) : Un seul sac, sous Sacs. Emplacements vides unis, juste en dessous, les rend de nouveau tous pareils."
+L["WN98_2_TITLE"] = "Couleurs de classe en champ de bataille"
+L["WN98_2_TEXT"] = "Les barres de nom des joueurs ennemis montrent désormais leur couleur de classe en champ de bataille et en donjon, où le jeu cache leur classe et où elles étaient rouges."
+L["WN98_3_TITLE"] = "Les sacs restent en place"
+L["WN98_3_TEXT"] = "Les sacs déplacés en mode Édition restent désormais là où vous les laissez. Ceux placés avant cette version restent où ils sont."
+L["WN98_4_TITLE"] = "Fenêtres au premier plan"
+L["WN98_4_TEXT"] = "Une fenêtre glissée sur le journal de quêtes ou le grimoire passe désormais par-dessus, et les icônes du grimoire ne transparaissent plus."
+L["WN98_5_TITLE"] = "Onglets de la recherche de groupe"
+L["WN98_5_TEXT"] = "La recherche de groupe et une fenêtre qu'un autre addon ouvre depuis ses onglets latéraux partagent désormais une même place : changer d'onglet ne fait plus sauter la fenêtre, et déplacer l'une déplace les deux."
 L["WN97_1_TITLE"] = "Plus d'espace au niveau maximum"
 L["WN97_1_TEXT"] = "Au niveau maximum, sans barre d'expérience ni de réputation, les barres au-dessus de la barre principale reposent maintenant sur la fine barre où se trouvait l'expérience, comme dans Era."
 L["WN97_2_TITLE"] = "Défis d'Héritage"

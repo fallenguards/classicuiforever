@@ -3,6 +3,16 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN98_1_TITLE"] = "Icone delle borse sugli spazi vuoti"
+L["WN98_1_TEXT"] = "In Una borsa, ogni spazio vuoto mostra ora un'icona sbiadita della borsa a cui appartiene, così gli spazi di una faretra si notano subito. Attivala nelle opzioni (/fcui): Una borsa, sotto Borse. Spazi vuoti semplici, subito sotto, li rende di nuovo tutti uguali."
+L["WN98_2_TITLE"] = "Colori di classe nei campi di battaglia"
+L["WN98_2_TEXT"] = "Le barre del nome dei giocatori nemici ora mostrano il colore della loro classe nei campi di battaglia e nelle spedizioni, dove il gioco nasconde la classe e apparivano rosse."
+L["WN98_3_TITLE"] = "Le borse restano al loro posto"
+L["WN98_3_TEXT"] = "Le borse spostate in modalità modifica ora restano dove le lasci. Quelle sistemate prima di questa versione restano dove sono."
+L["WN98_4_TITLE"] = "Finestre in primo piano"
+L["WN98_4_TEXT"] = "Una finestra trascinata sul registro delle missioni o sul libro degli incantesimi ora gli passa sopra, e le icone del libro degli incantesimi non si vedono più in trasparenza."
+L["WN98_5_TITLE"] = "Schede della ricerca di gruppo"
+L["WN98_5_TEXT"] = "La ricerca di gruppo e una finestra che un altro addon apre dalle sue schede laterali ora condividono lo stesso posto: cambiando scheda non salta più nulla, e trascinarne una sposta entrambe."
 L["WN97_1_TITLE"] = "Nessuno spazio al livello massimo"
 L["WN97_1_TEXT"] = "Al livello massimo, senza barra dell'esperienza o della reputazione, le barre sopra la barra principale ora poggiano sulla barra sottile dove c'era l'esperienza, come in Era."
 L["WN97_2_TITLE"] = "Sfide dell'Eredità"

@@ -2,6 +2,24 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.65.0] - 2026-11-24
+
+### Added
+- Plain empty slots, under One bag in the Bags options, makes every empty slot in the one bag look the same, as before.
+
+### Changed
+- In One bag, each empty slot shows a faded icon of the bag it belongs to, so a quiver's slots show the quiver.
+- The group finder and a window another addon opens from its side tabs share one spot, so switching tabs no longer jumps, and dragging either moves both.
+- In Edit Mode, our list of windows grays out a window another addon already moves, and its tooltip says why.
+
+### Fixed
+- Enemy players' nameplates show their class color in battlegrounds and dungeons, where they were red.
+- Bags moved in Edit Mode stay where you leave them. Bags you placed before this version stay where they are.
+- Minimap buttons that other addons place themselves sit on the minimap's edge instead of floating off it.
+- After a /who, the group finder icon on the minimap opens the group finder, not the Who list.
+- Window mover addons can drag the group finder.
+- A window dragged over the quest log or the spellbook goes over it, and the spellbook's icons no longer show through.
+
 ## [0.64.2] - 2026-11-23
 
 ### Changed

@@ -3,6 +3,16 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN98_1_TITLE"] = "Iconos de bolsa en ranuras vacías"
+L["WN98_1_TEXT"] = "En Una bolsa, cada ranura vacía muestra ahora un icono atenuado de la bolsa a la que pertenece, así las ranuras de un carcaj se ven al instante. Actívala en las opciones (/fcui): Una bolsa, en Bolsas. Ranuras vacías lisas, justo debajo, las vuelve a dejar todas iguales."
+L["WN98_2_TITLE"] = "Colores de clase en campos de batalla"
+L["WN98_2_TEXT"] = "Las placas de nombre de los jugadores enemigos ahora muestran su color de clase en campos de batalla y mazmorras, donde el juego oculta su clase y se veían en rojo."
+L["WN98_3_TITLE"] = "Las bolsas se quedan en su sitio"
+L["WN98_3_TEXT"] = "Las bolsas que mueves en el modo de edición ahora se quedan donde las dejas. Las que colocaste antes de esta versión siguen donde están."
+L["WN98_4_TITLE"] = "Ventanas por encima"
+L["WN98_4_TEXT"] = "Una ventana que arrastras sobre el registro de misiones o el libro de hechizos ahora queda encima, y los iconos del libro de hechizos ya no se transparentan."
+L["WN98_5_TITLE"] = "Pestañas del buscador de grupos"
+L["WN98_5_TEXT"] = "El buscador de grupos y una ventana que otro addon abre desde sus pestañas laterales ahora comparten un mismo sitio, así que cambiar de pestaña ya no salta, y arrastrar cualquiera de las dos mueve ambas."
 L["WN97_1_TITLE"] = "Sin hueco al nivel máximo"
 L["WN97_1_TEXT"] = "Al nivel máximo, sin barra de experiencia ni de reputación, las barras sobre la barra principal ahora se apoyan en la barra fina donde estaba la experiencia, como en Era."
 L["WN97_2_TITLE"] = "Desafíos de Legado"

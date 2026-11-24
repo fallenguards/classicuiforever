@@ -3,6 +3,16 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN98_1_TITLE"] = "Taschensymbole auf leeren Plätzen"
+L["WN98_1_TEXT"] = "In Eine Tasche zeigt jeder leere Platz jetzt ein blasses Symbol der Tasche, zu der er gehört, so sind die Plätze eines Köchers leicht zu finden. Schalte sie in den Optionen (/fcui) ein: Eine Tasche, unter Taschen. Schlichte leere Plätze, direkt darunter, macht sie wieder alle gleich."
+L["WN98_2_TITLE"] = "Klassenfarben im Schlachtfeld"
+L["WN98_2_TEXT"] = "Namensplaketten feindlicher Spieler zeigen jetzt ihre Klassenfarbe in Schlachtfeldern und Dungeons, wo das Spiel ihre Klasse verbirgt und sie rot waren."
+L["WN98_3_TITLE"] = "Taschen bleiben, wo sie sind"
+L["WN98_3_TEXT"] = "Im Bearbeitungsmodus verschobene Taschen bleiben jetzt, wo du sie ablegst. Taschen, die du vor dieser Version platziert hast, bleiben an ihrem Platz."
+L["WN98_4_TITLE"] = "Fenster im Vordergrund"
+L["WN98_4_TEXT"] = "Ein Fenster, das du über das Questlog oder das Zauberbuch ziehst, liegt jetzt darüber, und die Symbole des Zauberbuchs scheinen nicht mehr durch."
+L["WN98_5_TITLE"] = "Reiter der Gruppensuche"
+L["WN98_5_TEXT"] = "Die Gruppensuche und ein Fenster, das ein anderes Addon über seine Seitenreiter öffnet, teilen sich jetzt einen Platz: Beim Wechsel der Reiter springt nichts mehr, und Ziehen eines der beiden verschiebt beide."
 L["WN97_1_TITLE"] = "Keine Lücke auf Höchststufe"
 L["WN97_1_TEXT"] = "Auf Höchststufe, ohne Erfahrungs- oder Rufleiste, sitzen die Leisten über der Hauptleiste jetzt auf der schmalen Leiste, wo die Erfahrung war, wie in Era."
 L["WN97_2_TITLE"] = "Vermächtnisherausforderungen"
