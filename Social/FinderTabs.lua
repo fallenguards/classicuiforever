@@ -121,14 +121,28 @@ local function OuterHost(index, up)
     end
 end
 
--- The finder's micro button, hovered while the finder is shut on another page (the Who list after a /who): the first
--- page's tab lies over it, so the press turns the page in the client's name and the finder opens there.
+-- The finder's micro button, and the secure pad our minimap's group finder icon presses it through (that press never
+-- reached the micro button's tab: a /who, then the icon, opened the Who list, 2026-11-24).
+local MINIMAP_ICON = "ForeverClassicUIMinimapGroupFinderButton"
+local function MicroHosts()
+    local icon = _G[MINIMAP_ICON]
+    return _G["LFDMicroButton"], icon and ns.PadOf and ns.PadOf(icon)
+end
+local function IsMicroHost(host)
+    local micro, pad = MicroHosts()
+    return host ~= nil and (host == micro or host == pad)
+end
+
+-- One of those, hovered while the finder is shut on another page (the Who list after a /who): the first page's tab lies
+-- over it, so the press turns the page in the client's name and the finder opens there.
 local function MicroHost(finder, up)
     if up or finder.selectedTab == 1 then return nil end
-    local micro = _G["LFDMicroButton"]
-    if not (micro and micro:IsVisible() and micro:IsEnabled() and micro:IsMouseOver()) then return nil end
-    return micro
+    local micro, pad = MicroHosts()
+    if micro and micro:IsVisible() and micro:IsEnabled() and micro:IsMouseOver() then return micro end
+    if pad and pad:IsVisible() and pad:IsMouseOver() then return pad end
+    return nil
 end
+local WatchMicro
 
 -- Over the Who tab's while those show and the finder is shut or hovered there, else the finder's.
 local function SyncCatchers()
@@ -139,6 +153,7 @@ local function SyncCatchers()
         onFinder = true
         RunCatchers(finder, "finder.catchers")
     end
+    WatchMicro()
     local up = finder:IsShown()
     local micro = MicroHost(finder, up)
     local own = S.FinderOnOwnWho()
@@ -199,11 +214,15 @@ local function OpenOnPage()
     end
 end
 
--- Nothing else runs the catchers while no finder or Who tab shows: the hover does.
-local function WatchMicro()
-    local micro = _G["LFDMicroButton"]
-    if not micro or not ns.Once(micro, "finderMicroWatch") then return end
-    micro:HookScript("OnEnter", SyncCatchers)
+-- Nothing else runs the catchers while no finder or Who tab shows: the hover does, on either host (a pad made later is
+-- hooked on the next pass, out of a fight: a secure frame takes no hook in one).
+local function WatchHost(host)
+    if host and not InCombatLockdown() and ns.Once(host, "finderMicroWatch") then host:HookScript("OnEnter", SyncCatchers) end
+end
+WatchMicro = function()
+    local micro, pad = MicroHosts()
+    WatchHost(micro)
+    WatchHost(pad)
 end
 
 local clickWatch
@@ -218,7 +237,7 @@ local function WatchClicks()
         if button ~= "LeftButton" then return end
         for index = 1, #CATCH_KEYS do
             local host, catcher = lent[index], Catcher(index)
-            local opens = host and (host.onWho or host == _G["LFDMicroButton"] or host == S.whoTab or outerHost[host])
+            local opens = host and (host.onWho or IsMicroHost(host) or host == S.whoTab or outerHost[host])
             if opens and catcher and catcher:IsVisible() and catcher:IsMouseOver() then
                 -- Next frame: the client's own mouse-up turns the page first.
                 pending = index

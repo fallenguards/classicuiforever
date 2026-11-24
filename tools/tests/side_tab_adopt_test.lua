@@ -411,6 +411,28 @@ local fit = handle:read("a")
 handle:close()
 Check(select(2, fit:gsub("S%.AdoptFinderOthers%(parent%)", "")) == 2, "the finder's pass runs it, standing down too")
 
+------------------------------------------------------------------ a /who, then our minimap group finder icon
+
+-- A /who leaves the finder shut on its own Who page. Our minimap icon presses the micro button through a secure pad, a
+-- press the micro button's tab never caught, so the Who list opened in the finder's place (/fcuidev finderopen,
+-- 2026-11-24). Hovering the pad lays the first page's tab over it; its press turns the page in the client's name.
+local icon = CreateFrame("Button", "ForeverClassicUIMinimapGroupFinderButton", UIParent)
+local pad = CreateFrame("Button", "ClassicUIForeverMapPad19", UIParent)
+-- The game names its globals by CreateFrame's name; this stub does not.
+_G[icon:GetName()] = icon
+ns.PadOf = function(button) return button == icon and pad or nil end
+finder:Hide()
+finder.selectedTab = 3
+S.WatchSocialWho(UIParent, true)
+pad._over = true
+pad:Fire("OnEnter")
+Check(finder.ListingTab:GetParent() == pad, "a /who then the minimap icon hovered: the first page's tab lies over its pad")
+pad._over = false
+finder.selectedTab = 1
+finder:Show()
+pad:Fire("OnEnter")
+Check(finder.ListingTab:GetParent() ~= pad, "the finder up on its first page: the tab leaves the pad")
+
 if failed > 0 then
     print(failed .. " check(s) failed")
     os.exit(1)
