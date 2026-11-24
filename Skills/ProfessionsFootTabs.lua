@@ -43,8 +43,9 @@ end
 -- window, under a tab that turns back to the face: the book, or the open profession under its own icon; its own tabs
 -- on this window stand down, hidden as they show (#260).
 local TRAINING_TABS = { "WhatsTrainingCraftingTab", "WhatsTrainingCraftingReturnTab" }
--- The spellbook's first side tab spot (Spells/SpellBook.lua): just past the window's right edge, 65 down.
-local TRAIN_X, TRAIN_Y, TRAIN_GAP = 2, -65, -17
+-- The spellbook's first side tab spot on screen: its 352 right and 65 down, less this window's 12 right and 14 down
+-- from the book's corner (UI/WindowList.lua follows), so the tabs start where the spellbook's do.
+local TRAIN_X, TRAIN_Y, TRAIN_GAP = 1, -51, -17
 local PROF_ICON = "Interface\\Icons\\INV_SideTab_Professions_c60"
 local faceTab, trainTab, faceIcon
 local function TrainingOurs()

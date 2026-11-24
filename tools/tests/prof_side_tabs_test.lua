@@ -138,8 +138,13 @@ local last = window.rightProfessionTabs[3]
 -- Always shown.
 Pass()
 local face, train = Ours()
-Check(adoptedWith ~= nil and adoptedWith[1] == window and adoptedWith[2] == 2 and adoptedWith[3] == -65,
-    "the game's side tabs wear the classic look from the spellbook's first tab spot")
+-- The spellbook's first tab: 352 right of its left edge (384 wide less 32), 65 under its top; this window stands 12 right
+-- and 14 down from the book's corner and is 339 wide: the same spot on screen is 1 past its right edge, 51 under its top.
+local SPELL_TAB_X, SPELL_TAB_Y, FOLLOW_X, FOLLOW_Y, BOOK_W = 352, -65, 12, -14, 339
+Check(adoptedWith ~= nil and adoptedWith[1] == window and adoptedWith[2] == SPELL_TAB_X - FOLLOW_X - BOOK_W
+    and adoptedWith[3] == SPELL_TAB_Y - FOLLOW_Y,
+    "the game's side tabs start on the spellbook's first tab spot (" .. tostring(adoptedWith and adoptedWith[2]) .. ", "
+    .. tostring(adoptedWith and adoptedWith[3]) .. ")")
 Check(last.scale == 1, "a classic tab keeps its own size (" .. tostring(last.scale) .. ")")
 Check(face ~= nil and not face.shown, "no second Professions tab under the side tabs")
 Check(train ~= nil and train.points and train.points[2] == last, "What's Training's tab stands under the last side tab")

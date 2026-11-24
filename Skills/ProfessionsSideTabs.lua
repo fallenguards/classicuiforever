@@ -118,8 +118,8 @@ local fadeJob = ns.Sched.Job({ name = "professions.tabFade", every = FADE_STEP, 
 end })
 
 -- The classic look while our book is on, out of a fight (they are protected): stacked from the spellbook's first side
--- tab spot, just past the window's right edge, 65 down; given back otherwise.
-local FIRST = { nil, 2, -65 }
+-- tab spot on screen (Skills/ProfessionsFootTabs.lua TRAIN_X, TRAIN_Y); given back otherwise.
+local FIRST = { nil, 1, -51 }
 local function Classic() return ns.OnForever() and ns.ModuleInForce("professionsBook") end
 local function Adopt(frame)
     if InCombatLockdown() then return end
