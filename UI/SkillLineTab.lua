@@ -144,6 +144,12 @@ local function GiveBack(tab)
     ns.PutPoints(tab, was.points)
 end
 
+-- Another addon's tabs adopted on a window, for that window's own code (Social/FinderTabs.lua: what one opens).
+function ns.AdoptedSideTabs(window)
+    local state = held[window]
+    return state and state.list or {}
+end
+
 -- AdoptSideTabs(window, under, own, first), from the window's own pass while it shows. under: our last shown tab; first:
 -- { frame, x, y } on a window with none of ours, the first at x, y off frame's top right; neither gives the others back.
 -- own(frame): true for the game's own tabs there, left alone. Children are read again on a count change.

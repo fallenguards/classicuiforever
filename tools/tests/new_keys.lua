@@ -375,4 +375,5 @@ return {
     raidManagerHover = "same for everyone: opt-in, off by default",
     questAutoTrack = "same for everyone: read from the game's own setting (autoQuestWatch) on every pass, never decided by us",
     bagsOldSpot = "kept as before: dbVersion 38 (ns.KeepBagsSpot) marks an updating player, whose moved bags stay drawn where they were seen until moved in edit mode (per layout); new players never have it",
+    finderPartner = "same for everyone: empty by default, learned from the first press of another addon's group finder tab; it only places that window on the finder's spot",
 }

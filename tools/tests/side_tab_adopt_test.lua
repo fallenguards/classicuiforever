@@ -65,6 +65,10 @@ function Region:SetPoint(point, rel, relPoint, x, y)
 end
 function Region:SetAllPoints(rel) self._points = { { "TOPLEFT", rel, "TOPLEFT", 0, 0 }, { "BOTTOMRIGHT", rel, "BOTTOMRIGHT", 0, 0 } } end
 function Region:GetNumPoints() return #self._points end
+function Region:GetLeft() return self._left end
+function Region:GetTop() return self._top end
+function Region:GetEffectiveScale() return self._scale or 1 end
+function Region:IsProtected() return false end
 function Region:GetPoint(i) local p = self._points[i or 1] if p then return p[1], p[2], p[3], p[4], p[5] end end
 function Region:SetAlpha(a) self._alpha = a end
 function Region:GetAlpha() return self._alpha end
@@ -410,6 +414,45 @@ local handle = assert(io.open(ROOT .. "/Social/GroupFinder.lua", "r"))
 local fit = handle:read("a")
 handle:close()
 Check(select(2, fit:gsub("S%.AdoptFinderOthers%(parent%)", "")) == 2, "the finder's pass runs it, standing down too")
+
+------------------------------------------------------------------ the window another addon's finder tab opens
+
+-- LFG Forever's tab opens its own window in the finder's place, one at a time, and that window stood where its addon
+-- kept it, so the switch jumped (2026-11-24). It must open on the finder's spot, found by what came up with the tab's
+-- press, its name kept for the next session; a standalone open takes the finder's last spot.
+ns.db.finderPartner = ""
+finder:Show()
+finder.selectedTab = 2
+finder._left, finder._top = 700, 600
+local window = CreateFrame("Frame", "PartnerWindow", UIParent)
+window:Hide()
+window:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+S.AdoptFinderOthers(finder)
+-- The press: its own handler opens its window and shuts the finder on the release.
+lfg:Fire("OnMouseDown", "LeftButton")
+window:Show()
+finder:Hide()
+lfg:Fire("OnMouseUp", "LeftButton", true)
+local wp, wrel, wrp, wx, wy = window:GetPoint(1)
+Check(wp == "TOPLEFT" and wrel == UIParent and wrp == "BOTTOMLEFT" and wx == 700 and wy == 600,
+    string.format("the tab's window opens on the finder's spot (now %s %s %s, %s)", tostring(wp), tostring(wrp), tostring(wx), tostring(wy)))
+Check(ns.db.finderPartner == "PartnerWindow", "its name kept for the next session")
+-- The finder moved (MoveAny), then the window opened on its own (its minimap button): the finder's last spot.
+window:Hide()
+finder:Show()
+finder._left, finder._top = 300, 500
+S.AdoptFinderOthers(finder)
+finder:Hide()
+window:Show()
+window:Fire("OnShow")
+wx, wy = select(4, window:GetPoint(1))
+Check(wx == 300 and wy == 500, "opened on its own: on the finder's last spot")
+-- A window at another scale lands on the same screen spot.
+window._scale = 2
+window:Fire("OnShow")
+wx, wy = select(4, window:GetPoint(1))
+Check(wx == 150 and wy == 250, "at another scale: the same spot on screen")
+window._scale = 1
 
 ------------------------------------------------------------------ a /who, then our minimap group finder icon
 

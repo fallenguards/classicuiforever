@@ -120,6 +120,7 @@ return {
     fadeMicro = 100,
     fadePet = 100,
     fadeStance = 100,
+    finderPartner = "",
     focusBuffsOnTop = false,
     foreverWelcome = true,
     fullPlates = true,

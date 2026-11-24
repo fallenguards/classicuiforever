@@ -392,6 +392,76 @@ local function IsCatcher(frame)
 end
 
 -- Other addons' side tabs on the finder (LFG Forever's, #335) under our last shown one; theirs again on its own Who page.
+---------------------------------------------------------------- the window another addon's finder tab opens
+
+-- Another addon's side tab on the finder opens that addon's own window in the finder's place, one at a time. It stood
+-- where its addon kept it, so the switch jumped (2026-11-24): it opens on the finder's spot, or the finder's last one.
+-- Found as the one window that came up with the tab's press, never by a name; that name is kept for the next session.
+local partner, finderSpot, shownAtPress
+
+-- A frame's top left in screen pixels, nil while unreadable.
+local function Spot(frame)
+    local left, top = frame:GetLeft(), frame:GetTop()
+    if ns.AnySecret(left, top) or not (left and top) then return nil end
+    local k = frame:GetEffectiveScale()
+    return { left * k, top * k }
+end
+
+local function OnFinderSpot(frame)
+    local finder = _G["LFGParentFrame"]
+    local spot = (finder and finder:IsVisible() and Spot(finder)) or finderSpot
+    if not spot or (InCombatLockdown() and frame:IsProtected()) then return end
+    local k = frame:GetEffectiveScale()
+    ns.SetPointIf(frame, "TOPLEFT", UIParent, "BOTTOMLEFT", spot[1] / k, spot[2] / k)
+end
+
+local function TakePartner(frame)
+    if partner == frame then return end
+    partner = frame
+    ns.db.finderPartner = frame:GetName()
+    frame:HookScript("OnShow", OnFinderSpot)
+end
+
+local function NoteShown(child, set)
+    if child:IsShown() then set[child] = true end
+end
+
+-- The tab's own press opens the window: the one named window up now that was not at the press.
+local function PressStart()
+    shownAtPress = {}
+    ns.EachChild(UIParent, NoteShown, shownAtPress)
+end
+local function PressEnd()
+    local before = shownAtPress
+    shownAtPress = nil
+    if not before then return end
+    local now, found = {}, nil
+    ns.EachChild(UIParent, NoteShown, now)
+    for frame in pairs(now) do
+        if not before[frame] and frame:GetName() and frame ~= _G["LFGParentFrame"] then
+            -- Two came up: no telling which the tab opened.
+            if found then return end
+            found = frame
+        end
+    end
+    if not found then return end
+    TakePartner(found)
+    OnFinderSpot(found)
+end
+
+-- Each pass while the finder shows: its spot kept, the partner of an earlier session found again, other tabs heard.
+local function KeepPartner(parent)
+    finderSpot = Spot(parent) or finderSpot
+    local saved = ns.db.finderPartner
+    if not partner and type(saved) == "string" and saved ~= "" and type(_G[saved]) == "table" then TakePartner(_G[saved]) end
+    for _, tab in ipairs(ns.AdoptedSideTabs and ns.AdoptedSideTabs(parent) or {}) do
+        if ns.Once(tab, "finderPartnerPress") then
+            tab:HookScript("OnMouseDown", PressStart)
+            tab:HookScript("OnMouseUp", PressEnd)
+        end
+    end
+end
+
 function S.AdoptFinderOthers(parent)
     if not ns.AdoptSideTabs then return end
     local last
@@ -401,6 +471,7 @@ function S.AdoptFinderOthers(parent)
         end
     end
     ns.AdoptSideTabs(parent, last, IsCatcher)
+    KeepPartner(parent)
 end
 
 -- In a fight too: only a widget's shown state (the client's tab over it hides with it).

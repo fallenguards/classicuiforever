@@ -42,6 +42,8 @@ ns.DB_DEFAULTS = {
     bagsSnapScale = 0,
     -- Updating players: per edit mode layout, the bags' spot first seen after the update (drawn as before while kept).
     bagsOldSpot = false,
+    -- The name of the window another addon's group finder tab opens, learned at its first press (Social/FinderTabs.lua).
+    finderPartner = "",
     barScale = 1,
     buttons = true,
     squareIcons = true,
