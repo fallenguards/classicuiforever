@@ -28,10 +28,41 @@ local function LayoutValue(name, default)
     return type(value) == "number" and value or default
 end
 
--- A window mover took this game window: it makes a <window>Move frame for each one it takes.
+-- A window mover took this game window: it makes a <window>Move frame for each one it takes, at the window's first
+-- show of a session. Seen once it is remembered (moverTook), so later sessions hold the window from the start: our edit
+-- mode's row grayed before that show. Dropped once the window stands shown FREE_AFTER s with no such frame.
+local FREE_AFTER = 2
+local freeSince = setmetatable({}, { __mode = "k" })
+local function NoteTook(name, took)
+    local db = ns.db
+    if not db then return end
+    if took and not (type(db.moverTook) == "table" and db.moverTook[name]) then
+        if type(db.moverTook) ~= "table" then db.moverTook = {} end
+        db.moverTook[name] = true
+    elseif not took and type(db.moverTook) == "table" then
+        db.moverTook[name] = nil
+    end
+end
 function ns.MoverTakes(frame)
     local name = frame and frame.GetName and frame:GetName()
-    return type(name) == "string" and type(_G[name .. "Move"]) == "table"
+    if type(name) ~= "string" then return false end
+    if type(_G[name .. "Move"]) == "table" then
+        freeSince[frame] = nil
+        NoteTook(name, true)
+        return true
+    end
+    if not (frame.IsShown and frame:IsShown()) then
+        freeSince[frame] = nil
+    elseif not freeSince[frame] then
+        freeSince[frame] = GetTime()
+    elseif GetTime() - freeSince[frame] >= FREE_AFTER then
+        NoteTook(name, false)
+    end
+    return false
+end
+function ns.MoverTook(name)
+    local db = ns.db
+    return type(name) == "string" and db ~= nil and type(db.moverTook) == "table" and db.moverTook[name] == true
 end
 
 -- The game's windows: its panel list, and the ones our window list holds as the game's (made once).
@@ -49,10 +80,12 @@ end
 
 -- A game window placed by someone else: a mover took it, or the player left the game's windows to other addons. Ours
 -- stand aside, with no place, size, lock, row pass or learned shift of ours on it.
-function ns.MoverHolds(frame)
-    if ns.MoverTakes(frame) then return true end
-    local name = ns.db and ns.db.leaveGameWindows and frame and frame.GetName and frame:GetName()
-    return type(name) == "string" and GameWindow(name)
+-- name: the window's, when its frame may not be made yet (a load-on-demand window in our edit mode's list).
+function ns.MoverHolds(frame, name)
+    if frame and ns.MoverTakes(frame) then return true end
+    name = name or (frame and frame.GetName and frame:GetName())
+    if ns.MoverTook(name) then return true end
+    return type(name) == "string" and ns.db ~= nil and ns.db.leaveGameWindows == true and GameWindow(name)
 end
 
 -- A window's scale against UIParent's (its units to UIParent units), nil while secret.

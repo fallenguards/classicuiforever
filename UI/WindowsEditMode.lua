@@ -339,9 +339,8 @@ end
 -- Why another addon has a window, or nil while it is ours: its box never comes here (#336 offered the row and said
 -- nothing).
 local function HeldBy(entry)
-    local frame = ns.WindowFrame(entry)
-    if not (frame and ns.MoverHolds(frame)) then return nil end
-    return ns.MoverTakes(frame) and L["UI_WINDOW_HELD_MOVER"] or L["UI_WINDOW_HELD_LEFT"]
+    if not ns.MoverHolds(ns.WindowFrame(entry), entry.name) then return nil end
+    return ns.MoverTook(entry.name) and L["UI_WINDOW_HELD_MOVER"] or L["UI_WINDOW_HELD_LEFT"]
 end
 
 -- A row's tip: why it is grayed while held, else the entry's own tip.

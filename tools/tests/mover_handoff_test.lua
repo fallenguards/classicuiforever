@@ -79,8 +79,10 @@ Yield(art, finder)
 Yield(art, finder)
 Check(art.writes == writes, "the pass runs ten times a second: no write while nothing changed")
 
--- Leave game windows to other addons on, no mover: still handed off, the press reaches the window.
+-- Leave game windows to other addons on, no mover: still handed off, the press reaches the window. No mover ever took it
+-- (a take seen is remembered across sessions, UI/GameSpot.lua moverTook).
 game.LFGParentFrameMove = nil
+ns.db.moverTook = nil
 ns.db.leaveGameWindows = true
 Yield(art, finder)
 Check(not art.mouse, "left to other addons by the setting: our art's frame lets the press through too")
@@ -128,6 +130,7 @@ Check(bookTip.text(bookRow) == "Book" and bookTip.lines[1][1](bookRow) == "the b
     "our window's row keeps its own tip")
 
 game.LFGParentFrameMove = nil
+ns.db.moverTook = nil
 ns.db.leaveGameWindows = true
 SyncHeld(finderRow, picked)
 Check(not finderRow.enabled and RowTip(finderRow.entry).lines[1][1](finderRow) == L.UI_WINDOW_HELD_LEFT,

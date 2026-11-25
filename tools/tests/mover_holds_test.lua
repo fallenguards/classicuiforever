@@ -54,6 +54,7 @@ local ns = {
         region:SetPoint(...)
     end,
 }
+GetTime = GetTime or function() return 0 end   -- the game's clock (a mover's take is timed)
 assert(loadfile(ROOT .. "/UI/GameSpot.lua"))("ClassicUIForever", ns)
 
 -- A mover holds it: our reset leaves it, and the row learns no shift from where the mover put it.

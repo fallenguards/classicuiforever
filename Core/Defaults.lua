@@ -42,6 +42,8 @@ ns.DB_DEFAULTS = {
     bagsSnapScale = 0,
     -- Updating players: per edit mode layout, the bags' spot first seen after the update (drawn as before while kept).
     bagsOldSpot = false,
+    -- Game windows a window mover took in an earlier session, held from the start of the next (UI/GameSpot.lua).
+    moverTook = false,
     -- The name of the window another addon's group finder tab opens, learned at its first press (Social/FinderTabs.lua).
     finderPartner = "",
     -- The spot it and the group finder share (screen pixels, top left), false till one is seen.

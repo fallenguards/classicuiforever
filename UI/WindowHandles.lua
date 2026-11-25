@@ -770,7 +770,7 @@ end
 -- One window's placeholder up or down; its dialog goes with it.
 local function ShowHandle(entry, on)
     -- A window a mover holds has no box here: it places that window.
-    if on and (ns.MoverHolds(ns.WindowFrame(entry)) or not Worn(entry)) then on = false end
+    if on and (ns.MoverHolds(ns.WindowFrame(entry), entry.name) or not Worn(entry)) then on = false end
     if on then
         Handle(entry)
         LayHandle(entry)

@@ -17,6 +17,7 @@ return {
     bagsFoldShiftRight = false,
     bagsHeld = false,
     bagsOldSpot = false,
+    moverTook = false,
     bagsSnapScale = 0,
     bagsTight = false,
     bagsUnfolded = false,
