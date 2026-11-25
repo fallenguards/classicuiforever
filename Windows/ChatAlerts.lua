@@ -10,6 +10,10 @@ local TOAST_UP = 27
 local TOASTS = { "BNToastFrame", "TimeAlertFrame", "VoiceChatPromptActivateChannel", "VoiceChatChannelActivatedNotification" }
 -- The world refresh toast: hung once at load on the container's top left at this offset, outside its stack.
 local SHARD, SHARD_X, SHARD_Y = "ShardTransferImminentFrame", 30, 55
+-- Classic chat off, the game hangs the container on the chat's column (27 over its top); another addon's top-edge
+-- sizing then left the chat with no points and it vanished, so it stands on that spot by the screen's coordinates.
+local GAME_UP = 27
+local following = false
 local was   -- the container's own width and points, for the hand-back
 local lifting   -- toasts kept over the chat while the column carries the container
 local shardMoved
@@ -89,12 +93,37 @@ function ns.RestoreChatAlerts()
         ns.SetPointOnce(_G[SHARD], "BOTTOMLEFT", alerts, "TOPLEFT", SHARD_X, SHARD_Y)
         shardMoved = nil
     end
-    if not (was and alerts) then return end
-    alerts:SetWidth(was.w)
-    alerts:ClearAllPoints()
-    for i = 1, was.n do
-        local p = was[i]
-        alerts:SetPoint(p[1], p[2] or alerts:GetParent(), p[3], p[4], p[5])
-    end
+    if was and alerts then alerts:SetWidth(was.w) end
     was = nil
+    -- Back on the game's own spot, still off the chat.
+    ns.KeepChatAlertsOffChat()
 end
+
+-- The game's spot: the column's top left, 27 up, read now and set by the screen's coordinates.
+local function AtGameSpot()
+    if lifting then return end
+    local alerts, chat = _G.ChatAlertFrame, _G.ChatFrame1
+    local column = chat and chat.buttonFrame
+    if not (alerts and column) then return end
+    local left, top = column:GetLeft(), column:GetTop()
+    if not (left and top) or ns.AnySecret(left, top) then return end
+    local k = column:GetEffectiveScale() / alerts:GetEffectiveScale()
+    ns.SetPointOnce(alerts, "BOTTOMLEFT", UIParent, "BOTTOMLEFT", left * k, top * k + GAME_UP)
+end
+local function Soon() ns.Sched.NextFrame("chat.alertsSpot", AtGameSpot) end
+
+-- Off the chat while the classic chat is off: placed now, and again after any move, size or side change of the chat.
+function ns.KeepChatAlertsOffChat()
+    local chat = _G.ChatFrame1
+    if not following and chat and chat.buttonFrame then
+        following = true
+        ns.HookScriptOnce(chat, "OnSizeChanged", Soon, "alertsSpot")
+        ns.HookMethod(chat, "SetPoint", Soon)
+        ns.HookMethod(chat.buttonFrame, "SetPoint", Soon)
+        ns.HookGlobal("FCF_StopDragging", Soon)
+        ns.HookGlobal("FCF_SetButtonSide", Soon)
+    end
+    AtGameSpot()
+end
+
+ns.EventFrame("PLAYER_ENTERING_WORLD", function() ns.KeepChatAlertsOffChat() end)

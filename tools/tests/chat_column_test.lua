@@ -131,6 +131,7 @@ ns.ThemeLook = function() return "classic" end
 ns.EventFrame, ns.StateTexture, ns.BronzeCopy, ns.DressStates, ns.PaintCopy, ns.EachState, ns.Dress = noop, noop, noop,
     noop, noop, noop, noop
 ns.SkinMinimalScrollBar = noop
+ns.HookScriptOnce, ns.HookMethod, ns.HookGlobal = noop, noop, noop
 ns.RegisterModule = function(_, mod) module = mod end
 ns.OnToggle = noop
 ns.OnEditMode = noop
