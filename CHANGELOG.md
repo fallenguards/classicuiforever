@@ -7,6 +7,12 @@ All notable changes to ClassicUI Forever are documented here.
 ### Fixed
 - Share Quest in the quest log shares your quest with your group again.
 - With a custom theme and Textured color, the drop downs in the game's Options no longer show a stretched button inside them.
+- Action bars no longer jump sideways in a fight when a window opens while a micro button is hidden.
+- Opening the professions book from the spellbook in a fight keeps it in the spellbook's place, with no empty second pane.
+- Inspect Talents from a player's menu opens only our talents window, with no error in a fight.
+- The chat and its tabs no longer vanish when another addon resizes the chat.
+- With a custom theme and Textured color, the drop downs in our options are drawn whole again.
+- What's Training on the professions book wears the spellbook's black marble, with no lines across the list.
 
 ## [0.65.0] - 2026-11-24
 
