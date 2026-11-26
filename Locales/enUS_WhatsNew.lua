@@ -2,6 +2,14 @@ local _, ns = ...
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; English beside Locales/enUS.lua.
+L["WN100_1_TITLE"] = "Profession side tabs"
+L["WN100_1_TEXT"] = "The professions side tabs wear the classic look and start where the spellbook's do, with What's Training's tab under them, fading on hover with them."
+L["WN100_2_TITLE"] = "Who"
+L["WN100_2_TEXT"] = "With \"Group finder\" unchecked, the game's group finder keeps its own Who tab and the social window shows none. To have Who in the social window instead, turn on \"Who tab in the social window\" under Social in the options."
+L["WN100_3_TITLE"] = "Windows"
+L["WN100_3_TEXT"] = "Collections, Legacy, and the group finder are each our classic window or the game's own, our windows open past a neighbor's side tabs, and in Edit Mode a window another addon moves is grayed out from the start."
+L["WN100_4_TITLE"] = "Smaller fixes"
+L["WN100_4_TEXT"] = "What's Training on the spellbook wears the professions' black marble, the spellbook's options arrow keeps to the right with the search hidden, and another addon's button no longer covers the professions window's lock."
 L["WN99_1_TITLE"] = "Share Quest"
 L["WN99_1_TEXT"] = "Share Quest in the quest log shares your quest with your group again."
 L["WN99_2_TITLE"] = "Options drop downs"

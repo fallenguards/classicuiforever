@@ -3,6 +3,14 @@ if ns.LOCALE ~= "deDE" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/deDE.lua.
+L["WN100_1_TITLE"] = "Berufs-Seitenreiter"
+L["WN100_1_TEXT"] = "Die Seitenreiter der Berufe tragen das klassische Aussehen und beginnen dort, wo die des Zauberbuchs beginnen, mit dem Reiter von What's Training darunter, der beim Überfahren mit ihnen erscheint."
+L["WN100_2_TITLE"] = "Wer"
+L["WN100_2_TEXT"] = "Ist \"Gruppensuche\" abgewählt, behält die Gruppensuche des Spiels ihren eigenen Wer-Reiter, und das Kontaktefenster zeigt keinen. Für Wer im Kontaktefenster schalte \"Wer-Reiter im Kontaktefenster\" unter Kontakte in den Optionen ein."
+L["WN100_3_TITLE"] = "Fenster"
+L["WN100_3_TEXT"] = "Sammlungen, Vermächtnis und die Gruppensuche sind jeweils unser klassisches Fenster oder das des Spiels, unsere Fenster öffnen sich neben den Seitenreitern eines Nachbarfensters, und im Bearbeitungsmodus ist ein Fenster, das ein anderes Addon bewegt, von Anfang an ausgegraut."
+L["WN100_4_TITLE"] = "Kleinere Korrekturen"
+L["WN100_4_TEXT"] = "What's Training im Zauberbuch trägt den schwarzen Marmor der Berufe, der Optionspfeil des Zauberbuchs bleibt bei ausgeblendeter Suche rechts, und der Knopf eines anderen Addons verdeckt das Schloss des Berufefensters nicht mehr."
 L["WN99_1_TITLE"] = "Quests teilen"
 L["WN99_1_TEXT"] = "Das Teilen von Quests im Questlog funktioniert wieder: deine Gruppe bekommt die Quest."
 L["WN99_2_TITLE"] = "Ausklappmenüs in den Optionen"

@@ -3,6 +3,14 @@ if ns.LOCALE ~= "frFR" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/frFR.lua.
+L["WN100_1_TITLE"] = "Onglets latéraux des métiers"
+L["WN100_1_TEXT"] = "Les onglets latéraux des métiers prennent l'aspect classique et commencent là où ceux du grimoire commencent, avec l'onglet de What's Training en dessous, qui apparaît avec eux au survol."
+L["WN100_2_TITLE"] = "Qui"
+L["WN100_2_TEXT"] = "Avec \"Recherche de groupe\" décoché, la recherche de groupe du jeu garde son propre onglet Qui et la fenêtre sociale n'en affiche aucun. Pour avoir Qui dans la fenêtre sociale, activez \"Onglet Qui dans la fenêtre sociale\" sous Social dans les options."
+L["WN100_3_TITLE"] = "Fenêtres"
+L["WN100_3_TEXT"] = "Collections, Héritage et la recherche de groupe sont chacun notre fenêtre classique ou celle du jeu, nos fenêtres s'ouvrent à côté des onglets latéraux d'une fenêtre voisine, et en mode Édition une fenêtre déplacée par un autre addon est grisée dès le départ."
+L["WN100_4_TITLE"] = "Petites corrections"
+L["WN100_4_TEXT"] = "What's Training dans le grimoire prend le marbre noir des métiers, la flèche des options du grimoire reste à droite quand la recherche est masquée, et le bouton d'un autre addon ne couvre plus le cadenas de la fenêtre des métiers."
 L["WN99_1_TITLE"] = "Partager une quête"
 L["WN99_1_TEXT"] = "Le partage de quêtes depuis le journal de quêtes fonctionne de nouveau avec votre groupe."
 L["WN99_2_TITLE"] = "Menus déroulants des Options"

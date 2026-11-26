@@ -3,6 +3,14 @@ if ns.LOCALE ~= "esES" and ns.LOCALE ~= "esMX" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/esES.lua.
+L["WN100_1_TITLE"] = "Pestañas laterales de profesiones"
+L["WN100_1_TEXT"] = "Las pestañas laterales de profesiones tienen el aspecto clásico y empiezan donde las del libro de hechizos, con la pestaña de What's Training debajo, que aparece con ellas al pasar el ratón."
+L["WN100_2_TITLE"] = "Quién"
+L["WN100_2_TEXT"] = "Con \"Buscador de grupos\" desmarcado, el buscador de grupos del juego conserva su propia pestaña Quién y la ventana social no muestra ninguna. Para tener Quién en la ventana social, activa \"Pestaña Quién en la ventana social\" en Social en las opciones."
+L["WN100_3_TITLE"] = "Ventanas"
+L["WN100_3_TEXT"] = "Colecciones, Legado y el buscador de grupos son cada uno nuestra ventana clásica o la del juego, nuestras ventanas se abren junto a las pestañas laterales de una ventana vecina, y en el modo de edición una ventana que mueve otro addon aparece en gris desde el principio."
+L["WN100_4_TITLE"] = "Arreglos menores"
+L["WN100_4_TEXT"] = "What's Training en el libro de hechizos lleva el mármol negro de las profesiones, la flecha de opciones del libro de hechizos se queda a la derecha con la búsqueda oculta, y el botón de otro addon ya no tapa el candado de la ventana de profesiones."
 L["WN99_1_TITLE"] = "Compartir misiones"
 L["WN99_1_TEXT"] = "Compartir misiones desde el registro de misiones vuelve a funcionar con tu grupo."
 L["WN99_2_TITLE"] = "Menús desplegables de Opciones"

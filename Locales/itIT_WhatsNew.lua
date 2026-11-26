@@ -3,6 +3,14 @@ if ns.LOCALE ~= "itIT" then return end
 local L = ns.L
 
 -- Options/Welcome.lua: What's New, by version (WN<id>_<n>), newest first; beside Locales/itIT.lua.
+L["WN100_1_TITLE"] = "Schede laterali delle professioni"
+L["WN100_1_TEXT"] = "Le schede laterali delle professioni hanno l'aspetto classico e iniziano dove iniziano quelle del libro degli incantesimi, con la scheda di What's Training sotto, che appare con loro al passaggio del mouse."
+L["WN100_2_TITLE"] = "Chi"
+L["WN100_2_TEXT"] = "Con \"Ricerca gruppi\" deselezionato, la ricerca gruppi del gioco mantiene la sua scheda Chi e la finestra sociale non ne mostra nessuna. Per avere Chi nella finestra sociale, attiva \"Scheda Chi nella finestra sociale\" in Sociale nelle opzioni."
+L["WN100_3_TITLE"] = "Finestre"
+L["WN100_3_TEXT"] = "Collezioni, Eredità e la ricerca gruppi sono ciascuna la nostra finestra classica o quella del gioco, le nostre finestre si aprono accanto alle schede laterali di una finestra vicina, e in Modalità modifica una finestra spostata da un altro addon è grigia fin dall'inizio."
+L["WN100_4_TITLE"] = "Piccole correzioni"
+L["WN100_4_TEXT"] = "What's Training nel libro degli incantesimi ha il marmo nero delle professioni, la freccia delle opzioni del libro degli incantesimi resta a destra con la ricerca nascosta, e il pulsante di un altro addon non copre più il lucchetto della finestra delle professioni."
 L["WN99_1_TITLE"] = "Condividere missioni"
 L["WN99_1_TEXT"] = "La condivisione delle missioni dal registro delle missioni funziona di nuovo con il tuo gruppo."
 L["WN99_2_TITLE"] = "Menu a tendina delle Opzioni"

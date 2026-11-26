@@ -2,6 +2,23 @@
 
 All notable changes to ClassicUI Forever are documented here.
 
+## [0.65.2] - 2026-11-26
+
+### Added
+- "Who tab in the social window", under "Group finder" in the Social options, puts Who in the social window while "Group finder" is unchecked.
+
+### Changed
+- The professions side tabs wear the classic look, start where the spellbook's do, and What's Training's tab stands under them, fading on hover with them.
+- What's Training on the spellbook wears the same black marble as on the professions book.
+- With "Group finder" unchecked, the game's group finder keeps its own Who tab and the social window shows none.
+- Collections, Legacy, and the group finder are each our classic window or the game's own, with no frame-only option under All windows.
+
+### Fixed
+- The spellbook's options arrow keeps to the right end when the search box is hidden.
+- Another addon's button on the professions window's title bar no longer covers our lock.
+- Our windows open past the side tabs of a game window beside them instead of covering them.
+- In Edit Mode, a window another addon moves is grayed out from the start of each session, not only after it first opens.
+
 ## [0.65.1] - 2026-11-24
 
 ### Fixed
