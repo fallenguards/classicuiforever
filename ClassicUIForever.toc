@@ -16,6 +16,7 @@ Core\Localization.lua
 Locales\enUS.lua
 Locales\enUS_Colors.lua
 Locales\enUS_WhatsNew.lua
+Locales\enUS_WhatsNewEarly.lua
 Locales\enUS_Help.lua
 Locales\enUS_Legacy.lua
 Locales\enUS_Windows.lua
@@ -26,6 +27,7 @@ Locales\enUS_Map.lua
 Locales\deDE.lua
 Locales\deDE_Colors.lua
 Locales\deDE_WhatsNew.lua
+Locales\deDE_WhatsNewEarly.lua
 Locales\deDE_Help.lua
 Locales\deDE_Legacy.lua
 Locales\deDE_Windows.lua
@@ -34,6 +36,7 @@ Locales\deDE_Minimap.lua
 Locales\frFR.lua
 Locales\frFR_Colors.lua
 Locales\frFR_WhatsNew.lua
+Locales\frFR_WhatsNewEarly.lua
 Locales\frFR_Help.lua
 Locales\frFR_Legacy.lua
 Locales\frFR_Windows.lua
@@ -42,6 +45,7 @@ Locales\frFR_Minimap.lua
 Locales\esES.lua
 Locales\esES_Colors.lua
 Locales\esES_WhatsNew.lua
+Locales\esES_WhatsNewEarly.lua
 Locales\esES_Help.lua
 Locales\esES_Legacy.lua
 Locales\esES_Windows.lua
@@ -50,6 +54,7 @@ Locales\esES_Minimap.lua
 Locales\itIT.lua
 Locales\itIT_Colors.lua
 Locales\itIT_WhatsNew.lua
+Locales\itIT_WhatsNewEarly.lua
 Locales\itIT_Help.lua
 Locales\itIT_Legacy.lua
 Locales\itIT_Windows.lua
