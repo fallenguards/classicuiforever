@@ -77,6 +77,11 @@ end
 
 -- A kind's art frame once made, and the kind up now (What's Training's marble goes on it, Skills/ProfessionsTraining.lua).
 function T.EraHolder(kind) return holders[kind] end
+-- Where a kind's portrait ring ends, from the window's left edge (another addon's title button stands past it).
+function T.RingRight(kind)
+    local spec = KINDS[kind]
+    return spec and spec.x + spec.ring.w or nil
+end
 function T.EraKind() return current end
 
 -- Every kind's art made ahead, out of combat: a page opened in a fight finds it, and its files are loaded before the

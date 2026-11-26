@@ -107,6 +107,27 @@ SizeButton = function(book, trade)
     ns.SetShownIf(sizeButton, (book or trade) and true or false)
 end
 
+-- TradeSkillMaster's "TSM" switch (its 60 x 15 button 30 in from the window's top right) stood over our lock and reset:
+-- it stands at the title bar's left end instead, past the portrait ring. Found by its spot and size, never its code.
+local TSM_W, TSM_H, TSM_X, TSM_Y, TSM_GAP = 60, 15, -30, -4, 6
+local tsmSwitch
+local function IsTSMSwitch(child, frame)
+    local point, rel, relPoint, x, y = child:GetPoint(1)
+    if ns.AnySecret(point, rel, x, y) or point ~= "TOPRIGHT" or (rel ~= nil and rel ~= frame) then return false end
+    return relPoint == "TOPRIGHT" and ns.Near(x, TSM_X, 1) and ns.Near(y, TSM_Y, 1)
+        and ns.Near(child:GetWidth(), TSM_W, 0.5) and ns.Near(child:GetHeight(), TSM_H, 0.5)
+end
+local function FindTSM(child, frame)
+    if not tsmSwitch and IsTSMSwitch(child, frame) then tsmSwitch = child end
+end
+local function KeepTSMLeft(frame, kind)
+    local ring = kind and T.RingRight(kind)
+    if not ring then return end
+    if not tsmSwitch then ns.EachChild(frame, FindTSM, frame) end
+    if tsmSwitch then ns.SetPointIf(tsmSwitch, "TOPLEFT", frame, "TOPLEFT", ring + TSM_GAP, TSM_Y) end
+end
+T.KeepTSMLeft = KeepTSMLeft
+
 -- Turn back to the book piece by piece: calling the window's own code would taint it.
 local function BackToBook()
     local frame, page = ProfessionsFrame, Page()
@@ -531,6 +552,7 @@ local function WatchTick(self, elapsed)
     local trade = ns.tradeDual.On() and "tradeDual" or "trade"
     if active then T.PrepareEraFrames() end
     T.EraFrame(bookUp and "book" or craftUp and trade or nil)
+    if craftUp then KeepTSMLeft(frame, trade) end
     T.Zoom(T.Big() and not craftUp)
     if bookUp or craftUp then ns.ProfessionPortrait(bookUp) end
     T.SyncBookPads()
